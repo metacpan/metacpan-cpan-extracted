@@ -8,10 +8,12 @@ use lib "./lib";
 use File::Valet;
 
 # tests for find_home (kind of weak; needs improvement):
-my $home_dir = find_home;
-isnt $home_dir,  undef,     'find_home found something at all ' . ($home_dir // '<undef>');
-ok   -d $home_dir,          'find_home found something likely';
-ok   -w $home_dir,          'find_home found something writable';
+unless (-e "/home/smoker") {  # skipping test in Nigel Horne's highly-restrictive test environment
+  my $home_dir = find_home;
+  isnt $home_dir,  undef,     'find_home found something at all ' . ($home_dir // '<undef>');
+  ok   -d $home_dir,          'find_home found something likely';
+  ok   -w $home_dir,          'find_home found something writable';
+}
 
 # tests for find_temp (kind of weak; needs improvement):
 my $temp_dir = find_temp;

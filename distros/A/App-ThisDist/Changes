@@ -1,3 +1,14 @@
+0.007   2020-10-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --extract-version (-V) to extract version.
+
+
+0.006   2020-10-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Extract distribution name from {META,MYMETA}.{json,yml},
+	  Makefile{,.PL}, Build.PL.
+
+
 0.005   2020-10-03  Released-By: PERLANCAR; Urgency: medium
 
 	- [internal] Move logic to this_dist() function in App::ThisDist

@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-03'; # DATE
+our $DATE = '2020-10-11'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,10 +12,17 @@ use Log::ger::Screen;
 
 use App::ThisDist 'this_dist';
 use Cwd;
+use Getopt::Long;
+
+my ($quiet, $extract_version);
+Getopt::Long::Configure("bundling", "no_ignore_case");
+GetOptions(
+    "quiet|q" => \$quiet,
+    "extract-version|V" => \$extract_version,
+);
 
 my $cwd = getcwd();
-my $dist = this_dist($cwd);
-my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
+my $dist = this_dist($cwd, $extract_version);
 
 if (defined $dist) {
     print $dist, "\n";
@@ -42,7 +49,7 @@ this-dist - Return name of Perl distribution associated with the current directo
 
 =head1 VERSION
 
-This document describes version 0.005 of this-dist (from Perl distribution App-ThisDist), released on 2020-10-03.
+This document describes version 0.007 of this-dist (from Perl distribution App-ThisDist), released on 2020-10-11.
 
 =head1 SYNOPSIS
 
@@ -66,6 +73,10 @@ This document describes version 0.005 of this-dist (from Perl distribution App-T
  % this-dist -q
  % _
 
+ # Also try to extract version
+ % this-dist -V
+ Foo-Bar 1.23
+
 Some recipes:
 
  # Show metacpan distribution page in browser (requires L<lcpan> from L<App::lcpan>)
@@ -77,6 +88,10 @@ This script tries these methods when guessing Perl distribution name associated
 with current directory:
 
 =over
+
+=item * Distribution metadata {MYMETA,META}.{json,yml}
+
+=item * Makefile.PL, Makefile, Build.PL
 
 =item * Name in F<dist.ini> (L<Dist::Zilla> configuration file), if the file is available
 

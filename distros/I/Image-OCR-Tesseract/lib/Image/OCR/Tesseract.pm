@@ -7,7 +7,7 @@ use Exporter;
 use vars qw(@EXPORT_OK @ISA $VERSION $DEBUG $WHICH_TESSERACT $WHICH_CONVERT %EXPORT_TAGS @TRASH);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(get_ocr _tesseract convert_8bpp_tif tesseract);
-$VERSION = sprintf "%d.%02d", q$Revision: 1.24 $ =~ /(\d+)/g;
+$VERSION = '1.26';
 %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 
@@ -67,7 +67,26 @@ sub convert_8bpp_tif {
 
    $abs_out ||= $abs_img.'.tmp.'.time().(int rand(9000)).'.tif';
    
-   my @arg = ( $WHICH_CONVERT, $abs_img, '-compress','none','+matte', $abs_out );
+   # WAS failing for a lot of people:
+   #my @arg = ( 
+   #   $WHICH_CONVERT, 
+   #   $abs_img, 
+   #   '-compress','none',
+   #   '+matte', 
+   #   $abs_out );
+
+   my @arg = (
+      $WHICH_CONVERT,
+       , $abs_img,
+       , qw/-density 300/,
+       , qw/-compress none/,
+       , qw/-depth 8/,
+       , qw/-background white/,
+       , qw/-alpha Off/,
+       , $abs_out
+   );
+
+
    system(@arg) == 0 or die("convert $abs_img error.. $?");
 
    $DEBUG and warn("made $abs_out 8bpp tiff.");

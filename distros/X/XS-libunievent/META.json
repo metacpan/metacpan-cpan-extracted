@@ -25,34 +25,35 @@
       },
       "configure" : {
          "requires" : {
+            "Alien::cmake3" : "0",
             "Export::XS" : "v3.0.5",
-            "Net::SockAddr" : "v1.0.2",
+            "Net::SockAddr" : "v1.0.4",
             "Test::Catch" : "v1.0.13",
             "XS::Framework" : "v1.3.2",
-            "XS::Install" : "v1.2.19",
+            "XS::Install" : "v1.2.20",
             "XS::libcares" : "v1.16.1.0",
             "XS::libcatch" : "v2.12.1",
-            "XS::libpanda" : "v1.4.8",
-            "XS::libuv" : "v1.35.0.2",
+            "XS::libpanda" : "v1.4.9",
+            "XS::libuv" : "v1.35.0.4",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
             "Export::XS" : "v3.0.5",
-            "Net::SockAddr" : "v1.0.2",
+            "Net::SockAddr" : "v1.0.4",
             "XS::Framework" : "v1.3.2",
-            "XS::Install" : "v1.2.19",
+            "XS::Install" : "v1.2.20",
             "XS::libcares" : "v1.16.1.0",
-            "XS::libpanda" : "v1.4.8",
-            "XS::libuv" : "v1.35.0.2",
+            "XS::libpanda" : "v1.4.9",
+            "XS::libuv" : "v1.35.0.4",
             "next::XS" : "v1.0.7"
          }
       },
       "test" : {
          "requires" : {
             "Export::XS" : "v3.0.5",
-            "Net::SockAddr" : "v1.0.2",
+            "Net::SockAddr" : "v1.0.4",
             "Test::Catch" : "v1.0.13",
             "Test::Deep" : "0",
             "Test::More" : "0",
@@ -60,13 +61,13 @@
             "XS::Framework" : "v1.3.2",
             "XS::libcares" : "v1.16.1.0",
             "XS::libcatch" : "v2.12.1",
-            "XS::libpanda" : "v1.4.8",
-            "XS::libuv" : "v1.35.0.2",
+            "XS::libpanda" : "v1.4.9",
+            "XS::libuv" : "v1.35.0.4",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

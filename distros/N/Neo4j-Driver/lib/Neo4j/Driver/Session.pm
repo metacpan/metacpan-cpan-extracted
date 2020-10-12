@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.16';
+$Neo4j::Driver::Session::VERSION = '0.17';
 
 use URI 1.25;
 
@@ -49,7 +49,7 @@ sub close {
 sub server {
 	my ($self) = @_;
 	
-	return $self->{transport}->server_info;
+	return $self->{transport}->{server_info};
 }
 
 
@@ -67,7 +67,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -125,6 +125,14 @@ commit the transaction.
  $result = $transaction->run('...');
  $transaction->commit;
 
+=head2 server
+
+ $address = $summary->server->address;
+ $version = $summary->server->version;
+
+Obtain the L<ServerInfo|Neo4j::Driver::ServerInfo>, consisting of
+the host, port and Neo4j version.
+
 =head1 EXPERIMENTAL FEATURES
 
 L<Neo4j::Driver::Session> implements the following experimental
@@ -139,22 +147,6 @@ these features.
 
 The C<run> method tries to Do What You Mean if called in list
 context.
-
-=head2 ServerInfo
-
- $host_port = $session->server->address;
- $version_string = $session->server->version;
- say "Contacting $version_string at $host_port.";
-
-For security reasons, L<ResultSummary|Neo4j::Driver::ResultSummary>
-cannot provide C<ServerInfo>. Therefore, C<ServerInfo> is available
-from the L<Session|Neo4j::Driver::Session> instead.
-
-In future, an extra server round-trip I<just> to obtain the Neo4j
-version number might be a way to get around this restriction and
-offer the C<ServerInfo> strings through
-L<ResultSummary|Neo4j::Driver::ResultSummary> after all. However,
-I'm really not sure if the ensuing performance penalty is worth it.
 
 =head2 Concurrent explicit transactions
 
@@ -187,6 +179,7 @@ L<Transaction|Neo4j::Driver::Transaction> objects internally hold
 references to the authentication credentials used to contact the
 Neo4j server. Objects of these classes should therefore not be
 passed to untrusted modules. However, objects of the
+L<ServerInfo|Neo4j::Driver::ServerInfo> class and the
 L<StatementResult|Neo4j::Driver::StatementResult> class do not
 contain a reference to these credentials and are safe in this
 regard.
@@ -198,6 +191,7 @@ regard.
 =item * L<Neo4j::Driver>
 
 =item * L<Neo4j::Driver::B<Transaction>>,
+L<Neo4j::Driver::B<ServerInfo>>,
 L<Neo4j::Driver::B<StatementResult>>
 
 =item * Equivalent documentation for the official Neo4j drivers:

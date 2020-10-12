@@ -59,6 +59,7 @@ Files: README
  lib/Zydeco/Manual/09_Parameterizable.pod
  lib/Zydeco/Manual/10_BeyondZydeco.pod
  t/01basic.t
+ t/70symmethods.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

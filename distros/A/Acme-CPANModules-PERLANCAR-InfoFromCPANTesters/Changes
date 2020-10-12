@@ -1,0 +1,11 @@
+0.002   2020-10-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Rebuild with updated POD::Weaver::Plugin::Acme::CPANModules
+          (0.005) to tweak generated POD.
+
+
+0.001   2020-10-10  Released-By: PERLANCAR
+
+        - First release.

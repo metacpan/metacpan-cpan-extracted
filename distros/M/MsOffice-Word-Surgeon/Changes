@@ -1,8 +1,10 @@
 Revision history for MsOffice-Word-Surgeon
 
+1.02     12.10.2020
+  - fix bug in ->replace(): tabs or other contents outside of <w:t> was lost during replacement
+
 1.01     03.07.2020     
   - fix bug in "unlink_fields" : field boundaries ("begin" / "separate" / "end" ) may contain child nodes
-
 
 1.0      24.11.2019
   - First public release

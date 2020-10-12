@@ -4,7 +4,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 # VERSION
 
-version v0.1.6
+version v0.2.0
 
 # SYNOPSIS
 
@@ -74,6 +74,12 @@ You can specify the following `%opts`:
     will not be performed.
 
     It is optional.
+
+Alternatively, you can pass in a Plack environment:
+
+```perl
+my $result = $rv->validate($env);
+```
 
 # KNOWN ISSUES
 

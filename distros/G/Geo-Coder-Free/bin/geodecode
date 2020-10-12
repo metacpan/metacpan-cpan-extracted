@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use autodie qw(:all);
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+eval {
+	doit();
+};
+die $@ if $@;
+
+sub doit
+{
+	print "Test 1 - White House\n";
+	system("perl $Bin/../lib/Geo/Coder/Free.pm 1600 Pennsylvania Avenue NW, Washington DC, USA");
+}

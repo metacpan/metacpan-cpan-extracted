@@ -1,10 +1,10 @@
 {
-   "abstract" : "Verify dependencies in META.yml or cpanfile",
+   "abstract" : "Verify dependencies in META.yml, META.json or cpanfile",
    "author" : [
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -73,7 +73,7 @@
          "web" : "https://github.com/ehuelsmann/perl-Test-Dependencies"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_contributors" : [
       "Kent Fredric <kentfredric@gmail.com>",
       "Nick Morrott <knowledgejunkie@gmail.com>"

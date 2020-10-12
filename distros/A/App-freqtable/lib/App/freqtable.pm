@@ -1,6 +1,9 @@
 package App::freqtable;
 
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-11'; # DATE
+our $DIST = 'App-freqtable'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Print frequency table of lines/words/characters/bytes/numbers
@@ -17,7 +20,7 @@ App::freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.002 of App::freqtable (from Perl distribution App-freqtable), released on 2018-11-12.
+This document describes version 0.003 of App::freqtable (from Perl distribution App-freqtable), released on 2020-10-11.
 
 =head1 SYNOPSIS
 
@@ -39,13 +42,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<wordstat> from L<App::wordstat>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

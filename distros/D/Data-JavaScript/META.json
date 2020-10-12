@@ -1,0 +1,67 @@
+{
+   "abstract" : "Dump perl data structures into JavaScript code",
+   "author" : [
+      "Michael Stemle, Jr. <mstemle@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-JavaScript",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "B::Debug" : "0",
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Coveralls" : "0",
+            "FindBin" : "0",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manchicken/data-javascript/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/manchicken/data-javascript"
+      }
+   },
+   "version" : "1.14",
+   "x_contributors" : [
+      "Jerrad Pierce <jpierce@cpan.org>",
+      "Ariel Brosh <schop cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -1,0 +1,60 @@
+{
+   "abstract" : "A lightweight base class for checked get/set property accessors",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-NamedParms",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::NamedParms" : {
+         "file" : "lib/Class/NamedParms.pm",
+         "version" : "1.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-Class-NamedParms/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-Class-NamedParms",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-Class-NamedParms.git",
+         "web" : "https://github.com/JerilynFranz/perl-Class-NamedParms"
+      }
+   },
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -1,2 +1,5 @@
+2.50 2020-10-11
+- fix bad logger default
+
 2.49 2020-09-27
 - separated out of GraphViz2 2.48

@@ -14,28 +14,11 @@
         use GraphViz2;
         use GraphViz2::Parse::ISA;
 
-        use Log::Handler;
-
-        # ------------------------------------------------
-
-        my($logger) = Log::Handler -> new;
-
-        $logger -> add
-                (
-                 screen =>
-                 {
-                         maxlevel       => 'debug',
-                         message_layout => '%m',
-                         minlevel       => 'error',
-                 }
-                );
-
         my($graph) = GraphViz2 -> new
                 (
                  edge   => {color => 'grey'},
                  global => {directed => 1},
                  graph  => {rankdir => 'BT'},
-                 logger => $logger,
                  node   => {color => 'blue', shape => 'Mrecord'},
                 );
         my($parser) = GraphViz2::Parse::ISA -> new(graph => $graph);
@@ -73,9 +56,9 @@ Key-value pairs accepted in the parameter list:
 
     This option specifies the GraphViz2 object to use. This allows you to configure it as desired.
 
-    The default is GraphViz2 -> new. The default attributes are the same as
-    in the synopsis, above, except for the logger of course, which defaults to
-    ''. The default for [GraphViz2::Parse::ISA](https://metacpan.org/pod/GraphViz2::Parse::ISA) is to plot from the bottom to
+    The default is GraphViz2->new. The default attributes are the same as
+    in the synopsis, above.
+    The default for [GraphViz2::Parse::ISA](https://metacpan.org/pod/GraphViz2::Parse::ISA) is to plot from the bottom to
     the top (Grandchild to Parent).  This is the opposite of [GraphViz2](https://metacpan.org/pod/GraphViz2).
 
     This key is optional.

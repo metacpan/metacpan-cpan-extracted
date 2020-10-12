@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -143,29 +143,26 @@ sub new {
     $profile->set_value( 'browser.reader.detectedFirstArticle', 'true',  0 );
     $profile->set_value( 'browser.shell.checkDefaultBrowser',   'false', 0 );
     $profile->set_value( 'browser.showQuitWarning',             'false', 0 );
-    $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
+    $profile->set_value( 'browser.startup.homepage', 'about:blank',      1 );
     $profile->set_value( 'browser.startup.homepage_override.mstone',
         'ignore', 1 );
     $profile->set_value( 'browser.startup.page',                 '0',      0 );
     $profile->set_value( 'browser.tabs.warnOnClose',             'false',  0 );
     $profile->set_value( 'browser.warnOnQuit',                   'false',  0 );
+    $profile->set_value( 'datareporting.policy.firstRunURL',     q[],      1 );
     $profile->set_value( 'devtools.jsonview.enabled',            'false',  0 );
     $profile->set_value( 'devtools.netmonitor.persistlog',       'true',   0 );
     $profile->set_value( 'devtools.toolbox.host',                'window', 1 );
     $profile->set_value( 'dom.disable_open_click_delay',         0,        0 );
     $profile->set_value( 'extensions.installDistroAddons',       'false',  0 );
-    $profile->set_value( 'extensions.update.notifyUser',         'false',  0 );
-    $profile->set_value( 'extensions.update.enabled',            'false',  0 );
-    $profile->set_value( 'extensions.update.notifyUser',         'false',  0 );
     $profile->set_value( 'focusmanager.testmode',                'true',   0 );
-    $profile->set_value( 'general.useragent.updates.enabled',    'false',  0 );
     $profile->set_value( 'marionette.port',                      _ANY_PORT() );
-    $profile->set_value( 'media.gmp-gmpopenh264.autoupdate',     'false',  0 );
-    $profile->set_value( 'network.http.prompt-temp-redirect',    'false',  0 );
-    $profile->set_value( 'network.http.request.max-start-delay', '0',      0 );
-    $profile->set_value( 'signon.autofillForms',                 'false',  0 );
-    $profile->set_value( 'signon.rememberSignons',               'false',  0 );
-    $profile->set_value( 'startup.homepage_welcome_url', 'about:blank', 1 );
+    $profile->set_value( 'network.http.prompt-temp-redirect',    'false', 0 );
+    $profile->set_value( 'network.http.request.max-start-delay', '0',     0 );
+    $profile->set_value( 'security.osclientcerts.autoload',      'true',  0 );
+    $profile->set_value( 'signon.autofillForms',                 'false', 0 );
+    $profile->set_value( 'signon.rememberSignons',               'false', 0 );
+    $profile->set_value( 'startup.homepage_welcome_url', 'about:blank',   1 );
     $profile->set_value( 'startup.homepage_welcome_url.additional',
         'about:blank', 1 );
 
@@ -178,18 +175,19 @@ sub new {
         $profile->set_value( 'network.prefetch-next', 'false', 0 );
     }
     if ( !$parameters{chatty} ) {
-        $profile->set_value( 'app.normandy.enabled',        'false',   0 );
-        $profile->set_value( 'app.update.auto',             'false',   0 );
-        $profile->set_value( 'app.update.doorhanger',       'false',   0 );
-        $profile->set_value( 'app.update.enabled',          'false',   0 );
-        $profile->set_value( 'app.update.checkInstallTime', 'false',   0 );
-        $profile->set_value( 'app.update.idletime',         '1314000', 0 );
+        $profile->set_value( 'app.normandy.enabled',          'false',   0 );
+        $profile->set_value( 'app.update.auto',               'false',   0 );
+        $profile->set_value( 'app.update.doorhanger',         'false',   0 );
+        $profile->set_value( 'app.update.enabled',            'false',   0 );
+        $profile->set_value( 'app.update.checkInstallTime',   'false',   0 );
+        $profile->set_value( 'app.update.disabledForTesting', 'true',    0 );
+        $profile->set_value( 'app.update.idletime',           '1314000', 0 );
         $profile->set_value(
             'app.update.lastUpdateDate.background-update-timer',
             time, 0 );
-        $profile->set_value( 'app.update.staging.enabled', 'false',     0 );
-        $profile->set_value( 'app.update.timer',           '131400000', 0 );
-        $profile->set_value( 'beacon.enabled',             'false',     0 );
+        $profile->set_value( 'app.update.staging.enabled', 'false',      0 );
+        $profile->set_value( 'app.update.timer',           '131400000',  0 );
+        $profile->set_value( 'beacon.enabled',             'false',      0 );
         $profile->set_value( 'browser.aboutHomeSnippets.updateUrl', q[], 1 );
         $profile->set_value( 'browser.beacon.enabled',          'false', 0 );
         $profile->set_value( 'browser.casting.enabled',         'false', 0 );
@@ -260,10 +258,14 @@ sub new {
         $profile->set_value( 'extensions.getAddons.cache.enabled', 'false', 0 );
         $profile->set_value( 'extensions.update.autoUpdateDefault', 'false',
             0 );
-        $profile->set_value( 'geo.enabled',                   'false', 0 );
-        $profile->set_value( 'geo.provider.testing',          'true',  0 );
-        $profile->set_value( 'geo.wifi.scan',                 'false', 0 );
-        $profile->set_value( 'media.gmp-gmpopenh264.enabled', 'false', 0 );
+        $profile->set_value( 'extensions.update.enabled',         'false', 0 );
+        $profile->set_value( 'extensions.update.notifyUser',      'false', 0 );
+        $profile->set_value( 'general.useragent.updates.enabled', 'false', 0 );
+        $profile->set_value( 'geo.enabled',                       'false', 0 );
+        $profile->set_value( 'geo.provider.testing',              'true',  0 );
+        $profile->set_value( 'geo.wifi.scan',                     'false', 0 );
+        $profile->set_value( 'media.gmp-gmpopenh264.autoupdate',  'false', 0 );
+        $profile->set_value( 'media.gmp-gmpopenh264.enabled',     'false', 0 );
         $profile->set_value( 'media.gmp-manager.cert.checkAttributes',
             'false', 0 );
         $profile->set_value( 'media.gmp-manager.cert.requireBuiltIn',
@@ -296,6 +298,7 @@ sub new {
 'services.sync.prefs.sync.privacy.trackingprotection.pbmode.enabled',
             'false', 0
         );
+        $profile->set_value( 'signon.rememberSignons',    'false', 0 );
         $profile->set_value( 'toolkit.telemetry.enabled', 'false', 0 );
         $profile->set_value( 'toolkit.telemetry.reportingpolicy.firstRun',
             'false', 0 );
@@ -307,9 +310,6 @@ sub new {
 sub download_directory {
     my ( $self, $new ) = @_;
     my $old;
-    if ( $OSNAME eq 'cygwin' ) {
-        $new = Firefox::Marionette->execute( 'cygpath', '-s', '-w', $new );
-    }
     $self->set_value( 'browser.download.downloadDir',   $new, 1 );
     $self->set_value( 'browser.download.dir',           $new, 1 );
     $self->set_value( 'browser.download.lastDir',       $new, 1 );
@@ -422,7 +422,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.98
+Version 0.99
 
 =head1 SYNOPSIS
 
@@ -562,7 +562,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2020, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

@@ -75,6 +75,19 @@ sub driver_no_auth {
 }
 
 
+# returns a transaction not connected to a server
+# (convenience for unit tests)
+sub transaction_unconnected {
+	my (undef, $driver) = @_;
+	
+	$driver //= Neo4j::Driver->new;
+	my $transport = Neo4j::Driver::Transport::HTTP->new( $driver );
+	my $session = Neo4j::Driver::Session->new( $transport );
+	my $transaction = Neo4j::Driver::Transaction->new( $session );
+	return $transaction;
+}
+
+
 # used for the ResultSummary/ServerInfo test
 sub server_address {
 	return 'localhost:7474' unless $ENV{TEST_NEO4J_SERVER};

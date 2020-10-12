@@ -1,0 +1,337 @@
+NAME
+    Sub::SymMethod - symbiotic methods; methods that act a little like BUILD
+    and DEMOLISH
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use feature 'say';
+  
+      {
+        package Local::Base;
+        use Class::Tiny;
+        use Sub::SymMethod;
+    
+        symmethod foo => sub { say __PACKAGE__ };
+      }
+  
+      {
+        package Local::Role;
+        use Role::Tiny;
+        use Sub::SymMethod;
+    
+        symmethod foo => sub { say __PACKAGE__ };
+      }
+  
+      {
+        package Local::Derived;
+        use parent -norequire, 'Local::Base';
+        use Role::Tiny::With; with 'Local::Role';
+        use Sub::SymMethod;
+    
+        symmethod foo => sub { say __PACKAGE__ };
+      }
+  
+      'Local::Derived'->foo();
+      # Local::Base
+      # Local::Role
+      # Local::Derived
+
+DESCRIPTION
+    Sub::SymMethod creates hierarchies of methods so that when you call one,
+    all the methods in the inheritance chain (including ones defined in roles)
+    are invoked.
+
+    They are invoked from the most basal class to the most derived class.
+    Methods defined in roles are invoked before methods defined in the class
+    they were composed into.
+
+    This is similar to how the `BUILD` and `DEMOLISH` methods are invoked in
+    Moo, Moose, and Mouse. (You should *not* use this module to define `BUILD`
+    and `DEMOLISH` methods though, as Moo/Moose/Mouse already includes all the
+    plumbing to ensure that they are called correctly. This module is instead
+    intended to allow you to define your own methods which behave similarly.)
+
+    You can think of "symmethod" as being short for "symbiotic method",
+    "syncretic method", or "synarchy of methods".
+
+    If you are familiar with multi methods, you can think of a symmethod as a
+    multi method where instead of picking one "winning" candidate to dispatch
+    to, the dispatcher dispatches to as many candidates as it can find!
+
+  Use Cases
+    Symmethods are useful for "hooks". For example, the following pseudocode:
+
+      class Message {
+        method send () {
+          $self->on_send();
+          $self->do_smtp_stuff();
+        }
+    
+        symmethod on_send () {
+          # do nothing
+        }
+      }
+  
+      role LoggedMessage {
+        symmethod on_send () {
+          print STDERR "Sending message\n";
+        }
+      }
+  
+      class ImportantMessage {
+        extends Message;
+        with LoggedMessage;
+    
+        symmethod on_send () {
+          $self->add_to_archive( "Important" );
+        }
+      }
+
+    When the `send` method gets called on an ImportantMessage object, the
+    inherited `send` method from Message will get invoked. This will call
+    `on_send`, which will call every `on_send` definition in the inheritance
+    hierarchy for ImportantMessage, ensuring the sending of the important
+    message gets logged to STDERR and the message gets archived.
+
+  Functions
+    Sub::SymMethod exports one function, but which may be called in two
+    different ways.
+
+    `symmethod $name => $coderef`
+        Creates a symmethod.
+
+    `symmethod $name => %spec`
+        Creates a symmethod.
+
+        The specification hash must contain a `code` key, and may contain
+        `signature`, `named`, and `method` keys, which work the same as in
+        Sub::MultiMethod. It may also include an `order` key.
+
+  Invoking Symmethods
+    Given the following pseudocode:
+
+      class Base {
+        symmethod foo () {
+          say wantarray ? "List context" : "Scalar context";
+          return "BASE";
+        }
+      }
+  
+      class Derived {
+        extends Base;
+    
+        symmethod foo () {
+          say wantarray ? "List context" : "Scalar context";
+          return "DERIVED";
+        }
+      }
+  
+      my @r = Derived->foo();
+      my $r = Derived->foo();
+
+    "Scalar context" will be said four times. Symmethods are always invoked in
+    scalar context even when they have been called in list context!
+
+    The @r array will be `( "BASE", "DERIVED" )`. When a symmethod is called
+    in list context, a list of the returned values will be returned.
+
+    The variable $r will be 2. It is the count of the returned values.
+
+    If a symmethod throws an exception this will not be caught, so any further
+    symmethods waiting to be invoked will not get invoked.
+
+   Invocation Order
+    It is possible to force a symmethod to run early by setting `order` to a
+    negative number.
+
+      symmethod foo => (
+        order => -100,
+        code  => sub { my $self = shift; ... },
+      );
+
+    It is possible to force a symmethod to run late by setting order to a
+    positive number.
+
+      symmethod foo => (
+        order => 100,
+        code  => sub { my $self = shift; ... },
+      );
+
+    The default `order` is 0 for all symmethods, and in most cases this will
+    be fine.
+
+    Where symmethods have the same order (the usual case!) symmethods are
+    invoked from most basal class to most derived class -- i.e. from parent to
+    child. Where a class consumes symmethods from roles, a symmethods defined
+    in a role will be invoked before a symmethod defined in the class, but
+    after any inherited from base/parent classes.
+
+  Symmethods and Signatures
+    When defining symmethods, you can define a signature:
+
+      use Types::Standard 'Num';
+      use Sub::SymMethod;
+  
+      symmethod foo => (
+        signature => [ Num ],
+        code      => sub {
+          my ( $self, $num ) = @_;
+          print $num, "\n";
+        },
+      );
+  
+      symmethod foo => (
+        named     => 1,
+        signature => [ mynum => Num ],
+        code      => sub {
+          my ( $self, $arg ) = @_;
+          print $arg->mynum, "\n";
+        },
+      );
+
+    When the symmethod is called, any symmethods where the arguments do not
+    match the signature are simply skipped.
+
+    The invocant ($self or $class or whatever) is *not* included in the
+    signature.
+
+    The coderef given in `code` receives the list of arguments *after* they've
+    been passed through the signature, which may coerce them, etc.
+
+    Instead of an arrayref (which will be treated as a signature using
+    Type::Params `compile` or `compile_named_oo`), you can provide a signature
+    as a coderef. The coderef will be passed a list of argument to the
+    symmethod to be checked. If the arguments are bad, it should throw an
+    exception (which will be caught, and the symmethod will be safely
+    skipped). If the arguments are good, it should return the list of
+    arguments, possibly after some coercion or other processing.
+
+    Using an arrayref signature requires Type::Params to be installed.
+
+  API
+    Sub::SymMethod has an object oriented API for metaprogramming.
+
+    When describing it, we'll borrow the terms *dispatcher* and *candidate*
+    from Sub::MultiMethod. The candidates are the coderefs you gave to
+    Sub::SymMethod -- so there might be a candidate defined in your parent
+    class and a candidate defined in your child class. The dispatcher is the
+    method that Sub::SymMethod creates for you (probably just in the base
+    class, but theoretically perhaps also in the child class) which is
+    responsible for finding the candidates and calling them.
+
+    The Sub::SymMethod API offers the following methods:
+
+    `install_symmethod( $target, $name, %spec )`
+        Installs a candidate method for a class or role.
+
+        $target is the class or role the candidate is being defined for. $name
+        is the name of the method. %spec must include a `code` key and
+        optionally `named`, `signature`, `method`, and `order` keys.
+
+        If $target is a class, this will also install a dispatcher into the
+        class. Passing `no_dispatcher => 1` in the spec will avoid this.
+
+        If $target is a role, this will also install hooks to the role to
+        notify Sub::SymMethod whenever the role gets consumed by a class.
+        Passing `no_hooks => 1` in the spec will avoid this.
+
+        This will also perform any needed cache invalidation.
+
+    `build_dispatcher( $target, $name )`
+        Builds a coderef that could potentially be installed into
+        `*{"$target\::$name"}` to be used as a dispatcher.
+
+    `installer_dispatcher( $target, $name )`
+        Builds a coderef that could potentially be installed into
+        `*{"$target\::$name"}` to be used as a dispatcher, and actually
+        installs it.
+
+        This complains if it notices it's overwriting an existing method which
+        isn't a dispatcher. (It also remembers the coderef being installed is
+        a dispatcher, which can later be checked using `is_dispatcher`.)
+
+    `is_dispatcher( $coderef )`
+        Checks to see if $coderef is a dispatcher.
+
+        Can also be called as `is_dispatcher( $coderef, 0 )` or
+        `is_dispatcher( $coderef, 1 )` to teach it about a coderef.
+
+    `dispatch( $invocant, $name, @args )`
+        Equivalent to calling `$invocant->$name(@args)` except doesn't use the
+        dispatcher installed into the invocant's class, instead building a new
+        dispatcher and using that.
+
+    `install_hooks( $rolename )`
+        Given a role, sets up the required hooks which ensure that when the
+        role is composed with a class, dispatchers will be installed into the
+        class to handle all of the role's symmethods, and Sub::SymMethod will
+        know that the class consumed the role.
+
+        Also performs cache invalidation.
+
+    `get_roles_for_class ( $classname )`
+        Returns an arrayref containing a list of roles the class is known to
+        consume. We only care about roles that define symmethods.
+
+        If you need to manually specify that a class consumes a role, you can
+        push the role name onto the arrayref. This would usually only be
+        necessary if you were using an unsupported role implementation.
+        (Supported role implementations include Role::Tiny, Role::Basic,
+        Moo::Role, Moose::Role, and Mouse::Role.)
+
+    `clear_cache( $name )`
+        Clears all caches associated with any symmethods with a given name.
+        The target class is irrelevent because symmethods can be created in
+        roles which may be consumed by multiple unrelated classes.
+
+    `get_symmethod_names( $target )`
+        For a given class or role, returns a list of the names of symmethods
+        defined directly in that class or role, not considering inheritance
+        and composition.
+
+    `get_symmethods( $target, $name )`
+        For a given class or role and a method name, returns an arrayref of
+        spec hashrefs for that symmethod, not considering inheritance and
+        composition.
+
+        This arrayref can be pushed onto to define more candidates, though
+        this bypasses setting up hooks, installing dispatches, and performing
+        cache invalidation, so `install_symmethod` is generally preferred
+        unless you're doing something unusual.
+
+    `get_all_symmethods( $target, $name )`
+        Like `get_symmethods`, but *does* consider inheritance and
+        composition. Returns the arrayref of the spec hashrefs in the order
+        they will be called when dispatching.
+
+    `compile_signature( \%spec )`
+        When non-coderef signatures are found, this is called to compile them
+        into a coderef. It is a small wrapper around Type::Params. Modifies
+        %spec rather than returning a useful value.
+
+    `_generate_symmethod( $name, \%opts, \%globalopts )`
+        This method is used by `import` to generate a coderef that will be
+        installed into the called as `symmethod`.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod>.
+
+SEE ALSO
+    Sub::MultiMethod, Type::Params, NEXT.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

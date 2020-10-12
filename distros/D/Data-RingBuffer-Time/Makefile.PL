@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
                 web  => "$GIT",
             },
         },
+        dynamic_config => 0,
         x_authority    => "cpan:ZHMYLOVE",
         x_contributors => [], # Feel free to add yourself here ;-)
     },
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Carp'          => '0',
-        'Exporter'      => '0',
+        'Data::RingBuffer'      => '0',
     },
     test => {TESTS => "t/*.t"},
     dist  => {

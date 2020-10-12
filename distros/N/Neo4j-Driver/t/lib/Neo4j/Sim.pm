@@ -44,8 +44,9 @@ sub request {
 		$self->{status} = 204;  # HTTP: No Content
 		return $self;
 	}
+	return $self->GET($url, $headers) if $method eq 'GET';
 	return $self->not_implemented($method, $url) unless $method eq 'POST';
-	return $self->not_found($url) if $url !~ m/^$Neo4j::Driver::Transport::HTTP::SERVICE_ROOT_ENDPOINT/;
+	return $self->not_found($url) if $url !~ m|^/db/data/transaction\b|;
 	
 	my $hash = request_hash($url, $content);
 	my $file = "$path/$hash.json";
@@ -61,10 +62,12 @@ sub request {
 
 sub GET {
 	my ($self, $url, $headers) = @_;
-	if ($url ne $Neo4j::Driver::Transport::HTTP::SERVICE_ROOT_ENDPOINT) {
+	if ($url ne $Neo4j::Driver::Transport::HTTP::DISCOVERY_ENDPOINT) {
 		return $self->not_implemented('GET', $url);
 	}
-	$self->{json} = '{"neo4j_version":"0.0.0 (Neo4j::Sim)"}';
+	my $neo4j_version = '"neo4j_version":"0.0.0 (Neo4j::Sim)"';
+	my $transaction = '"transaction":"/db/data/transaction"';
+	$self->{json} = "{$neo4j_version,$transaction}";
 	$self->{status} = 200;  # HTTP: OK
 	return $self;
 }

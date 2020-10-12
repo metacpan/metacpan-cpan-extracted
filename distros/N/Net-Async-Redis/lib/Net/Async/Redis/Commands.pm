@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.001'; # VERSION
+our $VERSION = '3.002'; # VERSION
 
 =head1 NAME
 
@@ -118,6 +118,7 @@ our %KEY_FINDER = (
     'SINTERSTORE' => 2,
     'SISMEMBER' => 1,
     'SMEMBERS' => 1,
+    'SMISMEMBER' => 1,
     'SORT' => 1,
     'SPOP' => 1,
     'SRANDMEMBER' => 1,
@@ -148,8 +149,10 @@ our %KEY_FINDER = (
     'ZCARD' => 1,
     'ZCOUNT' => 1,
     'ZINCRBY' => 1,
+    'ZINTER' => 2,
     'ZINTERSTORE' => 3,
     'ZLEXCOUNT' => 1,
+    'ZMSCORE' => 1,
     'ZPOPMAX' => 1,
     'ZPOPMIN' => 1,
     'ZRANGE' => 1,
@@ -166,6 +169,7 @@ our %KEY_FINDER = (
     'ZREVRANK' => 1,
     'ZSCAN' => 1,
     'ZSCORE' => 1,
+    'ZUNION' => 2,
     'ZUNIONSTORE' => 3,
 );
 
@@ -1984,6 +1988,33 @@ sub pfmerge : method {
 
 =head1 METHODS - List
 
+=head2 blmove
+
+Pop an element from a list, push it to another list and return it; or block until one is available.
+
+=over 4
+
+=item * source
+
+=item * destination
+
+=item * LEFT|RIGHT
+
+=item * LEFT|RIGHT
+
+=item * timeout
+
+=back
+
+L<https://redis.io/commands/blmove>
+
+=cut
+
+sub blmove : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BLMOVE) => @args)
+}
+
 =head2 blpop
 
 Remove and get the first element in a list, or block until one is available.
@@ -2112,6 +2143,31 @@ L<https://redis.io/commands/llen>
 sub llen : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(LLEN) => @args)
+}
+
+=head2 lmove
+
+Pop an element from a list, push it to another list and return it.
+
+=over 4
+
+=item * source
+
+=item * destination
+
+=item * LEFT|RIGHT
+
+=item * LEFT|RIGHT
+
+=back
+
+L<https://redis.io/commands/lmove>
+
+=cut
+
+sub lmove : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(LMOVE) => @args)
 }
 
 =head2 lpop
@@ -3703,6 +3759,27 @@ sub smembers : method {
     $self->execute_command(qw(SMEMBERS) => @args)
 }
 
+=head2 smismember
+
+Returns the membership associated with the given elements for a set.
+
+=over 4
+
+=item * key
+
+=item * member [member ...]
+
+=back
+
+L<https://redis.io/commands/smismember>
+
+=cut
+
+sub smismember : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SMISMEMBER) => @args)
+}
+
 =head2 smove
 
 Move a member from one set to another.
@@ -3908,6 +3985,8 @@ Add one or more members to a sorted set, or update its score if it already exist
 
 =item * [NX|XX]
 
+=item * [GT|LT]
+
 =item * [CH]
 
 =item * [INCR]
@@ -3990,6 +4069,33 @@ sub zincrby : method {
     $self->execute_command(qw(ZINCRBY) => @args)
 }
 
+=head2 zinter
+
+Intersect multiple sorted sets.
+
+=over 4
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * [WEIGHTS weight [weight ...]]
+
+=item * [AGGREGATE SUM|MIN|MAX]
+
+=item * [WITHSCORES]
+
+=back
+
+L<https://redis.io/commands/zinter>
+
+=cut
+
+sub zinter : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZINTER) => @args)
+}
+
 =head2 zinterstore
 
 Intersect multiple sorted sets and store the resulting sorted set in a new key.
@@ -4038,6 +4144,27 @@ L<https://redis.io/commands/zlexcount>
 sub zlexcount : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(ZLEXCOUNT) => @args)
+}
+
+=head2 zmscore
+
+Get the score associated with the given members in a sorted set.
+
+=over 4
+
+=item * key
+
+=item * member [member ...]
+
+=back
+
+L<https://redis.io/commands/zmscore>
+
+=cut
+
+sub zmscore : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZMSCORE) => @args)
 }
 
 =head2 zpopmax
@@ -4414,6 +4541,33 @@ sub zscore : method {
     $self->execute_command(qw(ZSCORE) => @args)
 }
 
+=head2 zunion
+
+Add multiple sorted sets.
+
+=over 4
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * [WEIGHTS weight [weight ...]]
+
+=item * [AGGREGATE SUM|MIN|MAX]
+
+=item * [WITHSCORES]
+
+=back
+
+L<https://redis.io/commands/zunion>
+
+=cut
+
+sub zunion : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZUNION) => @args)
+}
+
 =head2 zunionstore
 
 Add multiple sorted sets and store the resulting sorted set in a new key.
@@ -4558,6 +4712,8 @@ Create, destroy, and manage consumer groups.
 =item * [SETID key groupname id-or-$]
 
 =item * [DESTROY key groupname]
+
+=item * [CREATECONSUMER key groupname consumername]
 
 =item * [DELCONSUMER key groupname consumername]
 
@@ -5171,6 +5327,8 @@ Set the string value of a key.
 =item * [EX seconds|PX milliseconds|KEEPTTL]
 
 =item * [NX|XX]
+
+=item * [GET]
 
 =back
 

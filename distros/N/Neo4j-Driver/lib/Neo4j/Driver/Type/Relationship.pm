@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.16';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.17';
 
 sub get {
 	my ($self, $property) = @_;
@@ -72,7 +72,7 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -203,7 +203,7 @@ is returned instead.
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Relationship (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Relationship.html>,
-L<Relationship (Python)|https://neo4j.com/docs/api/python-driver/current/types/graph.html#neo4j.types.graph.Relationship>
+L<Relationship (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#relationship>
 
 =back
 

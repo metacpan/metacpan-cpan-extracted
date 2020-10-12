@@ -11,7 +11,7 @@ use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION);
 BEGIN {
     require Exporter;
     @ISA = qw(Exporter);
-    $VERSION = '1.07';
+    $VERSION = '1.08';
     @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_home find_temp find_bin lockafile unlockafile unlock_all_the_files);
 }
 
@@ -526,12 +526,21 @@ If C<$ENV{TEMPDIR}>, C<$ENV{TEMP}> or C<$ENV{TMP}> are defined, C<find_temp()> w
 
 C<find_temp()> is Windows-savvy enough to check such locations as "C:\Windows\Temp", but might try to open locations on network-mounted drives if it is unable to find a local alternative.
 
+=item B<find_home>
+
+  my $path = find_home();
+  my $path = find_home("/var/home/fred");
+
+Another function intended for easy cross-platform programming, C<find_home()> will first check $ENV{HOME} on *nix or $ENV{HOMEDIRVE} and $ENV{HOMEPATH (on Windows) if defined, then in the system's passwd database, and then in a number of other likely locations, for a writable home directory for the effective user.
+
+It will return the full absolute path of the home directory on success, or undef on failure.
+
 =item B<find_bin>
 
  my $pathname = find_bin("ls");
  my $pathname = find_bin("ls", "/home/ttk/bin", "/opt/bin", ...);
 
-Another function intended for easy cross-platform programming, C<find_bin()> will first check all of the directories in $ENV{PATH} (if defined), and then in number of other likely, common locations, for an executable file whose name matches the first parameter.  It will return the full absolute pathname of the executable file on success, or undef on failure.
+Another function intended for easy cross-platform programming, C<find_bin()> will first check all of the directories in $ENV{PATH} (if defined), and then in a number of other likely, common locations, for an executable file whose name matches the first parameter.  It will return the full absolute pathname of the executable file on success, or undef on failure.
 
 C<find_bin()> is Windows-savvy, albeit does not search Windows systems as extensively as others.
 
@@ -628,6 +637,8 @@ L<NL::File::Lock|https://metacpan.org/pod/NL::File::Lock> - file locker with tim
 L<File::Lock::Multi|https://metacpan.org/pod/File::Lock::Multi> - file locker with support for nested locks.
 
 L<File::TinyLock|https://metacpan.org/pod/File::TinyLock> - a very easy to use file locker.
+
+L<Data::Munge|https://metacpan.org/pod/Data::Munge> - a gaggle of useful functions, including a simple slurp().
 
 =back
 

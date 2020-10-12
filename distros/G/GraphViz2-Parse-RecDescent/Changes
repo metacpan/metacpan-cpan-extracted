@@ -1,3 +1,6 @@
+2.51 2020-10-11
+- zap pointless logger attribute
+
 2.50 2020-10-04
 - fix test to not need File::Slurp
 

@@ -5,10 +5,10 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.16';
+$Neo4j::Driver::Record::VERSION = '0.17';
 
 use Carp qw(croak);
-use JSON::MaybeXS 1.002004 qw(is_bool);
+use JSON::MaybeXS 1.003003 qw(is_bool);
 
 use Neo4j::Driver::ResultSummary;
 
@@ -95,7 +95,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ index.
 
 When called without parameters, C<get()> will return the first
 field. If there is more than a single field, a warning in the
-category `ambiguous` will be issued.
+category C<ambiguous> will be issued.
 
  $value = $session->run('RETURN "It works!"')->single->get;
  $value = $session->run('RETURN "warning", "ambiguous"')->single->get;

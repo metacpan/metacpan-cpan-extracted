@@ -1,12 +1,12 @@
 package WordList::ID::Common::Wikipedia5000;
 
-our $DATE = '2018-01-01'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-10-11'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("avg_word_len",7.4528,"num_words_contains_nonword_chars",0,"num_words_contains_whitespace",0,"num_words_contains_unicode",0,"shortest_word_len",2,"longest_word_len",18,"num_words",5000); # STATS
+our %STATS = ("num_words_contains_whitespace",0,"num_words_contains_nonword_chars",0,"avg_word_len",7.4528,"longest_word_len",18,"num_words_contains_unicode",0,"num_words_contain_unicode",0,"num_words_contain_whitespace",0,"shortest_word_len",2,"num_words_contain_nonword_chars",0,"num_words",5000); # STATS
 
 1;
 # ABSTRACT: Top 5000 words from Wikipedia Indonesia pages
@@ -21,7 +21,7 @@ WordList::ID::Common::Wikipedia5000 - Top 5000 words from Wikipedia Indonesia pa
 
 =head1 VERSION
 
-This document describes version 0.004 of WordList::ID::Common::Wikipedia5000 (from Perl distribution WordLists-ID-Common), released on 2018-01-01.
+This document describes version 0.006 of WordList::ID::Common::Wikipedia5000 (from Perl distribution WordLists-ID-Common), released on 2020-10-11.
 
 =head1 SYNOPSIS
 
@@ -38,6 +38,10 @@ This document describes version 0.004 of WordList::ID::Common::Wikipedia5000 (fr
 
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
+
+ # Iterate
+ my $first_word = $wl->first_word;
+ while (defined(my $word = $wl->next_word)) { ... }
 
  # Get all the words
  my @all_words = $wl->all_words;
@@ -69,7 +73,7 @@ C<work/> directories in the Git repository.
 
 [1] https://id.wikipedia.org/wiki/Wikipedia:Wikipedia_bahasa_Indonesia_versi_luring
 
-=head1 STATISTICS
+=head1 WORDLIST STATISTICS
 
  +----------------------------------+--------+
  | key                              | value  |
@@ -77,6 +81,9 @@ C<work/> directories in the Git repository.
  | avg_word_len                     | 7.4528 |
  | longest_word_len                 | 18     |
  | num_words                        | 5000   |
+ | num_words_contain_nonword_chars  | 0      |
+ | num_words_contain_unicode        | 0      |
+ | num_words_contain_whitespace     | 0      |
  | num_words_contains_nonword_chars | 0      |
  | num_words_contains_unicode       | 0      |
  | num_words_contains_whitespace    | 0      |
@@ -107,7 +114,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

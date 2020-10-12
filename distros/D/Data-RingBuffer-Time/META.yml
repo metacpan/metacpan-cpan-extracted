@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -20,12 +20,12 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Exporter: '0'
+  Data::RingBuffer: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/zhmylove/data-ringbuffer-time/issues
   repository: https://github.com/zhmylove/data-ringbuffer-time.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:ZHMYLOVE
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

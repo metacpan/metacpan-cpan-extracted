@@ -6,7 +6,7 @@ use warnings;
 use Moo;
 use MooX::Types::MooseLike::Base qw/ ArrayRef HashRef Int Str /;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Data::Dump 'dump';
 use Devel::StackTrace;
@@ -61,7 +61,7 @@ Sentry::Raven - A perl sentry client
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =head1 SYNOPSIS
 
@@ -310,8 +310,10 @@ sub _get_frames_from_devel_stacktrace {
 sub _get_lines_from_file {
   my ($self, $abs_path, $lineno) = @_;
 
-  my @lines = read_file($abs_path);
+  my @lines = eval { read_file($abs_path) };
   chomp(@lines);
+  return () unless @lines;
+  return () unless @lines >= $lineno;
   
   my $context_lines = 5;
   my $lower_bound = max(0, $lineno - $context_lines);

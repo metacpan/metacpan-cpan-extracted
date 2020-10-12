@@ -1,5 +1,7 @@
 releases by David Cantrell:
 
+0.41  2020-10-12  Fix build failures with XCode 12
+
 0.40  2019-01-11  MaxMind's GeoLite database has been discontinued,
                     so now only use WIPmania's data
 

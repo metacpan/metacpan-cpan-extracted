@@ -1,3 +1,7 @@
+ 1.03 2020.10.12 - Relicensed under MIT License. Maintainer updated. Build
+                   configs updated. Set min version of Perl to 5.6. Added
+                   'use warnings'. Misc file permissions updated. Added
+                   GitHub repo to metadata.
 
  1.02 2008.05.17 - Permissions fixes for build tools and added more examples
 

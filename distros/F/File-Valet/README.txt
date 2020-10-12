@@ -21,6 +21,9 @@ SYNOPSIS
         # Find a place suited to temporary files:
         my $tmp = find_temp();  # Likely /var/tmp or /tmp or C:\Windows\Temp
 
+        # Find the most likely home directory:
+        my $home = find_home();
+
         # Find the full pathname of an executable:
         my $shell = find_bin('sh');  # Likely /bin/sh
 

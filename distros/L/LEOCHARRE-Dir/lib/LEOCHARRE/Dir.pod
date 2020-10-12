@@ -32,17 +32,18 @@ None are exported by default.
 
 =head2 ls()
 
-Argument is path to dir.
-Returns list array with all files, including dirs files and symlinks, etc.
+Argument is path to directory.
+Returns array of entries.
+With all files, including directories, files and symlinks, etc.
 
 =head2 lsa()
 
-Same as ls(), but paths are absolute.
+Same as ls(), but paths returned are absolute.
 
 =head2 lsf()
 
 Argument is path to dir.
-Returns list array with all files.
+Returns array with all files.
 
 =head2 lsfa()
 
@@ -51,7 +52,7 @@ Same as lsf(), but paths are absolute.
 =head2 lsd()
 
 Argument is path to dir.
-Returns list array with all dirs.
+Returns array with all dirs.
 
 =head2 lsda()
 
@@ -91,9 +92,13 @@ Please contact the AUTHOR.
 
 L<Cwd>
 
+=head1 CAVEATS
+
+Not meant to work under windows environments/cygwin etc.
+
 =head1 AUTHOR
 
-Leo Charre leocharre at cpan dot org
+Leo Charre leocharre at gmail dot com
 
 =head1 LICENSE
 

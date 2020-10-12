@@ -29,7 +29,8 @@ my %params = (
         },
         RECURSIVE_TEST_FILES => 1,
     },
-    LIBS             => [$libs{$^O} // $libs{default}],
+    LIBS               => [$libs{$^O} // $libs{default}],
+    CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},
 );
 
 if ($ENV{SANITIZE}) {

@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
+our $VERSION = '2.50';
+
 use DBIx::Admin::TableInfo;
 
 use GraphViz2;
@@ -16,20 +18,25 @@ has catalog =>
 (
 	default  => sub{return undef},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
 has dbh =>
 (
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 1,
 );
 
 has graph =>
 (
-	default  => sub{return '' },
+	default  => sub {
+		GraphViz2 -> new(
+			edge   => {color => 'grey'},
+			global => {directed => 1},
+			graph  => {rankdir => 'TB'},
+			node   => {color => 'blue', shape => 'oval'},
+		)
+        },
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
@@ -39,7 +46,6 @@ has schema =>
 (
 	default  => sub{return undef},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
@@ -47,7 +53,6 @@ has table =>
 (
 	default  => sub{return '%'},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
@@ -55,7 +60,6 @@ has table_info =>
 (
 	default  => sub{return {} },
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
 
@@ -63,34 +67,8 @@ has type =>
 (
 	default  => sub{return 'TABLE'},
 	is       => 'rw',
-	#isa     => 'GraphViz2',
 	required => 0,
 );
-
-our $VERSION = '2.49';
-
-# -----------------------------------------------
-
-sub BUILD
-{
-	my($self) = @_;
-
-	$self -> graph
-	(
-		$self -> graph ||
-		GraphViz2 -> new
-		(
-			edge   => {color => 'grey'},
-			global => {directed => 1},
-			graph  => {rankdir => 'TB'},
-			logger => '',
-			node   => {color => 'blue', shape => 'oval'},
-		)
-	);
-
-} # End of BUILD.
-
-# -----------------------------------------------
 
 sub create
 {
@@ -442,6 +420,26 @@ The conversion of plural to singular is done with L<Lingua::EN::PluralToSingular
 If this naming convention does not hold, then both the source and destination ports default to '1',
 which is the port of the 1st column (in alphabetical order) in each table. The table name itself is
 port '0'.
+
+=head1 Scripts Shipped with this Module
+
+=head2 scripts/dbi.schema.pl
+
+If the environment vaiables DBI_DSN, DBI_USER and DBI_PASS are set (the latter 2 are optional [e.g. for SQLite]),
+then this demonstrates building a graph from a database schema.
+
+Also, for Postgres, you can set $ENV{DBI_SCHEMA} to a comma-separated list of schemas, e.g. when processing the
+MusicBrainz database. See scripts/dbi.schema.pl.
+
+For details, see L<http://blogs.perl.org/users/ron_savage/2013/03/graphviz2-and-the-dread-musicbrainz-db.html>.
+
+Outputs to ./html/dbi.schema.svg by default.
+
+=head2 scripts/sqlite.foreign.keys.pl
+
+Demonstrates how to find foreign key info by calling SQLite's pragma foreign_key_list.
+
+Outputs to STDOUT.
 
 =head1 Thanks
 

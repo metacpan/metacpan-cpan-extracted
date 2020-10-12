@@ -1,29 +1,33 @@
-BEGIN { $| = 1; print "1..6\n"; }
+#!/usr/bin/env perl
+
+use Modern::Perl;
+
+use Test2::V0;
 
 use Data::JavaScript;
 
+use Readonly;
+Readonly my $NEGATIVE_ONE => -1;
+Readonly my $PI           => 3.14159;
+
 #Test numbers: negative, real, engineering, octal/zipcode
+is join( q//, jsdump( 'ixi', $NEGATIVE_ONE ) ), 'var ixi = -1;', 'Integer -1';
 
-$_ = join('', jsdump('ixi', -1));
-print 'not ' unless $_ eq 'var ixi = -1;';
-print "ok 1 #$_\n";
+is join( q//, jsdump( 'pi', $PI ) ), 'var pi = 3.14159;', 'Pi';
 
-$_ = join('', jsdump('pi', 3.14159));
-print 'not ' unless $_ eq 'var pi = 3.14159;';
-print "ok 2 #$_\n";
+is join( q//, jsdump( 'c', '3E8' ) ), 'var c = "3E8";', 'Scientific notation';
 
-$_ = join('', jsdump('c', '3E8'));
-print 'not ' unless $_ eq 'var c = "3E8";';
-print "ok 3 #$_\n";
+is join( q//, jsdump( 'zipcode', '02139' ) ),
+  'var zipcode = "02139";',
+  'US ZIP code';
 
-$_ = join('', jsdump('zipcode', '02139'));
-print 'not ' unless $_ eq 'var zipcode = "02139";';
-print "ok 4 #$_\n";
+is join( q//, jsdump( 'hex', '0xdeadbeef' ) ),
+  'var hex = "0xdeadbeef";',
+  'Hexadecimal';
 
-$_ = join('', jsdump('hex', '0xdeadbeef'));
-print 'not ' unless $_ eq 'var hex = "0xdeadbeef";';
-print "ok 5 #$_\n";
+## no critic (RequireInterpolationOfMetachars)
+is join( q//, jsdump( 'IEsux', '</script>DoS!' ) ),
+  'var IEsux = "\x3C\x2Fscript\x3EDoS!";',
+  'Entity encoding.';
 
-$_ = join('', jsdump("IEsux", "</script>DoS!"));
-print 'not ' unless $_ eq 'var IEsux = "\x3C\x2Fscript\x3EDoS!";';
-print "ok 6 #$_\n";
+done_testing;

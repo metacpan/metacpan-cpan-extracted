@@ -1,6 +1,6 @@
 package SPVM::Regex {
   use SPVM::Unicode (uchar);
-  use SPVM::ObjectList;
+  use SPVM::List;
   use SPVM::IntList;
   use SPVM::Hash;
   use SPVM::StringBuffer;
@@ -8,7 +8,7 @@ package SPVM::Regex {
   use SPVM::Regex::Pattern;
   use SPVM::Util (is_perl_word, isdigit, strtoi, substr, sliceb, copy_str, INT8_MIN, INT8_MAX, INT16_MIN, INT16_MAX, INT32_MIN, INT32_MAX, INT64_MIN, INT64_MAX, FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX);
 
-  has patterns : SPVM::ObjectList;
+  has patterns : SPVM::List;
   has string_start : int;
   has string_end : int;
   
@@ -30,7 +30,7 @@ package SPVM::Regex {
   sub new : SPVM::Regex ($re_str : string) {
     my $self = new SPVM::Regex;
     
-    $self->{patterns} = SPVM::ObjectList->new;
+    $self->{patterns} = SPVM::List->new;
     
     $self->compile($re_str);
     
@@ -586,7 +586,7 @@ package SPVM::Regex {
     my $result : byte[];
     my $replace_count = 0;
     my $result_buffer = SPVM::StringBuffer->new;
-    my $target_length = length $target;
+    my $tarlength = length $target;
     
     if ($target_base_index > 0) {
       my $first_string = substr($target, 0, $target_base_index);
@@ -637,11 +637,11 @@ package SPVM::Regex {
       my $match_length = $self->match_length;
       my $replace_length = length $replace;
       
-      my $result_length = $target_length + $replace_length - $match_length;
+      my $result_length = $tarlength + $replace_length - $match_length;
       
       $result = new byte[$result_length];
       
-      my $rest_length = $target_length - $match_end;
+      my $rest_length = $tarlength - $match_end;
       
       my $before_result = (string)sliceb((byte[])$target, $target_base_index, $match_start - $target_base_index);
       $result_buffer->push($before_result);
@@ -661,7 +661,7 @@ package SPVM::Regex {
     }
     else {
       my $match_end = $self->match_start + $self->match_length;
-      my $rest_length = $target_length - $match_end;
+      my $rest_length = $tarlength - $match_end;
       my $rest_string = substr($target, $match_end, $rest_length);
       $result_buffer->push($rest_string);
       

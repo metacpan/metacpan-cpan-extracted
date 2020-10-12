@@ -8,8 +8,8 @@ Class::ParmList - Methods for processing named parameter lists
   use Class::ParmList qw(simple_parms parse_parms);
 
  $thingy->some_method({
-      -bgcolor   => '#ff0000',
-      -textcolor => '#000000'
+      bgcolor   => '#ff0000',
+      textcolor => '#000000'
       });
 
  sub some_method {
@@ -19,11 +19,11 @@ Class::ParmList - Methods for processing named parameter lists
 
      my $parms = Class::ParmList->new ({
             -parms    => $parm_ref,
-            -legal    => [qw (-textcolor -border -cellpadding)],
-            -required => [qw (-bgcolor)],
+            -legal    => [qw (textcolor border cellpadding)],
+            -required => [qw (bgcolor)],
             -defaults => {
-                           -bgcolor   => "#ffffff",
-                           -textcolor => "#000000"
+                           bgcolor   => "#ffffff",
+                           textcolor => "#000000"
                          }
          });
 
@@ -38,7 +38,7 @@ Class::ParmList - Methods for processing named parameter lists
 
   sub another_method {
     my $self = shift;
-    my ($name,$rank,$serial_number) = simple_parms([qw(-name -rank -serial_number)], @_);
+    my ($name,$rank,$serial_number) = simple_parms([qw(name rank serial_number)], @_);
 
     #...
   }
@@ -46,11 +46,11 @@ Class::ParmList - Methods for processing named parameter lists
   sub still_another {
      my $parms = parse_parms ({
             -parms    => \@_,
-            -legal    => [qw (-textcolor -border -cellpadding)],
-            -required => [qw (-bgcolor)],
+            -legal    => [qw (textcolor border cellpadding)],
+            -required => [qw (bgcolor)],
             -defaults => {
-                           -bgcolor   => "#ffffff",
-                           -textcolor => "#000000"
+                           bgcolor   => "#ffffff",
+                           textcolor => "#000000"
                          }
          });
      if (not defined $parms) {
@@ -70,33 +70,6 @@ meet any minimum requirements. It also allows the setting of default
 values for the named parameters if omitted.
 
 =cut
-
-=head1 CHANGES
-
- 1.00 1999.06.16 - Initial release
-
- 1.01 1999.06.18 - Performance tweaks
-
- 1.02 1999.06.21 - Fixing of failure to catch undeclared parm,
-                   removal of 'use attrs qw(method)', and
-                   extension of 'make test' support.
-
- 1.03 2000.12.06 - Added exportable class functions 'simple_parms'
-                   and 'parse_parms' and allowed 'stacking' references
-                   for parms to the object to improve calling usage.
-
- 1.04 2005.09.18 - Added META.yml, Build.PL, Artistic_License.txt
-                   GPL_License.txt, LICENSE to distribution. Renamed
-                   CHANGES to Changes. Extended build tests to 100%
-                   coverage. Minor refactoring of module for speed.
-                   Seperated documentation into .pod file.
-                   Added POD/POD Coverage tests.
-
- 1.05 2006.03.04 - Corrected mis-usage of Carp in error paths that
-                   was causing less than useful error messages.
-
-                   Added LICENSE and DISCLAIMER sections to
-                   documentation.
 
 =head1 METHODS
 
@@ -309,24 +282,67 @@ mis-usages and is reasonably fast.
 
 =head1 VERSION
 
-1.05 2006.03.04
+1.06 2020.10.11
+
+=head1 CHANGES
+
+ 1.00 1999.06.15 - Initial release
+
+ 1.01 1999.06.18 - Performance tweaks. Addition of 'make test' support
+
+ 1.02 1999.06.21 - Fixed '-legal' (broken by performance tweaks in 1.01),
+                   removed use of 'use attrs' for portability, extended
+                   'make test' tests.
+
+ 1.03 2000.12.06 - Added exportable class functions 'simple_parms'
+                   and 'parse_parms' and allowed 'stacking' references
+                   for parms to the object to improve calling usage.
+
+ 1.04 2005.09.18 - Added META.yml, Build.PL, Artistic_License.txt
+                   GPL_License.txt, LICENSE to distribution. Renamed
+                   CHANGES to Changes. Extended build tests to 100%
+                   coverage. Minor refactoring of module for speed.
+                   Seperated documentation into .pod file.
+                   Added POD/POD Coverage tests.
+
+ 1.05 2006.03.04 - Corrected mis-usage of Carp in error paths that
+                   was causing less than useful error messages.
+
+                   Added LICENSE and DISCLAIMER sections to
+                   documentation.
+
+ 1.06 2020.10.11 - Relicensed under the MIT License. Cleanup of test reporting.
+                   Updating of build configurations. Addition of GitHub repo
+                   information to meta data. Updating of maintainer information.
+                   Small changes to examples in POD documentation.
 
 =head1 COPYRIGHT
 
-Copyright Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
+Copyright Jerilyn Franz and FreeRun Technologies, Inc. All Rights Reserved.
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it
-and/or modify it under the same terms and conditions as
-Perl itself.
+MIT License
 
-This means that you can, at your option, redistribute it and/or modify it under
-either the terms the GNU Public License (GPL) version 1 or later, or under the
-Perl Artistic License.
+Copyright (c) 2020 Jerilyn Franz and Freerun Technologies, Inc.
 
-See http://dev.perl.org/licenses/
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =head1 DISCLAIMER
 
@@ -348,7 +364,7 @@ POSSIBILITY OF SUCH DAMAGE
 
 =head1 AUTHOR
 
-Benjamin Franz, <snowhare@nihongo.org>
+Jerilyn Franz, <cpan@jerilyn.info>
 
 =head1 BUGS
 

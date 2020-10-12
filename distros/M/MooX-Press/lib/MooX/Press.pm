@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.079';
+our $VERSION   = '0.081';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -44,6 +44,7 @@ my @delete_keys = qw(
 	factory_package_can
 	abstract
 	multimethod
+	symmethod
 	multifactory
 );
 
@@ -228,7 +229,7 @@ sub import {
 		$builder->make_role($pkg->[0], _parent_opts => \%opts, _roles => \@roles, %opts, %{$pkg->[1]});
 	}
 	for my $pkg (@classes) {
-		$builder->make_class($pkg->[0], _parent_opts => \%opts, _roles => \@roles, %opts, %{$pkg->[1]});
+		$builder->make_class($pkg->[0], _parent_opts => \%opts, _classes => \@classes, _roles => \@roles, %opts, %{$pkg->[1]});
 	}
 	
 	if (keys %modifiers) {
@@ -703,6 +704,10 @@ sub _make_package {
 	my @isa = $opts{extends} ? $builder->_expand_isa($opts{prefix}, $opts{extends}) : ();
 	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
 	my $tn = $builder->type_name($qname, $opts{prefix});
+
+	no strict 'refs';
+	no warnings 'once';
+	return if ${"$qname\::BUILT"};
 	
 	$builder->_mark_package_as_loaded(($opts{is_role} ? 'role' : 'class') => $qname, \%opts);
 	
@@ -717,9 +722,6 @@ sub _make_package {
 	}->{lc $opts{toolkit}} || $opts{toolkit};
 	
 	if ($opts{is_role}) {
-		no strict 'refs';
-		no warnings 'once';
-		return if ${"$qname\::BUILT"};
 		use_module("$toolkit\::Role")->import::into($qname);
 		use_module("namespace::autoclean")->import::into($qname);
 	}
@@ -731,6 +733,39 @@ sub _make_package {
 		
 		my $method = "extend_class_" . lc $toolkit;
 		if (@isa) {
+			
+			# Check that each parent class exists
+			PARENT: for my $parent_qname ( @isa ) {
+				no strict 'refs';
+				no warnings 'once';
+				next if ${"$parent_qname\::BUILT"};
+				next if eval { use_module($parent_qname); 1 };
+				
+				# Parent class is not already built by MooX::Press.
+				# Parent class is not loadable.
+				# This is going to be an issue when we try to extend it.
+				
+				my @dfns = @{ $opts{_classes} || [] } or last PARENT;
+				
+				DFN: for my $dfn ( @dfns ) {
+					my ( $dfn_shortname, $dfn_spec ) = @$dfn;
+					my %dfn_spec = %opts;
+					delete $dfn_spec{$_} for @delete_keys;
+					%dfn_spec = ( %dfn_spec, %$dfn_spec );
+					my @dfn_isa = $dfn_spec{extends} ? $builder->_expand_isa($dfn_spec{prefix}, $dfn_spec{extends}) : ();
+					my $dfn_qname = $builder->qualify_name($dfn_shortname, $dfn_spec{prefix}, @dfn_isa);
+					
+					# We have found a saviour!
+					if ($parent_qname eq $dfn_qname) {
+						$builder->make_class(
+							make_absolute_package_name($parent_qname),
+							%dfn_spec,
+						);
+						last DFN;
+					}
+				}
+			}
+			
 			$builder->$method($qname, \@isa);
 		}
 	}
@@ -796,7 +831,7 @@ sub _make_package {
 		require Import::Into;
 		'overload'->import::into($qname, @overloads);
 	}
-
+	
 	if (defined $opts{can}) {
 		my %methods = $opts{can}->$_handle_list_add_nulls;
 		$builder->install_methods($qname, \%methods) if keys %methods;
@@ -819,6 +854,10 @@ sub _make_package {
 	
 	if (defined $opts{has}) {
 		$builder->install_attributes($qname, $opts{has}, \%opts);
+	}
+	
+	if (defined $opts{symmethod}) {
+		$builder->install_symmethods($qname, $opts{symmethod});
 	}
 	
 	if (defined $opts{multimethod}) {
@@ -1025,15 +1064,19 @@ sub patch_package {
 	}
 	
 	if ( my $methods = delete $spec{can} ) {
-		'MooX::Press'->install_methods( $package, $methods );
+		$me->install_methods( $package, $methods );
 	}
 	
 	if ( my $constants = delete $spec{constant} ) {
-		'MooX::Press'->install_constants( $package, $constants );
+		$me->install_constants( $package, $constants );
 	}
 	
 	if ( my $atts = delete $spec{has} ) {
-		'MooX::Press'->install_attributes( $package, $atts );
+		$me->install_attributes( $package, $atts );
+	}
+	
+	if ( my $symm = delete $spec{symmethod} ) {
+		$me->install_symmethods($package, $symm);
 	}
 	
 	if ( my $multimethods = delete $spec{multimethod} ) {
@@ -1066,7 +1109,7 @@ sub patch_package {
 	if ( $kind eq 'class' ) {
 		
 		if ( $fp and my $factory = delete $spec{factory} ) {
-			'MooX::Press'->install_factories( $fp, $package, $factory );
+			$me->install_factories( $fp, $package, $factory );
 		}
 		
 		if ( $fp and my $factory = delete $spec{multifactory} ) {
@@ -1094,7 +1137,7 @@ sub patch_package {
 				push @names, shift @mm;
 			}
 			else {
-				my $coderef = 'MooX::Press'->_prepare_method_modifier( $package, $modifier, [@names], shift(@mm) );
+				my $coderef = $me->_prepare_method_modifier( $package, $modifier, [@names], shift(@mm) );
 				Class::Method::Modifiers::install_modifier( $package, $modifier, @names, $coderef );
 				@names = ();
 			}
@@ -1246,7 +1289,7 @@ sub generate_package {
 	my %opts;
 	for my $key (qw/ extends with has can constant around before after
 		toolkit version authority mutable begin end requires import overload
-		before_apply after_apply multimethod definition_context /) {
+		before_apply after_apply symmethod multimethod definition_context /) {
 		if (exists $local_opts{$key}) {
 			$opts{$key} = delete $local_opts{$key};
 		}
@@ -1638,6 +1681,37 @@ sub extend_class_mouse {
 	(Mouse::Util::find_meta($class) or $class->meta)->superclasses(@$isa);
 }
 
+sub install_symmethods {
+	my $builder = shift;
+	my ($target, $symm) = @_;
+	
+	my @symm = $symm->$_handle_list or return;
+	
+	require Sub::SymMethod;
+	
+	while ( @symm ) {
+		my $name = shift(@symm);
+		my $spec = is_CodeRef($symm[0]) ? { code => shift(@symm) } : shift(@symm);
+		
+		if ( $spec->{signature} ) {
+			my $signature_style = CodeRef->check($spec->{signature})
+				? 'code'
+				: ($spec->{named} ? 'named' : 'positional');
+			my $new_sig = $builder->_build_method_signature_check(
+				$target,
+				$name,
+				$signature_style,
+				$spec->{signature},
+				exists($spec->{signature}) ? $spec->{signature} : 1,
+				1,
+			);
+			$spec->{signature}  = $new_sig;
+		}
+		
+		'Sub::SymMethod'->install_symmethod( $target, $name, %$spec );
+	}
+}
+
 sub install_multimethod {
 	my $builder = shift;
 	my ($target, $kind, $method_name, $method_spec) = @_;
@@ -1698,7 +1772,7 @@ sub install_multimethod {
 	
 	my $_maybe_do_multimethods = sub {
 		my $tk = 'Sub::MultiMethod';
-		if ($tk->can('copy_package_candidates')) {
+		if ($tk->can('copy_package_candidates') and $tk->VERSION lt '0.901') {
 			my ($target, $kind, @sources) = @_;
 			$tk->copy_package_candidates(@sources => $target);
 			$tk->install_missing_dispatchers($target) unless $kind eq 'role';
@@ -2554,6 +2628,11 @@ L<Sub::MultiMethod>.
        },
     ],
   );
+
+=item C<< symmethod >> I<< (ArrayRef) >>
+
+An arrayref of name-spec pairs suitable for passing to
+L<Sub::SymMethod>.
 
 =item C<< multifactory >> I<< (ArrayRef) >>
 

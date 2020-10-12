@@ -32,6 +32,7 @@
       },
       "develop" : {
          "requires" : {
+            "Pod::Markdown" : "0",
             "Test::Pod" : "1.48"
          }
       },
@@ -66,6 +67,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2-DBI"
       }
    },
-   "version" : "2.49",
+   "version" : "2.50",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

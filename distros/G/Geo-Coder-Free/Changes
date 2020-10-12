@@ -1,5 +1,12 @@
 Revision history for Geo-Coder-Free
 
+0.27.1
+	Fix https://github.com/nigelhorne/Geo-Coder-Free/issues/47
+
+0.27	Fri Oct  9 20:44:09 EDT 2020
+	Local.pm: Call _normalize when libpostal is installed
+	Install LWP::Simple and LWP::Protocol::https if needed
+
 0.26	Thu Oct  8 19:47:45 EDT 2020
 	Create the MaxMind database directory to download to
 	Use Geo::Coder::Abbreviations

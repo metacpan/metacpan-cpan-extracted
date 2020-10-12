@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.014"
+            "perl" : "5.020"
          }
       },
       "develop" : {
@@ -37,7 +37,7 @@
          "requires" : {
             "exact" : "0",
             "exact::class" : "0",
-            "perl" : "5.014"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -52,7 +52,7 @@
             "Test::Most" : "0",
             "constant" : "0",
             "parent" : "0",
-            "perl" : "5.014",
+            "perl" : "5.020",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -70,7 +70,7 @@
          "web" : "https://github.com/gryphonshafer/Bible-Reference"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

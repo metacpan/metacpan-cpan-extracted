@@ -32,7 +32,7 @@ END
 	my @params = (fortytwo => 42);
 	lives_ok { $r = $s->run($q, @params)->summary; } 'get summary';
 	isa_ok $r, 'Neo4j::Driver::ResultSummary', 'ResultSummary';
-	throws_ok { $r->server; } qr/\bunimplemented\b/i, 'server address';
+	isa_ok $r->server, 'Neo4j::Driver::ServerInfo', 'ServerInfo';
 	my $param_start = $driver->config('cypher_filter') ? '\$' : '\{';
 	lives_and { like $r->statement->{text}, qr/RETURN ${param_start}fortytwo\b/ } 'statement text';
 	lives_and { is_deeply $r->statement->{parameters}, {@params} } 'statement params';

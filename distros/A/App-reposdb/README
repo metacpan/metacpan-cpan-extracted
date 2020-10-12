@@ -2,8 +2,8 @@ NAME
     App::reposdb - Manipulate repos.db
 
 VERSION
-    This document describes version 0.006 of App::reposdb (from Perl
-    distribution App-reposdb), released on 2020-04-08.
+    This document describes version 0.007 of App::reposdb (from Perl
+    distribution App-reposdb), released on 2020-10-10.
 
 SYNOPSIS
     See reposdb.
@@ -24,6 +24,8 @@ FUNCTIONS
 
      add_repo_tag(%args) -> [status, msg, payload, meta]
 
+    Add a tag to a repo (by default the current repo).
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -33,6 +35,32 @@ FUNCTIONS
     *   reposdb_path* => *str*
 
     *   tags* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_repo_metadata
+    Usage:
+
+     get_repo_metadata(%args) -> [status, msg, payload, meta]
+
+    Get metadata for a repo (by default the current repo).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   repo => *str*
+
+    *   reposdb_path* => *str*
 
     Returns an enveloped result (an array).
 
@@ -82,6 +110,8 @@ FUNCTIONS
 
      remove_all_repo_tags(%args) -> [status, msg, payload, meta]
 
+    Remove all tags from a repo (by default the current repo).
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -105,6 +135,8 @@ FUNCTIONS
     Usage:
 
      remove_repo_tag(%args) -> [status, msg, payload, meta]
+
+    Remove tag from a repo (by default the current repo).
 
     This function is not exported.
 
@@ -131,6 +163,8 @@ FUNCTIONS
     Usage:
 
      touch_repo(%args) -> [status, msg, payload, meta]
+
+    Touch the timestamp(s) of a repo (by default current repo).
 
     This function is not exported.
 

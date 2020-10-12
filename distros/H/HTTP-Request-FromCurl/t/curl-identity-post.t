@@ -7,7 +7,7 @@ use TestCurlIdentity 'run_curl_tests';
 
 my @tests = (
     { name => 'Form parameters',
-      ignore => [ 'Content-Length', 'Content-Type' ],
+      ignore_headers => [ 'Content-Length', 'Content-Type' ],
       cmd => [ '--verbose', '-g', '-s', '$url', '--get', '-F', 'name=Foo', '-F','version=1' ],
       version => '007061000', # earlier versions send an Expect: 100-continue header
       },

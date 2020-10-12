@@ -21,7 +21,7 @@ name: IP-World
 provides:
   IP::World:
     file: lib/IP/World.pm
-    version: '0.40'
+    version: '0.41'
 requires:
   Carp: '0'
   File::ShareDir: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/DrHyde/perl-modules-IP-World/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DrHyde/perl-modules-IP-World
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

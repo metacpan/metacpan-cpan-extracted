@@ -1,5 +1,9 @@
 Revision history for Robots-Validate:
 
+v0.2.0    2020-10-12 17:50:15+01:00 Europe/London
+  [Enhancements]
+  - Allow validate to take a Plack environment hash.
+
 v0.1.6    2019-11-16 11:05:30+00:00 Europe/London
   [Enhancements]
   - Added rule for SeznamBot.

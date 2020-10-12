@@ -11,3 +11,6 @@ or just because, he was balancing slightly on his heels.
 
 He continued doing so when I boarded the train and it left the
 station. He was, at that moment, the only person left at the station.
+
+This is a [single-line URL](foo-bar-baz) while this is a [multi-line 
+URL](quux/zuuz)

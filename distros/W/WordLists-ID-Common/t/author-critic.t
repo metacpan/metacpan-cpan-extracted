@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/WordList/ID/Common/Wikipedia/Top300.pm','lib/WordList/ID/Common/Wikipedia/Top500.pm','lib/WordList/ID/Common/Wikipedia1000.pm','lib/WordList/ID/Common/Wikipedia2500.pm','lib/WordList/ID/Common/Wikipedia5000.pm','lib/WordLists/ID/Common.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

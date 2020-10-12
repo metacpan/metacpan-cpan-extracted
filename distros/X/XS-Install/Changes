@@ -1,3 +1,6 @@
+1.2.20   12.10.2020
+           - CMAKE_OPTIONS to pass additional options to CMake
+           - remove Alien::cmake3 requirement until the feature is used by certain module
 1.2.19   09.10.2020
            - basic CMake suport
 1.2.18   22.06.2020

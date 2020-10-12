@@ -19,6 +19,7 @@ my %params = (
         },
         RECURSIVE_TEST_FILES => 1,
     },
+    CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},
 );
 
 write_makefile(%params);

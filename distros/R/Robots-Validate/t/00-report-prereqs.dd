@@ -32,6 +32,7 @@ do { my $x = {
                                       'Moo' => '1',
                                       'MooX::Const' => 'v0.4.0',
                                       'Net::DNS::Resolver' => '0',
+                                      'Ref::Util' => '0',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.10.0'

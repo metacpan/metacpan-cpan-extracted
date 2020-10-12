@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Sender::Manual;
 # ABSTRACT: table of contents for the Email::Sender manual
-$Email::Sender::Manual::VERSION = '1.300034';
+$Email::Sender::Manual::VERSION = '1.300035';
 #pod =head1 THE MANUAL
 #pod
 #pod L<Email::Sender::Manual::QuickStart> tells you just what you need to know to
@@ -24,7 +24,7 @@ Email::Sender::Manual - table of contents for the Email::Sender manual
 
 =head1 VERSION
 
-version 1.300034
+version 1.300035
 
 =head1 THE MANUAL
 
@@ -33,11 +33,11 @@ start using Email::Sender.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

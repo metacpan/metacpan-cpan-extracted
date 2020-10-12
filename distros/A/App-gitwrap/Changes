@@ -1,23 +1,29 @@
-0.006   2017-07-10 (PERLANCAR)
+0.007   2020-10-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Can now do stuffs after git command too, introducing
+	  after_{commit,status,pull}_cmd configurations.
+
+
+0.006   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.005   2016-10-10 (PERLANCAR)
+0.005   2016-10-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Update doc, add FAQ entry about continuing after error.
 
 
-0.004   2016-10-09 (PERLANCAR)
+0.004   2016-10-09  Released-By: PERLANCAR
 
 	- [doc] Add FAQ entry about string quote/comment in configuration.
 
 
-0.003   2016-10-09 (PERLANCAR)
+0.003   2016-10-09  Released-By: PERLANCAR
 
         - Add logging (Log::Any::IfLOG).
 
@@ -29,7 +35,7 @@
         - [doc] Add example of when I use gitwrap: correct hooks.
 
 
-0.002   2016-06-12 (PERLANCAR)
+0.002   2016-06-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -38,6 +44,6 @@
 	- Update doc & function name.
 
 
-0.001   2016-06-11 (PERLANCAR)
+0.001   2016-06-11  Released-By: PERLANCAR
 
         - First early release.

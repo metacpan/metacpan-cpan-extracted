@@ -13,30 +13,15 @@ use GraphViz2::Data::Grapher;
 
 use File::Slurp; # For read_file().
 
-use Log::Handler;
-
 use XML::Bare;
 
 # ------------------------------------------------
-
-my($logger) = Log::Handler -> new;
-
-$logger -> add
-	(
-	 screen =>
-	 {
-		 maxlevel       => 'debug',
-		 message_layout => '%m',
-		 minlevel       => 'error',
-	 }
-	);
 
 my($graph) = GraphViz2 -> new
 	(
 	 edge   => {color => 'grey'},
 	 global => {directed => 1},
 	 graph  => {rankdir => 'TB'},
-	 logger => $logger,
 	 node   => {color => 'blue', shape => 'oval'},
 	);
 my $xml   = read_file(File::Spec -> catfile('t', 'sample.xml'), {chomp => 1});

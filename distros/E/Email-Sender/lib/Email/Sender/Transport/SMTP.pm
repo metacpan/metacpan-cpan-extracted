@@ -1,6 +1,6 @@
 package Email::Sender::Transport::SMTP;
 # ABSTRACT: send email over SMTP
-$Email::Sender::Transport::SMTP::VERSION = '1.300034';
+$Email::Sender::Transport::SMTP::VERSION = '1.300035';
 use Moo;
 
 use Email::Sender::Failure::Multi;
@@ -117,7 +117,7 @@ has timeout => (is => 'ro', isa => Int, default => sub { 120 });
 
 #pod =item C<sasl_username>: the username to use for auth; optional
 #pod
-#pod =item C<sasl_password>: the password to use for auth; required if C<username> is provided
+#pod =item C<sasl_password>: the password to use for auth; required if C<sasl_username> is provided
 #pod
 #pod =item C<allow_partial_success>: if true, will send data even if some recipients were rejected; defaults to false
 #pod
@@ -286,16 +286,6 @@ sub send_email {
   while (length $msg_string) {
     my $next_hunk = substr $msg_string, 0, $hunk_size, '';
 
-    # For the need to downgrade, see
-    #   https://rt.cpan.org/Ticket/Display.html?id=104433
-    #
-    # The ||0 is there because when we've mocked Net::SMTP, there is no
-    # version.  We can't get the ->VERSION call to hit the mock, because we get
-    # the mock from ->new.  We don't want to create a new SMTP just to get the
-    # version, and we can't rely on $smtp being a Net::SMTP object.
-    # -- rjbs, 2015-08-10
-    utf8::downgrade($next_hunk) if (Net::SMTP->VERSION || 0) < 3.07;
-
     $smtp->datasend($next_hunk) or $FAULT->("error at during DATA");
   }
 
@@ -354,7 +344,7 @@ Email::Sender::Transport::SMTP - send email over SMTP
 
 =head1 VERSION
 
-version 1.300034
+version 1.300035
 
 =head1 DESCRIPTION
 
@@ -389,7 +379,7 @@ IO::Socket::SSL
 
 =item C<sasl_username>: the username to use for auth; optional
 
-=item C<sasl_password>: the password to use for auth; required if C<username> is provided
+=item C<sasl_password>: the password to use for auth; required if C<sasl_username> is provided
 
 =item C<allow_partial_success>: if true, will send data even if some recipients were rejected; defaults to false
 
@@ -411,11 +401,11 @@ documentation.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

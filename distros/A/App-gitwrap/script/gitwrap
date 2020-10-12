@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-10-10'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,39 +59,50 @@ sub run_cmds {
     chdir $Cwd if defined($Repo_Dir);
 }
 
-sub do_stuffs {
+sub do_stuffs_before {
     my $cmds;
 
-    $cmds = $Config->{GLOBAL}{before_commit_cmd};
-    $cmds = [$cmds] if defined $cmds && ref $cmds ne 'ARRAY';
-    if ($cmds && @ARGV && $ARGV[0] eq 'commit') {
-        log_info(
-            "gitwrap: Running command(s) specified in before_commit_cmd");
-        run_cmds($cmds);
-    }
-
-    $cmds = $Config->{GLOBAL}{before_status_cmd};
-    $cmds = [$cmds] if defined $cmds && ref $cmds ne 'ARRAY';
-    if ($cmds && @ARGV && $ARGV[0] eq 'status') {
-        log_info(
-            "gitwrap: Running command(s) specified in before_status_cmd");
-        run_cmds($cmds);
+    for my $cmdname (qw/commit status pull push/) {
+        $cmds = $Config->{GLOBAL}{"before_${cmdname}_cmd"};
+        $cmds = [$cmds] if defined $cmds && ref $cmds ne 'ARRAY';
+        if ($cmds && @ARGV && $ARGV[0] eq $cmdname) {
+            log_info(
+                "gitwrap: Running command(s) specified in before_${cmdname}_cmd");
+            run_cmds($cmds);
+        }
     }
 }
 
+sub do_stuffs_after {
+    my $cmds;
+
+    for my $cmdname (qw/commit status pull push/) {
+        $cmds = $Config->{GLOBAL}{"after_${cmdname}_cmd"};
+        $cmds = [$cmds] if defined $cmds && ref $cmds ne 'ARRAY';
+        if ($cmds && @ARGV && $ARGV[0] eq $cmdname) {
+            log_info(
+                "gitwrap: Running command(s) specified in after_${cmdname}_cmd");
+            run_cmds($cmds);
+        }
+    }
+}
 
 sub exec_git {
     my @cmd = ($Config->{GLOBAL}{git_path} // 'git', @ARGV);
     log_info("gitwrap: Executing git: %s", \@cmd);
-    exec {$cmd[0]} @cmd;
+    system {$cmd[0]} @cmd;
+    my $exit_code = $? < 0 ? $? : $? >> 8;
+    do_stuffs_after();
+    exit $exit_code;
 }
 
 ### main
 
 log_info("gitwrap: start");
 read_config;
-do_stuffs;
+do_stuffs_before;
 exec_git;
+log_info("gitwrap: end");
 
 # ABSTRACT: Git wrapper script
 # PODNAME: gitwrap
@@ -108,7 +119,7 @@ gitwrap - Git wrapper script
 
 =head1 VERSION
 
-This document describes version 0.006 of gitwrap (from Perl distribution App-gitwrap), released on 2017-07-10.
+This document describes version 0.007 of gitwrap (from Perl distribution App-gitwrap), released on 2020-10-10.
 
 =head1 SYNOPSIS
 
@@ -128,15 +139,21 @@ then this will call C<gitwrap> instead.
 
 =head1 DESCRIPTION
 
-C<gitwrap> is a script that will eventually exec() the C<git> binary. But before
-it does that, it can do some things first.
+C<gitwrap> is a script that runs the C<git> binary. But before it does that, it
+can do some things first. And after that, it can also do some other things.
 
 It will first search for configuration file F<gitwrap.conf> in one of these
 locations: F<~/.config>, F<~>, or F</etc>. It then will execute various commands
-as described in the configuration. See L</"CONFIGURATION">.
+as described in the configuration, e.g. L</before_commit_cmd>. See
+L</"CONFIGURATION">.
 
-It will then call the git binary as specified in the configuration C<git_path>
-or just use C<git>.
+It will then run the git binary as specified in the configuration C<git_path> or
+just use C<git>.
+
+Then it will run various commands as described in the configuration, e.g.
+L</after_commit_cmd>.
+
+Lastly it will exit with the exit code of git command executed earlier.
 
 Some examples of how I use this script:
 
@@ -208,6 +225,32 @@ execution if any of the commands fails.
 
 Command to run before C<git status>. Can be specified multiple times. Will abort
 execution if any of the commands fails.
+
+=head2 before_pull_cmd
+
+Command to run before C<git pull>. Can be specified multiple times. Will abort
+execution if any of the commands fails.
+
+=head2 before_push_cmd
+
+Command to run before C<git push>. Can be specified multiple times. Will abort
+execution if any of the commands fails.
+
+=head2 after_commit_cmd
+
+Command to run after C<git commit>. Can be specified multiple times.
+
+=head2 after_status_cmd
+
+Command to run after C<git status>. Can be specified multiple times.
+
+=head2 after_pull_cmd
+
+Command to run after C<git pull>. Can be specified multiple times.
+
+=head2 after_push_cmd
+
+Command to run after C<git push>. Can be specified multiple times.
 
 =head1 FAQ
 
@@ -288,7 +331,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

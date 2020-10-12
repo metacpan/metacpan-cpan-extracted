@@ -1,7 +1,7 @@
 package App::linerange;
 
-our $DATE = '2020-02-17'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-10-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -223,7 +223,7 @@ sub linerange {
                 ($range->[1] < 0 ||
                  $range->[1] > 0 && $linenum <= $range->[1]);
             # check if line is included by every (N3)
-            say "D:linenum=$linenum, range=".join(",",@$range).", ".($linenum-1 - $range->[0]+1)." % $range->[2] == ".(($linenum-1 + $range->[0]-1) % $range->[2]);
+            #say "D:linenum=$linenum, range=".join(",",@$range).", ".($linenum-1 - $range->[0]+1)." % $range->[2] == ".(($linenum-1 + $range->[0]-1) % $range->[2]);
             next unless $range->[0] > 0 && (($linenum-1 - $range->[0]+1) % $range->[2] == $range->[2]-1);
             $reslines{$linenum} = $line;
         }
@@ -275,7 +275,7 @@ App::linerange - Retrieve line ranges from a filehandle
 
 =head1 VERSION
 
-This document describes version 0.004 of App::linerange (from Perl distribution App-linerange), released on 2020-02-17.
+This document describes version 0.005 of App::linerange (from Perl distribution App-linerange), released on 2020-10-11.
 
 =head1 FUNCTIONS
 

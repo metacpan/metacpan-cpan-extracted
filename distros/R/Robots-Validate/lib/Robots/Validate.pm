@@ -9,6 +9,7 @@ use Moo 1;
 use MooX::Const v0.4.0;
 use List::Util 1.33 qw/ first none /;
 use Net::DNS::Resolver;
+use Ref::Util qw/ is_plain_hashref /;
 use Types::Standard -types;
 
 # RECOMMEND PREREQ: Type::Tiny::XS
@@ -16,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.2.0';
 
 
 has resolver => (
@@ -142,6 +143,11 @@ has die_on_error => (
 sub validate {
     my ( $self, $ip, $args ) = @_;
 
+    if (is_plain_hashref($ip) && !$args) {
+        $args = { agent => $ip->{HTTP_USER_AGENT} };
+        $ip   = $ip->{REMOTE_ADDR};
+    }
+
     my $res = $self->resolver;
 
     # Reverse DNS
@@ -206,7 +212,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.1.6
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -280,6 +286,10 @@ will not be performed.
 It is optional.
 
 =back
+
+Alternatively, you can pass in a Plack environment:
+
+  my $result = $rv->validate($env);
 
 =head1 KNOWN ISSUES
 

@@ -1,0 +1,28 @@
+Sub-SymMethod
+=============
+
+Created:      2020-10-09
+Home page:    <https://metacpan.org/release/Sub-SymMethod>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2020-10-12
+
+ - Use `before_apply` instead of `after_apply` hook when copying symmethods
+   from roles to classes.
+
+0.003	2020-10-10
+
+ [ Packaging ]
+ - Add some version numbers for dependencies.
+
+0.002	2020-10-10
+
+ [ Documentation ]
+ - Improve abstract for module.
+
+ [ Other ]
+ - Issue a warning if you try creating a symmethod called `BUILD`,
+   `DEMOLISH`, or `new` because that's probably a bad idea.
+
+0.001	2020-10-10	Initial release

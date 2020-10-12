@@ -1,5 +1,8 @@
 Revision history for Test-Dependencies
 
+0.29    2020-10-10
+        * Eliminate masked variable warning
+
 0.28    2020-08-30
         * Modules which had no minimum required version (but were
           required!) *and* were removed from CORE incorrectly fail the

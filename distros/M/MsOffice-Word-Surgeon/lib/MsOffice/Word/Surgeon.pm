@@ -11,7 +11,7 @@ use MsOffice::Word::Surgeon::Change;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -125,11 +125,11 @@ sub _runs {
     my @txt_fragments = split m[$txt_regex], $run_contents, -1;
     my @texts;
   TXT:
-    while (my ($bt, $txt_contents) = splice @txt_fragments, 0, 2) {
-      next TXT if !$bt && !$txt_contents;
+    while (my ($xml_before_text, $txt_contents) = splice @txt_fragments, 0, 2) {
+      next TXT if !$xml_before_text && !$txt_contents;
       push @texts, MsOffice::Word::Surgeon::Text->new(
-        xml_before   => $bt           // '',
-        literal_text => $txt_contents // '',
+        xml_before   => $xml_before_text // '',
+        literal_text => $txt_contents    // '',
        );
     }
 
@@ -165,6 +165,9 @@ sub plain_text {
 
   # replace opening paragraph tags by newlines
   $txt =~ s/(<w:p[ >])/\n$1/g;
+
+  # replace tab nodes by ASCII tabs
+  $txt =~ s/<w:tab[^s][^>]*>/\t/g;
 
   # remove all remaining XML tags
   $txt =~ s/<[^>]+>//g;

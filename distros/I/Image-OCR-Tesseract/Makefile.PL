@@ -1,5 +1,5 @@
 use lib inc; #__assertexe__#
-use Devel::AssertOS qw(Unix Linux);
+use Devel::AssertOS qw(Cygwin Unix Linux);
 use Devel::AssertEXE qw(tesseract convert); #__assertexe__#
 
 use ExtUtils::MakeMaker;

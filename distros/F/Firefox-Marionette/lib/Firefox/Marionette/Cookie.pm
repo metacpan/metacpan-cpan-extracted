@@ -3,7 +3,7 @@ package Firefox::Marionette::Cookie;
 use strict;
 use warnings;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -11,12 +11,15 @@ sub new {
         http_only => $parameters{http_only} ? 1 : 0,
         secure    => $parameters{secure}    ? 1 : 0,
         domain    => $parameters{domain},
-        path  => defined $parameters{path} ? $parameters{path} : q[/],
-        value => $parameters{value},
-        name  => $parameters{name},
+        path      => defined $parameters{path} ? $parameters{path} : q[/],
+        value     => $parameters{value},
+        name      => $parameters{name},
     }, $class;
     if ( defined $parameters{expiry} ) {
         $cookie->{expiry} = $parameters{expiry};
+    }
+    if ( defined $parameters{same_site} ) {
+        $cookie->{same_site} = $parameters{same_site};
     }
     return $cookie;
 }
@@ -51,6 +54,11 @@ sub expiry {
     return $self->{expiry};
 }
 
+sub same_site {
+    my ($self) = @_;
+    return $self->{same_site};
+}
+
 sub name {
     my ($self) = @_;
     return $self->{name};
@@ -65,7 +73,7 @@ Firefox::Marionette::Cookie - Represents a Firefox cookie retrieved using the Ma
 
 =head1 VERSION
 
-Version 0.98
+Version 0.99
 
 =head1 SYNOPSIS
 
@@ -101,6 +109,8 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * value - the value of the cookie. 
 
+=item * same_site - should the cookie be restricted to a first party or same-site context.  See L<MSDN|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite>.
+
 =item * name - the name of the cookie. 
 
 =back
@@ -130,6 +140,10 @@ returns the integer value of the cookies expiry time in seconds since the UNIX e
 =head2 value
 
 returns the value of the cookie.
+
+=head2 same_site
+
+returns the L<Same Site|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite> value for the cookie (if any).
 
 =head2 name
 
@@ -165,7 +179,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2020, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

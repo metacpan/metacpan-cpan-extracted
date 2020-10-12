@@ -17,6 +17,7 @@ t/106prime-zstd.t
 t/107multi-zstd.t
 t/108anyunc-zstd.t
 t/110encode-zstd.t
+t/200regression.t
 t/files/lorem.txt
 t/files/winzip-et-zstd.zip
 t/meta-json.t

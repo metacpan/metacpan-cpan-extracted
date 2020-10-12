@@ -1,5 +1,11 @@
 Revision history for Bible::Reference
 
+1.05      2020-10-10 12:06:43-07:00 America/Los_Angeles
+        - Major input parsing code rewrite to handle a broader set of edge cases
+        - Add boolean setting: add_detail
+        - Add method: expand_ranges
+        - Patches to Bible book defintions
+
 1.04      2020-07-09 08:10:08-07:00 America/Los_Angeles
         - Remove subroutine signatures to allow operation back to Perl 5.14
 

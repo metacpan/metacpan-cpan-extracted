@@ -10,7 +10,7 @@ use warnings FATAL => 'all';
 use Carp;
 use Data::RingBuffer;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 $VERSION =~ tr/_//d;
 
 BEGIN { our @ISA = 'Data::RingBuffer' };

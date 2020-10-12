@@ -18,7 +18,7 @@ no warnings 'experimental::signatures';
 use Exporter 'import';
 
 our @EXPORT_OK = (qw(&run_curl_tests $server));
-our $VERSION = '0.17';
+our $VERSION = '0.23';
 
 $Data::Dumper::Useqq = 1;
 
@@ -179,20 +179,23 @@ sub identical_headers_ok( $code, $expected_request, $name,
 }
 
 my $version = curl_version( $curl );
-
+my $cmp_version = sprintf "%03d%03d%03d", split /\./, $version;
 if( ! $version) {
     plan skip_all => "Couldn't find curl executable";
     exit;
-};
+
+    # https://curl.haxx.se/changes.html#7_37_0
+} elsif( $cmp_version < 7037000 and $server->url->host_port =~ /\[/ ) {
+    plan skip_all => sprintf "Curl %s doesn't handle IPv6 hostnames like '%s'",
+                             $version, $server->url;
+    exit;
+}
 
 note "Curl version $version";
 $HTTP::Request::FromCurl::default_headers{ 'User-Agent' } = "curl/$version";
 
-my $cmp_version = sprintf "%03d%03d%03d", split /\./, $version;
-
 # Generates 2 OK stanzas
-sub request_logs_identical_ok {
-    my( $test, $name, $r, $res ) = @_;
+sub request_logs_identical_ok( $test, $name, $r, $res ) {
     my $status;
     if( ! $r ) {
         fail $name;
@@ -232,9 +235,10 @@ sub request_logs_identical_ok {
         };
 
         my %got = %{ $r->headers };
-        if( $test->{ignore} ) {
-            delete @got{ @{ $test->{ignore}}};
-            delete @{$res->{headers}}{ @{ $test->{ignore}}};
+        if( my $h = $test->{ignore_headers} ) {
+            $h = [$h] if ! ref $h;
+            delete @got{ @{ $h }};
+            delete @{$res->{headers}}{ @{ $h }};
         };
 
         # Fix weirdo CentOS6 build of Curl which has a weirdo User-Agent header:
@@ -253,28 +257,32 @@ sub request_logs_identical_ok {
     };
 }
 
-sub request_identical_ok {
-    my( $test ) = @_;
+sub request_identical_ok( $test ) {
     local $TODO = $test->{todo};
-
     local $TODO = "curl $test->{version} required, we have $cmp_version"
         if $test->{version} and $cmp_version < $test->{version};
-
     my $name = $test->{name} || (join " ", @{ $test->{cmd}});
     my $cmd = [ @{ $test->{cmd} }];
 
     # Replace the dynamic parameters
     my $port = $server->url->port;
-    s!\$(url)\b!$server->$1!ge for @$cmd;
-    s!\$(port)\b!$server->$1!ge for @$cmd;
-    s!\$(tempfile)\b!$tempfile!g for @$cmd;
-    s!\$(tempoutput)\b!$tempoutput!g for @$cmd;
-    s!\$(tempcookies)\b!$tempcookies!g for @$cmd;
+    for (@$cmd) {
+        s!\$(url)\b!$server->$1!ge;
+        s!\$(port)\b!$server->$1!ge;
+        s!\$(tempfile)\b!$tempfile!g;
+        s!\$(tempoutput)\b!$tempoutput!g;
+        s!\$(tempcookies)\b!$tempcookies!g;
+    };
+
+    my $request_count = $test->{request_count} || 1;
 
     my @res = curl_request( @$cmd );
     note sprintf "Made %d curl requests", 0+@res;
+    # For consistency checking the skip counts
+    #$res[0]->{error} = "Dummy error";
     if( $res[0]->{error} ) {
-        my $skipcount = 5;
+        # We run 2 tests for the setup and then 6 tests per request
+        my $skipcount = 6;
         my $skipreason = $res[0]->{error};
         if(     $res[0]->{error_output}
             and $res[0]->{error_output} =~ /\b(option .*?: the installed libcurl version doesn't support this\b)/) {
@@ -282,12 +290,13 @@ sub request_identical_ok {
             $skipreason = $1;
 
         } else {
-            fail $test->{name};
+            fail $name;
             diag join " ", @$cmd;
             diag $res[0]->{error_output};
         };
         SKIP: {
-            skip $skipreason, $skipcount;
+            # -1 for the fail() above
+            skip $skipreason, 2 + ($skipcount * $request_count) -1;
         };
         return;
     };
@@ -380,6 +389,13 @@ sub request_identical_ok {
                 };
             };
 
+            # Ignore headers that the test says should be ignored
+            if( my $h = $test->{ignore_headers} ) {
+                $h = [$h] if ! ref $h;
+                delete @{$reconstructed[$i]->{headers}}{ @{ $h }};
+                delete @{$copy->{headers}}{ @{ $h }};
+            };
+
             if( !is_deeply $reconstructed[$i], $copy, "$name (reconstructed)" ) {
                 diag "Original command:";
                 diag Dumper $test->{cmd};
@@ -390,7 +406,6 @@ sub request_identical_ok {
                 diag "Reconstructed request:";
                 diag Dumper $reconstructed[$i];
             };
-            #request_logs_identical_ok( $test, "$name (reconstructed)", $reconstructed[$i], $res[$i] );
         };
     };
 
@@ -412,7 +427,12 @@ sub request_identical_ok {
         my $curl_log = $curl_log[$i];
         (my $boundary) = ($curl_log =~ m!Content-Type: multipart/form-data; boundary=(.*?)$!ms);
 
-        request_logs_identical_ok( $test, $name, $r, $res );
+        my $copy = dclone($r);
+        if( exists $copy->{headers}->{'Accept-Encoding'} ) {
+            $copy->{headers}->{'Accept-Encoding'} = $org_accept_encoding;
+        };
+
+        request_logs_identical_ok( $test, $name, $copy, $res );
 
         # Now create a program from the request, run it and check that it still
         # sends the same request as curl does
@@ -446,7 +466,7 @@ sub request_identical_ok {
                 or diag $code;
             identical_headers_ok( $code, $curl_log,
                 "We create (almost) the same headers with HTTP::Tiny",
-                ignore_headers => ['Host'],
+                ignore_headers => ['Host','Connection'],
                 boundary       => $boundary,
             ) or diag $code;
 
@@ -459,9 +479,12 @@ sub request_identical_ok {
 };
 
 sub run_curl_tests( @tests ) {
-    my $testcount = @tests * 8;
-    if( ! ref $tests[-1] ) {
-        $testcount = pop @tests;
+    my $testcount = 0;
+
+    for( @tests ) {
+        my $request_count = $_->{request_count} || 1;
+        $testcount +=   2
+                      + ($request_count * 6);
     };
     plan tests => $testcount;
 

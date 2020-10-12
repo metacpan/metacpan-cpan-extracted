@@ -6,13 +6,13 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-Rijndael",
    "no_index" : {
@@ -55,6 +55,6 @@
          "web" : "https://github.com/leont/crypt-rijndael"
       }
    },
-   "version" : "1.14",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

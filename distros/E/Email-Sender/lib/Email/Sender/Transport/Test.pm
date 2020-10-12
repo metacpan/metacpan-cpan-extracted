@@ -1,6 +1,6 @@
 package Email::Sender::Transport::Test;
 # ABSTRACT: deliver mail in memory for testing
-$Email::Sender::Transport::Test::VERSION = '1.300034';
+$Email::Sender::Transport::Test::VERSION = '1.300035';
 use Moo;
 
 use Email::Sender::Failure::Multi;
@@ -35,6 +35,7 @@ use MooX::Types::MooseLike::Base qw(ArrayRef Bool);
 #pod =for Pod::Coverage clear_deliveries
 #pod
 #pod This attribute stores an arrayref of all the deliveries made via the transport.
+#pod The C<clear_deliveries> method returns a list of them.
 #pod
 #pod Each delivery is a hashref, in the following format:
 #pod
@@ -141,7 +142,7 @@ Email::Sender::Transport::Test - deliver mail in memory for testing
 
 =head1 VERSION
 
-version 1.300034
+version 1.300035
 
 =head1 DESCRIPTION
 
@@ -173,6 +174,7 @@ L<Email::Sender::Transport::Failable>.
 =for Pod::Coverage clear_deliveries
 
 This attribute stores an arrayref of all the deliveries made via the transport.
+The C<clear_deliveries> method returns a list of them.
 
 Each delivery is a hashref, in the following format:
 
@@ -205,11 +207,11 @@ shift_deliveries
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

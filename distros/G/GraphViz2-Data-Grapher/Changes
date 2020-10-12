@@ -1,2 +1,5 @@
+2.50 2020-10-11
+- zap pointless logger attribute
+
 2.49 2020-09-27
 - split out from GraphViz2 2.48

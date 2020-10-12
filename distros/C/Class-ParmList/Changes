@@ -23,3 +23,8 @@
                    Added LICENSE and DISCLAIMER sections to
                    documentation.
 
+ 1.06 2020.10.11 - Relicensed under the MIT License. Cleanup of test reporting.
+                   Updating of build configurations. Addition of GitHub repo
+                   information to meta data. Updating of maintainer information.
+                   Small changes to examples in POD documentation.
+

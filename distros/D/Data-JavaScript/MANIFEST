@@ -1,13 +1,27 @@
 CHANGES
-MANIFEST
-README
-TODO
-JavaScript.pm
+CONTRIBUTING.md
+example.pl
+lib/Data/JavaScript.pm
+LICENSE
 Makefile.PL
+MANIFEST			This list of files
+README.md
+t/0-critic.t
 t/1-load.t
 t/2-import.t
 t/3-js12.t
 t/3-noArgs.t
 t/3-undef.t
 t/4-escape.t
-example.pl
+t/5-multi-line.t
+t/6-accents.t
+t/7-nested-compat.t
+test/cover.14
+test/cover.css
+test/coverage.html
+test/digests
+test/structure/8a140d68720d0a5b729893bf554821ab
+test/structure/8a140d68720d0a5b729893bf554821ab.lock
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

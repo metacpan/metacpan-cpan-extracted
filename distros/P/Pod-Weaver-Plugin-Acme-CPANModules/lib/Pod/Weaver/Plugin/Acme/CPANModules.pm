@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-24'; # DATE
+our $DATE = '2020-10-10'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -71,10 +71,11 @@ sub _process_module {
     {
         my @pod;
         push @pod,
-q(=head2 What are ways to use this module?
+q(=head2 What are ways to use this Acme::CPANModules module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanmodules> CLI (from
+L<App::cpanmodules> distribution):
 
     % cpanmodules ls-entries ).$ac_name.q( | cpanm -n
 
@@ -82,12 +83,16 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=).$ac_name.q( -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
+or directly:
+
+    % perl -MAcme::CPANModules::).$ac_name.q( -E'say $_->{module} for @{ $Acme::CPANModules::).$ac_name.q(::LIST->{entries} }' | cpanm -n
+
 );
         if ($has_benchmark) {
             push @pod,
-q(This module contains benchmark instructions. You can run a benchmark
-for some/all the modules listed in this Acme::CPANModules module using
-L<bencher>:
+q(This Acme::CPANModules module contains benchmark instructions. You can run a
+benchmark for some/all the modules listed in this Acme::CPANModules module using
+the L<bencher> CLI (from L<Bencher> distribution):
 
     % bencher --cpanmodules-module ).$ac_name.q(
 
@@ -95,9 +100,9 @@ L<bencher>:
         }
 
         push @pod,
-q(This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+q(This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 );
         $self->add_text_to_section(
@@ -139,7 +144,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.003 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2019-12-24.
+This document describes version 0.005 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2020-10-10.
 
 =head1 SYNOPSIS
 
@@ -154,7 +159,7 @@ currently does the following:
 
 =over
 
-=item * Create "INCLUDED MODULES" POD section from the list
+=item * Create "MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE" POD section from the list
 
 =item * Mention some modules in See Also section
 
@@ -193,7 +198,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

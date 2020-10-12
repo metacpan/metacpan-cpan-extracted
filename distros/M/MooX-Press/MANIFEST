@@ -48,6 +48,8 @@ t/30bare.t
 t/31lexhas.t
 t/32multifactory-zylite.t
 t/32multifactory.t
+t/40symmethods-zylite.t
+t/40symmethods.t
 t/70tagrole.t
 t/87weirdscopes.t
 t/88patchpackage.t

@@ -5,7 +5,7 @@ use Test::More;
 
 package My::RoleA; {
 	use Role::Tiny;
-	use Sub::MultiMethod -role, qw(multimethod);
+	use Sub::MultiMethod qw(multimethod);
 	use Types::Standard -types;
 	
 	multimethod foo => (
@@ -17,7 +17,7 @@ package My::RoleA; {
 
 package My::RoleB; {
 	use Role::Tiny;
-	use Sub::MultiMethod -role, qw(multimethod);
+	use Sub::MultiMethod qw(multimethod);
 	use Types::Standard -types;
 	
 	multimethod foo => (
@@ -29,12 +29,10 @@ package My::RoleB; {
 package My::Class; {
 	use Class::Tiny;
 	use Role::Tiny::With;
-	use Sub::MultiMethod qw(multimethod multimethods_from_roles);
+	use Sub::MultiMethod qw(multimethod);
 	use Types::Standard -types;
 	
 	with qw( My::RoleA My::RoleB );
-	
-	multimethods_from_roles qw( My::RoleA My::RoleB );
 	
 	multimethod foo => (
 		signature  => [ HashRef ],

@@ -16,3 +16,8 @@
                    it more inheritance friendly. Updated documentation.
 
  1.06 2005.09.20 - Fixed bad pod coverage build test.
+
+ 1.07 2020.10.10 - Relicensed under MIT License. Maintainer info updated.
+                   Build tooling updated. Documentation updates
+
+ 1.08 2020.10.10 - Added LICENSE file that was inadvertently omitted in 1.07

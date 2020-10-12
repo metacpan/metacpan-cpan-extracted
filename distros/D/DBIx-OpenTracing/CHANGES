@@ -1,3 +1,7 @@
+v0.1.0 2020-10-09
+
+* Hide wrapper methods from caller
+
 v0.0.9 2020-09-02
 
 * Fix row counting for empty results

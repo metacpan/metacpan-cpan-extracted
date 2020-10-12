@@ -5,11 +5,12 @@ author:
 build_requires:
   Test::More: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
-license: gpl
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,15 +28,16 @@ no_index:
 provides:
   Text::Hyphen:
     file: lib/Text/Hyphen.pm
-    version: '0.2'
+    version: '0.3'
 requires:
   perl: 5.008_001
 resources:
   bugtracker: https://github.com/kappa/Text-Hyphen/issues
   homepage: https://github.com/kappa/Text-Hyphen
   repository: git://github.com/kappa/Text-Hyphen.git
-version: '0.2'
+version: '0.3'
 x_contributors:
-  - 'Alex Kapranoff <kappa@rambler-co.ru>'
   - 'Alex Kapranoff <alex@kapranoff.ru>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Alex Kapranoff <kappa@rambler-co.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

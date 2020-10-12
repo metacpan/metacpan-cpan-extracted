@@ -2,13 +2,15 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'WordList/ID/Common/Wikipedia/Top300.pm',
+    'WordList/ID/Common/Wikipedia/Top500.pm',
     'WordList/ID/Common/Wikipedia1000.pm',
     'WordList/ID/Common/Wikipedia2500.pm',
     'WordList/ID/Common/Wikipedia5000.pm',

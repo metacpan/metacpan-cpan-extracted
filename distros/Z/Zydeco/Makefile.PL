@@ -31,7 +31,7 @@ my $meta = {
                                                        "Exporter::Tiny" => "1.000000",
                                                        "Import::Into" => 0,
                                                        "Keyword::Simple" => 0.04,
-                                                       "MooX::Press" => 0.077,
+                                                       "MooX::Press" => 0.081,
                                                        "Path::ScanINC" => 0,
                                                        "perl" => "5.014000",
                                                        "PPR" => "0.000023",
@@ -43,8 +43,8 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.611 },
-                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.611 },
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.612 },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.612 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -58,7 +58,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
                       },
-  "version"        => 0.611,
+  "version"        => 0.612,
 };
 
 my %dynamic_config;
@@ -138,28 +138,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

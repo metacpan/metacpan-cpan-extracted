@@ -14,22 +14,6 @@
         use GraphViz2;
         use GraphViz2::Data::Grapher;
 
-        use Log::Handler;
-
-        # ------------------------------------------------
-
-        my($logger) = Log::Handler -> new;
-
-        $logger -> add
-                (
-                 screen =>
-                 {
-                         maxlevel       => 'debug',
-                         message_layout => '%m',
-                         minlevel       => 'error',
-                 }
-                );
-
         my($sub) = sub{};
         my($s)   =
         {
@@ -64,11 +48,10 @@
                  edge   => {color => 'grey'},
                  global => {directed => 1},
                  graph  => {rankdir => 'TB'},
-                 logger => $logger,
                  node   => {color => 'blue', shape => 'oval'},
                 );
 
-        my($g)           = GraphViz2::Data::Grapher -> new(graph => $graph, logger => $logger);
+        my($g)           = GraphViz2::Data::Grapher->new(graph => $graph);
         my($format)      = shift || 'svg';
         my($output_file) = shift || File::Spec -> catfile('html', "parse.data.$format");
 
@@ -126,16 +109,6 @@ Key-value pairs accepted in the parameter list:
     except for the graph label of course.
 
     This key is optional.
-
-- o logger => $logger\_object
-
-    Provides a logger object so $logger\_object -> $level($message) can be called at certain times.
-
-    Retrieve and update the value with the logger() method.
-
-    The default is ''.
-
-    At the moment, the logger object is not used. This feature is mainly used for testing.
 
 # Methods
 

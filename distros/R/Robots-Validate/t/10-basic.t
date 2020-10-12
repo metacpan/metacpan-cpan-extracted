@@ -46,6 +46,13 @@ ok $rv->validate(
     ),
     'validate with UA string';
 
+ok $rv->validate(
+    {
+        REMOTE_ADDR     => '192.168.1.1',
+        HTTP_USER_AGENT => 'Morkzilla/5.0 examplebot/1.0',
+    }),
+    'validate with UA string';
+
 ok !$rv->validate('192.168.1.2'), 'failed validtion';
 
 ok !$rv->validate('192.168.1.1', { agent => 'Googlebot' } ), 'failed validtion with UA';

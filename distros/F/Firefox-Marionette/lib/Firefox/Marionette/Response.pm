@@ -8,7 +8,7 @@ use Firefox::Marionette::Exception::StaleElement();
 use Firefox::Marionette::Exception::InsecureCertificate();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 sub _TYPE_INDEX            { return 0 }
 sub _MESSAGE_ID_INDEX      { return 1 }
@@ -19,7 +19,7 @@ sub _DEFAULT_RESPONSE_TYPE { return 1 }
 my %_known_exceptions = (
     'stale element reference' => 'Firefox::Marionette::Exception::StaleElement',
     'no such alert'           => 'Firefox::Marionette::Exception::NoSuchAlert',
-    'insecure certificate' =>
+    'insecure certificate'    =>
       'Firefox::Marionette::Exception::InsecureCertificate',
 );
 
@@ -46,7 +46,15 @@ sub new {
             if ( !defined $error->{error} ) {
                 $error->{error} = q[];
             }
-            if ( !defined $error->{message} ) {
+            if ( defined $error->{message} ) {
+                if (   ( ref $error->{message} )
+                    && ( ref $error->{message} eq 'HASH' )
+                    && ( scalar keys %{ $error->{message} } == 0 ) )
+                {
+                    $error->{message} = q[];
+                }
+            }
+            else {
                 $error->{message} = q[];
             }
             $response = bless {
@@ -115,7 +123,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.98
+Version 0.99
 
 =head1 SYNOPSIS
 
@@ -192,7 +200,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2019, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2020, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

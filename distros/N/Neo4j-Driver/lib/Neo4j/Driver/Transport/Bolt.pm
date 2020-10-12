@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::Bolt;
 # ABSTRACT: Adapter for Neo4j::Bolt
-$Neo4j::Driver::Transport::Bolt::VERSION = '0.16';
+$Neo4j::Driver::Transport::Bolt::VERSION = '0.17';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -13,6 +13,7 @@ our @CARP_NOT = qw(Neo4j::Driver::Transaction);
 use URI 1.25;
 use Neo4j::Bolt;
 
+use Neo4j::Driver::ServerInfo;
 use Neo4j::Driver::StatementResult;
 
 
@@ -49,7 +50,10 @@ sub new {
 	
 	return bless {
 		connection => $cxn,
-		uri => $driver->{uri},
+		server_info => Neo4j::Driver::ServerInfo->new({
+			uri => $uri,
+			version => $cxn->server_id,
+		}),
 		cypher_types => $driver->{cypher_types},
 	}, $class;
 }
@@ -102,6 +106,7 @@ sub run {
 				deep_bless => \&_deep_bless,
 				statement => $statement_json,
 				cypher_types => $self->{cypher_types},
+				server_info => $self->{server_info},
 			});
 			return ($result);
 		}
@@ -114,6 +119,7 @@ sub run {
 			deep_bless => \&_deep_bless,
 			statement => $statement_json,
 			cypher_types => $self->{cypher_types},
+			server_info => $self->{server_info},
 		});
 	}
 	
@@ -176,31 +182,6 @@ sub rollback {
 	my ($self, $tx) = @_;
 	
 	$self->run( $tx, $self->prepare($tx, 'ROLLBACK') );
-}
-
-
-sub server_info {
-	my ($self) = @_;
-	
-	# That the ServerInfo is provided by the same object
-	# is an implementation detail that might change in future.
-	return $self;
-}
-
-
-# server_info->
-sub address {
-	my ($self) = @_;
-	
-	return URI->new( $self->{uri} )->host_port;
-}
-
-
-# server_info->
-sub version {
-	my ($self) = @_;
-	
-	return $self->{connection}->server_id;
 }
 
 
@@ -298,7 +279,7 @@ Neo4j::Driver::Transport::Bolt - Adapter for Neo4j::Bolt
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 DESCRIPTION
 

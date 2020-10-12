@@ -1,3 +1,5 @@
+.ChangeLog.swp
+.github/workflows/testsuite.yml
 ChangeLog
 lib/Pod/Simple.pm
 lib/Pod/Simple.pod
@@ -149,6 +151,7 @@ t/junk2o.txt
 t/JustPod01.t
 t/JustPod02.t
 t/JustPod_corpus.t
+t/lib/helpers.pm
 t/linkclas.t
 t/output.t
 t/perlcyg.pod

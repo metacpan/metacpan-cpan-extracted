@@ -2,6 +2,57 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec();
+use Fcntl();
+
+sub _win32_registry_query_key {
+    my (%parameters) = @_;
+    my $binary = 'reg';
+    my @parameters =
+      ( 'query', q["] . ( join q[\\], @{ $parameters{subkey} } ) . q["] );
+    if ( $parameters{name} ) {
+        push @parameters, ( '/v', q["] . $parameters{name} . q["] );
+    }
+    my @values;
+    my $command   = join q[ ], $binary, @parameters;
+    my $reg_query = `$command 2>nul`;
+    if ( defined $reg_query ) {
+
+        foreach my $line ( split /\r?\n/smx, $reg_query ) {
+            if ( defined $parameters{name} ) {
+                my $name =
+                  $parameters{name} eq q[] ? '(Default)' : $parameters{name};
+                my $quoted_name = quotemeta $name;
+                if ( $line =~
+                    /^[ ]+${quoted_name}[ ]+(?:REG_SZ)[ ]+(\S.*\S)\s*$/smx )
+                {
+                    push @values, $1;
+                }
+            }
+            else {
+                push @values, $line;
+            }
+        }
+    }
+    return @values;
+}
+
+sub _cygwin_reg_query_value {
+    my ($path) = @_;
+    sysopen my $handle, $path, Fcntl::O_RDONLY();
+    my $value;
+    if ( defined $handle ) {
+        my $result;
+        no warnings;
+        while ( read $handle, my $buffer, 1 ) {
+            $value .= $buffer;
+        }
+        use warnings;
+        if ( defined $value ) {
+            $value =~ s/\0$//smx;
+        }
+    }
+    return $value;
+}
 
 if ( ( $^O eq 'MSWin32' ) || ( $^O eq 'cygwin' ) ) {
 }
@@ -17,64 +68,166 @@ elsif ( $> == 0 ) {    # see RT#131304
     }
 }
 
+my @possibles = qw(firefox waterfox basilisk);
+my $dev_null  = File::Spec->devnull();
+
 sub last_desperate_search {
     if ( ( $^O eq 'MSWin32' ) ) {
-        print "Checking in Path:" . `"firefox.exe" -version` . "\n";
+        foreach my $possible (@possibles) {
+            print "Checking for $possible in Path:"
+              . `"$possible.exe" -version 2>$dev_null` . "\n";
+        }
     }
     elsif ( ( $^O eq 'darwin' ) or ( $^O eq 'cygwin' ) ) {
-        print "Checking in PATH:" . `firefox -version` . "\n";
+        foreach my $possible (@possibles) {
+            print "Checking for $possible in PATH:"
+              . `$possible -version $dev_null` . "\n";
+        }
     }
     my $glob_path = '/usr/share/applications/firefox*.desktop';
     foreach my $path ( glob $glob_path ) {
-        print `perl -nle 'print "\$ARGV:\$_" if (/(Exec|^\\[)/);' $path`;
+        print `$^X -nle 'print "\$ARGV:\$_" if (/(Exec|^\\[)/);' $path`;
     }
 }
 
-my @win32_firefox_directories =
-  ( 'Mozilla Firefox', 'Firefox Developer Edition', 'Firefox Nightly' );
-my $binary = 'firefox';
+my $binary                      = 'firefox';
+my $suffix = (( $^O eq 'MSWin32' ) || ( $^O eq 'cygwin' )) ? '.exe' : q[];
+my %known_win32_preferred_names = (
+    'Mozilla Firefox'           => 1,
+    'Mozilla Firefox ESR'       => 2,
+    'Firefox Developer Edition' => 3,
+    Nightly                     => 4,
+    'Waterfox Current'          => 5,
+    Basilisk                    => 6,
+    'Pale Moon'                 => 7,
+);
+my %_known_win32_organisations = (
+    'Mozilla Firefox'           => 'Mozilla',
+    'Mozilla Firefox ESR'       => 'Mozilla',
+    'Firefox Developer Edition' => 'Mozilla',
+    Nightly                     => 'Mozilla',
+    'Waterfox Current'          => 'Waterfox',
+    'Waterfox Classic'          => 'Waterfox',
+    Basilisk                    => 'Mozilla',
+    'Pale Moon'                 => 'Mozilla',
+);
+my $version_string;
 if ( $^O eq 'MSWin32' ) {
-  SEARCH: foreach my $env_key ( 'ProgramFiles', 'ProgramFiles(x86)' ) {
-        foreach my $firefox_directory (@win32_firefox_directories) {
-            if (
-                ( $ENV{$env_key} )
-                && (
-                    -e File::Spec->catfile(
-                        $ENV{$env_key}, $firefox_directory, 'firefox.exe'
-                    )
-                )
-              )
-            {
-                $binary =
-                  File::Spec->catfile( $ENV{$env_key}, $firefox_directory,
-                    'firefox.exe' );
-                last;
+  NAME: foreach my $name (
+        sort {
+            $known_win32_preferred_names{$a}
+              <=> $known_win32_preferred_names{$b}
+        } keys %known_win32_preferred_names
+      )
+    {
+      ROOT_SUBKEY:
+        foreach my $root_subkey ( ['SOFTWARE'], [ 'SOFTWARE', 'WOW6432Node' ] )
+        {
+            my $organisation = $_known_win32_organisations{$name};
+            my ($version) = _win32_registry_query_key(
+                subkey => [ 'HKLM', @{$root_subkey}, $organisation, $name ],
+                name   => 'CurrentVersion'
+            );
+            if ( !defined $version ) {
+                next ROOT_SUBKEY;
+            }
+            my ($initial_version) = _win32_registry_query_key(
+                subkey => [ 'HKLM', @{$root_subkey}, $organisation, $name ],
+                name   => q[]    # (Default) value
+            );
+            my $name_for_path_to_exe = $name;
+            $name_for_path_to_exe =~ s/[ ]ESR//smx;
+            my ($path) = _win32_registry_query_key(
+                subkey => [
+                    'HKLM',        @{$root_subkey},
+                    $organisation, $name_for_path_to_exe,
+                    $version,      'Main'
+                ],
+                name => 'PathToExe'
+            );
+            if (( defined $path ) && (-e $path)) {
+                $binary = $path;
+                last NAME;
             }
         }
     }
 }
 elsif ( $^O eq 'darwin' ) {
-    $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
+    foreach my $path (
+        '/Applications/Firefox.app/Contents/MacOS/firefox',
+        '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox',
+        '/Applications/Firefox Nightly.app/Contents/MacOS/firefox',
+        '/Applications/Waterfox Current.app/Contents/MacOS/waterfox',
+      )
+    {
+        if ( -e $path ) {
+            $binary = $path;
+        }
+    }
 }
 elsif ( $^O eq 'cygwin' ) {
-  SEARCH:
-    foreach
-      my $base_directory ( "$ENV{PROGRAMFILES} (x86)", "$ENV{PROGRAMFILES}" )
+  NAME: foreach my $name (
+        sort {
+            $known_win32_preferred_names{$a}
+              <=> $known_win32_preferred_names{$b}
+        } keys %known_win32_preferred_names
+      )
     {
-        foreach my $firefox_directory (@win32_firefox_directories) {
-            if (   ( -e "$base_directory" )
-                && ( -e "$base_directory/$firefox_directory/firefox.exe" ) )
+      ROOT_SUBKEY:
+        foreach my $root_subkey (qw(SOFTWARE SOFTWARE/WOW6432Node)) {
+            my $organisation = $_known_win32_organisations{$name};
+            my $version =
+              _cygwin_reg_query_value( '/proc/registry/HKEY_LOCAL_MACHINE/'
+                  . $root_subkey . q[/]
+                  . $organisation . q[/]
+                  . $name
+                  . '/CurrentVersion' );
+            if ( !defined $version ) {
+                next ROOT_SUBKEY;
+            }
+            my $initial_version =
+              _cygwin_reg_query_value( '/proc/registry/HKEY_LOCAL_MACHINE/'
+                  . $root_subkey . q[/]
+                  . $organisation . q[/]
+                  . $name
+                  . q[/@] );    # (Default) value
+            my $name_for_path_to_exe = $name;
+            $name_for_path_to_exe =~ s/[ ]ESR//smx;
+            my $path =
+              _cygwin_reg_query_value( '/proc/registry/HKEY_LOCAL_MACHINE/'
+                  . $root_subkey . q[/]
+                  . $organisation . q[/]
+                  . $name_for_path_to_exe . q[/]
+                  . $version
+                  . '/Main/PathToExe' );
+            my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?/smx;
+            if (   ( defined $path ) && (-e $path)
+                && ( $initial_version =~ /^$version_regex$/smx ) )
             {
-                $binary = "$base_directory/$firefox_directory/firefox.exe";
+                $binary         = `cygpath -s -m "$path"`;
+                $version_string = "$name $initial_version";
+                $version_string =~ s/[ ]ESR//smx;
+                last NAME;
             }
         }
     }
 }
-my $version_string = `"$binary" -version`;
+if (!defined $binary) {
+  POSSIBLE: foreach my $possible (@possibles) {
+        foreach my $path ( split /$Config::Config{path_sep}/, defined $ENV{PATH} ? $ENV{PATH} : $ENV{Path} ) {
+            if ( -e "$path/$possible$suffix" ) {
+                $binary = "$path/$possible";
+            }
+        }
+    }
+}
+if ( !defined $version_string ) {
+    $version_string = `"$binary" -version 2>$dev_null`;
+}
 print $version_string;
 my $major;
 if ($version_string) {
-    if ( $version_string =~ /^Mozilla[ ]Firefox[ ](\d+)[.]\d+([.]\d+)?\s*/smx )
+    if ( $version_string =~ /^(?:Mozilla[ ]Firefox|Firefox[ ]Developer[ ]Edition|Nightly)[ ](\d+)[.]\d+(?:a\d+)?([.]\d+)?\s*/smx )
     {
         ($major) = ($1);
         if ( $major < 31 ) {
@@ -82,6 +235,12 @@ if ($version_string) {
             warn
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";
         }
+    }
+    elsif (
+        $version_string =~ /^Waterfox[ ]Current[ ]\d+[.]\d+[.]\d+[.]\d+\s*/smx )
+    {
+    }
+    elsif ( $version_string =~ /^Moonchild[ ]/smx ) {
     }
     else {
         last_desperate_search();
@@ -93,18 +252,21 @@ else {
     die "Mozilla Firefox cannot be discovered in $ENV{PATH}\n";
 }
 if ( $^O eq 'linux' ) {
+    local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
     print "grep -r Mem /proc/meminfo\n";
     print `grep -r Mem /proc/meminfo`;
     print "ulimit -a | grep -i mem\n";
     print `ulimit -a | grep -i mem`;
 }
 elsif ( $^O =~ /bsd/i ) {
+    local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
     print "sysctl hw | egrep 'hw.(phys|user|real)'\n";
     print `sysctl hw | egrep 'hw.(phys|user|real)'`;
     print "ulimit -a | grep -i mem\n";
     print `ulimit -a | grep -i mem`;
 }
 if ( ( $^O eq 'linux' ) || ( $^O eq 'freebsd' ) ) {
+    local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
     my $virtual_memory = `ulimit -v 2>/dev/null`;
     if ( $? == 0 ) {
         chomp $virtual_memory;
@@ -148,43 +310,47 @@ WriteMakefile(
         : ()
     ),
     PL_FILES       => {},
+    EXE_FILES      => ['ssh-auth-cmd-marionette'],
     BUILD_REQUIRES => {
+        'Compress::Zlib'  => 0,
         'Cwd'             => 0,
-        'Test::More'      => 0,
         'Digest::SHA'     => 0,
-        'HTTP::Daemon'    => 0,
-        'HTTP::Status'    => 0,
-        'HTTP::Response'  => 0,
         'File::HomeDir'   => 0,
+        'HTTP::Daemon'    => 0,
+        'HTTP::Response'  => 0,
+        'HTTP::Status'    => 0,
         'IO::Socket::SSL' => 0,
         $] ge '5.010' ? ( 'PDF::API2' => 2.036 ) : (),
+        'Test::More' => 0,
     },
     PREREQ_PM => {
         'Archive::Zip'        => 0,
-        'Config::INI::Reader' => 0,
-        'JSON'                => 0,
-        'Config'              => 0,
-        'FileHandle'          => 0,
-        'DirHandle'           => 0,
-        'File::Find'          => 0,
-        'File::Temp'          => 0,
-        'File::Spec'          => 0,
-        'Socket'              => 0,
-        'English'             => 0,
-        'POSIX'               => 0,
-        'URI'                 => 0,
-        'Fcntl'               => 0,
-        'IPC::Open3'          => 1.03,
-        'MIME::Base64'        => 0,
-        'Time::HiRes'         => 0,
-        'Exporter'            => 0,
-        'overload'            => 0,
         'base'                => 0,
+        'Config'              => 0,
+        'Config::INI::Reader' => 0,
+        'DirHandle'           => 0,
+        'English'             => 0,
+        'Exporter'            => 0,
+        'Fcntl'               => 0,
+        'FileHandle'          => 0,
+        'File::Find'          => 0,
+        'File::Spec'          => 0,
+        'File::Temp'          => 0,
+        'IPC::Open3'          => 1.03,
+        'JSON'                => 0,
+        'MIME::Base64'        => 0,
+        'overload'            => 0,
+        'Pod::Simple::Text'   => 0,
+        'POSIX'               => 0,
+        'Socket'              => 0,
+        'Time::HiRes'         => 0,
+        'URI'                 => 0,
         (
             $^O eq 'MSWin32'
             ? (
-                'Win32'          => 0,
-                'Win32::Process' => 0,
+                'Win32'              => 0,
+                'Win32::Process'     => 0,
+                'Win32API::Registry' => 0,
               )
             : ()
         ),

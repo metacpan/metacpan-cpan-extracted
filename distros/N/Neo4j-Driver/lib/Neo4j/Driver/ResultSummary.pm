@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.16';
+$Neo4j::Driver::ResultSummary::VERSION = '0.17';
 
 use Carp qw(croak);
 
@@ -13,13 +13,14 @@ use Neo4j::Driver::SummaryCounters;
 
 
 sub new {
-	my ($class, $result, $notifications, $statement) = @_; 
+	my ($class, $result, $notifications, $statement, $server_info) = @_; 
 	my $self = {};
 	if ($result && $result->{stats}) {
 		$self->{counters} = $result->{stats};
 		$self->{plan} = $result->{plan};
 		$self->{notifications} = $notifications;
 		$self->{statement} = $statement;
+		$self->{server_info} = $server_info;
 	}
 	return bless $self, $class;
 }
@@ -70,12 +71,7 @@ sub statement {
 sub server {
 	my ($self) = @_;
 	
-	# The HTTP-based driver does not provide the ServerInfo in the
-	# ResultSummary for security reasons: Determining the server version
-	# requires an additional server request, which requires the server's
-	# login credentials. If ResultSummary had access to those, it would
-	# not be safe to pass statement results to untrusted parties.
-	croak "Unimplemented (use Session->server instead)";
+	return $self->{server_info};
 }
 
 
@@ -93,7 +89,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -111,6 +107,10 @@ version 0.16
  $params = $summary->statement->{parameters};
  $plan   = $summary->plan;
  @notes  = $summary->notifications;
+ 
+ # ServerInfo
+ $address = $summary->server->address;
+ $version = $summary->server->version;
 
 =head1 DESCRIPTION
 
@@ -118,10 +118,6 @@ The result summary of running a statement. The result summary can be
 used to investigate details about the result, like the Neo4j server
 version, how many and which kinds of updates have been executed, and
 query plan information if available.
-
-The Perl driver does not currently provide C<ServerInfo> as part of
-the result summary. Use L<Neo4j::Driver::Session> to obtain this
-information instead.
 
 =head1 METHODS
 
@@ -159,6 +155,14 @@ Available if this is the summary of a Cypher C<EXPLAIN> statement.
 At time of this writing, execution plans are not supported on a Bolt
 connection for this driver.
 
+=head2 server
+
+ $address = $summary->server->address;
+ $version = $summary->server->version;
+
+The L<ServerInfo|Neo4j::Driver::ServerInfo>, consisting of
+the host, port and Neo4j version.
+
 =head2 statement
 
  $query  = $summary->statement->{text};
@@ -186,7 +190,7 @@ scalar context, or C<undef> if there are no notifications.
 
 =item * L<Neo4j::Driver>
 
-=item * L<Neo4j::Driver::B<Session>>,
+=item * L<Neo4j::Driver::B<ServerInfo>>,
 L<Neo4j::Driver::B<SummaryCounters>>
 
 =item * Equivalent documentation for the official Neo4j drivers:

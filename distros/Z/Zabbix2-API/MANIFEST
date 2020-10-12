@@ -22,8 +22,6 @@ lib/Zabbix2/API/User.pm
 lib/Zabbix2/API/UserGroup.pm
 LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/actions.t
 t/applications.t
@@ -45,3 +43,5 @@ xt/perl-critic.t
 xt/perlcriticrc
 xt/pod-coverage.t
 xt/pod-syntax.t
+META.yml
+META.json

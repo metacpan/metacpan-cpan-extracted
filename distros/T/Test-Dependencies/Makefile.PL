@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Verify dependencies in META.yml or cpanfile",
+  "ABSTRACT" => "Verify dependencies in META.yml, META.json or cpanfile",
   "AUTHOR" => "Erik Huelsmann <ehuels\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "CPAN::Meta::Requirements" => "2.120620",
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.30",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.29",
   "test" => {
     "TESTS" => "t/*.t"
   }

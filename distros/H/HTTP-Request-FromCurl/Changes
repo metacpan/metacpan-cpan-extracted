@@ -1,3 +1,15 @@
+0.23 2020-10-11
+    * Curl previous to 7.37.0 does not handle IPv6 hostnames well, skip that
+      combination in tests
+    * This is a really minor release to investigate/eliminate one CPAN tester
+      failure
+    * Test infrastructure now runs on Github Actions as well
+    * No functionality changes, no need to upgrade
+
+0.22 2020-10-10
+    * Properly ignore some more headers in the test suite
+    * No functionality changes, no need to upgrade
+
 0.21 2020-10-09
     * --next was introduced in Curl 7.36.0, skip tests on versions before that
     * Adjust test count when things fail

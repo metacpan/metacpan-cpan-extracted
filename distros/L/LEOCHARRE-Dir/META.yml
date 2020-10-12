@@ -1,26 +1,26 @@
---- #YAML:1.0
-name:               LEOCHARRE-Dir
-version:            1.08
-abstract:           my subs for general directory needs
+---
+abstract: 'my subs for general directory needs'
 author:
-    - Leo Charre leocharre at cpan dot org
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Leo Charre leocharre at cpan dot org'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:          1
-    Cwd:           3
-    Exporter:      5
-    File::Path:    2.07
-    Test::Simple:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.54
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LEOCHARRE-Dir
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1'
+  Cwd: '3'
+  Exporter: '5'
+  File::Path: '2.07'
+  Test::Simple: '0'
+version: '1.09'

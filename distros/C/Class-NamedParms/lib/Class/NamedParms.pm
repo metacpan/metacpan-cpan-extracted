@@ -1,9 +1,10 @@
 package Class::NamedParms;
 
 use strict;
+use warnings;
 
 BEGIN {
-    $Class::NamedParms::VERSION = '1.06';
+    $Class::NamedParms::VERSION = '1.08';
 }
 
 ######################################################################

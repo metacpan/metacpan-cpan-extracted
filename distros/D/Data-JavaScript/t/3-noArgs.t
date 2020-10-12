@@ -1,25 +1,29 @@
-BEGIN { $| = 1; $] < 5.007 ?
-      do{ print "1..0 # Skipped: No real Unicode\n"; exit} : print "1..4\n"; }
+#!/usr/bin/env perl
+
+use Modern::Perl;
+
+use Test2::V0;
+use Test2::Require::Perl 'v5.7';
+
 use Data::JavaScript;
 
 #Test undef default
-
-$_ = join('', jsdump('foo', [1,undef,1]));
-print 'not ' unless $_ eq
-      'var foo = new Array;foo[0] = 1;foo[1] = undefined;foo[2] = 1;';
-print "ok 1 #$_\n";
+is join( q//, jsdump( 'foo', [ 1, undef, 1 ] ) ),
+  'var foo = new Array;foo[0] = 1;foo[1] = undefined;foo[2] = 1;',
+  'Default undef';
 
 #Test alphanumeric string output: quoting, ASCII/ANSI escaping, Unicode
+## no critic (ProhibitEscapedCharacters, RequireInterpolationOfMetachars)
+is join( q//, jsdump( 'ANSI', "M\xF6tley Cr\xFce" ) ),
+  'var ANSI = "M\xF6tley Cr\xFCe";',
+  'Quoting, ASCII/ANSI escaping, unicode';
 
-$_ = join('', jsdump("ANSI", "M\xF6tley Cr\xFce"));
-print 'not ' unless $_ eq 'var ANSI = "M\xF6tley Cr\xFCe";';
-print "ok 2 #$_\n";
+is join( q//, jsdump( 'unicode', "Euros (\x{20ac}) aren't Ecus (\x{20a0})" ) ),
+  q(var unicode = "Euros (\u20AC) aren't Ecus (\u20A0)";),
+  q(Wide characters);
 
-$_ = join('', jsdump("unicode", "Euros (\x{20ac}) aren't Ecus (\x{20a0})"));
-print 'not ' unless $_ eq
-	q(var unicode = "Euros (\u20AC) aren't Ecus (\u20A0)";);
-print "ok 3 #$_\n";
+is join( q//, jsdump( 'Cherokee', "\x{13E3}\x{13E3}\x{13E3}" ) ),
+  q(var Cherokee = "\u13E3\u13E3\u13E3";),
+  'Non-Latin characters';
 
-$_ = join('', jsdump("Cherokee", "\x{13E3}\x{13E3}\x{13E3}"));
-print 'not ' unless $_ eq q(var Cherokee = "\u13E3\u13E3\u13E3";);
-print "ok 4 #$_\n";
+done_testing;

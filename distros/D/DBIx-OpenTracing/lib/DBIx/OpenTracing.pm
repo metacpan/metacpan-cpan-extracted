@@ -5,6 +5,7 @@ use feature qw[ state ];
 use syntax 'maybe';
 use B;
 use Carp qw[ croak ];
+use Caller::Hide qw[ hide_package ];
 use DBI;
 use DBIx::OpenTracing::Constants ':ALL';
 use List::Util qw[ sum0 ];
@@ -13,7 +14,9 @@ use Package::Constants;
 use Scalar::Util qw[ blessed looks_like_number ];
 use Scope::Context;
 
-our $VERSION = 'v0.0.9';
+our $VERSION = 'v0.1.0';
+
+hide_package(__PACKAGE__);
 
 use constant TAGS_DEFAULT => (DB_TAG_TYPE ,=> 'sql');
 
@@ -239,8 +242,8 @@ sub _tags_bind_values {
 }
 
 sub _tags_caller {
-    my ($call_package, $call_filename, $call_line) = caller(1);
-    my $call_sub = (caller(2))[3];
+    my ($call_package, $call_filename, $call_line) = CORE::caller(1);
+    my $call_sub = (CORE::caller(2))[3];
     return (
         maybe
         DB_TAG_CALLER_SUB     ,=> $call_sub,

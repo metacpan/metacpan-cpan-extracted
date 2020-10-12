@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Reduce Maxmind memory and increase speed
+
+set -x
+set -e
+
+cd lib/Geo/Coder/Free/MaxMind/databases && ../../bin/db2sql cities

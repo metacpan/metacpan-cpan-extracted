@@ -42,7 +42,7 @@ subtest 'die_on_error = 0' => sub {
 	# die_on_error only ever affected upstream errors via HTTP, 
 	# never any errors issued via Bolt or by this driver itself.
 	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
-	plan tests => 8;
+	plan tests => 6;
 	# init
 	my $d = Neo4j::Test->driver;
 	$d->{die_on_error} = 0;
@@ -56,15 +56,6 @@ subtest 'die_on_error = 0' => sub {
 	$w = '';
 	lives_ok { $w = warning { is $t->run('iced manifolds.')->size, 0 }; } 'execute cypher syntax error';
 	(like $w, qr/\bStatement\b.*Syntax/i, 'cypher syntax error') or diag 'got warning(s): ', explain($w);
-	# connection issue
-	$w = '';
-	lives_ok { $w = warning {
-		no warnings 'deprecated';
-		my $d = Neo4j::Test->driver_no_host;
-		$d->{die_on_error} = 0;
-		$d->session->run;
-	}; } 'no connection';
-	(like $w, qr/\bNetwork\b.*\bCan't connect\b/i, 'no connection warning') or diag 'got warning(s): ', explain($w);
 };
 
 
@@ -72,10 +63,11 @@ subtest 'driver mutability (config/auth)' => sub {
 	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
 	plan tests => 5;
 	lives_ok { $d = 0; $d = Neo4j::Test->driver_maybe; } 'get driver';
-	lives_ok { $r = 0; $r = $d->basic_auth('user1', 'password')->session; } 'get auth session';
-	lives_ok { $w = warning { $r = $d->basic_auth('user2', 'password')->session }; } 'auth mutable lives';
+	lives_ok { $r = 0; $r = $d->session; } 'get auth session';  # basic_auth used by driver_maybe
+	my @credentials = ('unlikely user/password combo', '');
+	lives_ok { $w = warning { $d->basic_auth(@credentials) }; } 'auth mutable lives';
 	(like $w, qr/\bDeprecate.*\bbasic_auth\b.*\bsession\b/i, 'auth mutable deprecated') or diag 'got warning(s): ', explain($w);
-	is $d->{auth}->{principal}, 'user2', 'auth mutable';
+	is $d->{auth}->{principal}, $credentials[0], 'auth mutable';
 };
 
 

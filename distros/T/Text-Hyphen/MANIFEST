@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Text/Hyphen.pm
+minil.toml
 t/00-load.t
 t/01-enhyphen.t
 t/02-contexts.t

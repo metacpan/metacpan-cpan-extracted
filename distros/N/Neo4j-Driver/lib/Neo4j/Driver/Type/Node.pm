@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.16';
+$Neo4j::Driver::Type::Node::VERSION = '0.17';
 
 use Carp qw(croak);
 
@@ -62,7 +62,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -186,7 +186,7 @@ is returned instead.
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Node (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Node.html>,
-L<Node (Python)|https://neo4j.com/docs/api/python-driver/current/types/graph.html#neo4j.types.graph.Node>
+L<Node (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#node>
 
 =back
 

@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.079';
+our $VERSION   = '0.081';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -16,6 +16,7 @@ use Exporter::Shiny our @EXPORT = qw(
 	generator
 	method factory constant
 	multi_method multi_factory
+	symmethod
 	before after around
 	extends with has requires
 	confess
@@ -364,6 +365,27 @@ sub method {
 		$next = sub {
 			my ( $subname, $args ) = @_;
 			'MooX::Press'->patch_package( $caller, can => { $subname => $args } );
+		};
+	}
+	
+	unshift @_, $next;
+	goto \&_method;
+}
+
+sub symmethod {
+	my $next;
+	
+	if ( my $target = $THIS{CLASS_SPEC} ) {
+		$next = sub {
+			my ( $subname, $args ) = @_;
+			push @{ $target->{symmethod} ||= [] }, $subname, $args;
+		};
+	}
+	else {
+		my $target = $THIS{APP} || caller;
+		$next = sub {
+			my ( $subname, $args ) = @_;
+			'MooX::Press'->patch_package( $target, symmethod => { $subname => $args } );
 		};
 	}
 	
@@ -1082,6 +1104,8 @@ Indicate you want a class to have no factories:
 
 The keywords C<multi_method> and C<multi_factory> exist for multimethods.
 
+The keyword C<symmethod> exists for symmethods.
+
 =head3 Types
 
 Setting the type name for a class or role:
@@ -1273,6 +1297,14 @@ means that the keyword may appear only within an app definition block.
  
  # Scope: CLASS
  multi_factory(
+   Str                      $name,
+   ArrayRef                 $signature,
+   Hash                     %args,
+   CodeRef                  $body,
+ );
+ 
+ # Scope: ANY
+ symmethod(
    Str                      $name,
    ArrayRef                 $signature,
    Hash                     %args,

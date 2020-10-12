@@ -41,8 +41,7 @@
 \.prj$
 \.pui$
 
-^MYMETA.yml$
-^MYMETA\.json$
+^MYMETA\.
 
 ^GraphViz2-.*
 \.swp$

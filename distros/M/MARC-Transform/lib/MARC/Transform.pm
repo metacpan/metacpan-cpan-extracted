@@ -7,7 +7,7 @@ use Carp;
 use MARC::Record;
 use YAML;
 use Scalar::Util qw< reftype >;
-our $VERSION = '0.003008';
+our $VERSION = '0.003009';
 our $DEBUG = 0;
 sub debug { $DEBUG and say STDERR @_ }
 
@@ -22,13 +22,18 @@ my $global_LUT;
 our $this="";
 
 sub new {
-    my ($self,$recordsource,$yaml,$mthsource,$verb) = @_;
+    my ($self,$recordsource,$yaml,$mthsource,$verb,$yamlencode) = @_;
     my @yaml;
     no warnings 'redefine';
     no warnings 'newline';
     my $yamltoload;
     if ( -e $yaml ) {
-        open my $yamls, "< $yaml" or die "can't open file: $!";
+        my $yamls;
+        if(defnonull($yamlencode)){
+            open $yamls, "<:encoding($yamlencode)", $yaml or die "can't open file: $!";
+        } else {
+            open $yamls, "< $yaml" or die "can't open file: $!";
+        }
         my $yamlline;
         while ($yamlline = <$yamls>){ $yamltoload.=$yamlline; }
         close $yamls;
@@ -791,7 +796,7 @@ sub testrule {
     my ($rul, $actionsin, $actionsinter, $actionsout, $subs) = @_;
     $globalcondition="";
     $subs="no warnings 'redefine';".$subs if $subs ne "";
-    my $globalconditionstart='{ '."\n".$subs."\n".'my $boolcond=0;my $boolcondint=0;my $currentfield;no warnings \'substr\';no warnings \'uninitialized\';'."\n";
+    my $globalconditionstart='{ '."\n".$subs."\n".'my $boolcond=0;my $boolcondint=0;my $currentfield;no warnings \'substr\';no warnings \'uninitialized\';no warnings \'portable\';'."\n";
     my $globalconditionint="";
     my $globalconditionend="";#print Data::Dumper::Dumper ($rul);
     if ( defnonull ( $$rul{'condition'} ) ) {
@@ -914,7 +919,7 @@ MARC::Transform - Perl module to transform a MARC record using a YAML configurat
 
 =head1 VERSION
 
-Version 0.003008
+Version 0.003009
 
 =head1 SYNOPSIS
 
@@ -1011,6 +1016,16 @@ As we will see in more detail below, it is possible to add a hash reference (nam
 Each YAML rule (see basis below to understand what is a rule) generates a script that is evaluated, in the record, for each field and subfield specified in the condition (If there is a condition). By adding a fourth optional argument B<1> to the method, it displays the generated script. This can be useful to understand what is happening:
 
     $record = MARC::Transform->new($record,"/path/conf.yaml",0,1);
+
+=head3 Define YAML configuration file encoding
+
+You can force use of a specific encoding to open YAML configuration file by specifying it in the fifth optional argument like this (e.g. for an UTF-8 file)
+
+    $record = MARC::Transform->new($record,"/path/conf.yaml",0,0,"UTF-8");
+
+or like this (e.g. for an Latin1 file)
+
+    $record = MARC::Transform->new($record,"/path/conf.yaml",0,0,"Latin1");
 
 =head1 YAML
 
@@ -1130,7 +1145,7 @@ For example, this means, that if we have more '501' fields in the record, if our
 
 =item * Controlfields names begin with the letter B<f> followed by B<3-digit lower than 010> followed by B<underscore> (e.g. B<f005_>). 
 
-=item * B<Indicators> must begin with the letter B<i>, followed by the B<3-digit> field name followed by the indicator's position (B<1 or 2>) (par exemple B<i0991>).
+=item * B<Indicators> must begin with the letter B<i>, followed by the B<3-digit> field name followed by the indicator's position (B<1 or 2>) (e.g. B<i0991>).
 
 =item * In actions, you can define B<a subfield directly> (or an indicator with i1 or i2). Depending on context, it refers to the condition's field (if we define only one field to be tested in the condition), or to the field currently being processed in action:
 
@@ -2017,7 +2032,7 @@ In YAML, these characters are interpreted differently. To use them in string con
 
 =item * Restriction: You can test if a field or subfield exists, but it is inadvisable to test its absence.
 
-=item * Example: feel free to copy the examples in this documentation. Be aware that I have added four space characters at the beginning of each exemple's line to make them better displayed by the POD interpreter. If you copy / paste them into your YAML configuration file, Be sure to remove the first four characters of each line (e.g. with vim, C<:%s/^\s\s\s\s//g> ). 
+=item * Example: feel free to copy the examples in this documentation. Be aware that I have added four space characters at the beginning of each example's line to make them better displayed by the POD interpreter. If you copy / paste them into your YAML configuration file, Be sure to remove the first four characters of each line (e.g. with vim, C<:%s/^\s\s\s\s//g> ). 
 
 =item * 
 This yaml was called like this: C<< my %mth; $mth{"var"}="a string"; $record = MARC::Transform->new($record,$yaml,\%mth); >>
@@ -2190,7 +2205,7 @@ Stephane Delaune, (delaune.stephane at gmail.com)
 
 =head1 COPYRIGHT
 
-Copyright 2011-2019 Stephane Delaune for Biblibre.com, all rights reserved.
+Copyright 2011-2020 Stephane Delaune for Biblibre.com, all rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -2205,7 +2220,7 @@ MARC::Transform - Module Perl pour transformer une notice MARC en utilisant un f
 
 =head1 - VERSION
 
-Version 0.003008
+Version 0.003009
 
 =head1 - SYNOPSIS
 
@@ -2302,6 +2317,16 @@ Comme nous allons le voir plus en détail plus bas, il est possible d'ajouter co
 Chaque règle du YAML (voir les bases plus bas pour comprendre ce qu'est une règle) génère un script qui est évalué, dans la notice, pour chaque champ et sous-champ spécifié dans la condition (si il y a une condition). En ajoutant un quatrième argument optionnel B<1> à la méthode, elle affiche le script généré. Cela peut être utile pour comprendre ce qu'il se passe:
 
     $record = MARC::Transform->new($record,"/path/conf.yaml",0,1);
+
+=head3 - Définir l'encodage du fichier de configuration YAML
+
+Vous pouvez forcer l'ouverture du fichier de configuration YAML dans un encodage spécifique en le précisant dans le cinquième argument facultatif comme ceci (pour un fichier UTF-8)
+
+    $record = MARC::Transform->new($record,"/path/conf.yaml",0,0,"UTF-8");
+
+ou comme ceci (pour un fichier Latin1)
+
+    $record = MARC::Transform->new($record,"/path/conf.yaml",0,0,"Latin1");
 
 =head1 - YAML
 
@@ -3480,7 +3505,7 @@ Stéphane Delaune, (delaune.stephane at gmail.com)
 
 =head1 - COPYRIGHT
 
-Copyright 2011-2019 Stephane Delaune for Biblibre.com, all rights reserved.
+Copyright 2011-2020 Stephane Delaune for Biblibre.com, all rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

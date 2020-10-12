@@ -24,6 +24,7 @@ my %params = (
             DIR  => 'libnet-sockaddr',
         },
     },
+    CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},
 );
 
 write_makefile(%params);

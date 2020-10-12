@@ -52,10 +52,10 @@ TEST("normal input") {
 
 TEST("pause input") {
     AsyncTest test(3000, 1);
-    auto p = make_pair(test.loop, 10000, 20);
+    auto p = make_pair(test.loop, 1000, 20);
     auto i = new TestStreamInput(p.sconn);
-    auto o = new TestOutput(9000);
-    StreamerSP s = new Streamer(i, o, 50000, test.loop);
+    auto o = new TestOutput(400);
+    StreamerSP s = new Streamer(i, o, 3000, test.loop);
     s->start();
     s->finish_event.add([&](const ErrorCode& err) {
         if (err) WARN(err);
@@ -69,8 +69,8 @@ TEST("pause input") {
 
 TEST("normal output") {
     AsyncTest test(3000, 2);
-    auto p1 = make_pair(test.loop, 10000, 20);
     auto p2 = make_p2p(test.loop);
+    auto p1 = make_pair(test.loop, 10000, 20);
     auto i = new TestStreamInput(p1.sconn);
     auto o = new StreamOutput(p2.sconn);
     StreamerSP s = new Streamer(i, o, 50000, test.loop);
@@ -83,7 +83,7 @@ TEST("normal output") {
     });
 
     string res;
-    p2.client->read_event.add([&](auto&, string& data, auto...) {
+    p2.client->read_event.add([&](auto&, const string& data, auto...) {
         res += data;
     });
     p2.client->eof_event.add([&](auto...){

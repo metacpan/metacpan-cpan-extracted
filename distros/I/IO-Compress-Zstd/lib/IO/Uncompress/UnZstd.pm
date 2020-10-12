@@ -13,7 +13,7 @@ use IO::Uncompress::Adapter::UnZstd  2.096 ;
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnZstdError);
 
-$VERSION = '2.096';
+$VERSION = '2.097';
 $UnZstdError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -882,4 +882,3 @@ Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

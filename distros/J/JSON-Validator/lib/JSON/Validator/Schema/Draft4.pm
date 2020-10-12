@@ -61,15 +61,15 @@ sub _validate_type_array_items {
   my @errors;
 
   if (ref $schema->{items} eq 'ARRAY') {
-    my $additional_items = $schema->{additionalItems} // {type => 'any'};
+    my $additional_items = $schema->{additionalItems} // {};
     my @rules            = @{$schema->{items}};
 
     if ($additional_items) {
       push @rules, $additional_items while @rules < @$data;
     }
 
-    if (@rules == @$data) {
-      for my $i (0 .. @rules - 1) {
+    if (@rules >= @$data) {
+      for my $i (0 .. @$data - 1) {
         push @errors, $self->_validate($data->[$i], "$path/$i", $rules[$i]);
       }
     }
@@ -152,8 +152,8 @@ sub _validate_type_object_dependencies {
         map { E json_pointer($path, $_), [object => dependencies => $k] }
         grep { !exists $data->{$_} } @{$dependencies->{$k}};
     }
-    elsif (ref $dependencies->{$k} eq 'HASH') {
-      push @errors, $self->_validate_type_object($data, $path, $schema->{dependencies}{$k});
+    else {
+      push @errors, $self->_validate($data, $path, $dependencies->{$k});
     }
   }
 
@@ -165,7 +165,7 @@ sub _validate_type_object_properties {
   my @dkeys = sort keys %$data;
   my (@errors, %rules);
 
-  for my $k (keys %{$schema->{properties}}) {
+  for my $k (keys %{$schema->{properties} || {}}) {
     my $r = $schema->{properties}{$k};
     push @{$rules{$k}}, $r;
     if ($self->{coerce}{defaults} and ref $r eq 'HASH' and exists $r->{default} and !exists $data->{$k}) {

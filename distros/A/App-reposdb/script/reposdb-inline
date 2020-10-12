@@ -2,21 +2,21 @@
 
 ### begin code_after_shebang
 # Note: This script is a CLI
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 ### end code_after_shebang
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"reposdb-inline.conf","env_name":"REPOSDB_INLINE_OPT","include":null,"log":null,"pack_deps":"0","pod":0,"read_config":1,"read_env":1,"script_name":"reposdb-inline","script_summary":null,"script_version":"0.006","shebang":"perl","skip_format":0,"subcommands":{"ls":{"url":"/App/reposdb/list_repos"},"remove-all-tags":{"url":"/App/reposdb/remove_all_repo_tags"},"remove-tag":{"url":"/App/reposdb/remove_repo_tag"},"touch":{"url":"/App/reposdb/touch_repo"}},"url":"/App/reposdb/","use_cleanser":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"reposdb-inline.conf","env_name":"REPOSDB_INLINE_OPT","include":null,"log":null,"pack_deps":"0","pod":0,"read_config":1,"read_env":1,"script_name":"reposdb-inline","script_summary":null,"script_version":"0.007","shebang":"perl","skip_format":0,"subcommands":{"ls":{"url":"/App/reposdb/list_repos"},"remove-all-tags":{"url":"/App/reposdb/remove_all_repo_tags"},"remove-tag":{"url":"/App/reposdb/remove_repo_tag"},"touch":{"url":"/App/reposdb/touch_repo"}},"url":"/App/reposdb/","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = do{my$a={ls=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],tags=>["category:field-selection"]},has_tags=>{element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],tags=>["category:filtering"],"x.name.is_plural"=>1,"x.name.singular"=>"has_tag"},lacks_tags=>{element_completion=>'fix',schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],tags=>["category:filtering"],"x.name.is_plural"=>1,"x.name.singular"=>"lacks_tag"},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>["common"]},sorts=>{default=>["name"],schema=>["array",{of=>["str",{in=>["name","-name","commit_time","-commit_time","status_time","-status_time","pull_time","-pull_time"],req=>1},{}],req=>1},{}],tags=>["category:sorting"],"x.name.is_plural"=>1}},result=>{},summary=>"List repositories registered in repos.db",v=>1.1},"remove-all-tags"=>{args=>{repo=>{completion=>sub{"DUMMY"},pos=>0,schema=>["str",{req=>1},{}]},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>'fix'}},result=>{},v=>1.1},"remove-tag"=>{args=>{repo=>{completion=>'fix',pos=>0,schema=>["str",{req=>1},{}]},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>'fix'},tags=>{element_completion=>'fix',greedy=>1,pos=>1,req=>1,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],"x.name.is_plural"=>1}},result=>{},v=>1.1},touch=>{args=>{commit_time=>{schema=>["bool",{is=>1},{}]},pull_time=>{schema=>["bool",{is=>1},{}]},repo=>{completion=>'fix',pos=>0,schema=>["str",{req=>1},{}]},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>'fix'},status_time=>{schema=>["bool",{is=>1},{}]},to=>{schema=>["date",{req=>1},{}]}},args_rels=>{req_some=>[1,3,["commit_time","status_time","pull_time"]]},result=>{},v=>1.1}};$a->{ls}{args}{lacks_tags}{element_completion}=$a->{ls}{args}{has_tags}{element_completion};$a->{"remove-all-tags"}{args}{reposdb_path}{tags}=$a->{ls}{args}{reposdb_path}{tags};$a->{"remove-tag"}{args}{repo}{completion}=$a->{"remove-all-tags"}{args}{repo}{completion};$a->{"remove-tag"}{args}{reposdb_path}{tags}=$a->{ls}{args}{reposdb_path}{tags};$a->{"remove-tag"}{args}{tags}{element_completion}=$a->{ls}{args}{has_tags}{element_completion};$a->{touch}{args}{repo}{completion}=$a->{"remove-all-tags"}{args}{repo}{completion};$a->{touch}{args}{reposdb_path}{tags}=$a->{ls}{args}{reposdb_path}{tags};$a};
+my $_pci_metas = do{my$a={ls=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],tags=>["category:field-selection"]},has_tags=>{element_completion=>sub{"DUMMY"},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],tags=>["category:filtering"],"x.name.is_plural"=>1,"x.name.singular"=>"has_tag"},lacks_tags=>{element_completion=>'fix',schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],tags=>["category:filtering"],"x.name.is_plural"=>1,"x.name.singular"=>"lacks_tag"},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>["common"]},sorts=>{default=>["name"],schema=>["array",{of=>["str",{in=>["name","-name","commit_time","-commit_time","status_time","-status_time","pull_time","-pull_time"],req=>1},{}],req=>1},{}],tags=>["category:sorting"],"x.name.is_plural"=>1}},result=>{},summary=>"List repositories registered in repos.db",v=>1.1},"remove-all-tags"=>{args=>{repo=>{completion=>sub{"DUMMY"},pos=>0,schema=>["str",{req=>1},{}]},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>'fix'}},result=>{},summary=>"Remove all tags from a repo (by default the current repo)",v=>1.1},"remove-tag"=>{args=>{repo=>{completion=>'fix',pos=>0,schema=>["str",{req=>1},{}]},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>'fix'},tags=>{element_completion=>'fix',greedy=>1,pos=>1,req=>1,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],"x.name.is_plural"=>1}},result=>{},summary=>"Remove tag from a repo (by default the current repo)",v=>1.1},touch=>{args=>{commit_time=>{schema=>["bool",{is=>1},{}]},pull_time=>{schema=>["bool",{is=>1},{}]},repo=>{completion=>'fix',pos=>0,schema=>["str",{req=>1},{}]},reposdb_path=>{req=>1,schema=>["str",{req=>1},{}],tags=>'fix'},status_time=>{schema=>["bool",{is=>1},{}]},to=>{schema=>["date",{req=>1},{}]}},args_rels=>{req_some=>[1,3,["commit_time","status_time","pull_time"]]},result=>{},summary=>"Touch the timestamp(s) of a repo (by default current repo)",v=>1.1}};$a->{ls}{args}{lacks_tags}{element_completion}=$a->{ls}{args}{has_tags}{element_completion};$a->{"remove-all-tags"}{args}{reposdb_path}{tags}=$a->{ls}{args}{reposdb_path}{tags};$a->{"remove-tag"}{args}{repo}{completion}=$a->{"remove-all-tags"}{args}{repo}{completion};$a->{"remove-tag"}{args}{reposdb_path}{tags}=$a->{ls}{args}{reposdb_path}{tags};$a->{"remove-tag"}{args}{tags}{element_completion}=$a->{ls}{args}{has_tags}{element_completion};$a->{touch}{args}{repo}{completion}=$a->{"remove-all-tags"}{args}{repo}{completion};$a->{touch}{args}{reposdb_path}{tags}=$a->{ls}{args}{reposdb_path}{tags};$a};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.548 on Wed Apr  8 09:46:29 2020.
+# This script is generated by Perinci::CmdLine::Inline version 0.551 on Sat Oct 10 19:58:23 2020.
 
 # Rinci metadata taken from these modules: App::reposdb (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-10-10'; # DATE
+our $VERSION = '0.007'; # VERSION
 # PODNAME: reposdb-inline
 
 package main;
@@ -60,13 +60,13 @@ sub _pci_json {
 my %mentioned_args;
 require Getopt::Long::EvenLess;
 require Getopt::Long::Subcommand;
-my $help_msg = "Usage:\n  reposdb-inline --help (or -h, -?)\n  reposdb-inline --page-result (or --page-result=PROGNAME)\n  reposdb-inline --subcommands\n  reposdb-inline --version (or -v)\n  reposdb-inline [options]\n\nSubcommands:\n  ls\n  remove-all-tags\n  remove-tag\n  touch\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --cmd=s                        Select subcommand\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --subcommands                  List available subcommands\n  --version, -v                  Display program's version and exit\n";
+my $help_msg = "Usage:\n  reposdb-inline --help (or -h, -?)\n  reposdb-inline --subcommands\n  reposdb-inline --version (or -v)\n  reposdb-inline [--cmd=subcommand_name] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--naked-res]\n    [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [--page-result[=program]]\n\nSubcommands:\n  ls\n  remove-all-tags\n  remove-tag\n  touch\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --cmd=s                        Select subcommand\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --subcommands                  List available subcommands\n  --version, -v                  Display program's version and exit\n";
 my $go_spec1 = {
   'cmd=s' => sub { $_[2]{subcommand} = [$_[1]]; $_pci_r->{subcommand_name} = $_[1]; },
   'config-path=s@' => sub { $_pci_r->{config_paths} //= []; push @{ $_pci_r->{config_paths} }, $_[1]; },
   'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
   'format=s' => sub { $_pci_r->{format} = $_[1]; },
-  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "Usage:\n  reposdb-inline --help (or -h, -?)\n  reposdb-inline --page-result (or --page-result=PROGNAME)\n  reposdb-inline --subcommands\n  reposdb-inline --version (or -v)\n  reposdb-inline [options]\n\nSubcommands:\n  ls\n  remove-all-tags\n  remove-tag\n  touch\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --cmd=s                        Select subcommand\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --subcommands                  List available subcommands\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "reposdb-inline ls - List repositories registered in repos.db\n\nUsage:\n  reposdb-inline ls --help (or -h, -?)\n  reposdb-inline ls --page-result (or --page-result=PROGNAME)\n  reposdb-inline ls --version (or -v)\n  reposdb-inline ls [options]\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nField selection options:\n  --detail, -l  \n\nFiltering options:\n  --has-tag=s\@    \n  --lacks-tag=s\@  \n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nSorting options:\n  --sort=s\@   [[\"name\"]]\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "remove-all-tags") { print "Usage:\n  reposdb-inline remove-all-tags --help (or -h, -?)\n  reposdb-inline remove-all-tags --page-result (or --page-result=PROGNAME)\n  reposdb-inline remove-all-tags --version (or -v)\n  reposdb-inline remove-all-tags [options] [repo]\n\nMain options:\n  --repo=s   (=arg[0])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "remove-tag") { print "Usage:\n  reposdb-inline remove-tag --help (or -h, -?)\n  reposdb-inline remove-tag --page-result (or --page-result=PROGNAME)\n  reposdb-inline remove-tag --version (or -v)\n  reposdb-inline remove-tag [options] [repo] <tags> ...\n\nMain options:\n  --repo=s    (=arg[0])\n  --tag=s\@*   (=arg[1-])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "touch") { print "Usage:\n  reposdb-inline touch --help (or -h, -?)\n  reposdb-inline touch --page-result (or --page-result=PROGNAME)\n  reposdb-inline touch --version (or -v)\n  reposdb-inline touch [options] [repo]\n\nMain options:\n  --commit-time  \n  --pull-time    \n  --repo=s        (=arg[0])\n  --status-time  \n  --to=s         \n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
+  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "Usage:\n  reposdb-inline --help (or -h, -?)\n  reposdb-inline --subcommands\n  reposdb-inline --version (or -v)\n  reposdb-inline [--cmd=subcommand_name] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--naked-res]\n    [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [--page-result[=program]]\n\nSubcommands:\n  ls\n  remove-all-tags\n  remove-tag\n  touch\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --cmd=s                        Select subcommand\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --subcommands                  List available subcommands\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "reposdb-inline ls - List repositories registered in repos.db\n\nUsage:\n  reposdb-inline ls --help (or -h, -?)\n  reposdb-inline ls --version (or -v)\n  reposdb-inline ls [--config-path=path+] [--config-profile=profile] [--detail]\n    [--format=name] [--has-tag=s+] [--json] [-l] [--lacks-tag=s+] [--naked-res]\n    [--no-config] [--no-detail] [--no-env] [--no-naked-res | --nonaked-res]\n    [--nodetail] [--page-result[=program]] [--reposdb-path=s] [--sort=s+]\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nField selection options:\n  --detail, -l  \n\nFiltering options:\n  --has-tag=s\@    \n  --lacks-tag=s\@  \n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nSorting options:\n  --sort=s\@   [[\"name\"]]\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "remove-all-tags") { print "reposdb-inline remove-all-tags - Remove all tags from a repo (by default the current repo)\n\nUsage:\n  reposdb-inline remove-all-tags --help (or -h, -?)\n  reposdb-inline remove-all-tags --version (or -v)\n  reposdb-inline remove-all-tags [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--naked-res]\n    [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [--page-result[=program]] [--reposdb-path=s] [repo]\n\nMain options:\n  --repo=s   (=arg[0])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "remove-tag") { print "reposdb-inline remove-tag - Remove tag from a repo (by default the current repo)\n\nUsage:\n  reposdb-inline remove-tag --help (or -h, -?)\n  reposdb-inline remove-tag --version (or -v)\n  reposdb-inline remove-tag [--config-path=path+] [--config-profile=profile]\n    [--format=name] [--json] [--naked-res] [--no-config] [--no-env]\n    [--no-naked-res | --nonaked-res] [--page-result[=program]]\n    [--reposdb-path=s] [repo] <tags> ...\n\nMain options:\n  --repo=s    (=arg[0])\n  --tag=s\@*   (=arg[1-])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "touch") { print "reposdb-inline touch - Touch the timestamp(s) of a repo (by default current repo)\n\nUsage:\n  reposdb-inline touch --help (or -h, -?)\n  reposdb-inline touch --version (or -v)\n  reposdb-inline touch [--commit-time] [--config-path=path+]\n    [--config-profile=profile] [--format=name] [--json] [--naked-res]\n    [--no-config] [--no-env] [--no-naked-res | --nonaked-res]\n    [--page-result[=program]] [--pull-time] [--reposdb-path=s] [--status-time]\n    [--to=s] [repo]\n\nMain options:\n  --commit-time  \n  --pull-time    \n  --repo=s        (=arg[0])\n  --status-time  \n  --to=s         \n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s     Choose output format, e.g. json, text\n  --json         Set output format to json\n  --page-result  Filter output through a pager\n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --reposdb-path=s*              \n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
   'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
   'naked-res' => sub { $_pci_r->{naked_res} = 1; },
   'no-config' => sub { $_pci_r->{read_config} = 0; },
@@ -74,7 +74,7 @@ my $go_spec1 = {
   'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
   'page-result:s' => sub { $_pci_r->{page_result} = 1; },
   'subcommands' => sub { print "Available subcommands:\n  ls\n  remove-all-tags\n  remove-tag\n  touch\n"; exit 0 },
-  'version|v' => sub { no warnings 'once'; require App::reposdb; print "reposdb-inline version ", "0.006", ($App::reposdb::DATE ? " ($App::reposdb::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.548 (2020-04-05)\n"; exit 0 },
+  'version|v' => sub { no warnings 'once'; require App::reposdb; print "reposdb-inline version ", "0.007", ($App::reposdb::DATE ? " ($App::reposdb::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.551 (2020-05-18)\n"; exit 0 },
 };
 my $go_spec2 = {
   options => {
@@ -274,25 +274,25 @@ if ($sc_name eq "ls") {
     $_pci_meta_result_type = "";
     require App::reposdb;
     eval { $_pci_r->{res} = App::reposdb::list_repos(%_pci_args) };
-    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
 }
 elsif ($sc_name eq "remove-all-tags") {
     $_pci_meta_result_type = "";
     require App::reposdb;
     eval { $_pci_r->{res} = App::reposdb::remove_all_repo_tags(%_pci_args) };
-    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
 }
 elsif ($sc_name eq "remove-tag") {
     $_pci_meta_result_type = "";
     require App::reposdb;
     eval { $_pci_r->{res} = App::reposdb::remove_repo_tag(%_pci_args) };
-    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
 }
 elsif ($sc_name eq "touch") {
     $_pci_meta_result_type = "";
     require App::reposdb;
     eval { $_pci_r->{res} = App::reposdb::touch_repo(%_pci_args) };
-    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+    if ($@) { die if $ENV{PERINCI_CMDLINE_INLINE_DEBUG_DIE}; $_pci_r->{res} = [500, "Function died: $@"] }
 }
 }
 
@@ -317,7 +317,7 @@ else { require Perinci::Result::Format::Lite; $is_stream=0; _pci_clean_json($_pc
 my $use_utf8 = $_pci_r->{res}[3]{"x.hint.result_binary"} ? 0 : 0;
 if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }
 if ($is_stream) {
-    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print $fh _pci_json()->encode($rec),"\n" } }
+    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $fh $l; print $fh "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { if (!defined($rec) || ref $rec) { print $fh _pci_json()->encode($rec),"\n" } else { print $fh $rec,"\n" } } }
 } else {
     print $fh $fres;
 }
@@ -678,7 +678,7 @@ sub _pci_check_args {
 # END Local::_pci_check_args
 
 # BEGIN Local::_pci_clean_json
-sub _pci_clean_json { require Scalar::Util; require Clone::PP;  use feature 'state'; state $cleanser = sub {
+sub _pci_clean_json { require Clone::PP; require Scalar::Util;  use feature 'state'; state $cleanser = sub {
 my $data = shift;
 state %refs;
 state $ctr_circ;
@@ -758,16 +758,31 @@ reposdb-inline
 
 =head1 VERSION
 
-This document describes version 0.006 of main (from Perl distribution App-reposdb), released on 2020-04-08.
+This document describes version 0.007 of main (from Perl distribution App-reposdb), released on 2020-10-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % reposdb-inline ls [options]
- % reposdb-inline remove-all-tags [options] [repo]
- % reposdb-inline remove-tag [options] [repo] <tags> ...
- % reposdb-inline touch [options] [repo]
+ % reposdb-inline ls [--config-path=path+] [--config-profile=profile]
+     [--detail] [--format=name] [--has-tag=s+] [--has-tags-json=s] [--json]
+     [-l] [--lacks-tag=s+] [--lacks-tags-json=s] [--(no)naked-res]
+     [--no-config] [--no-detail] [--no-env] [--nodetail]
+     [--page-result[=program]] [--reposdb-path=s] [--sort=s+]
+     [--sorts-json=s] [--view-result[=program]]
+ % reposdb-inline remove-all-tags [--config-path=path+]
+     [--config-profile=profile] [--format=name] [--json] [--(no)naked-res]
+     [--no-config] [--no-env] [--page-result[=program]] [--reposdb-path=s]
+     [--view-result[=program]] [repo]
+ % reposdb-inline remove-tag [--config-path=path+]
+     [--config-profile=profile] [--format=name] [--json] [--(no)naked-res]
+     [--no-config] [--no-env] [--page-result[=program]] [--reposdb-path=s]
+     [--view-result[=program]] [repo] <tags> ...
+ % reposdb-inline touch [--commit-time] [--config-path=path+]
+     [--config-profile=profile] [--format=name] [--json] [--(no)naked-res]
+     [--no-config] [--no-env] [--page-result[=program]] [--pull-time]
+     [--reposdb-path=s] [--status-time] [--to=s] [--view-result[=program]]
+     [repo]
 
 =head1 DESCRIPTION
 
@@ -787,9 +802,15 @@ List repositories registered in repos.db.
 
 =head2 B<remove-all-tags>
 
+Remove all tags from a repo (by default the current repo).
+
 =head2 B<remove-tag>
 
+Remove tag from a repo (by default the current repo).
+
 =head2 B<touch>
+
+Touch the timestamp(s) of a repo (by default current repo).
 
 =head1 OPTIONS
 
@@ -867,6 +888,10 @@ List available subcommands.
 =item B<--version>, B<-v>
 
 Display program's version and exit.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

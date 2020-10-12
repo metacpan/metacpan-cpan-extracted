@@ -23,3 +23,4 @@ t/paragraph.jpg
 t/tesseract_install_helper.pl
 t/test.sh
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

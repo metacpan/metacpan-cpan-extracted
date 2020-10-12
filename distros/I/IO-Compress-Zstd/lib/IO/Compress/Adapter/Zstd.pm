@@ -9,7 +9,7 @@ use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 use Compress::Stream::Zstd::Compressor qw(ZSTD_CSTREAM_IN_SIZE);
 
 our ($VERSION);
-$VERSION = '2.096';
+$VERSION = '2.097';
 
 sub mkCompObject
 {

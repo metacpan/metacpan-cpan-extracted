@@ -15,8 +15,11 @@ my $test_subs = {
        6 => { -code => \&test5,             -desc => 'stacked parms (list) ' },
        7 => { -code => \&test_bad_parms,    -desc => 'bad parameters       ' },
 };
-print $do_tests[0],'..',$do_tests[$#do_tests],"\n";
-print STDERR "\n";
+
+my @commentary = ('');
+my $test_plan = join('', $do_tests[0],'..',$do_tests[$#do_tests]);
+my @results = ($test_plan);
+
 my $n_failures = 0;
 foreach my $test (@do_tests) {
     my $sub  = $test_subs->{$test}->{-code};
@@ -28,16 +31,17 @@ foreach my $test (@do_tests) {
     }
     if ($failure ne '') {
         chomp $failure;
-        print "not ok $test\n";
-        print STDERR "     $desc                  - $failure\n";
+        push(@results, "not ok $test");
+        push(@commentary, "     $desc                  - $failure");
         $n_failures++;
     } else {
-        print "ok $test\n";
-        print STDERR "     $desc                  - ok\n";
+        push(@results, "ok $test");
+        push(@commentary, "     $desc                  - ok");
 
     }
 }
-print "END\n";
+print join("\n",@results,"END\n");
+print STDERR join("\n", @commentary, '');
 exit;
 
 ########################################

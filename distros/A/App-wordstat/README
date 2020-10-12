@@ -1,0 +1,96 @@
+NAME
+    App::wordstat - Return word statistics of a text
+
+VERSION
+    This document describes version 0.003 of App::wordstat (from Perl
+    distribution App-wordstat), released on 2020-10-11.
+
+DESCRIPTION
+    See included script wordstat.
+
+FUNCTIONS
+  wordstat
+    Usage:
+
+     wordstat(%args) -> [status, msg, payload, meta]
+
+    Return word statistics of a text.
+
+    Examples:
+
+    *   Example #1:
+
+         wordstat(text => "An optimistic person sees good things everywhere, is generally confident and\nhopeful of what the future holds. From the optimist's point-of-view the world is\nfull of potential opportunities. The pessimist, on the other hand, observes\nmainly the negative aspects of everything around.\n\n");
+
+        Result:
+
+         [
+           200,
+           "OK (envelope generated)",
+           {
+             avg_line_len                  => 56,
+             avg_line_with_words_len       => 70,
+             avg_nonempty_line_len         => 70,
+             avg_word_len                  => 5.17777777777778,
+             avg_words_per_line            => 9,
+             avg_words_per_line_with_words => 11.25,
+             avg_words_per_nonempty_line   => 11.25,
+             longest_word_len              => 13,
+             num_chars                     => 285,
+             num_lines                     => 5,
+             num_lines_with_words          => 4,
+             num_nonempty_lines            => 4,
+             num_unique_words              => 36,
+             num_words                     => 45,
+             shortest_word_len             => 1,
+           },
+         ]
+
+    *   Supply text from file or stdin:
+
+         wordstat( text => "file.txt");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   text* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-wordstat>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-wordstat>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordstat>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    freqtable from App::freqtable.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

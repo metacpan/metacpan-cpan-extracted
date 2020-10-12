@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-10'; # DATE
+our $DIST = 'App-reposdb'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +20,7 @@ Perinci::CmdLine::Any->new(
         tag               => {url => "${prefix}add_repo_tag"},
         'remove-tag'      => {url => "${prefix}remove_repo_tag"},
         'remove-all-tags' => {url => "${prefix}remove_all_repo_tags"},
+        get               => {url => "${prefix}get_repo_metadata"},
     },
     log => 1,
 )->run;
@@ -38,21 +41,53 @@ reposdb - Manipulate repos.db
 
 =head1 VERSION
 
-This document describes version 0.006 of reposdb (from Perl distribution App-reposdb), released on 2020-04-08.
+This document describes version 0.007 of reposdb (from Perl distribution App-reposdb), released on 2020-10-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % reposdb ls [options]
- % reposdb remove-all-tags [options] [repo]
- % reposdb remove-tag [options] [repo] <tags> ...
- % reposdb tag [options] [repo] <tags> ...
- % reposdb touch [options] [repo]
+ % reposdb get [--config-path=path | -c] [--config-profile=profile | -P]
+     [--debug] [--format=name] [--json] [--log-level=level]
+     [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] [--quiet] [--reposdb-path=s] [--trace]
+     [--verbose] [--view-result[=program]] [repo]
+ % reposdb ls [--config-path=path | -c] [--config-profile=profile | -P]
+     [--debug] [--detail] [--format=name] [--has-tag=s+]
+     [--has-tags-json=s] [--json] [-l] [--lacks-tag=s+]
+     [--lacks-tags-json=s] [--log-level=level] [--(no)naked-res]
+     [--no-config | -C] [--no-detail] [--no-env] [--nodetail]
+     [--page-result[=program]] [--quiet] [--reposdb-path=s] [--sort=s+]
+     [--sorts-json=s] [--trace] [--verbose] [--view-result[=program]]
+ % reposdb remove-all-tags [--config-path=path | -c]
+     [--config-profile=profile | -P] [--debug] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] [--quiet] [--reposdb-path=s] [--trace]
+     [--verbose] [--view-result[=program]] [repo]
+ % reposdb remove-tag [--config-path=path | -c] [--config-profile=profile |
+     -P] [--debug] [--format=name] [--json] [--log-level=level]
+     [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] [--quiet] [--reposdb-path=s] [--trace]
+     [--verbose] [--view-result[=program]] [repo] <tags> ...
+ % reposdb tag [--config-path=path | -c] [--config-profile=profile | -P]
+     [--debug] [--format=name] [--json] [--log-level=level]
+     [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] [--quiet] [--reposdb-path=s] [--trace]
+     [--verbose] [--view-result[=program]] [repo] <tags> ...
+ % reposdb touch [--commit-time] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--debug] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] [--pull-time] [--quiet] [--reposdb-path=s]
+     [--status-time] [--to=s] [--trace] [--verbose]
+     [--view-result[=program]] [repo]
 
 =head1 DESCRIPTION
 
 =head1 SUBCOMMANDS
+
+=head2 B<get>
+
+Get metadata for a repo (by default the current repo).
 
 =head2 B<ls>
 
@@ -60,11 +95,19 @@ List repositories registered in repos.db.
 
 =head2 B<remove-all-tags>
 
+Remove all tags from a repo (by default the current repo).
+
 =head2 B<remove-tag>
+
+Remove tag from a repo (by default the current repo).
 
 =head2 B<tag>
 
+Add a tag to a repo (by default the current repo).
+
 =head2 B<touch>
+
+Touch the timestamp(s) of a repo (by default current repo).
 
 =head1 OPTIONS
 
@@ -160,6 +203,18 @@ Shortcut for --log-level=info.
 =item B<--version>, B<-v>
 
 Display program's version and exit.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Options for subcommand get
+
+=over
+
+=item B<--repo>=I<s>
 
 =back
 
@@ -315,6 +370,10 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
  reposdb_path (see --reposdb-path)
+
+=head2 Configuration for subcommand get
+
+ repo (see --repo)
 
 =head2 Configuration for subcommand ls
 

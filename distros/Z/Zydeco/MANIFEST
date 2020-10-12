@@ -56,6 +56,7 @@ t/50complextypes.t
 t/51mixedsigs.t
 t/52lists.t
 t/53outsiders.t
+t/70symmethods.t
 t/80lines.t
 t/96box.t
 t/97defaults.t

@@ -1,9 +1,11 @@
+Build.PL
+Changes
+LICENSE
 MANIFEST
 Makefile.PL
-Build.PL
-README
 META.yml
-Changes
+META.json
+README
 lib/Class/NamedParms.pm
 lib/Class/NamedParms.pod
 t/01_general.t

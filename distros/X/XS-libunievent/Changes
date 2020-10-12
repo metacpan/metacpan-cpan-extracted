@@ -1,3 +1,6 @@
+1.0.1     12.10.2020
+           - streamer-stream test fix
+           - require Alien::cmake3 to build
 1.0.0     09.10.2020
            - C++ part moved from UniEvent
            - added streamers (abstract, file, stream)

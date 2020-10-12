@@ -15,7 +15,7 @@ Class::NamedParms - A lightweight base class for checked get/set property access
     my $proto = shift;
     my $class = ref ($proto) || $proto;
  
-    my $self = Class::NamedParms->new(-benefits,-costs);
+    my $self = Class::NamedParms->new(qw(benefits costs));
     $self    = bless $self,$class;
  
     return $self;
@@ -23,8 +23,8 @@ Class::NamedParms - A lightweight base class for checked get/set property access
 
 
  $thingy = SomePackage->new;
- $thingy->set({ -benefits => 1, -costs => 0.5 });
- my ($costs,$benefits) = $thingy->get(-costs,-benefits);
+ $thingy->set({ benefits => 1, costs => 0.5 });
+ my ($costs,$benefits) = $thingy->get('costs', 'benefits');
 
 =head1 DESCRIPTION
 
@@ -51,7 +51,7 @@ Example:
 
  1.03 1999.06.21 - Minor docs tweaks. Removal of 'use attrs' for portability
 
- 1.04 1999.10.08 - Bug fix to 'all_parms' method
+ 1.04 1999.10.08 - Bug fix to 'all_parms' method 
 
  1.05 2005.09.19 - Added GPL_License.txt, Artistic_License.txt, LICENSE,
                    Changes, Build.PL. Added pod build tests.
@@ -61,6 +61,11 @@ Example:
 
  1.06 2005.09.20 - Fixed bad pod coverage build test.
 
+ 1.07 2020.10.10 - Relicensed under MIT License. Maintainer info updated.
+                   Build tooling updated. Documentation updates
+
+ 1.08 2020.10.10 - Added LICENSE file that was inadvertently omitted in 1.07
+
 =head1 METHODS
 
 =over 4
@@ -69,11 +74,11 @@ Example:
 
 Creates a new instance of a NamedParms object.
 
-You can optionally 'declare' the legal parameter keys at the same time.
+You can optionally declare the legal parameter keys at the same time.
 
 Example:
 
-     my $obj = Class::NamedParms->new('benefits', 'costs', 'other');
+     my $obj = Class::NamedParms->new(qw(benefits costs other);
 
 =back
 
@@ -109,7 +114,7 @@ Declares one or more parameters for use with the NamedParms object.
 
 Example:
 
-   $self->declare(-moved_in,-car_key,-house_key,-relationship);
+   $self->declare(qw(moved_in car_key house_key relationship));
 
 This *does not* initialize the parameters - only declares them
 to be legal for use.
@@ -125,7 +130,7 @@ This also deletes any values assigned to those parameters.
 
 Example:
 
-   $self->undeclare(-house_key,-car_key,-relationship);
+   $self->undeclare(qw(house_key car_key relationship));
 
 =back
 
@@ -151,7 +156,7 @@ Sets one or more named parameter values.
 
 Example:
 
-  $self->set({ -thingy => 'test', -other_thingy => 'more stuff' });
+  $self->set({ thingy => 'test', other_thingy => 'more stuff' });
 
 Will 'confess' if an attempt is made to set an undeclared parameter key.
 
@@ -165,7 +170,7 @@ Clears (deletes) one or more named parameter values.
 
 Example:
 
-     $self->clear(-this,-that,-the_other_thing);
+     $self->clear(qw(this that the_other_thing));
 
 Note: A 'cleared' value returns undef from 'get'.
 
@@ -185,7 +190,7 @@ In a scalar context, the _last_ result is what is returned.
 
 Example:
 
-   my ($age,$gender) = $self->get(-age,-gender);
+   my ($age,$gender) = $self->get('age', 'gender');
 
 Will 'confess' if an attempt is made to access an undeclared key or if
 the requested value has not been initialized.
@@ -216,11 +221,11 @@ Example:
 
 =head1 AUTHOR
 
-Benjamin Franz <snowhare@nihongo.org>
+Jerilyn Franz <cpan@jerilyn.info>
 
 =head1 VERSION
 
-1.06 2005.09.20
+1.07 2020.10.10
 
 =head1 TODO
 
@@ -228,18 +233,30 @@ Nothing.
 
 =head1 COPYRIGHT
 
-Copyright 1999-2005, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. All Rights Reserved.
 
 =head1 LICENSE
 
-This module is licensed under the same terms and conditions as Perl itself.
+MIT License
 
-This means that you can, at your option, redistribute is and/or modify it under
-either the terms the GNU Public License (GPL) version 1 or later, or under the
-Perl Artistic License.
+Copyright (c) 2020 Jerilyn Franz, Freerun Technologies Inc.
 
-See http://dev.perl.org/licenses/
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut

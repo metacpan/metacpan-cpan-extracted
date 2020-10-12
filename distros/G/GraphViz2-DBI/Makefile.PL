@@ -36,8 +36,19 @@ WriteMakefile(
       develop => {
         requires => {
           'Test::Pod' => 1.48,
+          'Pod::Markdown' => 0,
         },
       },
     },
   },
 );
+
+sub MY::postamble {
+  return '' if !-e '.git';
+  <<EOF;
+pure_all :: README.md
+
+README.md : \$(VERSION_FROM)
+\tpod2markdown \$< >\$\@
+EOF
+}

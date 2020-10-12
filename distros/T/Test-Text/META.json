@@ -49,6 +49,6 @@
          "web" : "https://github.com/JJ/Test-Text"
       }
    },
-   "version" : "0.6.3",
+   "version" : "0.6.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

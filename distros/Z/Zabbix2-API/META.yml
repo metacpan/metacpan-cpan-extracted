@@ -1,7 +1,7 @@
 ---
 abstract: 'Access the JSON-RPC API of a Zabbix 2.x server'
 author:
-  - 'Fabrice Gabolde <fgabolde@weborama.com>'
+  - 'Sujit Sali <sali.sujit@gmail.com>'
 build_requires:
   Test::Deep: '0'
   Test::Exception: '0'
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.36_14
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: Zabbix2-API
 provides:
   Zabbix2::API:
     file: lib/Zabbix2/API.pm
-    version: '0.013'
+    version: '0.014'
   Zabbix2::API::Action:
     file: lib/Zabbix2/API/Action.pm
   Zabbix2::API::Application:
@@ -77,6 +77,6 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://bitbucket.org/fgabolde/zabbix2-api/issues
-  repository: https://bitbucket.org/fgabolde/zabbix2-api
-version: '0.013'
+  repository: https://github.com/sujitSali/Zabbix2-API
+version: '0.014'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

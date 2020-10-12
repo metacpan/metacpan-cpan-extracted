@@ -1,10 +1,11 @@
 package Acme::Sub::Parms;
 
 use strict;
+use warnings;
 use Filter::Util::Call;
 
 BEGIN {
-    $Acme::Sub::Parms::VERSION  = '1.02';
+    $Acme::Sub::Parms::VERSION  = '1.03';
     %Acme::Sub::Parms::args     = ();
     %Acme::Sub::Parms::raw_args = ();
     $Acme::Sub::Parms::line_counter   = 0;
@@ -26,7 +27,6 @@ sub _legal_option {
 ####
 
 sub import {
-    local $^W = 1; # We _like_ warnings
     my $class = shift;
     my $options = {
            _NORMALIZE()      => 0,
@@ -249,7 +249,6 @@ sub bind_spec {
 ####
 
 sub filter {
-    local $^W = 1; # We _like_ warnings
     my $self = shift;
 
     my $options        = $self->{'options'};

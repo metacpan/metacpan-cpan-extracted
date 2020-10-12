@@ -34,8 +34,8 @@ my $ContentProvider = Dict [
     originalContentUrl => Optional[NonEmptyStr],
 ];
 
-# https://developers.line.biz/en/reference/messaging-api/#wh-text
-my $TextMessage = declare TextMessage => as Dict[ id => Str, type => Enum["text"], text => StrLength[1,2000] ];
+# https://developers.line.biz/en/reference/messaging-api/#text-message
+my $TextMessage = declare TextMessage => as Dict[ id => Str, type => Enum["text"], text => StrLength[1,5000] ];
 
 # https://developers.line.biz/en/reference/messaging-api/#wh-image
 my $ImageMessage = declare ImageMessage => as Dict[
@@ -208,6 +208,25 @@ declare DeviceUnlinkEvent => as Dict[
     things     => Dict[
         type => Enum["unlink"],
         deviceId => NonEmptyStr,
+    ],
+    @__common__,
+];
+
+# https://developers.line.biz/en/reference/messaging-api/#unsend-event
+declare UnsendEvent => as Dict[
+    type       => Enum["unsend"],
+    unsend     => Dict [
+        messageId => Str,
+    ],
+    @__common__,
+];
+
+# https://developers.line.biz/en/reference/messaging-api/#video-viewing-complete
+declare VideoViewingCompleteEvent => as Dict[
+    type    => Enum["videoPlayComplete"],
+    replyToken  => Str,
+    videoPlayComplete   => Dict [
+        trackingId  => Str,
     ],
     @__common__,
 ];

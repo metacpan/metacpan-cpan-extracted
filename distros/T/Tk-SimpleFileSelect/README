@@ -1,0 +1,50 @@
+Tk::SimpleFileSelect.pm installation.
+
+System Requirements:
+
+1.  A Unix or derivative operating system.
+2.  Perl version 5.005 or greater.
+3.  Perl/Tk, version 800 or later.
+4.  GNU make.
+
+Installation:
+
+1.  Untar the Tk-SimpleFileselect-<version> archive with the gunzip and 
+    tar commands:
+
+  # gzip -dc Tk-SimpleFileselect-<version>.tar.gz | tar xvf -
+ 
+   or, using GNU tar,
+
+  # tar zxvf Tk-SimpleFileselect-<version>.tar.gz
+
+2.  Change to the top-level subdirectory:
+
+  # cd Tk-SimpleFileSelect-<version>
+
+3.  The top-level Makefile should work on any Unix or derivative
+    system that has GNU make installed.  It uses the Perl ExtUtils 
+    installation to build the package's Makefile.  At the prompt, 
+    type:
+
+  # perl Makefile.PL
+
+4.  Build the program module and documentation.  Type:
+
+  # make
+
+6.  If necessary, become root (via "su", for example), and 
+    install the source files and documentation in the system's 
+    site_perl library.
+
+  # su
+  Enter Password:
+  $ make install
+
+Copyright:
+
+This software is distributed under the Perl Artistic License.
+Please refer to the file "Artistic" in this directory.
+
+Author - Robert Allan Kiesling <rkies@cpan.org>.
+

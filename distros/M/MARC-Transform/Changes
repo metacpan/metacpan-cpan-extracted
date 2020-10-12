@@ -1,0 +1,41 @@
+Revision history for Perl extension MARC::Transform.
+
+* 2020-10-12: Version 0.003009
+    - add an optional argument to define yaml file encoding
+
+* 2019-04-17: Version 0.003008
+    - fix : so that the 010 fields are no longer considered as controlfields
+
+* 2018-12-04: Version 0.003007
+    - fixes to maintain module compatibility with the latest version of YAML Perl module
+
+* 2014-11-25: Version 0.003006
+    - improves field validation defined in the yaml
+    - documentation corrections
+
+* 2014-08-26: Version 0.003005
+    - documentation update
+
+* 2013-10-10: Version 0.003004
+    - fix : prevents interpretation of incorrectly defined fields in the yaml
+
+* 2013-09-30: Version 0.003003
+    - documentation updates
+
+* 2013-09-27: Version 0.003002
+    - fixes : checks the existence of subfields defined in the yaml, prevents misinterpretation of certain characters
+
+* 2012-04-12: Version 0.003001
+    - enhancement : add optional hash reference in third argument
+
+* 2011-12-12: Version 0.002004
+    - fix : no longer displays warnings for undefined fields
+
+* 2011-11-02: Versions 0.002002 and 0.002003
+    - documentation corrections
+
+* 2011-11-01: Version 0.002001
+    - adds support of yaml files
+
+* 2011-08-28: Version 0.001001
+    - first version

@@ -2,8 +2,6 @@ package
     XS::Install::CMake;
 use strict;
 use warnings;
-
-use Alien::cmake3;
 use Env qw/@PATH/;
 
 sub configure {
@@ -13,6 +11,8 @@ sub configure {
 
 sub run {
     my ($bdir, $props_dir, $target, $options) = @_;
+    my $ok = eval { require Alien::cmake3; 1 };
+    die "This module requires Alien::cmake3 to build.\n" unless $ok;
 
     unshift @PATH, Alien::cmake3->bin_dir;
     open(CMAKELISTS, '>', "$props_dir/CMakeLists.txt") or die $!;

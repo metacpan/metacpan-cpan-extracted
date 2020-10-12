@@ -1,3 +1,7 @@
+2020-10-10  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/Test/Text.pm: 0.6.4 includes multi-line markdown links.
+
 2020-09-21  jmerelo  <jmerelo@princess-carolyn>
 
 	* lib/Test/Text.pm: Changes again so that it can be called with or without calling done_testing.

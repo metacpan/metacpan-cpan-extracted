@@ -5,12 +5,13 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.901';
 
 use B ();
 use Exporter::Shiny qw( multimethod multimethods_from_roles monomethod );
 use Type::Params ();
 use Types::Standard qw( -types is_ClassName is_Object );
+use Role::Hooks;
 
 *_set_subname =
 	eval { require Sub::Util;  \&Sub::Util::set_subname } ||
@@ -122,28 +123,17 @@ sub _generate_multimethod {
 	!defined $target and die;
 	ref $target and die;
 	
-	my $is_role = 0+!!$globals->{role};
-	
 	return sub {
 		my ($sub_name, %spec) = @_;
+		my $is_role = !! 'Role::Hooks'->is_role($target);
+		
 		$me->install_candidate($target, $sub_name, no_dispatcher => $is_role, %spec);
 	};
 }
 
 sub _generate_multimethods_from_roles {
 	my ($me, $name, $args, $globals) = (shift, @_);
-	
-	my $target = $globals->{into};
-	!defined $target and die;
-	ref $target and die;
-	
-	my $is_role = 0+!!$globals->{role};
-	
-	return sub {
-		my @roles = @_;
-		$me->copy_package_candidates(@roles => $target);
-		$me->install_missing_dispatchers($target) unless $is_role;
-	};
+	return sub { return; };  # this is a no-op now
 }
 
 sub _generate_monomethod {
@@ -152,8 +142,6 @@ sub _generate_monomethod {
 	my $target = $globals->{into};
 	!defined $target and die;
 	ref $target and die;
-	
-	my $is_role = 0+!!$globals->{role};
 	
 	return sub {
 		my ($sub_name, %spec) = @_;
@@ -214,12 +202,13 @@ sub install_monomethod {
 	$me->install_candidate($target, undef, no_dispatcher => 1, %spec, is_monomethod => 1);
 }
 
+my %hooked;
 my $DECLARATION_ORDER = 0;
 sub install_candidate {
 	my $me = shift;
 	my ($target, $sub_name, %spec) = @_;
 	$spec{method} = 1 unless defined $spec{method};
-	
+
 	my $is_method = $spec{method};
 	
 	$spec{declaration_order} = ++$DECLARATION_ORDER;
@@ -286,6 +275,16 @@ sub install_candidate {
 	
 	$me->install_dispatcher($target, $sub_name, $is_method)
 		if defined $sub_name && !$spec{no_dispatcher};
+	
+	if ( !$hooked{$target} and 'Role::Hooks'->is_role($target) ) {
+		'Role::Hooks'->after_apply($target, sub {
+			my ($rolepkg, $consumerpkg) = @_;
+			$me->copy_package_candidates($rolepkg => $consumerpkg);
+			$me->install_missing_dispatchers($consumerpkg)
+				unless 'Role::Hooks'->is_role($consumerpkg);
+		});
+		$hooked{$target}++;
+	}
 }
 
 sub install_dispatcher {
@@ -630,21 +629,15 @@ and that was declared first!)
 Sub::MultiMethod exports nothing by default. You can import the functions
 you want by listing them in the C<use> statement:
 
-  use Sub::MultiMethod "multimethod", "multimethods_from_roles";
+  use Sub::MultiMethod "multimethod";
 
 You can rename functions:
 
   use Sub::MultiMethod "multimethod" => { -as => "mm" };
 
-If you are using Sub::MultiMethod in a role, make sure you include
-the C<< -role >> option:
-
-  use Sub::MultiMethod -role, "multimethod";
-
 You can import everything using C<< -all >>:
 
   use Sub::MultiMethod -all;
-  use Sub::MultiMethod -role, -all;
 
 Sub::MultiMethod also offers an API for setting up multimethods for a
 class, in which case, you don't need to import anything.
@@ -781,11 +774,10 @@ C<< monomethod($name, %spec) >> is basically just a shortcut for
 C<< multimethod(undef, alias => $name, %spec) >> though with error
 messages which don't mention it being an alias.
 
-=head3 C<< multimethods_from_roles @roles >>
+=head3 C<< multimethods_from_roles >>
 
-Imports any multimethods defined in roles, and adds them to the
-current package as if they were defined locally. See the section on
-roles below.
+This function is exported for compatibility with older versions of
+Sub::MultiMethod, but in recent versions does nothing.
 
 =head2 Dispatch Technique
 
@@ -850,7 +842,7 @@ that allows multimethods imported from roles to integrate into a class.
   
   package My::RoleA {
     use Moo::Role;
-    use Sub::MultiMethod -role, qw(multimethod);
+    use Sub::MultiMethod qw(multimethod);
     use Types::Standard -types;
     
     multimethod foo => (
@@ -862,7 +854,7 @@ that allows multimethods imported from roles to integrate into a class.
   
   package My::RoleB {
     use Moo::Role;
-    use Sub::MultiMethod -role, qw(multimethod);
+    use Sub::MultiMethod qw(multimethod);
     use Types::Standard -types;
     
     multimethod foo => (
@@ -873,12 +865,10 @@ that allows multimethods imported from roles to integrate into a class.
   
   package My::Class {
     use Moo;
-    use Sub::MultiMethod qw(multimethod multimethods_from_roles);
+    use Sub::MultiMethod qw(multimethod);
     use Types::Standard -types;
     
     with qw( My::RoleA My::RoleB );
-    
-    multimethods_from_roles qw( My::RoleA My::RoleB );
     
     multimethod foo => (
       signature  => [ HashRef ],
@@ -891,32 +881,6 @@ that allows multimethods imported from roles to integrate into a class.
   say $obj->foo_a( {} );  # A (alias defined in RoleA)
   say $obj->foo( [] );    # B (candidate from RoleB)
   say $obj->foo( {} );    # C (Class overrides candidate from RoleA)
-
-Sub::MultiMethods doesn't try to be clever about detecting whether your
-package is a role or a class. If you want to use it in a role, simply
-do:
-
-  use Sub::MultiMethod -role, qw(multimethod);
-
-The main difference this makes is that the exported C<multimethod>
-function will default to C<< no_dispatcher => 1 >>, so any multimethods
-you define in the role won't be seen by Moose/Mouse/Moo/Role::Tiny as
-part of the role's API, and won't be installed with the C<with> keyword.
-
-Sub::MultiMethods doesn't try to detect what roles your class has
-consumed, so in classes that consume roles with multimethods, do this:
-
-  use Sub::MultiMethod qw(multimethods_from_roles);
-  
-  multimethods_from_roles qw( My::RoleA My::RoleB );
-
-The list of roles should generally be the same as from C<with>.
-This function only copies multimethods across from roles; it does not
-copy their aliases. However, C<with> should find and copy the aliases.
-
-If consuming one role into another role, remember to import
-C<multimethods_from_roles> into the consumer with the C<< -role >>
-tag so it knows not to set up the dispatchers in the role.
 
 All other things being equal, candidates defined in classes should
 beat candidates imported from roles.
@@ -964,12 +928,21 @@ C<< @sources >> is the list of packages to copy candidates from.
 
 C<< $target >> is the class (package) name being installed into.
 
-Useful if C<< @sources >> are a bunch of roles (like Role::Tiny).
+Sub::MultiMethod will use L<Role::Hooks> to automatically copy candidates
+from roles to consuming classes if your role implementation is supported.
+(Supported implementations include Role::Tiny, Role::Basic, Moo::Role,
+Moose::Role, and Mouse::Role, plus any role implementations that extend
+those. If your role implementation is something else, then when you consume
+a role into a class you may need to copy the candidates from the role to
+the class.)
 
 =item C<< Sub::MultiMethod->install_missing_dispatchers($target) >>
 
 Should usually be called after C<copy_package_candidates>, unless
-C<< $target >> is a role.
+C<< $target >> is a role. 
+
+Again, this is unnecessary if your role implementation is supported
+by Role::Hooks.
 
 =item C<< Sub::MultiMethod->get_multimethods($target) >>
 
@@ -1008,7 +981,7 @@ This is basically how the dispatcher for a method works:
   my @invocants = splice(@_, 0, $ismethod);
   my $pkg       = __PACKAGE__;
   
-  my $mm = 'Sub::MultiMethod';
+  my $smm = 'Sub::MultiMethod';
   my @candidates =
     $smm->get_all_multimethod_candidates($pkg, $sub, $ismethod);
   my ($winner, $new_args, $new_invocants) =

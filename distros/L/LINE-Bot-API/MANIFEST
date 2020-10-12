@@ -54,9 +54,11 @@ lib/LINE/Bot/API/Response/AudienceGroupForUploadingUserId.pm
 lib/LINE/Bot/API/Response/AudienceMultipleData.pm
 lib/LINE/Bot/API/Response/Common.pm
 lib/LINE/Bot/API/Response/Content.pm
+lib/LINE/Bot/API/Response/Count.pm
 lib/LINE/Bot/API/Response/Error.pm
 lib/LINE/Bot/API/Response/FriendDemographics.pm
 lib/LINE/Bot/API/Response/GroupMemberProfile.pm
+lib/LINE/Bot/API/Response/GroupSummary.pm
 lib/LINE/Bot/API/Response/IssueLinkToken.pm
 lib/LINE/Bot/API/Response/NarrowcastStatus.pm
 lib/LINE/Bot/API/Response/NumberOfFollowers.pm
@@ -75,6 +77,7 @@ lib/LINE/Bot/Audience.pm
 lib/LINE/Bot/Message/Narrowcast.pm
 t/00_compile.t
 t/00_send_message_response.t
+t/01_check_sender.t
 t/01_send_text-with-emoji.t
 t/01_send_text.t
 t/02_send_image.t
@@ -106,6 +109,9 @@ t/17_get_narrowcast_message_status.t
 t/17_send_message.t
 t/21_get_profile.t
 t/22_get_group_member_profile.t
+t/22_get_group_summary.t
+t/22_get_member_in_group_count.t
+t/22_get_member_in_room_count.t
 t/22_get_room_member_profile.t
 t/41_event.t
 t/42_create_events_by_api.t
@@ -114,6 +120,7 @@ t/52_download_rich_menu_image.t
 t/52_rich_menu.t
 t/52_rich_menu_response.t
 t/52_upload_rich_menu_image.t
+t/53-retry_key.t
 t/PR75-get-number-of-followers.t
 t/author-critic.t
 t/author-pod-syntax.t

@@ -1,12 +1,20 @@
 package LEOCHARRE::Dir;
 use Carp;
+use Cwd;
 use strict;
 use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK);
 use Exporter;
 @ISA = qw/Exporter/;
 @EXPORT_OK = qw(reqdir ls lsa lsf lsfa lsd lsda lsr lsfr lsdr);
 %EXPORT_TAGS = ( all => \@EXPORT_OK );
-$VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /(\d+)/g;
+$VERSION = '1.09';
+
+BEGIN { 
+   croak("Not meant to run in windows or cygwin environments.") 
+      if $^O=~/cygwin|MSWin32/;
+}
+
+
 
 *reqdir = \&__require_dir;
 *ls     = \&__ls;
@@ -21,10 +29,21 @@ $VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /(\d+)/g;
 
 
 sub __require_dir {
-   require Cwd;
-   my $_d = Cwd::abs_path($_[0]) or croak("Bad or missing argument '@_'.");
-   -d $_d or mkdir $_d or warn("cant mkdir $_d") and return;
-   return $_d;
+   my $arg = $_[0];
+   $arg or croak("Missing argument");
+   my $resolved_path = Cwd::abs_path($arg)
+      or croak("Cwd::abs_path() not returning for '$arg'");
+   unless ( -d $resolved_path ){
+      unless( mkdir $resolved_path ){
+         warn("cant mkdir '$resolved_path'");
+         return undef;
+      }
+   }
+   return $resolved_path;
+   
+   #my $_d = Cwd::abs_path($_[0]) or croak("Bad or missing argument '@_'.");
+   #-d $_d or mkdir $_d or warn("cant mkdir $_d") and return;
+   #return $_d;
 }
 
 sub __ls {
@@ -36,7 +55,6 @@ sub __ls {
 }
 sub __lsa {
    $_[0] or croak("Bad or missing argument");
-   require Cwd;
    my $abs = Cwd::abs_path($_[0]) or die("Can't resolve abs path to '@_'");
    my @ls = map { "$abs/$_" } __ls($abs);
    return @ls;

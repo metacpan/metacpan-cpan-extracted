@@ -540,7 +540,7 @@
 	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.022000"^^doap-deps:CpanId ], [
 		doap-deps:on "MooX::TypeTiny 0.002002"^^doap-deps:CpanId;
 	], [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.077"^^doap-deps:CpanId ], [ doap-deps:on "PPR 0.000023"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.081"^^doap-deps:CpanId ], [ doap-deps:on "PPR 0.000023"^^doap-deps:CpanId ], [
 		doap-deps:on "Keyword::Simple 0.04"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "B::Hooks::EndOfScope 0.24"^^doap-deps:CpanId;
@@ -559,7 +559,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Zydeco";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-500>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-501>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-502>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-503>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-504>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-505>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-506>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-507>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-508>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-509>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-510>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-511>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-512>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-513>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-514>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-515>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-516>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-517>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-518>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-519>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-520>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-521>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-600>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-601>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-602>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-603>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-604>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-605>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-606>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-607>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-608>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-609>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-610>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-611>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-500>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-501>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-502>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-503>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-504>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-505>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-506>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-507>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-508>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-509>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-510>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-511>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-512>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-513>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-514>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-515>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-516>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-517>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-518>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-519>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-520>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-521>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-600>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-601>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-602>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-603>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-604>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-605>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-606>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-607>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-608>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-609>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-610>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-611>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-612>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-zydeco>;
@@ -1103,6 +1103,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.611.tar.gz>;
 	doap:revision        "0.611"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-612>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.612"^^xsd:string;
+	dc:issued            "2020-10-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "New `symmethod` keyword.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.612.tar.gz>;
+	doap:revision        "0.612"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

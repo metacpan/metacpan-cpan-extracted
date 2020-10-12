@@ -1,3 +1,9 @@
+0.014 2020-10-10
+
+ * Support Zabbix 4.0 by adding a fix. 
+ * Zabbix 4 introduced new (readonly) property 'auto_compress' that causes 
+   host update failure, fixed this issue.  
+
 0.013 2015-06-09
 
  * Remove dependency on Moo::Lax, recent versions of Moo have

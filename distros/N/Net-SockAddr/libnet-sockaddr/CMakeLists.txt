@@ -17,7 +17,7 @@ find_package(panda-lib REQUIRED)
 target_link_libraries(net-sockaddr panda::panda-lib)
 
 if (WIN32)
-    target_link_libraries(net-sockaddr ws2_32)
+    target_link_libraries(net-sockaddr PUBLIC ws2_32)
 endif()
 
 ########################tests#######################################

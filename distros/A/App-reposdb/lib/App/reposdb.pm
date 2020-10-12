@@ -1,7 +1,9 @@
 package App::reposdb;
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-10'; # DATE
+our $DIST = 'App-reposdb'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -272,6 +274,7 @@ sub list_repos {
 
 $SPEC{touch_repo} = {
     v => 1.1,
+    summary => "Touch the timestamp(s) of a repo (by default current repo)",
     args => {
         %common_args,
         %repo_arg,
@@ -320,8 +323,36 @@ sub touch_repo {
     [200];
 }
 
+$SPEC{get_repo_metadata} = {
+    v => 1.1,
+    summary => 'Get metadata for a repo (by default the current repo)',
+    args => {
+        %common_args,
+        %repo_arg,
+    },
+};
+sub get_repo_metadata {
+    my %args = @_;
+
+    _set_args_default(\%args, 1);
+    my $dbh = _connect_db(\%args);
+
+    return [400, "Please specify repo name"] unless defined $args{repo};
+
+    my $res = $dbh->selectrow_hashref(
+        "SELECT commit_time,status_time,pull_time,tags FROM repos WHERE name=?", {},
+        $args{repo}) // {};
+    for (qw/commit_time status_time pull_time/) {
+        if ($res->{$_}) {
+            $res->{"${_}_fmt"} = scalar localtime $res->{$_};
+        }
+    }
+    [200, "OK", $res];
+}
+
 $SPEC{add_repo_tag} = {
     v => 1.1,
+    summary => 'Add a tag to a repo (by default the current repo)',
     args => {
         %common_args,
         %repo_arg,
@@ -352,6 +383,7 @@ sub add_repo_tag {
 
 $SPEC{remove_repo_tag} = {
     v => 1.1,
+    summary => 'Remove tag from a repo (by default the current repo)',
     args => {
         %common_args,
         %repo_arg,
@@ -381,6 +413,7 @@ sub remove_repo_tag {
 
 $SPEC{remove_all_repo_tags} = {
     v => 1.1,
+    summary => 'Remove all tags from a repo (by default the current repo)',
     args => {
         %common_args,
         %repo_arg,
@@ -419,7 +452,7 @@ App::reposdb - Manipulate repos.db
 
 =head1 VERSION
 
-This document describes version 0.006 of App::reposdb (from Perl distribution App-reposdb), released on 2020-04-08.
+This document describes version 0.007 of App::reposdb (from Perl distribution App-reposdb), released on 2020-10-10.
 
 =head1 SYNOPSIS
 
@@ -445,6 +478,8 @@ Usage:
 
  add_repo_tag(%args) -> [status, msg, payload, meta]
 
+Add a tag to a repo (by default the current repo).
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -456,6 +491,40 @@ Arguments ('*' denotes required arguments):
 =item * B<reposdb_path>* => I<str>
 
 =item * B<tags>* => I<array[str]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 get_repo_metadata
+
+Usage:
+
+ get_repo_metadata(%args) -> [status, msg, payload, meta]
+
+Get metadata for a repo (by default the current repo).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<repo> => I<str>
+
+=item * B<reposdb_path>* => I<str>
 
 
 =back
@@ -519,6 +588,8 @@ Usage:
 
  remove_all_repo_tags(%args) -> [status, msg, payload, meta]
 
+Remove all tags from a repo (by default the current repo).
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -550,6 +621,8 @@ Return value:  (any)
 Usage:
 
  remove_repo_tag(%args) -> [status, msg, payload, meta]
+
+Remove tag from a repo (by default the current repo).
 
 This function is not exported.
 
@@ -584,6 +657,8 @@ Return value:  (any)
 Usage:
 
  touch_repo(%args) -> [status, msg, payload, meta]
+
+Touch the timestamp(s) of a repo (by default current repo).
 
 This function is not exported.
 

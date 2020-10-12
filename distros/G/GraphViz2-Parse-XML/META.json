@@ -65,6 +65,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2-Parse-XML"
       }
    },
-   "version" : "2.49",
+   "version" : "2.50",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -25,12 +25,13 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.2.19"
+            "Alien::cmake3" : "0",
+            "XS::Install" : "v1.2.20"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.19"
+            "XS::Install" : "v1.2.20"
          }
       },
       "test" : {
@@ -42,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.35.0.3",
+   "version" : "v1.35.0.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

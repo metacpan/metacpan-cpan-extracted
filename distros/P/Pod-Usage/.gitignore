@@ -1,0 +1,11 @@
+.DS_Store
+*.o
+*.tar.gz
+*.old
+/Makefile
+/blib/
+/pm_to_blib
+MYMETA.json
+MYMETA.yml
+/.build/
+/Pod-Usage-*

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Sender::Util;
 # ABSTRACT: random stuff that makes Email::Sender go
-$Email::Sender::Util::VERSION = '1.300034';
+$Email::Sender::Util::VERSION = '1.300035';
 use Email::Address;
 use Email::Sender::Failure;
 use Email::Sender::Failure::Permanent;
@@ -112,7 +112,7 @@ Email::Sender::Util - random stuff that makes Email::Sender go
 
 =head1 VERSION
 
-version 1.300034
+version 1.300035
 
 =head1 METHODS
 
@@ -129,11 +129,11 @@ will be removed.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

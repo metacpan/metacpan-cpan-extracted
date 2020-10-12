@@ -11,7 +11,7 @@ Text::Hyphen - determine positions for hyphens inside words
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 SYNOPSIS
 
@@ -595,7 +595,7 @@ Knuth-Liang algorithm available at L<http://nedbatchelder.com/code/modules/hyphe
 Copyright 2008-2015 Alex Kapranoff.
 
 This is free software; you can redistribute it and/or modify it under
-the terms GNU General Public License version 3.
+the terms of the BSD License.
 
 =cut
 

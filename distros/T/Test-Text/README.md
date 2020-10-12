@@ -7,7 +7,7 @@ Objective
 ---
 
 A module for testing and doing other kind of metrics on regular text, as in books or
-novels, or, for that matter, manuals. 
+novels, or, for that matter, manuals.
 
 We're not there yet, but for the time being it is a pretty
 good spelling checker that can be used *on the cloud* in continuous
@@ -19,7 +19,7 @@ who is this module for?
 People who write fiction or non-fiction using simple text, Markdown or
 similar formats. You don't need to know Perl or continuous integration
 or nothing more techie than clicking here and there and saving
-files. You probably do know programming stuff, but it's not really needed for using it. 
+files. You probably do know programming stuff, but it's not really needed for using it.
 
 what is this for?
 ---
@@ -52,7 +52,7 @@ branches:
     - gh-pages
 language: perl
 perl:
-  - "5.16"
+  - "5.22"
 before_install:
   - sudo apt-get install libhunspell-1.3-0 libhunspell-dev
   - curl https://raw.githubusercontent.com/JJ/Test-Text/master/files/just_check_en.t -o just_check.t
@@ -83,6 +83,13 @@ FooBar
 
 Simple enough, ain't it?
 
+You can also directly
+use
+[this GitHub action](.github/workflows/check-readme.yml) in
+your repository to have the README checked. It deletes all markdown
+elements that are not README, you might have to adapt it to your
+situation (or leave it there).
+
 it does not work!
 ---
 
@@ -95,7 +102,7 @@ I'd like to help!
 Help with other languages would be great. Adding tests other than pure
 spell checking, like grammar, would be great too. Check out
 the [issues](https://github.com/JJ/Test-Text/issues) and
-the [TODO file](TODO.md) for ideas, or create your own issues. 
+the [TODO file](TODO.md) for ideas, or create your own issues.
 
 LICENSES
 ---

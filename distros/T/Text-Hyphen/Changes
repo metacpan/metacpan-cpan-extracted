@@ -1,5 +1,12 @@
 Revision history for Text-Hyphen
 
+0.3 2020-10-11T00:21:15Z
+
+0.3 Sat Oct 10 16:59:22 PDT 2020
+        It was brought up to my attention that some files delared BSD
+        license and some GPL. I am relicensing everything under BSD so
+        that past users who may not like GPL are not restricted.
+
 0.2 2015-10-06T17:36:19Z
 		- Incompatible interface change: in list context with defined
 		  delimiter hyphenate() method now works as if the context is

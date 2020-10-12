@@ -23,7 +23,7 @@ use SPVM 'TestCase::ExchangeAPI';
 use SPVM 'TestCase::Point_3i';
 
 use SPVM 'SPVM::Hash';
-use SPVM 'SPVM::ObjectList';
+use SPVM 'SPVM::List';
 
 use SPVM 'TestCase::Minimal';
 
@@ -45,6 +45,19 @@ my $DBL_MAX = POSIX::DBL_MAX();
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+
+# Get hash key - any object
+{
+  my $biases = SPVM::new_float_array([1, 2, 3]);
+  my $hash = SPVM::Hash->new;
+  $hash->set(biases => $biases);
+  $hash->set("int" => SPVM::Int->new(4));
+  my $get_biases = $hash->get("biases");
+  my $get_int = $hash->get("int");
+  
+  is(ref $get_biases, 'SPVM::BlessedObject::Array');
+  is(ref $get_int, 'SPVM::Int');
+}
 
 # ref SPVM array
 {
@@ -221,7 +234,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Pass list
   {
-    my $list = SPVM::ObjectList->newa([SPVM::Int->new(1), SPVM::Double->new(2.5), undef]);
+    my $list = SPVM::List->newa([SPVM::Int->new(1), SPVM::Double->new(2.5), undef]);
     my $x = $list->get(0);
     
     is($list->get(0)->val, 1);
@@ -1075,26 +1088,26 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   }
 }
 
-# get_length
+# length
 {
   {
     my $spvm_values = SPVM::new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
-    my $length = $spvm_values->get_length;
+    my $length = $spvm_values->length;
     is($length, 3);
   }
   {
     my $spvm_values = SPVM::new_short_array([1, $SHORT_MAX, $SHORT_MIN]);
-    my $length = $spvm_values->get_length;
+    my $length = $spvm_values->length;
     is($length, 3);
   }
   {
     my $spvm_values = SPVM::new_int_array([1, $INT_MAX, $INT_MIN]);
-    my $length = $spvm_values->get_length;
+    my $length = $spvm_values->length;
     is($length, 3);
   }
   {
     my $spvm_values = SPVM::new_long_array([1, $LONG_MAX, $LONG_MIN]);
-    my $length = $spvm_values->get_length;
+    my $length = $spvm_values->length;
     is($length, 3);
   }
 }
@@ -1265,27 +1278,27 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     {
       my $binary = pack('l*', 1 .. $length);
       my $spvm_values = SPVM::new_int_array_from_bin($binary);
-      is($spvm_values->get_length, $length);
+      is($spvm_values->length, $length);
     }
     {
       my $binary = pack('q*', 1 .. $length);
       my $spvm_values = SPVM::new_long_array_from_bin($binary);
-      is($spvm_values->get_length, $length);
+      is($spvm_values->length, $length);
     }
     {
       my $binary = pack('f*', 1 .. $length);
       my $spvm_values = SPVM::new_float_array_from_bin($binary);
-      is($spvm_values->get_length, $length);
+      is($spvm_values->length, $length);
     }
     {
       my $binary = pack('d*', 1 .. $length);
       my $spvm_values = SPVM::new_double_array_from_bin($binary);
-      is($spvm_values->get_length, $length);
+      is($spvm_values->length, $length);
     }
     {
       my $binary = pack('f*', 1 .. $length);
       my $spvm_values = SPVM::new_float_array_from_bin($binary);
-      is($spvm_values->get_length, $length);
+      is($spvm_values->length, $length);
     }
   }
 }

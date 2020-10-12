@@ -4,6 +4,50 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my @needfull;
+
+# Install Pre-requisites
+BEGIN {
+	my @modules = (
+		'LWP::Protocol::https', 'LWP::Simple'
+	);
+
+	foreach my $module(@modules) {
+		eval "use $module";
+		if($@) {
+			push @needfull, $module;
+		}
+	}
+
+	if(scalar(@needfull)) {
+		my $list = join(' ', @needfull);
+		if($ENV{'AUTOMATED_TESTING'}) {
+			die "You need $list to test this package";
+		}
+		print "Installing $list\n";
+		system("cpan -i $list");
+	}
+}
+
+foreach my $module(@needfull) {
+	my $version;
+	if($module =~ /(.+)\s(.+)$/) {
+		$module = $1;
+		$version = $2;
+	}
+	if($module =~ /.+\/(.+)/) {
+		$module = $1;
+	}
+	eval "require $module";
+	if($@) {
+		die $@;
+	}
+	$module->import();
+	# if($version && ($module::VERSION < $version)) {
+		# die "$module: need $version got ", $module::VERSION;
+	# }
+}
+
 if(eval { require Geo::libpostal; }) {
 	my $v = Geo::libpostal->VERSION;
 	print "You have Geo::libpostal version $v installed, so Geo-Coder-Free can work better\n";
@@ -11,9 +55,19 @@ if(eval { require Geo::libpostal; }) {
 	print "Consider installing Geo::libpostal for improved parsing\n";
 }
 
-(-d 'lib/Geo/Coder/Free/GeoNames') || mkdir 'lib/Geo/Coder/Free/GeoNames';
-(-d 'lib/Geo/Coder/Free/GeoNames/databases') || mkdir 'lib/Geo/Coder/Free/GeoNames/databases';
-(-d 'lib/Geo/Coder/Free/MaxMind/databases') || mkdir 'lib/Geo/Coder/Free/MaxMind/databases';
+my @dirs = (
+	'lib/Geo/Coder/Free/GeoNames',
+	'lib/Geo/Coder/Free/GeoNames/databases',
+	'lib/Geo/Coder/Free/MaxMind',
+	'lib/Geo/Coder/Free/MaxMind/databases'
+);
+
+foreach my $dir(@dirs) {
+	if(! -d $dir) {
+		print "Creating the download directory $dir\n";
+		mkdir $dir || die "$dir: $@";
+	}
+}
 
 my %urls = (
 	'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
@@ -46,14 +100,6 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
 }
 
-# Put this after so that H:C:T can try its magic on the internal $ua in
-# LWP::Simple
-if(eval { require LWP::Simple; }) {
-	LWP::Simple->import();
-} else {
-	die "Can't find LWP::Simple";
-}
-
 foreach my $url(keys %urls) {
 	my $file = $urls{$url};
 	if(-r $file) {
@@ -61,10 +107,11 @@ foreach my $url(keys %urls) {
 		next if(-M $file < 7);
 	}
 
-	print "Downloading $url\n";
-	if(is_error(my $rc = getstore($url, $file))) {
+	print "Downloading $url to $file\n";
+	if(is_error(my $rc = mirror($url, $file))) {
 		die "$url: LWP error $rc";
 	}
+	die $file if(!-r $file);
 }
 
 if(!(-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) {

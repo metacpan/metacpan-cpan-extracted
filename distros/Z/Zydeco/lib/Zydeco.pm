@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.611';
+our $VERSION   = '0.612';
 
 use Keyword::Simple ();
 use PPR;
@@ -195,6 +195,7 @@ our $GRAMMAR = qr{
 			(?: method          (?&MxpMethodSyntax)    )|
 			(?: factory         (?&MxpFactorySyntax)   )|
 			(?: factory         (?&MxpFactoryViaSyntax))|
+			(?: symmethod       (?&MxpSymMethodSyntax) )|
 			(?: before          (?&MxpModifierSyntax)  )|
 			(?: after           (?&MxpModifierSyntax)  )|
 			(?: around          (?&MxpModifierSyntax)  )|
@@ -586,6 +587,27 @@ our $GRAMMAR = qr{
 			(?: (?&MxpBlockLike) )                        # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpMethodSyntax>
+		
+		(?<MxpSymMethodSyntax>
+		
+			(?&PerlOWS)
+			(?: \$? (?&MxpSimpleIdentifier) )             # CAPTURE:name
+			(?&PerlOWS)
+			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&MxpBlockLike) )                        # CAPTURE:code
+			(?&PerlOWS)
+		)#</MxpSymMethodSyntax>
 		
 		(?<MxpMultiSyntax>
 		
@@ -1085,7 +1107,7 @@ sub _handle_factory_keyword {
 
 sub _handle_method_keyword {
 	my $me = shift;
-	my ($name, $code, $has_sig, $sig, $attrs) = @_;
+	my ($kind, $name, $code, $has_sig, $sig, $attrs) = @_;
 	
 	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $has_sig ? $me->_handle_signature_list($sig) : ();
 	
@@ -1109,14 +1131,20 @@ sub _handle_method_keyword {
 		$inject_vars .= '; my $factory = $self->FACTORY';
 	}
 	
+	my $handler = '_can';
+	if ( $kind eq 'symmethod' ) {
+		$handler = '_symmethod';
+	}
+	
 	my $return = '';
 	
 	if (defined $name and not defined $lex_name) {
 		if ($has_sig) {
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 			$return = sprintf(
-				'q[%s]->_can(%s, { %s, attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+				'q[%s]->%s(%s, { %s, attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				$me,
+				$handler,
 				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
 				$DCTX,
 				$me->_stringify_attributes($attrs),
@@ -1129,8 +1157,9 @@ sub _handle_method_keyword {
 		else {
 			my $munged_code = sprintf('sub { my $self = $_[0]; %s; do %s }', $inject_vars, $code);
 			$return = sprintf(
-				'q[%s]->_can(%s, { %s, attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
+				'q[%s]->%s(%s, { %s, attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 				$me,
+				$handler,
 				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
 				$DCTX,
 				$me->_stringify_attributes($attrs),
@@ -1140,6 +1169,8 @@ sub _handle_method_keyword {
 		}
 	}
 	else {
+		die if $kind eq 'symmethod';
+		
 		if ($has_sig) {
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 			$return = sprintf(
@@ -1547,7 +1578,7 @@ my @EXPORTABLES = qw(
 	class abstract role interface
 	begin end before_apply after_apply
 	include toolkit extends with requires
-	has constant method multi factory before after around
+	has constant method symmethod multi factory before after around
 	type_name coerce
 	version authority overload
 );
@@ -1557,7 +1588,7 @@ sub unimport {
 	class abstract role interface
 	begin end before_apply after_apply
 	include toolkit extends with requires
-	has constant method multi factory before after around
+	has constant method symmethod multi factory before after around
 	type_name coerce
 	version authority overload
 	>;
@@ -1911,8 +1942,31 @@ sub import {
 		my $has_sig = !!exists $+{sig};
 		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
 		
-		$me->_inject($ref, $pos, $me->_handle_method_keyword($name, $code, $has_sig, $sig,  \@attrs));
+		$me->_inject($ref, $pos, $me->_handle_method_keyword(method => $name, $code, $has_sig, $sig,  \@attrs));
 	} if $want{method};
+
+	# `symmethod` keyword
+	#
+	Keyword::Simple::define symmethod => sub {
+		my $ref = shift;
+		
+		state $re_attr = _fetch_re('MxpAttribute');
+		
+		$$ref =~ _fetch_re('MxpSymMethodSyntax', anchor => 'start') or $me->_syntax_error(
+			'symmethod declaration',
+			'symmethod <name> <attributes> (<signature>) { <block> }',
+			'symmethod <name> (<signature>) { <block> }',
+			'symmethod <name> <attributes> { <block> }',
+			'symmethod <name> { <block> }',
+			$ref,
+		);
+		
+		my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
+		my $has_sig = !!exists $+{sig};
+		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
+		
+		$me->_inject($ref, $pos, $me->_handle_method_keyword(symmethod => $name, $code, $has_sig, $sig,  \@attrs));
+	} if $want{symmethod};
 
 	# `multi` keyword
 	#
@@ -2293,6 +2347,29 @@ sub _can {
 	_define_or_patch { $_->{can}{$name} = $code } scalar(caller) or die;
 }
 
+sub _symmethod {
+	my $me = shift;
+	my ($name, $code) = @_;
+	
+	my @new_attr;
+	my $order;
+	for my $attr ( @{ $code->{attributes} } ) {
+		if ( $attr =~ /^order\((.+)\)$/ ) {
+			$order = $1;
+		}
+		else {
+			push @new_attr, $attr;
+		}
+	}
+	
+	if ( defined $order ) {
+		$code->{attributes} = \@new_attr;
+		$code->{order}      = $order;
+	}
+	
+	_define_or_patch { push @{$_->{symmethod}||=[]}, $name, $code } scalar(caller) or die;
+}
+
 sub _multi {
 	my $me = shift;
 	my ($kind, $name, $spec) = @_;
@@ -2349,7 +2426,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.611';
+#	our $VERSION   = '0.612';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2360,7 +2437,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.611';
+#	our $VERSION   = '0.612';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2373,12 +2450,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.611';
+#	our $VERSION   = '0.612';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.611';
+#	our $VERSION   = '0.612';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2392,7 +2469,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.611';
+#	our $VERSION   = '0.612';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2808,6 +2885,16 @@ class will not be able to see functions exported into the class.
     ...;
   }
 
+=head2 C<< symmethod >>
+
+  symmethod myfunc {
+    ...;
+  }
+  
+  symmethod myfunc ( Int $x, ArrayRef $y ) {
+    ...;
+  }
+  
 =head2 C<< multi method >>
 
   multi method myfunc {
@@ -2894,6 +2981,18 @@ class will not be able to see functions exported into the class.
   
   class MyThing {
     factory new_thing;
+  }
+
+=head2 C<< multi factory >>
+
+  class MyThing {
+    multi factory new_thing ( ArrayRef $x ) {
+      ...;
+    }
+    
+    multi factory new_thing ( HashRef $x ) {
+      ...;
+    }
   }
 
 =head2 C<< type_name >>

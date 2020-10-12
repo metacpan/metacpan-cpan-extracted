@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0918';
+our $VERSION = '0.0921';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -448,7 +448,7 @@ SPVM Core Modules.
 
 =item * L<SPVM::Matrix::Float>
 
-=item * L<SPVM::ObjectList>
+=item * L<SPVM::List>
 
 =item * L<SPVM::Regex>
 

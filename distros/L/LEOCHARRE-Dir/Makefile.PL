@@ -1,5 +1,14 @@
 use ExtUtils::MakeMaker;
 
+BEGIN {
+
+   if( $^O=~/cygwin/i or $^O=~/MSWin32/i ){
+
+     die("This is not meant to run in cygwin or windows environments");
+   }
+}
+
+
 WriteMakefile(
 
    NAME => 'LEOCHARRE::Dir',
@@ -13,6 +22,7 @@ WriteMakefile(
    AUTHOR         => 'Leo Charre leocharre at cpan dot org',   
    
    EXE_FILES => [],
+
 
    
    # gen /usr/bin/pmused by Sun Apr 25 16:38:46 EDT 2010 

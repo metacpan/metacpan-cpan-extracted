@@ -15,11 +15,11 @@ Test::Dependencies - Ensure that the dependency listing is complete
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 
@@ -31,8 +31,8 @@ In your t/00-dependencies.t:
     use Test::More;
     use Test::Dependencies '0.28' forward_compatible => 1;
 
-    my $meta = CPAN::Meta->load_file('META.yml');
-    plan skip_all => 'No META.yml' if ! $meta;
+    my $meta = CPAN::Meta->load_file('META.json'); # or META.yml
+    plan skip_all => 'No META.json' if ! $meta;
 
     my @files = File::Find::Rule::Perl->perl_files->in('./lib', './bin');
     ok_dependencies($meta, \@files, [qw/runtime configure build test/],
@@ -307,20 +307,21 @@ sub ok_dependencies {
                  or ($exclude_re and  $mod =~ $exclude_re));
 
         my $first_in = Module::CoreList->first_release($mod, $required{$mod});
-        if (my $v = Module::CoreList->removed_from($mod)) {
+        my $v;
+        if ($v = Module::CoreList->removed_from($mod)) {
             $v = version->parse($v)->normal;
             $tb->ok(exists $required{$mod},
                     "Removed-from-CORE (in $v) module '$mod' "
                     . 'explicitly required');
         }
-        elsif (my $v = Module::CoreList->deprecated_in($mod)) {
+        elsif ($v = Module::CoreList->deprecated_in($mod)) {
             $v = version->parse($v)->normal;
             $tb->ok(exists $required{$mod},
                     "Deprecated-from-CORE (in $v) module '$mod' explicitly "
                     . 'required to anticipate removal');
         }
         elsif (defined $first_in) {
-            my $v = version->parse($first_in)->normal;
+            $v = version->parse($first_in)->normal;
             $tb->ok($first_in <= $min_perl_ver or exists $required{$mod},
                     "Used CORE module '$mod' in core before "
                     . "Perl $minimum_perl (since $v) "

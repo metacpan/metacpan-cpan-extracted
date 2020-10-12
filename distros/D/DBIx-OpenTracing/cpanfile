@@ -1,4 +1,5 @@
 requires 'DBI', '1.639';
+requires 'Caller::Hide';
 requires 'OpenTracing::GlobalTracer';
 requires 'OpenTracing::Implementation';
 requires 'Package::Constants';

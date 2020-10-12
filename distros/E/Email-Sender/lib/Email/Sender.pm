@@ -1,6 +1,6 @@
 package Email::Sender;
 # ABSTRACT: a library for sending email
-$Email::Sender::VERSION = '1.300034';
+$Email::Sender::VERSION = '1.300035';
 use Moo::Role;
 requires 'send';
 
@@ -68,7 +68,7 @@ Email::Sender - a library for sending email
 
 =head1 VERSION
 
-version 1.300034
+version 1.300035
 
 =head1 SYNOPSIS
 
@@ -119,11 +119,11 @@ L<Email::Sender::Failure> on failure.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Christian Walde David Golden Steinbrunner Hans Dieter Pearcey HIROSE Masaaki Justin Hunter Karen Etheridge Kenichi Ishigaki kga Kris Matthews William Blunn
+=for stopwords Alex Efros Aristotle Pagaltzis Bernhard Graf Christian Walde David Golden Steinbrunner Hans Dieter Pearcey HIROSE Masaaki James E Keenan Justin Hunter Karen Etheridge Kenichi Ishigaki kga Kris Matthews Stefan Hornburg (Racke) William Blunn
 
 =over 4
 
@@ -134,6 +134,10 @@ Alex Efros <powerman@powerman.name>
 =item *
 
 Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+=item *
+
+Bernhard Graf <augensalat@gmail.com>
 
 =item *
 
@@ -157,6 +161,10 @@ HIROSE Masaaki <hirose31@gmail.com>
 
 =item *
 
+James E Keenan <jkeenan@cpan.org>
+
+=item *
+
 Justin Hunter <justin.d.hunter@gmail.com>
 
 =item *
@@ -177,13 +185,17 @@ Kris Matthews <kris@tigerlms.com>
 
 =item *
 
+Stefan Hornburg (Racke) <racke@linuxia.de>
+
+=item *
+
 William Blunn <zgpmax@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

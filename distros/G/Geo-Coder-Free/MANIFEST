@@ -1,4 +1,16 @@
+bin/address_lookup
+bin/create_db
+bin/create_sqlite
+bin/download_databases
+bin/geodecode
+bin/testcgibin
+cgi-bin/page.fcgi
 Changes
+conf/default
+conf/page.l4pconf
+createdatabase.PL
+css/style.css
+ignore.txt
 index.html
 lib/Geo/Coder/Free.pm
 lib/Geo/Coder/Free/bin/db2sql
@@ -20,6 +32,7 @@ lib/Geo/Coder/Free/Utils.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README
 README.md
 t/00-load.t
 t/10-new.t

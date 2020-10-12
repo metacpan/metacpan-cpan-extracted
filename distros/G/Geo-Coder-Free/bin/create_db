@@ -1,0 +1,13 @@
+set -e
+
+# First use download_databases to download the databases, then use this
+# script to build the G:C:F database
+
+export WHOSONFIRST_HOME=~/src/whosonfirst-sqlite
+export OPENADDR_HOME=~/misc/openaddr
+
+cd ~/src/njh/Geo-Coder-Free
+git pull
+mv $OPENADDR_HOME/*.sql $OPENADDR_HOME/openaddresses.sql.keep
+chmod 444 $OPENADDR_HOME/openaddresses.sql.keep
+REDIS_SERVER= make

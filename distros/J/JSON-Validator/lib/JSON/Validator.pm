@@ -19,7 +19,7 @@ use constant CASE_TOLERANT   => File::Spec->case_tolerant;
 use constant DEBUG           => $ENV{JSON_VALIDATOR_DEBUG} || 0;
 use constant RECURSION_LIMIT => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 
-our $VERSION = '4.05';
+our $VERSION = '4.09';
 our @EXPORT_OK = qw(joi validate_json);
 
 our %SCHEMAS = (
@@ -60,8 +60,8 @@ sub bundle {
   my $cloner;
 
   my $schema    = $self->_new_schema($args->{schema} || $self->schema);
-  my $schema_id = $schema->id || $self->{root_schema_url} || '';
-  my @topics    = ([$schema->data, my $bundle = {}, '']);                 # ([$from, $to], ...);
+  my $schema_id = $schema->id || ($self->schema ? $self->schema->id : '');
+  my @topics    = ([$schema->data, my $bundle = {}]);                        # ([$from, $to], ...);
 
   if ($args->{replace}) {
     $cloner = sub {
@@ -86,6 +86,9 @@ sub bundle {
         push @topics, [$from, $to] if $from_type;
         return $to;
       }
+
+      # Traverse all $ref
+      while (my $tmp = tied %{$tied->schema}) { $tied = $tmp }
 
       return $from if !$args->{schema} and $tied->fqn =~ m!^\Q$schema_id\E\#!;
 
@@ -153,7 +156,8 @@ sub load_and_validate_schema {
   $self->{version} = $1 if !$self->{version} and ($args->{schema} || 'draft-04') =~ m!draft-0+(\w+)!;
 
   my $schema_obj = $self->_new_schema($schema, %$args);
-  confess join "\n", "Invalid JSON specification $schema", map {"- $_"} @{$schema_obj->errors}
+  confess join "\n", "Invalid JSON specification", (ref $schema eq 'HASH' ? Mojo::Util::dumper($schema) : $schema),
+    map {"- $_"} @{$schema_obj->errors}
     if @{$schema_obj->errors};
 
   $self->{schema} = $schema_obj;
@@ -245,11 +249,11 @@ sub _definitions_path {
   }
 
   # Generate definitions key based on filename
-  my ($spec_path, $fragment) = split '#', $ref->fqn;
-  my $key = $fragment;
-  if (-e $spec_path) {
-    $key = join '-', map { s!^\W+!!; $_ } grep {$_} path($spec_path)->basename, $fragment,
-      substr(sha1_sum($spec_path), 0, 10);
+  my $fqn = Mojo::URL->new($ref->fqn);
+  my $key = $fqn->fragment;
+  if ($fqn->scheme eq 'file') {
+    $key = join '-', map { s!^\W+!!; $_ } grep {$_} path($fqn->path)->basename, $key,
+      substr(sha1_sum($fqn->path), 0, 10);
   }
 
   # Fallback or nicer path name
@@ -262,10 +266,57 @@ sub _definitions_path_for_ref { ['definitions'] }
 # Try not to break JSON::Validator::OpenAPI::Mojolicious
 sub _get { shift; JSON::Validator::Util::_schema_extract(@_) }
 
+sub _find_and_resolve_refs {
+  my ($self, $base_url, $schema) = @_;
+  my %root = is_type($schema, 'HASH') ? %$schema : ();
+
+  my ($id_key, @topics, @refs, %seen) = ($self->_id_key, [$base_url, $schema]);
+  while (@topics) {
+    my ($base_url, $topic) = @{shift @topics};
+
+    if (is_type $topic, 'ARRAY') {
+      push @topics, map { [$base_url, $_] } @$topic;
+    }
+    elsif (is_type $topic, 'HASH') {
+      next if $seen{refaddr($topic)}++;
+
+      my $base_url = $base_url;    # do not change the global $base_url
+      if ($topic->{$id_key} and !ref $topic->{$id_key}) {
+        my $id = Mojo::URL->new($topic->{$id_key});
+        $id = $id->to_abs($base_url) unless $id->is_abs;
+        $self->_store($id->to_string => $topic);
+        $base_url = $id;
+      }
+
+      my $has_ref = $topic->{'$ref'} && !ref $topic->{'$ref'} && !tied %$topic ? 1 : 0;
+      push @refs, [$base_url, $topic] if $has_ref;
+
+      for my $key (keys %$topic) {
+        next unless ref $topic->{$key};
+        next if $has_ref and $key eq '$ref';
+        push @topics, [$base_url, $topic->{$key}];
+      }
+    }
+  }
+
+  while (@refs) {
+    my ($base_url, $topic) = @{shift @refs};
+    next if is_type $topic, 'BOOL';
+    next if !$topic->{'$ref'} or ref $topic->{'$ref'};
+    my $base = Mojo::URL->new($base_url || $base_url)->fragment(undef);
+    my ($other, $ref_url, $fqn) = $self->_resolve_ref($topic->{'$ref'}, $base, \%root);
+    tie %$topic, 'JSON::Validator::Ref', $other, "$ref_url", "$fqn";
+    push @refs, [$other, $fqn];
+  }
+}
+
 sub _id_key { ($_[0]->{version} || 4) < 7 ? 'id' : '$id' }
 
 sub _load_schema {
   my ($self, $url) = @_;
+
+  my $cached;
+  return $cached, $url if $cached = $self->_store($url);
 
   if ($url =~ m!^https?://!) {
     warn "[JSON::Validator] Loading schema from URL $url\n" if DEBUG;
@@ -286,11 +337,13 @@ sub _load_schema {
   my $file = $url;
   $file =~ s!^file://!!;
   $file =~ s!#$!!;
-  $file = path(split '/', $file);
+  $file = path(split '/', url_unescape $file);
   if (-e $file) {
     $file = $file->realpath;
     warn "[JSON::Validator] Loading schema from file: $file\n" if DEBUG;
-    return $self->_load_schema_from_text(\$file->slurp), CASE_TOLERANT ? path(lc $file) : $file;
+    $url = Mojo::URL->new->scheme('file')->host('')->path(CASE_TOLERANT ? lc $file : "$file");
+    return $cached, $url if $cached = $self->_store($url);
+    return $self->_load_schema_from_text(\$file->slurp), $url;
   }
   elsif ($url =~ m!^/! and $self->ua->server->app) {
     warn "[JSON::Validator] Loading schema from URL $url\n" if DEBUG;
@@ -347,6 +400,7 @@ sub _new_schema {
 
   $attrs{formats} ||= $self->{formats} if $self->{formats};
   $attrs{version} ||= $self->{version} if $self->{version};
+  $attrs{schemas} ||= $self->{schemas} ||= {};
   $attrs{$_} = $self->$_ for qw(cache_paths ua);
 
   my $schema_obj = $self->_schema_class($attrs{specification} || $schema)->new($schema, %attrs);
@@ -368,6 +422,7 @@ sub _node {
 
 sub _ref_to_schema {
   my ($self, $schema) = @_;
+  return $schema if ref $schema ne 'HASH';
 
   my @guard;
   while (my $tied = tied %$schema) {
@@ -380,123 +435,60 @@ sub _ref_to_schema {
   return $schema;
 }
 
-sub _register_schema {
-  my ($self, $schema, $fqn) = @_;
-  $fqn =~ s!(.)#$!$1!;
-  $self->{schemas}{$fqn} = $schema;
+sub _register_root_schema {
+  my ($self, $id, $schema) = @_;
+  confess "Root schema cannot have a fragment in the 'id'. ($id)" if $id =~ /\#./;
+  confess "Root schema cannot have a relative 'id'. ($id)" unless $id =~ /^\w+:/ or -e $id or $id =~ m!^/!;
 }
 
 # _resolve() method is used to convert all "id" into absolute URLs and
 # resolve all the $ref's that we find inside JSON Schema specification.
 sub _resolve {
-  my ($self, $schema) = @_;
-  my $id_key = $self->_id_key;
-  my ($id, $resolved);
+  my ($self, $schema, $nested) = @_;
+  return $schema if is_type $schema, 'BOOL';
 
-  local $self->{level} = $self->{level} || 0;
-  delete $self->{schemas}{''} unless $self->{level};
-
+  my ($id_key, $id, $resolved) = ($self->_id_key);
   if (ref $schema eq 'HASH') {
-    $id = $schema->{$id_key} // '';
-    return $resolved if $resolved = $self->{schemas}{$id};
-  }
-  elsif ($resolved = $self->{schemas}{$schema // ''}) {
-    return $resolved;
-  }
-  elsif (is_type $schema, 'BOOL') {
-    $self->_register_schema($schema, $schema);
-    return $schema;
+    $id       = $schema->{$id_key} // '';
+    $resolved = $self->_store($id) // $schema;
   }
   else {
-    ($schema, $id) = $self->_load_schema($schema);
-    $id = $schema->{$id_key} if $schema->{$id_key};
+    ($resolved, $id) = $self->_load_schema($schema);
+    $id = $resolved->{$id_key} if is_type($resolved, 'HASH') and $resolved->{$id_key};
   }
 
-  unless ($self->{level}) {
-    my $rid = $schema->{$id_key} // $id;
-    if ($rid) {
-      confess "Root schema cannot have a fragment in the 'id'. ($rid)" if $rid =~ /\#./;
-      confess "Root schema cannot have a relative 'id'. ($rid)" unless $rid =~ /^\w+:/ or -e $rid or $rid =~ m!^/!;
-    }
-    warn sprintf "[JSON::Validator] Using root_schema_url of '$rid'\n" if DEBUG;
-    $self->id($rid)                                                    if $self->can('id') and !$self->id;
-    $self->{root_schema_url} = $rid;
+  $id = Mojo::URL->new("$id");
+  $self->_register_root_schema($id => $resolved) if !$nested and "$id";
+
+  unless ($self->_store($id)) {
+    $self->_store($id => $resolved) if "$id";
+    $self->_find_and_resolve_refs($id => $resolved);
   }
 
-  $self->{level}++;
-  $self->_register_schema($schema, $id);
-
-  my (%seen, @refs);
-  my @topics = ([$schema, is_type($id, 'Mojo::File') ? $id : Mojo::URL->new($id)]);
-  while (@topics) {
-    my ($topic, $base) = @{shift @topics};
-
-    if (is_type $topic, 'ARRAY') {
-      push @topics, map { [$_, $base] } @$topic;
-    }
-    elsif (is_type $topic, 'HASH') {
-      my $seen_addr = join ':', $base, refaddr($topic);
-      next if $seen{$seen_addr}++;
-
-      push @refs, [$topic, $base] and next if $topic->{'$ref'} and !ref $topic->{'$ref'};
-
-      if ($topic->{$id_key} and !ref $topic->{$id_key}) {
-        my $fqn = Mojo::URL->new($topic->{$id_key});
-        $fqn = $fqn->to_abs($base) unless $fqn->is_abs;
-        $self->_register_schema($topic, $fqn->to_string);
-      }
-
-      push @topics, map { [$_, $base] } values %$topic;
-    }
-  }
-
-  # Need to register "id":"..." before resolving "$ref":"..."
-  $self->_resolve_ref(@$_) for @refs;
-
-  return $schema;
-}
-
-sub _location_to_abs {
-  my ($location, $base) = @_;
-  my $location_as_url = Mojo::URL->new($location);
-  return $location_as_url if $location_as_url->is_abs;
-
-  # definitely relative now
-  if (is_type $base, 'Mojo::File') {
-    return $base if !length $location;
-    my $path = $base->sibling(split '/', $location)->realpath;
-    return CASE_TOLERANT ? lc($path) : $path;
-  }
-  return $location_as_url->to_abs($base);
+  return $resolved;
 }
 
 sub _resolve_ref {
-  my ($self, $topic, $url) = @_;
-  return if tied %$topic;
+  my ($self, $ref_url, $base_url, $schema) = @_;
+  $ref_url = "#$ref_url" if $ref_url =~ m!^/!;
 
-  my $other = $topic;
-  my ($fqn, $ref, @guard);
+  my $fqn     = Mojo::URL->new($ref_url);
+  my $pointer = $fqn->fragment;
+  my $other;
 
-  while (1) {
-    last if is_type $other, 'BOOL';
-    push @guard, ($ref = $other->{'$ref'});
-    confess "Seems like you have a circular reference: @guard" if @guard > RECURSION_LIMIT;
-    last                                                       if !$ref or ref $ref;
-    $fqn = $ref =~ m!^/! ? "#$ref" : $ref;
-    my ($location, $pointer) = split /#/, $fqn, 2;
-    $url     = $location = _location_to_abs($location, $url);
-    $pointer = undef if length $location and !length $pointer;
-    $pointer = url_unescape $pointer if defined $pointer;
-    $fqn     = join '#', grep defined, $location, $pointer;
-    $other   = $self->_resolve($location);
+  $fqn = $fqn->to_abs($base_url) if "$base_url";
+  $other //= $self->_store($fqn);
+  $other //= $self->_store($fqn->clone->fragment(undef));
+  $other //= $self->_resolve($fqn->clone->fragment(undef), 1) if $fqn->is_abs && $fqn ne $base_url;
+  $other //= $schema;
 
-    if (defined $pointer and length $pointer and $pointer =~ m!^/!) {
-      $other = Mojo::JSON::Pointer->new($other)->get($pointer);
-      confess qq[Possibly a typo in schema? Could not find "$pointer" in "$location" ($ref)] if not defined $other;
-    }
+  if (defined $pointer and $pointer =~ m!^/!) {
+    $other = Mojo::JSON::Pointer->new($other)->get($pointer);
+    confess qq[Possibly a typo in schema? Could not find "$pointer" in "$fqn" ($ref_url)] unless defined $other;
   }
 
-  tie %$topic, 'JSON::Validator::Ref', $other, $topic->{'$ref'}, $fqn;
+  $fqn->fragment($pointer // '');
+  return $other, $ref_url, $fqn;
 }
 
 # back compat
@@ -517,72 +509,66 @@ sub _schema_class {
 
   die "package $package: $@" unless eval "package $package; use Mojo::Base '$jv_class'; 1";
   Mojo::Util::monkey_patch($package, $_ => $schema_class->can($_))
-    for qw(bundle contains data errors get id new resolve specification validate);
+    for qw(_register_root_schema bundle contains data errors get id new resolve specification validate);
   return $package;
+}
+
+sub _store {
+  my ($self, $id, $schema) = @_;
+  $id =~ s!(.)#$!$1!;
+  return $self->{schemas}{$id} unless defined $schema;
+  return $self->{schemas}{$id} = $schema;
 }
 
 sub _validate {
   my ($self, $data, $path, $schema) = @_;
-
-  $schema = $self->_ref_to_schema($schema) if ref $schema eq 'HASH' and $schema->{'$ref'};
+  $schema = $self->_ref_to_schema($schema);
   return $schema ? () : E $path, [not => 'not'] if is_type $schema, 'BOOL';
 
   my @errors;
-
   if ($self->recursive_data_protection) {
     my $seen_addr = join ':', refaddr($schema), (ref $data ? refaddr $data : ++$self->{seen}{scalar});
-
-    # Avoid recursion
-    return @{$self->{seen}{$seen_addr}} if $self->{seen}{$seen_addr};
-
+    return @{$self->{seen}{$seen_addr}} if $self->{seen}{$seen_addr};    # Avoid recursion
     $self->{seen}{$seen_addr} = \@errors;
   }
 
-  my $to_json = (blessed $data and $data->can('TO_JSON')) ? \$data->TO_JSON : undef;
-  $data = $$to_json if $to_json;
-  my $type = $schema->{type} || schema_type $schema, $data;
+  local $_[1] = $data->TO_JSON if blessed $data and $data->can('TO_JSON');
 
-  # Test base schema before allOf, anyOf or oneOf
+  if (my $rules = $schema->{not}) {
+    my @e = $self->_validate($_[1], $path, $rules);
+    push @errors, E $path, [not => 'not'] unless @e;
+  }
+  if (my $rules = $schema->{allOf}) {
+    push @errors, $self->_validate_all_of($_[1], $path, $rules);
+  }
+  if (my $rules = $schema->{anyOf}) {
+    push @errors, $self->_validate_any_of($_[1], $path, $rules);
+  }
+  if (my $rules = $schema->{oneOf}) {
+    push @errors, $self->_validate_one_of($_[1], $path, $rules);
+  }
+  if (exists $schema->{if}) {
+    my $rules = !$schema->{if} || $self->_validate($_[1], $path, $schema->{if}) ? $schema->{else} : $schema->{then};
+    push @errors, $self->_validate($_[1], $path, $rules // {});
+  }
+
+  my $type = $schema->{type} || schema_type $schema, $_[1];
   if (ref $type eq 'ARRAY') {
     push @{$self->{temp_schema}}, [map { +{%$schema, type => $_} } @$type];
-    return $self->_validate_any_of_types($to_json ? $$to_json : $_[1], $path, $self->{temp_schema}[-1]);
+    push @errors, $self->_validate_any_of_types($_[1], $path, $self->{temp_schema}[-1]);
   }
   elsif ($type) {
     my $method = sprintf '_validate_type_%s', $type;
-    @errors = $self->$method($to_json ? $$to_json : $_[1], $path, $schema);
-    return @errors if @errors;
+    push @errors, $self->$method($_[1], $path, $schema);
   }
+
+  return @errors if @errors;
 
   if (exists $schema->{const}) {
-    push @errors, $self->_validate_type_const($to_json ? $$to_json : $_[1], $path, $schema);
-    return @errors if @errors;
+    push @errors, $self->_validate_type_const($_[1], $path, $schema);
   }
-
   if ($schema->{enum}) {
-    push @errors, $self->_validate_type_enum($to_json ? $$to_json : $_[1], $path, $schema);
-    return @errors if @errors;
-  }
-
-  if (my $rules = $schema->{not}) {
-    my @e = $self->_validate($to_json ? $$to_json : $_[1], $path, $rules);
-    push @errors, E $path, [not => 'not'] unless @e;
-  }
-
-  if (my $rules = $schema->{allOf}) {
-    push @errors, $self->_validate_all_of($to_json ? $$to_json : $_[1], $path, $rules);
-  }
-
-  if (my $rules = $schema->{anyOf}) {
-    push @errors, $self->_validate_any_of($to_json ? $$to_json : $_[1], $path, $rules);
-  }
-
-  if (my $rules = $schema->{oneOf}) {
-    push @errors, $self->_validate_one_of($to_json ? $$to_json : $_[1], $path, $rules);
-  }
-
-  if ($schema->{if}) {
-    my $rules = $self->_validate($data, $path, $schema->{if}) ? $schema->{else} : $schema->{then};
-    push @errors, $self->_validate($data, $path, $rules // {});
+    push @errors, $self->_validate_type_enum($_[1], $path, $schema);
   }
 
   return @errors;
@@ -790,15 +776,15 @@ sub _validate_type_array {
   }
 
   if (ref $schema->{items} eq 'ARRAY') {
-    my $additional_items = $schema->{additionalItems} // {type => 'any'};
+    my $additional_items = $schema->{additionalItems} // {};
     my @rules            = @{$schema->{items}};
 
     if ($additional_items) {
       push @rules, $additional_items while @rules < @$data;
     }
 
-    if (@rules == @$data) {
-      for my $i (0 .. @rules - 1) {
+    if (@rules >= @$data) {
+      for my $i (0 .. @$data - 1) {
         push @errors, $self->_validate($data->[$i], "$path/$i", $rules[$i]);
       }
     }
@@ -882,15 +868,15 @@ sub _validate_type_object {
   if (defined $schema->{minProperties} and $schema->{minProperties} > @dkeys) {
     push @errors, E $path, [object => minProperties => int(@dkeys), $schema->{minProperties}];
   }
-  if (my $n_schema = $schema->{propertyNames}) {
+  if (exists $schema->{propertyNames}) {
     for my $name (keys %$data) {
-      next unless my @e = $self->_validate($name, $path, $n_schema);
+      next unless my @e = $self->_validate($name, $path, $schema->{propertyNames});
       push @errors, prefix_errors propertyName => map [$name, $_], @e;
     }
   }
 
   my %rules;
-  for my $k (keys %{$schema->{properties}}) {
+  for my $k (keys %{$schema->{properties} || {}}) {
     my $r = $schema->{properties}{$k};
     push @{$rules{$k}}, $r;
     if ($self->{coerce}{defaults} and ref $r eq 'HASH' and exists $r->{default} and !exists $data->{$k}) {
@@ -935,7 +921,7 @@ sub _validate_type_object {
   for my $k (sort keys %rules) {
     for my $r (@{$rules{$k}}) {
       next unless exists $data->{$k};
-      $r = $self->_ref_to_schema($r) if ref $r eq 'HASH' and $r->{'$ref'};
+      $r = $self->_ref_to_schema($r);
       my @e = $self->_validate($data->{$k}, json_pointer($path, $k), $r);
       push @errors, @e;
       next if @e or !is_type $r, 'HASH';
@@ -951,6 +937,9 @@ sub _validate_type_string {
   my ($self, $value, $path, $schema) = @_;
   my @errors;
 
+  if (!$schema->{type} and !defined $value) {
+    return;
+  }
   if (!defined $value or ref $value) {
     return E $path, [string => type => data_type $value];
   }

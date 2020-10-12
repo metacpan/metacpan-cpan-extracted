@@ -20,11 +20,11 @@ inspecting GeoTagged photographs.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -295,34 +295,7 @@ sub geocode {
 		}
 		$addr{'location'} = $location;
 		if(my $street = $addr{'road'}) {
-			$street = uc($street);
-			if($street =~ /(.+)\s+STREET$/) {
-				$street = "$1 ST";
-			} elsif($street =~ /(.+)\s+ROAD$/) {
-				$street = "$1 RD";
-			} elsif($street =~ /(.+)\s+AVENUE$/) {
-				$street = "$1 AVE";
-			} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-				$street = "$1 AVE $2";
-			} elsif($street =~ /(.+)\s+COURT$/) {
-				$street = "$1 CT";
-			} elsif($street =~ /(.+)\s+CIRCLE$/) {
-				$street = "$1 CIR";
-			} elsif($street =~ /(.+)\s+DRIVE$/) {
-				$street = "$1 DR";
-			} elsif($street =~ /(.+)\s+PARKWAY$/) {
-				$street = "$1 PKWY";
-			} elsif($street =~ /(.+)\s+GARDENS$/) {
-				$street = "$1 GRDNS";
-			} elsif($street =~ /(.+)\s+LANE$/) {
-				$street = "$1 LN";
-			} elsif($street =~ /(.+)\s+PLACE$/) {
-				$street = "$1 PL";
-			} elsif($street =~ /(.+)\s+CREEK$/) {
-				$street = "$1 CRK";
-			}
-			$street =~ s/^0+//;	# Turn 04th St into 4th St
-			$addr{'road'} = $street;
+			$addr{'road'} = Geo::Coder::Free::_normalize($street);
 		}
 		if(defined($addr{'state'}) && !defined($addr{'country'}) && ($addr{'state'} eq 'england')) {
 			delete $addr{'state'};

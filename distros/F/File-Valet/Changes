@@ -1,4 +1,9 @@
 Revision history for perl-file-valet
+1.08 Fri Oct 09 17:45:09
+	- Added Data::Munge to SEE ALSO section.
+        - Added documentation for find_home.
+        - Skipping find_home test when Nigel's overly-restrictive environment detected.
+
 1.07 Tue Sep 01 15:33:19 PDT 2020
 	- Fixed my stupid broken tests in 00-slurp.t (thanks, xenu and Grinnz)
         - Tests represent binary data with %v02X (thanks, Grinnz)

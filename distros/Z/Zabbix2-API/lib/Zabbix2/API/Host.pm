@@ -41,6 +41,7 @@ sub _readonly_properties {
     return {
         hostid => 1,
         available => 1,
+        auto_compress => 1,
         disable_until => 1,
         error => 1,
         errors_from => 1,
@@ -236,7 +237,7 @@ L<Zabbix2::API::CRUDE>.
 
 =head1 AUTHOR
 
-Fabrice Gabolde <fga@cpan.org>
+Fabrice Gabolde <fga@cpan.org>, Sujit Sali <sali.sujit@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

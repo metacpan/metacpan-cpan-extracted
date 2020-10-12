@@ -3,7 +3,7 @@
 
 requires "exact" => "0";
 requires "exact::class" => "0";
-requires "perl" => "5.014";
+requires "perl" => "5.020";
 
 on 'test' => sub {
   requires "File::Spec" => "0";
@@ -16,14 +16,14 @@ on 'test' => sub {
   requires "Test::Most" => "0";
   requires "constant" => "0";
   requires "parent" => "0";
-  requires "perl" => "5.014";
+  requires "perl" => "5.020";
   requires "strict" => "0";
   requires "warnings" => "0";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.014";
+  requires "perl" => "5.020";
 };
 
 on 'develop' => sub {

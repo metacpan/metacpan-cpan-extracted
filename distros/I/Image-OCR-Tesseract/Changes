@@ -1,3 +1,11 @@
+2020-10-10
+
+   * lib/Image/OCR/Tesseract.pm: altered mode to create tif files
+     got help from shields.nikolai [...] gmail.com
+
+   * Makefile.PL: added a line to allow Cygwin to be used
+     got help from peter.john.acklam [...] gmail.com 
+
 2010-02-04 21:36  cvs
 
 	* Makefile.PL, README, t/02_Image_OCR_Tesseract.t: tests are better

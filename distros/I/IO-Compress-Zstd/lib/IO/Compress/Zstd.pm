@@ -14,7 +14,7 @@ use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $ZstdError);
 
-$VERSION = '2.096';
+$VERSION = '2.097';
 $ZstdError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -768,4 +768,3 @@ Copyright (c) 2019-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

@@ -6,7 +6,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Zabbix2::API',
     license             => 'gpl_3',
-    dist_author         => q{Fabrice Gabolde <fgabolde@weborama.com>},
+    dist_author         => q{Sujit Sali <sali.sujit@gmail.com>},
     dist_version_from   => 'lib/Zabbix2/API.pm',
     dist_abstract       => 'Access the JSON-RPC API of a Zabbix 2.x server',
     configure_requires => { 'Module::Build' => '0.36_14' },
@@ -38,8 +38,9 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Zabbix2-API-*' ],
     release_status      => 'stable',
     meta_merge          => { resources =>
-                             { repository => 'https://bitbucket.org/fgabolde/zabbix2-api',
-                               bugtracker => 'https://bitbucket.org/fgabolde/zabbix2-api/issues' } },
+                             { repository => 'https://github.com/sujitSali/Zabbix2-API',
+                               } 
+    },
 );
 
 $builder->create_build_script();

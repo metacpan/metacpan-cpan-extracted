@@ -12,7 +12,7 @@ use XS::Install::Payload;
 use XS::Install::CMake;
 use Data::Dumper;
 
-our $VERSION = '1.2.19';
+our $VERSION = '1.2.20';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -393,7 +393,8 @@ sub process_CMAKE {
         MAIN_TARGET => $target,
         TARGETS => {
             $target     => "-fPIC $cflags",
-        }
+        },
+        OPTIONS => $info->{CMAKE_OPTIONS},
     };
 
     $info->{DIR} = $bdir;
@@ -696,6 +697,7 @@ sub run_cmake {
     }
 
     my $targets = join(';', keys %{$cmake_params->{TARGETS}});
+    push(@options, $cmake_params->{OPTIONS}) if $cmake_params->{OPTIONS};
     my $options = join(' ', @options);
 
     return XS::Install::CMake::configure($cmake_params->{BUILD_DIR}, $cmake_params->{PROP_DIR}, $cmake_params->{MAIN_TARGET}, qq(-DCONF_TARGETS="$targets" $options));

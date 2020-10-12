@@ -70,8 +70,11 @@ sub start_firefox {
 	if ($ENV{FIREFOX_BINARY}) {
 		$parameters{firefox} = $ENV{FIREFOX_BINARY};
 		diag("Overriding firefox binary to $parameters{firefox}");
-	} elsif (defined $ca_cert_handle) {
-		if ($launches % 2) {
+	}
+	if (defined $ca_cert_handle) {
+		my $certutil = `certutil --help 2>/dev/null`;
+		if ($? != 0) {
+		} elsif ($launches % 2) {
 			diag("Setting trust to list");
 			$parameters{trust} = [ '/dev/fd/' . fileno $ca_cert_handle ];
 		} else {
@@ -84,10 +87,21 @@ sub start_firefox {
 		diag("HAR support is not available for Firefox versions less than 61");
 		delete $parameters{har};
 	}
+        if (defined $ENV{FIREFOX_NIGHTLY}) {
+		$parameters{nightly} = 1;
+        }
+        if (defined $ENV{FIREFOX_DEVELOPER}) {
+		$parameters{developer} = 1;
+        }
+        if (defined $ENV{FIREFOX_DEBUG}) {
+		$parameters{debug} = $ENV{FIREFOX_DEBUG};
+        }
 	if ($ENV{FIREFOX_HOST}) {
 		$parameters{host} = $ENV{FIREFOX_HOST};
 		diag("Overriding host to '$parameters{host}'");
-		if (($ENV{FIREFOX_HOST} eq 'localhost') && (!$ENV{FIREFOX_PORT})) {
+		if ($ENV{FIREFOX_USER}) {
+			$parameters{user} = $ENV{FIREFOX_USER};
+		} elsif (($ENV{FIREFOX_HOST} eq 'localhost') && (!$ENV{FIREFOX_PORT})) {
 			if ($launches != 0) {
 				diag("Overriding user to 'firefox'");
 				$parameters{user} = 'firefox';
@@ -325,6 +339,18 @@ elsif ( $^O eq 'darwin' ) {
 }
 my $version_string = `"$binary" -version`;
 diag("Version is $version_string");
+if ((exists $ENV{FIREFOX_HOST}) && (defined $ENV{FIREFOX_HOST})) {
+	diag("FIREFOX_HOST is $ENV{FIREFOX_HOST}");
+}
+if ((exists $ENV{FIREFOX_USER}) && (defined $ENV{FIREFOX_USER})) {
+	diag("FIREFOX_USER is $ENV{FIREFOX_USER}");
+}
+if ((exists $ENV{FIREFOX_PORT}) && (defined $ENV{FIREFOX_PORT})) {
+	diag("FIREFOX_PORT is $ENV{FIREFOX_PORT}");
+}
+if ((exists $ENV{FIREFOX_VISIBLE}) && (defined $ENV{FIREFOX_VISIBLE})) {
+	diag("FIREFOX_VISIBLE is $ENV{FIREFOX_VISIBLE}");
+}
 if ($^O eq 'MSWin32') {
 } elsif ($^O eq 'darwin') {
 } else {
@@ -461,6 +487,8 @@ $profile->set_value('security.OCSP.GET.enabled', 'false');
 $profile->clear_value('security.OCSP.enabled');  # just testing
 $profile->set_value('security.OCSP.enabled', 0); 
 my $correct_exit_status = 0;
+my $mozilla_pid_support;
+
 SKIP: {
 	($skip_message, $firefox) = start_firefox(0, debug => 1, profile => $profile, mime_types => [ 'application/pkcs10', 'application/pdf' ]);
 	if (!$skip_message) {
@@ -487,6 +515,7 @@ SKIP: {
 	diag("Operating System is " . ($capabilities->platform_name() || 'Unknown') . q[ ] . ($capabilities->platform_version() || 'Unknown'));
 	diag("Profile Directory is " . $capabilities->moz_profile());
 	diag("Mozilla PID is " . ($capabilities->moz_process_id() || 'Unknown'));
+	$mozilla_pid_support = defined $capabilities->moz_process_id() ? 1 : 0;
 	diag("Firefox BuildID is " . ($capabilities->moz_build_id() || 'Unknown'));
 	diag("Addons are " . ($firefox->addons() ? 'working' : 'disabled'));
 	if ($firefox->xvfb()) {
@@ -583,6 +612,41 @@ $profile->set_value('browser.shell.shortcutFavicons', 'true');
 $profile->set_value('browser.newtabpage.enabled', 'true'); 
 $profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0); 
 $profile->set_value('startup.homepage_welcome_url', 'false', 0); 
+
+SKIP: {
+	if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
+		skip("$^O is not supported for reconnecting yet", 8);
+	} elsif (!$mozilla_pid_support) {
+		skip("No pid support for this version of firefox", 8);
+	}
+	($skip_message, $firefox) = start_firefox(0, debug => 1, survive => 1);
+	if (!$skip_message) {
+		$at_least_one_success = 1;
+	}
+	if ($skip_message) {
+		skip($skip_message, 8);
+	}
+	ok($firefox, "Firefox has started in Marionette mode with as survivable");
+	my $capabilities = $firefox->capabilities();
+	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+	my $firefox_pid = $capabilities->moz_process_id();
+	ok($firefox_pid, "Firefox process has a process id of $firefox_pid");
+	if (!$ENV{FIREFOX_HOST}) {
+		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid)");
+	}
+	$firefox = undef;
+	if (!$ENV{FIREFOX_HOST}) {
+		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid)");
+	}
+	($skip_message, $firefox) = start_firefox(0, debug => 1, reconnect => 1);
+	ok($firefox, "Firefox has reconnected in Marionette mode");
+	$capabilities = $firefox->capabilities();
+	ok($firefox_pid == $capabilities->moz_process_id(), "Firefox has the same process id");
+	$firefox = undef;
+	if (!$ENV{FIREFOX_HOST}) {
+		ok((!kill 0, $firefox_pid), "Cannot contact firefox process ($firefox_pid)");
+	}
+}
 
 if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
 } elsif ($ENV{RELEASE_TESTING}) {
@@ -902,11 +966,15 @@ SKIP: {
 		$pdf = PDF::API2->open_scalar($raw_pdf);
 		$page = $pdf->openpage(0);
 		($llx, $lly, $urx, $ury) = $page->mediabox();
+		$urx = int $urx; # for darwin
+		$ury = int $ury; # for darwin
 		ok(centimetres_to_points(7) == $urx && centimetres_to_points(12) == $ury, "Correct page height of " . centimetres_to_points(12) . " (was actually $ury) and width " . centimetres_to_points(7) . " (was actually $urx)");
 		$raw_pdf = $firefox->pdf(raw => 1, shrinkToFit => 1, landscape => 1, page => { width => 7, height => 12 });
 		$pdf = PDF::API2->open_scalar($raw_pdf);
 		$page = $pdf->openpage(0);
 		($llx, $lly, $urx, $ury) = $page->mediabox();
+		$urx = int $urx; # for darwin
+		$ury = int $ury; # for darwin
 		ok(centimetres_to_points(12) == $urx && centimetres_to_points(7) == $ury, "Correct page height of " . centimetres_to_points(7) . " (was actually $ury) and width " . centimetres_to_points(12) . " (was actually $urx)");
 		foreach my $paper_size ($firefox->paper_sizes()) {
 			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size, print_background => 1, shrink_to_fit => 1);
@@ -926,6 +994,8 @@ SKIP: {
 			$pages = $pdf->pages();
 			$page = $pdf->openpage(0);
 			($llx, $lly, $urx, $ury) = $page->mediabox();
+			$urx = int $urx; # for darwin
+			$ury = int $ury; # for darwin
 			ok(((centimetres_to_points($paper_sizes{$paper_size}->{height}) == $ury) || (centimetres_to_points($paper_sizes{$paper_size}->{height}) + 1) == $ury) &&
 			   ((centimetres_to_points($paper_sizes{$paper_size}->{width}) == $urx) || (centimetres_to_points($paper_sizes{$paper_size}->{width}) + 1) == $urx), "Correct page height ($ury) and width ($urx) for " . uc $paper_size);
 		}
@@ -994,10 +1064,10 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 5);
+		skip($skip_message, 6);
 	}
 	if (!$tls_tests_ok) {
-		skip("TLS test infrastructure seems compromised", 5);
+		skip("TLS test infrastructure seems compromised", 6);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	my $capabilities = $firefox->capabilities();
@@ -1008,28 +1078,28 @@ SKIP: {
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
 	ok($firefox->go(URI->new("https://fastapi.metacpan.org/author/DDICK")), "https://fastapi.metacpan.org/author/DDICK has been loaded");
+	ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
 	if ($major_version < 61) {
 		skip("HAR support not available in Firefox before version 61", 1);
 	}
 	if ($ENV{RELEASE_TESTING}) { # har sometimes hangs
 		my $har = $firefox->har();
-		ok($har->{log}->{creator}->{name} eq 'Firefox', "\$firefox->har() gives a data structure with the correct creator name");
+		ok($har->{log}->{creator}->{name} eq ucfirst $firefox->capabilities()->browser_name(), "\$firefox->har() gives a data structure with the correct creator name");
 	}
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 0, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1));
+	($skip_message, $firefox) = start_firefox(0, debug => 0, page_load => 600000, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, page_load_strategy => 'eager'));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 248);
+		skip($skip_message, 247);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	my $frame_url = 'https://www.w3schools.com/html/tryit.asp?filename=tryhtml_iframe_height_width';
 	my $frame_element = '//iframe[@name="iframeResult"]';
 	ok($firefox->go(URI->new($frame_url)), "$frame_url has been loaded");
-	ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
 	ok($firefox->window_handle() =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $firefox->window_handle());
 	my $chrome_window_handle_supported;
 	eval {
@@ -1138,7 +1208,7 @@ SKIP: {
 	SKIP: {
 		my $active_frame;
 		eval { $active_frame = $firefox->active_frame() };
-		if ((!$active_frame) && ($major_version < 50)) {
+		if ((!$active_frame) && (($major_version < 50) || ($major_version > 80))) {
 			diag("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@");
 			skip("\$firefox->active_frame is not supported for $major_version.$minor_version.$patch_version:$@", 1);
 		}
@@ -1650,6 +1720,12 @@ SKIP: {
 	ok($cookies[0]->secure() =~ /^[01]$/, "The first cookie secure flag is a boolean set to '" . $cookies[0]->secure() . "'");
 	ok($cookies[0]->path() =~ /\S/, "The first cookie path is a string set to '" . $cookies[0]->path() . "'");
 	ok($cookies[0]->domain() =~ /^[\w\-.]+$/, "The first cookie domain is a domain set to '" . $cookies[0]->domain() . "'");
+	if (defined $cookies[0]->same_site()) {
+		ok($cookies[0]->same_site() =~ /^(Lax|Strict|None)$/, "The first cookie same-site value is legal '" . $cookies[0]->same_site() . "'");
+	} else {
+		diag("Possible no same-site support for $major_version.$minor_version.$patch_version");
+		ok(1, "The first cookie same-site value is not present");
+	}
 	my $original_number_of_cookies = scalar @cookies;
 	ok(($original_number_of_cookies > 1) && ((ref $cookies[0]) eq 'Firefox::Marionette::Cookie'), "\$firefox->cookies() returns more than 1 cookie on " . $firefox->uri());
 	ok($firefox->delete_cookie($cookies[0]->name()), "\$firefox->delete_cookie('" . $cookies[0]->name() . "') deletes the specified cookie name");
@@ -1727,11 +1803,14 @@ SKIP: {
 		ok($count == 1, "Downloaded 1 files:$count");
 		my $handle = $firefox->download($download_path);
 		ok($handle->isa('GLOB'), "Obtained GLOB from \$firefox->download(\$path)");
-		my $result = sysread $handle, my $buffer, 2;
-		ok($result == 2, "Read data from GLOB:$!");
 		if ($INC{'Devel/Cover.pm'}) {
 		} else {
-			ok($buffer eq "\x1f\x8b", "Downloaded file is gzipped");
+			my $gz = Compress::Zlib::gzopen($handle, 'rb') or die "Failed to open gzip stream";
+			my $bytes_read = 0;
+			while($gz->gzread(my $buffer, 4096)) {
+				$bytes_read += length $buffer
+			}
+			ok($bytes_read > 1_000, "Downloaded file is gzipped");
 		}
 	}
 
@@ -1856,9 +1935,8 @@ SKIP: {
 		}
 		my $install_id;
 		my $install_path = Cwd::abs_path($path);
-		if ($^O eq 'cygwin') {
-			$install_path = $firefox->execute( 'cygpath', '-s', '-w', $install_path );
-		} elsif ($^O eq 'MSWin32') {
+		diag("Original install path is $install_path");
+		if ($^O eq 'MSWin32') {
 			$install_path =~ s/\//\\/smxg;
 		}
 		diag("Installing extension from $install_path");
@@ -1881,9 +1959,8 @@ SKIP: {
 		$result = undef;
 		$install_id = undef;
 		$install_path = $path;
-		if ($^O eq 'cygwin') {
-			$install_path = $firefox->execute( 'cygpath', '-s', '-w', $install_path );
-		} elsif ($^O eq 'MSWin32') {
+		diag("Original install path is $install_path");
+		if ($^O eq 'MSWin32') {
 			$install_path =~ s/\//\\/smxg;
 		}
 		diag("Installing extension from $install_path");
@@ -2088,6 +2165,9 @@ SKIP: {
 		if ($major_version < 66) {
 			skip("Firefox $major_version does not support \$firefox->new_window()", 15);
 		}
+		if ($firefox->capabilities()->browser_name() eq 'waterfox') {
+			skip("Waterfox does not support \$firefox->new_window()", 15);
+		}
 		ok(scalar $firefox->window_handles() == 1, "The number of window handles is currently 1");
 		my ($old_window) = $firefox->window_handles();
 		my $new_window = $firefox->new_window();
@@ -2156,9 +2236,9 @@ SKIP: {
 			skip("Firefox $major_version does not appear to support the \$firefox->window_rect() method", 2);
 		}
 		local $TODO = $^O eq 'linux' ? '' : "Initial width/height parameters not entirely stable in $^O";
-		ok($window_rect->width() == 800, "Window has a width of 800 (" . $window_rect->width() . ")");
-		ok($window_rect->height() == 600, "Window has a height of 600 (" . $window_rect->height() . ")");
-		if (($window_rect->width() == 800) && ($window_rect->height() == 600)) {
+		ok($window_rect->width() >= 800, "Window has a width of 800 (" . $window_rect->width() . ")");
+		ok($window_rect->height() >= 600, "Window has a height of 600 (" . $window_rect->height() . ")");
+		if (($window_rect->width() >= 800) && ($window_rect->height() >= 600)) {
 		} else {
 			diag("Width/Height for $^O set to 800x600, but returned " . $window_rect->width() . "x" . $window_rect->height());
 		}
@@ -2227,6 +2307,11 @@ SKIP: {
 	} elsif (($^O eq 'MSWin32') || (!grep /^moz_process_id$/, $capabilities->enumerate())) {
 		SKIP: {
 			skip("Not testing dead firefox processes for win32/early firefox versions", 2);	
+		}
+		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+	} elsif ($^O eq 'cygwin') {
+		SKIP: {
+			skip("Not testing dead firefox processes for cygwin", 2);	
 		}
 		ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 	} else {

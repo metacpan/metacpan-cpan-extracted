@@ -1,0 +1,157 @@
+name: testsuite
+
+on:
+  push:
+    branches:
+      - "*"
+    tags-ignore:
+      - "*"
+  pull_request:
+
+jobs:
+  ubuntu:
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: install perl-doc
+        run: |
+          sudo apt-get clean
+          sudo apt-get install -y perl-doc perl-doc-html
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+      - run: perl Makefile.PL
+      - run: make
+      - run: make test
+      - name: remove pod2usage
+        run: |
+          POD=$(which pod2usage)
+          echo "pod2usage: $POD"
+          sudo rm -f $POD ||:
+      - run: sudo make install
+      - run: which pod2usage
+
+  # ------------------------------------------------------------------------
+
+  no-perl-doc:
+    needs: [ubuntu]
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+      - run: perl Makefile.PL
+      - run: make
+      - run: make test
+      - name: remove pod2usage
+        run: |
+          POD=$(which pod2usage)
+          echo "pod2usage: $POD"
+          sudo rm -f $POD ||:
+      - run: sudo make install
+      - run: which pod2usage
+
+  # ------------------------------------------------------------------------
+
+  linux:
+    name: "linux ${{ matrix.perl-version }}"
+    needs: [ubuntu]
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          [
+            "5.32",
+            "5.30",
+            "5.28",
+            "5.26",
+            "5.24",
+            "5.22",
+            "5.20",
+            "5.18",
+            "5.16",
+            "5.14",
+            "5.12",
+            "5.10",
+            "5.8",
+          ]
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+          sudo: false
+      - run: perl Makefile.PL
+      - run: make
+      - run: make test
+      - run: "rm -f $(which pod2usage) ||:"
+      - run: make install
+      - run: which pod2usage
+
+  # ------------------------------------------------------------------------
+
+  windows:
+    needs: [ubuntu]
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 0
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 0
+
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version: [latest]
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Perl
+        run: |
+          choco install strawberryperl
+          echo "C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin" >> $GITHUB_PATH
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+          sudo: false
+      - run: prove -vl t/*.t

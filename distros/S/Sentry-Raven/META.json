@@ -4,7 +4,7 @@
       "Matt Harrington"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -72,7 +72,7 @@
          "web" : "https://github.com/getsentry/perl-raven"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_homepage" : "https://github.com/getsentry/perl-raven",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

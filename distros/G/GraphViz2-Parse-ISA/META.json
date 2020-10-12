@@ -70,6 +70,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2-Parse-ISA"
       }
    },
-   "version" : "2.49",
+   "version" : "2.51",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

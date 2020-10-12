@@ -1,3 +1,7 @@
+2020-10-10
+
+   Made sure this won't test under a cygwin/windows environment
+
 2009-04-22 10:35  cvs
 
 	* MANIFEST, lib/LEOCHARRE/Dir.pm, lib/LEOCHARRE/Dir.pod, t/00.t:

@@ -1,4 +1,3 @@
-Artistic_License.txt
 Build.PL
 Changes
 examples/bench-parm-parsers-ci-novalid.pl
@@ -10,13 +9,13 @@ examples/function_use_example.pl
 examples/line-warn.pl
 examples/object_use_example.pl
 examples/testing-optimizations.pl
-GPL_License.txt
 lib/Acme/Sub/Parms.pm
 lib/Acme/Sub/Parms.pod
 LICENSE
 Makefile.PL
 MANIFEST
 META.yml
+META.json
 README
 t/01_validating.t
 t/02_no_validation.t

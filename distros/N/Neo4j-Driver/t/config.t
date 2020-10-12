@@ -164,18 +164,20 @@ subtest 'uris with path/query' => sub {
 
 
 subtest 'tls' => sub {
-	plan tests => 5;
-	lives_ok {
-		$d = Neo4j::Driver->new('https://test/')->config(tls_ca => 'foo');
+	plan tests => 6;
+	throws_ok {
+		$d = Neo4j::Driver->new('https://test/')->config(tls_ca => 'foo.');
 		$d->session;
-	} 'create https';
-	is $d->{tls_ca}, 'foo', 'tls_ca';
+	} qr/\bTLS CA file 'foo\.' doesn't exist\b/i, 'create https with tls_ca';
+	is $d->{tls_ca}, 'foo.', 'tls_ca';
 	throws_ok {
 		Neo4j::Driver->new('https://test/')->config(tls => 0)->session;
 	} qr/\bHTTPS does not support unencrypted communication\b/i, 'no unencrypted https';
 	lives_ok {
-		Neo4j::Driver->new('https://test/')->config(tls => 1)->session;
+		$d = Neo4j::Driver->new('https://test/')->config(tls => 1);
+		Neo4j::Test->transaction_unconnected($d);
 	} 'encrypted https';
+	ok $d->{tls}, 'tls';
 	throws_ok {
 		Neo4j::Driver->new('http://test/')->config(tls => 1)->session;
 	} qr/\bHTTP does not support encrypted communication\b/i, 'no encrypted http';
@@ -187,7 +189,7 @@ subtest 'cypher filter' => sub {
 	my ($t, @q);
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 1';
 	lives_ok { $d->config(cypher_filter => 'params'); } 'set filter';
-	lives_ok { $t = Neo4j::Driver::Transaction->new( $d->session ); } 'new tx 1';
+	lives_ok { $t = Neo4j::Test->transaction_unconnected($d); } 'new tx 1';
 	@q = ('RETURN {ab}, {c}, {cd}', ab => 17, c => 19, cd => 23);
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare simple';
 	is $r->{statement}, 'RETURN $ab, $c, $cd', 'filtered simple';
@@ -198,13 +200,13 @@ subtest 'cypher filter' => sub {
 	is $r->{statement}, 'RETURN 42', 'filtered no params';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 2';
 	lives_ok { $d->config(cypher_filter => 'coffee'); } 'set filter unkown name';
-	lives_ok { $t = 0; $t = Neo4j::Driver::Transaction->new( $d->session ); } 'new tx 2';
+	lives_ok { $t = Neo4j::Test->transaction_unconnected($d); } 'new tx 2';
 	throws_ok {
 		$r = 0; $r = $t->_prepare('RETURN 42');
 	} qr/\bUnimplemented cypher filter\b/i, 'unprepared filter unkown name';
 	# no filter (for completeness)
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 3';
-	lives_ok { $t = 0; $t = Neo4j::Driver::Transaction->new( $d->session ); } 'new tx 3';
+	lives_ok { $t = Neo4j::Test->transaction_unconnected($d); } 'new tx 3';
 	@q = ('RETURN {a}', a => 17);
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare unfiltered';
 	is $r->{statement}, 'RETURN {a}', 'unfiltered';

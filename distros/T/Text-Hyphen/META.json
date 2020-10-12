@@ -4,9 +4,9 @@
       "Alex Kapranoff, C<< <kappa at cpan.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.5.0",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
-      "gpl_3"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -28,7 +28,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38",
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035",
             "perl" : "5.008_001"
          }
       },
@@ -36,7 +37,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -55,7 +56,7 @@
    "provides" : {
       "Text::Hyphen" : {
          "file" : "lib/Text/Hyphen.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       }
    },
    "release_status" : "stable",
@@ -69,10 +70,11 @@
          "web" : "https://github.com/kappa/Text-Hyphen"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_contributors" : [
-      "Alex Kapranoff <kappa@rambler-co.ru>",
-      "Alex Kapranoff <alex@kapranoff.ru>"
+      "Alex Kapranoff <alex@kapranoff.ru>",
+      "Alex Kapranoff <kappa@rambler-co.ru>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

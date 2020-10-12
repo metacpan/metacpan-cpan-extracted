@@ -11,7 +11,7 @@ use Text::Hunspell;
 use Test::Text::Sentence qw(split_sentences);
 use v5.22;
 
-use version; our $VERSION = qv('0.6.3'); # Works with UTF8 and includes Text::Sentence
+use version; our $VERSION = qv('0.6.4'); # Works with UTF8 and includes Text::Sentence
 
 use parent 'Test::Builder::Module'; # Included in Test::Simple
 
@@ -35,7 +35,7 @@ sub new {
   } else {
     @files = map( "$dir/$_", @files );
   }
-  my $self = { 
+  my $self = {
 	      _dir => $dir,
 	      _data_dir => $data_dir,
 	      _files => \@files
@@ -89,7 +89,7 @@ sub check {
 
 sub _strip_urls {
   my $text = shift || carp "No text";
-  $text =~ s/\[(.+?)\]\(\S+\)/$1/g;
+  $text =~ s/\[(.+?)\]\(\S+\)/$1/sg;
   return $text;
 }
 

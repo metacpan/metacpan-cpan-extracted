@@ -94,7 +94,7 @@ Alexander Lebedev for all his valuable work on russian ispell
 dictionaries and russian hyphenation patterns. See his archive
 at [ftp://scon155.phys.msu.ru/pub/russian/](ftp://scon155.phys.msu.ru/pub/russian/).
 
-Mark-Jason Dominus and Jan Pazdziora for [Text::Hyphenate](https://metacpan.org/pod/Text::Hyphenate) and [TeX::Hyphenate](https://metacpan.org/pod/TeX::Hyphenate)
+Mark-Jason Dominus and Jan Pazdziora for [Text::Hyphenate](https://metacpan.org/pod/Text%3A%3AHyphenate) and [TeX::Hyphenate](https://metacpan.org/pod/TeX%3A%3AHyphenate)
 modules on CPAN.
 
 Ned Batchelder for his public domain Python implementation of
@@ -105,4 +105,4 @@ Knuth-Liang algorithm available at [http://nedbatchelder.com/code/modules/hyphen
 Copyright 2008-2015 Alex Kapranoff.
 
 This is free software; you can redistribute it and/or modify it under
-the terms GNU General Public License version 3.
+the terms of the BSD License.

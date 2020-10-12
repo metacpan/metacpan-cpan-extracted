@@ -15,7 +15,7 @@ use JSON;
 use LWP::UserAgent;
 use Log::Any;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 has 'server' => (is => 'ro',
                  required => 1);

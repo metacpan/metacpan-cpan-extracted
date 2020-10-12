@@ -9,7 +9,7 @@ use namespace::clean -except => 'meta';
 has 'xml_before'   => (is => 'ro', isa => 'Str');
 has 'literal_text' => (is => 'ro', isa => 'Str', required => 1);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 
 sub as_xml {
@@ -122,16 +122,21 @@ sub replace {
   }
 
   # handle remaining contents after the last match
-  $add_to_current_text_node->($txt_after_last_match)
-    if $txt_after_last_match;
-  $maybe_clear_current_text_node->();
+  if ($txt_after_last_match) {
+    $add_to_current_text_node->($txt_after_last_match);
+    $maybe_clear_current_text_node->();
+  }
+  elsif ($xml_before) {
+    !$xml or croak "internal error : Text::xml_before was ignored during replacements";
+    $xml = $xml_before;
+  }
 
   return $xml;
 }
 
 
 
-sub uppercase {
+sub to_uppercase {
   my $self = shift;
   $self->{literal_text} = uc($self->{literal_text});
 }
@@ -212,7 +217,7 @@ string corresponding to the result of all these replacements. This is the
 internal implementation for public method
 L<MsOffice::Word::Surgeon/replace>.
 
-=head2 uppercase
+=head2 to_uppercase
 
 Puts the literal text within the node into uppercase letters.
 

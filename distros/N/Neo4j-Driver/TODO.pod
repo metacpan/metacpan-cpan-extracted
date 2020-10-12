@@ -18,6 +18,9 @@ the scalar's FLAGS (namely, C<POK>/C<IOK>; see L<Devel::Peek/"EXAMPLES"> and
 L<JSON::PP>'s C<_looks_like_number>). Then C<get(0)> would mean I<index>
 C<0> and C<get('0')> would mean I<key> C<0>. The JS driver uses this concept.
 
+See also L<https://github.com/makamaka/JSON-PP/commit/87bd6a4>
+and L<https://github.com/makamaka/JSON-PP/commit/81dd25b>.
+
 =item * Implement spatial and temporal types.
 
 =item * Add timers to L<Neo4j::Driver::ResultSummary> (see C<Neo4j::Bolt>).
@@ -29,16 +32,6 @@ C<0> and C<get('0')> would mean I<key> C<0>. The JS driver uses this concept.
 =head2 Experimental features
 
 =over
-
-=item * C<ServerInfo>: Refactor the existing code into a package of its own
-for clarity. Create an instance on creation of the driver's first session,
-so that it's relatively cheap and can safely be handed down to the
-L<ResultSummary|Neo4j::Driver::ResultSummary>. Get server version with Bolt.
-
-=item * L<Neo4j::Driver/"Database selection">: Make stable. While running
-multiple databases is mostly an enterprise feature, even the community edition
-comes with the C<system> database in addition to the main/default database,
-thus switching databases must be possible somehow.
 
 =item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable and move
 filter implementation to C<Transaction> in preparation of Bolt v3 support
@@ -181,6 +174,8 @@ priority.
 =head2 L<Neo4j::Driver::StatementResult>
 
 =over
+
+=item * Rename C<Result>, in line with the official drivers.
 
 =back
 

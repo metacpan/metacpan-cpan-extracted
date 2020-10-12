@@ -1,7 +1,7 @@
 package XS::libpanda;
 use XS::Loader;
 
-our $VERSION = '1.4.8';
+our $VERSION = '1.4.9';
 
 XS::Loader::load_noboot();
 

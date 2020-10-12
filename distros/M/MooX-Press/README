@@ -409,6 +409,9 @@ DESCRIPTION
             ],
           );
 
+    `symmethod` *(ArrayRef)*
+        An arrayref of name-spec pairs suitable for passing to Sub::SymMethod.
+
     `multifactory` *(ArrayRef)*
         Similar to `multimethod` but the methods are created in the factory
         package.

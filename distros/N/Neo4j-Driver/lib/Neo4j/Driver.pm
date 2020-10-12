@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.16';
+$Neo4j::Driver::VERSION = '0.17';
 
 use Carp qw(croak);
 
@@ -105,14 +105,7 @@ sub config {
 	}
 	
 	croak "Unsupported sequence: call config() before session()" if $self->{session};
-	croak "Odd number of elements in config hash" if @options & 1;
-	my %options = @options;
-	
-	my @unsupported = ();
-	foreach my $key (keys %options) {
-		push @unsupported, $key unless grep m/^$key$/, keys %OPTIONS;
-	}
-	croak "Unsupported config option: " . join ", ", sort @unsupported if @unsupported;
+	my %options = $self->_parse_options('config', [keys %OPTIONS], @options);
 	
 	# set config option
 	foreach my $key (keys %options) {
@@ -123,9 +116,10 @@ sub config {
 
 
 sub session {
-	my ($self, %options) = @_;
+	my ($self, @options) = @_;
 	
 	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
+	my %options = $self->_parse_options('session', ['database'], @options);
 	
 	my $transport;
 	if ($self->{uri}->scheme eq 'bolt') {
@@ -134,11 +128,27 @@ sub session {
 	}
 	else {
 		$transport = Neo4j::Driver::Transport::HTTP->new($self);
-		$transport->_database($options{database}) if defined $options{database};
+		$transport->_connect($options{database});
 	}
 	$self->{session} = 1;
 	
 	return Neo4j::Driver::Session->new($transport);
+}
+
+
+sub _parse_options {
+	my ($self, $context, $supported, @options) = @_;
+	
+	croak "Odd number of elements in $context options hash" if @options & 1;
+	my %options = @options;
+	
+	my @unsupported = ();
+	foreach my $key (keys %options) {
+		push @unsupported, $key unless grep m/^$key$/, @$supported;
+	}
+	croak "Unsupported $context option: " . join ", ", sort @unsupported if @unsupported;
+	
+	return %options;
 }
 
 
@@ -161,7 +171,7 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -261,7 +271,7 @@ including server URIs, credentials and other configuration.
 
 The URI passed to this method determines the type of driver created. 
 The C<http>, C<https>, and C<bolt> URI schemes are supported.
-Use of C<bolt> URIs requires L<Neo4::Bolt> to be installed.
+Use of C<bolt> URIs requires L<Neo4j::Bolt> to be installed.
 
 If a part of the URI or even the entire URI is missing, suitable
 default values will be substituted. In particular, the host name
@@ -279,7 +289,20 @@ if no port is specified, the protocol's default port will be used.
 
  $session = $driver->session;
 
-Creates and returns a new L<Session|Neo4j::Driver::Session>.
+Creates and returns a new L<Session|Neo4j::Driver::Session>,
+initiating a network connection with the Neo4j server.
+
+Each session connects to a single database, which may be specified
+using the C<database> option. If no defined value is given for this
+option, the driver will select the default database configured
+in F<neo4j.conf>.
+(As of S<L<Neo4j::Driver> 0.16>, selecting the default database
+sometimes doesn't work reliably with Neo4j 4.x (see L</BUGS>).)
+
+ $session = $driver->session( database => 'system' );
+
+The C<database> option is silently ignored when used with Neo4j
+S<versions 2> S<and 3>, which only support a single database.
 
 =head1 EXPERIMENTAL FEATURES
 
@@ -287,22 +310,6 @@ L<Neo4j::Driver> implements the following experimental features.
 These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
-
-=head2 Database selection
-
- $session = $driver->session( database => 'system' );
-
-Starting with version 4.0, Neo4j supports multiple databases within
-a single installation. A specific database may be selected using the
-optional session config option C<database>.
-
-If this option is not given, the driver will attempt to select
-whichever database is configured as the default in F<neo4j.conf>.
-As of S<L<Neo4j::Driver> 0.16>, this sometimes doesn't work reliably
-with Neo4j 4.x (see L</BUGS>).
-
-The result of using this option on Neo4j versions earlier than 4.0
-is undefined.
 
 =head2 Parameter syntax conversion
 
@@ -401,7 +408,7 @@ certificates. When this option is given, encrypted connections will
 only be accepted if the server's identity can be verified using the
 certificates provided.
 
-The certificates in the file must in PEM encoding. They are expected
+The certificates in the file must be PEM encoded. They are expected
 to be "root" certificates, S<i. e.> the S<"CA bit"> needs to be set
 and the certificate presented by the server must be signed by one of
 the certificates in this file (or by an intermediary).

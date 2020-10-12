@@ -1,5 +1,13 @@
+0.0921 2020-10-12
+  - fix bug that in exchange api, any object return type is wrong.
+0.0920 2020-10-12
+  - rename SPVM::get_length to SPVM::length
+  - rename SPVM ExchangeAPI get_length to length
+0.0919 2020-10-12
+  - rename SPVM::ObjectList to SPVM::List because this is maybe Perl to SPVM offten used interface, short name is good.
 0.0918 2020-10-07
   - SPVM::Util->rand is renamed to crand because perl rand is different from C rand.
+  - add SPVM::Util->rand. This is same as Perl rand(0 <= random_number < 1)
   - fix anon subroutine redefine warnings.
 0.0917 2020-10-06
   - fix bug that when a module contains multi packages, Perl Package is not created for after seconds packages

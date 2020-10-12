@@ -312,6 +312,15 @@ KEYWORDS
         ...;
       }
 
+  `symmethod`
+      symmethod myfunc {
+        ...;
+      }
+  
+      symmethod myfunc ( Int $x, ArrayRef $y ) {
+        ...;
+      }
+
   `multi method`
       multi method myfunc {
         ...;
@@ -392,6 +401,17 @@ KEYWORDS
   
       class MyThing {
         factory new_thing;
+      }
+
+  `multi factory`
+      class MyThing {
+        multi factory new_thing ( ArrayRef $x ) {
+          ...;
+        }
+    
+        multi factory new_thing ( HashRef $x ) {
+          ...;
+        }
       }
 
   `type_name`

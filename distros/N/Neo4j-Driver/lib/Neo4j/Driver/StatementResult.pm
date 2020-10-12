@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::StatementResult::VERSION = '0.16';
+$Neo4j::Driver::StatementResult::VERSION = '0.17';
 
 use Carp qw(croak);
 
@@ -36,6 +36,7 @@ sub new {
 		statement => $params->{statement},
 		cxn => $params->{bolt_connection},  # important to avoid dereferencing the connection
 		stream => $params->{bolt_stream},
+		server_info => $params->{server_info},
 	};
 	
 	# HTTP JSON results can be fully buffered immediately
@@ -209,7 +210,7 @@ sub summary {
 	
 	$self->_fill_buffer;
 	
-	$self->{summary} //= Neo4j::Driver::ResultSummary->new( $self->{result}, $self->{notifications}, $self->{statement} );
+	$self->{summary} //= Neo4j::Driver::ResultSummary->new( $self->{result}, $self->{notifications}, $self->{statement}, $self->{server_info} );
 	
 	return $self->{summary}->init;
 }
@@ -238,7 +239,7 @@ Neo4j::Driver::StatementResult - Result of running a Cypher statement (a stream 
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -434,7 +435,7 @@ L<Neo4j::Driver::B<ResultSummary>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Result (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Result.html>,
-L<Results (Python)|https://neo4j.com/docs/api/python-driver/current/results.html>,
+L<Result (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#result>,
 L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/result.js~Result.html>,
 L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
 
