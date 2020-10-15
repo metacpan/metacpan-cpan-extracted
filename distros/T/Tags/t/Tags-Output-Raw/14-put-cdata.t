@@ -18,7 +18,7 @@ $obj->put(
 );
 my $ret = $obj->flush;
 my $right_ret = '<element><![CDATA[aaaaa<dddd>dddd]]></element>';
-is($ret, $right_ret);
+is($ret, $right_ret, 'Simple test for CDATA.');
 
 # Test.
 $obj->reset;
@@ -29,5 +29,6 @@ eval {
 		['e', 'element'],
 	);
 };
-is($EVAL_ERROR, "Bad CDATA data.\n");
+is($EVAL_ERROR, "Bad CDATA data.\n",
+	'Bad CDATA data.');
 clean();

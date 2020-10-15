@@ -22,7 +22,7 @@
 
 AUTOMAKE_OPTIONS = foreign nostdinc
 
-EXTRA_DIST = README Makefile.example Makefile.inc Makefile.m32 \
+EXTRA_DIST = README.md Makefile.example Makefile.inc Makefile.m32 \
   Makefile.netware makefile.dj $(COMPLICATED_EXAMPLES)
 
 # Specify our include paths here, and do it relative to $(top_srcdir) and
@@ -67,4 +67,4 @@ CS_1 =
 CS_ = $(CS_0)
 
 checksrc:
-	$(CHECKSRC)(@PERL@ $(top_srcdir)/lib/checksrc.pl $(srcdir)/*.c)
+	$(CHECKSRC)(@PERL@ $(top_srcdir)/lib/checksrc.pl -D$(srcdir) $(srcdir)/*.c)

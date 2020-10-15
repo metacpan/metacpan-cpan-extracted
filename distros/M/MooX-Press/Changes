@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.082	2020-10-13
+
+ - Allow certain features previously only supported in classes and roles
+   (`with`, `extends`, `can`, `constant`, `multimethod`, `symmethod`) to
+   work for the factory itself.
+
 0.081	2020-10-10
 
  - Added: Support for Sub::SymMethod.

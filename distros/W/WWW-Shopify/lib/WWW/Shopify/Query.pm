@@ -63,6 +63,18 @@ package WWW::Shopify::Query::Match;
 use parent 'WWW::Shopify::Query';
 sub new { return bless { 'field_name' => $_[1] }, $_[0]; }
 
+
+
+=head2 WWW::Shopify::Query::MultiMatch
+
+A query that states that the specified field must equal any element in the input, though there is no restriction on what this input might be.
+
+=cut
+
+package WWW::Shopify::Query::MultiMatch;
+use parent 'WWW::Shopify::Query';
+sub new { return bless { 'field_name' => $_[1] }, $_[0]; }
+
 =head2 WWW::Shopify::Query::Custom
 
 A query that takes a sub that details how to handle the query.

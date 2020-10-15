@@ -1,26 +1,20 @@
-#!/usr/bin/env perl
-#
-# Note: t/test.t searches for the next line.
 # Annotation: Demonstrates graphing a byacc-style grammar.
 
 use strict;
 use warnings;
-
 use File::Spec;
-
 use GraphViz2;
 use GraphViz2::Parse::Yacc;
 
-my($graph)  = GraphViz2 -> new
-	(
-	 edge   => {color => 'grey'},
-	 global => {directed => 1},
-	 graph  => {concentrate => 1, rankdir => 'TB'},
-	 node   => {color => 'blue', shape => 'oval'},
-	);
-my($g) = GraphViz2::Parse::Yacc -> new(graph => $graph);
+my $graph = GraphViz2->new(
+	edge   => {color => 'grey'},
+	global => {directed => 1},
+	graph  => {concentrate => 1, rankdir => 'TB'},
+	node   => {color => 'blue', shape => 'oval'},
+);
+my $g = GraphViz2::Parse::Yacc->new(graph => $graph);
 
-$g -> create(file_name => File::Spec -> catfile('t', 'calc3.output') );
+$g->create(file_name => File::Spec->catfile('t', 'calc3.output'));
 
 if (@ARGV) {
   my($format)      = shift || 'svg';
@@ -30,7 +24,6 @@ if (@ARGV) {
   # run as a test
   require Test::More;
   require Test::Snapshot;
-  $graph->run(format => 'dot');
   Test::Snapshot::is_deeply_snapshot($graph->dot_input, 'dot file');
   Test::More::done_testing();
 }

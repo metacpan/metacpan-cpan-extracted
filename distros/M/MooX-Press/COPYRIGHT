@@ -33,6 +33,8 @@ Files: Changes
  t/88patchpackage.t
  t/89anonrolefun.t
  t/90withtraits.t
+ t/91factoryroles-zylite.t
+ t/91factoryroles.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

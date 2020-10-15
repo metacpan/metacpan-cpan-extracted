@@ -79,15 +79,15 @@
    "provides" : {
       "MooX::Press" : {
          "file" : "lib/MooX/Press.pm",
-         "version" : "0.081"
+         "version" : "0.082"
       },
       "MooX::Press::Keywords" : {
          "file" : "lib/MooX/Press/Keywords.pm",
-         "version" : "0.081"
+         "version" : "0.082"
       },
       "Zydeco::Lite" : {
          "file" : "lib/Zydeco/Lite.pm",
-         "version" : "0.081"
+         "version" : "0.082"
       }
    },
    "release_status" : "stable",
@@ -106,6 +106,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
    },
-   "version" : "0.081",
+   "version" : "0.082",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

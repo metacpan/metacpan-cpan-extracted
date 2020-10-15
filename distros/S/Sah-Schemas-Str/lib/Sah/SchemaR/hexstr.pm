@@ -1,9 +1,9 @@
 package Sah::SchemaR::hexstr;
 
-our $DATE = '2019-08-23'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["str",[{match=>qr(\A(?:[0-9A-Fa-f]{2})*\z),summary=>"String of bytes in hexadecimal"}],["str"]];
+our $rschema = ["str",[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"a0"},{valid=>0,value=>"a0f"},{valid=>1,value=>"a0ff"},{valid=>0,value=>"a0fg"},{valid=>1,value=>"a0ff12345678"}],match=>qr(\A(?:[0-9A-Fa-f]{2})*\z),summary=>"String of bytes in hexadecimal"}],["str"]];
 
 1;
 # ABSTRACT: String of bytes in hexadecimal
@@ -20,7 +20,7 @@ Sah::SchemaR::hexstr - String of bytes in hexadecimal
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::hexstr (from Perl distribution Sah-Schemas-Str), released on 2019-08-23.
+This document describes version 0.002 of Sah::SchemaR::hexstr (from Perl distribution Sah-Schemas-Str), released on 2020-05-27.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

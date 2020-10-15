@@ -1,18 +1,12 @@
-#!/usr/bin/env perl
-#
-# Note: t/test.t searches for the next line.
 # Annotation: Demonstrates HTML labels with newlines and double-quotes.
 
 use strict;
 use warnings;
-
 use File::Spec;
-
 use GraphViz2;
 
-my($id)    = 3;
-my($graph) = GraphViz2 -> new
-(
+my $id    = 3;
+my $graph = GraphViz2->new(
 	edge   => {color => 'grey'},
 	global => {directed => 1},
 	graph  => {label => "HTML label demo # $id - Fixing newlines", rankdir => 'TB'},
@@ -43,7 +37,6 @@ if (@ARGV) {
   # run as a test
   require Test::More;
   require Test::Snapshot;
-  $graph->run(format => 'dot');
   Test::Snapshot::is_deeply_snapshot($graph->dot_input, 'dot file');
   Test::More::done_testing();
 }

@@ -967,7 +967,7 @@ BEGIN {
 #	    print Dumper $oBank ;
 
 	    my $nb = $oBank->buildTheoPeakBankFromKnapsack($IonMode) ;
-	    print Dumper $oBank ;
+#	    print Dumper $oBank ;
 
 		$oBank->parsingMsFragments($expFile, 'asheader', $col) ; # get mz in colunm 2
 #		print Dumper $oBank ;

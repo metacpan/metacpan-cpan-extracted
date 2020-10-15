@@ -1,4 +1,8 @@
-{{NEXT}}
+2.01      2020-10-13
+
+- fix Changes for last release and missing MANIFEST
+
+2.00 2020-10-12
 
 - welcome Nicolas R (ATOOMIC) as co-maintainer of this package,
   and thanks for setting up a modern repo at Github:

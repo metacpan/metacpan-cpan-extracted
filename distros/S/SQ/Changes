@@ -1,5 +1,8 @@
 Revision history for SQ
 
+0.0.6       2020-10-13
+    - Update dist.ini, weaver.ini, .tidyallrc.
+
 v0.0.5      2014-11-21
     - Now exporting only $S.
         - One variable and it's an uppercase one.

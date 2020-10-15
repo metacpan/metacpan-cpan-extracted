@@ -33,6 +33,11 @@ These arguments are saved in the objects and can be accessed with:
 
 =item filename
 
+=item rotate
+
+Allowed values are 90 180 270. Rotation happens around the image
+figure and before the scaling.
+
 =item width
 
 =item wrap
@@ -90,7 +95,10 @@ sub new {
             die "Wrong width $w passed!";
         }
     }
-
+    if (my $r = $opts{rotate}) {
+        my %angles = (90 => 90, 180 => 180, 270 => 270);
+        $self->{rotate} = $angles{$r} || 0;
+    }
     foreach my $k (qw/desc fmt/) {
         if (exists $opts{$k} and defined $opts{$k}) {
             $self->{$k} = $opts{$k};
@@ -98,6 +106,10 @@ sub new {
     }
 
     bless $self, $class;
+}
+
+sub rotate {
+    return shift->{rotate};
 }
 
 sub width {
@@ -231,11 +243,13 @@ sub as_latex {
         $open = "\\begin{figure}[htbp!]";
         $close = "\\end{figure}";
     }
+    my $rotation = $self->rotate ? "origin=c,angle=" . $self->rotate . ',' : '';
+    my $heightratio = $desc ? '0.85' : "";
     my $out = <<"EOF";
 
 $open
 \\centering
-\\includegraphics[keepaspectratio=true,height=0.75\\textheight,width=$width]{$src}$desc
+\\includegraphics[${rotation}keepaspectratio=true,height=$heightratio\\textheight,width=$width]{$src}$desc
 $close
 EOF
     return $out;
@@ -259,11 +273,20 @@ sub as_html {
 <div class="caption">$realdesc</div>
 EOF
     }
-    if ($self->width != 1) {
-        $width = q{ style="width:} .  $self->width_html . q{;"};
-    }
 
-    $out = qq{\n<div class="$class"$width>\n} .
+    my @styles;
+    if ($self->width != 1) {
+        push @styles, "width:" . $self->width_html . ";";
+    }
+    if (my $rotate = $self->rotate) {
+        push @styles, "transform:rotate(${rotate}deg);";
+        push @styles, "background: transparent;";
+    }
+    my $style_html = "";
+    if (@styles) {
+        $style_html = q{ style="} . join(' ', @styles) . q{"};
+    }
+    $out = qq{\n<div class="$class"$style_html>\n} .
       qq{<img src="$src" alt="$src" class="embedimg" />\n};
     if (defined $desc) {
         $out .= $desc;

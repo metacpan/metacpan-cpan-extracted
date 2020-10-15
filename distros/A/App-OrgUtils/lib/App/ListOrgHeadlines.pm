@@ -1,7 +1,9 @@
 package App::ListOrgHeadlines;
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.479'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-14'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.481'; # VERSION
 
 use 5.010001;
 use strict;
@@ -208,12 +210,16 @@ _
             tags => ['format'],
         },
         has_tags => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'has_tag',
             schema => ['array', of=>'str*'],
             summary => 'Only show headlines that have the specified tags',
             tags => ['filter'],
             element_completion => $App::OrgUtils::_complete_tags,
         },
         lacks_tags => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'lacks_tag',
             schema => ['array', of=>'str*'],
             summary=> 'Only show headlines that don\'t have the specified tags',
             tags => ['filter'],
@@ -415,7 +421,7 @@ App::ListOrgHeadlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.479 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 

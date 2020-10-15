@@ -1,0 +1,33 @@
+openapi: "3.0.0"
+info:
+  description: "This is a sample configuration"
+  version: "1"
+  title: "Example Config"
+  termsOfService: "http://toterms/"
+  contact:
+    email: "developer@org"
+  license:
+    name: "Your-Licence"
+    url: "http://licence-link/"
+tags:
+- name: "example"
+  description: "some example"
+  externalDocs:
+    description: "Find out more"
+    url: "http://example"
+servers:
+  - url: '/v1/'
+  - url: 'http://localhost:8089/v1/'
+paths:
+  '/hcheck':
+    get:
+      description: 'Returns 200 response and Perl package name as text when service available'
+      responses:
+        200:
+          description: 'alive'
+          content:
+            'text/plain':
+              example: "Service-name: async-microservice-time\nAPI-version: 1"
+externalDocs:
+  description: "Find out more about Async::Microservice"
+  url: "https://metacpan.org/pod/Async::Microservice"

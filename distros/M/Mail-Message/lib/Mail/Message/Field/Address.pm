@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Address;
 use vars '$VERSION';
-$VERSION = '3.009';
+$VERSION = '3.010';
 
 use base 'Mail::Identity';
 
@@ -55,7 +55,7 @@ sub init($)
 
 sub parse($)
 {   my $self   = shift;
-    my $parsed = Mail::Message::Field::Addresses->new('To' => shift);
+    my $parsed = Mail::Message::Field::Addresses->new(To => shift);
     defined $parsed ? ($parsed->addresses)[0] : ();
 }
 

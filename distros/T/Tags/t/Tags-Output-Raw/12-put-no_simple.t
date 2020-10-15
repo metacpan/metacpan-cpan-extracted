@@ -15,4 +15,4 @@ $obj->put(
 );
 my $ret = $obj->flush;
 my $right_ret = '<element></element>';
-is($ret, $right_ret);
+is($ret, $right_ret, "Test for element in 'no_simple' parameter.");

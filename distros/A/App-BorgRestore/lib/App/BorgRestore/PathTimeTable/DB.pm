@@ -1,6 +1,7 @@
 package App::BorgRestore::PathTimeTable::DB;
 use strictures 2;
 
+use Carp::Assert;
 use Function::Parameters;
 BEGIN {
 	use Log::Any qw($log);
@@ -130,6 +131,11 @@ method save_nodes() {
 	for my $key (keys %{$self->{stats}}) {
 		$log->debugf("Performance counter %s = %s", $key, $self->{stats}->{$key});
 	}
+
+	# +2 because:
+	# - borg list gives us `.` as the first path and we essentially skip it
+	# - we call `add_path` with `.` at the beginning of this method
+	assert($self->{stats}->{real_calls_to_db_class} + 2 == $self->{stats}->{total_paths}, "All files were actually added to the database");
 }
 
 1;

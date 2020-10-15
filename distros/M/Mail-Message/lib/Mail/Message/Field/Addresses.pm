@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Addresses;
 use vars '$VERSION';
-$VERSION = '3.009';
+$VERSION = '3.010';
 
 use base 'Mail::Message::Field::Structured';
 
@@ -191,8 +191,16 @@ sub produceBody()
 sub consumeAddress($@)
 {   my ($self, $string, @options) = @_;
 
-    my ($local, $shorter, $loccomment) = $self->consumeDotAtom($string);
-    $local =~ s/\s//g if defined $local;
+    my ($local, $shorter, $loccomment);
+    if($string =~ s/^\s*"((?:\\.|[^"])*)"\s*\@/@/)
+    {   # local part is quoted-string rfc2822
+        ($local, $shorter) = ($1, $string);
+        $local =~ s/\\"/"/g;
+    }
+    else
+    {   ($local, $shorter, $loccomment) = $self->consumeDotAtom($string);
+        $local =~ s/\s//g if defined $local;
+    }
 
     return (undef, $string)
         unless defined $local && $shorter =~ s/^\s*\@//;

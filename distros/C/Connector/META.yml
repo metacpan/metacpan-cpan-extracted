@@ -47,7 +47,7 @@ recommends:
 requires:
   Log::Log4perl: 0
   Moose: 0
-  perl: 5.8.8
+  perl: 5.10.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.32'
+version: '1.35'

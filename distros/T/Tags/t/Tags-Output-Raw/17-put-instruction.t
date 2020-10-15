@@ -11,7 +11,7 @@ $obj->put(
 	['i', 'perl', 'print "1\n";'],
 );
 my $ret = $obj->flush;
-is($ret, '<?perl print "1\n";?>');
+is($ret, '<?perl print "1\n";?>', 'Simple perl instruction.');
 
 # Test.
 $obj->reset;
@@ -19,7 +19,7 @@ $obj->put(
 	['i', 'perl'],
 );
 $ret = $obj->flush;
-is($ret, '<?perl?>');
+is($ret, '<?perl?>', 'Perl instruction without code.');
 
 # Test.
 $obj->reset;
@@ -29,4 +29,5 @@ $obj->put(
 	['e', 'element'],
 );
 $ret = $obj->flush;
-is($ret, '<element><?perl print "1\n";?></element>');
+is($ret, '<element><?perl print "1\n";?></element>',
+	'Instruction inside element.');

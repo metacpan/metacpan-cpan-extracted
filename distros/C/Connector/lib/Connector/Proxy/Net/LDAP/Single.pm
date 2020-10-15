@@ -213,7 +213,7 @@ sub set {
         }
     }
 
-    my $mesg = $entry->update( $self->ldap() );
+    $mesg = $entry->update( $self->ldap() );
     if ($mesg->is_error()) {
         $self->_log_and_die("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() . ")" );
     }

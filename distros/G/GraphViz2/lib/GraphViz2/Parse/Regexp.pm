@@ -4,44 +4,26 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
+our $VERSION = '2.47';
+
 use IPC::Run3; # For run3().
-
 use GraphViz2;
-
 use Moo;
 
 has graph =>
 (
-	default  => sub{return ''},
+	default  => sub {
+		GraphViz2->new(
+			edge   => {color => 'grey'},
+			global => {directed => 1},
+			graph  => {rankdir => 'TB'},
+			node   => {color => 'blue', shape => 'oval'},
+		)
+        },
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
 );
-
-our $VERSION = '2.47';
-
-# -----------------------------------------------
-
-sub BUILD
-{
-	my($self) = @_;
-
-	$self -> graph
-	(
-		$self -> graph ||
-		GraphViz2 -> new
-		(
-			edge   => {color => 'grey'},
-			global => {directed => 1},
-			graph  => {rankdir => 'TB'},
-			logger => '',
-			node   => {color => 'blue', shape => 'oval'},
-		)
-	);
-
-} # End of BUILD.
-
-# -----------------------------------------------
 
 sub create
 {
@@ -274,8 +256,7 @@ Key-value pairs accepted in the parameter list:
 
 This option specifies the GraphViz2 object to use. This allows you to configure it as desired.
 
-The default is GraphViz2 -> new. The default attributes are the same as in the synopsis, above,
-except for the logger of course, which defaults to ''.
+The default is GraphViz2 -> new. The default attributes are the same as in the synopsis, above.
 
 This key is optional.
 

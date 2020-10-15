@@ -7,7 +7,7 @@ use autodie;
 
 use 5.008;
 
-our $VERSION = '0.0.2';
+our $VERSION = 'v0.0.2';
 
 use SVG::Graph::Kit;
 use Getopt::Long qw( GetOptionsFromArray );
@@ -38,9 +38,9 @@ sub new
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    $self->argv($args->{argv});
+    $self->argv( $args->{argv} );
 
     return;
 }
@@ -55,33 +55,43 @@ sub _slurp_lines
     return \@ret;
 }
 
+sub _render_as_svg
+{
+    my ( $self, $args ) = @_;
+
+    my $g = SVG::Graph::Kit->new( data => $args->{data} );
+    print { $args->{out_fh} } $g->draw;
+
+    return;
+}
+
 sub run
 {
     my ($self) = @_;
 
     my $output_fn;
-    my $man = 0;
-    my $help = 0;
+    my $man     = 0;
+    my $help    = 0;
     my $version = 0;
 
-    my @argv = @{$self->argv};
+    my @argv = @{ $self->argv };
 
     GetOptionsFromArray(
         \@argv,
         "output|o" => \$output_fn,
-        "help|h" => \$help,
-        "man" => \$man,
-        "version" => \$version,
+        "help|h"   => \$help,
+        "man"      => \$man,
+        "version"  => \$version,
     ) or pod2usage(2);
 
     if ($help)
     {
-        pod2usage(1)
+        pod2usage(1);
     }
 
     if ($man)
     {
-        pod2usage(-verbose => 2);
+        pod2usage( -verbose => 2 );
     }
 
     if ($version)
@@ -93,7 +103,7 @@ sub run
     my $in_fh;
 
     my $filename = shift(@argv);
-    if (!defined($filename))
+    if ( !defined($filename) )
     {
         $in_fh = \*STDIN;
     }
@@ -104,7 +114,7 @@ sub run
 
     my $out_fh;
 
-    if (!defined($output_fn))
+    if ( !defined($output_fn) )
     {
         $out_fh = \*STDOUT;
     }
@@ -113,13 +123,12 @@ sub run
         open $out_fh, '>', $output_fn;
     }
 
-    my $data = [map { [split/\t/, $_] } @{_slurp_lines($in_fh)}];
+    my $data = [ map { [ split /\t/, $_ ] } @{ _slurp_lines($in_fh) } ];
+    $self->_render_as_svg( { data => $data, out_fh => $out_fh } );
 
-    my $g = SVG::Graph::Kit->new(data => $data);
-    print {$out_fh} $g->draw;
-    close ($out_fh);
+    close($out_fh);
 
-    if (defined($filename))
+    if ( defined($filename) )
     {
         close($in_fh);
     }
@@ -133,13 +142,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::SVG::Graph - generate SVG graphs from the command line.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 DESCRIPTION
 
@@ -171,37 +182,9 @@ L<https://github.com/FormidableLabs/victory-cli> is a similar tool for
 Node.js/npm , but I had trouble installing it so I decided to create
 L<svg-graph>. It may work well enough for you, though.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-SVG-Graph or by email to
-bug-app-svg-graph@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc App::SVG::Graph
 
 =head2 Websites
 
@@ -216,15 +199,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/App-SVG-Graph>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-SVG-Graph>
+L<https://metacpan.org/release/App-SVG-Graph>
 
 =item *
 
@@ -233,30 +208,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SVG-Graph>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-SVG-Graph>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-SVG-Graph>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/App-SVG-Graph>
 
 =item *
 
@@ -270,7 +221,7 @@ L<http://cpants.cpanauthors.org/dist/App-SVG-Graph>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-SVG-Graph>
 
@@ -307,5 +258,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-App-SVG-Graph>
 
   git clone https://github.com/shlomif/perl-App-SVG-Graph.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/app-svg-graph/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

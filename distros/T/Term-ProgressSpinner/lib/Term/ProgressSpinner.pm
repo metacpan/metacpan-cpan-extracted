@@ -1,7 +1,9 @@
 package Term::ProgressSpinner; 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use 5.006; use strict; use warnings;
 use IO::Handle; use Term::ANSIColor; use Time::HiRes qw//;
+use Term::Size::Any qw/chars/;
+if ($^O eq 'MSWin32') { eval "use Win32::Console::ANSI;use Win32::Console;"; }
 our (%SPINNERS, %PROGRESS, %VALIDATE);
 
 BEGIN {
@@ -462,22 +464,70 @@ sub new {
 		progress_options => $PROGRESS{ $args{progress} || 'default' },
 		output => \*STDERR,
 		spinner_index => 0,
+		progress_spinners => [],
 		message => "{progress} {spinner} processed {percents} of {counter}/{total} {elapsed}/{estimate}",
+		terminal_height => 43,
 		%args
-	}, $pkg;
+	}, ref $pkg || $pkg;
 }
 
-#TODO refactor everything to make context aware
+sub spinner_index {
+	my ($self, $val) = @_;
+	if (defined $val) {
+		if (ref $val || $val !~ m/\d+/) {
+			die 'spinner_index should be a integer';
+		}
+		$self->{spinner_index} = $val;
+	}
+	return $self->{spinner_index};
+}
+
+sub terminal_height {
+	my ($self, $val) = @_;
+	if (defined $val) {
+		if (ref $val || $val !~ m/\d+/) {
+			die 'terminal_height should be a integer';
+		}
+		$self->{terminal_height} = $val;
+	}
+	return $self->{terminal_height};
+}
+
+sub progress_spinners {
+	my ($self, $val) = @_;
+	if (defined $val) {
+		if (ref $val || "" ne 'ARRAY') {
+			die 'progress_spinners should be a array';
+		}
+		$self->{progress_spinners} = $val;
+	}
+	return $self->{progress_spinners};
+}
+
 sub savepos {
 	my $self = shift;
-	my $x='';
-	system "stty cbreak </dev/tty >/dev/tty 2>&1";
-	$self->output->print("\e[6n");
-	$x .= getc STDIN for 0 .. 5;
-	system "stty -cbreak </dev/tty >/dev/tty 2>&1";
-	my($n, $m)=$x=~m/(\d+)\;(\d+)/;
-	$self->clear();
-	$self->{savepos} = $n;
+	my ($col, $rows) = Term::Size::Any::chars($self->output);
+	$rows ||= $self->terminal_height;
+	my $x = '';
+	if ($^O eq 'MSWin32') {
+		my $CONSOLE = Win32::Console->new(Win32::Console::STD_OUTPUT_HANDLE());
+		($x) = $CONSOLE->Cursor();
+	} else {
+		system "stty cbreak </dev/tty >/dev/tty 2>&1";
+		$self->output->print("\e[6n");
+		$x .= getc STDIN for 0 .. 5;
+		system "stty -cbreak </dev/tty >/dev/tty 2>&1";
+		my($n, $m)=$x=~m/(\d+)\;(\d+)/;
+		$x = $n;
+		$self->clear();
+	}
+	if ($x == $rows) {
+		$x--;
+		for (@{ $self->progress_spinners }) {
+			$_->{savepos} = $_->{savepos} - 1;
+		}
+	}
+	$self->{savepos} = $x;
 }
 
 sub loadpos {
@@ -492,22 +542,33 @@ sub start {
 	$self->start_epoch(Time::HiRes::time);
 	$self->output->print("\e[?25l");
 	$self->savepos;
-	$self->advance();
+	$self->output->print("\n");
+	my $ps = $self->new(%{ $self });
+	push @{ $self->progress_spinners }, $ps;
+	$self->spinner_index($self->spinner_index + 1);
+	return $ps;
 }
  
 sub advance {
-	my ($self) = @_;
-	if ($self->counter < $self->total) {
-		$self->counter($self->counter + 1);
-		my $spinner = $self->spinner;
-		for (1 .. $spinner->{width}) {
-			my $index = $spinner->{index}->[$_ - 1];
-			$spinner->{index}->[$_ - 1] = ($index + 1) % scalar @{$spinner->{chars}};
+	my ($self, $ps, $prevent) = @_;
+	if ($ps) {
+		if ($ps->counter < $ps->total) {
+			$ps->counter($ps->counter + 1);
+			my $spinner = $ps->spinner;
+			for (1 .. $spinner->{width}) {
+				my $index = $spinner->{index}->[$_ - 1];
+				$spinner->{index}->[$_ - 1] = ($index + 1) % scalar @{$spinner->{chars}};
+			}
+			select(undef, undef, undef, $ps->slowed) if $ps->slowed;
+			$ps->draw() unless $prevent;
+		} else {
+			$self->finish($ps);
 		}
-		select(undef, undef, undef, $self->slowed) if $self->slowed;
-		$self->draw();
 	} else {
-		$self->finish();
+		for my $spinner (@{$self->progress_spinners}) {
+			$self->advance($spinner, 1);
+		}
+		scalar @{$self->{progress_spinners}} ? $self->draw() : $self->finish;
 	}
 }
 
@@ -527,60 +588,79 @@ sub time_advance_elapsed {
 }
 
 sub draw {
-	my ($self) = @_;
-	$self->loadpos;
-	$self->clear();
-	my ($spinner, $progress, $available, %options) = ($self->spinner, $self->progress, $self->progress_width, $self->time_advance_elapsed);
-	$options{total} = $self->total;	
-	$options{counter} = $self->counter;
-	$options{spinner} = color($self->spinner_color);
-	$options{spinner} .= $spinner->{chars}->[
-		$spinner->{index}->[$_ - 1]
-	] for (1 .. $spinner->{width});
-	$options{spinner} .= color($self->text_color);
-	$options{percent} = int( ( $options{counter} / $options{total} ) * 100 );
-	$options{percentage} = ($available / 100) * $options{percent};
-	$options{estimate} = (($options{elapsed} / $options{percent}) * 100) - $options{elapsed}; 
-	$options{estimate_second} = int($options{estimate} + 0.5);
-	$options{per_second} = $options{elapsed_seconds} ? 
-		$options{counter} / int($options{elapsed_second})
-		: 0;
-	$options{progress} = sprintf("%s%s%s%s%s",
-		color($self->progress_color),
-		$progress->{chars}->[0],
-		( $progress->{chars}->[1] x int($options{percentage} + 0.5) ) . ( ' ' x int( ($available - $options{percentage}) + 0.5 ) ),
-		$progress->{chars}->[2],
-		color($self->text_color)
-	);
-	$options{percents} = $options{percent} . '%'; 
-	$options{$_} = sprintf ("%s %s %s",
-		color($self->{$_ . "_color"}),
-		$options{$_},
-		color($self->text_color)
-	) for (qw/total percent percents percentage counter per_second/);
-	for (qw/elapsed last_elapsed estimate last_advance_epoch start_epoch epoch/) {
+	my ($self, $ps) = @_;
+	if ($ps) {
+		$ps->loadpos;
+		$ps->clear();
+		my ($spinner, $progress, $available, %options) = ($ps->spinner, $ps->progress, $ps->progress_width, $ps->time_advance_elapsed);
+		$options{total} = $ps->total;	
+		$options{counter} = $ps->counter;
+		$options{spinner} = color($ps->spinner_color);
+		$options{spinner} .= $spinner->{chars}->[
+			$spinner->{index}->[$_ - 1]
+		] for (1 .. $spinner->{width});
+		$options{spinner} .= color($ps->text_color);
+		$options{percent} = int( ( $options{counter} / $options{total} ) * 100 );
+		$options{percentage} = ($available / 100) * $options{percent};
+		$options{estimate} = $options{percent} ? (($options{elapsed} / $options{percent}) * 100) - $options{elapsed} : 0; 
+		$options{estimate_second} = int($options{estimate} + 0.5);
+		$options{per_second} = $options{elapsed_seconds} ? 
+			$options{counter} / int($options{elapsed_second})
+			: 0;
+		$options{progress} = sprintf("%s%s%s%s%s",
+			color($ps->progress_color),
+			$progress->{chars}->[0],
+			( $progress->{chars}->[1] x int($options{percentage} + 0.5) ) . ( ' ' x int( ($available - $options{percentage}) + 0.5 ) ),
+			$progress->{chars}->[2],
+			color($ps->text_color)
+		);
+		$options{percents} = $options{percent} . '%'; 
 		$options{$_} = sprintf ("%s %s %s",
-			color($self->{$_ . "_color"}),
+			color($ps->{$_ . "_color"}),
 			$options{$_},
-			color($self->text_color)
-		);
-		$options{"${_}_second"} = sprintf ("%s%s%s",
-			color($self->{$_ . "_color"}),
-			$options{"${_}_second"},
-			color($self->text_color)
-		);
+			color($ps->text_color)
+		) for (qw/total percent percents percentage counter per_second/);
+		for (qw/elapsed last_elapsed estimate last_advance_epoch start_epoch epoch/) {
+			$options{$_} = sprintf ("%s %s %s",
+				color($ps->{$_ . "_color"}),
+				$options{$_},
+				color($ps->text_color)
+			);
+			$options{"${_}_second"} = sprintf ("%s%s%s",
+				color($ps->{$_ . "_color"}),
+				$options{"${_}_second"},
+				color($ps->text_color)
+			);
+		}
+		my $message = $ps->message;
+		$message =~ s/$VALIDATE{msg_regex}/$options{$1}/ig;
+		$message .= color('reset') . "\n";
+		$ps->output->print($message);
+		return $ps->drawn(1);
+	} else {
+		for my $spinner (@{$self->progress_spinners}) {
+			$self->draw($spinner);
+		}
+		return $self->drawn(1);
 	}
-	my $message = $self->message;
-	$message =~ s/$VALIDATE{msg_regex}/$options{$1}/ig;
-	$message .= color('reset') . "\n";
-	$self->output->print($message);
-	return $self->drawn(1);
 }
  
 sub finish {
-	my ($self) = @_;
-	$self->finished(1);
-	$self->output->print("\e[?25h"); 
+	my ($self, $sp) = @_;
+	if ($sp && scalar @{$self->progress_spinners}) {
+		my $i = 0;
+		for (@{ $self->progress_spinners }) {
+			if ($sp->spinner_index == $_->spinner_index) {
+				last;
+			}
+			$i++;
+		}
+		splice @{$self->progress_spinners}, $i, 1;
+
+	} else {
+		$self->output->print("\e[?25h"); 
+		$self->finished(1);
+	}	
 	return 0;
 }
 
@@ -879,7 +959,7 @@ Term::ProgressSpinner - Terminal Progress bars!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -889,6 +969,29 @@ Version 0.02
 	my $ps = Term::ProgressSpinner->new();
 	$ps->slowed(0.1);
 	$ps->start(50);
+	while ($ps->advance()) {}
+
+	...
+
+	my $s1 = $ps->start(20);
+	my $s2 = $ps->start(10);
+	my $s3 = $ps->start(50);
+	my $s4 = $ps->start(30);
+
+	while (!$ps->finished) {
+		$ps->advance($s1) unless $s1->finished;
+		$ps->advance($s2) unless $s2->finished;
+		$ps->advance($s3) unless $s3->finished;
+		$ps->advance($s4) unless $s4->finished;
+	}
+
+	...
+
+	$s1 = $ps->start(20);
+	$s2 = $ps->start(10);
+	$s3 = $ps->start(50);
+	$s4 = $ps->start(30);
+
 	while ($ps->advance()) {}
 
 =head1 SUBROUTINES/METHODS

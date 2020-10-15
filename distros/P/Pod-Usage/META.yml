@@ -1,0 +1,52 @@
+---
+abstract: 'extracts POD documentation and shows usage information'
+author:
+  - 'Marek Rouchal <marekr@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0.82'
+  Test::More: '0.60'
+  blib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Usage
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Pod::Usage:
+    file: lib/Pod/Usage.pm
+    version: '2.01'
+requires:
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0.82'
+  Pod::Perldoc: '3.28'
+  Pod::Simple: '3.40'
+  Pod::Text: '4.00'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/Dual-Life/Pod-Usage/issues
+  homepage: https://github.com/Dual-Life/Pod-Usage
+  repository: https://github.com/Dual-Life/Pod-Usage.git
+version: '2.01'
+x_contributors:
+  - 'Marek Rouchal <43476190+marekro@users.noreply.github.com>'
+  - 'Marek Rouchal <marek.rouchal@gmx.net>'
+  - 'Nicolas R <nicolas@atoomic.org>'
+x_generated_by_perl: v5.30.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

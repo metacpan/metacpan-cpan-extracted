@@ -1,0 +1,65 @@
+{
+   "abstract" : "Just simple backuper app with incremental compressed encrypted backups stored on remote ssh server",
+   "author" : [
+      "Dmitry Novozhilov <Dmitry@Novozhilov.ru>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-SimpleBackuper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Raw::Lzma" : "0",
+            "Const::Fast" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "Crypt::Rijndael" : "0",
+            "Digest::SHA" : "0",
+            "JSON::PP" : "0",
+            "MIME::Base64" : "0",
+            "Net::SFTP::Foreign" : "0",
+            "POSIX" : "0",
+            "Text::Glob" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dmitry-novozhilov/simple-backuper.git",
+         "web" : "https://github.com/dmitry-novozhilov/simple-backuper"
+      }
+   },
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

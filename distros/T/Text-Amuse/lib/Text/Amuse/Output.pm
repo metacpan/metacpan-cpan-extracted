@@ -1973,6 +1973,7 @@ sub image_re {
                                 ([ ]+
                                     ([0-9]+)? # width in percent
                                     ([ ]*([rlf]))?
+                                    ([ ]*(a(90|180|270)))?
                                 )?}x;
 }
 
@@ -1991,9 +1992,11 @@ sub find_image {
         my $filename = $1;
         my $width = $4;
         my $float = $6;
+        my $rotate = $9;
         return Text::Amuse::Output::Image->new(filename => $filename,
                                                width => $width,
                                                wrap => $float,
+                                               rotate => $rotate,
                                                fmt => $self->fmt);
     }
     else {

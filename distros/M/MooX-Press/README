@@ -254,6 +254,11 @@ DESCRIPTION
     This saves a level of indentation. (`=> undef` or `=> 1` are supported as
     synonyms for `=> {}`.)
 
+    The `can`, `before`, `after`, `around`, `multimethod`, `symmethod`,
+    `constant`, `with`, and `extends` options documented under Class Options
+    can also be used as top-level import options to apply them to the factory
+    package.
+
    Class Options
     Each class in the list of classes can be followed by a hashref of options:
 

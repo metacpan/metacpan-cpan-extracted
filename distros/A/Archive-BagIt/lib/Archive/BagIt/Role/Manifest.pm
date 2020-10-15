@@ -7,6 +7,7 @@ use Carp;
 use File::Spec;
 use Moo::Role;
 with 'Archive::BagIt::Role::Plugin';
+with 'Archive::BagIt::Role::Portability';
 
 has 'algorithm' => (
     is => 'rw',
@@ -82,7 +83,7 @@ sub __build_xxxmanifest_entries {
     open(my $XXMANIFEST, "<:encoding(UTF-8)", $xxmanifest_file) or croak("Cannot open $xxmanifest_file: $!");
     my $algorithm = $self->algorithm()->name;
     while (my $line = <$XXMANIFEST>) {
-        chomp($line);
+        $line = $self->chomp_portable($line);
         my ($digest, $file) = split(/\s+/, $line, 2);
         next unless ((defined $digest) && (defined $file)); # empty lines!
         $xxmanifest_entries->{$algorithm}->{$file} = $digest;
@@ -364,7 +365,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head2 calc_digests($bagit, $digestobj, $filenames_ref, $opts)
 

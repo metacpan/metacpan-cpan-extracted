@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -92,6 +92,11 @@ sub put {
 		# Bad data.
 		if (ref $tags_structure_ar ne 'ARRAY') {
 			err 'Bad data.';
+		}
+
+		# Input 'Tags' item callback.
+		if (defined $self->{'input_tags_item_callback'}) {
+			$self->{'input_tags_item_callback'}->($tags_structure_ar)
 		}
 
 		# Split to type and main tags structure.
@@ -201,6 +206,9 @@ sub _default_parameters {
 
 	# Auto-flush.
 	$self->{'auto_flush'} = 0;
+
+	# Input 'Tags' item callback.
+	$self->{'input_tags_item_callback'} = undef;
 
 	# Output callback.
 	$self->{'output_callback'} = undef;
@@ -335,6 +343,13 @@ __END__
 
  Auto flush flag.
  Default value is 0.
+
+=item * C<input_tags_item_callback>
+
+ Input 'Tags' item callback.
+ Callback is processing before main 'Tags' put().
+ It's usefull for e.g. validation.
+ Default value is undef.
 
 =item * C<output_callback>
 
@@ -558,6 +573,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

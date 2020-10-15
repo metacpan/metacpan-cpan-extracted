@@ -4,12 +4,20 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+version 1.00: Wed 14 Oct 19:14:36 CEST 2020
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- when the username of an address contains " [Andy Beverley]
+	
 version 0.99: Wed 24 Jan 09:08:27 CET 2018
 
 	Improvements:
 	- convert to GIT
 	- publish via GitHUB
 	- rename Changes -> ChangeLog
+	- fix license to "as perl"
+	  rt.cpan.org#124046 [Jitka Plesnikova]
 
 version 0.98: Wed  8 Nov 09:46:42 CET 2017
 

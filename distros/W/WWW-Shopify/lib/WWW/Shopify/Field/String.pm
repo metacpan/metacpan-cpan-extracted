@@ -57,12 +57,31 @@ sub generate($) {
 
 package WWW::Shopify::Field::String::URL;
 use parent 'WWW::Shopify::Field::String';
+
+sub sql_type { return 'TEXT'; }
 sub generate($) {
 	return 'http://www.' . ::random_regex('[a-z_0-9]{3,24}') . '.com/' . ::random_regex('[a-z_0-9]{0,16}');
 }
 
+
+package WWW::Shopify::Field::String::URL::Domain;
+use base 'WWW::Shopify::Field::String::URL';
+sub generate($) {
+	return ::random_regex('[a-z_0-9]{3,24}') . '.com';
+}
+
+
+package WWW::Shopify::Field::String::URL::Long;
+use parent 'WWW::Shopify::Field::String';
+sub sql_type { return 'TEXT'; }
+sub generate($) {
+	return 'http://www.' . ::random_regex('[a-z_0-9]{3,24}') . '.com/' . ::random_regex('[a-z_0-9]{0,16}');
+}
+
+
 package WWW::Shopify::Field::String::URL::Shopify;
 use parent 'WWW::Shopify::Field::String';
+sub sql_type { return 'TEXT'; }
 sub generate($) {
 	return 'http://www.' . ::random_regex('[a-z_0-9]{3,24}') . '.myshopify.com/' . ::random_regex('[a-z_0-9]{0,16}');
 }
@@ -70,6 +89,7 @@ sub generate($) {
 # We'll just generate like 1000 images in this folder.
 package WWW::Shopify::Field::String::URL::Image;
 use parent 'WWW::Shopify::Field::String';
+sub sql_type { return 'TEXT'; }
 sub generate($) {
 	return '/mock/images/' . ::random_regex('[a-z_0-9]{1,8}') . ".png";
 }
@@ -151,11 +171,13 @@ package WWW::Shopify::Field::String::Phone;
 use parent 'WWW::Shopify::Field::String';
 
 sub generate($) {
-	return ::random_regex('\d{1,2} \d{3} \d{3}-\d{4}');
+	return ::random_regex('\d{1,2} \d{3} \d{3}-\d{4}');		
 }
 
 package WWW::Shopify::Field::String::Handle;
 use parent 'WWW::Shopify::Field::String';
+
+sub sql_type { return "varchar(255)"; }
 
 sub generate($) {
 	my $string = lc(join("-", ::rand_words(size => int(rand(2))+2)));

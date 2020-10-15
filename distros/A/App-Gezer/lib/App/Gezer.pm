@@ -1,5 +1,5 @@
 package App::Gezer;
-$App::Gezer::VERSION = '0.0.3';
+$App::Gezer::VERSION = '0.0.4';
 # ABSTRACT: HTML Postprocessor and frontend to html-minifier
 
 use strict;
@@ -15,7 +15,7 @@ use Data::Munge qw/ list2re /;
 use File::Update qw/ modify_on_change write_on_change /;
 use Path::Tiny qw/ path /;
 
-has '_minifier_conf_fn' => ( is => 'rw', );
+has '_minifier_conf_fn'          => ( is => 'rw', );
 has [ '_temp_dir', '_proc_dir' ] => ( is => 'rw', );
 
 my $XMLNS_NEEDLE = <<'EOF';
@@ -240,11 +240,11 @@ __END__
 
 =head1 NAME
 
-App::Gezer - HTML Postprocessor and frontend to html-minifier
+App::Gezer - HTML Postprocessor and frontend to html-minifier .
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =begin removed
 
@@ -256,14 +256,6 @@ s#\s*(</?(?:body|(?:br /)|div|head|li|ol|p|title|ul)>)\s*#$1#gms;
                 $text =~ s#\s+\z##ms;
 
 =end removed
-
-=head1 NAME
-
-App::Gezer - HTML Postprocessor and frontend to html-minifier .
-
-=head1 VERSION
-
-version 0.0.3
 
 =head1 METHODS
 
@@ -306,7 +298,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -327,35 +319,11 @@ L<https://metacpan.org/release/App-Gezer>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Gezer>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Gezer>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Gezer>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Gezer>
 
 =item *
 

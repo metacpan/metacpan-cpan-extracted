@@ -1,3 +1,4 @@
+use lib '.';
 use strict;
 use warnings;
 
@@ -22,7 +23,7 @@ requires 'Indent::Word' => 0.01;
 requires 'Indent::Block' => 0.01;
 requires 'List::MoreUtils' => 0;
 requires 'Readonly' => 0;
-requires 'Tags::Output' => 0.09;
+requires 'Tags::Output' => 0.10;
 requires 'Tags::Utils' => 0.09;
 requires 'Tags::Utils::Preserve' => 0.09;
 requires 'perl' => '5.6.0';
@@ -37,7 +38,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

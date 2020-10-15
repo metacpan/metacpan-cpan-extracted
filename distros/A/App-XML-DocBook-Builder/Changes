@@ -1,3 +1,9 @@
+0.1002  2020-10-13
+    - Remove leftover old POD sections.
+
+0.1001  2020-10-13
+    - Rebuild for new PodWeaver dependencies.
+
 0.1000  2020-08-15
     - Preliminary support for rendering "manpages".
 

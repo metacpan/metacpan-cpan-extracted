@@ -9,7 +9,7 @@
 
 package Mail::Message::Convert::EmailSimple;
 use vars '$VERSION';
-$VERSION = '3.009';
+$VERSION = '3.010';
 
 use base 'Mail::Message::Convert';
 

@@ -1,3 +1,6 @@
+0.71    2020-10-13
+  - fix RT #133524: undeclared dependency on Tk in Makefile.PL
+
 0.70	2020-10-05
   - moved .pm file to lib folder
   - fixed critical issue with -width and -height options of ScrListbox in Populate(). Now, module can be instantiated again.

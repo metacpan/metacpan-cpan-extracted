@@ -45,9 +45,9 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Press"           => { file => "lib/MooX/Press.pm", version => 0.081 },
-                        "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.081 },
-                        "Zydeco::Lite"          => { file => "lib/Zydeco/Lite.pm", version => 0.081 },
+                        "MooX::Press"           => { file => "lib/MooX/Press.pm", version => 0.082 },
+                        "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.082 },
+                        "Zydeco::Lite"          => { file => "lib/Zydeco/Lite.pm", version => 0.082 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -61,7 +61,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                       },
-  "version"        => 0.081,
+  "version"        => 0.082,
 };
 
 my %dynamic_config;

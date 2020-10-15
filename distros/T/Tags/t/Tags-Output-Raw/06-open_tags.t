@@ -3,8 +3,8 @@ use warnings;
 
 use Tags::Output::Raw;
 use Test::More 'tests' => 9;
-use Test::Warn;
 use Test::NoWarnings;
+use Test::Warn;
 
 # Test.
 my $obj = Tags::Output::Raw->new;

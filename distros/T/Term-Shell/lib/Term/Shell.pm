@@ -35,15 +35,15 @@ sub new
     $o->{API}     = {
         args        => \@_,
         case_ignore => ( $^O eq 'MSWin32' ? 1 : 0 ),
-        check_idle => 0,                         # changing this isn't supported
-        class      => $cls,
-        command    => $o->{command},
-        cmd        => $o->{command},             # shorthand
-        match_uniq => 1,
-        pager      => $ENV{PAGER} || 'internal',
-        readline => eval { $o->{term}->ReadLine } || 'none',
-        script   => ( caller(0) )[1],
-        version  => $VERSION,
+        check_idle  => 0,                # changing this isn't supported
+        class       => $cls,
+        command     => $o->{command},
+        cmd         => $o->{command},    # shorthand
+        match_uniq  => 1,
+        pager       => $ENV{PAGER}                   || 'internal',
+        readline    => eval { $o->{term}->ReadLine } || 'none',
+        script      => ( caller(0) )[1],
+        version     => $VERSION,
     };
 
     # Note: the rl_completion_function doesn't pass an object as the first
@@ -256,8 +256,8 @@ sub page_internal
         print $l;
         my $ans = $o->readkey;
         print "\r$b\r" if $o->have_readkey;
-        print "\n" if $ans =~ /q/i or not $o->have_readkey;
-        $line = -1 if $ans =~ /q/i;
+        print "\n"     if $ans =~ /q/i or not $o->have_readkey;
+        $line = -1     if $ans =~ /q/i;
     }
     $line;
 }
@@ -589,6 +589,7 @@ sub format_pairs
     my $ind  = shift || "";
     my $len  = shift || 0;
     my $wrap = shift || 0;
+
     if ($wrap)
     {
         eval {
@@ -611,7 +612,7 @@ sub format_pairs
     {
         next unless defined $vals[$i];
         my $sz   = ( $len - length( $keys[$i] ) );
-        my $lpad = $left ? "" : " " x $sz;
+        my $lpad = $left ? ""        : " " x $sz;
         my $rpad = $left ? " " x $sz : "";
         my $l    = "$ind$lpad$keys[$i]$rpad$sep";
         my $wrap = $wrap & ( $vals[$i] =~ /\s/ and $vals[$i] !~ /^\d/ );
@@ -811,8 +812,8 @@ sub do_action
     my $type = shift || 'run';
     my ( $fullname, $cmdname, $handler ) = $o->handler( $cmd, $type, $args );
     $o->{command}{$type} = {
-        cmd  => $cmd,
-        name => $cmd,
+        cmd     => $cmd,
+        name    => $cmd,
         found   => defined $handler ? 1 : 0,
         cmdfull => $fullname,
         cmdreal => $cmdname,
@@ -1114,7 +1115,7 @@ Term::Shell - A simple command-line shell framework.
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -1160,10 +1161,6 @@ To write a shell with an C<exec> command, do something like this:
 When Term::Shell needs to handle the C<exec> command, it will invoke this
 method. That's all there is to it! You write handlers, and Term::Shell handles
 the gory details.
-
-=head1 VERSION
-
-version 0.11
 
 =head1 Using Term::Shell Shells
 
@@ -2088,12 +2085,6 @@ The name of the script that invoked your shell.
 
 The version of Term::Shell you are running under.
 
-=head1 BUGS AND DEFICIENCIES
-
-There are bound to be some bugs lurking about.
-
-If you find bugs, please send them to C<NEILW@cpan.org>.
-
 =head1 SEE ALSO
 
 For more information about the underlying ReadLine module, see
@@ -2106,7 +2097,7 @@ L<Text::Autoformat>.
 The API for Term::Shell was inspired by (gasp!) a Python package called
 C<cmd>. For more information about this package, please look in the Python
 Library Reference, either in your Python distribution or at
-http://www.python.org/doc/current/lib/module-cmd.html
+L<https://docs.python.org/3/library/cmd.html> .
 
 =head1 AUTHOR
 
@@ -2121,36 +2112,9 @@ redistributed and/or modified under the same terms as Perl itself.
 
 See http://www.perl.com/perl/misc/Artistic.html
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2001 by Neil Watkiss.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-Shell> or by email to
-L<bug-term-shell@rt.cpan.org|mailto:bug-term-shell@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Term::Shell
 
 =head2 Websites
 
@@ -2169,35 +2133,11 @@ L<https://metacpan.org/release/Term-Shell>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Term-Shell>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Shell>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Term-Shell>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Term-Shell>
 
 =item *
 
@@ -2248,5 +2188,26 @@ from your repository :)
 L<https://github.com/shlomif/Term-Shell>
 
   git clone git://git@github.com:shlomif/Term-Shell.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-Shell> or by email to
+L<bug-term-shell@rt.cpan.org|mailto:bug-term-shell@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2001 by Neil Watkiss.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

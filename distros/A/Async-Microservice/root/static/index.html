@@ -1,0 +1,69 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>OpenAPI - ASYNC-SERVICE-NAME</title>
+    <link rel="stylesheet" type="text/css" href="https://b.dbedia.com/3b75813ce9aa01cba6ac694726d1a9e8ab6e280e12f6c6c4bb734249b69cc59f/swagger-ui.css" >
+    <link rel="icon" type="image/png" href="https://www.meon.eu/static/img/favicon.ico" sizes="32x32" />
+    <style>
+      html
+      {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
+
+      *,
+      *:before,
+      *:after
+      {
+        box-sizing: inherit;
+      }
+
+      body
+      {
+        margin:0;
+        background: #fafafa;
+      }
+    </style>
+
+    <!-- hide topbar -->
+    <style>
+      #swagger-ui .topbar {
+        display: none;
+      }
+      .information-container .info {
+        margin-top: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="swagger-ui"></div>
+
+    <script src="https://b.dbedia.com/9777d20825ff2280851844c71c45d35c9b5841aef54a2787aa847f35a6bb890b/swagger-ui-bundle.js"> </script>
+    <script src="https://b.dbedia.com/0067dc17f1ca9e1a864d934bfa934627ec9e980cebdadbaf6cfebda586e7f865/swagger-ui-standalone-preset.js"> </script>
+    <script>
+    window.onload = function() {
+      // Begin Swagger UI call region
+      const ui = SwaggerUIBundle({
+        url: "static/ASYNC-SERVICE-NAME_openapi.yaml",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      })
+      // End Swagger UI call region
+
+      window.ui = ui
+    }
+  </script>
+  </body>
+</html>

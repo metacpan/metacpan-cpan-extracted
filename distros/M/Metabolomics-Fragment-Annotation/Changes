@@ -1,5 +1,8 @@
 Revision history for Metabolomics-Fragment-Annotation
 
+0.6.1	2020-10-14
+	- fix inheritance issue
+
 0.6.0	2020-10-06
 	- Adding new resource as knapsack
 

@@ -18,7 +18,9 @@ subtype 'EmailType' => as 'Str' => where {
         m/^(?:contact|acquaintance|friend|met|co-worker|colleague|co-resident|neighbor|child|parent|sibling|spouse|kin|muse|crush|date|sweetheart|me|agent|emergency)$/is # 本当にこれでいのか怪しい
 } => message {"The Email you provided, $_, was not supported in 'Type'"};
 
-has types => ( is => 'rw', isa => 'ArrayRef[EmailType]', default => sub { [] } );
+subtype 'EmailTypes' => as 'ArrayRef[EmailType]';
+coerce 'EmailTypes'  => from 'Str' => via { [$_] };
+has types            => ( is => 'rw', isa => 'EmailTypes', default => sub { [] }, coerce => 1 );
 
 override 'as_string' => sub {
     my ($self) = @_;
@@ -27,7 +29,7 @@ override 'as_string' => sub {
     push @lines, 'ALTID=' . $self->altID() if $self->can('altID') and $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->can('pid') and $self->pid();
 
-    push my @types, grep { length $_ } map { uc $_ if defined $_ } @{ $self->types() };
+    push my @types, map { uc $_ } grep { length $_ } @{ $self->types() };
     push @types, 'PREF' if $self->preferred();
     my $types = 'TYPE="' . join( ',', @types ) . '"' if @types;
     push @lines, $types if $types;

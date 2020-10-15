@@ -76,7 +76,7 @@ use LWP::UserAgent;
 
 package WWW::Shopify;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use WWW::Shopify::Exception;
 use WWW::Shopify::Field;
@@ -84,10 +84,11 @@ use Module::Find;
 use WWW::Shopify::URLHandler;
 use WWW::Shopify::Query;
 use WWW::Shopify::Login;
+use WWW::Shopify::GraphQL;
 
 
 # Make sure we include all our models so that when people call the model, we actually know what they're talking about.
-BEGIN {	eval(join("\n", map { "require $_;" } findallmod WWW::Shopify::Model)); }
+BEGIN {	eval(join("\n", map { "require $_;" } findallmod WWW::Shopify::Model)); if (my $exp = $@) { die $exp; } }
 
 package WWW::Shopify;
 
@@ -102,23 +103,39 @@ Creates a new shop, without using the actual API, uses automated form submission
 =cut
 
 sub new { 
-	my ($package, $shop_url, $email, $password) = @_;
+	my ($package, $shop_url, $email, $password, $api_version) = @_;
 	die new WWW::Shopify::Exception("Can't create a shop without a shop url.") unless $shop_url;
+	$api_version = '2020-07' unless $api_version && ($api_version =~ m/\d\d\d\d-\d\d/ || $api_version =~ m/^unstable$/);
 	my $ua = LWP::UserAgent->new( ($^O eq' linux' ? (ssl_opts => {'SSL_version' => 'TLSv12' }) : ()) );
 	$ua->cookie_jar({ });
-	$ua->timeout(30);	
+	$ua->timeout(60);
 	$ua->agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36");
 	$package = "WWW::Shopify::Login" if $package eq "WWW::Shopify";
-	my $self = bless { _shop_url => $shop_url, _ua => $ua, _url_handler => undef, _api_calls => 0, _sleep_for_limit => 0, _last_timestamp => undef }, $package;
+	my $self = bless { _shop_url => $shop_url, _ua => $ua, _url_handler => undef, _api_calls => 0, _sleep_for_limit => 0, _retry_on_errors => 0, _last_timestamp => undef, _decode_entities => 1, _api_version => $api_version }, $package;
+	$self->{_ql} = new WWW::Shopify::GraphQL($self);
 	$self->url_handler(new WWW::Shopify::URLHandler($self));
 	return $self;
 }
 
 
+sub version { $_[0]->{_version} = $_[1] if defined $_[1]; return $_[0]->{_version}; }
 sub api_calls { $_[0]->{_api_calls} = $_[1] if defined $_[1]; return $_[0]->{_api_calls}; }
 sub url_handler { $_[0]->{_url_handler} = $_[1] if defined $_[1]; return $_[0]->{_url_handler}; }
 sub sleep_for_limit { $_[0]->{_sleep_for_limit} = $_[1] if defined $_[1]; return $_[0]->{_sleep_for_limit}; }
+sub retry_on_errors { $_[0]->{_retry_on_errors} = $_[1] if defined $_[1]; return $_[0]->{_retry_on_errors}; }
 sub last_timestamp { $_[0]->{_last_timestamp} = $_[1] if defined $_[1]; return $_[0]->{_last_timestamp}; }
+sub decode_entities { $_[0]->{_decode_entities} = $_[1] if defined $_[1]; return $_[0]->{_decode_entities}; }
+sub api_version { $_[0]->{_api_version} = $_[1] if defined $_[1]; return $_[0]->{_api_version}; }
+sub include_presentment_prices {
+	my ($self, $enabled) = @_;
+	if ($enabled) {
+		$self->url_handler->default_header('X-Shopify-Api-Features' => 'include-presentment-prices');
+	} else {
+		$self->url_handler->default_header('X-Shopify-Api-Features' => $self->url_handler->default_header('X-Shopify-Api-Features') =~ s/,\s*include\-presentment\-prices//ri);
+	}
+}
+
+sub ql { $_[0]->{_ql} = $_[1] if defined $_[1]; return $_[0]->{_ql}; }
 
 =head2 encode_url($url)
 
@@ -177,17 +194,28 @@ sub use_url {
 	my ($decoded, $response);
 	$url = $self->encode_url($url);
 	eval {
-		if ($self->sleep_for_limit) {
-			do { 
-				eval { ($decoded, $response) = $self->$method($url, @args); };
-				if (my $exp = $@) { 
-					die $exp if !ref($exp) || ref($exp) ne 'WWW::Shopify::Exception::CallLimit';
-					sleep(1);
+		my $error_count = 0;
+		my $repeatable_error = undef;
+		do {
+			eval {
+				if ($self->sleep_for_limit) {
+					do { 
+						eval { ($decoded, $response) = $self->$method($url, @args); };
+						if (my $exp = $@) { 
+							die $exp if !ref($exp) || ref($exp) ne 'WWW::Shopify::Exception::CallLimit';
+							sleep(1);
+						}
+					} while (!$response);
+				} else {
+					($decoded, $response) = $self->$method($url, @args);
 				}
-			} while (!$response);
-		} else {
-			($decoded, $response) = $self->$method($url, @args);
-		}
+			};
+			if ($repeatable_error = $@) {
+				if (!$self->retry_on_errors || $error_count++ >= $self->retry_on_errors) {
+					die $repeatable_error;
+				}
+			}
+		} while ($repeatable_error);
 	};
 	if (my $exp = $@) {
 		print STDERR Dumper($exp->error) if $ENV{'SHOPIFY_LOG'} && $ENV{'SHOPIFY_LOG'} > 1;
@@ -204,32 +232,49 @@ sub resolve_trailing_url {
 	my ($self, $package, $action, $parent, $specs) = @_;
 	$package = ref($package) if ref($package);
 	my $method = lc($action) . "_through_parent";
-	if ($package->$method && (!$parent || !$parent->is_shop || $package ne "WWW::Shopify::Model::Metafield")) {
-		die new WWW::Shopify::Exception("Cannot get, no parent specified.") unless $parent;
+	if (($package eq 'WWW::Shopify::Model::Event' && $parent) || ($package->$method && (!$parent || !$parent->is_shop || $package ne "WWW::Shopify::Model::Metafield"))) {
+		die new WWW::Shopify::Exception("Cannot resolve URL, no parent specified.") unless $parent;
 		if ($package eq "WWW::Shopify::Model::Metafield" && ref($parent) eq 'WWW::Shopify::Model::Product::Image' && $specs) {
 			$specs->{"metafield[owner_id]"} = $parent->id;
 			$specs->{"metafield[owner_resource]"} = "product_image";
-			return "/admin/" . $package->url_plural;
+			return "/admin/api/" . $self->api_version . $package->prefix . $package->url_plural;
 		}
 		# Should be made more generic when I'm sure this won't mess up any other of Shopfy's crazy API.
 		if ($package eq 'WWW::Shopify::Model::Order::Fulfillment::FulfillmentEvent') {
-			return '/admin/' . $parent->associated_parent->url_plural . '/' . $parent->associated_parent->id . '/' . $parent->url_plural . '/' . $parent->id . '/' . $package->url_plural;
+			return "/admin/api/" . $self->api_version . $package->prefix . $parent->associated_parent->url_plural . '/' . $parent->associated_parent->id . '/' . $parent->url_plural . '/' . $parent->id . '/' . $package->url_plural;
+		} elsif ($package eq 'WWW::Shopify::Model::Event') {
+			return "/admin/api/" . $self->api_version . $package->prefix . $parent->associated_parent->url_plural . '/' . $parent->associated_parent->id . '/' . $parent->url_plural . '/' . $parent->id . '/' . $package->url_plural if $parent->associated_parent;
 		}
-		return "/admin/" . $parent->url_plural . "/" . $parent->id . "/" . $package->url_plural;
+		return "/admin/api/" . $self->api_version . $package->prefix . $parent->url_plural . "/" . $parent->id . "/" . $package->url_plural;
+	# I cannot believe that I'm doing this. I don't know why I'm surprised, but it just keeps on going.
+	} elsif ($package eq 'WWW::Shopify::Model::ShopifyPayment::Balance::Transaction' && $parent) {
+		$specs->{payout_id} = $parent->id;
+		return "/admin/api/" . $self->api_version . $package->prefix . $package->url_plural;
+	# What the acutal fuck.
+	} elsif ($package eq 'WWW::Shopify::Model::Product' && $parent && ref($parent) && ref($parent) =~ m/Collection$/) {
+		return "/admin/api/" . $self->api_version . "/collections/" . $parent->id . "/products";
 	}
-	return "/admin/" . $package->url_plural;
+	return "/admin/api/" . $self->api_version . $package->prefix . $package->url_plural;
 }
 
 sub get_all_limit {
 	my ($self, $package, $specs) = @_;
 	$package = $self->translate_model($package);
 	$specs->{"limit"} = $package->max_per_page unless exists $specs->{"limit"};
-	return () if ($specs->{limit} == 0);
+	return () if (defined $specs->{limit} && $specs->{limit} == 0);
 	return $self->get_shop if $package->is_shop;
 	my $url = $self->resolve_trailing_url($package, "get", $specs->{parent}, $specs) . ".json";
 	my ($decoded, $response) = $self->use_url('get', $url, $specs);
-	my @return = map { my $object = $package->from_json($_, $self); $object->associated_parent($specs->{parent}); $object; } @{$decoded->{$package->plural}};
-	return @return;
+	my @return = $self->{_decode_entities} ? (map { my $object = $package->from_json($_, $self); $object->associated_parent($specs->{parent}); $object; } @{$decoded->{$package->plural}}) : @{$decoded->{$package->plural}};
+	# The links in the headers come in the form 
+	#
+	# <https://gift-reggie.myshopify.com/admin/api/2019-10/customers.json?limit=75&page_info=eyJkaXJlY3Rpb24iOiJwcmV2IiwibGFzdF9pZCI6MTA0MTYyOTYxMDAyNywibGFzdF92YWx1ZSI6MTU0MTE4MTU3MzAwMH0>; rel="previous", <https://gift-reggie.myshopify.com/admin/api/2019-10/customers.json?limit=75&page_info=eyJkaXJlY3Rpb24iOiJuZXh0IiwibGFzdF9pZCI6MzM2MTU1NDc2MDA2LCJsYXN0X3ZhbHVlIjoxNTE2MDI3Mjk0MDAwfQ>; rel="next"
+	#
+	# and we want to extract the page_info string.
+	my ($next_page_info) = $response->headers->{link} =~ /.*page_info=([^>|&]*)[^>]*>; rel="next"/  if $response->headers->{link} ;
+	my ($prev_page_info) = $response->headers->{link} =~ /.*page_info=([^>|&]*)[^>]*>; rel="previous"/  if $response->headers->{link} ;
+	
+	return (($next_page_info ? $next_page_info : undef), ($prev_page_info ? $prev_page_info : undef), @return);
 }
 
 =head2 get_all($self, $package, $filters)
@@ -246,6 +291,94 @@ use POSIX qw/ceil/;
 use List::Util qw(min);
 sub get_all {
 	my ($self, $package, $specs) = @_;
+	# objects that still use pageination in 2019-07
+	my %v1907 = (
+        "AbandonedCheckout" => 1,
+        "Article" => 1,
+		"Asset" =>1,
+        "Blog" => 1,
+        "Comment" => 1,
+        "CustomCollection" => 1,
+        "CustomerAddress" => 1,
+        "Customer" => 1,
+        "DiscountCode" => 1,
+        "Dispute" => 1,
+        "DraftOrder" => 1,
+        "Fulfillment" => 1,
+        "GiftCard" => 1,
+        "InventoryItem" => 1,
+        "InventoryLevel" => 1,
+        "LocationLevel" => 1,
+        "MarketingEvent" => 1,
+        "Order" => 1,
+        "Risk" => 1,
+        "Payout" => 1,
+        "PriceRule" => 1,
+        "Refund" => 1,
+        "Report" => 1,
+        "SmartCollection" => 1,
+        "TenderTransaction" => 1,
+        "Transaction" => 1,
+        "Webhook" => 1
+	);
+	return get_all_page(@_) if $self->api_version eq '2019-04' || ($self->api_version eq '2019-07' && $v1907{$package});
+	return get_all_cursor(@_);
+}
+
+sub get_all_cursor {
+    my ($self, $package, $specs, $next_ref, $prev_ref) = @_;
+	# We copy our specs so that we don't modify the original hash. Doesn't have to be a deep copy.
+	$specs = {%$specs} if $specs;
+	$package = $self->translate_model($package);
+	$self->validate_item($package);
+	return $self->get_shop if $package->is_shop;
+	
+	my $limit = $specs->{limit};
+	$specs->{limit} = defined $limit && $limit < $package->max_per_page ? $limit : $package->max_per_page;
+	
+	my @return;
+	my $callback = $specs->{callback} ? delete $specs->{callback} : undef;
+	my $counter = 0;
+	my $wantarray = wantarray;
+	eval {
+		#delete $specs->{page};
+		my @chunk;
+		my $next_page_info;
+		my $prev_page_info;
+		do {
+			my $real_specs = {%$specs} unless $specs->{page_info};
+			$real_specs->{page_info} = $specs->{page_info} if $specs->{page_info};
+			$real_specs->{parent} = $specs->{parent} if $specs->{page_info};
+			$real_specs->{limit} = $limit ? int($limit) - $counter : $package->max_per_page;
+			$real_specs->{limit} = $package->max_per_page if $package->max_per_page && $real_specs->{limit} > $package->max_per_page;
+			delete $real_specs->{page_info} unless $real_specs->{page_info};
+			($next_page_info, $prev_page_info, @chunk) = $self->get_all_limit($package, $real_specs);
+			$callback->(undef, @chunk) if $callback;
+			if (defined $wantarray) {
+				if (!defined $limit || (int(@chunk) + int(@return) < $limit)) {
+					push(@return, @chunk);
+				} else {
+					push(@return, grep { defined $_ } @chunk[0..($limit - int(@return) - 1)]);
+				}
+			}
+			$specs->{page_info} = $next_page_info;
+			$$next_ref = $next_page_info if $next_ref;
+			$$prev_ref = $prev_page_info if $prev_ref;
+			
+			$counter += int(scalar(@chunk));
+		} while ( (!defined $specs->{limit} || int(scalar(@chunk)) == $specs->{limit}) && (!defined $limit || $counter < $limit) && $specs->{page_info});
+	};
+	if (my $exception = $@) {
+		$exception->extra(\@return) if ref($exception) && $exception->isa('WWW::Shopify::Exception::CallLimit');
+		die $exception;
+	}
+	return @return if wantarray;
+	return $return[0];
+}
+
+#Used for legacy page based pagination or non paginated objects like Assets
+sub get_all_page {
+    my ($self, $package, $specs) = @_;
 	# We copy our specs so that we don't modify the original hash. Doesn't have to be a deep copy.
 	$specs = {%$specs} if $specs;
 	$package = $self->translate_model($package);
@@ -257,18 +390,26 @@ sub get_all {
 	
 	my @return;
 	my $page = $specs->{page};
+	my $callback = $specs->{callback} ? delete $specs->{callback} : undef;
+	my $counter = 0;
+	my $wantarray = wantarray;
+	my ($null_next_page_info,$null_prev_page_info);
 	eval {
 		$specs->{page} = $specs->{page} ? $specs->{page} : 1;
 		my @chunk;
 		do {
-			@chunk = $self->get_all_limit($package, $specs);
-			if (!defined $limit || (int(@chunk) + int(@return) < $limit)) {
-				push(@return, @chunk);
-			} else {
-				push(@return, grep { defined $_ } @chunk[0..($limit - int(@return) - 1)]);
+			($null_next_page_info,$null_prev_page_info,@chunk) = $self->get_all_limit($package, $specs);
+			$callback->($specs->{page}, @chunk) if $callback;
+			if (defined $wantarray) {
+				if (!defined $limit || (int(@chunk) + int(@return) < $limit)) {
+					push(@return, @chunk);
+				} else {
+					push(@return, grep { defined $_ } @chunk[0..($limit - int(@return) - 1)]);
+				}
 			}
 			$specs->{page}++;
-		} while (!defined $page && int(@chunk) == $specs->{limit} && (!defined $limit || int(@return) < $limit));
+			$counter += int(@chunk);
+		} while (!defined $page && int(@chunk) == $specs->{limit} && (!defined $limit || $counter < $limit));
 	};
 	if (my $exception = $@) {
 		$exception->extra(\@return) if ref($exception) && $exception->isa('WWW::Shopify::Exception::CallLimit');
@@ -277,6 +418,22 @@ sub get_all {
 	return @return if wantarray;
 	return $return[0];
 }
+
+=head2 get_access_scopes($self)
+
+Returns a list of scopes that the token has access to.
+
+	my @access_scopes = $sa->get_access_scopes;
+	$access_scopes[0]->{handle}
+
+=cut
+
+sub get_access_scopes {
+	my ($self) = @_;
+	my ($decoded, $response) = $self->use_url('get', "/admin/oauth/access_scopes.json");
+	return @{$decoded->{'access_scopes'}};
+}
+
 
 =head2 get_shop($self)
 
@@ -326,33 +483,9 @@ sub get_count {
 	$self->validate_item($package);
 	# If it's not countable (sigh), do a binary search to figure out what the count is. Should find it in ln(n), as opposed to n/250
 	# This is generally better for stores where this could become an issue.
+	# This used to use a binary search to count non-countable objects, but this is broken in cursor based implementation.
 	if (!$package->countable) {
-		my $limit = $specs->{limit} || $package->max_per_page;
-		my ($lowest_no_items, $highest_items);
-		my $page = 1;
-		my @items;
-		 while (int(@items) == $limit || int(@items) == 0) {
-			@items = $self->get_all_limit($package, { %$specs, limit => $limit, page => $page });
-			return 0 if int(@items) == 0 && $page == 1;
-			if (int(@items) == 0) {
-				$lowest_no_items = $page if !defined $lowest_no_items || $page < $lowest_no_items;
-				# We need to go down.
-				my $differential = int(($highest_items - $page)/2);
-				return ($page-1)*$limit if $differential == 0;
-				$page = $differential + $page;
-			} elsif (int(@items) == $limit) {
-				$highest_items = $page if !defined $highest_items || $page > $highest_items;
-				# We need to go up.
-				if (!defined $lowest_no_items) {
-					$page *= 2;
-				} else {
-					my $differential = int(($lowest_no_items - $page)/2);
-					return $page*$limit if $differential == 0;
-					$page = $differential + $page;
-				}
-			}
-		}
-		return ($page-1)*$limit + int(@items);
+		die new WWW::Shopify::Exception("Unable to count $package; it is not marked as countable in Shopify's API.")
 	}
 	my ($decoded, $response) = $self->use_url('get', $self->resolve_trailing_url($package, "get", $specs->{parent}, $specs) . "/count.json", $specs);
 	return $decoded->{'count'};
@@ -379,18 +512,22 @@ sub get {
 			($decoded, $response) = $self->use_url('get', $self->resolve_trailing_url($package, "get", $specs->{parent}) . "/$id.json");
 		} else {
 			die new WWW::Shopify::Exception("MUST have a parent with assets.") unless $specs->{parent};
-			($decoded, $response) = $self->use_url('get', "/admin/themes/" . $specs->{parent}->id . "/assets.json", {'asset[key]' => $id, theme_id => $specs->{parent}->id});
+			($decoded, $response) = $self->use_url('get', "/admin/api/" . $self->api_version . "/themes/" . $specs->{parent}->id . "/assets.json", {'asset[key]' => $id, theme_id => $specs->{parent}->id});
 		}
 	};
 	if (my $exp = $@) {
 		return undef if ref($exp) && $exp->isa("WWW::Shopify::Exception::NotFound");
 		die $exp;
 	}
-	my $class = $package->from_json($decoded->{$package->singular()}, $self);
-	# Wow, this is straight up stupid that sometimes we don't get a 404.
-	return undef unless $class;
-	$class->associated_parent($specs->{parent});
-	return $class;
+	if ($self->{_decode_entities}) {
+		my $class = $package->from_json($decoded->{$package->singular()}, $self);
+		# Wow, this is straight up stupid that sometimes we don't get a 404.
+		return undef unless $class;
+		$class->associated_parent($specs->{parent});
+		return $class;
+	} else {
+		return $decoded->{$package->singular};
+	}
 }
 
 =head2 search($self, $package, $item, { query => $query })
@@ -413,10 +550,14 @@ sub search {
 	my ($decoded, $response) = $self->use_url('get', $self->resolve_trailing_url($package, "get", $specs->{parent}) . "/search.json", $specs);
 
 	my @return = ();
-	foreach my $element (@{$decoded->{$package->plural()}}) {
-		my $class = $package->from_json($element, $self);
-		$class->associated_parent($specs->{parent}) if $specs->{parent};
-		push(@return, $class);
+	if ($self->{_decode_entities}) {
+		foreach my $element (@{$decoded->{$package->plural()}}) {
+			my $class = $package->from_json($element, $self);
+			$class->associated_parent($specs->{parent}) if $specs->{parent};
+			push(@return, $class);
+		}
+	} else {
+		@return = @{$decoded->{$package->plural()}}
 	}
 	return @return if wantarray;
 	return $return[0] if int(@return) > 0;
@@ -442,9 +583,13 @@ sub create {
 	$specs = $item->to_json();
 	my ($decoded, $response) = $self->use_url($item->create_method, $self->resolve_trailing_url(ref($item), "create", $item->associated_parent) . ".json", {$item->singular() => $specs}, $item->needs_login);
 	my $element = $decoded->{$item->singular};
-	my $object = ref($item)->from_json($element, $self);
-	$object->associated_parent($item->associated_parent);
-	return $object;
+	if ($self->{_decode_entities}) {
+		my $object = ref($item)->from_json($element, $self);
+		$object->associated_parent($item->associated_parent);
+		return $object;
+	} else {
+		return $element;
+	}
 }
 
 =head2 update($self, $item)
@@ -470,9 +615,13 @@ sub update {
 	}
 
 	my $element = $decoded->{$class->singular()};
-	my $object = ref($class)->from_json($element, $self);
-	$object->associated_parent($class->associated_parent);
-	return $object;
+	if ($self->{_decode_entities}) {
+		my $object = ref($class)->from_json($element, $self);
+		$object->associated_parent($class->associated_parent);
+		return $object;
+	} else {
+		return $element;
+	}
 }
 
 =head2 delete($self, $item)
@@ -500,11 +649,20 @@ use List::Util qw(first);
 sub custom_action {
 	my ($self, $object, $action) = @_;
 	die new WWW::Shopify::Exception("You can't $action " . $object->plural . ".") unless defined $object && first { $_ eq $action } $object->actions;
-	my $id = $object->id;
-	my $url = $self->resolve_trailing_url($object, $action, $object->associated_parent) . "/$id/$action.json";
-	my ($decoded, $response) = $self->use_url('post', $url, {$object->singular() => $object->to_json});
-	return 1 if !$decoded;
-	my $element = $decoded->{$object->singular()};
+	my $element;
+	my ($decoded, $response);
+	if ($object->can('id')) {
+		my $id = $object->id;
+		my $url = $self->resolve_trailing_url($object, $action, $object->associated_parent) . "/$id/$action.json";
+		($decoded, $response) = $self->use_url('post', $url, {$object->singular() => $object->to_json});
+		return 1 if !$decoded;
+		$element = $decoded->{$object->singular()};
+	} else {
+		my $url = $self->resolve_trailing_url($object, $action, $object->associated_parent) . "/$action.json";
+		($decoded, $response) = $self->use_url('post', $url, $object->to_json);
+		return 1 if !$decoded;
+		$element = $decoded->{$object->singular()};
+	}
 	if ($element) {
 		$object = ref($object)->from_json($element, $self);
 		return $object;
@@ -519,6 +677,9 @@ Special actions that do what they say.
 
 =cut
 
+sub adjust { return $_[0]->custom_action($_[1], "adjust"); }
+sub connect { return $_[0]->custom_action($_[1], "connect"); }
+sub set { return $_[0]->custom_action($_[1], "set"); }
 sub activate { return $_[0]->custom_action($_[1], "activate"); }
 sub disable { return $_[0]->custom_action($_[1], "disable"); }
 sub enable { return $_[0]->custom_action($_[1], "enable"); }
@@ -529,7 +690,24 @@ sub approve { return $_[0]->custom_action($_[1], "approve"); }
 sub remove { return $_[0]->custom_action($_[1], "remove"); }
 sub spam { return $_[0]->custom_action($_[1], "spam"); }
 sub not_spam { return $_[0]->custom_action($_[1], "not_spam"); }
+sub complete { return $_[0]->custom_action($_[1], "complete"); }
 sub account_activation_url { return $_[0]->custom_action($_[1], "account_activation_url"); }
+sub order { 	
+	my ($self, $object, $hash) = @_;
+	die new WWW::Shopify::Exception("You can't order " . $object->plural . ".") unless defined $object && first { $_ eq "order" } $object->actions;
+	# Mainly for smart collections; no idea why Shopify decides to go against the grain and do something completely different for smart collections against literally everything else.
+	# It's a mystery.
+	my $url = $self->resolve_trailing_url($object, "order", $object->associated_parent) . "/" . $object->id . "/order.json?";
+	if ($hash->{products}) {
+		$url .= join("&", map { "products[]=" . (ref($_) ? $_->{id} : $_) } @{$hash->{products}});
+	} 
+	if ($hash->{sort_order}) {
+		$url .= "&" if $url !~ m/\?$/;
+		$url .= "sort_order=" . $hash->{sort_order};
+	}
+	my ($decoded, $response) = $self->use_url('put', $url, {});
+	return 1;
+}
 
 
 sub is_valid { eval { $_[0]->get_shop; }; return undef if ($@); return 1; }
@@ -537,6 +715,8 @@ sub handleize {
 	my ($self, $handle) = @_;
 	$handle = $self if !ref($self);
 	$handle = lc($handle);
+	$handle =~ s/^\s+//;
+	$handle =~ s/\s+$//;
 	$handle =~ s/\s/-/g;
 	$handle =~ s/[^a-z0-9\-]//g;
 	$handle =~ s/\-+/-/g;
@@ -584,37 +764,6 @@ sub validate_item {
 }
 
 
-=head2 upload_files($self, @image_paths)
-
-Requires log in. Uploads an array of files/images into the shop's non-theme file/image management system by automating a form submission.
-
-	$sa->login_admin("email", "password");
-	$sa->upload_files("image1.jpg", "image2.jpg");
-
-Gets around the issue that this is not actually exposed to the API.
-
-=cut
-
-use JSON qw(decode_json);
-
-sub upload_files {
-	my ($self, @images) = @_;
-	die new WWW::Shopify::Exception("Uploading files/images requires you to login with an admin account.") unless $self->logged_in_admin;
-	my @returns;
-	foreach my $path (@images) {
-		die new WWW::Shopify::Exception("Unable to determine extension type.") unless $path =~ m/\.(\w{2,4})$/;
-		my $req = POST "https://" . $self->shop_url . "/admin/settings/files.json",
-			Content_Type => "form-data",
-			Accept => "*/*",
-			Content => [authenticity_token => $self->{authenticity_token}, "file[file]" => [$path]];
-		my $res = $self->ua->request($req);
-		print STDERR Dumper($res) if $ENV{'SHOPIFY_LOG'} && $ENV{'SHOPIFY_LOG'} == 2;
-		die new WWW::Shopify::Exception("Error uploading $path.") unless $res->is_success;
-		push(@returns, WWW::Shopify::Model::File->from_json(decode_json($res->decoded_content)->{file}));
-	}
-	return @returns;
-}
-
 =cut
 
 =head1 EXPORTED FUNCTIONS
@@ -645,6 +794,7 @@ use MIME::Base64;
 
 sub calc_webhook_signature {
 	my ($shared_secret, $request_body) = @_;
+	die new WWW::Shopify::Exception("Requires a shared secret.") unless $shared_secret;
 	my $calc_signature = hmac_sha256_base64((defined $request_body) ? $request_body : "", $shared_secret);
 	while (length($calc_signature) % 4) { $calc_signature .= '='; }
 	return $calc_signature;
@@ -685,13 +835,17 @@ sub calc_login_signature {
 
 sub calc_hmac_login_signature {
 	my ($shared_secret, $params) = @_;
-	return hmac_sha256_hex(join("&", map { "$_=" . $params->{$_} } (sort(grep { $_ ne "hmac" && $_ ne "signature" } keys(%$params)))), $shared_secret);
+	return hmac_sha256_hex(join("&", map { 
+		my $key = $_ =~ s/\[\]//r; 
+		(ref($params->{$_}) eq 'ARRAY' ? ($_ !~ m/\[\]$/ ? "$key=" . join(", ", @{$params->{$_}}) : "$key=[" . join(", ", map { "\"$_\"" } @{$params->{$_}}) . "]") : ("$_=" . $params->{$_}))
+	} (sort(grep { $_ ne "hmac" && $_ ne "signature" } keys(%$params)))), $shared_secret);
 }
 
 sub verify_login {
 	my ($shared_secret, $params) = @_;
 	return undef unless $params->{hmac};
-	return calc_hmac_login_signature($shared_secret, $params) eq $params->{hmac};
+	my $hmac = ref($params->{hmac}) eq 'ARRAY' ? $params->{hmac}->[0] : $params->{hmac};
+	return calc_hmac_login_signature($shared_secret, $params) eq $hmac;
 }
 
 =head2 calc_proxy_signature($shared_secret, $%params)
@@ -710,14 +864,26 @@ sub calc_proxy_signature {
 	my ($shared_secret, $params) = @_;
 	return hmac_sha256_hex(join("", sort(map { 
 		my $p = $params->{$_};
-		"$_=" . (ref($p) eq "ARRAY" ? join("$_=", @$p) : $p);
+		"$_=" . (ref($p) eq "ARRAY" ? join(",", @$p) : $p);
 	} (grep { $_ ne "signature" } keys(%$params)))), $shared_secret);
 }
 
 sub verify_proxy { 
 	my ($shared_secret, $params) = @_;
 	return undef unless $params->{signature};
-	return calc_proxy_signature($shared_secret, $params) eq $params->{signature};
+	my $signature = ref($params->{signature}) eq 'ARRAY' ? $params->{signature}->[0] : $params->{signature};
+	return calc_proxy_signature($shared_secret, $params) eq $signature;
+}
+
+=head2 all_items($self)
+
+Returns a list of all publically available items on the store.
+
+=cut
+
+sub all_items {
+	my ($package) = @_;
+	return grep { $_ ne 'WWW::Shopify::Model::NestedItem' &&  $_ ne 'WWW::Shopify::Model::Item' && !$_->needs_login && (!$_->is_nested || !$_->included_in_parent) } findsubmod WWW::Shopify::Model;
 }
 
 =head1 SEE ALSO

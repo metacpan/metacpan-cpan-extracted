@@ -1,7 +1,7 @@
 package App::ListOrgHeadlinesFast;
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.479'; # VERSION
+our $DATE = '2020-10-14'; # DATE
+our $VERSION = '0.481'; # VERSION
 
 use 5.010;
 use strict;
@@ -98,7 +98,7 @@ App::ListOrgHeadlinesFast - List & count Org headlines & todos
 
 =head1 VERSION
 
-This document describes version 0.479 of App::ListOrgHeadlinesFast (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of App::ListOrgHeadlinesFast (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 FUNCTIONS
 

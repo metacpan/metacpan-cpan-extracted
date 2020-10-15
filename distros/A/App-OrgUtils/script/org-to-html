@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Org/To/HTML/org_to_html
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-21'; # DATE
+our $DATE = '2020-10-14'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.479'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ org-to-html - Export Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.479 of org-to-html (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of org-to-html (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 
@@ -45,11 +45,12 @@ Usage:
  % org-to-html [--config-path=path | -c] [--config-profile=profile | -P]
      [--css-url=s] [--exclude-tags-json=s] [--exclude-tags=s+]
      [--format=name] [--html-title=s] [--ignore-unknown-settings]
-     [--include-tags-json=s] [--include-tags=s+] [--json] [--naked]
-     [--(no)naked-res] [--no-config | -C] [--no-env]
-     [--no-ignore-unknown-settings] [--no-naked]
-     [--noignore-unknown-settings] [--nonaked] [--page-result[=program]]
-     [--source-file=s] [--source-str=s] [--target-file=s]
+     [--include-tags-json=s] [--include-tags=s+] [--inline-images] [--json]
+     [--naked] [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--no-ignore-unknown-settings] [--no-inline-images] [--no-naked]
+     [--noignore-unknown-settings] [--noinline-images] [--nonaked]
+     [--page-result[=program]] [--source-file=s] [--source-str=s]
+     [--target-file=s]
 
 =head1 DESCRIPTION
 
@@ -116,6 +117,8 @@ Can be specified multiple times.
 =item B<--naked>
 
 Don't wrap exported HTML with HTML/HEAD/BODY elements.
+
+=item B<--no-inline-images>
 
 =item B<--source-file>=I<s>
 
@@ -277,6 +280,7 @@ List of available configuration parameters:
  html_title (see --html-title)
  ignore_unknown_settings (see --ignore-unknown-settings)
  include_tags (see --include-tags)
+ inline_images (see --no-inline-images)
  naked (see --naked)
  naked_res (see --naked-res)
  source_file (see --source-file)

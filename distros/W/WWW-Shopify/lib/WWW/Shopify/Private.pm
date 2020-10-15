@@ -29,8 +29,8 @@ Creates a new WWW::Shopify::Private object, which allows you to make calls via t
 
 sub new { 
 	my $package = shift;
-	my ($shop_url, $api_key, $password) = @_;
-	my $self = $package->SUPER::new($shop_url);
+	my ($shop_url, $api_key, $password, $api_version) = @_;
+	my $self = $package->SUPER::new($shop_url,undef,undef,$api_version);
 	$self->api_key($api_key);
 	$self->password($password);
 	return $self;
@@ -46,7 +46,7 @@ Modifies the requested url by prepending the api key and the password, as well a
 
 sub encode_url { 
 	my ($self, $url) = @_;
-	return "https://" . $self->api_key . ":" . $_[0]->password . "@" . $self->shop_url . $url;
+	return "https://" . $self->api_key . ":" . $self->password . "@" . $self->shop_url . $url;
 }
 
 

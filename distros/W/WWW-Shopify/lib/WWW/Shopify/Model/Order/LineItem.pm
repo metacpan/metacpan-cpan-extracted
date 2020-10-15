@@ -23,6 +23,7 @@ BEGIN { $fields = {
 	"variant_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::Product::Variant', 1),
 	#
 	"gift_card" => new WWW::Shopify::Field::Boolean(),
+	"pre_tax_price" => new WWW::Shopify::Field::Money(),
 	"quantity" => new WWW::Shopify::Field::Int(1, 20),
 	"requires_shipping" => new WWW::Shopify::Field::Boolean(),
 	"product_exists" => new WWW::Shopify::Field::Boolean(),
@@ -31,12 +32,18 @@ BEGIN { $fields = {
 	"variant_title" => new WWW::Shopify::Field::String::Words(1,3),
 	"vendor" => new WWW::Shopify::Field::String(),
 	"name" => new WWW::Shopify::Field::String::Words(1, 3),
+	"discount_allocations" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Order::LineItem::DiscountAllocation"),
 	"properties" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Order::LineItem::Property"),
 	"tax_lines" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Order::LineItem::TaxLine"),
 	"origin_location" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::Location"),
 	"destination_location" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::Location"),
 	"taxable" => new WWW::Shopify::Field::Boolean(),
-	"variant_inventory_management" => new WWW::Shopify::Field::String::Enum(["shopify", "manual"]) };
+	"variant_inventory_management" => new WWW::Shopify::Field::String::Enum(["shopify", "manual"]),
+	
+	
+	"pre_tax_price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet"),
+	"total_discount_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet"),
+	"price_set" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Order::LineItem::PriceSet") };
 }
 
 sub singular { return 'line_item'; }

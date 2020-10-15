@@ -74,7 +74,7 @@
 #include "warnless.h"
 #include "conncache.h"
 #include "multihandle.h"
-#include "system_win32.h"
+#include "version_win32.h"
 #include "quic.h"
 #include "socks.h"
 
@@ -82,11 +82,6 @@
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-
-#ifdef __SYMBIAN32__
-/* This isn't actually supported under Symbian OS */
-#undef SO_NOSIGPIPE
-#endif
 
 static bool verifyconnect(curl_socket_t sockfd, int *error);
 
@@ -746,8 +741,8 @@ static CURLcode connect_SOCKS(struct connectdata *conn, int sockindex,
                               bool *done)
 {
   CURLcode result = CURLE_OK;
-
 #ifndef CURL_DISABLE_PROXY
+  CURLproxycode pxresult = CURLPX_OK;
   if(conn->bits.socksproxy) {
     /* for the secondary socket (FTP), use the "connect to host"
      * but ignore the "connect to port" (use the secondary port)
@@ -767,20 +762,24 @@ static CURLcode connect_SOCKS(struct connectdata *conn, int sockindex,
     switch(conn->socks_proxy.proxytype) {
     case CURLPROXY_SOCKS5:
     case CURLPROXY_SOCKS5_HOSTNAME:
-      result = Curl_SOCKS5(conn->socks_proxy.user, conn->socks_proxy.passwd,
-                           host, port, sockindex, conn, done);
+      pxresult = Curl_SOCKS5(conn->socks_proxy.user, conn->socks_proxy.passwd,
+                             host, port, sockindex, conn, done);
       break;
 
     case CURLPROXY_SOCKS4:
     case CURLPROXY_SOCKS4A:
-      result = Curl_SOCKS4(conn->socks_proxy.user, host, port, sockindex,
-                           conn, done);
+      pxresult = Curl_SOCKS4(conn->socks_proxy.user, host, port, sockindex,
+                             conn, done);
       break;
 
     default:
       failf(conn->data, "unknown proxytype option given");
       result = CURLE_COULDNT_CONNECT;
     } /* switch proxytype */
+    if(pxresult) {
+      result = CURLE_PROXY;
+      conn->data->info.pxcode = pxresult;
+    }
   }
   else
 #else
@@ -934,10 +933,10 @@ CURLcode Curl_is_connected(struct connectdata *conn,
 
         return CURLE_OK;
       }
-      infof(data, "Connection failed\n");
     }
-    else if(rc & CURL_CSELECT_ERR)
+    else if(rc & CURL_CSELECT_ERR) {
       (void)verifyconnect(conn->tempsock[i], &error);
+    }
 
     /*
      * The connection failed here, we should attempt to connect to the "next
@@ -1085,8 +1084,8 @@ void Curl_sndbufset(curl_socket_t sockfd)
   static int detectOsState = DETECT_OS_NONE;
 
   if(detectOsState == DETECT_OS_NONE) {
-    if(Curl_verify_windows_version(6, 0, PLATFORM_WINNT,
-                                   VERSION_GREATER_THAN_EQUAL))
+    if(curlx_verify_windows_version(6, 0, PLATFORM_WINNT,
+                                    VERSION_GREATER_THAN_EQUAL))
       detectOsState = DETECT_OS_VISTA_OR_LATER;
     else
       detectOsState = DETECT_OS_PREVISTA;
@@ -1313,10 +1312,9 @@ CURLcode Curl_connecthost(struct connectdata *conn,  /* context */
                           const struct Curl_dns_entry *remotehost)
 {
   struct Curl_easy *data = conn->data;
-  struct curltime before = Curl_now();
   CURLcode result = CURLE_COULDNT_CONNECT;
   int i;
-  timediff_t timeout_ms = Curl_timeleft(data, &before, TRUE);
+  timediff_t timeout_ms = Curl_timeleft(data, NULL, TRUE);
 
   if(timeout_ms < 0) {
     /* a precaution, no need to continue if time already is up */
@@ -1363,15 +1361,15 @@ CURLcode Curl_connecthost(struct connectdata *conn,  /* context */
 }
 
 struct connfind {
-  struct connectdata *tofind;
-  bool found;
+  long id_tofind;
+  struct connectdata *found;
 };
 
 static int conn_is_conn(struct connectdata *conn, void *param)
 {
   struct connfind *f = (struct connfind *)param;
-  if(conn == f->tofind) {
-    f->found = TRUE;
+  if(conn->connection_id == f->id_tofind) {
+    f->found = conn;
     return 1;
   }
   return 0;
@@ -1393,21 +1391,22 @@ curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
    * - that is associated with a multi handle, and whose connection
    *   was detached with CURLOPT_CONNECT_ONLY
    */
-  if(data->state.lastconnect && (data->multi_easy || data->multi)) {
-    struct connectdata *c = data->state.lastconnect;
+  if((data->state.lastconnect_id != -1) && (data->multi_easy || data->multi)) {
+    struct connectdata *c;
     struct connfind find;
-    find.tofind = data->state.lastconnect;
-    find.found = FALSE;
+    find.id_tofind = data->state.lastconnect_id;
+    find.found = NULL;
 
     Curl_conncache_foreach(data, data->multi_easy?
                            &data->multi_easy->conn_cache:
                            &data->multi->conn_cache, &find, conn_is_conn);
 
     if(!find.found) {
-      data->state.lastconnect = NULL;
+      data->state.lastconnect_id = -1;
       return CURL_SOCKET_BAD;
     }
 
+    c = find.found;
     if(connp) {
       /* only store this if the caller cares for it */
       *connp = c;
@@ -1415,8 +1414,7 @@ curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
     }
     return c->sock[FIRSTSOCKET];
   }
-  else
-    return CURL_SOCKET_BAD;
+  return CURL_SOCKET_BAD;
 }
 
 /*

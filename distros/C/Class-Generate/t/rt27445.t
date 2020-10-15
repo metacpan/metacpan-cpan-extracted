@@ -13,15 +13,15 @@ use Test::More tests => 1;
 
 use Class::Generate qw(class subclass);
 
-class MyTest => [ '&createNewClass' => <<'EOF'
+class MyTest => [
+    '&createNewClass' => <<'EOF'
     subclass MySubTest => [ '&ISA' => 'return @ISA;' ], -parent => 'MyTest';
 EOF
     ],
-    -use => ['Class::Generate qw(class subclass)']
-    ;
+    -use => ['Class::Generate qw(class subclass)'];
 
 my $d = MyTest->new();
 $d->createNewClass();
 
 # TEST
-ok (1, "createNewClass worked fine for RT #27445");
+ok( 1, "createNewClass worked fine for RT #27445" );

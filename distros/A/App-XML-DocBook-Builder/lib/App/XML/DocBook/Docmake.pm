@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.1000';
+$App::XML::DocBook::Docmake::VERSION = '0.1002';
 use 5.014;
 use strict;
 use warnings;
@@ -552,7 +552,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1000';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1002';
 use Class::XSAccessor {
     accessors => [
 
@@ -586,7 +586,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.1000
+version 0.1002
 
 =head1 SYNOPSIS
 

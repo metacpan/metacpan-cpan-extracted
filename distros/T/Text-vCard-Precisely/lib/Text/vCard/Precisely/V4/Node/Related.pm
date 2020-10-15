@@ -15,7 +15,11 @@ subtype 'RelatedType' => as 'Str' => where {
 
     # it needs tests
 } => message {"The text you provided, $_, was not supported in 'RelatedType'"};
-has types => ( is => 'rw', isa => 'ArrayRef[RelatedType]', default => sub { [] }, required => 1 );
+
+subtype 'RelatedTypes' => as 'ArrayRef[RelatedType]';
+coerce 'RelatedTypes'  => from 'RelatedType' => via { [$_] };
+has types =>
+    ( is => 'rw', isa => 'RelatedTypes', default => sub { [] }, required => 1, coerce => 1 );
 
 override 'as_string' => sub {
     my ($self) = @_;
@@ -23,8 +27,8 @@ override 'as_string' => sub {
     push @lines, $self->name() || croak "Empty name";
     push @lines, 'ALTID=' . $self->altID() if $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->pid();
-    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types() } )
-        if @{ $self->types() || [] } > 0;
+    push @lines, 'TYPE="' . join( ',', map { uc $_ } @{ $self->types() } ) . '"'
+        if ref $self->types() eq 'ARRAY' and $self->types()->[0];
     push @lines, "MEDIATYPE=" . $self->media_type() if defined $self->media_type();
 
     my $string = join( ';', @lines ) . ':' . $self->content();

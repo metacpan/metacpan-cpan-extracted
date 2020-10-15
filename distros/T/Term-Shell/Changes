@@ -1,3 +1,6 @@
+0.12    2020-10-14
+    - Rebuild for new dist.ini / weaver.ini / etc. deps
+
 0.11    2019-04-30
     - Apply https://github.com/shlomif/Term-Shell/pull/3
         - Fix aliases.

@@ -34,7 +34,7 @@
    "provides" : {
       "Devel::PPPort" : {
          "file" : "PPPort.pm",
-         "version" : "3.60"
+         "version" : "3.61"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "web" : "https://github.com/Dual-Life/Devel-PPPort"
       }
    },
-   "version" : "3.60",
+   "version" : "3.61",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

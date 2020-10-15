@@ -6,17 +6,21 @@ package A_Class;
 use strict;
 
 my $instances_declared = 0;
-sub init() {
+
+sub init()
+{
     $instances_declared = 0;
 }
 
-sub new {
+sub new
+{
     my $class = shift;
-    my $v = ++$instances_declared;
+    my $v     = ++$instances_declared;
     return bless \$v, $class;
 }
 
-sub value {
+sub value
+{
     my $self = shift;
     return $$self;
 }

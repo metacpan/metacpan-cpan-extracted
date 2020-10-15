@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Share" : "0.25",
             "Text::CSV" : "2.0",
             "XML::Twig" : "3.48",
             "perl" : "5.006"
@@ -40,11 +41,12 @@
       },
       "test" : {
          "requires" : {
+            "File::Share" : "0.25",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.6.0",
+   "version" : "v0.6.1",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

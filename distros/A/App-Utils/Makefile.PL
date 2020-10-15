@@ -5,7 +5,7 @@ WriteMakefile(
   NAME             => 'App::Utils',
   VERSION_FROM     => 'lib/App/Utils.pm',
   ABSTRACT_FROM    => 'lib/App/Utils.pm',
-  AUTHOR           => 'Vlado Keselj https://web.cs.dal.ca/~vlado',
+  AUTHOR           => 'Vlado Keselj vlado@dnlp.ca http://vlado.ca',
   LICENSE          => 'perl',
   MIN_PERL_VERSION => '5.0008004',
   EXE_FILES        => ['bin/date-tag', 'bin/date-tag-file',

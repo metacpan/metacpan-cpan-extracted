@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
@@ -42,6 +42,7 @@
             "Data::Sah::Compiler::perl::TH::duration" : "0",
             "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
+            "HTML::Entities" : "0",
             "Log::ger" : "0.037",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.827",
@@ -74,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-App-GoogleSearchUtils"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

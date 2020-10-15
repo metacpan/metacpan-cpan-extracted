@@ -4,4 +4,7 @@ WriteMakefile(
     AUTHOR => "rkiesling\@mainmatter.com <Robert Kiesling>" ,
     NAME => 'Tk::SimpleFileSelect',
     VERSION_FROM => 'lib/Tk/SimpleFileSelect.pm',
+    PREREQ_PM => {
+        'Tk' => 800.004,
+    },
 );

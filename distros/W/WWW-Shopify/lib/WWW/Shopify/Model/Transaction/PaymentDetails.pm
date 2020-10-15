@@ -17,10 +17,8 @@ BEGIN { $fields = {
 	"credit_card_company" => new WWW::Shopify::Field::String()
 }; }
 sub plural($) { return $_[0]->singular(); }
+sub identifier { () }
 
 eval(__PACKAGE__->generate_accessors); die $@ if $@;
-
-1;
-
 
 1;

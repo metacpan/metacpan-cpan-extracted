@@ -34,9 +34,9 @@ BEGIN {
     require 'inctools';
   }
 
-  if (5) {
+  if (11) {
     load();
-    plan(tests => 5);
+    plan(tests => 11);
   }
 }
 
@@ -74,9 +74,33 @@ $warning = '';
 Devel::PPPort::ckWARN();
 is($warning, '');
 
+$warning = '';
+Devel::PPPort::ckWARN_d();
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN_d bar:42/ : $warning eq '');
+
+$warning = '';
+Devel::PPPort::Perl_ck_warner();
+ok($warning eq '');
+
+$warning = '';
+Devel::PPPort::Perl_ck_warner_d();
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_ck_warner_d bar:42/ : $warning eq '');
+
 $^W = 1;
 
 $warning = '';
 Devel::PPPort::ckWARN();
 ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN bar:42/ : $warning eq '');
+
+$warning = '';
+Devel::PPPort::ckWARN_d();
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN_d bar:42/ : $warning eq '');
+
+$warning = '';
+Devel::PPPort::Perl_ck_warner();
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_ck_warner bar:42/ : $warning eq '');
+
+$warning = '';
+Devel::PPPort::Perl_ck_warner_d();
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_ck_warner_d bar:42/ : $warning eq '');
 

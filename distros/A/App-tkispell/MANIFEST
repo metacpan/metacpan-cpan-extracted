@@ -1,0 +1,11 @@
+Artistic
+CHANGES
+lib/App/tkispell.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load-App-tkispell.t
+t/97-pod.t
+tkispell
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

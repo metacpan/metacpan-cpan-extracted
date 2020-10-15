@@ -1,3 +1,6 @@
+2.52 2020-10-14
+- drop test for GraphViz2->dependency method - thanks @neo1ite for report
+
 2.51 2020-10-12
 - stop using GraphViz2->dependency when is actually ours
 

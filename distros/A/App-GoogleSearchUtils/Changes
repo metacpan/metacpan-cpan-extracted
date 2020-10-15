@@ -1,3 +1,18 @@
+0.006   2020-10-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix/add examples.
+
+	- [doc] Forgot to document --action.
+
+
+0.005   2020-10-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: --type (e.g. --image, --video, etc) and --action
+	  (--open-url, --print-url, --print-html-link, --print-org-link).
+
+
 0.004   2020-10-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: --delay.

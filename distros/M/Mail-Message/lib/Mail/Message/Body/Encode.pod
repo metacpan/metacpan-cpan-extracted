@@ -204,8 +204,8 @@ unknown.  The decoded data is returned.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.009,
-built on February 07, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.010,
+built on October 14, 2020. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

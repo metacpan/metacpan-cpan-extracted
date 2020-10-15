@@ -2,7 +2,7 @@ use 5.010;
 
 use ExtUtils::MakeMaker;
 
-my $version = '0.99';
+my $version = '1.00';
 
 #
 # The following is needed, because User::Identity does gracefully handle
@@ -32,8 +32,8 @@ WriteMakefile
   , VERSION    => $version
   , PREREQ_PM  => \%prereq
   , ABSTRACT   => 'Collect information about a user'
-  , AUTHOR     => 'Mark Overmeer'
-  , LICENSE    => 'perl'
+  , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
+  , LICENSE    => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -43,9 +43,9 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-User-Identity.git'
               , web  => 'https://github.com/markov2/perl5-User-Identity'
               }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
           }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
   );
 

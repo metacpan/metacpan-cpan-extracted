@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Sah/Schema/hexstr.pm','lib/Sah/Schema/latin_alpha.pm','lib/Sah/Schema/latin_alphanum.pm','lib/Sah/Schema/latin_letter.pm','lib/Sah/SchemaR/hexstr.pm','lib/Sah/SchemaR/latin_alpha.pm','lib/Sah/SchemaR/latin_alphanum.pm','lib/Sah/SchemaR/latin_letter.pm','lib/Sah/Schemas/Str.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

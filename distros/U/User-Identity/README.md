@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-User-Identity>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/User-Identity/>
-    and <https://metacpan.org/release/User-Identity>
+  * Indexed from CPAN: <https://metacpan.org/release/User-Identity>
 
 The "User-Identity" distribution is created to maintain a set of informational
 objects which are related to one user.

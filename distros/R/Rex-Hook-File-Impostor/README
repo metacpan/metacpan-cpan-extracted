@@ -1,0 +1,72 @@
+NAME
+
+    Rex::Hook::File::Impostor - execute Rex file management commands on a
+    copy of the original file
+
+VERSION
+
+    version v0.1.1
+
+SYNOPSIS
+
+        use Rex::Hook::File::Impostor;
+
+DESCRIPTION
+
+    This module lets Rex <https://metacpan.org/pod/Rex> execute file
+    management commands on a copy of the file instead of the original one.
+
+    This could be particularly useful when it is loaded conditionally to be
+    combined with other modules. For example together with
+    Rex::Hook::File::Diff <https://metacpan.org/pod/Rex::Hook::File::Diff>,
+    it could be used to show a diff of file changes without actually
+    changing the original file contents.
+
+    It works by installing a before hook
+    <https://metacpan.org/pod/Rex::Commands::File#Hooks> for file commands,
+    which makes a copy of the original file into a temporary directory, and
+    then overrides the original arguments of the file commands
+    <https://metacpan.org/pod/Rex::Commands::File#file>.
+
+DIAGNOSTICS
+
+    This module does not do any error checking (yet).
+
+CONFIGURATION AND ENVIRONMENT
+
+    It uses the same temporary directory that is used by Rex. Therefore it
+    can be configured with set_tmp_dir
+    <https://metacpan.org/pod/Rex::Config#set_tmp_dir>:
+
+        Rex::Config->set_tmp_dir($tmp_dir);
+
+    This module does not use any environment variables.
+
+DEPENDENCIES
+
+    See the included cpanfile.
+
+INCOMPATIBILITIES
+
+    There are no known incompatibilities with other modules.
+
+BUGS AND LIMITATIONS
+
+    There are no known bugs. Make sure they are reported.
+
+AUTHOR
+
+    Ferenc Erki <erkiferenc@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Ferenc Erki.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 3, June 2007
+
+    Early versions of this software were sponsorware
+    <https://github.com/sponsorware/docs>. Thanks to GitHub sponsors
+    <https://github.com/sponsors/ferki>, it is now available to everyone!
+

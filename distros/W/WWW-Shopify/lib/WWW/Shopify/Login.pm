@@ -8,15 +8,6 @@ use utf8;
 package WWW::Shopify::Login;
 use parent 'WWW::Shopify';
 
-sub get_all {
-	my ($self, $package, $hash) = @_;
-	if ($package =~ m/LocaleTranslation/) {
-		$hash->{locale_id} = $hash->{parent}->id if $hash->{parent};
-	}
-	return shift->SUPER::get_all(@_);
-}
-
-
 # Used for the login version.
 # X-Shopify-Api-Features:pagination-headers, embed-metafields, include-image-token.
 sub embed_metafields { if (defined $_[1]) { $_[0]->{embed_metafields} = $_[1]; $_[0]->update_x_shopify_api_features; } return $_[0]->{embed_metafields}; }
@@ -46,6 +37,38 @@ sub new {
 	return $self;
 }
 
+
+sub get_all_limit {
+	my ($self, $package, $specs) = @_;
+	if ($package =~ m/File$/) {
+		$package = $self->translate_model($package);
+		$specs->{"limit"} = $package->max_per_page unless exists $specs->{"limit"};
+		my $response = $self->use_url('get', "/admin/api/" . $self->api_version . "/settings/files", { limit => $specs->{limit} }, "text/html");
+		my $contents = $response->decoded_content;
+		my @images = ();
+		return () if ($specs->{limit} == 0);
+		while ($contents =~ m/<tr bind-class="\{selected: bulk.selected\[(\d+)\]}".*?<td[^>]*>.*?<\/td>.*?<td[^>]*>.*?<\/td>.*?<td[^>]*>(.*?)<\/td>.*?id="text-\w+" value="([^"]+)".*?<\/tr>/gmis) {
+			my ($id, $key, $public_url) = ($1, $2, $3);
+			$key =~ s/\<[^\>]+>//g;
+			$key =~ s/^\s*//;
+			$key =~ s/\s*$//;
+			push(@images, WWW::Shopify::Model::File->new({ id => $id, key => $key, public_url => $public_url }));
+		}
+		return (undef,@images);
+	}
+	return shift->SUPER::get_all_limit(@_);
+}
+
+
+sub get_all {
+	my ($self, $package, $hash) = @_;
+	if ($package =~ m/LocaleTranslation/) {
+		$hash->{locale_id} = $hash->{parent}->id if $hash->{parent};
+	} 
+	return shift->SUPER::get_all(@_);
+}
+
+
 sub update_x_shopify_api_features {
 	my ($self) = @_;
 	my @list = (
@@ -74,7 +97,7 @@ sub create_update_locale_translation {
 		$mapping{$english->id} = exists $hash{$english->english} ? $hash{$english->english} : "";
 	}
 	my $locale_id = $locales[0]->locale_id;
-	my ($decoded, $response) = $self->use_url('put', "/admin/locales/$locale_id.json", { s => \%mapping });
+	my ($decoded, $response) = $self->use_url('put', "/admin/api/" . $self->api_version . "/locales/$locale_id.json", { s => \%mapping });
 	my $package = "WWW::Shopify::Model::Locale";
 	my $object = $package->from_json($decoded->{$package->singular}, $self);
 	return $object;
@@ -83,7 +106,7 @@ sub create_update_locale_translation {
 sub get_english_translation {
 	my ($self) = @_;
 	my $package = "WWW::Shopify::Model::LocaleTranslation";
-	my ($decoded, $response) = $self->use_url('get', "/admin/locale_translations/english_translations.json");
+	my ($decoded, $response) = $self->use_url('get', "/admin/api/" . $self->api_version . "/locale_translations/english_translations.json");
 	return map { my $object = $package->from_json($_, $self); $object; } @{$decoded->{$package->plural}};
 }
 
@@ -112,8 +135,22 @@ sub create {
 			$item->singular => $item
 		}, 1, "application/x-www-form-urlencoded",  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 		return (undef, $response);
-	}	
+	}
+	if (ref($item) && ref($item) =~ m/File$/) {
+		use MIME::Base64 qw(decode_base64);
+		die new WWW::Shopify::Exception("Requires attachment, and key.") unless $item->attachment && $item->key;
+		my $attachment = decode_base64($item->attachment);
+		my $response = $self->url_handler->upload_url("POST", 'https://' . $self->shop_url . '/admin/settings/files.json', 'file', $item->key, ($item->content_type || "application/octet-stream"), $attachment);
+		die new WWW::Shopify::Exception($response) unless $response->is_success;
+		return WWW::Shopify::Model::File->new({ content_type => $item->content_type, key => $item->key, size => length($attachment) });
+	}
 	return shift->SUPER::create(@_) unless ref($item) =~ m/LocaleTranslation/;
+}
+
+sub resolve_trailing_url {
+	my ($self, $class, $action, $parent) = @_;
+	return "/admin/api/settings/" . $class->url_plural if ((ref($class) || $class) =~ m/File$/) ;
+	return shift->SUPER::resolve_trailing_url(@_);
 }
 
 
@@ -121,11 +158,24 @@ sub delete {
 	my ($self, $class) = @_;
 	$self->validate_item(ref($class));
 	if ($class->needs_form_encoding_delete) {
-		$self->use_url("POST", $self->resolve_trailing_url($class, "delete", $class->associated_parent) . "/" . $class->id, {
-			_method => "delete",
-			authenticity_token => $self->{authenticity_token},
-			utf8 => "✓"
-		}, 1, "application/x-www-form-urlencoded",  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+		my $url;
+		if (ref($class) =~ m/File$/) {
+			$url = $self->resolve_trailing_url($class, "delete", $class->associated_parent);
+			$self->use_url("POST", $url, {
+				_method => "delete",
+				authenticity_token => $self->{authenticity_token},
+				utf8 => "✓",
+				file => $class->key
+			}, 1, "application/x-www-form-urlencoded",  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+		} else {
+			$url = $self->resolve_trailing_url($class, "delete", $class->associated_parent) . "/" . $class->id;
+			$self->use_url("POST", $url, {
+				_method => "delete",
+				authenticity_token => $self->{authenticity_token},
+				utf8 => "✓"
+			}, 1, "application/x-www-form-urlencoded",  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+		}
+		
 	} else {
 		$self->SUPER::delete($class);
 	}
@@ -141,54 +191,30 @@ sub extract_alt_text {
 	return $1;
 }
 
-sub get_alt_text {
-	my ($self, $image) = @_;
-	die new WWW::Shopify::Exception("Unable to find parent product.") unless $image->associated_parent;
-	my $result = $self->use_url("GET", $self->resolve_trailing_url($image->associated_parent, "GET") . "/" . $image->associated_parent->id, { }, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-	return $self->extract_alt_text($image, $result->decoded_content);
-}
-
-sub get_alt_texts {
-	my ($self, $product) = @_;
-	my $result = $self->use_url("GET", $self->resolve_trailing_url($product, "GET") . "/" . $product->id, { }, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-	my @alt_texts;
-	for my $image ($product->images) {
-		my $alt_text = $self->extract_alt_text($image, $result->decoded_content);
-		push(@alt_texts, $alt_text);
-		$image->{metafields} = [WWW::Shopify::Model::Metafield->new({
-			key => 'alt',
-			namespace => 'tags',
-			value_type => 'string',
-			value => $alt_text
-		})] if defined $alt_text;
-	}
-	return @alt_texts;
-}
-
 sub send_activation_links {
 	my ($self, @customers) = @_;
-	my ($decoded, $response) = $self->use_url('put', "/admin/customers/set", { operation => "invite", 'customer_ids[]' => [map { $_->id } @customers] }, 1, "application/x-www-form-urlencoded");
+	my ($decoded, $response) = $self->use_url('put', "/admin/api/" . $self->api_version . "/customers/set", { operation => "invite", 'customer_ids[]' => [map { $_->id } @customers] }, 1, "application/x-www-form-urlencoded");
 	die  new WWW::Shopify::Exception("Unexpected Response.") unless $decoded->{message} =~ m/Invited (\d+) customer/;
 	return $1;
 }
 
 sub get_activation_link {
 	my ($self, $customer) = @_;
-	my ($decoded, $reponse) = $self->use_url('get', "/admin/customers/" . $customer->id, { }, "text/html");
+	my ($decoded, $reponse) = $self->use_url('get', "/admin/api/" . $self->api_version . "/customers/" . $customer->id, { }, "text/html");
 	die new WWW::Shopify::Exception("Unable to find activation link for " . $customer->id . ".") unless $decoded =~ m/http:\/\/[\w\.]+\/account\/activate\/\w+/;
 	return $&;
 }
 
 sub get_reset_token {
 	my ($self, $customer) = @_;
-	my ($decoded, $response) = $self->use_url('get', "/admin/customers/" . $customer->id, { }, "text/html");
+	my ($decoded, $response) = $self->use_url('get', "/admin/api/" . $self->api_version . "/customers/" . $customer->id, { }, "text/html");
 	die new WWW::Shopify::Exception("Unable to find activation link for " . $customer->id . ".") unless $decoded =~ m/http:\/\/[\w\.]+\/account\/activate\/(\w+)/;
 	return $1;
 }
 
 sub send_activation_link {
 	my ($self, $customer, $from, $subject, $body, $reset_token) = @_;
-	my ($decoded, $response) = $self->use_url('post', "/admin/customers/" . $customer->id . "/invite", {
+	my ($decoded, $response) = $self->use_url('post', "/admin/api/" . $self->api_version . "/customers/" . $customer->id . "/invite", {
 		utf => '✓',
 		source => 'adminnext',
 		'customer_invite_message[from]' => $from,
@@ -261,10 +287,43 @@ sub logged_in_admin {
 	return 1 if $self->{last_login_check} && (time - $self->{last_login_check}) < 1000;
 	my $ua = $self->ua;
 	return undef unless $ua->cookie_jar;
-	my $res = $ua->get('https://' . $self->shop_url . '/admin/discounts/count.json');
+	my $res = $ua->get('https://' . $self->shop_url . '/admin/api/" . $self->api_version . "/discounts/count.json');
 	return undef unless $res->is_success;
 	$self->{last_login_check} = time;
 	return 1;
+}
+
+=head2 menu_or_linklists
+
+As of 2017-08-29, some stores will go for Menus, some for LinkList. This figures out which.
+
+=cut
+
+sub menu_or_linklists {
+	my ($self) = @_;
+	my $ua = $self->ua;
+	my $res = $ua->get('https://' . $self->shop_url . '/admin/api/" . $self->api_version . "/link_lists.json');
+	return $res->request->uri->path =~ m/menu/ ? "WWW::Shopify::Model::Menu" : "WWW::Shopify::Model::LinkList";	
+}
+
+sub convert_linklist_to_menu {
+	my ($self, $linklist) = @_;
+	return WWW::Shopify::Model::Menu->new({
+		id => $linklist->id,
+		handle => $linklist->handle,
+		title => $linklist->title,
+		items => [
+			(map {
+				WWW::Shopify::Model::Menu::Item->new({
+					title => $_->title,
+					subject => $_->subject,
+					subject_id => $_->subject_id,
+					subject_params => $_->subject_params,
+					type => $_->link_type,
+				})
+			} $linklist->links)
+		]
+	});
 }
 
 use Exporter 'import';

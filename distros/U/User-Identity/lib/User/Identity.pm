@@ -1,4 +1,4 @@
-# Copyrights 2003-2018 by [Mark Overmeer].
+# Copyrights 2003-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package User::Identity;
 use vars '$VERSION';
-$VERSION = '0.99';
+$VERSION = '1.00';
 
 use base 'User::Identity::Item';
 

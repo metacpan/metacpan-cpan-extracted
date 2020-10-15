@@ -1,9 +1,9 @@
 package Sah::SchemaR::sortsub::spec;
 
-our $DATE = '2020-02-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = ["str",[{match=>qr(\A\w+(?:<[ir]*>)?\z),prefilters=>["Str::replace_dashes_with_underscores"],summary=>"Sort::Sub specification string (name + optional <i,r>)","x.completion"=>["sortsub_spec"]}],["str"]];
+our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"alphabetically"},{valid=>1,value=>"alphabetically<i>"},{valid=>1,value=>"alphabetically<>"},{valid=>1,value=>"alphabetically<ir>"},{valid=>1,value=>"alphabetically<ri>"},{valid=>1,value=>"alphabetically<r>"},{valid=>0,value=>"alphabetically<R>"}],match=>qr(\A\w+(?:<[ir]*>)?\z),prefilters=>["Str::replace_dashes_with_underscores"],summary=>"Sort::Sub specification string (name + optional <i,r>)","x.completion"=>["sortsub_spec"]}],["str"]];
 
 1;
 # ABSTRACT: Sort::Sub specification string (name + optional <i,r>)
@@ -20,7 +20,7 @@ Sah::SchemaR::sortsub::spec - Sort::Sub specification string (name + optional <i
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::sortsub::spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-02-28.
+This document describes version 0.004 of Sah::SchemaR::sortsub::spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-05-27.
 
 =head1 DESCRIPTION
 

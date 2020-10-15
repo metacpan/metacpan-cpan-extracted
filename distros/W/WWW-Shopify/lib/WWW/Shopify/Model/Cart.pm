@@ -14,8 +14,10 @@ BEGIN { $fields = {
 	"token" => new WWW::Shopify::Field::String::Hash(),
 	"line_items" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Cart::LineItem', 0, 10),
 	"id" => new WWW::Shopify::Field::Identifier(),
-	"updated_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now')
+	"updated_at" => new WWW::Shopify::Field::Date()
 }; }
+
+sub needs_login { 1; }
 
 eval(__PACKAGE__->generate_accessors); die $@ if $@;
 

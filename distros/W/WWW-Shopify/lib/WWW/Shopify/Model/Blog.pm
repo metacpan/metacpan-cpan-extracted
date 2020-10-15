@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
@@ -20,12 +18,14 @@ BEGIN { $fields = {
 	"updated_at" => new WWW::Shopify::Field::Date(),
 	"feedburner" => new WWW::Shopify::Field::String(),
 	"feedburner_location" => new WWW::Shopify::Field::String(),
-	"template_suffix" => new WWW::Shopify::Field::String()
+	"template_suffix" => new WWW::Shopify::Field::String(),
+	"articles" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Article"),
 }; }
 
 sub creation_minimal { return qw(title); }
 sub creation_filled { return qw(id created_at); }
 sub update_filled { return qw(updated_at); }
+sub update_fields { return qw(title handle commentable tags metafields feedburner beedburner_location template_suffix); }
 
 sub read_scope { return "read_content"; }
 sub write_scope { return "write_content"; }

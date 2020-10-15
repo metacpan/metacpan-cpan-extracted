@@ -1,5 +1,5 @@
 package Net::Whois::IANA;
-$Net::Whois::IANA::VERSION = '0.45';
+$Net::Whois::IANA::VERSION = '0.46';
 use 5.006;
 
 use strict;
@@ -610,7 +610,7 @@ Net::Whois::IANA - Net::Whois::IANA - A universal WHOIS data extractor.
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

@@ -1,18 +1,15 @@
 ---
 abstract: 'Read, Write and Edit the vCards 3.0 and/or 4.0 precisely'
 author:
-  - 'L<Yuki Yoshida(worthmine)|https://github.com/worthmine>'
+  - 'Yuki Yoshida(L<worthmine|https://github.com/worthmine>)'
 build_requires:
-  Data::Section::Simple: '0'
+  Data::Section::Simple: '0.07'
   Test::More: '0'
-  Text::Diff: '0'
-  lib: '0'
-  strict: '0'
-  warnings: '0'
+  Text::Diff: '1.45'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,13 +28,13 @@ no_index:
 provides:
   Text::vCard::Precisely:
     file: lib/Text/vCard/Precisely.pm
-    version: '0.23'
+    version: '0.26'
   Text::vCard::Precisely::Multiple:
     file: lib/Text/vCard/Precisely/Multiple.pm
-    version: '0.23'
+    version: '0.26'
   Text::vCard::Precisely::V3:
     file: lib/Text/vCard/Precisely/V3.pm
-    version: '0.23'
+    version: '0.26'
   Text::vCard::Precisely::V3::Node:
     file: lib/Text/vCard/Precisely/V3/Node.pm
   Text::vCard::Precisely::V3::Node::Address:
@@ -56,7 +53,7 @@ provides:
     file: lib/Text/vCard/Precisely/V3/Node/URL.pm
   Text::vCard::Precisely::V4:
     file: lib/Text/vCard/Precisely/V4.pm
-    version: '0.23'
+    version: '0.26'
   Text::vCard::Precisely::V4::Node:
     file: lib/Text/vCard/Precisely/V4/Node.pm
   Text::vCard::Precisely::V4::Node::Address:
@@ -72,28 +69,22 @@ provides:
   Text::vCard::Precisely::V4::Node::Tel:
     file: lib/Text/vCard/Precisely/V4/Node/Tel.pm
 requires:
-  Carp: '0'
-  Data::UUID: '0'
-  Data::Validate::URI: '0'
-  Encode: '0'
-  MIME::Base64: '0'
-  Moose: '0'
-  Moose::Util::TypeConstraints: '0'
-  MooseX::Deprecated: '0'
-  MooseX::Types::DateTime: '0'
-  MooseX::Types::Email: '0'
-  Path::Tiny: '0'
-  Text::LineFold: '0'
-  Text::vFile::asData: '0'
-  URI: '0'
-  overload: '0'
+  Data::UUID: '1.226'
+  Data::Validate::URI: '0.07'
+  Moose: '2.2013'
+  Moose::Util::TypeConstraints: '2.2013'
+  MooseX::Types::DateTime: '0.13'
+  MooseX::Types::Email: '0.008'
+  Path::Tiny: '0.114'
+  Text::LineFold: '2018.012'
+  Text::vFile::asData: '0.08'
+  URI: '1.76'
   perl: v5.12.5
-  utf8: '0'
 resources:
   bugtracker: https://github.com/worthmine/Text-vCard-Precisely/issues
   homepage: https://github.com/worthmine/Text-vCard-Precisely
   repository: git://github.com/worthmine/Text-vCard-Precisely.git
-version: '0.23'
+version: '0.26'
 x_contributors:
   - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'Robin Mordasiewicz <robin@mordasiewicz.com>'

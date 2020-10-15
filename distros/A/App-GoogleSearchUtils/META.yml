@@ -26,6 +26,7 @@ requires:
   Data::Sah::Compiler::perl::TH::duration: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  HTML::Entities: '0'
   Log::ger: '0.037'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
@@ -39,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleSearchUtils
   homepage: https://metacpan.org/release/App-GoogleSearchUtils
   repository: git://github.com/perlancar/perl-App-GoogleSearchUtils.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

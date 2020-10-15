@@ -1,10 +1,10 @@
 {
    "abstract" : "Read, Write and Edit the vCards 3.0 and/or 4.0 precisely",
    "author" : [
-      "L<Yuki Yoshida(worthmine)|https://github.com/worthmine>"
+      "Yuki Yoshida(L<worthmine|https://github.com/worthmine>)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -26,16 +26,6 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Data::Section::Simple" : "0",
-            "Test::More" : "0",
-            "Text::Diff" : "0",
-            "lib" : "0",
-            "strict" : "0",
-            "warnings" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.035"
@@ -52,38 +42,39 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Data::UUID" : "0",
-            "Data::Validate::URI" : "0",
-            "Encode" : "0",
-            "MIME::Base64" : "0",
-            "Moose" : "0",
-            "Moose::Util::TypeConstraints" : "0",
-            "MooseX::Deprecated" : "0",
-            "MooseX::Types::DateTime" : "0",
-            "MooseX::Types::Email" : "0",
-            "Path::Tiny" : "0",
-            "Text::LineFold" : "0",
-            "Text::vFile::asData" : "0",
-            "URI" : "0",
-            "overload" : "0",
-            "perl" : "v5.12.5",
-            "utf8" : "0"
+            "Data::UUID" : "1.226",
+            "Data::Validate::URI" : "0.07",
+            "Moose" : "2.2013",
+            "Moose::Util::TypeConstraints" : "2.2013",
+            "MooseX::Types::DateTime" : "0.13",
+            "MooseX::Types::Email" : "0.008",
+            "Path::Tiny" : "0.114",
+            "Text::LineFold" : "2018.012",
+            "Text::vFile::asData" : "0.08",
+            "URI" : "1.76",
+            "perl" : "v5.12.5"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Section::Simple" : "0.07",
+            "Test::More" : "0",
+            "Text::Diff" : "1.45"
          }
       }
    },
    "provides" : {
       "Text::vCard::Precisely" : {
          "file" : "lib/Text/vCard/Precisely.pm",
-         "version" : "0.23"
+         "version" : "0.26"
       },
       "Text::vCard::Precisely::Multiple" : {
          "file" : "lib/Text/vCard/Precisely/Multiple.pm",
-         "version" : "0.23"
+         "version" : "0.26"
       },
       "Text::vCard::Precisely::V3" : {
          "file" : "lib/Text/vCard/Precisely/V3.pm",
-         "version" : "0.23"
+         "version" : "0.26"
       },
       "Text::vCard::Precisely::V3::Node" : {
          "file" : "lib/Text/vCard/Precisely/V3/Node.pm"
@@ -111,7 +102,7 @@
       },
       "Text::vCard::Precisely::V4" : {
          "file" : "lib/Text/vCard/Precisely/V4.pm",
-         "version" : "0.23"
+         "version" : "0.26"
       },
       "Text::vCard::Precisely::V4::Node" : {
          "file" : "lib/Text/vCard/Precisely/V4/Node.pm"
@@ -146,7 +137,7 @@
          "web" : "https://github.com/worthmine/Text-vCard-Precisely"
       }
    },
-   "version" : "0.23",
+   "version" : "0.26",
    "x_contributors" : [
       "Mohammad S Anwar <Mohammad.Anwar@yahoo.com>",
       "Robin Mordasiewicz <robin@mordasiewicz.com>",
@@ -154,6 +145,6 @@
       "worthmine <worthmine@cpan.org>",
       "worthmine <worthmine@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1
 }

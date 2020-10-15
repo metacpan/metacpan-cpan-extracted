@@ -1,7 +1,0 @@
-"digraph Perl {
- graph [ label=\"5 deltas\" rankdir=\"TB\" ]
- node [ shape=\"oval\" ]
- edge [ color=\"grey\" ]
- \"5 deltas\" [ label=\"\x{394}\x{394}\x{394}\x{394}\x{394}\" ]
-}
-"

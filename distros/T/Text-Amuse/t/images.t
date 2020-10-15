@@ -4,7 +4,7 @@ use utf8;
 use Test::More;
 use Text::Amuse::Output::Image;
 
-plan tests => 47;
+plan tests => 54;
 my ($image, $ltx, $html);
 
 $image = Text::Amuse::Output::Image->new(
@@ -22,7 +22,7 @@ $ltx =<<'EOF';
 
 \begin{wrapfigure}{r}{0.25\textwidth}
 \centering
-\includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.25\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=\textheight,width=0.25\textwidth]{test.png}
 \end{wrapfigure}
 EOF
 
@@ -54,7 +54,7 @@ $ltx =<<'EOF';
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[keepaspectratio=true,height=0.75\textheight,width=\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=\textheight,width=\textwidth]{test.png}
 \end{figure}
 EOF
 
@@ -89,7 +89,7 @@ $ltx =<<'EOF';
 
 \begin{wrapfigure}{l}{0.75\textwidth}
 \centering
-\includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.75\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=\textheight,width=0.75\textwidth]{test.png}
 \end{wrapfigure}
 EOF
 
@@ -124,7 +124,7 @@ $ltx =<<'EOF';
 
 \begin{figure}[p]
 \centering
-\includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.50\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=\textheight,width=0.50\textwidth]{test.png}
 \end{figure}
 \clearpage
 EOF
@@ -198,3 +198,54 @@ is($image->width, "1", "width ok");
 is($image->width_html, "100%", "html width ok");
 is($image->width_latex, "\\textwidth", "LaTeX width ok");
 
+
+
+$image = Text::Amuse::Output::Image->new(
+                                         width => 25,
+                                         wrap => "r",
+                                         filename => "test.png",
+                                         desc => 'Blabla',
+                                        );
+
+ok($image->wrap, "wrap ok");
+is($image->width, "0.25", "width ok");
+is($image->width_html, "25%", "html width ok");
+is($image->width_latex, "0.25\\textwidth", "LaTeX width ok");
+
+$ltx =<<'EOF';
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+\centering
+\includegraphics[keepaspectratio=true,height=0.85\textheight,width=0.25\textwidth]{test.png}
+\caption[]{\noindent Blabla}
+\end{wrapfigure}
+EOF
+
+is($image->as_latex, $ltx, "TeX output ok");
+
+$image = Text::Amuse::Output::Image->new(
+                                         width => 25,
+                                         wrap => "r",
+                                         filename => "test.png",
+                                         desc => 'Blabla',
+                                         rotate => 90,
+                                        );
+$html =<<'HTML';
+
+<div class="float_image_r" style="width:25%; transform:rotate(90deg); background: transparent;">
+<img src="test.png" alt="test.png" class="embedimg" />
+<div class="caption">Blabla</div>
+</div>
+HTML
+
+$ltx = <<'LTX';
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+\centering
+\includegraphics[origin=c,angle=90,keepaspectratio=true,height=0.85\textheight,width=0.25\textwidth]{test.png}
+\caption[]{\noindent Blabla}
+\end{wrapfigure}
+LTX
+
+is $image->as_latex, $ltx, "LaTeX rotation ok";
+is $image->as_html, $html, "HTML rotation ok";

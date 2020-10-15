@@ -32,6 +32,11 @@ sub new($) {
 	}, $package;
 }
 sub name { $_[0]->{name} = $_[1] if defined $_[1]; return $_[0]->{name}; }
+sub camelCase {
+	my ($self) = @_;
+	my ($name) = $self->name;
+	return lcfirst(join("", map { ucfirst($_) } split(/_/, lc($name))));
+}
 sub sql_type($) { die ref($_[0]); }
 sub is_relation { return undef; }
 sub is_qualifier { return undef; }
@@ -66,8 +71,8 @@ use base 'Exporter';
 our @EXPORT_OK = qw(TYPE_QUANTITATIVE TYPE_QUALITATIVE TYPE_BOOLEAN SET_NOMINAL SET_ORDINAL SET_CARDINAL);
 
 sub data_type { return TYPE_QUALITATIVE; }
-sub is_qualitative { return $_[0]->data_type == TYPE_QUANTITATIVE; }
-sub is_quantitative { return $_[0]->data_type == TYPE_QUALITATIVE; }
+sub is_quantitative { return $_[0]->data_type == TYPE_QUANTITATIVE; }
+sub is_qualitative { return $_[0]->data_type == TYPE_QUALITATIVE; }
 sub is_boolean { return $_[0]->data_type == TYPE_BOOLEAN; }
 sub number_type { return $_[0]->is_quantitative ? SET_CARDINAL : SET_NOMINAL }
 
@@ -301,6 +306,7 @@ my %from_shopify_timezones = (
 	"(GMT-07:00) America/Denver" => "America/Denver",
 	"(GMT-07:00) America/Phoenix" => "America/Phoenix",
 	"(GMT-06:00) America/Chicago" => "America/Chicago",
+	"(GMT-06:00) America/Winnipeg" => "America/Winnipeg",
 	"(GMT-05:00) America/New_York" => "America/New_York",
 	"(GMT-05:00) America/Toronto" => "America/Toronto",
 	"(GMT-05:00) America/Montreal" => "America/Montreal",
@@ -374,6 +380,7 @@ sub to_shopify {
 sub from_shopify {
 	my $dttz = $_[1];
 	return undef unless $dttz;
+	return $dttz if ref($dttz) && ref($dttz) =~ m/DateTime::TimeZone/;
 	return DateTime::TimeZone->new(name => $dttz);
 }
 
@@ -392,10 +399,11 @@ sub generate($) { return rand() < 0.5 ? "USD" : "CAD"; }
 package WWW::Shopify::Field::Money;
 use parent 'WWW::Shopify::Field';
 use String::Numeric qw(is_float);
-sub sql_type { return "decimal(10,2)"; }
+sub sql_type { return "decimal(16,2)"; }
 sub generate($) { return sprintf("%.2f", rand(500)); }
 sub validate($) { return undef unless $_[1] =~ m/\s*\$?\s*$/; return is_float($`); }
 sub data_type { return WWW::Shopify::Field::TYPE_QUANTITATIVE; }
+sub to_shopify { defined $_[1] ? sprintf('%.2f', $_[1]) : undef; }
 
 package WWW::Shopify::Field::Money::USD;
 use parent -norequire, 'WWW::Shopify::Field::Money';
@@ -453,8 +461,32 @@ sub from_shopify {
 			day       => $5,
 		);
 	}
-	else {
-		die new WWW::Shopify::Exception("Unable to parse date " . $_[0]->name . " " . $_[1]) unless $_[1] =~ m/(\d+)-(\d+)-(\d+)/;
+	elsif ($_[1] =~ m/(\d+)\-($abbrvs_reg)\-(\d+) (\d+):(\d+):(\d+)/) {
+		my %types = map { $abbrvs[$_] => ($_+1) } 0..$#abbrvs;
+		$dt = DateTime->new(
+			day       => $1,
+			month     => $types{$2},
+			year      => $3,
+			
+			hour      => $4,
+			minute    => $5,
+			second    => $6,
+		);
+	}
+	elsif ($_[1] =~ m/^(\d\d)(\d\d)(\d\d\d\d)(\d\d)(\d\d)(\d\d)$/) {
+                $dt = DateTime->new(
+                        hour      => $4,
+                        minute    => $5,
+                        second    => $6,
+
+                        year      => $3,
+                        month     => $2,
+                        day       => $1,
+                );
+        } elsif ($_[1] =~ m/^(\d+)$/) {
+        	$dt = DateTime->from_epoch(epoch => $1);
+        } else {
+		die new WWW::Shopify::Exception("Unable to parse date " . $_[1]) unless $_[1] =~ m/(\d+)-(\d+)-(\d+)/;
 		$dt = DateTime->new(
 			year      => $1,
 			month     => $2,
@@ -485,7 +517,7 @@ sub to_shopify { return $_[1]; }
 sub from_shopify { return $_[1]; }
 
 package WWW::Shopify::Field::Freeform::Array;
-use parent 'WWW::Shopify::Field';
+use base 'WWW::Shopify::Field';
 sub sql_type { return "text"; }
 sub generate { return []; }
 sub data_type { return WWW::Shopify::Field::TYPE_QUALITATIVE; }
@@ -494,7 +526,7 @@ sub to_shopify { return $_[1]; }
 sub from_shopify { return $_[1]; }
 
 package WWW::Shopify::Field::Freeform::Hash;
-use parent 'WWW::Shopify::Field';
+use base 'WWW::Shopify::Field::Freeform';
 sub sql_type { return "text"; }
 sub generate { return {}; }
 sub data_type { return WWW::Shopify::Field::TYPE_QUALITATIVE; }

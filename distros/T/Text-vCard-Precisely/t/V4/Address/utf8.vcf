@@ -1,4 +1,4 @@
 BEGIN:VCARD
 VERSION:4.0
-ADR;TYPE=HOME,WORK:;;通り;市;都道府県;郵便番号;日本
+ADR;TYPE="HOME,WORK":;;通り;市;都道府県;郵便番号;日本
 END:VCARD

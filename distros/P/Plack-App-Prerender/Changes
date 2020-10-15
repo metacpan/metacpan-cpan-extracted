@@ -1,0 +1,19 @@
+Revision history for Plack-App-Prerender:
+
+v0.1.2    2020-10-14 15:01:42+01:00 Europe/London
+  [Bug Fixes]
+  - The User-Agent header is forwarded as X-Forwarded-User-Agent, GH#1.
+
+  - Use the minimum of Cache-Control max-age and the configured max_age
+    when caching pages, GH#2.
+
+  [Documentation]
+  - Documented the forwarded headers for the request and response
+    attributes.
+
+v0.1.1    2020-10-12 22:53:31+01:00 Europe/London
+  [Toolchain]
+  - Fixed dist.ini configuration.
+
+v0.1.0    2020-10-12 22:33:31+01:00 Europe/London
+- First version released on CPAN.

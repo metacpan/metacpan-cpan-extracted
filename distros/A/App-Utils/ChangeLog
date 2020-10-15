@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Utils
 
+0.054 2020-10-14 08:29:35 ADT
+ - documentation improvements
+ - some documentation changes in remove-empty-dirs
+
 0.053 2020-08-09 14:40:10 ADT
  - documentation improvements, changes to synchronize with the blog
    http://vlado.ca/blog/perl-app.html

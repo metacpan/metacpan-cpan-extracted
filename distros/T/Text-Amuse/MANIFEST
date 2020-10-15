@@ -190,6 +190,9 @@ t/testfiles/hyper.muse
 t/testfiles/image2.exp.html
 t/testfiles/image2.exp.ltx
 t/testfiles/image2.muse
+t/testfiles/images-rotate.exp.html
+t/testfiles/images-rotate.exp.ltx
+t/testfiles/images-rotate.muse
 t/testfiles/images.exp.html
 t/testfiles/images.exp.ltx
 t/testfiles/images.muse

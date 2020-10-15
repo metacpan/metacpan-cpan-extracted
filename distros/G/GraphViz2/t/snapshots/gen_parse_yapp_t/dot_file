@@ -2,13 +2,9 @@
  graph [ concentrate="1" rankdir="TB" ]
  node [ color="blue" shape="oval" ]
  edge [ color="grey" ]
- "$start"
- "input"
  "$start" -> "input"
- "exp"
  "exp" -> "exp"
  "input" -> "input"
- "line"
  "input" -> "line"
  "line" -> "exp"
  "$start" [ label="<port1> $start|<port2> input $end \\n" shape="Mrecord" ]

@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Generate.
 
+1.18    2020-10-13
+        - Rebuild for new PodWeaver deps (remove stale links).
+
 1.17    2018-05-24
         - Fix github link.
             - https://rt.cpan.org/Ticket/Display.html?id=125392

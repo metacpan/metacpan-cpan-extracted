@@ -10,6 +10,7 @@ use parent "WWW::Shopify::Model::NestedItem";
 
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
+	"id" => new WWW::Shopify::Field::Identifier(),
 	"address1" => new WWW::Shopify::Field::String::Address(),
 	"address2" => new WWW::Shopify::Field::String::Address(),
 	"city" => new WWW::Shopify::Field::String::City(),
@@ -25,7 +26,7 @@ BEGIN { $fields = {
 	"name" => new WWW::Shopify::Field::String::Words(1, 3),
 	"country_code" => new WWW::Shopify::Field::String::CountryCode(),
 	"province_code" => new WWW::Shopify::Field::String::ProvinceCode(),
-	"id" => new WWW::Shopify::Field::Identifier()
+	"default" => new WWW::Shopify::Field::Boolean()
 }; }
 sub plural { return 'addresses'; }
 sub parent { return undef; }

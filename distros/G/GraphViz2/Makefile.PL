@@ -23,7 +23,7 @@ sub is_dot_installed
 is_dot_installed();
 
 WriteMakefile(
-  AUTHOR => 'Ron Savage (ron@savage.net.au)',
+  AUTHOR => 'Ron Savage <ron@savage.net.au>',
   ABSTRACT => "A wrapper for AT&T's Graphviz",
   MIN_PERL_VERSION => 5.010001,
   NAME => 'GraphViz2',
@@ -36,8 +36,6 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'Test::More' => 1.001002,
-    'charnames' => 0,
-    'open' => 0,
     'Test::Snapshot' => '0.06',
   },
   VERSION_FROM => 'lib/GraphViz2.pm',
@@ -48,12 +46,12 @@ WriteMakefile(
     },
     dynamic_config => 0,
     resources => {
-      bugtracker => { web => 'https://github.com/ronsavage/GraphViz2/issues' },
+      bugtracker => { web => 'https://github.com/graphviz-perl/GraphViz2/issues' },
       license => 'http://dev.perl.org/licenses/',
       repository => {
         type => 'git',
-        url => 'https://github.com/ronsavage/GraphViz2.git',
-        web => 'https://github.com/ronsavage/GraphViz2',
+        url => 'https://github.com/graphviz-perl/GraphViz2.git',
+        web => 'https://github.com/graphviz-perl/GraphViz2',
       },
     },
     prereqs => {

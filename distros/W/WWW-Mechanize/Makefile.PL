@@ -64,10 +64,9 @@ my %WriteMakefileArgs = (
     "URI" => 0,
     "URI::Escape" => 0,
     "bytes" => 0,
-    "lib" => 0,
-    "vars" => 0
+    "lib" => 0
   },
-  "VERSION" => "2.01",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t t/local/*.t t/mech-dump/*.t"
   }
@@ -117,7 +116,6 @@ my %FallbackPrereqs = (
   "bytes" => 0,
   "lib" => 0,
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

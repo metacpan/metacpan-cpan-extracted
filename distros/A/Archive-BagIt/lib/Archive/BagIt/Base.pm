@@ -12,8 +12,9 @@ use Class::Load qw(load_class);
 use Carp;
 use POSIX qw(strftime);
 use Moo;
+with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.066'; # VERSION
+our $VERSION = '0.067'; # VERSION
 
 # ABSTRACT: The common base for Archive::BagIt. This is the module for experts. ;)
 
@@ -686,11 +687,9 @@ sub _parse_bag_info { # parses a bag-info textblob
 
         if ($textblob =~ s/(.+?)(?=^\S)//ms) {
             # value if rest string starts with chars not \r and/or \n until a non-whitespace after \r\n
-            $value =$1;
-            chomp $value;
+            $value = $self->chomp_portable($1);
         } elsif ($textblob =~ s/(.*)//s) {
-            $value = $1;
-            chomp $value;
+            $value = $self->chomp_portable($1);
         }
         if (defined $label) {
             push @labels, { "$label" => "$value" };
@@ -954,7 +953,7 @@ Archive::BagIt::Base - The common base for Archive::BagIt. This is the module fo
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 NAME
 

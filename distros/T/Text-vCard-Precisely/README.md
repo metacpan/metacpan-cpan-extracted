@@ -15,8 +15,11 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 
     use GD;
     use MIME::Base64;
+    my $gd = GD::Image->new( 100, 100 );
+    my $black = $gd->colorAllocate( 0, 0, 0 );
+    $gd->rectangle( 0, 0, 99, 99, $black );
 
-    my $img = GD->new( ... some param ... )->plot()->png();
+    my $img = $gd->png();
     my $base64 = MIME::Base64::encode($img);
 
     $vc->photo([
@@ -49,9 +52,9 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 # DESCRIPTION
 
 A vCard is a digital business card.
-vCard and [Text::vFile::asData](https://metacpan.org/pod/Text::vFile::asData) provides an API for parsing vCards
+vCard and [Text::vFile::asData](https://metacpan.org/pod/Text%3A%3AvFile%3A%3AasData) provides an API for parsing vCards
 
-This module is forked from [Text::vCard](https://metacpan.org/pod/Text::vCard)
+This module is forked from [Text::vCard](https://metacpan.org/pod/Text%3A%3AvCard)
 because some reason below:
 
 - Text::vCard **doesn't provide** full methods based on [RFC2426](https://tools.ietf.org/html/rfc2426)
@@ -59,7 +62,7 @@ because some reason below:
 - Android 4.4.x can't parse vCard4.0
 
 To handle an address book with several vCard entries in it, start with
-[Text::vFile::asData](https://metacpan.org/pod/Text::vFile::asData) and then come back to this module.
+[Text::vFile::asData](https://metacpan.org/pod/Text%3A%3AvFile%3A%3AasData) and then come back to this module.
 
 Note that the vCard RFC requires `VERSION` and `FN`.  This module does not check or warn yet if these conditions have not been met
 
@@ -304,7 +307,7 @@ I don't know well about in Android or Windows. Somebody please feedback me
 
 # For operating files with multiple vCards
 
-See [Text::vCard::Precisely::Multiple](https://metacpan.org/pod/Text::vCard::Precisely::Multiple)
+See [Text::vCard::Precisely::Multiple](https://metacpan.org/pod/Text%3A%3AvCard%3A%3APrecisely%3A%3AMultiple)
 
 # aroud UTF-8
 
@@ -322,12 +325,12 @@ This module uses `\P{ascii}` in regexp so You have to use 5.12.5 and later
 - [RFC 2426](https://tools.ietf.org/html/rfc2426)
 - [RFC 2425](https://tools.ietf.org/html/rfc2425)
 - [RFC 6350](https://tools.ietf.org/html/rfc6350)
-- [Text::vCard::Precisely::Multiple](https://metacpan.org/pod/Text::vCard::Precisely::Multiple)
-- [Text::vFile::asData](https://metacpan.org/pod/Text::vFile::asData)
+- [Text::vCard::Precisely::Multiple](https://metacpan.org/pod/Text%3A%3AvCard%3A%3APrecisely%3A%3AMultiple)
+- [Text::vFile::asData](https://metacpan.org/pod/Text%3A%3AvFile%3A%3AasData)
 
 # AUTHOR
 
-[Yuki Yoshida(worthmine)](https://github.com/worthmine)
+Yuki Yoshida([worthmine](https://github.com/worthmine))
 
 # LICENSE
 

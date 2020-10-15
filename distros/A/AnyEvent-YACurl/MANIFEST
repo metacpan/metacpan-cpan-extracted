@@ -13,8 +13,8 @@ lib/AnyEvent/YACurl.pm
 ppport.h
 t/AnyEvent-YACurl.t
 curl-src/maketgz
+curl-src/winbuild/README.md
 curl-src/winbuild/gen_resp_file.bat
-curl-src/winbuild/BUILD.WINDOWS.txt
 curl-src/winbuild/Makefile.vc
 curl-src/winbuild/MakefileBuild.vc
 curl-src/src/tool_xattr.c
@@ -95,7 +95,6 @@ curl-src/src/tool_cb_rea.c
 curl-src/src/tool_main.h
 curl-src/src/tool_paramhlp.c
 curl-src/src/tool_cb_see.h
-curl-src/src/Makefile.Watcom
 curl-src/src/tool_urlglob.h
 curl-src/src/tool_getparam.h
 curl-src/src/tool_easysrc.h
@@ -122,9 +121,12 @@ curl-src/CMake/FindLibSSH2.cmake
 curl-src/CMake/FindWolfSSL.cmake
 curl-src/CMake/Macros.cmake
 curl-src/CMake/curl-config.cmake.in
+curl-src/CMake/FindBrotli.cmake
 curl-src/CMake/CurlTests.c
 curl-src/CMake/Utilities.cmake
 curl-src/CMake/FindNGHTTP3.cmake
+curl-src/CMake/FindZstd.cmake
+curl-src/CMake/FindNSS.cmake
 curl-src/CMake/FindGSS.cmake
 curl-src/CMake/FindNGHTTP2.cmake
 curl-src/CMake/CurlSymbolHiding.cmake
@@ -138,16 +140,6 @@ curl-src/CMake/FindQUICHE.cmake
 curl-src/CMake/cmake_uninstall.cmake.in
 curl-src/packages/Android/Android.mk
 curl-src/packages/Makefile.in
-curl-src/packages/Symbian/eabi/libcurlu.def
-curl-src/packages/Symbian/readme.txt
-curl-src/packages/Symbian/bwins/libcurlu.def
-curl-src/packages/Symbian/group/bld.inf
-curl-src/packages/Symbian/group/curl.iby
-curl-src/packages/Symbian/group/curl.mmp
-curl-src/packages/Symbian/group/libcurl.mmp
-curl-src/packages/Symbian/group/curl.pkg
-curl-src/packages/Symbian/group/libcurl.iby
-curl-src/packages/Symbian/group/libcurl.pkg
 curl-src/packages/DOS/common.dj
 curl-src/packages/DOS/README
 curl-src/packages/vms/make_pcsi_curl_kit_name.com
@@ -207,9 +199,9 @@ curl-src/packages/Makefile.am
 curl-src/packages/README
 curl-src/test-driver
 curl-src/buildconf
+curl-src/include/README.md
 curl-src/include/Makefile.in
 curl-src/include/Makefile.am
-curl-src/include/README
 curl-src/include/curl/typecheck-gcc.h
 curl-src/include/curl/multi.h
 curl-src/include/curl/curl.h
@@ -217,6 +209,7 @@ curl-src/include/curl/urlapi.h
 curl-src/include/curl/mprintf.h
 curl-src/include/curl/Makefile.in
 curl-src/include/curl/stdcheaders.h
+curl-src/include/curl/options.h
 curl-src/include/curl/easy.h
 curl-src/include/curl/Makefile.am
 curl-src/include/curl/curlver.h
@@ -317,6 +310,7 @@ curl-src/tests/data/test1298
 curl-src/tests/data/test2059
 curl-src/tests/data/test201
 curl-src/tests/data/test255
+curl-src/tests/data/test1465
 curl-src/tests/data/test228
 curl-src/tests/data/test1449
 curl-src/tests/data/test1236
@@ -332,9 +326,11 @@ curl-src/tests/data/test1553
 curl-src/tests/data/test1223
 curl-src/tests/data/test2019
 curl-src/tests/data/test336
+curl-src/tests/data/test3011
 curl-src/tests/data/test803
 curl-src/tests/data/test1226
 curl-src/tests/data/test1116
+curl-src/tests/data/test1297
 curl-src/tests/data/test343
 curl-src/tests/data/test598
 curl-src/tests/data/test533
@@ -344,6 +340,7 @@ curl-src/tests/data/test646
 curl-src/tests/data/test917
 curl-src/tests/data/test1033
 curl-src/tests/data/test3006
+curl-src/tests/data/test674
 curl-src/tests/data/test303
 curl-src/tests/data/test1208
 curl-src/tests/data/test332
@@ -393,7 +390,6 @@ curl-src/tests/data/test1056
 curl-src/tests/data/test637
 curl-src/tests/data/test1400
 curl-src/tests/data/test1503
-curl-src/tests/data/test1903
 curl-src/tests/data/test923
 curl-src/tests/data/test1303
 curl-src/tests/data/test1532
@@ -408,6 +404,7 @@ curl-src/tests/data/test350
 curl-src/tests/data/test67
 curl-src/tests/data/test1148
 curl-src/tests/data/test1518
+curl-src/tests/data/test396
 curl-src/tests/data/test1500
 curl-src/tests/data/test539
 curl-src/tests/data/test160
@@ -463,6 +460,7 @@ curl-src/tests/data/test148
 curl-src/tests/data/test327
 curl-src/tests/data/test28
 curl-src/tests/data/test1163
+curl-src/tests/data/test397
 curl-src/tests/data/test1202
 curl-src/tests/data/test532
 curl-src/tests/data/test2007
@@ -525,6 +523,7 @@ curl-src/tests/data/test1380
 curl-src/tests/data/test1062
 curl-src/tests/data/test1249
 curl-src/tests/data/test1039
+curl-src/tests/data/test3012
 curl-src/tests/data/test1082
 curl-src/tests/data/test1080
 curl-src/tests/data/test653
@@ -549,7 +548,6 @@ curl-src/tests/data/test2021
 curl-src/tests/data/test140
 curl-src/tests/data/test1361
 curl-src/tests/data/test1155
-curl-src/tests/data/test530
 curl-src/tests/data/test196
 curl-src/tests/data/test1168
 curl-src/tests/data/test149
@@ -656,7 +654,6 @@ curl-src/tests/data/test1612
 curl-src/tests/data/test15
 curl-src/tests/data/test2037
 curl-src/tests/data/test585
-curl-src/tests/data/test1541
 curl-src/tests/data/test254
 curl-src/tests/data/test2053
 curl-src/tests/data/test1206
@@ -667,10 +664,12 @@ curl-src/tests/data/test1233
 curl-src/tests/data/test856
 curl-src/tests/data/test100
 curl-src/tests/data/test895
+curl-src/tests/data/test1461
 curl-src/tests/data/test575
 curl-src/tests/data/test46
 curl-src/tests/data/test2056
 curl-src/tests/data/test1538
+curl-src/tests/data/test3015
 curl-src/tests/data/test405
 curl-src/tests/data/test1008
 curl-src/tests/data/test187
@@ -709,6 +708,7 @@ curl-src/tests/data/test1316
 curl-src/tests/data/test579
 curl-src/tests/data/test115
 curl-src/tests/data/test947
+curl-src/tests/data/test1567
 curl-src/tests/data/test431
 curl-src/tests/data/test99
 curl-src/tests/data/test643
@@ -759,6 +759,7 @@ curl-src/tests/data/test1156
 curl-src/tests/data/test640
 curl-src/tests/data/test1229
 curl-src/tests/data/test1600
+curl-src/tests/data/test1913
 curl-src/tests/data/test209
 curl-src/tests/data/test1081
 curl-src/tests/data/test1019
@@ -766,10 +767,13 @@ curl-src/tests/data/test491
 curl-src/tests/data/test1370
 curl-src/tests/data/test61
 curl-src/tests/data/test1432
+curl-src/tests/data/test3008
 curl-src/tests/data/test607
 curl-src/tests/data/test1700
 curl-src/tests/data/test1426
 curl-src/tests/data/test2055
+curl-src/tests/data/test1914
+curl-src/tests/data/test3013
 curl-src/tests/data/test220
 curl-src/tests/data/test346
 curl-src/tests/data/test716
@@ -788,12 +792,14 @@ curl-src/tests/data/test2073
 curl-src/tests/data/test882
 curl-src/tests/data/test400
 curl-src/tests/data/test330
+curl-src/tests/data/test433
 curl-src/tests/data/test823
 curl-src/tests/data/test502
 curl-src/tests/data/test120
 curl-src/tests/data/test58
 curl-src/tests/data/test165
 curl-src/tests/data/test953
+curl-src/tests/data/test3010
 curl-src/tests/data/test2069
 curl-src/tests/data/test176
 curl-src/tests/data/test1213
@@ -879,6 +885,7 @@ curl-src/tests/data/test844
 curl-src/tests/data/test943
 curl-src/tests/data/test934
 curl-src/tests/data/test1563
+curl-src/tests/data/test3014
 curl-src/tests/data/test260
 curl-src/tests/data/test1456
 curl-src/tests/data/test924
@@ -925,6 +932,7 @@ curl-src/tests/data/test900
 curl-src/tests/data/test1302
 curl-src/tests/data/test2064
 curl-src/tests/data/test563
+curl-src/tests/data/test1197
 curl-src/tests/data/test906
 curl-src/tests/data/test821
 curl-src/tests/data/test970
@@ -947,6 +955,7 @@ curl-src/tests/data/test334
 curl-src/tests/data/test276
 curl-src/tests/data/test928
 curl-src/tests/data/test1012
+curl-src/tests/data/test1464
 curl-src/tests/data/test1555
 curl-src/tests/data/test1328
 curl-src/tests/data/test123
@@ -982,6 +991,7 @@ curl-src/tests/data/test395
 curl-src/tests/data/test1157
 curl-src/tests/data/test1412
 curl-src/tests/data/test1034
+curl-src/tests/data/test3009
 curl-src/tests/data/test595
 curl-src/tests/data/test358
 curl-src/tests/data/test845
@@ -1193,7 +1203,6 @@ curl-src/tests/data/test937
 curl-src/tests/data/test1177
 curl-src/tests/data/test664
 curl-src/tests/data/test1064
-curl-src/tests/data/test584
 curl-src/tests/data/test301
 curl-src/tests/data/test908
 curl-src/tests/data/test72
@@ -1226,7 +1235,6 @@ curl-src/tests/data/test1102
 curl-src/tests/data/test1559
 curl-src/tests/data/test1099
 curl-src/tests/data/test88
-curl-src/tests/data/test1900
 curl-src/tests/data/test826
 curl-src/tests/data/test1551
 curl-src/tests/data/test1450
@@ -1257,6 +1265,7 @@ curl-src/tests/data/test180
 curl-src/tests/data/test549
 curl-src/tests/data/test1281
 curl-src/tests/data/test79
+curl-src/tests/data/test1463
 curl-src/tests/data/test26
 curl-src/tests/data/test608
 curl-src/tests/data/test559
@@ -1277,7 +1286,6 @@ curl-src/tests/data/test1129
 curl-src/tests/data/test707
 curl-src/tests/data/test271
 curl-src/tests/data/test1295
-curl-src/tests/data/test1902
 curl-src/tests/data/test1310
 curl-src/tests/data/test930
 curl-src/tests/data/test1167
@@ -1287,6 +1295,7 @@ curl-src/tests/data/test574
 curl-src/tests/data/test82
 curl-src/tests/data/test1030
 curl-src/tests/data/test1029
+curl-src/tests/data/test1462
 curl-src/tests/data/test862
 curl-src/tests/data/test527
 curl-src/tests/data/test901
@@ -1305,6 +1314,7 @@ curl-src/tests/data/test572
 curl-src/tests/data/test708
 curl-src/tests/data/test2048
 curl-src/tests/data/test285
+curl-src/tests/data/test347
 curl-src/tests/data/test144
 curl-src/tests/data/test1371
 curl-src/tests/data/DISABLED
@@ -1375,6 +1385,7 @@ curl-src/tests/data/test69
 curl-src/tests/data/test1395
 curl-src/tests/data/test181
 curl-src/tests/data/test1317
+curl-src/tests/data/test434
 curl-src/tests/data/test354
 curl-src/tests/data/test223
 curl-src/tests/data/test243
@@ -1472,7 +1483,6 @@ curl-src/tests/data/test1216
 curl-src/tests/data/test1537
 curl-src/tests/data/test1201
 curl-src/tests/data/test625
-curl-src/tests/data/test2033
 curl-src/tests/data/test714
 curl-src/tests/data/test2062
 curl-src/tests/data/test1355
@@ -1480,6 +1490,7 @@ curl-src/tests/data/test938
 curl-src/tests/data/test849
 curl-src/tests/data/test128
 curl-src/tests/data/test250
+curl-src/tests/data/test348
 curl-src/tests/data/test552
 curl-src/tests/data/test2045
 curl-src/tests/data/test292
@@ -1490,6 +1501,7 @@ curl-src/tests/data/test1335
 curl-src/tests/data/test613
 curl-src/tests/data/test1254
 curl-src/tests/data/test430
+curl-src/tests/data/test1912
 curl-src/tests/data/test1318
 curl-src/tests/data/test5
 curl-src/tests/data/test1352
@@ -1522,7 +1534,6 @@ curl-src/tests/data/test137
 curl-src/tests/data/test1365
 curl-src/tests/data/test288
 curl-src/tests/data/test2067
-curl-src/tests/data/test1901
 curl-src/tests/data/test1632
 curl-src/tests/data/test1023
 curl-src/tests/data/test2076
@@ -1592,6 +1603,7 @@ curl-src/tests/data/test631
 curl-src/tests/data/test955
 curl-src/tests/data/test703
 curl-src/tests/data/test971
+curl-src/tests/data/test1911
 curl-src/tests/data/test1166
 curl-src/tests/data/test1324
 curl-src/tests/http2-server.pl
@@ -1601,6 +1613,7 @@ curl-src/tests/options-scan.pl
 curl-src/tests/sshserver.pl
 curl-src/tests/httpserver.pl
 curl-src/tests/runtests.pl
+curl-src/tests/README.md
 curl-src/tests/CMakeLists.txt
 curl-src/tests/FILEFORMAT.md
 curl-src/tests/server/tftpd.c
@@ -1639,6 +1652,7 @@ curl-src/tests/unit/unit1612.c
 curl-src/tests/unit/unit1394.c
 curl-src/tests/unit/unit1603.c
 curl-src/tests/unit/unit1309.c
+curl-src/tests/unit/README.md
 curl-src/tests/unit/CMakeLists.txt
 curl-src/tests/unit/unit1655.c
 curl-src/tests/unit/unit1608.c
@@ -1668,7 +1682,6 @@ curl-src/tests/unit/unit1602.c
 curl-src/tests/unit/unit1307.c
 curl-src/tests/unit/Makefile.am
 curl-src/tests/unit/unit1302.c
-curl-src/tests/unit/README
 curl-src/tests/unit/unit1651.c
 curl-src/tests/testcurl.pl
 curl-src/tests/valgrind.supp
@@ -1712,6 +1725,7 @@ curl-src/tests/libtest/lib1560.c
 curl-src/tests/libtest/lib504.c
 curl-src/tests/libtest/lib1533.c
 curl-src/tests/libtest/lib578.c
+curl-src/tests/libtest/lib1912.c
 curl-src/tests/libtest/lib1502.c
 curl-src/tests/libtest/lib643.c
 curl-src/tests/libtest/lib517.c
@@ -1721,7 +1735,6 @@ curl-src/tests/libtest/lib1537.c
 curl-src/tests/libtest/lib1510.c
 curl-src/tests/libtest/lib1506.c
 curl-src/tests/libtest/lib1529.c
-curl-src/tests/libtest/lib1541.c
 curl-src/tests/libtest/lib1527.c
 curl-src/tests/libtest/lib1592.c
 curl-src/tests/libtest/lib525.c
@@ -1736,6 +1749,7 @@ curl-src/tests/libtest/mk-lib1521.pl
 curl-src/tests/libtest/lib540.c
 curl-src/tests/libtest/lib652.c
 curl-src/tests/libtest/lib591.c
+curl-src/tests/libtest/lib1911.c
 curl-src/tests/libtest/lib544.c
 curl-src/tests/libtest/test307.pl
 curl-src/tests/libtest/lib1540.c
@@ -1750,7 +1764,6 @@ curl-src/tests/libtest/lib553.c
 curl-src/tests/libtest/lib1523.c
 curl-src/tests/libtest/lib1564.c
 curl-src/tests/libtest/lib520.c
-curl-src/tests/libtest/lib1900.c
 curl-src/tests/libtest/lib519.c
 curl-src/tests/libtest/lib1514.c
 curl-src/tests/libtest/Makefile.in
@@ -1782,6 +1795,7 @@ curl-src/tests/libtest/lib1528.c
 curl-src/tests/libtest/lib1550.c
 curl-src/tests/libtest/test610.pl
 curl-src/tests/libtest/Makefile.inc
+curl-src/tests/libtest/lib1567.c
 curl-src/tests/libtest/lib583.c
 curl-src/tests/libtest/lib516.c
 curl-src/tests/libtest/lib1558.c
@@ -1805,6 +1819,7 @@ curl-src/tests/libtest/test613.pl
 curl-src/tests/libtest/lib549.c
 curl-src/tests/libtest/lib1905.c
 curl-src/tests/libtest/test1013.pl
+curl-src/tests/libtest/lib1913.c
 curl-src/tests/libtest/testtrace.h
 curl-src/tests/libtest/lib1555.c
 curl-src/tests/libtest/lib1512.c
@@ -1820,6 +1835,7 @@ curl-src/tests/libtest/lib559.c
 curl-src/tests/libtest/sethostname.h
 curl-src/tests/libtest/stub_gssapi.c
 curl-src/tests/libtest/lib512.c
+curl-src/tests/libtest/lib674.c
 curl-src/tests/libtest/lib562.c
 curl-src/tests/libtest/lib501.c
 curl-src/tests/libtest/lib1910.c
@@ -1828,10 +1844,10 @@ curl-src/tests/libtest/lib500.c
 curl-src/tests/libtest/lib526.c
 curl-src/tests/libtest/lib568.c
 curl-src/tests/libtest/lib658.c
+curl-src/tests/libtest/lib3010.c
 curl-src/tests/libtest/lib507.c
 curl-src/tests/libtest/lib661.c
 curl-src/tests/libtest/lib651.c
-curl-src/tests/libtest/lib530.c
 curl-src/tests/libtest/lib1565.c
 curl-src/tests/libtest/lib513.c
 curl-src/tests/libtest/lib567.c
@@ -1922,7 +1938,6 @@ curl-src/tests/memanalyze.pl
 curl-src/tests/manpage-syntax.pl
 curl-src/tests/ftpserver.pl
 curl-src/tests/testcurl.1
-curl-src/tests/README
 curl-src/CMakeLists.txt
 curl-src/config.sub
 curl-src/scripts/updatemanpages.pl
@@ -1936,10 +1951,8 @@ curl-src/curl-config.in
 curl-src/docs/CODE_STYLE.md
 curl-src/docs/curl.1
 curl-src/docs/CHECKSRC.md
-curl-src/docs/ESNI.md
 curl-src/docs/FAQ
 curl-src/docs/DEPRECATE.md
-curl-src/docs/RESOURCES
 curl-src/docs/HELP-US.md
 curl-src/docs/INTERNALS.md
 curl-src/docs/RELEASE-PROCEDURE.md
@@ -1950,6 +1963,7 @@ curl-src/docs/PARALLEL-TRANSFERS.md
 curl-src/docs/KNOWN_BUGS
 curl-src/docs/README.md
 curl-src/docs/CMakeLists.txt
+curl-src/docs/BUGS.md
 curl-src/docs/SSLCERTS.md
 curl-src/docs/THANKS
 curl-src/docs/cmdline-opts/socks4a.d
@@ -1963,6 +1977,7 @@ curl-src/docs/cmdline-opts/remote-name-all.d
 curl-src/docs/cmdline-opts/socks5-gssapi.d
 curl-src/docs/cmdline-opts/proxy-basic.d
 curl-src/docs/cmdline-opts/cacert.d
+curl-src/docs/cmdline-opts/curves.d
 curl-src/docs/cmdline-opts/socks5.d
 curl-src/docs/cmdline-opts/tftp-blksize.d
 curl-src/docs/cmdline-opts/page-footer
@@ -1974,6 +1989,7 @@ curl-src/docs/cmdline-opts/trace.d
 curl-src/docs/cmdline-opts/sasl-ir.d
 curl-src/docs/cmdline-opts/url.d
 curl-src/docs/cmdline-opts/append.d
+curl-src/docs/cmdline-opts/output-dir.d
 curl-src/docs/cmdline-opts/ntlm.d
 curl-src/docs/cmdline-opts/ciphers.d
 curl-src/docs/cmdline-opts/ftp-ssl-control.d
@@ -2220,6 +2236,7 @@ curl-src/docs/examples/multi-app.c
 curl-src/docs/examples/cacertinmem.c
 curl-src/docs/examples/crawler.c
 curl-src/docs/examples/imap-list.c
+curl-src/docs/examples/README.md
 curl-src/docs/examples/simplessl.c
 curl-src/docs/examples/fopen.c
 curl-src/docs/examples/pop3-uidl.c
@@ -2309,7 +2326,6 @@ curl-src/docs/examples/ftpgetresp.c
 curl-src/docs/examples/pop3-dele.c
 curl-src/docs/examples/pop3-stat.c
 curl-src/docs/examples/smtp-vrfy.c
-curl-src/docs/examples/README
 curl-src/docs/examples/imap-store.c
 curl-src/docs/examples/makefile.dj
 curl-src/docs/examples/pop3-authzid.c
@@ -2317,11 +2333,11 @@ curl-src/docs/examples/anyauthput.c
 curl-src/docs/examples/sessioninfo.c
 curl-src/docs/examples/pop3-list.c
 curl-src/docs/mk-ca-bundle.1
-curl-src/docs/LICENSE-MIXING.md
-curl-src/docs/TheArtOfHttpScripting
+curl-src/docs/ECH.md
 curl-src/docs/MQTT.md
 curl-src/docs/GOVERNANCE.md
 curl-src/docs/SSL-PROBLEMS.md
+curl-src/docs/TheArtOfHttpScripting.md
 curl-src/docs/HTTP3.md
 curl-src/docs/FEATURES
 curl-src/docs/Makefile.in
@@ -2349,6 +2365,7 @@ curl-src/docs/libcurl/symbols.h
 curl-src/docs/libcurl/curl_mime_addpart.3
 curl-src/docs/libcurl/symbols-in-versions
 curl-src/docs/libcurl/curl_strnequal.3
+curl-src/docs/libcurl/curl_easy_option_next.3
 curl-src/docs/libcurl/curl_mime_headers.3
 curl-src/docs/libcurl/curl_multi_assign.3
 curl-src/docs/libcurl/curl_mime_name.3
@@ -2361,6 +2378,7 @@ curl-src/docs/libcurl/libcurl.m4
 curl-src/docs/libcurl/libcurl-multi.3
 curl-src/docs/libcurl/curl_formget.3
 curl-src/docs/libcurl/curl_multi_poll.3
+curl-src/docs/libcurl/curl_easy_option_by_id.3
 curl-src/docs/libcurl/curl_slist_free_all.3
 curl-src/docs/libcurl/curl_formadd.3
 curl-src/docs/libcurl/libcurl-thread.3
@@ -2386,6 +2404,7 @@ curl-src/docs/libcurl/curl_multi_socket_all.3
 curl-src/docs/libcurl/Makefile.in
 curl-src/docs/libcurl/curl_mprintf.3
 curl-src/docs/libcurl/curl_share_cleanup.3
+curl-src/docs/libcurl/curl_easy_option_by_name.3
 curl-src/docs/libcurl/libcurl-url.3
 curl-src/docs/libcurl/curl_easy_pause.3
 curl-src/docs/libcurl/curl_multi_strerror.3
@@ -2427,6 +2446,7 @@ curl-src/docs/libcurl/opts/CURLINFO_APPCONNECT_TIME.3
 curl-src/docs/libcurl/opts/CURLINFO_LOCAL_PORT.3
 curl-src/docs/libcurl/opts/CURLOPT_SSLVERSION.3
 curl-src/docs/libcurl/opts/CURLOPT_XOAUTH2_BEARER.3
+curl-src/docs/libcurl/opts/CURLINFO_PROXY_ERROR.3
 curl-src/docs/libcurl/opts/CURLOPT_MAIL_FROM.3
 curl-src/docs/libcurl/opts/CURLOPT_HTTPPOST.3
 curl-src/docs/libcurl/opts/CURLINFO_SPEED_UPLOAD.3
@@ -2556,6 +2576,7 @@ curl-src/docs/libcurl/opts/CURLINFO_SIZE_UPLOAD.3
 curl-src/docs/libcurl/opts/CURLINFO_REDIRECT_TIME.3
 curl-src/docs/libcurl/opts/CURLOPT_PIPEWAIT.3
 curl-src/docs/libcurl/opts/CURLOPT_CONV_FROM_UTF8_FUNCTION.3
+curl-src/docs/libcurl/opts/CURLOPT_SSL_EC_CURVES.3
 curl-src/docs/libcurl/opts/CURLINFO_CONTENT_LENGTH_UPLOAD.3
 curl-src/docs/libcurl/opts/CURLOPT_CRLF.3
 curl-src/docs/libcurl/opts/CURLOPT_HTTP_VERSION.3
@@ -2714,6 +2735,7 @@ curl-src/docs/libcurl/opts/CURLOPT_INTERLEAVEDATA.3
 curl-src/docs/libcurl/opts/CURLOPT_SSLCERTTYPE.3
 curl-src/docs/libcurl/opts/CURLOPT_NOPROGRESS.3
 curl-src/docs/libcurl/opts/CURLOPT_PROXY_SSLCERT_BLOB.3
+curl-src/docs/libcurl/opts/CURLINFO_EFFECTIVE_METHOD.3
 curl-src/docs/libcurl/opts/CURLINFO_CONNECT_TIME.3
 curl-src/docs/libcurl/opts/CURLOPT_SSH_PUBLIC_KEYFILE.3
 curl-src/docs/libcurl/opts/CURLOPT_SOCKS5_GSSAPI_NEC.3
@@ -2787,7 +2809,6 @@ curl-src/docs/libcurl/curl_easy_cleanup.3
 curl-src/docs/libcurl/curl_easy_recv.3
 curl-src/docs/CODE_REVIEW.md
 curl-src/docs/BUG-BOUNTY.md
-curl-src/docs/BUGS
 curl-src/docs/DYNBUF.md
 curl-src/docs/MAIL-ETIQUETTE
 curl-src/docs/ALTSVC.md
@@ -2814,6 +2835,7 @@ curl-src/lib/http_chunks.c
 curl-src/lib/dotdot.h
 curl-src/lib/escape.c
 curl-src/lib/altsvc.h
+curl-src/lib/version_win32.c
 curl-src/lib/strtoofft.h
 curl-src/lib/url.c
 curl-src/lib/base64.c
@@ -2860,7 +2882,6 @@ curl-src/lib/idn_win32.c
 curl-src/lib/gopher.c
 curl-src/lib/Makefile.vxworks
 curl-src/lib/curl_config.h.in
-curl-src/lib/curl_sec.h
 curl-src/lib/asyn.h
 curl-src/lib/http_chunks.h
 curl-src/lib/curl_sasl.c
@@ -2870,6 +2891,7 @@ curl-src/lib/progress.h
 curl-src/lib/psl.h
 curl-src/lib/x509asn1.h
 curl-src/lib/slist.c
+curl-src/lib/curl_krb5.h
 curl-src/lib/setopt.h
 curl-src/lib/curl_ldap.h
 curl-src/lib/vtls/wolfssl.h
@@ -3032,6 +3054,7 @@ curl-src/lib/Makefile.inc
 curl-src/lib/doh.c
 curl-src/lib/curl_ntlm_wb.c
 curl-src/lib/curl_path.h
+curl-src/lib/easygetopt.c
 curl-src/lib/hostcheck.c
 curl-src/lib/ldap.c
 curl-src/lib/system_win32.h
@@ -3047,11 +3070,10 @@ curl-src/lib/vssh/libssh2.c
 curl-src/lib/conncache.h
 curl-src/lib/nonblock.h
 curl-src/lib/splay.c
-curl-src/lib/config-symbian.h
-curl-src/lib/security.c
 curl-src/lib/smb.h
 curl-src/lib/krb5.c
 curl-src/lib/progress.c
+curl-src/lib/easyoptions.c
 curl-src/lib/curl_range.c
 curl-src/lib/libcurl.plist
 curl-src/lib/curl_endian.c
@@ -3060,12 +3082,12 @@ curl-src/lib/strcase.h
 curl-src/lib/inet_ntop.c
 curl-src/lib/setup-vms.h
 curl-src/lib/timeval.c
-curl-src/lib/Makefile.Watcom
 curl-src/lib/asyn-ares.c
 curl-src/lib/rtsp.c
 curl-src/lib/sha256.c
 curl-src/lib/curl_threads.c
 curl-src/lib/easy.c
+curl-src/lib/version_win32.h
 curl-src/lib/firefox-db2pem.sh
 curl-src/lib/dotdot.c
 curl-src/lib/libcurl.rc
@@ -3105,6 +3127,7 @@ curl-src/lib/config-tpf.h
 curl-src/lib/fileinfo.h
 curl-src/lib/urlapi.c
 curl-src/lib/strcase.c
+curl-src/lib/easyoptions.h
 curl-src/lib/sendf.c
 curl-src/lib/config-amigaos.h
 curl-src/lib/http.c
@@ -4109,106 +4132,5 @@ c-ares-src/ares_set_sortlist.3
 c-ares-src/ares_getenv.h
 c-ares-src/Makefile.dj
 c-ares-src/ares_parse_txt_reply.3
-libbrotli-src/AUTHORS
-libbrotli-src/libbrotlienc.pc.in
-libbrotli-src/config.sub
-libbrotli-src/missing
-libbrotli-src/configure.ac
-libbrotli-src/m4/ltoptions.m4
-libbrotli-src/m4/ltsugar.m4
-libbrotli-src/m4/libtool.m4
-libbrotli-src/m4/ltversion.m4
-libbrotli-src/m4/lt~obsolete.m4
-libbrotli-src/depcomp
-libbrotli-src/config.guess
-libbrotli-src/Makefile.in
-libbrotli-src/compile
-libbrotli-src/configure
-libbrotli-src/libbrotlidec.pc.in
-libbrotli-src/aclocal.m4
-libbrotli-src/Makefile.am
-libbrotli-src/brotli/c/enc/backward_references.c
-libbrotli-src/brotli/c/enc/block_encoder_inc.h
-libbrotli-src/brotli/c/enc/write_bits.h
-libbrotli-src/brotli/c/enc/entropy_encode.h
-libbrotli-src/brotli/c/enc/hash_to_binary_tree_inc.h
-libbrotli-src/brotli/c/enc/histogram.c
-libbrotli-src/brotli/c/enc/cluster.c
-libbrotli-src/brotli/c/enc/hash_longest_match64_inc.h
-libbrotli-src/brotli/c/enc/bit_cost.h
-libbrotli-src/brotli/c/enc/static_dict_lut.h
-libbrotli-src/brotli/c/enc/compress_fragment_two_pass.c
-libbrotli-src/brotli/c/enc/memory.h
-libbrotli-src/brotli/c/enc/hash_longest_match_inc.h
-libbrotli-src/brotli/c/enc/hash_longest_match_quickly_inc.h
-libbrotli-src/brotli/c/enc/entropy_encode.c
-libbrotli-src/brotli/c/enc/port.h
-libbrotli-src/brotli/c/enc/metablock_inc.h
-libbrotli-src/brotli/c/enc/literal_cost.h
-libbrotli-src/brotli/c/enc/bit_cost.c
-libbrotli-src/brotli/c/enc/memory.c
-libbrotli-src/brotli/c/enc/static_dict.h
-libbrotli-src/brotli/c/enc/backward_references_hq.c
-libbrotli-src/brotli/c/enc/backward_references.h
-libbrotli-src/brotli/c/enc/brotli_bit_stream.h
-libbrotli-src/brotli/c/enc/dictionary_hash.c
-libbrotli-src/brotli/c/enc/block_splitter_inc.h
-libbrotli-src/brotli/c/enc/dictionary_hash.h
-libbrotli-src/brotli/c/enc/compress_fragment_two_pass.h
-libbrotli-src/brotli/c/enc/context.h
-libbrotli-src/brotli/c/enc/prefix.h
-libbrotli-src/brotli/c/enc/entropy_encode_static.h
-libbrotli-src/brotli/c/enc/block_splitter.c
-libbrotli-src/brotli/c/enc/compress_fragment.h
-libbrotli-src/brotli/c/enc/compress_fragment.c
-libbrotli-src/brotli/c/enc/cluster_inc.h
-libbrotli-src/brotli/c/enc/literal_cost.c
-libbrotli-src/brotli/c/enc/block_splitter.h
-libbrotli-src/brotli/c/enc/brotli_bit_stream.c
-libbrotli-src/brotli/c/enc/metablock.h
-libbrotli-src/brotli/c/enc/cluster.h
-libbrotli-src/brotli/c/enc/backward_references_inc.h
-libbrotli-src/brotli/c/enc/fast_log.h
-libbrotli-src/brotli/c/enc/quality.h
-libbrotli-src/brotli/c/enc/hash.h
-libbrotli-src/brotli/c/enc/histogram.h
-libbrotli-src/brotli/c/enc/hash_forgetful_chain_inc.h
-libbrotli-src/brotli/c/enc/bit_cost_inc.h
-libbrotli-src/brotli/c/enc/encode.c
-libbrotli-src/brotli/c/enc/ringbuffer.h
-libbrotli-src/brotli/c/enc/histogram_inc.h
-libbrotli-src/brotli/c/enc/backward_references_hq.h
-libbrotli-src/brotli/c/enc/static_dict.c
-libbrotli-src/brotli/c/enc/command.h
-libbrotli-src/brotli/c/enc/utf8_util.c
-libbrotli-src/brotli/c/enc/metablock.c
-libbrotli-src/brotli/c/enc/find_match_length.h
-libbrotli-src/brotli/c/enc/utf8_util.h
-libbrotli-src/brotli/c/include/brotli/port.h
-libbrotli-src/brotli/c/include/brotli/types.h
-libbrotli-src/brotli/c/include/brotli/decode.h
-libbrotli-src/brotli/c/include/brotli/encode.h
-libbrotli-src/brotli/c/dec/decode.c
-libbrotli-src/brotli/c/dec/transform.h
-libbrotli-src/brotli/c/dec/port.h
-libbrotli-src/brotli/c/dec/bit_reader.c
-libbrotli-src/brotli/c/dec/bit_reader.h
-libbrotli-src/brotli/c/dec/context.h
-libbrotli-src/brotli/c/dec/prefix.h
-libbrotli-src/brotli/c/dec/huffman.h
-libbrotli-src/brotli/c/dec/huffman.c
-libbrotli-src/brotli/c/dec/state.c
-libbrotli-src/brotli/c/dec/state.h
-libbrotli-src/brotli/c/common/dictionary.c
-libbrotli-src/brotli/c/common/dictionary.h
-libbrotli-src/brotli/c/common/version.h
-libbrotli-src/brotli/c/common/constants.h
-libbrotli-src/ltmain.sh
-libbrotli-src/tools/Makefile.in
-libbrotli-src/tools/brotli.c
-libbrotli-src/tools/Makefile.am
-libbrotli-src/config.h.in
-libbrotli-src/README
-libbrotli-src/install-sh
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

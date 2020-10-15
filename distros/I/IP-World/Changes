@@ -1,5 +1,9 @@
 releases by David Cantrell:
 
+0.42  2020-10-13  Fix licencing issues;
+                  Deprecate
+                  See https://github.com/DrHyde/perl-modules-IP-World/issues/2
+
 0.41  2020-10-12  Fix build failures with XCode 12
 
 0.40  2019-01-11  MaxMind's GeoLite database has been discontinued,

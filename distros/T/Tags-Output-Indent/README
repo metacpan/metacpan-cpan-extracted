@@ -12,155 +12,174 @@ SYNOPSIS
      $tags->reset;
 
 METHODS
-    "new(%params)"
-             Constructor
+  "new"
+     my $tags = Tags::Output::Indent->new;
 
-            *       "attr_callback"
+    Constructor.
 
-                     Subroutine for output processing of attribute key and value.
-                     Input argument is reference to array.
-                     Default value is &Tags::Utils::encode_attr_entities.
-                     Example is similar as 'data_callback'.
+    Returns instance of class.
 
-            *       "attr_delimeter"
+    *       "attr_callback"
 
-                     String, that defines attribute delimeter.
-                     Default is '"'.
-                     Possible is '"' or "'".
+             Subroutine for output processing of attribute key and value.
+             Input argument is reference to array.
+             Default value is &Tags::Utils::encode_attr_entities.
+             Example is similar as 'data_callback'.
 
-                     Example:
-                     Prints <tag attr='val' /> instead default <tag attr="val" />
+    *       "attr_delimeter"
 
-                     my $tags = Tags::Output::Indent->new(
-                             'attr_delimeter' => "'",
-                     );
-                     $tags->put(
-                             ['b', 'tag'],
-                             ['a', 'attr', 'val'],
-                             ['e', 'tag'],
-                     );
-                     $tags->flush;
+             String, that defines attribute delimeter.
+             Default is '"'.
+             Possible is '"' or "'".
 
-            *       "auto_flush"
+             Example:
+             Prints <tag attr='val' /> instead default <tag attr="val" />
 
-                     Auto flush flag.
-                     Default is 0.
+             my $tags = Tags::Output::Indent->new(
+                     'attr_delimeter' => "'",
+             );
+             $tags->put(
+                     ['b', 'tag'],
+                     ['a', 'attr', 'val'],
+                     ['e', 'tag'],
+             );
+             $tags->flush;
 
-            *       "cdata_indent"
+    *       "auto_flush"
 
-                     Flag, that means indent CDATA section.
-                     Default value is no-indent (0).
+             Auto flush flag.
+             Default is 0.
 
-            *       "cdata_callback"
+    *       "cdata_indent"
 
-                     Subroutine for output processing of cdata.
-                     Input argument is reference to array.
-                     Default value is undef.
-                     Example is similar as 'data_callback'.
+             Flag, that means indent CDATA section.
+             Default value is no-indent (0).
 
-            *       "data_callback"
+    *       "cdata_callback"
 
-                     Subroutine for output processing of data.
-                     Input argument is reference to array.
-                     Default value is &Tags::Utils::encode_char_entities.
+             Subroutine for output processing of cdata.
+             Input argument is reference to array.
+             Default value is undef.
+             Example is similar as 'data_callback'.
 
-                     Example:
-                     'data_callback' => sub {
-                             my $data_ar = shift;
-                             foreach my $data (@{$data_ar}) {
+    *       "data_callback"
 
-                                     # Some process.
-                                     $data =~ s/^\s*//ms;
-                             }
-                             return;
+             Subroutine for output processing of data.
+             Input argument is reference to array.
+             Default value is &Tags::Utils::encode_char_entities.
+
+             Example:
+             'data_callback' => sub {
+                     my $data_ar = shift;
+                     foreach my $data (@{$data_ar}) {
+
+                             # Some process.
+                             $data =~ s/^\s*//ms;
                      }
+                     return;
+             }
 
-            *       "line_size"
+    *       "input_tags_item_callback"
 
-                     Line size.
-                     Default value is 79.
+             Input 'Tags' item callback.
+             Callback is processing before main 'Tags' put().
+             It's usefull for e.g. validation.
+             Default value is undef.
 
-            *       "next_indent"
+    *       "line_size"
 
-                     Value of indent, which are added to begin of line.
-                     Default value is "  ".
+             Line size.
+             Default value is 79.
 
-            *       "no_simple"
+    *       "next_indent"
 
-                     Reference to array of tags, that can't by simple.
-                     Default is [].
+             Value of indent, which are added to begin of line.
+             Default value is "  ".
 
-                     Example:
-                     That's normal in html pages, web browsers has problem with <script /> tag.
-                     Prints <script></script> instead <script />.
+    *       "no_simple"
 
-                     my $tags = Tags::Output::Raw->new(
-                             'no_simple' => ['script']
-                     );
-                     $tags->put(
-                             ['b', 'script'],
-                             ['e', 'script'],
-                     );
-                     $tags->flush;
+             Reference to array of tags, that can't by simple.
+             Default is [].
 
-            *       "output_callback"
+             Example:
+             That's normal in html pages, web browsers has problem with <script /> tag.
+             Prints <script></script> instead <script />.
 
-                     Output callback.
-                     Input argument is reference to scalar of output string.
-                     Default value is undef.
-                     Example is similar as 'data_callback'.
+             my $tags = Tags::Output::Raw->new(
+                     'no_simple' => ['script']
+             );
+             $tags->put(
+                     ['b', 'script'],
+                     ['e', 'script'],
+             );
+             $tags->flush;
 
-            *       "output_handler"
+    *       "output_callback"
 
-                     Handler for print output strings.
-                     Must be a GLOB.
-                     Default is undef.
+             Output callback.
+             Input argument is reference to scalar of output string.
+             Default value is undef.
+             Example is similar as 'data_callback'.
 
-            *       "output_sep"
+    *       "output_handler"
 
-                     Output separator.
-                     Default value is newline (\n).
+             Handler for print output strings.
+             Must be a GLOB.
+             Default is undef.
 
-            *       "preserved"
+    *       "output_sep"
 
-                     List of elements, which content will be preserved.
-                     Default value is reference to blank array.
+             Output separator.
+             Default value is newline (\n).
 
-            *       "raw_callback"
+    *       "preserved"
 
-                     Subroutine for output processing of raw data.
-                     Input argument is reference to array.
-                     Default value is undef.
-                     Example is similar as 'data_callback'.
+             List of elements, which content will be preserved.
+             Default value is reference to blank array.
 
-            *       "skip_bad_tags"
+    *       "raw_callback"
 
-                     Skip bad tags.
-                     Default value is 0.
+             Subroutine for output processing of raw data.
+             Input argument is reference to array.
+             Default value is undef.
+             Example is similar as 'data_callback'.
 
-            *       "strict_instruction"
+    *       "skip_bad_tags"
 
-                     Strict instruction.
-                     Default value is 1.
+             Skip bad tags.
+             Default value is 0.
 
-    "finalize()"
-             Finalize Tags output.
-             Automaticly puts end of all opened tags.
+    *       "strict_instruction"
 
-    "flush($reset_flag)"
-             Flush tags in object.
-             If defined 'output_handler' flush to its.
-             Or return code.
-             If enabled $reset_flag, then resets internal variables via reset method.
+             Strict instruction.
+             Default value is 1.
 
-    "open_tags()"
-             Return array of opened tags.
+  "finalize"
+     $tags->finalize;
 
-    "put(@data)"
-             Put tags code in tags format.
+    Finalize Tags output. Automaticly puts end of all opened tags.
 
-    "reset()"
-             Resets internal variables.
+  "flush"
+     $tags->flush;
+
+    Flush tags in object. If defined 'output_handler' flush to its. Or
+    return code. If enabled $reset_flag, then resets internal variables via
+    reset method.
+
+  "open_tags"
+     my @open_tags = $tags->open_tags;
+
+    Return array of opened tags.
+
+  "put"
+     $tags->put(['b', 'tag']);
+
+    Put tags code in tags format.
+
+  "reset"
+     $tags->reset;
+
+    Resets internal variables.
 
 ERRORS
      'auto_flush' parameter can't use without 'output_handler' parameter.
@@ -225,5 +244,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

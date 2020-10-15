@@ -22,6 +22,13 @@ has uri => (
     required => 1,
     );
 
+has namespace => (
+    is => 'rw',
+    isa => 'Str',
+    required => 0,
+    default => '',
+    );
+
 has method => (
     is => 'rw',
     isa => 'Str',
@@ -256,6 +263,10 @@ sub _soap_call {
         # This modifies the seperator used in the SOAPAction Header to add
         # the method to the uri. Default is # but .Net expects a slash.
         $client->on_action( sub { join('/', @_) } );
+    }
+
+    if (my $ns = $self->namespace()) {
+        $client->ns($ns);
     }
 
     my @params = $self->_make_head();

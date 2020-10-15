@@ -5,16 +5,15 @@ use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Data::Section::Simple 'get_data_section';
-
-use File::Basename;	# For fileparse().
 use File::Temp;		# For newdir().
 use File::Which;	# For which().
-
 use Moo;
-
 use IPC::Run3; # For run3().
-
 use Types::Standard qw/Any ArrayRef HasMethods HashRef Int Str/;
+
+our $VERSION = '2.57';
+
+my $DATA_SECTION = get_data_section; # load once
 
 has command =>
 (
@@ -26,11 +25,15 @@ has command =>
 
 has dot_input =>
 (
-	default  => sub{return ''},
-	is       => 'rw',
+	is       => 'lazy',
 	isa      => Str,
 	required => 0,
 );
+
+sub _build_dot_input {
+	my ($self) = @_;
+	join('', @{ $self->command }) . "}\n";
+}
 
 has dot_output =>
 (
@@ -129,13 +132,47 @@ has verbose =>
 
 has valid_attributes =>
 (
-	default  => sub{return {} },
-	is       => 'rw',
+	is       => 'lazy',
 	isa      => HashRef,
 	required => 0,
 );
 
-our $VERSION = '2.54';
+sub _build_valid_attributes {
+	my($self) = @_;
+	my %data = map +($_ => [
+		grep !/^$/ && !/^(?:\s*)#/, split /\n/, $$DATA_SECTION{$_}
+	]), keys %$DATA_SECTION;
+	# Reorder them so the major key is the context and the minor key is the attribute.
+	# I.e. $attribute{global}{directed} => undef means directed is valid in a global context.
+	my %attribute;
+	# Common attributes are a special case, since one attribute can be valid is several contexts...
+	# Format: attribute_name => context_1, context_2.
+	for my $a (@{ delete $data{common_attribute} }) {
+		my ($attr, $contexts) = split /\s*=>\s*/, $a;
+		$attribute{$_}{$attr} = undef for split /\s*,\s*/, $contexts;
+	}
+	@{$attribute{$_}}{ @{$data{$_}} } = () for keys %data;
+	@{$attribute{subgraph}}{ keys %{ delete $attribute{cluster} } } = ();
+	\%attribute;
+}
+
+has valid_output_format => (
+	is       => 'lazy',
+	isa      => HashRef,
+	required => 0,
+);
+
+sub _build_valid_output_format {
+	my ($self) = @_;
+	run3
+		['dot', "-T?"],
+		undef,
+		\my $stdout,
+		\my $stderr,
+		;
+	$stderr =~ s/.*one of:\s+//;
+	+{ map +($_ => undef), split /\s+/, $stderr };
+}
 
 # -----------------------------------------------
 
@@ -143,18 +180,16 @@ sub BUILD
 {
 	my($self)    = @_;
 	my($globals) = $self -> global;
-	my($dot)     = which('dot');
 	my($global)  =
 	{
 		directed		=> $$globals{directed} ? 'digraph' : 'graph',
-		driver			=> $$globals{driver} || $dot,
+		driver			=> $$globals{driver} || scalar(which('dot')),
 		format			=> $$globals{format} ||	'svg',
 		im_format		=> $$globals{im_format} || 'cmapx',
 		label			=> $$globals{directed} ? '->' : '--',
 		name			=> $$globals{name} // 'Perl',
 		record_shape	=> ($$globals{record_shape} && $$globals{record_shape} =~ /^(M?record)$/) ? $1 : 'Mrecord',
 		strict			=> $$globals{strict} //  0,
-		subgraph		=> $$globals{subgraph} || {},
 		timeout			=> $$globals{timeout} // 10,
 	};
 	my($im_metas)	= $self -> im_meta;
@@ -165,7 +200,6 @@ sub BUILD
 
 	$self -> global($global);
 	$self -> im_meta($im_meta);
-	$self -> load_valid_attributes;
 	$self->validate_params('global',	$self->global);
 	$self->validate_params('graph',		$self->graph);
 	$self->validate_params('im_meta',	$self->im_meta);
@@ -192,7 +226,7 @@ sub BUILD
 
 	for my $key (grep{$im_meta{$_} } sort keys %im_meta)
 	{
-		$command .= qq|$key = "$im_meta{$key}"; \n|;
+		$command .= _indent(qq|$key = "$im_meta{$key}"; \n|, $self->scope);
 	}
 
 	push @{ $self->command }, $command;
@@ -203,7 +237,23 @@ sub BUILD
 
 } # End of BUILD.
 
-# -----------------------------------------------
+sub _edge_name_port {
+	my ($self, $name) = @_;
+	$name //= '';
+	# Remove :port:compass, if any, from name.
+	# But beware Perl-style node names like 'A::Class'.
+	my @field = split /(:(?!:))/, $name;
+	$field[0] = $name if !@field;
+	# Restore Perl module names:
+	# o A: & B to A::B.
+	# o A: & B: & C to A::B::C.
+	splice @field, 0, 3, "$field[0]:$field[2]" while $field[0] =~ /:$/;
+	# Restore:
+	# o : & port to :port.
+	# o : & port & : & compass to :port:compass.
+	$name = shift @field;
+	($name, join '', @field);
+}
 
 sub add_edge
 {
@@ -217,73 +267,29 @@ sub add_edge
 
 	$self->validate_params('edge', \%arg);
 
-	# If either 'from' or 'to' is unknown, add a new node.
-
-	my($new)  = 0;
-	my($node) = $self -> node_hash;
-
-	my(@node);
-
-	for my $name ($from, $to)
-	{
-		# Remove :port:compass, if any, from name.
-		# But beware Perl-style node names like 'A::Class'.
-
-		my(@field) = split(/(:(?!:))/, $name);
-		$field[0]  = $name if ($#field < 0);
-
-		# Restore Perl module names:
-		# o A: & B to A::B.
-		# o A: & B: & C to A::B::C.
-
-		while ($field[0] =~ /:$/)
-		{
-			splice(@field, 0, 3, "$field[0]:$field[2]");
-		}
-
-		# Restore:
-		# o : & port to :port.
-		# o : & port & : & compass to :port:compass.
-
-		splice(@field, 1, $#field, join('', @field[1 .. $#field]) ) if ($#field > 0);
-
-		# This line is mandatory - It overwrites $from and $to for use after the loop.
-
-		$name     = $field[0];
-		$field[1] = '' if ($#field == 0);
-
-		push @node, [$name, $field[1] ];
-
-		if (! defined $$node{$name})
-		{
-			$new = 1;
-
-			$self -> add_node(name => $name);
-		}
+	my @nodes;
+	for my $name ($from, $to) {
+		# overwrite $name for use after the loop
+		($name, my $port) = $self->_edge_name_port($name);
+		push @nodes, [ $name, $port ];
+		next if (my $nh = $self->node_hash)->{$name};
+		$self->log(debug => "Implicitly added node: $name");
+		$nh->{$name}{attributes} = {};
 	}
 
 	# Add this edge to the hashref of all edges.
-
-	my($edge)          = $self -> edge_hash;
-	$$edge{$from}      = {} if (! $$edge{$from});
-	$$edge{$from}{$to} = [] if (! $$edge{$from}{$to});
-
-	push @{$$edge{$from}{$to} },
-	{
-		attributes => {%arg},
-		from_port  => $node[0][1],
-		to_port    => $node[1][1],
+	push @{$self->edge_hash->{$from}{$to}}, {
+		attributes => \%arg,
+		from_port  => $nodes[0][1],
+		to_port    => $nodes[1][1],
 	};
 
 	# Add this edge to the DOT output string.
-
-	my($dot) = $self -> stringify_attributes(qq|"$from"$node[0][1] ${$self -> global}{label} "$to"$node[1][1]|, {%arg});
-
+	my $dot = $self->stringify_attributes(qq|"$from"$nodes[0][1] ${$self -> global}{label} "$to"$nodes[1][1]|, \%arg);
 	push @{ $self->command }, _indent($dot, $self->scope);
 	$self -> log(debug => "Added edge: $dot");
 
 	return $self;
-
 } # End of add_edge.
 
 sub _indent {
@@ -302,9 +308,7 @@ sub add_node
 	$self->validate_params('node', \%arg);
 
 	my($node)                 = $self -> node_hash;
-	$$node{$name}             ||= {};
-	$$node{$name}{attributes} ||= {};
-	$$node{$name}{attributes} = {%{$$node{$name}{attributes} }, %arg};
+	$$node{$name}{attributes} = {%{$$node{$name}{attributes} || {}}, %arg};
 	%arg                      = %{$$node{$name}{attributes} };
 	my($label)                = $arg{label} // '';
 	$label                    =~ s/^\s+(<)/$1/;
@@ -382,7 +386,7 @@ sub default_edge
 	$self->validate_params('edge', \%arg);
 
 	my $scope    = $self->scope->[-1];
-	$$scope{edge} = {%{$$scope{edge} }, %arg};
+	$$scope{edge} = {%{$$scope{edge} || {}}, %arg};
 
 	push @{ $self->command }, _indent($self->stringify_attributes('edge', $$scope{edge}), $self->scope);
 	$self -> log(debug => 'Default edge: ' . join(', ', map{"$_ => $$scope{edge}{$_}"} sort keys %{$$scope{edge} }) );
@@ -400,7 +404,7 @@ sub default_graph
 	$self->validate_params('graph', \%arg);
 
 	my $scope    = $self->scope->[-1];
-	$$scope{graph} = {%{$$scope{graph} }, %arg};
+	$$scope{graph} = {%{$$scope{graph} || {}}, %arg};
 
 	push @{ $self->command }, _indent($self->stringify_attributes('graph', $$scope{graph}), $self->scope);
 	$self -> log(debug => 'Default graph: ' . join(', ', map{"$_ => $$scope{graph}{$_}"} sort keys %{$$scope{graph} }) );
@@ -418,7 +422,7 @@ sub default_node
 	$self->validate_params('node', \%arg);
 
 	my $scope    = $self->scope->[-1];
-	$$scope{node} = {%{$$scope{node} }, %arg};
+	$$scope{node} = {%{$$scope{node} || {}}, %arg};
 
 	push @{ $self->command }, _indent($self->stringify_attributes('node', $$scope{node}), $self->scope);
 	$self -> log(debug => 'Default node: ' . join(', ', map{"$_ => $$scope{node}{$_}"} sort keys %{$$scope{node} }) );
@@ -436,7 +440,7 @@ sub default_subgraph
 	$self->validate_params('subgraph', \%arg);
 
 	my $scope    = $self->scope->[-1];
-	$$scope{subgraph} = {%{$$scope{subgraph} }, %arg};
+	$$scope{subgraph} = {%{$$scope{subgraph} || {}}, %arg};
 
 	push @{ $self->command }, _indent($self->stringify_attributes('subgraph', $$scope{subgraph}), $self->scope);
 	$self -> log(debug => 'Default subgraph: ' . join(', ', map{"$_ => $$scope{subgraph}{$_}"} sort keys %{$$scope{subgraph} }) );
@@ -444,33 +448,6 @@ sub default_subgraph
 	return $self;
 
 } # End of default_subgraph.
-
-# -----------------------------------------------
-
-sub dependency
-{
-	my($self, %arg) = @_;
-	my($data) = delete $arg{data} || die 'Error: No dependency data provided';
-	my(@item) = sort{$a -> id cmp $b -> id} $data -> source -> items;
-
-	for my $item (@item)
-	{
-		$self -> add_node(name => $item -> id);
-	}
-
-	for my $from (@item)
-	{
-		for my $to ($from -> depends)
-		{
-			$self -> add_edge(from => $from -> id, to => $to);
-		}
-	}
-
-	return $self;
-
-} # End of dependency.
-
-# -----------------------------------------------
 
 sub escape_some_chars
 {
@@ -508,74 +485,6 @@ sub escape_some_chars
 	return $label;
 
 } # End of escape_some_chars.
-
-# -----------------------------------------------
-
-sub load_valid_attributes
-{
-	my($self) = @_;
-
-	# Phase 1: Get attributes from __DATA__ section.
-
-	my($data) = get_data_section;
-
-	my(%data);
-
-	for my $key (sort keys %$data)
-	{
-		$data{$key} = [grep{! /^$/ && ! /^(?:\s*)#/} split(/\n/, $$data{$key})];
-	}
-
-	# Phase 2: Reorder them so the major key is the context and the minor key is the attribute.
-	# I.e. $attribute{global}{directed} => 1 means directed is valid in a global context.
-
-	my(%attribute);
-
-	for my $context (grep{! /common_attribute/} keys %$data)
-	{
-		for my $a (@{$data{$context} })
-		{
-			$attribute{$context}{$a} = 1;
-		}
-	}
-
-	# Common attributes are a special case, since one attribute can be valid is several contexts...
-	# Format: attribute_name => context_1, context_2.
-
-	my($attribute);
-	my($context, @context);
-
-	for my $a (@{$data{common_attribute} })
-	{
-		($attribute, $context) = split(/\s*=>\s*/, $a);
-		@context               = split(/\s*,\s*/, $context);
-
-		for my $c (@context)
-		{
-			$attribute{$c}             = {} if (! $attribute{$c});
-			$attribute{$c}{$attribute} = 1;
-		}
-	}
-
-	# Since V 2.24, output formats are no longer read from the __DATA__ section.
-	# Rather, they are extracted from the stderr output of 'dot -T?'.
-
-	run3
-		['dot', "-T?"],
-		undef,
-		\my $stdout,
-		\my $stderr,
-		;
-	my(@field)						= split(/one of:\s+/, $stderr);
-	$attribute{output_format}{$_}	= 1 for split(/\s+/, $field[1]);
-
-	$self -> valid_attributes(\%attribute);
-
-	return $self;
-
-} # End of load_valid_attributes.
-
-# -----------------------------------------------
 
 sub log
 {
@@ -620,16 +529,10 @@ sub push_subgraph
 	$self->validate_params('edge',     $arg{edge});
 	$self->validate_params('subgraph', $arg{subgraph});
 
-	# Child inherits parent attributes.
-
-	my $scope        = $self->scope->[-1];
-	$$scope{edge}     = {%{$$scope{edge} || {}}, %{$arg{edge} || {}}};
-	$$scope{graph}    = {%{$$scope{graph} || {}}, %{$arg{graph} || {}}};
-	$$scope{node}     = {%{$$scope{node} || {}}, %{$arg{node} || {}}};
-	$$scope{subgraph} = {%{$$scope{subgraph} || {}}, %{$arg{subgraph} || {}}};
+	$arg{subgraph} = { %{ $self->subgraph||{} }, %{$arg{subgraph}||{}} };
 
 	push @{ $self->command }, "\n" . _indent(join(' ', grep length, "subgraph", $name, "{\n"), $self->scope);
-	push @{ $self->scope }, $scope;
+	push @{ $self->scope }, \%arg;
 	$self -> default_graph;
 	$self -> default_node;
 	$self -> default_edge;
@@ -650,18 +553,14 @@ sub run
 	my($timeout)		= delete $arg{timeout}			|| ${$self -> global}{timeout};
 	my($output_file)	= delete $arg{output_file}		|| '';
 	my($im_output_file)	= delete $arg{im_output_file}	|| '';
-	my($prefix)			= $format;
-	$prefix				=~ s/:.+$//; # In case of 'png:gd', etc.
-	%arg				= ($prefix => 1);
 
-	$self->validate_params('output_format', \%arg);
+	for ($format, $im_format) {
+		my $prefix = $_;
+		$prefix =~ s/:.+$//; # In case of 'png:gd', etc.
+		$self->log(error => "Error: '$prefix' is not a valid output format")
+			if !exists $self->valid_output_format->{$prefix};
+	}
 
-	my($prefix_1)	= $im_format;
-	$prefix_1		=~ s/:.+$//; # In case of 'png:gd', etc.
-	%arg			= ($prefix_1 => 1);
-
-	$self->validate_params('output_format', \%arg);
-	$self -> dot_input(join('', @{ $self->command }) . "}\n");
 	$self -> log(debug => $self -> dot_input);
 
 	# Warning: Do not use $im_format in this 'if', because it has a default value.
@@ -763,15 +662,9 @@ sub stringify_attributes
 sub validate_params
 {
 	my($self, $context, $attributes) = @_;
-	my $valid = $self->valid_attributes;
-
-	for my $a (sort keys %$attributes)
-	{
-		next if ($valid->{$context}{$a} || ( ($context eq 'subgraph') && $valid->{cluster}{$a}) );
-
-		$self -> log(error => "Error: '$a' is not a valid attribute in the '$context' context");
-	}
-
+	my $valid = $self->valid_attributes->{$context};
+	my @invalid = grep !exists $valid->{$_}, keys %$attributes;
+	$self->log(error => "Error: '$_' is not a valid attribute in the '$context' context") for sort @invalid;
 	return $self;
 
 } # End of validate_params.
@@ -796,81 +689,51 @@ See L<https://graphviz-perl.github.io/>.
 
 =head3 Typical Usage
 
-	#!/usr/bin/env perl
-
 	use strict;
 	use warnings;
-
 	use File::Spec;
-
 	use GraphViz2;
 
 	use Log::Handler;
+	my $logger = Log::Handler->new;
+	$logger->add(screen => {
+		maxlevel => 'debug', message_layout => '%m', minlevel => 'error'
+	});
 
-	# ---------------
-
-	my($logger) = Log::Handler -> new;
-
-	$logger -> add
-		(
-		 screen =>
-		 {
-			 maxlevel       => 'debug',
-			 message_layout => '%m',
-			 minlevel       => 'error',
-		 }
-		);
-
-	my($graph) = GraphViz2 -> new
-		(
-		 edge   => {color => 'grey'},
-		 global => {directed => 1},
-		 graph  => {label => 'Adult', rankdir => 'TB'},
-		 logger => $logger,
-		 node   => {shape => 'oval'},
-		);
-
-	$graph -> add_node(name => 'Carnegie', shape => 'circle');
-	$graph -> add_node(name => 'Murrumbeena', shape => 'box', color => 'green');
-	$graph -> add_node(name => 'Oakleigh',    color => 'blue');
-
-	$graph -> add_edge(from => 'Murrumbeena', to    => 'Carnegie', arrowsize => 2);
-	$graph -> add_edge(from => 'Murrumbeena', to    => 'Oakleigh', color => 'brown');
-
-	$graph -> push_subgraph
-	(
-	 name  => 'cluster_1',
-	 graph => {label => 'Child'},
-	 node  => {color => 'magenta', shape => 'diamond'},
+	my $graph = GraphViz2->new(
+		edge   => {color => 'grey'},
+		global => {directed => 1},
+		graph  => {label => 'Adult', rankdir => 'TB'},
+		logger => $logger,
+		node   => {shape => 'oval'},
 	);
 
-	$graph -> add_node(name => 'Chadstone', shape => 'hexagon');
-	$graph -> add_node(name => 'Waverley', color => 'orange');
+	$graph->add_node(name => 'Carnegie', shape => 'circle');
+	$graph->add_node(name => 'Murrumbeena', shape => 'box', color => 'green');
+	$graph->add_node(name => 'Oakleigh',    color => 'blue');
+	$graph->add_edge(from => 'Murrumbeena', to    => 'Carnegie', arrowsize => 2);
+	$graph->add_edge(from => 'Murrumbeena', to    => 'Oakleigh', color => 'brown');
 
-	$graph -> add_edge(from => 'Chadstone', to => 'Waverley');
+	$graph->push_subgraph(
+		name  => 'cluster_1',
+		graph => {label => 'Child'},
+		node  => {color => 'magenta', shape => 'diamond'},
+	);
+	$graph->add_node(name => 'Chadstone', shape => 'hexagon');
+	$graph->add_node(name => 'Waverley', color => 'orange');
+	$graph->add_edge(from => 'Chadstone', to => 'Waverley');
+	$graph->pop_subgraph;
 
-	$graph -> pop_subgraph;
+	$graph->default_node(color => 'cyan');
 
-	$graph -> default_node(color => 'cyan');
+	$graph->add_node(name => 'Malvern');
+	$graph->add_node(name => 'Prahran', shape => 'trapezium');
+	$graph->add_edge(from => 'Malvern', to => 'Prahran');
+	$graph->add_edge(from => 'Malvern', to => 'Murrumbeena');
 
-	$graph -> add_node(name => 'Malvern');
-	$graph -> add_node(name => 'Prahran', shape => 'trapezium');
-
-	$graph -> add_edge(from => 'Malvern', to => 'Prahran');
-	$graph -> add_edge(from => 'Malvern', to => 'Murrumbeena');
-
-	my($format)      = shift || 'svg';
-	my($output_file) = shift || File::Spec -> catfile('html', "sub.graph.$format");
-
-	$graph -> run(format => $format, output_file => $output_file);
-
-This program ships as scripts/sub.graph.pl. See L</Scripts Shipped with this Module>.
-
-=head3 Image Maps Usage
-
-As of V 2.43, C<GraphViz2> supports image maps, both client and server side.
-
-See L</Image Maps> below.
+	my $format      = shift || 'svg';
+	my $output_file = shift || File::Spec->catfile('html', "sub.graph.$format");
+	$graph->run(format => $format, output_file => $output_file);
 
 =head1 Description
 
@@ -1012,34 +875,6 @@ The default is 0.
 
 This key is optional.
 
-=item o subgraph => $hashref
-
-The I<subgraph> key points to a hashref which is used to set attributes for all subgraphs, unless overridden
-for specific subgraphs in a call of the form push_subgraph(subgraph => {$attribute => $string}).
-
-Valid keys within this hashref are:
-
-=over 4
-
-=item o rank => $string
-
-This option affects the content of all subgraphs, unless overridden later.
-
-A typical usage would be new(subgraph => {rank => 'same'}) so that all nodes mentioned within each subgraph
-are constrained to be horizontally aligned.
-
-See scripts/rank.sub.graph.[12].pl for sample code.
-
-Possible values for $string are: max, min, same, sink and source.
-
-See the L<Graphviz 'rank' docs|http://www.graphviz.org/doc/info/attrs.html#d:rank> for details.
-
-=back
-
-The default is {}.
-
-This key is optional.
-
 =item o timeout => $integer
 
 This option specifies how long to wait for the external program before exiting with an error.
@@ -1064,13 +899,19 @@ This key is optional.
 
 =item o logger => $logger_object
 
-Provides a logger object so $logger_object -> $level($message) can be called at certain times.
-
-See "Why such a different approach to logging?" in the </FAQ> for details.
+Provides a logger object so $logger_object -> $level($message) can be called at certain times. Any object with C<debug> and C<error> methods
+will do, since these are the only levels emitted by this module.
+One option is a L<Log::Handler> object.
 
 Retrieve and update the value with the logger() method.
 
-The default is ''.
+By default (i.e. without a logger object), L<GraphViz2> prints warning and debug messages to STDOUT,
+and dies upon errors.
+
+However, by supplying a log object, you can capture these events.
+
+Not only that, you can change the behaviour of your log object at any time, by calling
+L</logger($logger_object)>.
 
 See also the verbose option, which can interact with the logger option.
 
@@ -1081,6 +922,34 @@ This key is optional.
 The I<node> key points to a hashref which is used to set default attributes for nodes.
 
 Hence, allowable keys and values within that hashref are anything supported by L<Graphviz|http://www.graphviz.org/>.
+
+The default is {}.
+
+This key is optional.
+
+=item o subgraph => $hashref
+
+The I<subgraph> key points to a hashref which is used to set attributes for all subgraphs, unless overridden
+for specific subgraphs in a call of the form push_subgraph(subgraph => {$attribute => $string}).
+
+Valid keys within this hashref are:
+
+=over 4
+
+=item o rank => $string
+
+This option affects the content of all subgraphs, unless overridden later.
+
+A typical usage would be new(subgraph => {rank => 'same'}) so that all nodes mentioned within each subgraph
+are constrained to be horizontally aligned.
+
+See scripts/rank.sub.graph.1.pl for sample code.
+
+Possible values for $string are: max, min, same, sink and source.
+
+See the L<Graphviz 'rank' docs|http://www.graphviz.org/doc/info/attrs.html#d:rank> for details.
+
+=back
 
 The default is {}.
 
@@ -1197,6 +1066,8 @@ this issue, including a special color of 'invisible'.
 =head1 Image Maps
 
 As of V 2.43, C<GraphViz2> supports image maps, both client and server side.
+For web use, note that these options also take effect when generating SVGs,
+for a much lighter-weight solution to hyperlinking graph nodes and edges.
 
 =head2 The Default URL
 
@@ -1261,6 +1132,8 @@ Default value: 'cmapx'.
 The name of the output map file.
 
 Default: ''.
+
+If you do not set it to anything, the new image maps code is ignored.
 
 =back
 
@@ -1421,7 +1294,7 @@ The format is "<$port_name>".
 
 See scripts/html.labels.*.pl and scripts/record.*.pl for sample code.
 
-See also the FAQ topic L</How labels interact with ports>.
+See also L</How labels interact with ports>.
 
 For more details on this complex topic, see L<Records|http://www.graphviz.org/doc/info/shapes.html#record> and L<Ports|http://www.graphviz.org/doc/info/attrs.html#k:portPos>.
 
@@ -1471,10 +1344,7 @@ new(subgraph => {}) and push_subgraph(subgraph => {}).
 
 =head2 dot_input()
 
-Returns the output stream, formatted nicely, which was passed to the external program (e.g. dot).
-
-You I<must> call run() before calling dot_input(), since it is only during the call to run() that the output stream is
-stored in the buffer controlled by dot_input().
+Returns the output stream, formatted nicely, to be passed to the external program (e.g. dot).
 
 =head2 dot_output()
 
@@ -1539,17 +1409,7 @@ See scripts/report.nodes.and.edges.pl (a version of scripts/html.labels.1.pl) fo
 
 Escapes various chars in various circumstances, because some chars are treated specially by Graphviz.
 
-See the L</FAQ> for a discussion of this tricky topic.
-
-=head2 load_valid_attributes()
-
-Load various sets of valid attributes from within the source code of this module, using L<Data::Section::Simple>.
-
-Returns $self to allow method chaining.
-
-These attributes are used to validate attributes in many situations.
-
-You wouldn't normally need to use this method.
+See L</Special characters in node names and labels> for a discussion of this tricky topic.
 
 =head2 log([$level, $message])
 
@@ -1655,6 +1515,10 @@ See scripts/rank.sub.graph.[12].pl and scripts/sub.graph.frames.pl for sample co
 Returns a hashref of all attributes known to this module, keyed by type
 to hashrefs to true values.
 
+Stored in this module, using L<Data::Section::Simple>.
+
+These attributes are used to validate attributes in many situations.
+
 You wouldn't normally need to use this method.
 
 See scripts/report.valid.attributes.pl. See L<GraphViz2/Scripts Shipped with this Module>.
@@ -1691,13 +1555,7 @@ This method performs a series of tasks:
 
 =over 4
 
-=item o Formats the output stream
-
-=item o Stores the formatted output in a buffer controlled by the dot_input() method
-
-=item o Output the output stream to a file
-
-=item o Run the chosen external program on that file
+=item o Run the chosen external program on the L</dot_input>
 
 =item o Capture STDOUT and STDERR from that program
 
@@ -1725,7 +1583,7 @@ Also, if $context is 'subgraph', attributes are allowed to be in the 'cluster' c
 
 Returns $self to allow method chaining.
 
-$context is one of 'edge', 'global', 'graph', 'node' or 'output_format'.
+$context is one of 'edge', 'global', 'graph', or 'node'.
 
 You wouldn't normally need to use this method.
 
@@ -1735,9 +1593,9 @@ Gets or sets the verbosity level, for when a logging object is not used.
 
 Here, [] indicates an optional parameter.
 
-=head1 FAQ
+=head1 MISC
 
-=head2 Which version of Graphviz do you use?
+=head2 Graphviz version supported
 
 GraphViz2 targets V 2.34.0 of L<Graphviz|http://www.graphviz.org/>.
 
@@ -1746,99 +1604,22 @@ This affects the list of available attributes per graph item (node, edge, cluste
 See the second column of the
 L<Graphviz attribute docs|https://www.graphviz.org/doc/info/attrs.html> for details.
 
-See the next item for a discussion of the list of output formats.
+=head2 Supported file formats
 
-=head2 Where does the list of valid output formats come from?
+Parses the output of C<dot -T?>, so depends on local installation.
 
-Up to V 2.23, it came from downloading and parsing https://www.graphviz.org/doc/info/output.html. This was done
-by scripts/extract.output.formats.pl.
-
-Starting with V 2.24 it comes from parsing the output of 'dot -T?'. The problems avoided, and advantages, of this are:
-
-=over 4
-
-=item o I might forget to run the script after Graphviz is updated
-
-=item o The on-line docs might be out-of-date
-
-=item o dot output includes the formats supported by locally-installed plugins
-
-=back
-
-=head2 Why do I get error messages like the following?
-
-	Error: <stdin>:1: syntax error near line 1
-	context: digraph >>>  Graph <<<  {
-
-Graphviz reserves some words as keywords, meaning they can't be used as an ID, e.g. for the name of the graph.
-So, don't do this:
-
-	strict graph graph{...}
-	strict graph Graph{...}
-	strict graph strict{...}
-	etc...
-
-Likewise for non-strict graphs, and digraphs. You can however add double-quotes around such reserved words:
-
-	strict graph "graph"{...}
-
-Even better, use a more meaningful name for your graph...
-
-The keywords are: node, edge, graph, digraph, subgraph and strict. Compass points are not keywords.
-
-See L<keywords|https://www.graphviz.org/doc/info/lang.html> in the discussion of the syntax of DOT
-for details.
-
-=head2 How do I include utf8 characters in labels?
-
-Since V 2.00, L<GraphViz2> incorporates a sample which produce graphs such as L<this|http://savage.net.au/Perl-modules/html/graphviz2/utf8.1.svg>.
-
-scripts/utf8.1.pl contains 'use utf8;' because of the utf8 characters embedded in the source code. You will need to do this.
-
-=head2 Why did you remove 'use utf8' from this file (in V 2.26)?
-
-Because it is global, i.e. it applies to all code in your program, not just within this module.
-Some modules you are using may not expect that. If you need it, just use it in your *.pl script.
-
-=head2 Why do I get 'Wide character in print...' when outputting to PNG but not SVG?
-
-As of V 2.02, you should not get this from GraphViz2. So, I suggest you study your own code very, very carefully :-(.
-
-Examine the output from scripts/utf8.2.pl, i.e. html/utf8.2.svg and you'll see it's correct. Then run:
-
-	perl scripts/utf8.2.pl png
-
-and examine html/utf8.2.png and you'll see it matches html/utf8.2.svg in showing 5 deltas. So, I I<think> it's all working.
-
-=head2 How do I print output files?
-
-Under Unix, output as PDF, and then try: lp -o fitplot html/parse.stt.pdf (or whatever).
-
-=head2 Can I include spaces and newlines in HTML labels?
-
-Yes. The code removes leading and trailing whitespace on HTML labels before calling 'dot'.
-
-Also, the code, and 'dot', both accept newlines embedded within such labels.
-
-Together, these allow HTML labels to be formatted nicely in the calling code.
-
-See L<the Graphviz docs|https://www.graphviz.org/doc/info/shapes.html#record> for their discussion on whitespace.
-
-=head2 I'm having trouble with special characters in node names and labels
+=head2 Special characters in node names and labels
 
 L<GraphViz2> escapes these 2 characters in those contexts: [].
 
 Escaping the 2 chars [] started with V 2.10. Previously, all of []{} were escaped, but {} are used in records
 to control the orientation of fields, so they should not have been escaped in the first place.
-See scripts/record.1.pl.
-
-Double-quotes are escaped when the label is I<not> an HTML label. See scripts/html.labels.*.pl for sample code.
 
 It would be nice to also escape | and <, but these characters are used in specifying fields and ports in records.
 
 See the next couple of points for details.
 
-=head2 A warning about L<Graphviz|http://www.graphviz.org/> and ports
+=head2 Ports
 
 Ports are what L<Graphviz|http://www.graphviz.org/> calls those places on the outline of a node where edges
 leave and terminate.
@@ -1867,17 +1648,15 @@ You can specify labels with ports in these ways:
 
 =item o As a string
 
-From scripts/record.1.pl:
-
 	$graph -> add_node(name => 'struct3', label => "hello\nworld |{ b |{c|<here> d|e}| f}| g | h");
 
 Here, the string contains a port (<here>), field markers (|), and orientation markers ({}).
 
 Clearly, you must specify the field separator character '|' explicitly. In the next 2 cases, it is implicit.
 
-Then you use $graph -> add_edge(...) to refer to those ports, if desired. Again, from scripts/record.1.pl:
+Then you use $graph -> add_edge(...) to refer to those ports, if desired:
 
-$graph -> add_edge(from => 'struct1:f2', to => 'struct3:here', color => 'red');
+	$graph -> add_edge(from => 'struct1:f2', to => 'struct3:here', color => 'red');
 
 The same label is specified in the next case.
 
@@ -1918,7 +1697,7 @@ Each hashref is a field, and hence you do not specify the field separator charac
 
 Then you use $graph -> add_edge(...) to refer to those ports, if desired. Again, from scripts/record.2.pl:
 
-$graph -> add_edge(from => 'struct1:f2', to => 'struct3:here', color => 'red');
+	$graph -> add_edge(from => 'struct1:f2', to => 'struct3:here', color => 'red');
 
 The same label is specified in the previous case.
 
@@ -1943,417 +1722,20 @@ Here's how you refer to those ports, again from scripts/html.labels.1.pl:
 
 See also the docs for the C<< add_node(name => $node_name, [%hash]) >> method.
 
-=head2 How do I specify attributes for clusters?
+=head2 Attributes for clusters
 
 Just use subgraph => {...}, because the code (as of V 2.22) accepts attributes belonging to either clusters or subgraphs.
 
 An example attribute is C<pencolor>, which is used for clusters but not for subgraphs:
 
-	$graph -> push_subgraph
-	(
+	$graph->push_subgraph(
 		graph    => {label => 'Child the Second'},
 		name     => 'cluster Second subgraph',
 		node     => {color => 'magenta', shape => 'diamond'},
 		subgraph => {pencolor => 'white'}, # White hides the cluster's frame.
 	);
-
-See scripts/sub.graph.frames.pl.
-
-=head2 Why does L<GraphViz> plot top-to-bottom but L<GraphViz2::Parse::ISA> plot bottom-to-top?
-
-Because the latter knows the data is a class structure. The former makes no assumptions about the nature of the data.
-
-=head2 What happened to GraphViz::No?
-
-The default_node(%hash) method in L<GraphViz2> allows you to make nodes vanish.
-
-Try: $graph -> default_node(label => '', height => 0, width => 0, style => 'invis');
-
-Because that line is so simple, I feel it's unnecessary to make a subclass of GraphViz2.
-
-=head2 What happened to GraphViz::Regex?
-
-See L<GraphViz2::Parse::Regexp>.
-
-=head2 What happened to GraphViz::Small?
-
-The default_node(%hash) method in L<GraphViz2> allows you to make nodes which are small.
-
-Try: $graph -> default_node(label => '', height => 0.2, width => 0.2, style => 'filled');
-
-Because that line is so simple, I feel it's unnecessary to make a subclass of GraphViz2.
-
-=head2 What happened to GraphViz::XML?
-
-Use L<GraphViz2::Parse::XML> instead, which uses the pure-Perl XML::Tiny.
-
-Alternately, see L<GraphViz2/Scripts Shipped with this Module> for how to use L<XML::Bare>, L<GraphViz2>
-and L<GraphViz2::Data::Grapher> instead.
-
-=head2 GraphViz returned a node name from add_node() when given an anonymous node. What does GraphViz2 do?
-
-You can give the node a name, and an empty string for a label, to suppress plotting the name.
-
-See L</scripts/anonymous.pl> for demo code.
-
-If there is some specific requirement which this does not cater for, let me know and I can change the code.
-
-=head2 How do I use image maps?
-
-See L</Image Maps> above.
-
-=head2 I'm trying to use image maps but the non-image map code runs instead!
-
-The default value of C<im_output_file> is '', so if you do not set it to anything, the new image maps code
-is ignored.
-
-=head2 Why such a different approach to logging?
-
-As you can see from scripts/*.pl, I always use L<Log::Handler>,
-but you don't have to: any object with C<debug> and C<error> methods
-will do, since these are the only levels emitted by this module.
-
-By default (i.e. without a logger object), L<GraphViz2> prints warning and debug messages to STDOUT,
-and dies upon errors.
-
-However, by supplying a log object, you can capture these events.
-
-Not only that, you can change the behaviour of your log object at any time, by calling
-L</logger($logger_object)>.
-
-=head2 A Note about XML Containers
-
-The 2 demo programs L</scripts/parse.html.pl> and L</scripts/parse.xml.bare.pl>, which both use L<XML::Bare>, assume your XML has a single
-parent container for all other containers. The programs use this container to provide a name for the root node of the graph.
-
-=head2 Why did you choose L<Moo> over L<Moose>?
-
-L<Moo> is light-weight.
-
-=head1 Scripts Shipped with this Module
-
-See L<the demo page|http://savage.net.au/Perl-modules/html/graphviz2/index.html>, which displays the output
-of each program listed below.
-
-=head2 scripts/anonymous.pl
-
-Demonstrates empty strings for node names and labels.
-
-Outputs to ./html/anonymous.svg by default.
-
-=head2 scripts/cluster.pl
-
-Demonstrates building a cluster as a subgraph.
-
-Outputs to ./html/cluster.svg by default.
-
-See also scripts/macro.*.pl below.
-
-=head2 copy.config.pl
-
-End users have no need to run this script.
-
-=head2 scripts/extract.arrow.shapes.pl
-
-Downloads the arrow shapes from L<Graphviz's Arrow Shapes|https://www.graphviz.org/doc/info/arrows.html> and outputs them to ./data/arrow.shapes.html.
-Then it extracts the reserved words into ./data/arrow.shapes.dat.
-
-=head2 scripts/extract.attributes.pl
-
-Downloads the attributes from L<Graphviz's Attributes|http://www.graphviz.org/doc/info/attrs.html> and outputs them to ./data/attributes.html.
-Then it extracts the reserved words into ./data/attributes.dat.
-
-=head2 scripts/extract.node.shapes.pl
-
-Downloads the node shapes from L<Graphviz's Node Shapes|http://www.graphviz.org/doc/info/shapes.html> and outputs them to ./data/node.shapes.html.
-Then it extracts the reserved words into ./data/node.shapes.dat.
-
-=head2 find.config.pl
-
-End users have no need to run this script.
-
-=head2 scripts/generate.demo.pl
-
-Run by scripts/generate.svg.sh. See next point.
-
-=head2 scripts/generate.png.sh
-
-See scripts/generate.svg.sh for details.
-
-Outputs to /tmp by default.
-
-This script is generated by generate.sh.pl.
-
-=head2 generate.sh.pl
-
-Generates scripts/generate.png.sh and scripts/generate.svg.sh.
-
-=head2 scripts/generate.svg.sh
-
-A bash script to run all the scripts and generate the *.svg and *.log files, in ./html.
-
-You can them copy html/*.html and html/*.svg to your web server's doc root, for viewing.
-
-Outputs to /tmp by default.
-
-This script is generated by generate.sh.pl.
-
-=head2 scripts/Heawood.pl
-
-Demonstrates the transitive 6-net, also known as Heawood's graph.
-
-Outputs to ./html/Heawood.svg by default.
-
-This program was reverse-engineered from graphs/undirected/Heawood.gv in the distro for L<Graphviz|http://www.graphviz.org/> V 2.26.3.
-
-=head2 scripts/html.labels.1.pl
-
-Demonstrates a HTML label without a table.
-
-Also demonstrates an arrayref of strings as a label.
-
-See also scripts/record.*.pl for other label techniques.
-
-Outputs to ./html/html.labels.1.svg by default.
-
-=head2 scripts/html.labels.2.pl
-
-Demonstrates a HTML label with a table.
-
-Outputs to ./html/html.labels.2.svg by default.
-
-=head2 scripts/macro.1.pl
-
-Demonstrates non-cluster subgraphs via a macro.
-
-Outputs to ./html/macro.1.svg by default.
-
-=head2 scripts/macro.2.pl
-
-Demonstrates linked non-cluster subgraphs via a macro.
-
-Outputs to ./html/macro.2.svg by default.
-
-=head2 scripts/macro.3.pl
-
-Demonstrates cluster subgraphs via a macro.
-
-Outputs to ./html/macro.3.svg by default.
-
-=head2 scripts/macro.4.pl
-
-Demonstrates linked cluster subgraphs via a macro.
-
-Outputs to ./html/macro.4.svg by default.
-
-=head2 scripts/macro.5.pl
-
-Demonstrates compound cluster subgraphs via a macro.
-
-Outputs to ./html/macro.5.svg by default.
-
-=head2 scripts/parse.regexp.pl
-
-Demonstrates graphing a Perl regular expression.
-
-Outputs to ./html/parse.regexp.svg by default.
-
-=head2 scripts/parse.stt.pl
-
-Demonstrates graphing a L<Set::FA::Element>-style state transition table.
-
-Inputs from t/sample.stt.1.dat and outputs to ./html/parse.stt.svg by default.
-
-The input grammar was extracted from L<Set::FA::Element>.
-
-You can patch the scripts/parse.stt.pl to read from t/sample.stt.2.dat instead of t/sample.stt.1.dat.
-t/sample.stt.2.dat was extracted from a obsolete version of L<Graph::Easy::Marpa>, i.e. V 1.*. The Marpa-based
-parts of the latter module were completely rewritten for V 2.*.
-
-=head2 scripts/parse.yacc.pl
-
-Demonstrates graphing a L<byacc|http://invisible-island.net/byacc/byacc.html>-style grammar.
-
-Inputs from t/calc3.output, and outputs to ./html/parse.yacc.svg by default.
-
-The input was copied from test/calc3.y in byacc V 20101229 and process as below.
-
-Note: The version downloadable via HTTP is 20101127.
-
-I installed byacc like this:
-
-	sudo apt-get byacc
-
-Now get a sample file to work with:
-
-	cd ~/Downloads
-	curl ftp://invisible-island.net/byacc/byacc.tar.gz > byacc.tar.gz
-	tar xvzf byacc.tar.gz
-	cd ~/perl.modules/GraphViz2
-	cp ~/Downloads/byacc-20101229/test/calc3.y t
-	byacc -v t/calc3.y
-	mv y.output t/calc3.output
-	diff ~/Downloads/byacc-20101229/test/calc3.output t/calc3.output
-	rm y.tab.c
-
-It's the file calc3.output which ships in the t/ directory.
-
-=head2 scripts/parse.yapp.pl
-
-Demonstrates graphing a L<Parse::Yapp>-style grammar.
-
-Inputs from t/calc.output, and outputs to ./html/parse.yapp.svg by default.
-
-The input was copied from t/calc.t in L<Parse::Yapp>'s and processed as below.
-
-I installed L<Parse::Yapp> (and yapp) like this:
-
-	cpanm Parse::Yapp
-
-Now get a sample file to work with:
-
-	cd ~/perl.modules/GraphViz2
-	cp ~/.cpanm/latest-build/Parse-Yapp-1.05/t/calc.t t/calc.input
-
-Edit t/calc.input to delete the code, leaving the grammar after the __DATA__token.
-
-	yapp -v t/calc.input > t/calc.output
-	rm t/calc.pm
-
-It's the file calc.output which ships in the t/ directory.
-
-=head2 scripts/quote.pl
-
-Demonstrates embedded newlines and double-quotes in node names and labels.
-
-It also demonstrates that the justification escapes, \l and \r, work too, sometimes.
-
-Outputs to ./html/quote.svg by default.
-
-Tests which run dot directly show this is a bug in L<Graphviz|http://www.graphviz.org/> itself.
-
-For example, in this graph, it looks like \r only works after \l (node d), but not always (nodes b, c).
-
-Call this x.gv:
-
-	digraph G {
-		rankdir=LR;
-		node [shape=oval];
-		a [ label ="a: Far, far, Left\rRight"];
-		b [ label ="\lb: Far, far, Left\rRight"];
-		c [ label ="XXX\lc: Far, far, Left\rRight"];
-		d [ label ="d: Far, far, Left\lRight\rRight"];
-	}
-
-and use the command:
-
-	dot -Tsvg x.gv > x.svg
-
-See L<the Graphviz docs|http://www.graphviz.org/doc/info/attrs.html#k:escString> for escString, where they write 'l to mean \l, for some reason.
-
-=head2 scripts/rank.sub.graph.1.pl
-
-Demonstrates a very neat way of controlling the I<rank> attribute of nodes within subgraphs.
-
-Outputs to ./html/rank.sub.graph.1.svg by default.
-
-=head2 scripts/rank.sub.graph.2.pl
-
-Demonstrates a long-winded way of controlling the I<rank> attribute of nodes within subgraphs.
-
-Outputs to ./html/rank.sub.graph.2.svg by default.
-
-=head2 scripts/rank.sub.graph.3.pl
-
-Demonstrates the effect of the name of a subgraph, when that name does not start with 'cluster'.
-
-Outputs to ./html/rank.sub.graph.3.svg by default.
-
-=head2 scripts/record.1.pl
-
-Demonstrates a string as a label, containing both ports and orientation markers ({}).
-
-Outputs to ./html/record.1.svg by default.
-
-See also scripts/html.labels.2.pl and scripts/record.*.pl for other label techniques.
-
-=head2 scripts/record.2.pl
-
-Demonstrates an arrayref of hashrefs as a label, containing both ports and orientation markers ({}).
-
-Outputs to ./html/record.2.svg by default.
-
-See also scripts/html.labels.1.pl the other type of HTML labels.
-
-=head2 scripts/record.3.pl
-
-Demonstrates a string as a label, containing ports and deeply nested orientation markers ({}).
-
-Outputs to ./html/record.3.svg by default.
-
-See also scripts/html.labels.*.pl and scripts/record.*.pl for other label techniques.
-
-=head2 scripts/record.4.pl
-
-Demonstrates setting node shapes by default and explicitly.
-
-Outputs to ./html/record.4.svg by default.
-
-=head2 scripts/rank.sub.graph.4.pl
-
-Demonstrates the effect of the name of a subgraph, when that name starts with 'cluster'.
-
-Outputs to ./html/rank.sub.graph.4.svg by default.
-
-=head2 scripts/report.nodes.and.edges.pl
-
-Demonstates how to access the data returned by L</edge_hash()> and L</node_hash()>.
-
-Prints node and edge attributes.
-
-Outputs to STDOUT.
-
-=head2 scripts/report.valid.attributes.pl
-
-Prints all current L<Graphviz|http://www.graphviz.org/> attributes, along with a few global ones I've invented for the purpose of writing this module.
-
-Outputs to STDOUT.
-
-=head2 scripts/sub.graph.frames.pl
-
-Demonstrates clusters with and without frames.
-
-Outputs to ./html/sub.graph.frames.svg by default.
-
-=head2 scripts/sub.graph.pl
-
-Demonstrates a graph combined with a subgraph.
-
-Outputs to ./html/sub.graph.svg by default.
-
-=head2 scripts/sub.sub.graph.pl
-
-Demonstrates a graph combined with a subgraph combined with a subsubgraph.
-
-Outputs to ./html/sub.sub.graph.svg by default.
-
-=head2 scripts/trivial.pl
-
-Demonstrates a trivial 3-node graph, with colors, just to get you started.
-
-Outputs to ./html/trivial.svg by default.
-
-=head2 scripts/utf8.1.pl
-
-Demonstrates using utf8 characters in labels.
-
-Outputs to ./html/utf8.1.svg by default.
-
-=head2 scripts/utf8.2.pl
-
-Demonstrates using utf8 characters in labels.
-
-Outputs to ./html/utf8.2.svg by default.
+	# other nodes or edges can be added within it...
+	$graph->pop_subgraph;
 
 =head1 TODO
 
@@ -2605,7 +1987,6 @@ label
 name
 record_shape
 strict
-subgraph
 timeout
 
 @@ im_meta

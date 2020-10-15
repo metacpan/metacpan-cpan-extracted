@@ -1,6 +1,6 @@
 package Archive::BagIt::DotBagIt;
 
-our $VERSION = '0.066'; # VERSION
+our $VERSION = '0.067'; # VERSION
 use strict;
 use warnings;
 use Sub::Quote;
@@ -51,7 +51,7 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 NAME
 

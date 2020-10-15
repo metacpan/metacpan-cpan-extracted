@@ -89,8 +89,7 @@ do { my $x = {
                                    'URI' => '0',
                                    'URI::Escape' => '0',
                                    'bytes' => '0',
-                                   'lib' => '0',
-                                   'vars' => '0'
+                                   'lib' => '0'
                                  }
                  }
      };

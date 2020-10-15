@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/OrgUtils/reverse_org_headlines
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-21'; # DATE
+our $DATE = '2020-10-14'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.479'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ reverse-org-headlines - Reverse Org headlines
 
 =head1 VERSION
 
-This document describes version 0.479 of reverse-org-headlines (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of reverse-org-headlines (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 

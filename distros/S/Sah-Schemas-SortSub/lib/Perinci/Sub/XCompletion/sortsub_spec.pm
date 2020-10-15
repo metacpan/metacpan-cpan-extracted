@@ -1,9 +1,9 @@
 package Perinci::Sub::XCompletion::sortsub_spec;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-27'; # DATE
 our $DIST = 'Sah-Schemas-SortSub'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,7 +60,7 @@ Perinci::Sub::XCompletion::sortsub_spec - Generate completion for Sort::Sub spec
 
 =head1 VERSION
 
-This document describes version 0.003 of Perinci::Sub::XCompletion::sortsub_spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-02-28.
+This document describes version 0.004 of Perinci::Sub::XCompletion::sortsub_spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-05-27.
 
 =head1 ARGUMENTS
 

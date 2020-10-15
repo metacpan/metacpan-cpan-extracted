@@ -16,27 +16,25 @@ use App::Du::Analyze::Filter;
 # TEST:$test_filter_on_fc_solve=1;
 sub test_filter_on_fc_solve
 {
-    my ($options, $expected_output, $blurb) = @_;
+    my ( $options, $expected_output, $blurb ) = @_;
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $obj = App::Du::Analyze::Filter->new($options);
 
-    open my $in_fh, '<:encoding(utf8)', File::Spec->catfile(File::Spec->curdir, 't', 'data', 'fc-solve-git-du-output.txt');
+    open my $in_fh, '<:encoding(utf8)',
+        File::Spec->catfile( File::Spec->curdir, 't', 'data',
+        'fc-solve-git-du-output.txt' );
 
     my $buffer = '';
     open my $out_fh, '>', \$buffer;
 
-    $obj->filter($in_fh, $out_fh);
+    $obj->filter( $in_fh, $out_fh );
 
     close($in_fh);
     close($out_fh);
 
-    return eq_or_diff(
-        $buffer,
-        $expected_output,
-        $blurb,
-    );
+    return eq_or_diff( $buffer, $expected_output, $blurb, );
 }
 
 {
@@ -45,7 +43,7 @@ sub test_filter_on_fc_solve
     test_filter_on_fc_solve(
         {
             prefix => '',
-            depth => 0,
+            depth  => 0,
         },
         <<"EOF", "depth 0 and no prefix",
 119224\t
@@ -56,7 +54,7 @@ EOF
     test_filter_on_fc_solve(
         {
             prefix => 'fc-solve',
-            depth => 0,
+            depth  => 0,
         },
         <<"EOF", "depth 0 and specified prefix",
 52532\tfc-solve
@@ -67,7 +65,7 @@ EOF
     test_filter_on_fc_solve(
         {
             prefix => 'fc-solve',
-            depth => 1,
+            depth  => 1,
         },
         <<"EOF", "depth 1 and specified prefix",
 16\tfc-solve/tests
@@ -86,7 +84,7 @@ EOF
     test_filter_on_fc_solve(
         {
             prefix => '',
-            depth => 1,
+            depth  => 1,
         },
         <<"EOF", "depth 1 and an empty prefix",
 72\tTask-FreecellSolver-Testing
@@ -102,7 +100,7 @@ EOF
     test_filter_on_fc_solve(
         {
             prefix => '',
-            depth => 2,
+            depth  => 2,
         },
         <<"EOF", "depth greater than 1 and an empty prefix",
 4\t.git/branches
@@ -135,7 +133,7 @@ EOF
     test_filter_on_fc_solve(
         {
             prefix => 'fc-solve/source',
-            depth => 2,
+            depth  => 2,
         },
         <<"EOF", "depth greater than 1 and a prefix",
 8\tfc-solve/source/t/dbm

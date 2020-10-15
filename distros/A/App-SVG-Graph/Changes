@@ -1,5 +1,10 @@
 Revision history for App-SVG-Graph
 
+0.0.3       2020-10-15
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 v0.0.2      2016-11-05
     - Improve the documentation.
 

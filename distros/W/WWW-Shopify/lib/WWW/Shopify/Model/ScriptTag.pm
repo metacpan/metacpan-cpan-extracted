@@ -10,11 +10,12 @@ use parent "WWW::Shopify::Model::Item";
 
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
-	"created_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now'),
+	"created_at" => new WWW::Shopify::Field::Date(),
 	"event" => new WWW::Shopify::Field::String::Enum(["onload"]),
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"src" => new WWW::Shopify::Field::String::URL(),
-	"updated_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now')
+	"display_scope" => new WWW::Shopify::Field::String::Enum(["online_store", "order_status", "both"]),
+	"updated_at" => new WWW::Shopify::Field::Date()
 }; }
 
 sub creation_minimal { return qw(event src); }

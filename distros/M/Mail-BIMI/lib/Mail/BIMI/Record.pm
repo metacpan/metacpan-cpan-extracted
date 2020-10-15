@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
 # ABSTRACT: Class to model a BIMI record
-our $VERSION = '2.20201006.1'; # VERSION
+our $VERSION = '2.20201013.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -279,7 +279,7 @@ Mail::BIMI::Record - Class to model a BIMI record
 
 =head1 VERSION
 
-version 2.20201006.1
+version 2.20201013.2
 
 =head1 DESCRIPTION
 

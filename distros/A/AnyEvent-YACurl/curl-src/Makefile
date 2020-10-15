@@ -339,11 +339,11 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -Werror-implicit-function-declaration -O2 -Wno-system-headers
 CFLAG_CURL_SYMBOL_HIDING = -fvisibility=hidden
-CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib' '--with-brotli=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib' '--enable-ares=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib' '--disable-shared' '--enable-static' '--prefix=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib' '--with-pic' '--disable-threaded-resolver' '--disable-pthreads'"
+CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib' '--enable-ares=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib' '--disable-shared' '--enable-static' '--prefix=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib' '--with-pic' '--disable-threaded-resolver' '--disable-pthreads'"
 CPP = gcc -E
-CPPFLAGS = -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/include -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
+CPPFLAGS = -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
 CPPFLAG_CURL_STATICLIB = -DCURL_STATICLIB
-CURLVERSION = 7.71.1
+CURLVERSION = 7.73.0
 CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
 CURL_CFLAG_EXTRAS = 
 CURL_DISABLE_DICT = 
@@ -354,6 +354,7 @@ CURL_DISABLE_HTTP =
 CURL_DISABLE_IMAP = 
 CURL_DISABLE_LDAP = 1
 CURL_DISABLE_LDAPS = 1
+CURL_DISABLE_MQTT = 
 CURL_DISABLE_POP3 = 
 CURL_DISABLE_PROXY = 
 CURL_DISABLE_RTSP = 
@@ -361,7 +362,6 @@ CURL_DISABLE_SMB =
 CURL_DISABLE_SMTP = 
 CURL_DISABLE_TELNET = 
 CURL_DISABLE_TFTP = 
-CURL_ENABLE_MQTT = 
 CURL_LT_SHLIB_VERSIONED_FLAVOUR = 
 CURL_NETWORK_AND_TIME_LIBS = 
 CURL_NETWORK_LIBS = 
@@ -384,12 +384,13 @@ FGREP = /bin/grep -F
 FISH_FUNCTIONS_DIR = ${prefix}/share/fish/vendor_completions.d
 GCOV = 
 GREP = /bin/grep
-HAVE_BROTLI = 1
+HAVE_BROTLI = 
 HAVE_GNUTLS_SRP = 
 HAVE_LDAP_SSL = 1
 HAVE_LIBZ = 1
 HAVE_OPENSSL_SRP = 1
 HAVE_PROTO_BSDSOCKET_H = 
+HAVE_ZSTD = 
 IDN_ENABLED = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
@@ -399,14 +400,14 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 IPV6_ENABLED = 1
 LCOV = 
 LD = /usr/bin/ld -m elf_x86_64
-LDFLAGS = -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/lib -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/lib -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/lib
-LIBCURL_LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz
-LIBCURL_NO_SHARED = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz 
+LDFLAGS = -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/lib -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/lib
+LIBCURL_LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lz
+LIBCURL_NO_SHARED = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lz 
 LIBMETALINK_CPPFLAGS = 
 LIBMETALINK_LDFLAGS = 
 LIBMETALINK_LIBS = 
 LIBOBJS = 
-LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz
+LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lz
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -448,8 +449,8 @@ SSL_BACKENDS = OpenSSL
 SSL_ENABLED = 1
 SSL_LIBS = -lssl -lcrypto
 STRIP = strip
-SUPPORT_FEATURES = SSL IPv6 UnixSockets libz brotli AsynchDNS NTLM NTLM_WB TLS-SRP HTTP2 HTTPS-proxy
-SUPPORT_PROTOCOLS = DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
+SUPPORT_FEATURES = AsynchDNS HTTP2 HTTPS-proxy IPv6 NTLM NTLM_WB SSL TLS-SRP UnixSockets libz
+SUPPORT_PROTOCOLS = DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS MQTT POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
 USE_ARES = 1
 USE_BEARSSL = 
 USE_GNUTLS = 
@@ -474,7 +475,7 @@ USE_WINDOWS_SSPI =
 USE_WOLFSSH = 
 USE_WOLFSSL = 
 VERSION = -
-VERSIONNUM = 074701
+VERSIONNUM = 074900
 ZLIB_LIBS = -lz
 ZSH_FUNCTIONS_DIR = ${prefix}/share/zsh/site-functions
 abs_builddir = /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
@@ -541,6 +542,7 @@ CMAKE_DIST = \
  CMake/CurlSymbolHiding.cmake                   \
  CMake/CurlTests.c                              \
  CMake/FindBearSSL.cmake                        \
+ CMake/FindBrotli.cmake                         \
  CMake/FindCARES.cmake                          \
  CMake/FindGSS.cmake                            \
  CMake/FindLibSSH2.cmake                        \
@@ -548,8 +550,10 @@ CMAKE_DIST = \
  CMake/FindNGHTTP2.cmake                        \
  CMake/FindNGHTTP3.cmake                        \
  CMake/FindNGTCP2.cmake                         \
+ CMake/FindNSS.cmake                            \
  CMake/FindQUICHE.cmake                         \
  CMake/FindWolfSSL.cmake                        \
+ CMake/FindZstd.cmake                           \
  CMake/Macros.cmake                             \
  CMake/OtherTests.cmake                         \
  CMake/Platforms/WindowsCache.cmake             \
@@ -664,7 +668,7 @@ VC_DIST = projects/README                           \
  projects/wolfssl_options.h                         \
  projects/wolfssl_override.props
 
-WINBUILD_DIST = winbuild/BUILD.WINDOWS.txt winbuild/gen_resp_file.bat \
+WINBUILD_DIST = winbuild/README.md winbuild/gen_resp_file.bat \
  winbuild/MakefileBuild.vc winbuild/Makefile.vc
 
 PLAN9_DIST = plan9/include/mkfile \
@@ -725,18 +729,19 @@ LIB_CFILES = altsvc.c amigaos.c asyn-ares.c asyn-thread.c base64.c            \
   http_ntlm.c http_proxy.c idn_win32.c if2ip.c imap.c inet_ntop.c inet_pton.c \
   krb5.c ldap.c llist.c md4.c md5.c memdebug.c mime.c mprintf.c mqtt.c        \
   multi.c netrc.c non-ascii.c nonblock.c openldap.c parsedate.c pingpong.c    \
-  pop3.c progress.c psl.c doh.c rand.c rename.c rtsp.c security.c select.c    \
+  pop3.c progress.c psl.c doh.c rand.c rename.c rtsp.c select.c               \
   sendf.c setopt.c sha256.c share.c slist.c smb.c smtp.c socketpair.c socks.c \
   socks_gssapi.c socks_sspi.c speedcheck.c splay.c strcase.c strdup.c         \
   strerror.c strtok.c strtoofft.c system_win32.c telnet.c tftp.c timeval.c    \
-  transfer.c urlapi.c version.c warnless.c wildcard.c x509asn1.c dynbuf.c
+  transfer.c urlapi.c version.c warnless.c wildcard.c x509asn1.c dynbuf.c     \
+  version_win32.c easyoptions.c easygetopt.c
 
 LIB_HFILES = altsvc.h amigaos.h arpa_telnet.h asyn.h conncache.h connect.h    \
   content_encoding.h cookie.h curl_addrinfo.h curl_base64.h curl_ctype.h      \
   curl_des.h curl_endian.h curl_fnmatch.h curl_get_line.h curl_gethostname.h  \
   curl_gssapi.h curl_hmac.h curl_ldap.h curl_md4.h curl_md5.h curl_memory.h   \
   curl_memrchr.h curl_multibyte.h curl_ntlm_core.h curl_ntlm_wb.h curl_path.h \
-  curl_printf.h curl_range.h curl_rtmp.h curl_sasl.h curl_sec.h curl_setup.h  \
+  curl_printf.h curl_range.h curl_rtmp.h curl_sasl.h curl_krb5.h curl_setup.h \
   curl_setup_once.h curl_sha256.h curl_sspi.h curl_threads.h curlx.h dict.h   \
   dotdot.h easyif.h escape.h file.h fileinfo.h formdata.h ftp.h url.h         \
   ftplistparser.h getinfo.h gopher.h hash.h hostcheck.h hostip.h http.h       \
@@ -748,7 +753,7 @@ LIB_HFILES = altsvc.h amigaos.h arpa_telnet.h asyn.h conncache.h connect.h    \
   smb.h smtp.h sockaddr.h socketpair.h socks.h speedcheck.h splay.h strcase.h \
   strdup.h strerror.h strtok.h strtoofft.h system_win32.h telnet.h tftp.h     \
   timeval.h transfer.h urlapi-int.h urldata.h warnless.h wildcard.h           \
-  x509asn1.h dynbuf.h
+  x509asn1.h dynbuf.h version_win32.h easyoptions.h
 
 LIB_RCFILES = libcurl.rc
 CSOURCES = $(LIB_CFILES) $(LIB_VAUTH_CFILES) $(LIB_VTLS_CFILES) \
@@ -765,7 +770,9 @@ CURLX_CFILES = \
   ../lib/nonblock.c \
   ../lib/warnless.c \
   ../lib/curl_ctype.c \
-  ../lib/curl_multibyte.c
+  ../lib/curl_multibyte.c \
+  ../lib/version_win32.c \
+  ../lib/dynbuf.c
 
 CURLX_HFILES = \
   ../lib/curl_setup.h \
@@ -773,7 +780,9 @@ CURLX_HFILES = \
   ../lib/nonblock.h \
   ../lib/warnless.h \
   ../lib/curl_ctype.h \
-  ../lib/curl_multibyte.h
+  ../lib/curl_multibyte.h \
+  ../lib/version_win32.h \
+  ../lib/dynbuf.h
 
 CURL_CFILES = \
   slist_wc.c \

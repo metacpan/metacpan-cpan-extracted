@@ -18,6 +18,7 @@ my @files = (
     'lib/Archive/BagIt/Role/Algorithm.pm',
     'lib/Archive/BagIt/Role/Manifest.pm',
     'lib/Archive/BagIt/Role/Plugin.pm',
+    'lib/Archive/BagIt/Role/Portability.pm',
     't/00-compile.t',
     't/00-load.t',
     't/access_bag.t',

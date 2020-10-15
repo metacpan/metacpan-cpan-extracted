@@ -1,6 +1,6 @@
 package Text::vCard::Precisely::Multiple;
 
-our $VERSION = '0.23';
+our $VERSION = '0.26';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -15,7 +15,7 @@ enum 'Version' => [qw( 3.0 4.0 )];
 has version    => ( is => 'ro', isa => 'Version', default => '3.0', required => 1 );
 
 subtype 'vCards' => as 'ArrayRef[Text::vCard::Precisely]';
-coerce 'vCards', from 'Text::vCard::Precisely', via { [ $_[0] ] };
+coerce 'vCards', from 'Text::vCard::Precisely', via { [$_] };
 has options => (
     traits  => ['Array'],
     is      => 'ro',
@@ -244,13 +244,13 @@ L<RFC 6350|https://tools.ietf.org/html/rfc6350>
 
 =item
 
-L<Text::vFile::asData|https://metacpan.org/pod/Text::vFile::asData>
+L<Text::vFile::asData>
 
 =back
 
 =head1 AUTHOR
 
-L<Yuki Yoshida(worthmine)|https://github.com/worthmine>
+Yuki Yoshida(L<worthmine|https://github.com/worthmine>)
 
 =head1 LICENSE
 

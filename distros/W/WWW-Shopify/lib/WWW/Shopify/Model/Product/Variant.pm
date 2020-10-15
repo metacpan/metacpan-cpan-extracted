@@ -23,6 +23,7 @@ BEGIN { $fields = {
 	"requires_shipping" => new WWW::Shopify::Field::Boolean(),
 	"sku" => new WWW::Shopify::Field::String(),
 	"taxable" => new WWW::Shopify::Field::Boolean(),
+	"tax_code" => new WWW::Shopify::Field::String(),
 	"title" => new WWW::Shopify::Field::String::Words(),
 	"compare_at_price" => new WWW::Shopify::Field::Money(),
 	"inventory_quantity" => new WWW::Shopify::Field::Int(),
@@ -33,7 +34,9 @@ BEGIN { $fields = {
 	"product_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Product'),
 	"created_at" => new WWW::Shopify::Field::Date(),
 	"updated_at" => new WWW::Shopify::Field::Date(),
-	"image_id" => new WWW::Shopify::Field::Relation::ReferenceOne("WWW::Shopify::Model::Product::Image")
+	"image_id" => new WWW::Shopify::Field::Relation::ReferenceOne("WWW::Shopify::Model::Product::Image"),
+	"presentment_prices" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Product::Variant::PresentmentPrice"),
+	"inventory_item_id" => new WWW::Shopify::Field::Relation::ReferenceOne("WWW::Shopify::Model::InventoryItem")
 }; }
 
 sub parent { return 'WWW::Shopify::Model::Product'; }

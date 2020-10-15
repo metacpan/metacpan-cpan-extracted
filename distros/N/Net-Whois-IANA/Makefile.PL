@@ -33,9 +33,10 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Explain" => 0,
     "Test::Builder" => 0,
     "Test::CPAN::Meta" => 0,
+    "Test::MockModule" => "0.175",
     "Test::More" => 0
   },
-  "VERSION" => "0.45",
+  "VERSION" => "0.46",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Test2::Tools::Explain" => 0,
   "Test::Builder" => 0,
   "Test::CPAN::Meta" => 0,
+  "Test::MockModule" => "0.175",
   "Test::More" => 0
 );
 

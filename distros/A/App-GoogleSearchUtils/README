@@ -2,8 +2,8 @@ NAME
     App::GoogleSearchUtils - CLI utilites related to google searching
 
 VERSION
-    This document describes version 0.004 of App::GoogleSearchUtils (from
-    Perl distribution App-GoogleSearchUtils), released on 2020-10-01.
+    This document describes version 0.006 of App::GoogleSearchUtils (from
+    Perl distribution App-GoogleSearchUtils), released on 2020-10-14.
 
 SYNOPSIS
     This distribution provides the following utilities:
@@ -22,6 +22,16 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   action => *str* (default: "open_url")
+
+        What to do with the URLs.
+
+        Instead of opening the queries in browser, you can also do other
+        action instead. For example, "print_url" will print the search URL.
+        "print_html_link" will print the HTML link (the <a> tag). And
+        "print_org_link" will print the Org-mode link, e.g.
+        "[[url...][query]]".
+
     *   append => *str*
 
         String to add at the end of each query.
@@ -39,6 +49,10 @@ FUNCTIONS
         String to add at the beginning of each query.
 
     *   queries* => *array[str]*
+
+    *   type => *str* (default: "web")
+
+        Search type.
 
     Returns an enveloped result (an array).
 

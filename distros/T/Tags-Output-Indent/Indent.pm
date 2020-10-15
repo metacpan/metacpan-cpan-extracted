@@ -19,7 +19,7 @@ Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Finalize Tags output.
 sub finalize {
@@ -553,11 +553,13 @@ __END__
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $tags = Tags::Output::Indent->new;
 
- Constructor
+Constructor.
+
+Returns instance of class.
 
 =over 8
 
@@ -620,6 +622,13 @@ __END__
 	 }
          return;
  }
+
+=item * C<input_tags_item_callback>
+
+ Input 'Tags' item callback.
+ Callback is processing before main 'Tags' put().
+ It's usefull for e.g. validation.
+ Default value is undef.
 
 =item * C<line_size>
 
@@ -691,31 +700,39 @@ __END__
 
 =back
 
-=item C<finalize()>
+=head2 C<finalize>
 
- Finalize Tags output.
- Automaticly puts end of all opened tags.
+ $tags->finalize;
 
-=item C<flush($reset_flag)>
+Finalize Tags output.
+Automaticly puts end of all opened tags.
 
- Flush tags in object.
- If defined 'output_handler' flush to its.
- Or return code.
- If enabled $reset_flag, then resets internal variables via reset method.
+=head2 C<flush>
 
-=item C<open_tags()>
+ $tags->flush;
 
- Return array of opened tags.
+Flush tags in object.
+If defined 'output_handler' flush to its.
+Or return code.
+If enabled $reset_flag, then resets internal variables via reset method.
 
-=item C<put(@data)>
+=head2 C<open_tags>
 
- Put tags code in tags format.
+ my @open_tags = $tags->open_tags;
 
-=item C<reset()>
+Return array of opened tags.
 
- Resets internal variables.
+=head2 C<put>
 
-=back
+ $tags->put(['b', 'tag']);
+
+Put tags code in tags format.
+
+=head2 C<reset>
+
+ $tags->reset;
+
+Resets internal variables.
 
 =head1 ERRORS
 
@@ -800,6 +817,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

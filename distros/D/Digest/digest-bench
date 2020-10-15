@@ -3,26 +3,27 @@
 use strict;
 die unless @ARGV;
 
-my($mod, @args) = @ARGV;
+my ( $mod, @args ) = @ARGV;
 
-eval "require $mod"; die $@ if $@;
+eval "require $mod";
+die $@ if $@;
 
-$a = substr(join("", "a" .. "z",) x 800, 0, 8 * 1024);
-my $count = 4*1024;
+$a = substr( join( "", "a" .. "z", ) x 800, 0, 8 * 1024 );
+my $count = 4 * 1024;
 
 use Time::HiRes qw(time);
 
 my $before = time;
-my $ctx = $mod->new(@args);
-for (1 .. $count) {
+my $ctx    = $mod->new(@args);
+for ( 1 .. $count ) {
     $ctx->add($a);
 }
 print $ctx->hexdigest, "\n";
 
-my $sec = time - $before;
+my $sec   = time - $before;
 my $bytes = length($a) * $count;
 
 print "$bytes/$sec\n";
 
-my $vers = do { no strict 'refs'; ${$mod . '::VERSION'} };
-printf "$mod $vers\t%.2f MB/s\n", $bytes/(1024*1024*$sec)
+my $vers = do { no strict 'refs'; ${ $mod . '::VERSION' } };
+printf "$mod $vers\t%.2f MB/s\n", $bytes / ( 1024 * 1024 * $sec )

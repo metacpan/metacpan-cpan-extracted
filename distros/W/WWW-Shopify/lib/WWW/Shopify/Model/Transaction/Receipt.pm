@@ -10,12 +10,13 @@ use parent 'WWW::Shopify::Model::NestedItem';
 
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
+	"id" => new WWW::Shopify::Field::String(),
 	"testcase" => new WWW::Shopify::Field::Boolean(),
 	"authorization" => new WWW::Shopify::Field::String::Regex("[0-9]{4,10}"),
 	# Stripe?
 	"code" => new WWW::Shopify::Field::String(),
 	"success" => new WWW::Shopify::Field::String(),
-	"message" => new WWW::Shopify::Field::String(),
+	"message" => new WWW::Shopify::Field::Text(),
 	"front_end" => new WWW::Shopify::Field::Int(),
 	"avs_end" => new WWW::Shopify::Field::String(),
 	"avs_result" => new WWW::Shopify::Field::String(),
@@ -30,7 +31,8 @@ BEGIN { $fields = {
 	"recurring" => new WWW::Shopify::Field::String(),
 	# Paypal
 	"ack" => new WWW::Shopify::Field::String::Enum(["Success", "Failure"]),
-	"timestamp" => new WWW::Shopify::Field::Date(),
+	# Isn't really a date. Can be a ton of different things.
+	"timestamp" => new WWW::Shopify::Field::String(),
 	"correlation_id" => new WWW::Shopify::Field::String(),
 	"version" => new WWW::Shopify::Field::Int(),
 	"build" => new WWW::Shopify::Field::Int(),
@@ -89,9 +91,28 @@ BEGIN { $fields = {
 	# Gift Card
 	"gift_card_id" => new WWW::Shopify::Field::String(),
 	"gift_card_masked_code" => new WWW::Shopify::Field::String(),
-	"gift_card_last_characters" => new WWW::Shopify::Field::String()
+	"gift_card_last_characters" => new WWW::Shopify::Field::String(),
+	# dibs_payment
+	"x_account_id" => new WWW::Shopify::Field::String(),
+	"x_amount" => new WWW::Shopify::Field::String(),
+	"x_currency" => new WWW::Shopify::Field::String(),
+	"x_gateway_reference" => new WWW::Shopify::Field::String(),
+	"x_reference" => new WWW::Shopify::Field::String(),
+	"x_result" => new WWW::Shopify::Field::String(),
+	"x_test" => new WWW::Shopify::Field::String(),
+	"x_timestamp" => new WWW::Shopify::Field::String(),
+	"x_transaction_type" => new WWW::Shopify::Field::String(),
+	"x_signature" => new WWW::Shopify::Field::String(),
+	# hi_trust
+	"ordernumber" => new WWW::Shopify::Field::String(),
+    "orderdesc" => new WWW::Shopify::Field::String(),
+	
 }; }
 
 eval(__PACKAGE__->generate_accessors); die $@ if $@;
+
+sub creation_filled { qw(); }
+sub identifier { qw() }
+sub is_single { 1; }
 
 1;

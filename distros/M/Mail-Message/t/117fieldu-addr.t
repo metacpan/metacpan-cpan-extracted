@@ -8,7 +8,7 @@ use Mail::Message;
 use Mail::Message::Test;
 use Mail::Message::Field::Addresses;
 
-use Test::More tests => 104;
+use Test::More tests => 108;
 use Encode qw(is_utf8);
 
 # avoid "print of Wide characters" warning
@@ -256,3 +256,15 @@ _MSG
 # returns last, but only invalid
 #   is($from, $two, 'scalar');
 }
+
+# Bug reported by Andrew, 2020-10-06
+# Since rfc2822, the local part of an email address can be a quoted
+# string.
+
+my $email = '"owner-farmsclub+\"simple.\"=ail.com"@simplelists.com';
+my $a1  = Mail::Message::Field::Address->parse($email);
+ok defined $a1, 'Parsed address with local as quoted-print';
+is $a1->address, $email;
+is $a1->username, 'owner-farmsclub+"simple."=ail.com';
+is $a1->domain, 'simplelists.com';
+

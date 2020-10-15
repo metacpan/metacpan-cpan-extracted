@@ -14,10 +14,10 @@ use warnings;
 use Metabolomics::Fragment::Annotation qw( :all ) ;
 
 use Metabolomics::Banks qw( :all ) ;
-use Metabolomics::Banks::BloodExposome qw( ) ;
+use Metabolomics::Banks::BloodExposome qw( :all ) ;
 use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 use Metabolomics::Banks::MaConDa qw( :all ) ;
-use Metabolomics::Banks::Knapsack qw( ) ;
+use Metabolomics::Banks::Knapsack qw( :all ) ;
 
 use Test::More tests =>  28 ;
 use Data::Dumper ;
@@ -73,7 +73,7 @@ BEGIN {
                  '_DATABASE_ENTRIES_' => [],
                  '_THEO_PEAK_LIST_' => [],
                  '_EXP_PEAK_LIST_' => [],
-               }, 'Metabolomics::Banks' ) ,
+               }, 'Metabolomics::Banks::BloodExposome' ) ,
 		'Method \'initBloodExpBankObject\' init a well formatted bank object'
 	) ;
 	
@@ -116,7 +116,7 @@ BEGIN {
                  '_THEO_PEAK_LIST_' => [],
                  '_DATABASE_NAME_' => 'Ab Initio Fragments',
                  '_DATABASE_ENTRIES_' => []
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 		'Method \'initBloodExpBankObject\' init a well formatted bank object'
 	) ;
 
@@ -178,7 +178,7 @@ BEGIN {
                  '_DATABASE_NAME_' => 'Ab Initio Fragments',
                  '_THEO_PEAK_LIST_' => [],
                  '_DATABASE_VERSION_' => '1.0'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 		## Eval:
 			'Method \'getFragmentsFromSource\' works with a well formatted source file');
 
@@ -294,7 +294,7 @@ BEGIN {
                                              '_ANNOTATION_IN_NEG_MODE_' => ''
                                            }, 'Metabolomics::Banks::AbInitioFragments' )
                                   ]
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 		## Eval
 			'Method \'buildTheoPeakBankFromFragments\' works with a refFragments object');
 		
@@ -411,7 +411,7 @@ BEGIN {
                  '_DATABASE_VERSION_' => '1.0',
                  '_DATABASE_DOI_' => 'database_doi',
                  '_DATABASE_NAME_' => 'Ab Initio Fragments'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 		## Eval
 			'Method \'buildTheoPeakBankFromFragments\' works with a refFragments object');
 
@@ -526,7 +526,7 @@ BEGIN {
                  '_DATABASE_VERSION_' => '1.0',
                  '_DATABASE_DOI_' => 'database_doi',
                  '_DATABASE_NAME_' => 'Ab Initio Fragments'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 			100.00001,
 			'POSITIVE'),
 		## Expected
@@ -727,7 +727,7 @@ BEGIN {
                                   ],
                  '_EXP_PEAK_LIST_' => [],
                  '_DATABASE_URL_' => 'database_url'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 		## Eval
 			'Method \'buildTheoDimerFromMz\' works with a oBank object' );
 
@@ -842,7 +842,7 @@ BEGIN {
                  '_DATABASE_VERSION_' => '1.0',
                  '_DATABASE_DOI_' => 'database_doi',
                  '_DATABASE_NAME_' => 'Ab Initio Fragments'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 			'POSITIVE'),
 		## Expected
 			bless( {
@@ -1003,7 +1003,7 @@ BEGIN {
                  '_DATABASE_URL_' => 'database_url',
                  '_DATABASE_DOI_' => 'database_doi',
                  '_DATABASE_NAME_' => 'Ab Initio Fragments'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::AbInitioFragments' ),
 		## Eval
 			'Method \'isotopicAdvancedCalculation\' works with a oBank object' );
 
@@ -1028,7 +1028,7 @@ BEGIN {
                  '_DATABASE_VERSION_' => '1.0',
                  '_CONTAMINANTS_' => [],
                  '_DATABASE_NAME_' => 'MaConDa'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		'Method \'initBloodExpBankObject\' init a well formatted bank object'
 	) ;
 
@@ -1099,7 +1099,7 @@ BEGIN {
                                               }, 'Metabolomics::Banks::MaConDa' )
                                      ],
                  '_DATABASE_NAME_' => 'MaConDa'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		## MSG:
 			'Method \'getContaminantsFromSource\' works with a well formatted source file');
 
@@ -1272,7 +1272,7 @@ BEGIN {
                  '_DATABASE_NAME_' => 'MaConDa',
                  '_DATABASE_DOI_' => 'database_doi',
                  '_DATABASE_ENTRIES_NB_' => 'database_entries_nb'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		## MSG:
 			'Method \'getContaminantsExtensiveFromSource\' works with a well formatted source file');
 
@@ -1466,7 +1466,7 @@ BEGIN {
                  '_THEO_PEAK_LIST_' => [],
                  '_DATABASE_URL_' => 'database_url',
                  '_DATABASE_ENTRIES_NB_' => 'database_entries_nb'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		'Method \'filterContaminantIonMode\' works with a refContaminants object and POSITIVE ion mode');
 
 #########################	
@@ -1506,7 +1506,7 @@ BEGIN {
                  '_DATABASE_URL_' => 'database_url',
                  '_DATABASE_VERSION_' => '1.0',
                  '_THEO_PEAK_LIST_' => []
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		'Method \'filterContaminantIonMode\' works with a refContaminants object and NEGATIVE ion mode');
 		
 #########################	
@@ -1546,7 +1546,7 @@ BEGIN {
                                      ],
                  '_DATABASE_DOI_' => 'database_doi',
                  '_DATABASE_ENTRIES_NB_' => 'database_entries_nb'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		'Method \'filterContaminantInstruments\' works with a refContaminants object and \'unknown\' instrument');
 
 #########################	
@@ -1605,7 +1605,7 @@ BEGIN {
                                               }, 'Metabolomics::Banks::MaConDa' )
                                      ],
                  '_DATABASE_VERSION_' => '1.0'
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		'Method \'filterContaminantInstrumentTypes\' works with a refContaminants object and \'Ion trap\' instrument');
 
 #########################	
@@ -1642,7 +1642,7 @@ BEGIN {
                  '_DATABASE_URL_' => 'database_url',
                  '_DATABASE_VERSION_' => '1.0',
                  '_THEO_PEAK_LIST_' => []
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
         # query mode
         'ION'
 		),
@@ -1691,7 +1691,7 @@ BEGIN {
                  '_DATABASE_ENTRIES_' => [],
                  '_DATABASE_URL_' => 'database_url',
                  '_EXP_PEAK_LIST_' => []
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::MaConDa' ),
 		## MSG
 		'Method \'buildTheoPeakBankFromContaminants\' works with Bank and Contaminants objects and \'ION\' mode');
 		
@@ -1713,7 +1713,7 @@ BEGIN {
                  '_DATABASE_ENTRIES_' => [],
                  '_THEO_PEAK_LIST_' => [],
                  '_EXP_PEAK_LIST_' => [],
-               }, 'Metabolomics::Banks' ) ,
+               }, 'Metabolomics::Banks::Knapsack' ) ,
 		'Method \'initKnapSackBankObject\' init a well formatted bank object'
 	) ;
 	
@@ -2100,7 +2100,7 @@ BEGIN {
                  '_DATABASE_DOI_' => '10.1093/pcp/pct176',
                  '_DATABASE_NAME_' => 'Knapsack',
                  '_THEO_PEAK_LIST_' => []
-               }, 'Metabolomics::Banks' ),
+               }, 'Metabolomics::Banks::Knapsack' ),
         # query mode
         'POSITIVE'
 		),

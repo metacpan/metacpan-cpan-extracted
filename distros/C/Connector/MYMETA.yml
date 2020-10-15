@@ -46,8 +46,8 @@ recommends:
 requires:
   Log::Log4perl: '0'
   Moose: '0'
-  perl: '5.008008'
+  perl: '5.010001'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.32'
+version: '1.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,8 @@
+0.07 2020-10-14T01:01:50+02:00
+ - Add 'input_tags_item_callback' for processing before 'Tags' put().
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Rewrite doc to use =head2 in case of methods.
+
 0.06 2020-04-28T00:10:37+02:00
  - Add author website to doc.
  - Add open_elements() method, deprecate open_tags() method with warning.

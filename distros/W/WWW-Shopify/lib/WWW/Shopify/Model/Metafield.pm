@@ -10,16 +10,16 @@ use parent "WWW::Shopify::Model::Item";
 
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
-	"created_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now'),
+	"created_at" => new WWW::Shopify::Field::Date(),
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"owner_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::Shop'),
-	"updated_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now'),
+	"updated_at" => new WWW::Shopify::Field::Date(),
 	"owner_resource" => new WWW::Shopify::Field::String::Enum(["shop"]),
 	"description" => new WWW::Shopify::Field::String(),
 	"key" => new WWW::Shopify::Field::String(),
 	"namespace" => new WWW::Shopify::Field::String(),
 	"value_type" => new WWW::Shopify::Field::String::Enum(["integer", "float", "string"]),
-	"value" => new WWW::Shopify::Field::String()
+	"value" => new WWW::Shopify::Field::MediumText()
 }; }
 
 sub get_all_through_parent { return 1; }

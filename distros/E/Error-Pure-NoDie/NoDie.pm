@@ -1,19 +1,15 @@
 package Error::Pure::NoDie;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Utils qw(err_helper);
 use List::MoreUtils qw(none);
 use Readonly;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
-# Constants.
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $EVAL => 'eval {...}';
@@ -63,25 +59,22 @@ Error::Pure::NoDie - Error::Pure module for simple print instead die.
 =head1 SYNOPSIS
 
  use Error::Pure::NoDie qw(err);
+
  err 'This is a fatal error', 'name', 'value';
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<err>
 
-=item B<err(@messages)>
+ err 'This is a fatal error', 'name', 'value';
 
- Process error with messages @messages.
-
-=back
+Process error with messages @messages.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::NoDie qw(err);
 
  # Error.
@@ -92,11 +85,9 @@ Error::Pure::NoDie - Error::Pure module for simple print instead die.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::NoDie qw(err);
 
  # Error.
@@ -109,11 +100,9 @@ Error::Pure::NoDie - Error::Pure module for simple print instead die.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::NoDie qw(err);
 
  # Error.
@@ -124,11 +113,9 @@ Error::Pure::NoDie - Error::Pure module for simple print instead die.
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dumpvalue;
  use Error::Pure::NoDie qw(err);
  use Error::Pure::Utils qw(err_get);
@@ -186,18 +173,24 @@ Install the Error::Pure modules.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Error-Pure-NoDie>
+
 =head1 AUTHOR
 
- Michal Špaček L<skim@cpan.org>
- http://skim.cz
+Michal Josef Špaček L<skim@cpan.org>
+
+http://skim.cz
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

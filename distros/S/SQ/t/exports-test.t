@@ -9,6 +9,6 @@ use SQ;
 
 {
     # TEST
-    is ($S, q#'#, "dollar-s contains a single quote.");
+    is( $S, q#'#, "dollar-s contains a single quote." );
 }
 

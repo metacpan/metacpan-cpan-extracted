@@ -1,0 +1,33 @@
+openapi: 3.0.0
+info:
+  version: '1'
+  title: 'Perl Async::Microservice::Helloworld'
+  description: 'synopsis example for Async::Microservice'
+  termsOfService: "http://toterms/"
+  contact:
+    name: Jozef
+    email: some@email
+  license:
+    name: Perl Licence
+    url: https://perldoc.perl.org/index-licence.html
+servers:
+  - url: /v1/
+paths:
+  '/hello':
+    get:
+      description: 'greetings'
+      responses:
+        200:
+          description: 'reply'
+          content:
+            'text/plain':
+              example: 'Hello world!'
+        500:
+          $ref: '#/components/responses/Internal-Server-Error'
+components:
+  responses:
+    'Internal-Server-Error':
+      description: 'Internal server error.'
+      content:
+        'text/plain':
+          example: 'Some exception at lib/Async/Microservice/Time.pm line 42.'

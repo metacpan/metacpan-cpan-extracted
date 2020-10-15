@@ -1,15 +1,27 @@
 package Sah::Schema::sortsub::spec;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-27'; # DATE
 our $DIST = 'Sah-Schemas-SortSub'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = ['str', {
     summary => 'Sort::Sub specification string (name + optional <i,r>)',
     match => qr/\A\w+(?:<[ir]*>)?\z/,
     'x.completion' => ['sortsub_spec'],
     prefilters => ['Str::replace_dashes_with_underscores'],
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'alphabetically', valid=>1},
+        {value=>'alphabetically<i>', valid=>1},
+        {value=>'alphabetically<>', valid=>1},
+        {value=>'alphabetically<ir>', valid=>1},
+        {value=>'alphabetically<ri>', valid=>1},
+        {value=>'alphabetically<r>', valid=>1},
+        {value=>'alphabetically<R>', valid=>0},
+    ],
+
 }, {}];
 
 1;
@@ -27,7 +39,86 @@ Sah::Schema::sortsub::spec - Sort::Sub specification string (name + optional <i,
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::sortsub::spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-02-28.
+This document describes version 0.004 of Sah::Schema::sortsub::spec (from Perl distribution Sah-Schemas-SortSub), released on 2020-05-27.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("sortsub::spec*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("sortsub::spec*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['sortsub::spec*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "alphabetically"  # valid
+
+ "alphabetically<i>"  # valid
+
+ "alphabetically<>"  # valid
+
+ "alphabetically<ir>"  # valid
+
+ "alphabetically<ri>"  # valid
+
+ "alphabetically<r>"  # valid
+
+ "alphabetically<R>"  # INVALID
 
 =head1 HOMEPAGE
 

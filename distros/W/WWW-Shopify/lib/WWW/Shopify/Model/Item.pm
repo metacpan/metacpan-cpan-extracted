@@ -73,6 +73,8 @@ Convenience method telling us if we're a WWW::Shopify::Model::Shop.
 
 sub is_shop { return undef; }
 
+sub graphql_only { return undef; }
+
 =head2 singular($package)
 
 Returns the text representing the singular form of this package. (WWW::Shopify::Model::Order->singular eq "order").
@@ -133,6 +135,9 @@ Returns whether or not a Shopify+ account is required to use this resource.
 
 sub needs_plus { return undef; }
 
+# Determines whether or not it's required for Shopify to manually enable access for this API.
+sub needs_blessing { return $_[0]->needs_plus; }
+
 # List of fields that should be filled automatically on creation.
 sub is_nested { return undef; }
 sub identifier { return ("id"); }
@@ -165,6 +170,8 @@ sub creatable { return 1; }
 sub updatable { my @fields = $_[0]->update_fields; return int(@fields) > 0; }
 sub deletable { return 1; }
 sub searchable { return undef; }
+
+sub get_order { ({'desc' => 'id' }) }
 
 =head2 actions($package)
 
@@ -270,9 +277,13 @@ Tells you whether or not the object throws webhooks for a living.
 
 =cut
 
+sub webhook_topic { return $_[0]->plural; }
 sub throws_webhooks { return undef; }
+sub webhook_create_name { 'create' }
 sub throws_create_webhooks { return $_[0]->throws_webhooks; }
+sub webhook_update_name { 'update' }
 sub throws_update_webhooks { return $_[0]->throws_webhooks; }
+sub webhook_delete_name { 'delete' }
 sub throws_delete_webhooks { return $_[0]->throws_webhooks; }
 
 # Oh fucking WOW. WHAT THE FUCK. Variants, of course, delete directly with their id, and modify with it.
@@ -301,6 +312,15 @@ sub cancel_through_parent { return defined $_[0]->parent; }
 sub enable_through_parent { return defined $_[0]->parent; }
 sub disable_through_parent { return defined $_[0]->parent; }
 sub account_activation_url_through_parent { return defined $_[0]->parent; }
+sub order_through_parent { return defined $_[0]->parent; }
+sub connect_through_parent { return defined $_[0]->parent; }
+sub adjust_through_parent { return defined $_[0]->parent; }
+sub set_through_parent { return defined $_[0]->parent; }
+
+sub prefix { '/'; }
+
+# Normally this is 403, but, lovely lovely shopify decides to vary this from object to object.
+sub error_codes_if_unavailable { (403) }
 
 =head2 max_per_page
 
@@ -315,6 +335,8 @@ sub max_per_page { return 250; }
 Tells you how many entries you'll get by default.
 
 =cut
+
+sub paginates { 1; }
 
 sub default_per_page { return 50; }
 
@@ -477,7 +499,7 @@ sub to_json($) {
 				next if $key eq "metafields" && !$_[0]->{metafields};
 				my @results = $self->$key();
 				if (int(@results)) {
-					$final->{$key} = [map { $_->to_json() } @results];
+					$final->{$key} = [map { $_->to_json() } grep { defined $_ } @results];
 				}
 				else {
 					$final->{$key} = [] if exists $self->{$key};
@@ -525,6 +547,8 @@ sub generate_accessors {
 
 sub read_scope { return undef; }
 sub write_scope { return undef; }
+# Whether or not the scopes actually need to be authorized; mega-sigh.
+sub actually_needs_scopes { 1; }
 
 =head1 SEE ALSO
 

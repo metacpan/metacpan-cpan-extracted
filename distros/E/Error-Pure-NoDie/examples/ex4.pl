@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Dumpvalue;
 use Error::Pure::NoDie qw(err);
 use Error::Pure::Utils qw(err_get);

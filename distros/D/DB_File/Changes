@@ -1,4 +1,11 @@
 
+1.855 13 October 2020
+
+   * Stop shipping DB_File_BS for the NeXT operating system.
+     https://github.com/pmqs/DB_File/pull/7
+     e5f329e066bf99f683c895f4a8b8ea328804bbb1
+     80e0bb7b655a2cb035292b3ae4b095d569314bdf
+
 1.854 16 September 2020
 
    * Prefer direct notation over indirect (#4)

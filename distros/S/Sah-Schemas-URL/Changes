@@ -1,3 +1,10 @@
+0.012   2020-05-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- Add examples (tests).
+
+
 0.011   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename coerce rule modules (Data::Sah::Coerce 0.034+).
@@ -8,7 +15,7 @@
 	- Update metadata version of coerce rule module(s) 3->4.
 
 
-0.009   2019-05-28 (PERLANCAR)
+0.009   2019-05-28  Released-By: PERLANCAR
 
 	- [ux] Add schema: urls (array of urls).
 

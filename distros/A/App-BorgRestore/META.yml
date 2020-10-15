@@ -34,7 +34,7 @@ no_index:
 provides:
   App::BorgRestore:
     file: lib/App/BorgRestore.pm
-    version: v3.4.3
+    version: v3.4.4
   App::BorgRestore::Borg:
     file: lib/App/BorgRestore/Borg.pm
   App::BorgRestore::DB:
@@ -48,7 +48,8 @@ provides:
   App::BorgRestore::Settings:
     file: lib/App/BorgRestore/Settings.pm
 requires:
-  DBD::SQLite: '0'
+  Carp::Assert: '0'
+  DBD::SQLite: '1.60'
   DBI: '0'
   Date::Parse: '0'
   File::pushd: '0'
@@ -75,6 +76,6 @@ resources:
   bugtracker: https://github.com/Bluewind/App-BorgRestore/issues
   homepage: https://github.com/Bluewind/App-BorgRestore
   repository: git://github.com/Bluewind/App-BorgRestore.git
-version: 3.4.3
+version: 3.4.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

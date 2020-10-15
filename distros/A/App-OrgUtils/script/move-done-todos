@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-21'; # DATE
+our $DATE = '2020-10-14'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.479'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 use 5.010001;
 use strict;
@@ -111,6 +111,8 @@ $SPEC{move_done_todos} = {
     summary => 'Move done todos from one Org file to another',
     description => <<'_',
 
+**WARNING: PLEASE BACKUP OR COMMIT YOUR UNSAVED WORK TO YOUR TODO FILE BEFORE USING THIS UTILITY. THIS UTILITY MODIFIES YOUR TODO FILE.**.
+
 This utility can move done todos from one file to another. One typical use-case
 is to archive done todo items from your todo file. The structure in the original
 file will be maintained. For example, suppose you have this file:
@@ -163,8 +165,38 @@ _
         },
     },
     features => {
-        dry_run => 1,
+        dry_run => {default=>1},
     },
+    examples => [
+        {
+            summary => 'Strip done items from todo.org into done.org (simulation mode, the default mode)',
+            src => '[[prog]] todo.org done.org',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Strip done items from todo.org into done.org',
+            src => '[[prog]] todo.org done.org --no-dry-run',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Strip done items from todo.org and put it into a new file done1.org',
+            src => '[[prog]] todo.org --no-dry-run >done1.org',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Strip done items from todo.org and print it to stdout (NOTE: you might want to save the stdout output because they are stripped from todo.org)',
+            src => '[[prog]] todo.org --no-dry-run',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub move_done_todos {
     require Org::Document;
@@ -231,19 +263,39 @@ move-done-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.479 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % move-done-todos [--config-path=path | -c] [--config-profile=profile |
-     -P] [--debug] [--dry-run] [--exclude-pat=s] [--format=name]
+     -P] [--debug] [--(no)dry-run] [--exclude-pat=s] [--format=name]
      [--include-pat=s] [--json] [--log-level=level] [--(no)naked-res]
      [--no-config | -C] [--no-env] [--page-result[=program]] [--quiet]
      [--trace] [--verbose] <undone_file> [done_file]
 
+Examples:
+
+Strip done items from todo.org into done.org (simulation mode, the default mode):
+
+ % move-done-todos todo.org done.org
+
+Strip done items from todo.org into done.org:
+
+ % move-done-todos todo.org done.org --no-dry-run
+
+Strip done items from todo.org and put it into a new file done1.org:
+
+ % move-done-todos todo.org --no-dry-run >done1.org
+
+Strip done items from todo.org and print it to stdout (NOTE: you might want to save the stdout output because they are stripped from todo.org):
+
+ % move-done-todos todo.org --no-dry-run
+
 =head1 DESCRIPTION
+
+B<WARNING: PLEASE BACKUP OR COMMIT YOUR UNSAVED WORK TO YOUR TODO FILE BEFORE USING THIS UTILITY. THIS UTILITY MODIFIES YOUR TODO FILE.>.
 
 This utility can move done todos from one file to another. One typical use-case
 is to archive done todo items from your todo file. The structure in the original
@@ -400,17 +452,13 @@ Filter output through a pager.
 
 =over
 
-=item B<--dry-run>
-
-Run in simulation mode (also via DRY_RUN=1).
-
-Default value:
-
- ""
-
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
+
+=item B<--no-dry-run>
+
+Disable simulation mode (also via DRY_RUN=0).
 
 =item B<--version>, B<-v>
 

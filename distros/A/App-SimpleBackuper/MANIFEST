@@ -1,0 +1,37 @@
+bin/simple-backuper
+Changes
+lib/App/SimpleBackuper.pm
+lib/App/SimpleBackuper.pod
+lib/App/SimpleBackuper/_BlockDelete.pm
+lib/App/SimpleBackuper/_BlocksInfo.pm
+lib/App/SimpleBackuper/_format.pm
+lib/App/SimpleBackuper/_print_table.pm
+lib/App/SimpleBackuper/Backup.pm
+lib/App/SimpleBackuper/BackupDB.pm
+lib/App/SimpleBackuper/DB.pm
+lib/App/SimpleBackuper/DB/BackupsTable.pm
+lib/App/SimpleBackuper/DB/BaseTable.pm
+lib/App/SimpleBackuper/DB/BlocksTable.pm
+lib/App/SimpleBackuper/DB/FilesTable.pm
+lib/App/SimpleBackuper/DB/Packer.pm
+lib/App/SimpleBackuper/DB/PartsTable.pm
+lib/App/SimpleBackuper/DB/UidsGidsTable.pm
+lib/App/SimpleBackuper/Info.pm
+lib/App/SimpleBackuper/RegularFile.pm
+lib/App/SimpleBackuper/Restore.pm
+lib/App/SimpleBackuper/RestoreDB.pm
+lib/App/SimpleBackuper/StorageCheck.pm
+lib/App/SimpleBackuper/StorageLocal.pm
+lib/App/SimpleBackuper/StorageSFTP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/Actions.t
+t/DB/BackupsTable.t
+t/DB/BaseTable.t
+t/DB/FilesTable.t
+t/RegularFile.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

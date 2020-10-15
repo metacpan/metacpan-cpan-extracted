@@ -8,12 +8,10 @@ META.yml
 Makefile.PL
 README.developer
 README.mkdn
-_Deparsed_XSubs.pm
 bagit_conformance_suite/LICENSE.md
 bagit_conformance_suite/README.1st
 bagit_conformance_suite/README.md
 bagit_conformance_suite/test-harness
-bagit_conformance_suite/v0.97/invalid/Makefile
 bagit_conformance_suite/v0.97/invalid/baginfo-missing-encoding/bag-info.txt
 bagit_conformance_suite/v0.97/invalid/baginfo-missing-encoding/bagit.txt
 bagit_conformance_suite/v0.97/invalid/baginfo-missing-encoding/data/bare-filename
@@ -123,7 +121,6 @@ bagit_conformance_suite/v0.97/valid/ISO-8859-1-encoded-tag-files/data/bare-filen
 bagit_conformance_suite/v0.97/valid/ISO-8859-1-encoded-tag-files/data/text-file.txt
 bagit_conformance_suite/v0.97/valid/ISO-8859-1-encoded-tag-files/manifest-md5.txt
 bagit_conformance_suite/v0.97/valid/ISO-8859-1-encoded-tag-files/tagmanifest-md5.txt
-bagit_conformance_suite/v0.97/valid/Makefile
 bagit_conformance_suite/v0.97/valid/UTF-16-encoded-tag-files/bag-info.txt
 bagit_conformance_suite/v0.97/valid/UTF-16-encoded-tag-files/bagit.txt
 bagit_conformance_suite/v0.97/valid/UTF-16-encoded-tag-files/data/bare-filename
@@ -324,6 +321,7 @@ lib/Archive/BagIt/Plugin/Manifest/SHA512.pm
 lib/Archive/BagIt/Role/Algorithm.pm
 lib/Archive/BagIt/Role/Manifest.pm
 lib/Archive/BagIt/Role/Plugin.pm
+lib/Archive/BagIt/Role/Portability.pm
 t/00-compile.t
 t/00-load.t
 t/access_bag.t

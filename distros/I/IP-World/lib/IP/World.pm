@@ -13,7 +13,7 @@ use Exporter qw(import);
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 our @EXPORT_OK = qw(IP_WORLD_FAST IP_WORLD_MMAP IP_WORLD_TINY IP_WORLD_TINY_PERL);
 

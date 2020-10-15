@@ -21,15 +21,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.902",
-    "Data::Sah::Coerce" => "0.038",
+    "Data::Sah" => "0.907",
+    "Data::Sah::Coerce" => "0.048",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98",
     "URI" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,8 +37,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.902",
-  "Data::Sah::Coerce" => "0.038",
+  "Data::Sah" => "0.907",
+  "Data::Sah::Coerce" => "0.048",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

@@ -1,9 +1,9 @@
 package Sah::Schemas::SortSub;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-28'; # DATE
+our $DATE = '2020-05-27'; # DATE
 our $DIST = 'Sah-Schemas-SortSub'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Sort::Sub
@@ -20,7 +20,7 @@ Sah::Schemas::SortSub - Sah schemas related to Sort::Sub
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::SortSub (from Perl distribution Sah-Schemas-SortSub), released on 2020-02-28.
+This document describes version 0.004 of Sah::Schemas::SortSub (from Perl distribution Sah-Schemas-SortSub), released on 2020-05-27.
 
 =head1 HOMEPAGE
 

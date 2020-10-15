@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
     "Log::ger" => "0.037",
     "Org::Document" => 0,
     "Org::Dump" => "0.551",
-    "Org::Parser" => "0.53",
+    "Org::Parser" => "0.553",
     "Org::Parser::Tiny" => "0.005",
     "Org::To::HTML" => "0.18",
     "Org::To::HTML::WordPress" => 0,
@@ -99,7 +99,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.479",
+  "VERSION" => "0.481",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -138,7 +138,7 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.037",
   "Org::Document" => 0,
   "Org::Dump" => "0.551",
-  "Org::Parser" => "0.53",
+  "Org::Parser" => "0.553",
   "Org::Parser::Tiny" => "0.005",
   "Org::To::HTML" => "0.18",
   "Org::To::HTML::WordPress" => 0,

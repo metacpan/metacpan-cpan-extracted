@@ -20,10 +20,12 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        'File::Share' => '0.25',
     },
     PREREQ_PM => {
         'Text::CSV' => '2.0',
         'XML::Twig' => '3.48',
+        'File::Share' => '0.25',
     },
     
     test  => {TESTS => 't/*.t'},

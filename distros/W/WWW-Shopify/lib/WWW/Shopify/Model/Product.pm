@@ -16,13 +16,15 @@ BEGIN { $fields = {
 	"body_html" => new WWW::Shopify::Field::Text::HTML(),
 	"variants" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Product::Variant", 1),
 	"handle" => new WWW::Shopify::Field::String::Handle(),
-	"product_type" => new WWW::Shopify::Field::String::Words(1,2),
+	"product_type" => new WWW::Shopify::Field::String(),
 	"template_suffix" => new WWW::Shopify::Field::String(),
 	"published_scope" => new WWW::Shopify::Field::String(),
-	"title" => new WWW::Shopify::Field::String::Words(1,2),
-	"vendor" => new WWW::Shopify::Field::String::Words(1,2),
+	"title" => new WWW::Shopify::Field::String(),
+	"vendor" => new WWW::Shopify::Field::String(),
 	"tags" => new WWW::Shopify::Field::String::Words(0,'*',', '),
 	"images" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Product::Image"),
+	# Useless alias.
+	# "image" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Product::Image"),
 	"options" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Product::Option", 1, 3),
 	"metafields" => new WWW::Shopify::Field::Relation::Many("WWW::Shopify::Model::Metafield"),
 	"id" => new WWW::Shopify::Field::Identifier(),
@@ -39,6 +41,7 @@ BEGIN { $queries = {
 	updated_at_max => new WWW::Shopify::Query::UpperBound('updated_at'),
 	published_at_min => new WWW::Shopify::Query::LowerBound('published_at'),
 	published_at_max => new WWW::Shopify::Query::UpperBound('published_at'),
+	ids => new WWW::Shopify::Query::MultiMatch('id'),
 	published_status => new WWW::Shopify::Query::Enum('published_status', ['unpublished', 'published', 'any']),
 	product_type => new WWW::Shopify::Query::Match('product_type'),
 	vendor => new WWW::Shopify::Query::Match('vendor'),
@@ -54,12 +57,13 @@ BEGIN { $queries = {
 
 
 sub get_fields { return grep { $_ ne "collects" && $_ ne "published" } keys(%$fields); }
-sub creation_minimal { return qw(title product_type vendor); }
+sub creation_minimal { return qw(title); }
 sub creation_filled { return qw(id created_at); }
 # Odd, even without an update method, it still has an updated at.
 sub update_filled { return qw(updated_at); }
 sub update_fields { return qw(metafields handle product_type title template_suffix vendor tags images options body_html variants published_at published); }
 sub throws_webhooks { return 1; }
+sub get_order { ({'asc' => 'title' }, { 'desc' => 'id' }) }
 
 sub read_scope { return "read_products"; }
 sub write_scope { return "write_products"; }

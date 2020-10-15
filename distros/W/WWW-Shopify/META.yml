@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,16 +15,20 @@ name: WWW-Shopify
 provides:
   WWW::Shopify:
     file: lib/WWW/Shopify.pm
-    version: '1.02'
+    version: '1.03'
   WWW::Shopify::Exception:
     file: lib/WWW/Shopify/Exception.pm
   WWW::Shopify::Exception::CallLimit:
     file: lib/WWW/Shopify/Exception.pm
   WWW::Shopify::Exception::DBError:
     file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Exception::ExceededCost:
+    file: lib/WWW/Shopify/Exception.pm
   WWW::Shopify::Exception::InvalidKey:
     file: lib/WWW/Shopify/Exception.pm
   WWW::Shopify::Exception::NotFound:
+    file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Exception::QueryParamTooLong:
     file: lib/WWW/Shopify/Exception.pm
   WWW::Shopify::Field:
     file: lib/WWW/Shopify/Field.pm
@@ -52,6 +56,8 @@ provides:
     file: lib/WWW/Shopify/Field/Identifier.pm
   WWW::Shopify::Field::Int:
     file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::MediumText:
+    file: lib/WWW/Shopify/Field/Text.pm
   WWW::Shopify::Field::Money:
     file: lib/WWW/Shopify/Field.pm
   WWW::Shopify::Field::Money::USD:
@@ -118,7 +124,11 @@ provides:
     file: lib/WWW/Shopify/Field/String.pm
   WWW::Shopify::Field::String::URL:
     file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::URL::Domain:
+    file: lib/WWW/Shopify/Field/String.pm
   WWW::Shopify::Field::String::URL::Image:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::URL::Long:
     file: lib/WWW/Shopify/Field/String.pm
   WWW::Shopify::Field::String::URL::Shopify:
     file: lib/WWW/Shopify/Field/String.pm
@@ -130,12 +140,16 @@ provides:
     file: lib/WWW/Shopify/Field/Text.pm
   WWW::Shopify::Field::Text::HTML:
     file: lib/WWW/Shopify/Field/Text.pm
+  WWW::Shopify::Field::Text::URL:
+    file: lib/WWW/Shopify/Field/Text.pm
   WWW::Shopify::Field::Timestamp:
     file: lib/WWW/Shopify/Field.pm
   WWW::Shopify::Field::Timezone:
     file: lib/WWW/Shopify/Field.pm
   WWW::Shopify::Field::Timezone::IANA:
     file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::GraphQL:
+    file: lib/WWW/Shopify/GraphQL.pm
   WWW::Shopify::Login:
     file: lib/WWW/Shopify/Login.pm
   WWW::Shopify::Model::APIClient:
@@ -146,8 +160,12 @@ provides:
     file: lib/WWW/Shopify/Model/Address.pm
   WWW::Shopify::Model::ApplicationCharge:
     file: lib/WWW/Shopify/Model/ApplicationCharge.pm
+  WWW::Shopify::Model::ApplicationCredit:
+    file: lib/WWW/Shopify/Model/ApplicationCredit.pm
   WWW::Shopify::Model::Article:
     file: lib/WWW/Shopify/Model/Article.pm
+  WWW::Shopify::Model::Article::Image:
+    file: lib/WWW/Shopify/Model/Article/Image.pm
   WWW::Shopify::Model::Asset:
     file: lib/WWW/Shopify/Model/Asset.pm
   WWW::Shopify::Model::Blog:
@@ -160,6 +178,8 @@ provides:
     file: lib/WWW/Shopify/Model/Cart/LineItem.pm
   WWW::Shopify::Model::Checkout:
     file: lib/WWW/Shopify/Model/Checkout.pm
+  WWW::Shopify::Model::Checkout::BillingAddress:
+    file: lib/WWW/Shopify/Model/Checkout/BillingAddress.pm
   WWW::Shopify::Model::Checkout::DiscountCode:
     file: lib/WWW/Shopify/Model/Checkout/DiscountCode.pm
   WWW::Shopify::Model::Checkout::LineItem:
@@ -168,10 +188,14 @@ provides:
     file: lib/WWW/Shopify/Model/Checkout/LineItem/Property.pm
   WWW::Shopify::Model::Checkout::NoteAttribute:
     file: lib/WWW/Shopify/Model/Checkout/NoteAttribute.pm
+  WWW::Shopify::Model::Checkout::ShippingAddress:
+    file: lib/WWW/Shopify/Model/Checkout/ShippingAddress.pm
   WWW::Shopify::Model::Checkout::ShippingLine:
     file: lib/WWW/Shopify/Model/Checkout/ShippingLine.pm
   WWW::Shopify::Model::Checkout::TaxLine:
     file: lib/WWW/Shopify/Model/Checkout/TaxLine.pm
+  WWW::Shopify::Model::Collect:
+    file: lib/WWW/Shopify/Model/Collect.pm
   WWW::Shopify::Model::Collection:
     file: lib/WWW/Shopify/Model/Collection.pm
   WWW::Shopify::Model::Collection::Image:
@@ -182,6 +206,8 @@ provides:
     file: lib/WWW/Shopify/Model/Country.pm
   WWW::Shopify::Model::Country::Province:
     file: lib/WWW/Shopify/Model/Country/Province.pm
+  WWW::Shopify::Model::Currency:
+    file: lib/WWW/Shopify/Model/Currency.pm
   WWW::Shopify::Model::CustomCollection:
     file: lib/WWW/Shopify/Model/CustomCollection.pm
   WWW::Shopify::Model::CustomCollection::Collect:
@@ -190,10 +216,36 @@ provides:
     file: lib/WWW/Shopify/Model/CustomCollection/Image.pm
   WWW::Shopify::Model::Customer:
     file: lib/WWW/Shopify/Model/Customer.pm
+  WWW::Shopify::Model::Customer::Address:
+    file: lib/WWW/Shopify/Model/Customer/Address.pm
   WWW::Shopify::Model::CustomerGroup:
     file: lib/WWW/Shopify/Model/CustomerGroup.pm
+  WWW::Shopify::Model::CustomerSavedSearch:
+    file: lib/WWW/Shopify/Model/CustomerSavedSearch.pm
   WWW::Shopify::Model::Discount:
     file: lib/WWW/Shopify/Model/Discount.pm
+  WWW::Shopify::Model::Dispute:
+    file: lib/WWW/Shopify/Model/Dispute.pm
+  WWW::Shopify::Model::DraftOrder:
+    file: lib/WWW/Shopify/Model/DraftOrder.pm
+  WWW::Shopify::Model::DraftOrder::BillingAddress:
+    file: lib/WWW/Shopify/Model/DraftOrder/BillingAddress.pm
+  WWW::Shopify::Model::DraftOrder::LineItem:
+    file: lib/WWW/Shopify/Model/DraftOrder/LineItem.pm
+  WWW::Shopify::Model::DraftOrder::LineItem::Property:
+    file: lib/WWW/Shopify/Model/DraftOrder/LineItem/Property.pm
+  WWW::Shopify::Model::DraftOrder::LineItem::TaxLine:
+    file: lib/WWW/Shopify/Model/DraftOrder/LineItem/TaxLine.pm
+  WWW::Shopify::Model::DraftOrder::NoteAttribute:
+    file: lib/WWW/Shopify/Model/DraftOrder/NoteAttribute.pm
+  WWW::Shopify::Model::DraftOrder::ShippingAddress:
+    file: lib/WWW/Shopify/Model/DraftOrder/ShippingAddress.pm
+  WWW::Shopify::Model::DraftOrder::ShippingLine:
+    file: lib/WWW/Shopify/Model/DraftOrder/ShippingLine.pm
+  WWW::Shopify::Model::DraftOrder::ShippingLine::TaxLine:
+    file: lib/WWW/Shopify/Model/DraftOrder/ShippingLine/TaxLine.pm
+  WWW::Shopify::Model::DraftOrder::TaxLine:
+    file: lib/WWW/Shopify/Model/DraftOrder/TaxLine.pm
   WWW::Shopify::Model::EmailTemplate:
     file: lib/WWW/Shopify/Model/EmailTemplate.pm
   WWW::Shopify::Model::Event:
@@ -204,6 +256,14 @@ provides:
     file: lib/WWW/Shopify/Model/FulfillmentService.pm
   WWW::Shopify::Model::GiftCard:
     file: lib/WWW/Shopify/Model/GiftCard.pm
+  WWW::Shopify::Model::GiftCard::Adjustment:
+    file: lib/WWW/Shopify/Model/GiftCard/Adjustment.pm
+  WWW::Shopify::Model::InventoryItem:
+    file: lib/WWW/Shopify/Model/InventoryItem.pm
+  WWW::Shopify::Model::InventoryItem::HSCode:
+    file: lib/WWW/Shopify/Model/InventoryItem/HSCode.pm
+  WWW::Shopify::Model::InventoryLevel:
+    file: lib/WWW/Shopify/Model/InventoryLevel.pm
   WWW::Shopify::Model::Item:
     file: lib/WWW/Shopify/Model/Item.pm
   WWW::Shopify::Model::LinkList:
@@ -218,6 +278,12 @@ provides:
     file: lib/WWW/Shopify/Model/LocaleTranslation.pm
   WWW::Shopify::Model::Location:
     file: lib/WWW/Shopify/Model/Location.pm
+  WWW::Shopify::Model::MarketingEvent:
+    file: lib/WWW/Shopify/Model/MarketingEvent.pm
+  WWW::Shopify::Model::Menu:
+    file: lib/WWW/Shopify/Model/Menu.pm
+  WWW::Shopify::Model::Menu::Item:
+    file: lib/WWW/Shopify/Model/Menu/Item.pm
   WWW::Shopify::Model::Metafield:
     file: lib/WWW/Shopify/Model/Metafield.pm
   WWW::Shopify::Model::NestedItem:
@@ -228,6 +294,8 @@ provides:
     file: lib/WWW/Shopify/Model/Order/BillingAddress.pm
   WWW::Shopify::Model::Order::ClientDetails:
     file: lib/WWW/Shopify/Model/Order/ClientDetails.pm
+  WWW::Shopify::Model::Order::DiscountApplication:
+    file: lib/WWW/Shopify/Model/Order/DiscountApplication.pm
   WWW::Shopify::Model::Order::DiscountCode:
     file: lib/WWW/Shopify/Model/Order/DiscountCode.pm
   WWW::Shopify::Model::Order::Fulfillment:
@@ -236,6 +304,8 @@ provides:
     file: lib/WWW/Shopify/Model/Order/Fulfillment/FulfillmentEvent.pm
   WWW::Shopify::Model::Order::Fulfillment::LineItem:
     file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem.pm
+  WWW::Shopify::Model::Order::Fulfillment::LineItem::DiscountAllocation:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem/DiscountAllocation.pm
   WWW::Shopify::Model::Order::Fulfillment::LineItem::Location:
     file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem/Location.pm
   WWW::Shopify::Model::Order::Fulfillment::LineItem::Property:
@@ -244,32 +314,64 @@ provides:
     file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem/TaxLine.pm
   WWW::Shopify::Model::Order::Fulfillment::Receipt:
     file: lib/WWW/Shopify/Model/Order/Fulfillment/Receipt.pm
+  WWW::Shopify::Model::Order::FulfillmentOrder:
+    file: lib/WWW/Shopify/Model/Order/FulfillmentOrder.pm
+  WWW::Shopify::Model::Order::FulfillmentOrder::Destination:
+    file: lib/WWW/Shopify/Model/Order/FulfillmentOrder/Destination.pm
+  WWW::Shopify::Model::Order::FulfillmentOrder::LineItem:
+    file: lib/WWW/Shopify/Model/Order/FulfillmentOrder/LineItem.pm
+  WWW::Shopify::Model::Order::FulfillmentOrder::MerchantRequest:
+    file: lib/WWW/Shopify/Model/Order/FulfillmentOrder/MerchantRequest.pm
   WWW::Shopify::Model::Order::LineItem:
     file: lib/WWW/Shopify/Model/Order/LineItem.pm
+  WWW::Shopify::Model::Order::LineItem::DiscountAllocation:
+    file: lib/WWW/Shopify/Model/Order/LineItem/DiscountAllocation.pm
+  WWW::Shopify::Model::Order::LineItem::DiscountAllocation::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/LineItem/DiscountAllocation/PriceSet.pm
   WWW::Shopify::Model::Order::LineItem::Location:
     file: lib/WWW/Shopify/Model/Order/LineItem/Location.pm
+  WWW::Shopify::Model::Order::LineItem::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/LineItem/PriceSet.pm
   WWW::Shopify::Model::Order::LineItem::Property:
     file: lib/WWW/Shopify/Model/Order/LineItem/Property.pm
   WWW::Shopify::Model::Order::LineItem::TaxLine:
     file: lib/WWW/Shopify/Model/Order/LineItem/TaxLine.pm
+  WWW::Shopify::Model::Order::LineItem::TaxLine::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/LineItem/TaxLine/PriceSet.pm
   WWW::Shopify::Model::Order::NoteAttribute:
     file: lib/WWW/Shopify/Model/Order/NoteAttribute.pm
   WWW::Shopify::Model::Order::PaymentDetails:
     file: lib/WWW/Shopify/Model/Order/PaymentDetails.pm
+  WWW::Shopify::Model::Order::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/PriceSet.pm
+  WWW::Shopify::Model::Order::PriceSet::MoneySet:
+    file: lib/WWW/Shopify/Model/Order/PriceSet/MoneySet.pm
   WWW::Shopify::Model::Order::Risk:
     file: lib/WWW/Shopify/Model/Order/Risk.pm
   WWW::Shopify::Model::Order::ShippingAddress:
     file: lib/WWW/Shopify/Model/Order/ShippingAddress.pm
   WWW::Shopify::Model::Order::ShippingLine:
     file: lib/WWW/Shopify/Model/Order/ShippingLine.pm
+  WWW::Shopify::Model::Order::ShippingLine::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/ShippingLine/PriceSet.pm
   WWW::Shopify::Model::Order::ShippingLine::TaxLine:
     file: lib/WWW/Shopify/Model/Order/ShippingLine/TaxLine.pm
   WWW::Shopify::Model::Order::TaxLine:
     file: lib/WWW/Shopify/Model/Order/TaxLine.pm
+  WWW::Shopify::Model::Order::TaxLine::PriceSet:
+    file: lib/WWW/Shopify/Model/Order/TaxLine/PriceSet.pm
   WWW::Shopify::Model::Page:
     file: lib/WWW/Shopify/Model/Page.pm
+  WWW::Shopify::Model::Payout:
+    file: lib/WWW/Shopify/Model/Payout.pm
+  WWW::Shopify::Model::Payout::Transaction:
+    file: lib/WWW/Shopify/Model/Payout/Transaction.pm
   WWW::Shopify::Model::Policy:
     file: lib/WWW/Shopify/Model/Policy.pm
+  WWW::Shopify::Model::PriceRule:
+    file: lib/WWW/Shopify/Model/PriceRule.pm
+  WWW::Shopify::Model::PriceRule::DiscountCode:
+    file: lib/WWW/Shopify/Model/PriceRule/DiscountCode.pm
   WWW::Shopify::Model::Product:
     file: lib/WWW/Shopify/Model/Product.pm
   WWW::Shopify::Model::Product::Image:
@@ -278,6 +380,10 @@ provides:
     file: lib/WWW/Shopify/Model/Product/Option.pm
   WWW::Shopify::Model::Product::Variant:
     file: lib/WWW/Shopify/Model/Product/Variant.pm
+  WWW::Shopify::Model::Product::Variant::PresentmentPrice:
+    file: lib/WWW/Shopify/Model/Product/Variant/PresentmentPrice.pm
+  WWW::Shopify::Model::Product::Variant::PresentmentPrice::MoneySet:
+    file: lib/WWW/Shopify/Model/Product/Variant/PresentmentPrice/MoneySet.pm
   WWW::Shopify::Model::ProductSearchEngine:
     file: lib/WWW/Shopify/Model/ProductSearchEngine.pm
   WWW::Shopify::Model::RecurringApplicationCharge:
@@ -288,6 +394,12 @@ provides:
     file: lib/WWW/Shopify/Model/Refund.pm
   WWW::Shopify::Model::Refund::LineItem:
     file: lib/WWW/Shopify/Model/Refund/LineItem.pm
+  WWW::Shopify::Model::Refund::LineItem::PriceSet:
+    file: lib/WWW/Shopify/Model/Refund/LineItem/PriceSet.pm
+  WWW::Shopify::Model::Refund::OrderAdjustment:
+    file: lib/WWW/Shopify/Model/Refund/OrderAdjustment.pm
+  WWW::Shopify::Model::Refund::OrderAdjustment::PriceSet:
+    file: lib/WWW/Shopify/Model/Refund/OrderAdjustment/PriceSet.pm
   WWW::Shopify::Model::Refund::Transaction:
     file: lib/WWW/Shopify/Model/Refund/Transaction.pm
   WWW::Shopify::Model::Refund::Transaction::PaymentDetails:
@@ -306,16 +418,30 @@ provides:
     file: lib/WWW/Shopify/Model/ShippingZone/WeightBasedShippingRate.pm
   WWW::Shopify::Model::Shop:
     file: lib/WWW/Shopify/Model/Shop.pm
+  WWW::Shopify::Model::ShopifyPayment::Balance::Transaction:
+    file: lib/WWW/Shopify/Model/ShopifyPayment/Balance/Transaction.pm
+  WWW::Shopify::Model::ShopifyPayment::Dispute:
+    file: lib/WWW/Shopify/Model/ShopifyPayment/Dispute.pm
+  WWW::Shopify::Model::ShopifyPayment::Payout:
+    file: lib/WWW/Shopify/Model/ShopifyPayment/Payout.pm
+  WWW::Shopify::Model::ShopifyPayment::Payout::Summary:
+    file: lib/WWW/Shopify/Model/ShopifyPayment/Payout/Summary.pm
   WWW::Shopify::Model::SmartCollection:
     file: lib/WWW/Shopify/Model/SmartCollection.pm
   WWW::Shopify::Model::SmartCollection::Image:
     file: lib/WWW/Shopify/Model/SmartCollection/Image.pm
   WWW::Shopify::Model::SmartCollection::Rule:
     file: lib/WWW/Shopify/Model/SmartCollection/Rule.pm
+  WWW::Shopify::Model::TenderTransaction:
+    file: lib/WWW/Shopify/Model/TenderTransaction.pm
+  WWW::Shopify::Model::TenderTransaction::PaymentDetails:
+    file: lib/WWW/Shopify/Model/TenderTransaction/PaymentDetails.pm
   WWW::Shopify::Model::Theme:
     file: lib/WWW/Shopify/Model/Theme.pm
   WWW::Shopify::Model::Transaction:
     file: lib/WWW/Shopify/Model/Transaction.pm
+  WWW::Shopify::Model::Transaction::CurrencyExchangeAdjustment:
+    file: lib/WWW/Shopify/Model/Transaction/CurrencyExchangeAdjustment.pm
   WWW::Shopify::Model::Transaction::PaymentDetails:
     file: lib/WWW/Shopify/Model/Transaction/PaymentDetails.pm
   WWW::Shopify::Model::Transaction::Receipt:
@@ -324,10 +450,14 @@ provides:
     file: lib/WWW/Shopify/Model/Transfer.pm
   WWW::Shopify::Model::Transfer::LineItem:
     file: lib/WWW/Shopify/Model/Transfer/LineItem.pm
+  WWW::Shopify::Model::UsageCharge:
+    file: lib/WWW/Shopify/Model/UsageCharge.pm
   WWW::Shopify::Model::User:
     file: lib/WWW/Shopify/Model/User.pm
   WWW::Shopify::Model::Webhook:
     file: lib/WWW/Shopify/Model/Webhook.pm
+  WWW::Shopify::Multiplexer:
+    file: lib/WWW/Shopify/Multiplexer.pm
   WWW::Shopify::Nest:
     file: lib/WWW/Shopify/Nest.pm
   WWW::Shopify::Private:
@@ -343,6 +473,8 @@ provides:
   WWW::Shopify::Query::LowerBound:
     file: lib/WWW/Shopify/Query.pm
   WWW::Shopify::Query::Match:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::Query::MultiMatch:
     file: lib/WWW/Shopify/Query.pm
   WWW::Shopify::Query::UpperBound:
     file: lib/WWW/Shopify/Query.pm
@@ -370,5 +502,5 @@ requires:
   URI::Escape: '3.31'
 resources:
   repository: https://bitbucket.org/bengmn/perl-shopify-api
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

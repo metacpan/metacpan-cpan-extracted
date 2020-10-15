@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.081';
+our $VERSION   = '0.082';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -375,7 +375,7 @@ sub method {
 sub symmethod {
 	my $next;
 	
-	if ( my $target = $THIS{CLASS_SPEC} ) {
+	if ( my $target = $THIS{CLASS_SPEC} || $THIS{APP_SPEC} ) {
 		$next = sub {
 			my ( $subname, $args ) = @_;
 			push @{ $target->{symmethod} ||= [] }, $subname, $args;
@@ -518,21 +518,21 @@ sub around {
 }
 
 sub extends {
-	$THIS{CLASS_SPEC}
-		or confess("`extends` used outside a class definition");
-	$THIS{CLASS_SPEC}{is_role}
+	my $spec = $THIS{CLASS_SPEC} || $THIS{APP_SPEC}
+		or confess("`extends` used outside a class or app definition");
+	$spec->{is_role}
 		and confess("`extends` used in a role definition");
 	
-	@{ $THIS{CLASS_SPEC}{extends} ||= [] } = @_;
+	@{ $spec->{extends} ||= [] } = @_;
 	
 	return;
 }
 
 sub with {
-	$THIS{CLASS_SPEC}
-		or confess("`with` used outside a class or role definition");
+	my $spec = $THIS{CLASS_SPEC} || $THIS{APP_SPEC}
+		or confess("`with` used outside a class, role, or app definition");
 	
-	push @{ $THIS{CLASS_SPEC}{with} ||= [] }, @_;
+	push @{ $spec->{with} ||= [] }, @_;
 	
 	return;
 }
@@ -565,11 +565,11 @@ sub constant {
 	
 	$names = [ $names ] unless is_ArrayRef $names;
 	
-	if ( $THIS{CLASS_SPEC} ) {
-		( $THIS{CLASS_SPEC}{constant} ||= {} )->{$_} = $value for @$names;
+	if ( my $spec = $THIS{CLASS_SPEC} || $THIS{APP_SPEC} ) {
+		( $spec->{constant} ||= {} )->{$_} = $value for @$names;
 	}
 	else {
-		my $caller = caller;
+		my $caller = $THIS{APP} || caller;
 		my %constants;
 		$constants{$_} = $value for @$names;
 		'MooX::Press'->patch_package( $caller, constant => \%constants );

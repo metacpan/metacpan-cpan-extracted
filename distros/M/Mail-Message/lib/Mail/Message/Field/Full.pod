@@ -519,7 +519,7 @@ concatenated comments.  Both atom and comments can be undef.
 
 Take the STRING, and try to strip-off a valid phrase.  In the obsolete
 phrase syntax, any sequence of words is accepted as phrase (as long as
-certain special characters are not used).  RFC2882 is stricter: only
+certain special characters are not used).  RFC2822 is stricter: only
 one word or a quoted string is allowed.  As always, the obsolete
 syntax is accepted, and the new syntax is produced.
 
@@ -672,8 +672,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.009,
-built on February 07, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.010,
+built on October 14, 2020. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

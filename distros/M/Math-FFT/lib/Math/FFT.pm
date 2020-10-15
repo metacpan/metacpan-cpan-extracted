@@ -13,37 +13,38 @@ require DynaLoader;
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 bootstrap Math::FFT $VERSION;
 
 # Preloaded methods go here.
 
-sub new {
-    my ($class, $data) = @_;
+sub new
+{
+    my ( $class, $data ) = @_;
     die 'Must call constructor with an array reference for the data'
         unless ref($data) eq 'ARRAY';
     $data->[0] ||= 0;    # keep warnings happy
-    my $n = @$data;
-    my $nip = int(3 + sqrt($n));
-    my $nw = int(2 + 5*$n/4);
-    my $ip = pack("i$nip", ());
-    my $w = pack("d$nw", ());
+    my $n   = @$data;
+    my $nip = int( 3 + sqrt($n) );
+    my $nw  = int( 2 + 5 * $n / 4 );
+    my $ip  = pack( "i$nip", () );
+    my $w   = pack( "d$nw", () );
     return bless {
-        type => '',
-        mean => '',
+        type  => '',
+        mean  => '',
         coeff => '',
-        n   => $n,
-        data => $data,
-        ip => \$ip,
-        w => \$w,
+        n     => $n,
+        data  => $data,
+        ip    => \$ip,
+        w     => \$w,
     }, $class;
 }
 
 # clone method to copy the ip and w arrays for data of equal size
-sub clone {
-    my ($self, $data) = @_;
+sub clone
+{
+    my ( $self, $data ) = @_;
     die 'Must call clone with an array reference for the data'
         unless ref($data) eq 'ARRAY';
     $data->[0] ||= 0;    # keep warnings happy
@@ -51,319 +52,371 @@ sub clone {
     die "Cannot clone data of unequal sizes" unless $n == $self->{n};
     my $class = ref($self);
     return bless {
-        type => '',
+        type  => '',
         coeff => '',
-        mean => '',
-        n   => $self->{n},
-        data => $data,
-        ip => $self->{ip},
-        w => $self->{w},
+        mean  => '',
+        n     => $self->{n},
+        data  => $data,
+        ip    => $self->{ip},
+        w     => $self->{w},
     }, $class;
 }
 
 # Complex Discrete Fourier Transform
-sub cdft {
+sub cdft
+{
     my $self = shift;
-    my $n = $self->{n};
+    my $n    = $self->{n};
     die "data size ($n) must be an integer power of 2" unless _check_n($n);
-    my $data = [ @{$self->{data}} ];
-    _cdft($n, 1, $data, $self->{ip}, $self->{w});
-    $self->{type} = 'cdft';
+    my $data = [ @{ $self->{data} } ];
+    _cdft( $n, 1, $data, $self->{ip}, $self->{w} );
+    $self->{type}  = 'cdft';
     $self->{coeff} = $data;
     return $data;
 }
 
 # Inverse Complex Discrete Fourier Transform
-sub invcdft {
+sub invcdft
+{
     my $self = shift;
     my $data;
     my $n = $self->{n};
-    if (my $arg = shift) {
-        if (ref($arg) ne 'ARRAY')
+    if ( my $arg = shift )
+    {
+        if ( ref($arg) ne 'ARRAY' )
         {
             die 'Must pass an array reference to invcdft';
         }
-        if ($n != @$arg)
+        if ( $n != @$arg )
         {
             die "Size of data set must be $n";
         }
-        $data = [ @$arg ];
+        $data = [@$arg];
     }
-    else {
+    else
+    {
         die 'Must invert data created with cdft'
             unless $self->{type} eq 'cdft';
-        $data =  [ @{$self->{coeff}} ];
+        $data = [ @{ $self->{coeff} } ];
     }
-    _cdft($n, -1, $data, $self->{ip}, $self->{w});
-    $_ *= 2.0/$n for (@$data);
+    _cdft( $n, -1, $data, $self->{ip}, $self->{w} );
+    $_ *= 2.0 / $n for (@$data);
     return $data;
 }
 
 # Real Discrete Fourier Transform
-sub rdft {
+sub rdft
+{
     my $self = shift;
-    my $n = $self->{n};
-    if (!_check_n($n))
+    my $n    = $self->{n};
+    if ( !_check_n($n) )
     {
         die "data size ($n) must be an integer power of 2";
     }
-    my $data = [ @{$self->{data}} ];
-    _rdft($n, 1, $data, $self->{ip}, $self->{w});
-    $self->{type} = 'rdft';
+    my $data = [ @{ $self->{data} } ];
+    _rdft( $n, 1, $data, $self->{ip}, $self->{w} );
+    $self->{type}  = 'rdft';
     $self->{coeff} = $data;
     return $data;
 }
 
 # Inverse Real Discrete Fourier Transform
-sub invrdft {
+sub invrdft
+{
     my $self = shift;
     my $data;
     my $n = $self->{n};
-    if (my $arg = shift) {
+    if ( my $arg = shift )
+    {
         die 'Must pass an array reference to invrdft'
             unless ref($arg) eq 'ARRAY';
         die "Size of data set must be $n"
             unless $n == @$arg;
-        $data = [ @$arg ];
+        $data = [@$arg];
     }
-    else {
+    else
+    {
         die 'Must invert data created with rdft'
             unless $self->{type} eq 'rdft';
-        $data =  [ @{$self->{coeff}} ];
+        $data = [ @{ $self->{coeff} } ];
     }
-    _rdft($n, -1, $data, $self->{ip}, $self->{w});
-    $_ *= 2.0/$n for (@$data);
+    _rdft( $n, -1, $data, $self->{ip}, $self->{w} );
+    $_ *= 2.0 / $n for (@$data);
     return $data;
 }
 
 # Discrete Cosine Transform
-sub ddct {
+sub ddct
+{
     my $self = shift;
-    my $n = $self->{n};
+    my $n    = $self->{n};
     die "data size ($n) must be an integer power of 2" unless _check_n($n);
-    my $data = [ @{$self->{data}} ];
-    _ddct($n, -1, $data, $self->{ip}, $self->{w});
-    $self->{type} = 'ddct';
+    my $data = [ @{ $self->{data} } ];
+    _ddct( $n, -1, $data, $self->{ip}, $self->{w} );
+    $self->{type}  = 'ddct';
     $self->{coeff} = $data;
     return $data;
 }
 
 # Inverse Discrete Cosine Transform
-sub invddct {
+sub invddct
+{
     my $self = shift;
     my $data;
     my $n = $self->{n};
-    if (my $arg = shift) {
+    if ( my $arg = shift )
+    {
         die 'Must pass an array reference to invddct'
             unless ref($arg) eq 'ARRAY';
         die "Size of data set must be $n"
             unless $n == @$arg;
-        $data = [ @$arg ];
+        $data = [@$arg];
     }
-    else {
+    else
+    {
         die 'Must invert data created with ddct'
             unless $self->{type} eq 'ddct';
-        $data =  [ @{$self->{coeff}} ];
+        $data = [ @{ $self->{coeff} } ];
     }
     $data->[0] *= 0.5;
-    _ddct($n, 1, $data, $self->{ip}, $self->{w});
-    $_ *= 2.0/$n for (@$data);
+    _ddct( $n, 1, $data, $self->{ip}, $self->{w} );
+    $_ *= 2.0 / $n for (@$data);
     return $data;
 }
 
 # Discrete Sine Transform
-sub ddst {
+sub ddst
+{
     my $self = shift;
-    my $n = $self->{n};
+    my $n    = $self->{n};
     die "data size ($n) must be an integer power of 2" unless _check_n($n);
-    my $data = [ @{$self->{data}} ];
-    _ddst($n, -1, $data, $self->{ip}, $self->{w});
-    $self->{type} = 'ddst';
+    my $data = [ @{ $self->{data} } ];
+    _ddst( $n, -1, $data, $self->{ip}, $self->{w} );
+    $self->{type}  = 'ddst';
     $self->{coeff} = $data;
     return $data;
 }
 
 # Inverse Discrete Sine Transform
-sub invddst {
+sub invddst
+{
     my $self = shift;
     my $data;
     my $n = $self->{n};
-    if (my $arg = shift) {
+    if ( my $arg = shift )
+    {
         die 'Must pass an array reference to invddst'
             unless ref($arg) eq 'ARRAY';
         die "Size of data set must be $n"
             unless $n == @$arg;
-        $data = [ @$arg ];
+        $data = [@$arg];
     }
-    else {
+    else
+    {
         die 'Must invert data created with ddst'
             unless $self->{type} eq 'ddst';
-        $data =  [ @{$self->{coeff}} ];
+        $data = [ @{ $self->{coeff} } ];
     }
     $data->[0] *= 0.5;
-    _ddst($n, 1, $data, $self->{ip}, $self->{w});
-    $_ *= 2.0/$n for (@$data);
+    _ddst( $n, 1, $data, $self->{ip}, $self->{w} );
+    $_ *= 2.0 / $n for (@$data);
     return $data;
 }
 
 # Cosine Transform of RDFT (Real Symmetric DFT)
-sub dfct {
+sub dfct
+{
     my $self = shift;
-    my $np1 = $self->{n};
-    my $n = $np1 - 1;
+    my $np1  = $self->{n};
+    my $n    = $np1 - 1;
     die "data size ($n) must be an integer power of 2" unless _check_n($n);
-    my $nt = int(2 + $n/2);
-    my $t = [];
-    my $data = [ @{$self->{data}} ];
-    pdfct($nt, $n, $data, $t, $self->{ip}, $self->{w});
-    $self->{type} = 'dfct';
+    my $nt   = int( 2 + $n / 2 );
+    my $t    = [];
+    my $data = [ @{ $self->{data} } ];
+    pdfct( $nt, $n, $data, $t, $self->{ip}, $self->{w} );
+    $self->{type}  = 'dfct';
     $self->{coeff} = $data;
     return $data;
 }
 
 # Inverse Cosine Transform of RDFT (Real Symmetric DFT)
-sub invdfct {
+sub invdfct
+{
     my $self = shift;
     my $data;
     my $np1 = $self->{n};
-    my $n = $np1 - 1;
-    if (my $arg = shift) {
+    my $n   = $np1 - 1;
+    if ( my $arg = shift )
+    {
         die 'Must pass an array reference to invdfct'
             unless ref($arg) eq 'ARRAY';
         die "Size of data set must be $n"
             unless $np1 == @$data;
-        $data = [ @$arg ];
+        $data = [@$arg];
     }
-    else {
+    else
+    {
         die 'Must invert data created with dfct'
             unless $self->{type} eq 'dfct';
-        $data =  [ @{$self->{coeff}} ];
+        $data = [ @{ $self->{coeff} } ];
     }
-    my $nt = int(2 + $n/2);
-    my $t = [];
-    $data->[0] *= 0.5;
+    my $nt = int( 2 + $n / 2 );
+    my $t  = [];
+    $data->[0]  *= 0.5;
     $data->[$n] *= 0.5;
-    pdfct($nt, $n, $data, $t, $self->{ip}, $self->{w});
-    $data->[0] *= 0.5;
+    pdfct( $nt, $n, $data, $t, $self->{ip}, $self->{w} );
+    $data->[0]  *= 0.5;
     $data->[$n] *= 0.5;
-    $_ *= 2.0/$n for (@$data);
+    $_          *= 2.0 / $n for (@$data);
     return $data;
 }
 
 # Sine Transform of RDFT (Real Anti-symmetric DFT)
-sub dfst {
+sub dfst
+{
     my $self = shift;
-    my $n = $self->{n};
+    my $n    = $self->{n};
     die "data size ($n) must be an integer power of 2" unless _check_n($n);
-    my $data = [ @{$self->{data}} ];
-    my $nt = int(2 + $n/2);
-    my $t = [];
-    pdfst($nt, $n, $data, $t, $self->{ip}, $self->{w});
-    $self->{type} = 'dfst';
+    my $data = [ @{ $self->{data} } ];
+    my $nt   = int( 2 + $n / 2 );
+    my $t    = [];
+    pdfst( $nt, $n, $data, $t, $self->{ip}, $self->{w} );
+    $self->{type}  = 'dfst';
     $self->{coeff} = $data;
     return $data;
 }
 
 # Inverse Sine Transform of RDFT (Real Anti-symmetric DFT)
-sub invdfst {
+sub invdfst
+{
     my $self = shift;
-    my $n = $self->{n};
+    my $n    = $self->{n};
     my $data;
-    if (my $arg = shift) {
+    if ( my $arg = shift )
+    {
         die 'Must pass an array reference to invdfst'
             unless ref($arg) eq 'ARRAY';
         die "Size of data set must be $n"
             unless $n == @$arg;
-        $data = [ @$arg ];
+        $data = [@$arg];
     }
-    else {
+    else
+    {
         die 'Must invert data created with dfst'
             unless $self->{type} eq 'dfst';
-        $data =  [ @{$self->{coeff}} ];
+        $data = [ @{ $self->{coeff} } ];
     }
-    my $nt = int(2 + $n/2);
-    my $t = [];
-    pdfst($nt, $n, $data, $t, $self->{ip}, $self->{w});
-    $_ *= 2.0/$n for (@$data);
+    my $nt = int( 2 + $n / 2 );
+    my $t  = [];
+    pdfst( $nt, $n, $data, $t, $self->{ip}, $self->{w} );
+    $_ *= 2.0 / $n for (@$data);
     return $data;
 }
 
 # check if $n is a power of 2
-sub _check_n {
+sub _check_n
+{
     my ($n) = @_;
 
-    return scalar($n == int($n) and $n > 0 and (! ($n & ($n-1))));
+    return scalar( $n == int($n) and $n > 0 and ( !( $n & ( $n - 1 ) ) ) );
 }
 
-sub correl {
-    my ($self, $other) = @_;
+sub correl
+{
+    my ( $self, $other ) = @_;
     my $n = $self->{n};
-    my $d1 = $self->{type} ?
-    ($self->{type} eq 'rdft' ? [ @{$self->{coeff}} ] :
-        die 'correl must involve a real function' ) :
-    $self->rdft &&  [ @{$self->{coeff}} ];
+    my $d1 =
+        $self->{type}
+        ? (
+        $self->{type} eq 'rdft'
+        ? [ @{ $self->{coeff} } ]
+        : die 'correl must involve a real function'
+        )
+        : $self->rdft && [ @{ $self->{coeff} } ];
     my $d2 = [];
-    if (ref($other) eq 'Math::FFT') {
-        $d2 = $other->{type} ?
-        ($other->{type} eq 'rdft' ? [ @{$other->{coeff}}] :
-            die 'correl must involve a real function' ) :
-        $other->rdft && [ @{$other->{coeff}}];
+    if ( ref($other) eq 'Math::FFT' )
+    {
+        $d2 =
+            $other->{type}
+            ? (
+            $other->{type} eq 'rdft'
+            ? [ @{ $other->{coeff} } ]
+            : die 'correl must involve a real function'
+            )
+            : $other->rdft && [ @{ $other->{coeff} } ];
     }
-    elsif (ref($other) eq 'ARRAY') {
-        $d2 = [ @$other ];
-        _rdft($n, 1, $d2, $self->{ip}, $self->{w});
+    elsif ( ref($other) eq 'ARRAY' )
+    {
+        $d2 = [@$other];
+        _rdft( $n, 1, $d2, $self->{ip}, $self->{w} );
     }
-    else {
+    else
+    {
         die 'Must call correl with either a Math::FFT object or an array ref';
     }
     my $corr = [];
-    _correl($n, $corr, $d1, $d2, $self->{ip}, $self->{w});
+    _correl( $n, $corr, $d1, $d2, $self->{ip}, $self->{w} );
     return $corr;
 }
 
-sub convlv {
-    my ($self, $r) = @_;
+sub convlv
+{
+    my ( $self, $r ) = @_;
     die 'Must call convlv with an array reference for the response data'
         unless ref($r) eq 'ARRAY';
-    my $respn = [ @$r ];
-    my $m = @$respn;
+    my $respn = [@$r];
+    my $m     = @$respn;
     die 'size of response data must be an odd integer' unless $m % 2 == 1;
     my $n = $self->{n};
-    my $d1 = $self->{type} ?
-    ($self->{type} eq 'rdft' ? [ @{$self->{coeff}} ] :
-        die 'correl must involve a real function' ) :
-    $self->rdft &&  [ @{$self->{coeff}} ];
-    for (my $i=1; $i<=($m-1)/2; $i++) {
-        $respn->[$n-$i] = $respn->[$m-$i];
+    my $d1 =
+        $self->{type}
+        ? (
+        $self->{type} eq 'rdft'
+        ? [ @{ $self->{coeff} } ]
+        : die 'correl must involve a real function'
+        )
+        : $self->rdft && [ @{ $self->{coeff} } ];
+    for ( my $i = 1 ; $i <= ( $m - 1 ) / 2 ; ++$i )
+    {
+        $respn->[ $n - $i ] = $respn->[ $m - $i ];
     }
-    for (my $i=($m+3)/2; $i<=$n-($m-1)/2; $i++) {
-        $respn->[$i-1] = 0.0;
+    for ( my $i = ( $m + 3 ) / 2 ; $i <= $n - ( $m - 1 ) / 2 ; ++$i )
+    {
+        $respn->[ $i - 1 ] = 0.0;
     }
     my $convlv = [];
-    _convlv($n, $convlv, $d1, $respn, $self->{ip}, $self->{w});
+    _convlv( $n, $convlv, $d1, $respn, $self->{ip}, $self->{w} );
     return $convlv;
 }
 
-sub deconvlv {
-    my ($self, $r) = @_;
+sub deconvlv
+{
+    my ( $self, $r ) = @_;
     die 'Must call deconvlv with an array reference for the response data'
         unless ref($r) eq 'ARRAY';
-    my $respn = [ @$r ];
-    my $m = @$respn;
+    my $respn = [@$r];
+    my $m     = @$respn;
     die 'size of response data must be an odd integer' unless $m % 2 == 1;
     my $n = $self->{n};
-    my $d1 = $self->{type} ?
-    ($self->{type} eq 'rdft' ? [ @{$self->{coeff}} ] :
-        die 'correl must involve a real function' ) :
-    $self->rdft &&  [ @{$self->{coeff}} ];
-    for (my $i=1; $i<=($m-1)/2; $i++) {
-        $respn->[$n-$i] = $respn->[$m-$i];
+    my $d1 =
+        $self->{type}
+        ? (
+        $self->{type} eq 'rdft'
+        ? [ @{ $self->{coeff} } ]
+        : die 'correl must involve a real function'
+        )
+        : $self->rdft && [ @{ $self->{coeff} } ];
+    for ( my $i = 1 ; $i <= ( $m - 1 ) / 2 ; ++$i )
+    {
+        $respn->[ $n - $i ] = $respn->[ $m - $i ];
     }
-    for (my $i=($m+3)/2; $i<=$n-($m-1)/2; $i++) {
-        $respn->[$i-1] = 0.0;
+    for ( my $i = ( $m + 3 ) / 2 ; $i <= $n - ( $m - 1 ) / 2 ; ++$i )
+    {
+        $respn->[ $i - 1 ] = 0.0;
     }
     my $convlv = [];
-    if (_deconvlv($n, $convlv, $d1, $respn, $self->{ip}, $self->{w}) != 0) {
+    if ( _deconvlv( $n, $convlv, $d1, $respn, $self->{ip}, $self->{w} ) != 0 )
+    {
         die "Singularity encountered for response in deconvlv";
     }
     return $convlv;
@@ -371,135 +424,166 @@ sub deconvlv {
 
 {
 
-    my $PI2 = 2 * 4.0 * atan2(1,1);
-sub spctrm {
-    my ($self, %args) = @_;
-    my %accept = map {$_ => 1} qw(window segments number overlap);
-    for (keys %args) {
-        die "`$_' is not a valid argument to spctrm" if not $accept{$_};
-    }
-    my $win_fun = $args{window};
-    if ($win_fun and ref($win_fun) ne 'CODE') {
-        my %accept = map {$_ => 1} qw(hamm hann welch bartlett);
-        die "`$win_fun' is not a known window function in spctrm"
-        if not $accept{$win_fun};
-    }
-    die 'Please specify a value for "segments" in spctrm()'
-    if ($args{number} and ! $args{segments});
-    my $n = $self->{n};
-    my $d;
-    my $n2 = 0;
-    my $spctrm = [];
-    my $win_sub = do {
-        my $h = sub {
-            my ($j, $n) = @_;
-            return (1 - cos($PI2*$j/$n))/2;
+    my $PI2 = 2 * 4.0 * atan2( 1, 1 );
+
+    sub spctrm
+    {
+        my ( $self, %args ) = @_;
+        my %accept = map { $_ => 1 } qw(window segments number overlap);
+        for ( keys %args )
+        {
+            die "`$_' is not a valid argument to spctrm" if not $accept{$_};
+        }
+        my $win_fun = $args{window};
+        if ( $win_fun and ref($win_fun) ne 'CODE' )
+        {
+            my %accept = map { $_ => 1 } qw(hamm hann welch bartlett);
+            die "`$win_fun' is not a known window function in spctrm"
+                if not $accept{$win_fun};
+        }
+        die 'Please specify a value for "segments" in spctrm()'
+            if ( $args{number} and !$args{segments} );
+        my $n = $self->{n};
+        my $d;
+        my $n2      = 0;
+        my $spctrm  = [];
+        my $win_sub = do
+        {
+            my $h = sub {
+                my ( $j, $n ) = @_;
+                return ( 1 - cos( $PI2 * $j / $n ) ) / 2;
+            };
+
+            +{
+                'hamm'  => $h,
+                'hann'  => $h,
+                'welch' => sub {
+                    my ( $j, $n ) = @_;
+                    return 1 - 4 * ( $j - $n / 2 ) * ( $j - $n / 2 ) / $n / $n;
+                },
+                'bartlett' => sub {
+                    my ( $j, $n ) = @_;
+                    return 1 - abs( 2 * ( $j - $n / 2 ) / $n );
+                },
+            };
         };
+        if ( not $args{segments}
+            or ( $args{segments} == 1 and not $args{number} ) )
+        {
+            die "data size ($n) must be an integer power of 2"
+                unless _check_n($n);
+            if ($win_fun)
+            {
+                $d       = [ @{ $self->{data} } ];
+                $win_fun = $win_sub->{$win_fun} if ref($win_fun) ne 'CODE';
+                for ( my $j = 0 ; $j < $n ; ++$j )
+                {
+                    my $w = $win_fun->( $j, $n );
+                    $d->[$j] *= $w;
+                    $n2 += $w * $w;
+                }
+                $n2 *= $n;
+                _spctrm( $n, $spctrm, $d, $self->{ip}, $self->{w}, $n2, 1 );
+            }
+            else
+            {
+                $d =
+                    $self->{type}
+                    ? (
+                      $self->{type} eq 'rdft'
+                    ? $self->{coeff}
+                    : die 'correl must involve a real function'
+                    )
+                    : $self->rdft && $self->{coeff};
+                $n2 = $n * $n;
+                _spctrm( $n, $spctrm, $d, $self->{ip}, $self->{w}, $n2, 0 );
+            }
+        }
+        else
+        {
+            $d = [ @{ $self->{data} } ];
+            my ( $data, @w );
+            my $k = $args{segments};
+            my $m = $args{number};
+            die 'Please specify a value for "number" in spctrm()'
+                if ( $k and !$m );
+            die "number ($m) must be an integer power of 2" unless _check_n($m);
+            my $m2      = $m + $m;
+            my $overlap = $args{overlap};
+            my $N       = $overlap ? ( $k + 1 ) * $m : 2 * $k * $m;
+            die "Need $N data points (data only has $n)" if $N > $n;
 
-        +{
-            'hamm' => $h,
-            'hann' => $h,
-            'welch' => sub {
-                my ($j, $n) = @_;
-                return 1 - 4*($j-$n/2)*($j-$n/2)/$n/$n;
-            },
-            'bartlett' => sub {
-                my ($j, $n) = @_;
-                return 1 - abs(2*($j-$n/2)/$n);
-            },
-        }
-    };
-    if (not $args{segments} or ($args{segments} == 1 and not $args{number})) {
-        die "data size ($n) must be an integer power of 2" unless _check_n($n);
-        if ($win_fun) {
-            $d = [ @{$self->{data}}];
-            $win_fun = $win_sub->{$win_fun} if ref($win_fun) ne 'CODE';
-            for (my $j=0; $j<$n; $j++) {
-                my $w = $win_fun->($j, $n);
-                $d->[$j] *= $w;
-                $n2 += $w * $w;
-            }
-            $n2 *= $n;
-            _spctrm($n, $spctrm, $d, $self->{ip}, $self->{w}, $n2, 1);
-        }
-        else {
-            $d = $self->{type} ?
-            ($self->{type} eq 'rdft' ? $self->{coeff} :
-                die 'correl must involve a real function' ) :
-            $self->rdft && $self->{coeff};
-            $n2 = $n*$n;
-            _spctrm($n, $spctrm, $d, $self->{ip}, $self->{w}, $n2, 0);
-        }
-    }
-    else {
-        $d = [ @{$self->{data}}];
-        my ($data, @w);
-        my $k = $args{segments};
-        my $m = $args{number};
-        die 'Please specify a value for "number" in spctrm()'
-        if ($k and ! $m);
-        die "number ($m) must be an integer power of 2" unless _check_n($m);
-        my $m2 = $m+$m;
-        my $overlap = $args{overlap};
-        my $N = $overlap ? ($k+1)*$m : 2*$k*$m;
-        die "Need $N data points (data only has $n)" if $N > $n;
-        if ($win_fun) {
-            $win_fun = $win_sub->{$win_fun} if ref($win_fun) ne 'CODE';
-            for (my $j=0; $j<$m2; $j++) {
-                $w[$j] = $win_fun->($j, $m2);
-                $n2 += $w[$j]*$w[$j];
-            }
-        }
-        else {
-            $n2 = $m2;
-        }
-        if ($overlap) {
-            my @old =  splice(@$d, 0, $m);
-            for (0..$k-1) {
-                push @{$data->[$_]}, @old;
-                my @new = splice(@$d, 0, $m);
-                push @{$data->[$_]}, @new;
-                @old = @new;
-                if ($win_fun) {
-                    my $j=0;
-                    $data->[$_] = [ map {$w[$j++]*$_} @{$data->[$_]}];
+            if ($win_fun)
+            {
+                $win_fun = $win_sub->{$win_fun} if ref($win_fun) ne 'CODE';
+                for ( my $j = 0 ; $j < $m2 ; ++$j )
+                {
+                    $w[$j] = $win_fun->( $j, $m2 );
+                    $n2 += $w[$j] * $w[$j];
                 }
             }
-        }
-        else {
-            for (0..$k-1) {
-                push @{$data->[$_]}, splice(@$d, 0, $m2);
-                if ($win_fun) {
-                    my $j=0;
-                    $data->[$_] = [ map {$w[$j++]*$_} @{$data->[$_]}];
+            else
+            {
+                $n2 = $m2;
+            }
+            if ($overlap)
+            {
+                my @old = splice( @$d, 0, $m );
+                for ( 0 .. $k - 1 )
+                {
+                    push @{ $data->[$_] }, @old;
+                    my @new = splice( @$d, 0, $m );
+                    push @{ $data->[$_] }, @new;
+                    @old = @new;
+                    if ($win_fun)
+                    {
+                        my $j = 0;
+                        $data->[$_] =
+                            [ map { $w[ $j++ ] * $_ } @{ $data->[$_] } ];
+                    }
                 }
             }
+            else
+            {
+                for ( 0 .. $k - 1 )
+                {
+                    push @{ $data->[$_] }, splice( @$d, 0, $m2 );
+                    if ($win_fun)
+                    {
+                        my $j = 0;
+                        $data->[$_] =
+                            [ map { $w[ $j++ ] * $_ } @{ $data->[$_] } ];
+                    }
+                }
+            }
+            my $tmp = [];
+            my $nip = int( 3 + sqrt($m2) );
+            my $nw  = int( 2 + 5 * $m2 / 4 );
+            my $ip  = pack( "i$nip", () );
+            my $w   = pack( "d$nw", () );
+            _spctrm_bin( $k, $m2, $spctrm, $data, \$ip, \$w, $n2, $tmp );
         }
-        my $tmp = [];
-        my $nip = int(3 + sqrt($m2));
-        my $nw = int(2 + 5*$m2/4);
-        my $ip = pack("i$nip", ());
-        my $w = pack("d$nw", ());
-        _spctrm_bin($k, $m2, $spctrm, $data, \$ip, \$w, $n2, $tmp);
+        return $spctrm;
     }
-    return $spctrm;
-}
 }
 
-sub mean {
+sub mean
+{
     my $self = shift;
-    my $sum = 0;
-    my ($n, $data);
+    my $sum  = 0;
+    my ( $n, $data );
     my $flag = 0;
-    if ($data = shift) {
+    if ( $data = shift )
+    {
         die 'Must call with an array reference'
-        unless ref($data) eq 'ARRAY';
-        $n = @$data;
+            unless ref($data) eq 'ARRAY';
+        $n    = @$data;
         $flag = 1;
     }
-    else {
+    else
+    {
         $data = $self->{data};
-        $n = $self->{n};
+        $n    = $self->{n};
     }
     $sum += $_ for @$data;
     my $mean = $sum / $n;
@@ -507,88 +591,99 @@ sub mean {
     return $mean;
 }
 
-sub rms {
+sub rms
+{
     my $self = shift;
-    my $sum = 0;
-    my ($n, $data);
-    if ($data = shift) {
-        die 'Must call with an array reference'
-        unless ref($data) eq 'ARRAY';
-        $n = @$data;
-    }
-    else {
-        $data = $self->{data};
-        $n = $self->{n};
-    }
-    $sum += $_*$_ for @$data;
-    return sqrt($sum / $n);
-}
-
-sub stdev {
-    my $self = shift;
-    my ($n, $data, $mean);
-    if ($data = shift) {
-        die 'Must call with an array reference'
-        unless ref($data) eq 'ARRAY';
-        $n = @$data;
-        $mean = $self->mean($data);
-    }
-    else {
-        $data = $self->{data};
-        $n = $self->{n};
-        $mean = $self->{mean} || $self->mean;
-    }
-    die 'Cannot find the standard deviation with n = 1'
-    if $n == 1;
-    my $sum = 0;
-    $sum += ($_ - $mean)*($_ - $mean) for @$data;
-    return sqrt($sum / ($n-1));
-}
-
-sub range {
-    my $self = shift;
-    my ($n, $data);
-    if ($data = shift) {
-        die 'Must call with an array reference'
-        unless ref($data) eq 'ARRAY';
-        $n = @$data;
-    }
-    else {
-        $data = $self->{data};
-        $n = $self->{n};
-    }
-    my $min = $data->[0];
-    my $max = $data->[0];
-    for (@$data) {
-        $min = $_ if $_ < $min;
-        $max = $_ if $_ > $max;
-    }
-    return ($min, $max);
-}
-
-sub median {
-    my $self = shift;
-    my ($n, $data);
-    if ($data = shift) {
+    my $sum  = 0;
+    my ( $n, $data );
+    if ( $data = shift )
+    {
         die 'Must call with an array reference'
             unless ref($data) eq 'ARRAY';
         $n = @$data;
     }
-    else {
+    else
+    {
         $data = $self->{data};
-        $n = $self->{n};
+        $n    = $self->{n};
     }
-    my @sorted = sort {$a <=> $b} @$data;
-    return
-    (
-        ($n & 0x1)
-        ? $sorted[($n-1)/2]
-        : ($sorted[$n/2] + $sorted[$n/2-1])/2
+    $sum += $_ * $_ for @$data;
+    return sqrt( $sum / $n );
+}
+
+sub stdev
+{
+    my $self = shift;
+    my ( $n, $data, $mean );
+    if ( $data = shift )
+    {
+        die 'Must call with an array reference'
+            unless ref($data) eq 'ARRAY';
+        $n    = @$data;
+        $mean = $self->mean($data);
+    }
+    else
+    {
+        $data = $self->{data};
+        $n    = $self->{n};
+        $mean = $self->{mean} || $self->mean;
+    }
+    die 'Cannot find the standard deviation with n = 1'
+        if $n == 1;
+    my $sum = 0;
+    $sum += ( $_ - $mean ) * ( $_ - $mean ) for @$data;
+    return sqrt( $sum / ( $n - 1 ) );
+}
+
+sub range
+{
+    my $self = shift;
+    my ( $n, $data );
+    if ( $data = shift )
+    {
+        die 'Must call with an array reference'
+            unless ref($data) eq 'ARRAY';
+        $n = @$data;
+    }
+    else
+    {
+        $data = $self->{data};
+        $n    = $self->{n};
+    }
+    my $min = $data->[0];
+    my $max = $data->[0];
+    for (@$data)
+    {
+        $min = $_ if $_ < $min;
+        $max = $_ if $_ > $max;
+    }
+    return ( $min, $max );
+}
+
+sub median
+{
+    my $self = shift;
+    my ( $n, $data );
+    if ( $data = shift )
+    {
+        die 'Must call with an array reference'
+            unless ref($data) eq 'ARRAY';
+        $n = @$data;
+    }
+    else
+    {
+        $data = $self->{data};
+        $n    = $self->{n};
+    }
+    my @sorted = sort { $a <=> $b } @$data;
+    return (
+        ( $n & 0x1 )
+        ? $sorted[ ( $n - 1 ) / 2 ]
+        : ( $sorted[ $n / 2 ] + $sorted[ $n / 2 - 1 ] ) / 2
     );
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
-
 
 1;
 
@@ -604,7 +699,7 @@ Math::FFT - Perl module to calculate Fast Fourier Transforms
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SYNOPSIS
 
@@ -1145,6 +1240,10 @@ the data set used in creating C<$fft> will be used.
 
 =back
 
+=head1 VERSION
+
+version 1.35
+
 =head1 BUGS
 
 Please report any to Randy Kobes <randy@theoryx5.uwinnipeg.ca>
@@ -1164,36 +1263,9 @@ module of Karl Glazebrook <kgb@aaoepp.aao.gov.au>. The perl code
 of Math::FFT is copyright 2000,2005 by Randy Kobes <r.kobes@uwinnipeg.ca>,
 and is distributed under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2000 by Randy Kobes.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-FFT> or by email
-to L<bug-math-fft@rt.cpan.org|mailto:bug-math-fft@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Math::FFT
 
 =head2 Websites
 
@@ -1208,15 +1280,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Math-FFT>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Math-FFT>
+L<https://metacpan.org/release/Math-FFT>
 
 =item *
 
@@ -1225,30 +1289,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-FFT>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Math-FFT>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Math-FFT>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Math-FFT>
 
 =item *
 
@@ -1262,7 +1302,7 @@ L<http://cpants.cpanauthors.org/dist/Math-FFT>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/M/Math-FFT>
 
@@ -1298,6 +1338,123 @@ from your repository :)
 
 L<https://github.com/shlomif/perl-Math-FFT>
 
-  git clone https://github.com/shlomif/perl-Math-FFT.git
+  git clone git://github.com/shlomif/perl-Math-FFT.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Math-FFT/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Randy Kobes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/Math-FFT>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-FFT>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/Math-FFT>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/M/Math-FFT>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Math-FFT>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Math::FFT>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-math-fft at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Math-FFT>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/shlomif/perl-Math-FFT>
+
+  git clone git://github.com/shlomif/perl-Math-FFT.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Math-FFT/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Randy Kobes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

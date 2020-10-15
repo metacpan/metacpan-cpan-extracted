@@ -1,0 +1,84 @@
+{
+   "abstract" : "execute Rex file management commands on a copy of the original file",
+   "author" : [
+      "Ferenc Erki <erkiferenc@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Rex-Hook-File-Impostor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Perl::Critic::Freenode" : "0.032",
+            "Perl::Critic::TooMuchCode" : "0.13",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Rex" : "1.012",
+            "Rex::Hook" : "0",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Temp" : "0",
+            "Rex::Commands::File" : "0",
+            "Test2::V0" : "0",
+            "Test::File" : "1.443",
+            "autodie" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Rex::Hook::File::Impostor" : {
+         "file" : "lib/Rex/Hook/File/Impostor.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ferki/Rex-Hook-File-Impostor/issues"
+      },
+      "homepage" : "https://github.com/sponsors/ferki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ferki/Rex-Hook-File-Impostor.git",
+         "web" : "https://github.com/ferki/Rex-Hook-File-Impostor"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "LGPL-3.0"
+}
+

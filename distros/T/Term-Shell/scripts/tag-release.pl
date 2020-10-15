@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use IO::All qw/ io /;
+use Path::Tiny qw/ path /;
 
 my ($version) =
-    ( map { m{\Aversion *= (*[0-9\.]+)\z} ? ($1) : () }
-        io->file("./dist.ini")->getlines() );
+    ( map { m{\Aversion *= *([0-9\.]+)\Z} ? ($1) : () }
+        path("./dist.ini")->lines_utf8() );
 
 if ( !defined($version) )
 {

@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::SortSub - Sah schemas related to Sort::Sub
 
 VERSION
-    This document describes version 0.003 of Sah::Schemas::SortSub (from
-    Perl distribution Sah-Schemas-SortSub), released on 2020-02-28.
+    This document describes version 0.004 of Sah::Schemas::SortSub (from
+    Perl distribution Sah-Schemas-SortSub), released on 2020-05-27.
 
 HOMEPAGE
     Please visit the project's homepage at

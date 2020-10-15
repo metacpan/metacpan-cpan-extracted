@@ -1,7 +1,7 @@
 {
    "abstract" : "some useful command-line utilities",
    "author" : [
-      "Vlado Keselj https://web.cs.dal.ca/~vlado"
+      "Vlado Keselj vlado@dnlp.ca http://vlado.ca"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
@@ -45,5 +45,5 @@
          "web" : "https://github.com/vkeselj/App-Utils"
       }
    },
-   "version" : 0.053
+   "version" : 0.054
 }

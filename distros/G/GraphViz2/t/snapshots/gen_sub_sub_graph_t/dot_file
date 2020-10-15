@@ -8,24 +8,22 @@
  "Murrumbeena" -> "Carnegie" [ arrowsize="2" ]
  "Murrumbeena" -> "Oakleigh" [ color="brown" ]
 
- subgraph "subgraph_1" {
-  graph [ label="Child" rankdir="TB" ]
+ subgraph "cluster_subgraph_1" {
+  graph [ label="Child" ]
   node [ color="magenta" shape="diamond" ]
-  edge [ color="grey" ]
   "Chadstone" [ shape="hexagon" ]
   "Waverley" [ color="orange" ]
   "Chadstone" -> "Waverley"
 
   subgraph "cluster_2" {
-   graph [ label="Grandchild" rankdir="TB" ]
+   graph [ label="Grandchild" ]
    node [ color="blue3" shape="triangle" ]
-   edge [ color="grey" ]
    "Glen Waverley" [ shape="pentagon" ]
    "Mount Waverley" [ color="darkslategrey" ]
    "Glen Waverley" -> "Mount Waverley"
   }
  }
- node [ color="cyan" shape="triangle" ]
+ node [ color="cyan" shape="oval" ]
  "Malvern"
  "Prahran" [ shape="trapezium" ]
  "Malvern" -> "Prahran"

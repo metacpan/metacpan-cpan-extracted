@@ -1,0 +1,65 @@
+---
+abstract: 'a simple prerendering proxy for Plack'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  CHI: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Tiny: '0'
+  Log::Log4perl: '0'
+  Module::Metadata: '0'
+  Plack::Middleware::ContentLength: '0'
+  Plack::Middleware::Head: '0'
+  Plack::Test: '0'
+  Test2::Require::Internet: '0'
+  Test2::V0: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - PSGI
+  - Plack
+  - prerendering
+  - Chrome
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-Prerender
+provides:
+  Plack::App::Prerender:
+    file: lib/Plack/App/Prerender.pm
+    version: v0.1.2
+recommends:
+  CHI: '0'
+  Log::Log4perl: '0'
+  Ref::Util::XS: '0'
+requires:
+  Encode: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  HTTP::Status: '0'
+  Plack::Component: '0'
+  Plack::Request: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  Ref::Util: '0'
+  Time::Seconds: '0'
+  WWW::Mechanize::Chrome: '0'
+  parent: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/perl-Plack-App-Prerender/issues
+  homepage: https://metacpan.org/release/Plack-App-Prerender
+  repository: git://github.com/robrwo/perl-Plack-App-Prerender.git
+version: v0.1.2
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+BASEDIR=$(dirname "$0")
+cd $BASEDIR/..
+
+plackup -Ilib --server Twiggy --port 8080 bin/async-microservice-time.psgi

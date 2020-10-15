@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.479'; # VERSION
+our $DATE = '2020-10-14'; # DATE
+our $VERSION = '0.481'; # VERSION
 
 use 5.010;
 use strict;
@@ -28,7 +28,7 @@ list-org-headlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.479 of list-org-headlines (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of list-org-headlines (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 
@@ -222,33 +222,33 @@ that has several tags will only be listed under its first tag, unless when
 under each of its tag.
 
 
-=item B<--has-tags-json>=I<s>
-
-Only show headlines that have the specified tags (JSON-encoded).
-
-See C<--has-tags>.
-
-=item B<--has-tags>=I<s@>
+=item B<--has-tag>=I<s@>
 
 Only show headlines that have the specified tags.
 
 Can be specified multiple times.
 
+=item B<--has-tags-json>=I<s>
+
+Only show headlines that have the specified tags (JSON-encoded).
+
+See C<--has-tag>.
+
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
+
+=item B<--lacks-tag>=I<s@>
+
+Only show headlines that don't have the specified tags.
+
+Can be specified multiple times.
 
 =item B<--lacks-tags-json>=I<s>
 
 Only show headlines that don't have the specified tags (JSON-encoded).
 
-See C<--lacks-tags>.
-
-=item B<--lacks-tags>=I<s@>
-
-Only show headlines that don't have the specified tags.
-
-Can be specified multiple times.
+See C<--lacks-tag>.
 
 =item B<--maximum-priority>=I<s>
 
@@ -381,8 +381,8 @@ List of available configuration parameters:
  format (see --format)
  from_level (see --from-level)
  group_by_tags (see --group-by-tags)
- has_tags (see --has-tags)
- lacks_tags (see --lacks-tags)
+ has_tags (see --has-tag)
+ lacks_tags (see --lacks-tag)
  maximum_priority (see --maximum-priority)
  minimum_priority (see --minimum-priority)
  naked_res (see --naked-res)

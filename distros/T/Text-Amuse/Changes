@@ -1,5 +1,15 @@
 Revision history for perl module Text::Amuse
 
+1.70 2020-10-14
+
+ - EXPERIMENTAL feature: support image rotation via a90|a180|a270
+   image attribute
+
+1.64 2020-10-14
+
+ - Increase LaTeX max-height for images to 0.85\textheight with
+   caption and to full \textheight if the image has no caption.
+
 1.63 2020-07-26
 
  - Fix include-related test on Windows

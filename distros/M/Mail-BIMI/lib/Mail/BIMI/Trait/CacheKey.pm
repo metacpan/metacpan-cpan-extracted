@@ -1,6 +1,6 @@
 package Mail::BIMI::Trait::CacheKey;
 # ABSTRACT: Cache key trait
-our $VERSION = '2.20201006.1'; # VERSION
+our $VERSION = '2.20201013.2'; # VERSION
 use 5.20.0;
 use Moose::Role;
 Moose::Util::meta_attribute_alias('CacheKey');
@@ -19,7 +19,7 @@ Mail::BIMI::Trait::CacheKey - Cache key trait
 
 =head1 VERSION
 
-version 2.20201006.1
+version 2.20201013.2
 
 =head1 REQUIRES
 

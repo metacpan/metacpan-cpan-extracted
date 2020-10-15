@@ -15,9 +15,7 @@ t/lib/Adult/Child2.pm
 t/lib/GoldenDelicious.pm
 t/lib/GrannySmith.pm
 t/lib/HybridVariety.pm
-t/snapshots/test_t/edges_dep
 t/snapshots/test_t/edges_isa
-t/snapshots/test_t/nodes_dep
 t/snapshots/test_t/nodes_isa
 t/test.t
 xt/author/pod.t

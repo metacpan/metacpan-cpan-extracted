@@ -16,7 +16,8 @@ BEGIN { $fields = {
 	"credit_card_number" => new WWW::Shopify::Field::String::Regex('XXXX-XXXX-XXXX-\d{4}'),
 	"credit_card_company" => new WWW::Shopify::Field::String()
 }; }
-sub plural($) { return $_[0]->singular(); }
+sub plural { return $_[0]->singular; }
+sub identifier { () }
 
 eval(__PACKAGE__->generate_accessors); die $@ if $@;
 

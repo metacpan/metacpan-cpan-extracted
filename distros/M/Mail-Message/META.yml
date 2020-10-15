@@ -31,10 +31,10 @@ requires:
   Test::More: '0.47'
   Time::Zone: '0'
   URI: '1.23'
-  User::Identity: '0.94'
+  User::Identity: '1'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Message.git
-version: '3.009'
+version: '3.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

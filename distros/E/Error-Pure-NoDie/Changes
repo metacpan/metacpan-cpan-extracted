@@ -1,3 +1,14 @@
+0.05 2020-10-14T10:00:09+02:00
+ - Add REPOSITORY section to doc.
+ - Improve AUTHOR and LICENSE AND COPYRIGHT sections in doc.
+ - Improve SYNOPSIS section in doc.
+ - Makefile.PL fails with no '.' in @INC.
+ - Rewrite doc to use =head2 in SUBROUTINES section.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-09-16T21:14:20+02:00
  - Add 'readme_from' directive to Makefile.PL.
  - Fix LICENSE file.

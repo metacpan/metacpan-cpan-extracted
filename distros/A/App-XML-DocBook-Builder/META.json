@@ -46,6 +46,7 @@
             "Test::CPAN::Changes" : "0.19",
             "Test::Code::TidyAll" : "0.50",
             "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -79,19 +80,19 @@
    "provides" : {
       "App::Docmake" : {
          "file" : "lib/App/Docmake.pm",
-         "version" : "0.1000"
+         "version" : "0.1002"
       },
       "App::XML::DocBook::Builder" : {
          "file" : "lib/App/XML/DocBook/Builder.pm",
-         "version" : "0.1000"
+         "version" : "0.1002"
       },
       "App::XML::DocBook::Docmake" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.1000"
+         "version" : "0.1002"
       },
       "App::XML::DocBook::Docmake::CmdComponent" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.1000"
+         "version" : "0.1002"
       }
    },
    "release_status" : "stable",
@@ -106,10 +107,10 @@
          "web" : "https://github.com/shlomif/docmake"
       }
    },
-   "version" : "0.1000",
+   "version" : "0.1002",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030003"
+         "version" : "5.032000"
       },
       "plugins" : [
          {
@@ -530,6 +531,17 @@
             "version" : "0.007"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Kwalitee" : {
+                  "filename" : "xt/release/kwalitee.t",
+                  "skiptest" : []
+               }
+            },
+            "name" : "Test::Kwalitee",
+            "version" : "2.12"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Test::TidyAll",
             "name" : "Test::TidyAll",
             "version" : "0.04"
@@ -598,8 +610,8 @@
          "version" : "6.015"
       }
    },
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "MIT"
 }
 

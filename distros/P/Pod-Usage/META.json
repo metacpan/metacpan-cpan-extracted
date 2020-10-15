@@ -75,7 +75,7 @@
    "provides" : {
       "Pod::Usage" : {
          "file" : "lib/Pod/Usage.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -90,8 +90,9 @@
          "web" : "https://github.com/Dual-Life/Pod-Usage"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_contributors" : [
+      "Marek Rouchal <43476190+marekro@users.noreply.github.com>",
       "Marek Rouchal <marek.rouchal@gmx.net>",
       "Nicolas R <nicolas@atoomic.org>"
    ],

@@ -12,5 +12,5 @@ ROLE:Section 9
 CATEGORIES:fisher
 NOTE:It's a note!
 XML:<b>Not an xCard XML element</b>
-KEY;TYPE=PGP:http://example.com/key.pgp
+KEY;TYPE="PGP":http://example.com/key.pgp
 END:VCARD

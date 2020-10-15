@@ -13,11 +13,11 @@ BEGIN { $fields = {
 	"arguments" => new WWW::Shopify::Field::String(),
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"body" => new WWW::Shopify::Field::String(),
-	"created_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now'),
+	"created_at" => new WWW::Shopify::Field::Date(),
 	"message" => new WWW::Shopify::Field::String::Words(),
 	"author" => new WWW::Shopify::Field::String(),
 	"subject_id" => new WWW::Shopify::Field::Identifier(),
-	"subject_type" => new WWW::Shopify::Field::String::Enum([qw(Article Blog Collection Comment Order Page Product)]),
+	"subject_type" => new WWW::Shopify::Field::String::Enum([qw(Article Blog Collection Comment Customer Order Page Product)]),
 	"verb" => new WWW::Shopify::Field::String()
 }; }
 
@@ -26,6 +26,7 @@ sub get_through_parent { return undef; }
 sub creatable { return undef; }
 sub updatable { return undef; }
 sub deletable { return undef; }
+sub get_order { return ({ 'asc' => 'id' }) }
 
 my $queries; sub queries { return $queries; }
 BEGIN { $queries = {

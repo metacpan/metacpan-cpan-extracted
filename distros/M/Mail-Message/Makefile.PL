@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.009';
+my $VERSION = '3.010';
 
 my @optional =
 ( 
@@ -53,7 +53,7 @@ my %prereq =
  , Test::More     => 0.47
  , Time::Zone     => 0
  , URI            => 1.23
- , User::Identity => 0.94
+ , User::Identity => 1.00
  );
 
 foreach my $module (sort keys %prereq)

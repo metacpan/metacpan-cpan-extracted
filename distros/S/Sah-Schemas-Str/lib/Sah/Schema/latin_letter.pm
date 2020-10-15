@@ -1,12 +1,22 @@
 package Sah::Schema::latin_letter;
 
-our $DATE = '2019-08-23'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-27'; # DATE
+our $DIST = 'Sah-Schemas-Str'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our $schema = [str => {
     summary => 'Latin letter, i.e. A-Z or a-z',
     len => 1,
     match => qr/\A[A-Za-z]\z/,
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'A', valid=>1},
+        {value=>'AB', valid=>0},
+        {value=>'1', valid=>0},
+    ],
+
 }, {}];
 
 1;
@@ -24,7 +34,78 @@ Sah::Schema::latin_letter - Latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2019-08-23.
+This document describes version 0.002 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2020-05-27.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("latin_letter*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("latin_letter*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['latin_letter*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "A"  # valid
+
+ "AB"  # INVALID
+
+ 1  # INVALID
 
 =head1 HOMEPAGE
 
@@ -48,7 +129,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

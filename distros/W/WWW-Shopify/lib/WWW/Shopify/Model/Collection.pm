@@ -32,6 +32,8 @@ BEGIN { $queries = {
 	updated_at_max => new WWW::Shopify::Query::UpperBound('updated_at'),
 }; }
 
+sub gettable { return undef; }
+sub singlable { 1; }
 sub creatable { return undef; }
 sub updatable { return undef; }
 

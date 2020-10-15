@@ -1,6 +1,6 @@
 package Text::vCard::Precisely::V4;
 
-our $VERSION = '0.23';
+our $VERSION = '0.26';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -25,7 +25,7 @@ You can unlock types that will be available in vCard4.0
  # Or you can write like below:
  my $vc4 = Text::vCard::Precisely::V4->new();
 
-The Usage is same with L<Text::vCard::Precisely::V3|https://metacpan.org/pod/Text::vCard::Precisely::V3>
+The Usage is same with L<Text::vCard::Precisely::V3>
 
 =head1 DESCRIPTION
 
@@ -196,17 +196,12 @@ coerce 'v4Tels',
     from 'Str',
     via { [ Text::vCard::Precisely::V4::Node::Tel->new( { content => $_ } ) ] },
     from 'HashRef', via {
-    [
-
-        Text::vCard::Precisely::V4::Node::Tel->new(
-            { %$_, types => [ @{ $_->{'types'} || [] } ] }
-        )
-
-    ]
+    my $types = ref( $_->{'types'} ) eq 'ARRAY' ? $_->{'types'} : [ $_->{'types'} ];
+    [ Text::vCard::Precisely::V4::Node::Tel->new( { %$_, types => $types } ) ]
     }, from 'ArrayRef[HashRef]', via {
     [   map {
-            Text::vCard::Precisely::V4::Node::Tel->new(
-                { %$_, types => [ @{ $_->{'types'} || [] } ] } )
+            my $types = ref( $_->{'types'} ) eq 'ARRAY' ? $_->{'types'} : [ $_->{'types'} ];
+            Text::vCard::Precisely::V4::Node::Tel->new( { %$_, types => $types } )
         } @$_
     ]
     };
@@ -326,8 +321,8 @@ coerce 'v4Node', from 'Str', via {
     my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
     return [
         Text::vCard::Precisely::V4::Node->new(
-            {   name  => $_->{'name'}  || $name,
-                types => $_->{'types'} || [],
+            {   name    => $_->{'name'}  || $name,
+                types   => $_->{'types'} || [],
                 sort_as => $_->{'sort_as'},
                 content => $_->{'content'} || croak "No value in HashRef!",
             }
@@ -338,8 +333,8 @@ coerce 'v4Node', from 'Str', via {
     return [
         map {
             Text::vCard::Precisely::V4::Node->new(
-                {   name  => $_->{'name'}  || $name,
-                    types => $_->{'types'} || [],
+                {   name    => $_->{'name'}  || $name,
+                    types   => $_->{'types'} || [],
                     sort_as => $_->{'sort_as'},
                     content => $_->{'content'} || croak "No value in HashRef!",
                 }
@@ -362,7 +357,7 @@ They are the B<new method from 4.0>
 
 =cut
 
-has [qw|source sound url fburl caladruri caluri|] => ( is => 'rw', isa => 'URLs', coerce => 1 );
+has [qw|source sound fburl caladruri caluri|] => ( is => 'rw', isa => 'URLs', coerce => 1 );
 
 subtype 'Related' => as 'ArrayRef[Text::vCard::Precisely::V4::Node::Related]';
 coerce 'Related',
@@ -540,7 +535,7 @@ L<RFC 6350|https://tools.ietf.org/html/rfc6350>
 
 =item
 
-L<Text::vCard::Precisely::V3|https://metacpan.org/pod/Text::vCard::Precisely::V3>
+L<Text::vCard::Precisely::V3>
 
 =item
 
@@ -550,7 +545,7 @@ L<vCard on Wikipedia|https://en.wikipedia.org/wiki/VCard>
  
 =head1 AUTHOR
  
-L<Yuki Yoshida(worthmine)|https://github.com/worthmine>
+Yuki Yoshida(L<worthmine|https://github.com/worthmine>)
 
 =head1 LICENSE
 

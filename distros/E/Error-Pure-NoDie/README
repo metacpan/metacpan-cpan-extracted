@@ -3,18 +3,19 @@ NAME
 
 SYNOPSIS
      use Error::Pure::NoDie qw(err);
+
      err 'This is a fatal error', 'name', 'value';
 
 SUBROUTINES
-    err(@messages)
-             Process error with messages @messages.
+  "err"
+     err 'This is a fatal error', 'name', 'value';
+
+    Process error with messages @messages.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::NoDie qw(err);
 
      # Error.
@@ -24,11 +25,9 @@ EXAMPLE1
      # 1
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::NoDie qw(err);
 
      # Error.
@@ -40,11 +39,9 @@ EXAMPLE2
      # 2
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::NoDie qw(err);
 
      # Error.
@@ -54,11 +51,9 @@ EXAMPLE3
      # 1
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Dumpvalue;
      use Error::Pure::NoDie qw(err);
      use Error::Pure::Utils qw(err_get);
@@ -107,14 +102,19 @@ SEE ALSO
     Task::Error::Pure
         Install the Error::Pure modules.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Error-Pure-NoDie>
+
 AUTHOR
-     Michal Špaček L<skim@cpan.org>
-     http://skim.cz
+    Michal Josef Špaček skim@cpan.org
+
+    http://skim.cz
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -6,12 +6,6 @@
  * and subsequent fixes by other contributors.
  */
 
-#define VERIFY_MULTI_CALLBACK(multi, cbindex, desc) \
-	if ( !(&multi->cb[cbindex])->func || !SvOK((&multi->cb[cbindex])->func) ) { \
-		warn("multi object lacks %s callback!", desc); \
-		return -1; \
-	}
-
 /* make a new multi */
 static perl_curl_multi_t *
 perl_curl_multi_new( void )
@@ -42,11 +36,11 @@ perl_curl_multi_delete( pTHX_ perl_curl_multi_t *multi )
 			perl_curl_easy_t *easy;
 			easy = INT2PTR( perl_curl_easy_t *, now->key );
 
+			next = now->next;
+
+			/* This frees `now` and does sv_2mortal(now->value): */
 			perl_curl_easy_remove_from_multi( aTHX_ easy );
 
-			next = now->next;
-			sv_2mortal( (SV *) now->value );
-			Safefree( now );
 		} while ( ( now = next ) != NULL );
 	}
 
@@ -74,8 +68,6 @@ cb_multi_socket( CURL *easy_handle, curl_socket_t s, int what, void *userptr,
 
 	multi = (perl_curl_multi_t *) userptr;
 
-	VERIFY_MULTI_CALLBACK(multi, CB_MULTI_SOCKET, "CURLMOPT_SOCKETFUNCTION");
-
 	(void) curl_easy_getinfo( easy_handle, CURLINFO_PRIVATE, (void *) &easy );
 
 	/* $multi, $easy, $socket, $what, $socketdata, $userdata */
@@ -99,8 +91,6 @@ cb_multi_timer( CURLM *multi_handle, long timeout_ms, void *userptr )
 
 	perl_curl_multi_t *multi;
 	multi = (perl_curl_multi_t *) userptr;
-
-	VERIFY_MULTI_CALLBACK(multi, CB_MULTI_TIMER, "CURLMOPT_TIMERFUNCTION");
 
 	/* $multi, $timeout, $userdata */
 	SV *args[] = {

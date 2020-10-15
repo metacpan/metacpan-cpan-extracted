@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-01'; # DATE
+our $DATE = '2020-10-14'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,17 +36,19 @@ google-search - Open google search page in browser
 
 =head1 VERSION
 
-This document describes version 0.004 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2020-10-01.
+This document describes version 0.006 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % google-search [--append=s] [--config-path=path | -c]
-     [--config-profile=profile | -P] [--delay=s] [--format=name] [--json]
-     [--(no)naked-res] [--no-config | -C] [--no-env] [--num=s]
-     [--page-result[=program]] [--prepend=s] [--queries-json=s]
-     [--query=s+] <query> ...
+ % google-search [--action=s] [--append=s] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--delay=s] [--format=name] [--image]
+     [--json] [--map] [--(no)naked-res] [--news] [--no-config | -C]
+     [--no-env] [--num=s] [--open-url] [--page-result[=program]]
+     [--prepend=s] [--print-html-link] [--print-org-link] [--print-url]
+     [--queries-json=s] [--query=s+] [--type=s] [--video] [--web] <query>
+     ...
 
 Examples:
 
@@ -66,6 +68,14 @@ Use with firefox-container:
 
  % BROWSER="firefox-container mycontainer" google-search "query one" query2
 
+Show image search URLs instead of opening them in browser:
+
+ % google-search --image --print-url "query one" query2
+
+Print map search URLs as Org links:
+
+ % google-search --map --print-org-link "jakarta selatan" "kebun raya bogor"
+
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -73,6 +83,24 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--action>=I<s>
+
+What to do with the URLs.
+
+Default value:
+
+ "open_url"
+
+Valid values:
+
+ ["open_url","print_url","print_html_link","print_org_link"]
+
+Instead of opening the queries in browser, you can also do other action instead.
+For example, `print_url` will print the search URL. `print_html_link` will print
+the HTML link (the <a> tag). And `print_org_link` will print the Org-mode link,
+e.g. `[[url...][query]]`.
+
 
 =item B<--append>=I<s>
 
@@ -82,6 +110,24 @@ String to add at the end of each query.
 
 Delay between opening each query.
 
+=item B<--image>
+
+Alias for --type=image.
+
+See C<--type>.
+
+=item B<--map>
+
+Alias for --type=map.
+
+See C<--type>.
+
+=item B<--news>
+
+Alias for --type=news.
+
+See C<--type>.
+
 =item B<--num>=I<s>
 
 Number of results per page.
@@ -90,9 +136,33 @@ Default value:
 
  100
 
+=item B<--open-url>
+
+Alias for --action=open_url.
+
+See C<--action>.
+
 =item B<--prepend>=I<s>
 
 String to add at the beginning of each query.
+
+=item B<--print-html-link>
+
+Alias for --action=print_html_link.
+
+See C<--action>.
+
+=item B<--print-org-link>
+
+Alias for --action=print_org_link.
+
+See C<--action>.
+
+=item B<--print-url>
+
+Alias for --action=print_url.
+
+See C<--action>.
 
 =item B<--queries-json>=I<s>
 
@@ -101,6 +171,30 @@ See C<--query>.
 =item B<--query>=I<s@>*
 
 Can be specified multiple times.
+
+=item B<--type>=I<s>
+
+Search type.
+
+Default value:
+
+ "web"
+
+Valid values:
+
+ ["web","image","video","news","map"]
+
+=item B<--video>
+
+Alias for --type=video.
+
+See C<--type>.
+
+=item B<--web>
+
+Alias for --type=web.
+
+See C<--type>.
 
 =back
 
@@ -241,6 +335,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ action (see --action)
  append (see --append)
  delay (see --delay)
  format (see --format)
@@ -248,6 +343,7 @@ List of available configuration parameters:
  num (see --num)
  prepend (see --prepend)
  queries (see --query)
+ type (see --type)
 
 =head1 ENVIRONMENT
 

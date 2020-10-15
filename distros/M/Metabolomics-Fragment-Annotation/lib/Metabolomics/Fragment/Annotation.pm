@@ -50,11 +50,11 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 
 =head1 VERSION
 
-Version 0.6.0
+Version 0.6.1
 
 =cut
 
-our $VERSION = '0.6.0';
+our $VERSION = '0.6.1';
 
 
 =head1 SYNOPSIS

@@ -15,7 +15,7 @@ sub identifier { return qw(key theme_id); }
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
 	"key" => new WWW::Shopify::Field::Identifier::String(),
-	"value" => new WWW::Shopify::Field::Text::HTML(),
+	"value" => new WWW::Shopify::Field::Text(),
 	"theme_id" => new WWW::Shopify::Field::Relation::Parent("WWW::Shopify::Model::Theme"),
 	"attachment" => new WWW::Shopify::Field::Text(),
 	"public_url" => new WWW::Shopify::Field::String::URL(),
@@ -28,11 +28,17 @@ BEGIN { $fields = {
 }; }
 
 # Look into finding some way to validate whether it's value OR attachment.
+sub included_in_parent { 0 }
 sub creation_minimal { return qw(key); }
 sub creation_filled { return qw(public_url created_at); }
 sub update_filled { return qw(updated_at size src content_type); }
 sub update_fields { qw(attachment value key) }
 sub create_method { return "PUT"; }
+sub paginates { undef; }
+# No limit?
+sub default_per_page { undef; }
+sub max_per_page { undef; }
+
 
 sub read_scope { return "read_themes"; }
 sub write_scope { return "write_themes"; }

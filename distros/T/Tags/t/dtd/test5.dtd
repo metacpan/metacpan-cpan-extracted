@@ -1,6 +1,0 @@
-<!ELEMENT MAIN %child;>
-<!ATTLIST MAIN
-	id ID #IMPLIED
->
-<!ENTITY % child "(#PCDATA|CHILD)*">
-<!ELEMENT CHILD (#PCDATA)>

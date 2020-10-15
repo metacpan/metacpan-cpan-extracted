@@ -1,0 +1,89 @@
+{
+   "abstract" : "Async HTTP Microservice Moose Role",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "async",
+      "asynchronous",
+      "micro",
+      "service",
+      "http",
+      "plack"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async-Microservice",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Path::Class" : "0",
+            "Pod::Simple::Text" : "0",
+            "Test::Most" : "0",
+            "Test::WWW::Mechanize" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::IO" : "0",
+            "DateTime" : "0",
+            "JSON::XS" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0",
+            "Path::Router" : "0",
+            "Plack::MIME" : "0",
+            "Plack::Request" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "Twiggy" : "0",
+            "URI" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Async::Microservice" : {
+         "file" : "lib/Async/Microservice.pm",
+         "version" : "0.01"
+      },
+      "Async::Microservice::HelloWorld" : {
+         "file" : "lib/Async/Microservice/HelloWorld.pm"
+      },
+      "Async::Microservice::Time" : {
+         "file" : "lib/Async/Microservice/Time.pm",
+         "version" : "0.01"
+      },
+      "Async::MicroserviceReq" : {
+         "file" : "lib/Async/MicroserviceReq.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meon/Async-Microservice/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/meon/Async-Microservice.git"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

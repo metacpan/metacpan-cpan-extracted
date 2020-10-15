@@ -1,26 +1,30 @@
---- #YAML:1.0
-name:               Digest
-version:            1.17
-abstract:           Modules that calculate message digests
+---
+abstract: 'Modules that calculate message digests'
 author:
-    - Gisle Aas <gisle@activestate.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Gisle Aas <gisle@activestate.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    MIME::Base64:  0
-    perl:          5.004
-    Test::More:    0.47
-resources:
-    repository:  http://github.com/gisle/digest
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Digest
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MIME::Base64: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/Dual-Life/digest/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Dual-Life/digest.git
+version: '1.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,13 +1,11 @@
 ---
 abstract: "A wrapper for AT&T's Graphviz"
 author:
-  - 'Ron Savage (ron@savage.net.au)'
+  - 'Ron Savage <ron@savage.net.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '1.001002'
   Test::Snapshot: '0.06'
-  charnames: '0'
-  open: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -29,8 +27,8 @@ requires:
   Types::Standard: '1.000005'
   perl: '5.010001'
 resources:
-  bugtracker: https://github.com/ronsavage/GraphViz2/issues
+  bugtracker: https://github.com/graphviz-perl/GraphViz2/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/ronsavage/GraphViz2.git
-version: '2.54'
+  repository: https://github.com/graphviz-perl/GraphViz2.git
+version: '2.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

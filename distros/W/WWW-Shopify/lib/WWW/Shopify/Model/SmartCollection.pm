@@ -35,15 +35,30 @@ BEGIN { $queries = {
 	created_at_max => new WWW::Shopify::Query::UpperBound('created_at'),
 	updated_at_min => new WWW::Shopify::Query::LowerBound('updated_at'),
 	updated_at_max => new WWW::Shopify::Query::UpperBound('updated_at'),
+	handle => new WWW::Shopify::Query::Match('handle')
 }; }
 
+
+
+sub should_contain {
+	my ($self, $product) = @_;
+	my @rules = $self->rules->all;
+	if ($self->disjunctive) {
+		return int(grep { $_->matches($product) } @rules) > 0;
+	} else {
+		return int(grep { !$_->matches($product) } @rules) == 0;
+	}
+}
 
 sub creation_minimal { return qw(title); }
 sub creation_filled { return qw(id created_at); }
 sub update_filled { return qw(updated_at); }
-sub update_fields { return qw(body_html handle sort_order template_suffix title rules image); }
+sub update_fields { return qw(body_html handle sort_order template_suffix title rules image metafields); }
 sub has_metafields { return 1; }
 sub throws_webhooks { return 1; }
+sub webhook_topic { return "collections"; }
+
+sub actions { return qw(order); }
 
 sub read_scope { return "read_products"; }
 sub write_scope { return "write_products"; }

@@ -12,18 +12,12 @@
  "Malvern" -> "Oakleigh" [ color="brown" ]
 
  subgraph {
-  graph [ rankdir="TB" ]
-  node [ shape="oval" ]
-  edge [ color="grey" ]
   rank="same" 
   "Malvern" [ color="green" shape="box" ]
   "Prahran"
  }
 
  subgraph {
-  graph [ rankdir="TB" ]
-  node [ shape="oval" ]
-  edge [ color="grey" ]
   rank="same" 
   "Oakleigh" [ color="blue" ]
   "Murrumbeena" [ color="orange" shape="doublecircle" ]

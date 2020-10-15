@@ -1,7 +1,6 @@
 Changes
 DB_File.pm          
 DB_File.xs          
-DB_File_BS
 MANIFEST
 Makefile.PL         
 README

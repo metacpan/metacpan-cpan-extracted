@@ -17,6 +17,7 @@
       "build" : {
          "requires" : {
             "JSON::PP" : "2.273",
+            "Module::Build" : "0.42",
             "Module::Build::Pluggable::CPANfile" : "0.05",
             "rlib" : "0"
          }
@@ -24,7 +25,8 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42",
-            "Module::Build::Pluggable::CPANfile" : "0.05"
+            "Module::Build::Pluggable::CPANfile" : "0.05",
+            "rlib" : "0"
          }
       },
       "runtime" : {
@@ -38,8 +40,7 @@
          "requires" : {
             "JSON::MaybeXS" : "0",
             "Sub::Util" : "1.40",
-            "perl" : "5.010",
-            "rlib" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -69,7 +70,7 @@
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.051"
+         "version" : "0.052"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
@@ -132,6 +133,6 @@
          "url" : "https://github.com/hkoba/perl-mop4import-declare"
       }
    },
-   "version" : "0.051",
+   "version" : "0.052",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

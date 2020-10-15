@@ -12,9 +12,9 @@ use XML::Twig ;
 use File::Share ':all'; 
 use Carp qw (cluck croak carp) ;
 
-require Exporter;
+#require Exporter;
 
-our @ISA = qw(Exporter Metabolomics::Banks::Knapsack Metabolomics::Banks::BloodExposome Metabolomics::Banks::AbInitioFragments Metabolomics::Banks::MaConDa);
+#our @ISA = qw(Exporter Metabolomics::Banks::Knapsack Metabolomics::Banks::BloodExposome Metabolomics::Banks::AbInitioFragments Metabolomics::Banks::MaConDa);
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.

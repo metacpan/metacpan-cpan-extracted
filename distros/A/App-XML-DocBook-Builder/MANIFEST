@@ -24,4 +24,5 @@ xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/tidyall.t
 xt/release/cpan-changes.t
+xt/release/kwalitee.t
 xt/release/trailing-space.t

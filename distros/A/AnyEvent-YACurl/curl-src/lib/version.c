@@ -31,8 +31,8 @@
 #include "curl_printf.h"
 
 #ifdef USE_ARES
-#  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) && \
-     (defined(WIN32) || defined(__SYMBIAN32__))
+#  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
+  defined(WIN32)
 #    define CARES_STATICLIB
 #  endif
 #  include <ares.h>
@@ -56,14 +56,14 @@
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
-#ifdef __SYMBIAN32__
-/* zlib pollutes the namespace with this definition */
-#undef WIN32
-#endif
 #endif
 
 #ifdef HAVE_BROTLI
 #include <brotli/decode.h>
+#endif
+
+#ifdef HAVE_ZSTD
+#include <zstd.h>
 #endif
 
 #ifdef HAVE_BROTLI
@@ -73,6 +73,20 @@ static size_t brotli_version(char *buf, size_t bufsz)
   unsigned int major = brotli_version >> 24;
   unsigned int minor = (brotli_version & 0x00FFFFFF) >> 12;
   unsigned int patch = brotli_version & 0x00000FFF;
+
+  return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
+}
+#endif
+
+#ifdef HAVE_ZSTD
+static size_t zstd_version(char *buf, size_t bufsz)
+{
+  unsigned long zstd_version = (unsigned long)ZSTD_versionNumber();
+  unsigned int major = (unsigned int)(zstd_version / (100 * 100));
+  unsigned int minor = (unsigned int)((zstd_version -
+                         (major * 100 * 100)) / 100);
+  unsigned int patch = (unsigned int)(zstd_version -
+                         (major * 100 * 100) - (minor * 100));
 
   return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
 }
@@ -102,6 +116,9 @@ char *curl_version(void)
 #endif
 #ifdef HAVE_BROTLI
   char br_version[40] = "brotli/";
+#endif
+#ifdef HAVE_ZSTD
+  char zst_version[40] = "zstd/";
 #endif
 #ifdef USE_ARES
   char cares_version[40];
@@ -152,6 +169,10 @@ char *curl_version(void)
 #ifdef HAVE_BROTLI
   brotli_version(&br_version[7], sizeof(br_version) - 7);
   src[i++] = br_version;
+#endif
+#ifdef HAVE_ZSTD
+  zstd_version(&zst_version[5], sizeof(zst_version) - 5);
+  src[i++] = zst_version;
 #endif
 #ifdef USE_ARES
   msnprintf(cares_version, sizeof(cares_version),
@@ -273,7 +294,7 @@ static const char * const protocols[] = {
   "ldaps",
 #endif
 #endif
-#ifdef CURL_ENABLE_MQTT
+#ifndef CURL_DISABLE_MQTT
   "mqtt",
 #endif
 #ifndef CURL_DISABLE_POP3
@@ -294,9 +315,8 @@ static const char * const protocols[] = {
 #ifdef USE_SSH
   "sftp",
 #endif
-#if !defined(CURL_DISABLE_SMB) && defined(USE_NTLM) && \
-   (CURL_SIZEOF_CURL_OFF_T > 4) && \
-   (!defined(USE_WINDOWS_SSPI) || defined(USE_WIN32_CRYPTO))
+#if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE) && \
+   (CURL_SIZEOF_CURL_OFF_T > 4)
   "smb",
 #  ifdef USE_SSL
   "smbs",
@@ -365,6 +385,9 @@ static curl_version_info_data version_info = {
     ( (SIZEOF_OFF_T > 4) || defined(USE_WIN32_LARGE_FILES) )
   | CURL_VERSION_LARGEFILE
 #endif
+#if defined(WIN32) && defined(UNICODE) && defined(_UNICODE)
+  | CURL_VERSION_UNICODE
+#endif
 #if defined(CURL_DOES_CONVERSIONS)
   | CURL_VERSION_CONV
 #endif
@@ -388,6 +411,9 @@ static curl_version_info_data version_info = {
 #endif
 #if defined(HAVE_BROTLI)
   | CURL_VERSION_BROTLI
+#endif
+#if defined(HAVE_ZSTD)
+  | CURL_VERSION_ZSTD
 #endif
 #if defined(USE_ALTSVC)
   | CURL_VERSION_ALTSVC
@@ -413,10 +439,12 @@ static curl_version_info_data version_info = {
   NULL,
 #endif
 #ifdef CURL_CA_PATH
-  CURL_CA_PATH  /* capath */
+  CURL_CA_PATH,  /* capath */
 #else
-  NULL
+  NULL,
 #endif
+  0,    /* zstd_ver_num */
+  NULL  /* zstd version */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
@@ -434,14 +462,20 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
 #ifdef HAVE_BROTLI
   static char brotli_buffer[80];
 #endif
+#ifdef HAVE_ZSTD
+  static char zstd_buffer[80];
+#endif
+
 
 #ifdef USE_SSL
   Curl_ssl_version(ssl_buffer, sizeof(ssl_buffer));
   version_info.ssl_version = ssl_buffer;
+#ifndef CURL_DISABLE_PROXY
   if(Curl_ssl->supports & SSLSUPP_HTTPS_PROXY)
     version_info.features |= CURL_VERSION_HTTPS_PROXY;
   else
     version_info.features &= ~CURL_VERSION_HTTPS_PROXY;
+#endif
 #endif
 
 #ifdef HAVE_LIBZ
@@ -483,6 +517,12 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   version_info.brotli_ver_num = BrotliDecoderVersion();
   brotli_version(brotli_buffer, sizeof(brotli_buffer));
   version_info.brotli_version = brotli_buffer;
+#endif
+
+#ifdef HAVE_ZSTD
+  version_info.zstd_ver_num = (unsigned int)ZSTD_versionNumber();
+  zstd_version(zstd_buffer, sizeof(zstd_buffer));
+  version_info.zstd_version = zstd_buffer;
 #endif
 
 #ifdef USE_NGHTTP2

@@ -1,5 +1,5 @@
 package App::Docmake;
-$App::Docmake::VERSION = '0.1000';
+$App::Docmake::VERSION = '0.1002';
 use 5.014;
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ App::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.1000
+version 0.1002
 
 =head1 SYNOPSIS
 

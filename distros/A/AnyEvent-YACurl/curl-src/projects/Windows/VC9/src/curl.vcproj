@@ -3946,11 +3946,19 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\dynbuf.c"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\nonblock.c"
 			>
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\strtoofft.c"
+			>
+			</File>
+			<File
+				RelativePath="..\..\..\..\lib\version_win32.c"
 			>
 			</File>
 			<File
@@ -4142,11 +4150,19 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\dynbuf.h"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\nonblock.h"
 			>
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\strtoofft.h"
+			>
+			</File>
+			<File
+				RelativePath="..\..\..\..\lib\version_win32.h"
 			>
 			</File>
 			<File

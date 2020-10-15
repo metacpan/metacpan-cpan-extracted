@@ -1,33 +1,19 @@
 'graph Heawood {
  graph [ rankdir="TB" ]
  edge [ color="black" ]
- node [ color="black" fontname="Arial" height="0.500000" label="\\N" shape="circle" width="0.50000" ]
- "0"
- "1"
+ node [ color="black" fontname="Arial" height="0.50000" shape="circle" width="0.50000" ]
  "0" -- "1"
- "2"
  "1" -- "2"
- "3"
  "2" -- "3"
- "4"
  "3" -- "4"
- "5"
  "4" -- "5"
- "6"
  "5" -- "6"
- "7"
  "6" -- "7"
- "8"
  "7" -- "8"
- "9"
  "8" -- "9"
- "10"
  "9" -- "10"
- "11"
  "10" -- "11"
- "12"
  "11" -- "12"
- "13"
  "12" -- "13"
  "13" -- "0"
  "0" -- "5" [ len="2.5" ]

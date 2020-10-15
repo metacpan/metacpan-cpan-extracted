@@ -37,14 +37,17 @@ subtype 'Type' => as 'Str' => where {
     m/^(?:work|home|PGP)$/is or                       #common
         m|^(?:[a-zA-z0-9\-]+/X-[a-zA-z0-9\-]+)$|s;    # does everything pass?
 } => message {"The text you provided, $_, was not supported in 'Type'"};
-has types => ( is => 'rw', isa => 'ArrayRef[Type]', default => sub { [] } );
+
+subtype 'Types' => as 'ArrayRef[Type]';
+coerce 'Types'  => from 'Str' => via { [$_] };
+has types       => ( is => 'rw', isa => 'Types', default => sub { [] }, coerce => 1 );
 
 subtype 'Language' => as 'Str' =>
     where {m|^[a-z]{2}(?:-[a-z]{2})?$|s}              # does it need something strictly?
 => message {"The Language you provided, $_, was not supported"};
 has language => ( is => 'rw', isa => 'Language' );
 
-sub charset {                                         # DEPRECATED in vCard 3.0
+sub charset {    # DEPRECATED in vCard 3.0
     my $self = shift;
     croak "'CHARSET' param is DEPRECATED! vCard3.0 will accept just ONLY UTF-8";
 }
@@ -60,7 +63,7 @@ sub as_string {
 
     push @lines, uc($node) || croak "Empty name";
     push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types() } )
-        if @{ $self->types() || [] } > 0;
+        if ref $self->types() eq 'ARRAY' and $self->types()->[0];
     push @lines, 'PREF=' . $self->pref()         if $self->pref();
     push @lines, 'LANGUAGE=' . $self->language() if $self->language();
 

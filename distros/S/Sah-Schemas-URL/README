@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::URL - Sah schemas related to URL
 
 VERSION
-    This document describes version 0.011 of Sah::Schemas::URL (from Perl
-    distribution Sah-Schemas-URL), released on 2019-11-29.
+    This document describes version 0.012 of Sah::Schemas::URL (from Perl
+    distribution Sah-Schemas-URL), released on 2020-05-27.
 
 SAH SCHEMAS
     *   url
@@ -36,7 +36,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

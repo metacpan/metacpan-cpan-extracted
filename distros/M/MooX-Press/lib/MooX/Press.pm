@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.081';
+our $VERSION   = '0.082';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -210,7 +210,8 @@ sub import {
 	}
 	
 	my %modifiers;
-	$opts{$_} && ($modifiers{$_} = delete $opts{$_}) for qw/ before after around /;
+	$opts{$_} && ($modifiers{$_} = delete $opts{$_})
+		for qw/ before after around can with constant symmethod multimethod extends /;
 	
 	for my $pkg (@roles) {
 		$builder->do_coercions_for_role($pkg->[0], %opts, reg => $reg, %{$pkg->[1]});
@@ -233,7 +234,7 @@ sub import {
 	}
 	
 	if (keys %modifiers) {
-		$builder->patch_package( $opts{'factory_package'}, %modifiers );
+		$builder->patch_package( $opts{'factory_package'}, prefix => $opts{'prefix'}, %modifiers );
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
@@ -1017,11 +1018,19 @@ sub patch_package {
 		? 'role'
 		: 'class';
 	delete $spec{is_role};
-	my $fp = $package->can('FACTORY')
-		? $package->FACTORY
-		: do { no strict 'refs'; ${"$package\::FACTORY"} };
-	my $prefix  = do { no strict 'refs'; ${"$package\::PREFIX"}  || $fp   };
-	my $toolkit = do { no strict 'refs'; ${"$package\::TOOLKIT"} || 'Moo' };
+	
+	my $fp =
+		exists($spec{'factory_package'})    ? delete($spec{'factory_package'}) :
+		$package->can('FACTORY')            ? $package->FACTORY :
+		do { no strict 'refs'; no warnings; ${"$package\::FACTORY"} };
+		
+	my $prefix =
+		exists($spec{'prefix'})             ? delete($spec{'prefix'}) :
+		do { no strict 'refs'; no warnings; ${"$package\::PREFIX"} || $fp };
+	
+	my $toolkit =
+		exists($spec{'toolkit'})            ? delete($spec{'toolkit'}) :
+		do { no strict 'refs'; no warnings; ${"$package\::TOOLKIT"} || 'Moo' };
 	
 	if ( my $version = delete $spec{version} ) {
 		no strict 'refs';
@@ -1032,15 +1041,20 @@ sub patch_package {
 		no strict 'refs';
 		${"$package\::AUTHORITY"} = $auth;
 	}
-
+	
 	if ( $kind eq 'class' and my $extends = delete $spec{extends} ) {
-		my @isa    = $me->_expand_isa( $prefix, $extends );
-		if (@isa) {
+		my @isa = $me->_expand_isa( $prefix, $extends );
+		if ( $package->isa("$toolkit\::Object") ) {
 			my $method = "extend_class_" . lc $toolkit;
 			$me->$method( $package, \@isa );
 		}
+		else {
+			no strict 'refs';
+			no warnings 'once';
+			@{"$package\::ISA"} = @isa;
+		}
 	}
-
+	
 	if ( $kind eq 'class' and my $overload = delete $spec{overload} ) {
 		require overload;
 		require Import::Into;
@@ -2458,6 +2472,11 @@ It is possible to write:
 
 This saves a level of indentation. (C<< => undef >> or C<< => 1 >> are
 supported as synonyms for C<< => {} >>.)
+
+The C<can>, C<before>, C<after>, C<around>, C<multimethod>, C<symmethod>,
+C<constant>, C<with>, and C<extends> options documented under Class Options
+can also be used as top-level import options to apply them to the factory
+package.
 
 =head3 Class Options
 

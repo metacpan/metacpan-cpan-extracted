@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Finalize Tags output.
 sub finalize {
@@ -367,7 +367,9 @@ sub _put_raw {
 # Reset flush code.
 sub _reset_flush {
 	my $self = shift;
+
 	$self->{'flush_code'} = $EMPTY_STR;
+
 	return;
 }
 
@@ -457,6 +459,13 @@ __END__
          }
          return;
  }
+
+=item * C<input_tags_item_callback>
+
+ Input 'Tags' item callback.
+ Callback is processing before main 'Tags' put().
+ It's usefull for e.g. validation.
+ Default value is undef.
 
 =item * C<no_simple>
 
@@ -678,6 +687,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

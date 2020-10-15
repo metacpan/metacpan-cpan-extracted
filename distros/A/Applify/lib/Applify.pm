@@ -13,7 +13,7 @@ use constant SUB_NAME_IS_AVAILABLE => $INC{'App/FatPacker/Trace.pm'}
 our $INSTANTIATING = 0;
 our $PERLDOC       = 'perldoc';
 our $SUBCMD_PREFIX = 'command';
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 my $ANON = 0;
 
 sub app {
@@ -111,12 +111,12 @@ sub import {
 
   no warnings 'redefine';    # need to allow redefine when loading a new app
   *{$export{app}}           = sub (&) { $self->app(@_) };
-  *{$export{hook}}          = sub     { $self->hook(@_) };
-  *{$export{option}}        = sub     { $self->option(@_) };
-  *{$export{version}}       = sub     { $self->version(@_) };
-  *{$export{documentation}} = sub     { $self->documentation(@_) };
-  *{$export{extends}}       = sub     { $self->extends(@_) };
-  *{$export{subcommand}}    = sub     { $self->subcommand(@_) };
+  *{$export{hook}}          = sub { $self->hook(@_) };
+  *{$export{option}}        = sub { $self->option(@_) };
+  *{$export{version}}       = sub { $self->version(@_) };
+  *{$export{documentation}} = sub { $self->documentation(@_) };
+  *{$export{extends}}       = sub { $self->extends(@_) };
+  *{$export{subcommand}}    = sub { $self->subcommand(@_) };
 }
 
 sub new {
@@ -263,8 +263,8 @@ sub _calculate_option_spec {
   elsif ($option->{type} =~ /^str/)            { $spec .= '=s' }
   elsif ($option->{type} =~ /^int/i)           { $spec .= '=i' }
   elsif ($option->{type} =~ /^num/i)           { $spec .= '=f' }
-  elsif ($option->{type} =~ /^file/)           { $spec .= '=s' }    # TODO
-  elsif ($option->{type} =~ /^dir/)            { $spec .= '=s' }    # TODO
+  elsif ($option->{type} =~ /^file/)           { $spec .= '=s' }                                                  # TODO
+  elsif ($option->{type} =~ /^dir/)            { $spec .= '=s' }                                                  # TODO
   else                                         { die 'Usage: option {bool|flag|inc|str|int|num|file|dir} ...' }
 
   # Let Types::Type handle the validation
@@ -372,9 +372,10 @@ sub _generate_application_class {
   my $meta = $application_class->meta if $application_class->isa('Moose::Object') and $application_class->can('meta');
 
   for my $option (@{$self->options}) {
-    my $name = $option->{name};
+    my $name      = $option->{name};
+    my $predicate = "has_$name";
     if ($meta) {
-      my %attr_options = (is => 'rw', predicate => 1, required => $option->{required});
+      my %attr_options = (is => 'rw', predicate => $predicate, required => $option->{required});
       $attr_options{default} = $option->{default} if $option->{default};
       $attr_options{isa}     = $option->{isa}     if $option->{isa};
       $meta->add_attribute($name => \%attr_options) unless $meta->find_attribute_by_name($name);
@@ -382,8 +383,8 @@ sub _generate_application_class {
     else {
       my $accessor = join '::', $application_class, $name;
       _sub($accessor => $self->_generate_attribute_accessor($option));
-      my $predicator = join '::', $application_class, join '_', has => $name;
-      _sub($predicator => sub { !!defined $_[0]->{$name} });
+      my $predicator = join '::', $application_class, $predicate;
+      _sub($predicator => sub { !!defined $_[0]->{$name} }) unless $application_class->can($predicate);
     }
   }
 
@@ -464,7 +465,7 @@ Applify - Write object oriented scripts with ease
 
 =head1 VERSION
 
-0.21
+0.22
 
 =head1 DESCRIPTION
 

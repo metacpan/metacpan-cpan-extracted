@@ -21,13 +21,11 @@ requires 'Class::Utils' => 0.05;
 requires 'Error::Pure' => 0.15;
 requires 'PYX::Parser' => 0.05;
 requires 'PYX::Utils' => 0.01;
-requires 'Tags::Output::Raw' => 0.04;
+requires 'Tags::Output::Raw' => 0.10;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=PYX-SGML-Tags';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/PYX-SGML-Tags/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-SGML-Tags';
 resources 'repository' => 'git://github.com/michal-josef-spacek/PYX-SGML-Tags';
-test_requires 'Encode' => 0;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.15;
 test_requires 'File::Object' => 0.07;
@@ -35,8 +33,9 @@ test_requires 'Tags::Output::Raw' => 0;
 test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.04';
+version '0.06';
 
 # Run.
 WriteAll();

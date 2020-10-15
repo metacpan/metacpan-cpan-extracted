@@ -34,9 +34,9 @@ BEGIN {
     require 'inctools';
   }
 
-  if (238) {
+  if (235) {
     load();
-    plan(tests => 238);
+    plan(tests => 235);
   }
 }
 
@@ -325,7 +325,6 @@ ok($o =~ /^Uses newCONSTSUB/m);
 ok($o =~ /^Uses PL_expect/m);
 ok($o =~ /^Uses SvPV_nolen.*depends.*sv_2pv_flags/m);
 ok($o =~ /WARNING: PL_expect/m);
-ok($o =~ /hint for newCONSTSUB/m);
 ok($o =~ /^Analysis completed \(1 warning\)/m);
 ok($o =~ /^Looks good/m);
 
@@ -337,7 +336,6 @@ ok($o =~ /^Uses newCONSTSUB/m);
 ok($o =~ /^Uses PL_expect/m);
 ok($o =~ /^Uses SvPV_nolen.*depends.*sv_2pv_flags/m);
 ok($o =~ /WARNING: PL_expect/m);
-ok($o !~ /hint for newCONSTSUB/m);
 ok($o =~ /^Analysis completed \(1 warning\)/m);
 ok($o =~ /^Looks good/m);
 
@@ -349,7 +347,6 @@ ok($o !~ /^Uses newCONSTSUB/m);
 ok($o !~ /^Uses PL_expect/m);
 ok($o !~ /^Uses SvPV_nolen/m);
 ok($o =~ /WARNING: PL_expect/m);
-ok($o !~ /hint for newCONSTSUB/m);
 ok($o =~ /^Analysis completed \(1 warning\)/m);
 ok($o =~ /^Looks good/m);
 

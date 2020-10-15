@@ -1,3 +1,18 @@
+0.481   2020-10-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli list-org-headlines][ux] Allow --has-tag and --lacks-tag in
+	  addition to --has-tags & --lacks-tags.
+
+
+0.480   2020-10-14  Released-By: PERLANCAR; Urgency: medium
+
+	[cli move-done-todos]
+
+	- [doc] Add warning about the utility modifying the todo file.
+
+        - [ux] By default use dry-run mode, add examples.
+
+
 0.479   2020-07-21  Released-By: PERLANCAR; Urgency: medium
 
 	- move-done-todos: Add --dry-run, --include-pat, --exclude-pat, and

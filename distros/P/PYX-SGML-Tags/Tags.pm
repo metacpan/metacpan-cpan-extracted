@@ -9,28 +9,36 @@ use PYX::Parser;
 use PYX::Utils qw(encode);
 use Tags::Output::Raw;
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
+
 	my $self = bless {}, $class;
 
 	# Input encoding.
 	$self->{'input_encoding'} = 'utf-8';
 
+	# Input 'Tags' item callback.
+	$self->{'input_tags_item_callback'} = undef;
+
 	# Tags object.
-	$self->{'tags'} = Tags::Output::Raw->new(
-		'output_handler' => \*STDOUT,
-	);
+	$self->{'tags'} = undef;
 
 	# Process params.
 	set_params($self, @params);
 
-	# Check for Tags::Output object.
-	if (! $self->{'tags'}
-		|| ! $self->{'tags'}->isa('Tags::Output')) {
+	if (! defined $self->{'tags'}) {
+		$self->{'tags'} = Tags::Output::Raw->new(
+			'input_tags_item_callback'
+				=> $self->{'input_tags_item_callback'},
+			'output_handler' => \*STDOUT,
+		);
+	}
 
+	# Check for Tags::Output object.
+	if (! $self->{'tags'}->isa('Tags::Output')) {
 		err "Bad 'Tags::Output::*' object.";
 	}
 
@@ -57,78 +65,98 @@ sub new {
 # Parse pyx text or array of pyx text.
 sub parse {
 	my ($self, $pyx, $out) = @_;
+
 	$self->{'pyx_parser'}->parse($pyx, $out);
 	$self->{'tags'}->flush;
+
 	return;
 }
 
 # Parse file with pyx text.
 sub parse_file {
 	my ($self, $file, $out) = @_;
+
 	$self->{'pyx_parser'}->parse_file($file, $out);
 	$self->{'tags'}->flush;
+
 	return;
 }
 
 # Parse from handler.
 sub parse_handler {
 	my ($self, $input_file_handler, $out) = @_;
+
 	$self->{'pyx_parser'}->parse_handler($input_file_handler, $out);
 	$self->{'tags'}->flush;
+
 	return;
 }
 
 sub finalize {
 	my $self = shift;
+
 	$self->{'tags'}->finalize;
+
 	return;
 }
 
 # Process start of element.
 sub _start_element {
 	my ($self, $elem) = @_;
+
 	my $tags = $self->{'non_parser_options'}->{'tags'};
 	$tags->put(['b', $elem]);
+
 	return;
 }
 
 # Process end of element.
 sub _end_element {
 	my ($self, $elem) = @_;
+
 	my $tags = $self->{'non_parser_options'}->{'tags'};
 	$tags->put(['e', $elem]);
+
 	return;
 }
 
 # Process data.
 sub _data {
 	my ($self, $data) = @_;
+
 	my $tags = $self->{'non_parser_options'}->{'tags'};
 	$tags->put(['d', encode($data)]);
+
 	return;
 }
 
 # Process attribute.
 sub _attribute {
 	my ($self, $attr, $value) = @_;
+
 	my $tags = $self->{'non_parser_options'}->{'tags'};
 	$tags->put(['a', $attr, $value]);
+
 	return;
 }
 
 # Process instruction tag.
 sub _instruction {
 	my ($self, $target, $code) = @_;
+
 	my $tags = $self->{'non_parser_options'}->{'tags'};
 	$tags->put(['i', $target, $code]);
+
 	return;
 }
 
 # Process comments.
 sub _comment {
 	my ($self, $comment) = @_;
+
 	my $tags = $self->{'non_parser_options'}->{'tags'};
 	$tags->put(['c', encode($comment)]);
+
 	return;
 }
 
@@ -156,55 +184,74 @@ PYX::SGML::Tags - Processing PYX data or file and write as SGML via Tags.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = PYX::SGML::Tags->new(%parameters);
 
 Constructor.
+
+Returns instance of class.
 
 =over 8
 
 =item * C<input_encoding>
 
- Input encoding.
- Default value is 'utf-8'.
+Input encoding.
+
+Default value is 'utf-8'.
+
+=item * C<input_tags_item_callback>
+
+Input 'Tags' item callback.
+This callback is for Tags::Output::* constructor parameter 'input_tags_item_callback'.
+
+Default value is undef.
 
 =item * C<tags>
 
- Tags object.
- Can be any of Tags::Output::* objects.
- Default value is Tags::Output::Raw->new('output_handler' => \*STDOUT).
- It's required.
+Tags object.
+Can be any of Tags::Output::* objects.
+Default value is C<Tags::Output::Raw->new('output_handler' => \*STDOUT)>.
+It's required.
 
 =back
 
-=item C<parse($pyx[, $out])>
+=head2 C<parse>
 
- Parse PYX text or array of PYX text.
- Output is serialization to SGML by Tags::Output::* module.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse($pyx, $out);
 
-=item C<parse_file($input_file[, $out])>
+Parse PYX text or array of PYX text.
+Output is serialization to SGML by Tags::Output::* module.
+If C<$out> not present, use 'output_handler'.
 
- Parse file with PYX data.
- Output is serialization to SGML.
- If $out not present, use 'output_handler'.
- Returns undef.
+Returns undef.
 
-=item C<parse_handler($input_file_handler[, $out])>
+=head2 C<parse_file>
 
- Parse PYX handler.
- Output is serialization to SGML.
- If $out not present, use 'output_handler'.
- Returns undef.
+ $obj->parse_file($input_file, $out);
 
-=item C<finalize()>
+Parse file with PYX data.
+Output is serialization to SGML.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<parse_handler>
+
+ $obj->parse_handle($input_file_handler, $out);
+
+Parse PYX handler.
+Output is serialization to SGML.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<finalize>
+
+ $obj->finalize;
 
  Finalize opened tags, if exists.
  Returns undef.
-
-=back
 
 =head1 ERRORS
 
@@ -286,6 +333,40 @@ Constructor.
  # Output:
  # <element>data</element>
 
+=head1 EXAMPLE3
+
+ use strict;
+ use warnings;
+
+ use PYX::SGML::Tags;
+ use Tags::Output::Indent;
+
+ # Input.
+ my $pyx = <<'END';
+ (element
+ -data
+ )element
+ END
+
+ # Object.
+ my $obj = PYX::SGML::Tags->new(
+         'input_tags_item_callback' => sub {
+                 my $tags_ar = shift;
+                 print '[ '.$tags_ar->[0].' ]'."\n";
+                 return;
+         },
+ );
+
+ # Process.
+ $obj->parse($pyx);
+ print "\n";
+
+ # Output:
+ # [ b ]
+ # [ d ]
+ # [ e ]
+ # <element>data</element>
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -322,6 +403,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

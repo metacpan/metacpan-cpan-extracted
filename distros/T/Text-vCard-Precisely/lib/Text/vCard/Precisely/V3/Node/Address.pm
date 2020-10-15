@@ -16,7 +16,7 @@ override 'as_string' => sub {
     my @lines;
     push @lines, $self->name() || croak "Empty name";
     push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types() } )
-        if @{ $self->types() || [] } > 0;
+        if ref $self->types() eq 'ARRAY' and $self->types()->[0];
     push @lines, 'PREF=' . $self->pref()         if $self->pref();
     push @lines, 'LANGUAGE=' . $self->language() if $self->language();
 

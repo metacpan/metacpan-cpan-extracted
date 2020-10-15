@@ -11,7 +11,7 @@ use parent "WWW::Shopify::Model::NestedItem";
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
 	"name" => new WWW::Shopify::Field::String(),
-	"value" => new WWW::Shopify::Field::String()};
+	"value" => new WWW::Shopify::Field::Text()};
 }
 
 sub plural() { return 'properties'; }

@@ -1,3 +1,6 @@
+use warnings;
+use strict;
+
 use Test::Simple tests => 7;
 
 # chdir to t/

@@ -17,7 +17,12 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Run unit tests
 
-    perl Makefile.PL && make test
+    perl Makefile.PL
+    make test
+
+* Run unit tests for multiple Perl versions using perlbrew on Vagrant
+
+    vagrant ssh --command "perlbrew exec --halt-on-error /vagrant/vag-tests.sh" 1>&2 | tee test.out
 
 * Bump version number in lib/Connector.pm
 
@@ -37,11 +42,11 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Build tarball
 
-    perl Makefile.PL
-    make manifest
-    make dist
+    perl Makefile.PL && make manifest && make dist
 
 * Upload tarball to https://pause.perl.org
+
+    cpan-upload Connector-$connver.tar.gz
 
 # If the build env is not already set up, run the following:
 
@@ -52,7 +57,23 @@ Note: Replace '1.10' in the examples below with the current version.
     # Note: Adjust perl version based on results from 'perlbrew available'
     perlbrew install perl-5.19.5
     perlbrew switch perl-5.19.5
+ 
     perlbrew install-cpanm
     cpanm Module::Install
     cpanm --installdeps --notest .
+
+## To set up a new perl version
+
+    perlbrew install perl-5.32.0
+    perlbrew use perl-5.32.0
+    cpanm Module::Install
+    cpanm --installdeps --notest .
+
+## Setting up Vagrant Tests
+
+    vagrant init ubuntu/bionic64
+    vagrant up
+    vagrant ssh --command /vagrant/vag-provision.sh
+    vagrant ssh --command /vagrant/vag-add-perl.sh
+
 

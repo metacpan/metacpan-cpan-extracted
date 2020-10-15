@@ -15,7 +15,7 @@ use Tk::Toplevel;
 use Tk::LabEntry;
 use Cwd;
 
-our $VERSION = 0.70;
+our $VERSION = 0.71;
 our @EXPORT_OK = qw(glob_to_re);
 
 Construct Tk::Widget 'SimpleFileSelect';

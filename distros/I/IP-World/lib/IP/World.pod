@@ -2,6 +2,32 @@
 
 IP::World - Fast IP-address to country-code translation using multiple databases
 
+=head1 DEPRECATION
+
+The databases that this module used to use have been discontinued in one case,
+and are no longer updated in the other. Therefore this module is deprecated.
+
+=head1 SEE ALSO
+
+=head2 IP::Country::Fast
+
+See L<http://search.cpan.org/perldoc%3FIP::Country>
+
+This module appears to have the disadvantage that its database can
+only be updated by re-installing the module.
+
+=head2 Geo::IP
+
+See L<http://search.cpan.org/perldoc%3FGeo::IP>
+
+This can use MaxMind's licensed, fee-based databases that include more data.
+
+Unfortunately if you want this package to operate at the speeds 
+shown in L</PERFORMANCE>, you have to download a C library from 
+L<http://www.maxmind.com> and install it from the command line.  
+Someone should tell them about XS modules so that their whole 
+package can be obtained from CPAN or CPANPLUS...  
+
 =head1 SYNOPSIS
 
  use IP::World;
@@ -10,15 +36,14 @@ IP::World - Fast IP-address to country-code translation using multiple databases
 
 =head1 DESCRIPTION
 
-IP::World returns the ISO-3166 country code associated with an IP4
-address.  This version is based on the free database from
-L<http://www.wipmania.com>.  An
-included application checks the currency of the included database
-on installation, and can be scheduled to do so periodically.
-
 The author uses this package for customizing served web pages to
 the location of the visitor, particularly to quote prices of items
 for sale in the visitor's currency.  Also for server log analysis.
+
+IP::World returns the ISO-3166 country code associated with an IP4
+address. This version is based on the free database from
+L<http://www.wipmania.com>. Note, however, that that appears to no
+longer be updated. Accordingly, this module is now deprecated.
 
 It used to also use the free GeoLite database from MaxMind but that
 has been discontinued (see L<https://blog.maxmind.com/2018/01/02/discontinuation-of-the-geolite-legacy-databases/>).
@@ -184,47 +209,29 @@ CPANPLUS take care of installation.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010, Craig MacKenna
+Copyright (C) 2010, Craig MacKenna, with some contributions from
+David Cantrell
 
 This module is free software; you may redistribute it and/or
-modify it under the same terms as Perl 5.10.1.  For more details,
-see the full text of the licenses
-at L<http://www.perlfoundation.org/artistic_license_1_0>
-and L<http://www.gnu.org/licenses/gpl-2.0.html>
+modify it under the terms of the Artistic Licence, a copy of which
+is included in the file ARTISTIC.txt.
 
 This program is distributed in the hope that it will be useful, but
 it is provided 'as is' and without any express or implied warranties.
-For details, see the full text of the licenses at the above URLs.
+For details, see the full text of the licenses.
 
-=head1 AUTHOR
+The WIPmania database has its own Special licence which can be found
+on their website at L<http://www.wipmania.com/terms/>. In particular
+note that it is "Creative Commons Attribution-Noncommercial-No Derivative
+Works" but they also say "The Databases can be also used for any business
+purposes for free" provided that you don't provide an API for querying
+it, you don't sell derivative works, and you may have to credit them on
+a website.
+
+=head1 AUTHORS
 
 Craig MacKenna <craig@animalhead.com>
 
-=head1 SEE ALSO
-
-The function of IP-World is almost the same as that of two other
-CPAN modules:
-
-=head2 IP::Country::Fast
-
-See L<http://search.cpan.org/perldoc%3FIP::Country>
-
-This module appears to have the disadvantage that its database can
-only be updated by re-installing the module. WIPmania updates its WorldIP data
-every 2 months.  Such updates are automatically downloaded if you
-schedule I<maint_ip_world_db>.
-
-=head2 Geo::IP
-
-See L<http://search.cpan.org/perldoc%3FGeo::IP>
-
-This uses one of the two data sources that IP-World uses.  It can also 
-use MaxMind's licensed, fee-based databases that include more data.
-
-Unfortunately if you want this package to operate at the speeds 
-shown in L</PERFORMANCE>, you have to download a C library from 
-L<http://www.maxmind.com> and install it from the command line.  
-Someone should tell them about XS modules so that their whole 
-package can be obtained from CPAN or CPANPLUS...  
+David Cantrell <david@cantrell.org.uk>
 
 =cut

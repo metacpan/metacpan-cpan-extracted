@@ -1,5 +1,11 @@
 Revision history for Perl extension App-BorgRestore
 
+3.4.4 2020-10-14T12:37:04Z
+	- Require DBD::SQLite 1.60 or newer to fix issues with schema migration 2
+	  on old systems.
+	- Reduce database size for databases that contained data from before
+	  migrations 3 and 4.
+
 3.4.3 2020-09-27T13:53:54Z
 	- Add database migration for change from 3.4.2
 

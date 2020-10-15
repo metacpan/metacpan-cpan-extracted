@@ -1,3 +1,13 @@
+0.25 2020-10-14
+    * Output more diagnostics on failure/suspect requests to find out
+      what makes the test suite unhappy on Cygwin
+    * No functionality changes, no need to upgrade
+
+0.24 2020-10-13
+    * Clean out HTTP_PROXY and other environment variables that prevent the
+      test suite from running properly
+    * No functionality changes, no need to upgrade
+
 0.23 2020-10-11
     * Curl previous to 7.37.0 does not handle IPv6 hostnames well, skip that
       combination in tests

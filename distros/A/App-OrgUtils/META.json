@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
@@ -61,7 +61,7 @@
             "Log::ger" : "0.037",
             "Org::Document" : "0",
             "Org::Dump" : "0.551",
-            "Org::Parser" : "0.53",
+            "Org::Parser" : "0.553",
             "Org::Parser::Tiny" : "0.005",
             "Org::To::HTML" : "0.18",
             "Org::To::HTML::WordPress" : "0",
@@ -105,7 +105,7 @@
          "web" : "https://github.com/perlancar/perl-App-OrgUtils"
       }
    },
-   "version" : "0.479",
+   "version" : "0.481",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -119,47 +119,52 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript count-org-headlines-fast",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript count-org-todos-fast",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript filter-org-by-headlines",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript list-org-headlines-fast",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript list-org-todos-fast",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript org-to-html",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript org-to-html-wordpress",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript sort-org-headlines",
-            "version" : "0.422"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript reverse-org-headlines",
-            "version" : "0.422"
+            "version" : "0.423"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -250,7 +255,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -319,9 +324,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",

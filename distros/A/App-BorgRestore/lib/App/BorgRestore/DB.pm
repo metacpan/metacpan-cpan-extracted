@@ -95,7 +95,32 @@ method _migrate() {
 			$self->{dbh}->do('delete from `archives`');
 			$self->{dbh}->do('delete from `files`');
 		},
+		5 => sub {
+			# Remove columns left over by migrations 3 and 4 from files tables
+			my @archive_ids;
+			my $st = $self->{dbh}->prepare("select `id` from `archives`;");
+			$st->execute();
+			while (my $result = $st->fetchrow_hashref) {
+				push @archive_ids, $result->{id};
+			}
+
+			$self->{dbh}->do('create table `files_new` (`path` text, primary key (`path`)) without rowid;');
+			for my $archive_id (@archive_ids) {
+				$archive_id = untaint($archive_id, qr(.*));
+				$self->{dbh}->do('alter table `files_new` add column `'.$archive_id.'` integer;');
+			}
+
+			if (@archive_ids > 0) {
+				my @columns_to_copy = map {'`'.$_.'`'} @archive_ids;
+				@columns_to_copy = ('`path`', @columns_to_copy);
+				$self->{dbh}->do('insert into `files_new` select '.join(',', @columns_to_copy).' from files');
+			}
+
+			$self->{dbh}->do('drop table `files`');
+			$self->{dbh}->do('alter table `files_new` rename to `files`');
+		},
 	};
+	my $ran_migrations = 0;
 
 	for my $target_version (sort { $a <=> $b } keys %$schema) {
 		if ($version < $target_version) {
@@ -105,7 +130,12 @@ method _migrate() {
 			$self->_set_db_version($target_version);
 			$self->{dbh}->commit();
 			$log->debugf("Schema upgrade to version %s complete", $target_version);
+			$ran_migrations = 1;
 		}
+	}
+	if ($ran_migrations) {
+		$log->debug("Vacuuming database");
+		$self->{dbh}->do("vacuum");
 	}
 }
 

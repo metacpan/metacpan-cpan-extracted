@@ -6,9 +6,11 @@
 #
 package Connector;
 
-use 5.008_008;  # This is the earliest version we've tested on
+# This is the earliest version we've tested on and we need at least 5.10
+# because of the '//' operator in one of the sub-modules.
+use 5.10.1;
 
-our $VERSION = '1.32';
+our $VERSION = '1.35';
 
 use strict;
 use warnings;

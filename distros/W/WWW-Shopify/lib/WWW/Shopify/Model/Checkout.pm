@@ -22,6 +22,7 @@ BEGIN { $fields = {
 	"note" => new WWW::Shopify::Field::String(),
 	"updated_at" => new WWW::Shopify::Field::Date(),
 	"source_name" => new WWW::Shopify::Field::String::Enum(["web", "pos"]),
+	"gateway" => new WWW::Shopify::Field::String(),
 	"subtotal_price" => new WWW::Shopify::Field::Money(),
 	"taxes_included" => new WWW::Shopify::Field::Boolean(),
 	"total_discounts" => new WWW::Shopify::Field::Money(),
@@ -34,8 +35,8 @@ BEGIN { $fields = {
 	"tax_lines" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Checkout::TaxLine'),
 	"shipping_lines" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Checkout::ShippingLine'),
 	"line_items" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Checkout::LineItem'),
-	"billing_address" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Address'),
-	"shipping_address" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Address'),
+	"billing_address" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Checkout::BillingAddress'),
+	"shipping_address" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Checkout::ShippingAddress'),
 	"customer" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Customer')};
 }
 
@@ -49,6 +50,9 @@ BEGIN { $queries = {
 	since_id => new WWW::Shopify::Query::LowerBound('id')
 }; }
 
+
+sub read_scope { return "read_checkouts"; }
+sub write_scope { return "write_checkouts"; }
 
 sub creatable { return undef; }
 sub updatable { return undef; }

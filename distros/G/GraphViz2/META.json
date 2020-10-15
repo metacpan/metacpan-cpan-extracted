@@ -1,7 +1,7 @@
 {
    "abstract" : "A wrapper for AT&T's Graphviz",
    "author" : [
-      "Ron Savage (ron@savage.net.au)"
+      "Ron Savage <ron@savage.net.au>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
@@ -57,26 +57,24 @@
       "test" : {
          "requires" : {
             "Test::More" : "1.001002",
-            "Test::Snapshot" : "0.06",
-            "charnames" : "0",
-            "open" : "0"
+            "Test::Snapshot" : "0.06"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ronsavage/GraphViz2/issues"
+         "web" : "https://github.com/graphviz-perl/GraphViz2/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ronsavage/GraphViz2.git",
-         "web" : "https://github.com/ronsavage/GraphViz2"
+         "url" : "https://github.com/graphviz-perl/GraphViz2.git",
+         "web" : "https://github.com/graphviz-perl/GraphViz2"
       }
    },
-   "version" : "2.54",
+   "version" : "2.57",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

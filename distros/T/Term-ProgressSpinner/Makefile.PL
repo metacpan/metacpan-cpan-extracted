@@ -15,16 +15,20 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
-	'IO::Handle' => '0',
-	'Term::ANSIColor' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'Term::Size::Any' => '0',
+        'Term::ANSIColor' => '0',
+        'IO::Handle' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Term-ProgressSpinner-*' },
 );
+
+if ($^O eq 'MSWin32') {
+    $WriteMakefileArgs{PREREQ_PM}{'Win32::Console'} = 0;
+    $WriteMakefileArgs{PREREQ_PM}{'Win32::Console::ANSI'} = '1.11';
+}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

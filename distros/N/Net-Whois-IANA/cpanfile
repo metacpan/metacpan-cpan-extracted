@@ -1,9 +1,11 @@
+use strict;
+use warnings;
 
 requires "IO::Socket" => 0;
 requires "Net::CIDR"  => 0;
 
 on "test" => sub {
-        requires "File::Slurper"               => 0;
+        requires "File::Slurper"             => 0;
         requires "FindBin"                   => 0;
         requires "File::Temp"                => 0;
         requires "List::MoreUtils"           => 0;
@@ -14,4 +16,5 @@ on "test" => sub {
         requires "Test::Builder"             => 0;
         requires "Test::CPAN::Meta"          => 0;
         requires "Test::More"                => 0;
+        requires "Test::MockModule"          => 0.175;
 };

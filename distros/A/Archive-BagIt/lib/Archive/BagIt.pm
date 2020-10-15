@@ -1,15 +1,15 @@
 package Archive::BagIt;
-our $VERSION = '0.066'; # VERSION
+our $VERSION = '0.067'; # VERSION
 # ABSTRACT: An interface to make and verify bags according to the BagIt standard
 use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-our @checksum_algos = qw(md5 sha1);
-our $DEBUG=0;
 use Encode qw(decode);
 use File::Find;
 use Data::Dumper;
+our @checksum_algos = qw(md5 sha1);
+our $DEBUG=0;
 
 
 sub new {
@@ -388,7 +388,7 @@ Archive::BagIt - An interface to make and verify bags according to the BagIt sta
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 WARNING
 

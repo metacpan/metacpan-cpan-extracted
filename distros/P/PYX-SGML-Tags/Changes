@@ -1,3 +1,16 @@
+0.06 2020-10-14T09:13:41+02:00
+ - Add tests for finalize().
+ - Change bugtracker to github.
+ - Fix tests for situation when Tags::Output::LibXML not present.
+ - Rewrite doc to use =head2 for methods.
+
+0.05 2020-10-14T01:03:12+02:00
+ - Add 'input_tags_item_callback' parameter for e.g.validation.
+ - Add tests for output via libxml.
+ - Rename test files to better names (raw tests).
+ - Rewrite to better default of 'tags' parameter.
+ - Rewrite Encode to Unicode::UTF8.
+
 0.04 2020-04-26T18:32:33+02:00
  - Add test comments.
  - Add test for utf-8 characters (in Czech).

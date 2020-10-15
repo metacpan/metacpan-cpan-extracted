@@ -16,6 +16,8 @@ BEGIN { $fields = {
 sub creation_minimal { return qw(title); }
 sub creation_filled { return qw(id); }
 
+sub identifier { (); }
+
 eval(__PACKAGE__->generate_accessors); die $@ if $@;
 
 1;

@@ -11,11 +11,19 @@ use DateTime;
 use Encode;
 
 sub new {
-	my ($package, $parent) = @_;
-	my $self = bless {_parent => $parent, _default_headers => {}}, $package;
+	my ($package, $parent, $headers) = @_;
+	my $self = bless {_parent => $parent, _default_headers => ($headers || {})}, $package;
 	weaken($self->{_parent});
 	return $self;
 }
+sub ua { return $_[0]->parent->ua; }
+
+sub default_header {
+	my ($self, $key, $value) = @_;
+	$self->{_default_headers}->{$key} = $value if int(@_) >= 3;
+	return $self->{_default_headers}->{$key};
+}
+
 sub parent { $_[0]->{_parent} = $_[1] if defined $_[1]; return $_[0]->{_parent}; }
 
 sub get_url {
@@ -37,13 +45,24 @@ sub get_url {
 	$uri->query_form(\%filtered);
 	my $request = HTTP::Request->new("GET", $uri);
 	$request->header("Accept" => $type);
+	$request->header("Accept-Encoding" => "gzip") if !$ENV{"SHOPIFY_LOG"} || $ENV{"SHOPIFY_LOG"} != 2;
 	$request->header($_ => $self->{_default_headers}->{$_}) for (keys(%{$self->{_default_headers}}));
-	my $response = $self->parent->ua->request($request);
+	return $self->handle_response($self->request($request));
+	
+}
+
+sub request {
+	my ($self, $request) = @_;
+	return $self->ua->request($request);
+}
+
+sub handle_response {
+	my ($self, $response) = @_;
 	if (!$response->is_success) {
-		die new WWW::Shopify::Exception::CallLimit($response) if $response->code() == 429;
-		die new WWW::Shopify::Exception::InvalidKey($response) if $response->code() == 401;
-		die new WWW::Shopify::Exception::NotFound($response) if $response->code() == 404;
-		die new WWW::Shopify::Exception($response);
+		die WWW::Shopify::Exception::CallLimit->new($response) if $response->code() == 429;
+		die WWW::Shopify::Exception::InvalidKey->new($response) if $response->code() == 401;
+		die WWW::Shopify::Exception::NotFound->new($response) if $response->code() == 404;
+		die WWW::Shopify::Exception->new($response);
 	}
 	my $limit = $response->header('x-shopify-shop-api-call-limit');
 	if ($limit) {
@@ -54,7 +73,7 @@ sub get_url {
 	# From JSON because decodec content is already a perl internal string.
 	# Sigh. No. It's not. As per https://rt.cpan.org/Public/Bug/Display.html?id=82963; decoded_content doesn't actually do anything.
 	$content = decode("UTF-8", $content) if ($response->header('Content-Type') =~ m/application\/json/);
-	my $decoded = !$response->header('Content-Type') || $response->header('Content-Type') =~ /json/ ? from_json($content) : $content;
+	my $decoded = length($content) >= 2 && (!$response->header('Content-Type') || $response->header('Content-Type') =~ /json/) ? from_json($content) : $content;
 	return ($decoded, $response);
 }
 
@@ -83,6 +102,8 @@ sub use_url{
 	$accept = "application/json" unless $accept;
 	my $request = HTTP::Request->new($method, $url);
 	$request->header("Accept" => $accept, "Content-Type" => $type);
+	$request->header("Accept-Encoding" => "gzip") if !$ENV{"SHOPIFY_LOG"} || $ENV{"SHOPIFY_LOG"} != 2;
+	$request->header($_ => $self->{_default_headers}->{$_}) for (keys(%{$self->{_default_headers}}));
 	if ($type =~ m/json/) {
 		$request->content($hash ? encode_json($hash) : undef);
 	} else {
@@ -97,24 +118,9 @@ sub use_url{
 			} keys(%$hash) ));
 		}
 	}
-	my $response = $self->parent->ua->request($request);
+	my $response = $self->request($request);
 	if ($type =~ m/json/) {
-		if (!$response->is_success) {
-			die new WWW::Shopify::Exception::CallLimit($response) if $response->code() == 429;
-			die new WWW::Shopify::Exception::InvalidKey($response) if $response->code() == 401;
-			die new WWW::Shopify::Exception($response);
-		}
-		my $limit = $response->header('x-shopify-shop-api-call-limit');
-		if ($limit) {
-			die new WWW::Shopify::Exception("Unrecognized limit.") unless $limit =~ m/(\d+)\/\d+/;
-			$self->parent->api_calls($1);
-		}
-		my $content = $response->decoded_content;
-		# From JSON because decodec content is already a perl internal string.
-		# Sigh. No. It's not. As per https://rt.cpan.org/Public/Bug/Display.html?id=82963; decoded_content doesn't actually do anything.
-		$content = decode("UTF-8", $content) if ($response->header('Content-Type') =~ m/application\/json/);
-		my $decoded = (length($content) >= 2 && (!$response->header('Content-Type') || $response->header('Content-Type') =~ /json/ ? from_json($content) : undef));
-		return ($decoded, $response);
+		return $self->handle_response($response);
 	} else {
 		if ($response->is_redirect) {
 			
@@ -122,6 +128,19 @@ sub use_url{
 		return (undef, $response);
 	}
 }
+
+sub upload_url {
+	my ($self, $method, $url, $name, $filename, $mime, $contents) = @_;
+	my $request = HTTP::Request->new($method, $url);
+	my $boundary = '----WebKitFormBoundaryePkpFF7tjBAqx29L';
+	$request->header('Content-Type' => 'multipart/form-data; boundary=' . $boundary);
+	$request->header('Accept' => 'Accept:application/json, text/javascript, */*; q=0.01');
+	$request->content("--" . $boundary . "\r\n" .
+	"Content-Disposition: form-data; name=\"$name\"; filename=\"$filename\"\r\n" .
+	"Content-Type: $mime\r\n\r\n$contents\r\n--$boundary--");
+	return $self->ua->request($request);
+}
+
 sub put_url { return shift->use_url("PUT", @_); }
 sub post_url { return shift->use_url("POST", @_); }
 sub delete_url { return shift->use_url("DELETE", @_); }

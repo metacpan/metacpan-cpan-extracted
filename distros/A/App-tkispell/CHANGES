@@ -1,0 +1,11 @@
+0.20	2020-10-13
+	* incorporate feedback from H.Merijn Brand (thanks)
+	* add CHANGES file
+	* create App::tkispell as package namespace for tkispell
+
+0.19	2020-10-12
+	* get it to work again with recent Perl
+	* use&prefer aspell because ispell is superseded by aspell
+	* add Windows support
+	* remove Tk::SimpleFileSelect depencency (move it out of tkispell package)
+	* Robert Kiesling (RKIES) granted co-maint to Alexander Becker (ASB)

@@ -49,7 +49,7 @@ use Mojo::Util qw(b64_encode dumper);
 use Mojo::Log;
 use Carp;
 
-our $VERSION = '0.1.6';
+our $VERSION = '0.1.7';
 
 =head2 Properties
 
@@ -252,20 +252,34 @@ sub call_p ($self,$operation,$params={}) {
                 my $res = $trace->response;
                 my $client_warning =
                     $res->headers->header('client-warning');
-                return $reject->($client_warning)
+                return $reject->($client_warning."\n".$self->trace_to_string($trace))
                     if $client_warning;
                 if (not $res->is_success) {
                     if (my $f = $answer->{Fault}){
                         $self->log->error(__PACKAGE__ . " $operation - ".$f->{_NAME} .": ". $f->{faultstring});
-                        return $reject->($f->{faultstring});
+                        return $reject->($f->{faultstring}."\n".$self->trace_to_string($trace));
                     }
-                    return $reject->($self->endPoint.' - '.$res->code.' '.$res->message)
+                    return $reject->($self->endPoint.' - '.$res->code.' '.$res->message."\n".$self->trace_to_string($trace))
                 }
                 # $self->log->debug(__PACKAGE__ . " $operation completed - ".dumper($answer));
                 return $resolve->($answer,$trace);
             }
         );
     });
+}
+
+sub trace_to_string ($self,$trace) {
+    my $ret;
+    open my $fh, '>', \$ret;
+    $trace->printErrors($fh);
+    print $fh "\nRequest:\n";
+    $trace->printRequest($fh,pretty_print=>1);
+    print $fh "\nResponse:\n";
+    $trace->printResponse($fh,pretty_print=>1);
+    print $fh "\n";
+    $trace->printTimings($fh);
+    close $fh;
+    return $ret;
 }
 
 =head3 call($operation,$paramHash)

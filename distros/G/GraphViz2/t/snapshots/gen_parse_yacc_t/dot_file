@@ -2,15 +2,10 @@
  graph [ concentrate="1" rankdir="TB" ]
  node [ color="blue" shape="oval" ]
  edge [ color="grey" ]
- "$accept"
- "list"
  "$accept" -> "list"
- "expr"
  "expr" -> "expr"
- "number"
  "expr" -> "number"
  "list" -> "list"
- "stat"
  "list" -> "stat"
  "number" -> "number"
  "stat" -> "expr"

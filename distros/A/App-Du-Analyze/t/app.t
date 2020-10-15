@@ -11,54 +11,48 @@ use Test::More tests => 12;
 
 use Test::Differences qw( eq_or_diff );
 
-use Test::Trap qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
+use Test::Trap
+    qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
 use App::Du::Analyze;
-my $input_filename = File::Spec->catfile(File::Spec->curdir, 't', 'data', 'fc-solve-git-du-output.txt');
+my $input_filename = File::Spec->catfile( File::Spec->curdir, 't', 'data',
+    'fc-solve-git-du-output.txt' );
 
 # TEST:$test_filter_on_fc_solve__proto=1;
 sub test_filter_on_fc_solve__proto
 {
-    my ($args, $expected_output, $blurb) = @_;
+    my ( $args, $expected_output, $blurb ) = @_;
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     trap
     {
-        App::Du::Analyze->new({argv => [@$args]})->run();
+        App::Du::Analyze->new( { argv => [@$args] } )->run();
     };
 
     my $got_output = $trap->stdout;
 
-    return eq_or_diff(
-        $got_output,
-        $expected_output,
-        $blurb,
-    );
+    return eq_or_diff( $got_output, $expected_output, $blurb, );
 }
 
 # TEST:$test_filter_on_fc_solve=0;
 sub test_filter_on_fc_solve
 {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    my ($args, $expected_output, $blurb) = @_;
+    my ( $args, $expected_output, $blurb ) = @_;
 
     {
         local $ENV{ANALYZE_DU_INPUT_FN} = $input_filename;
+
         # TEST:$test_filter_on_fc_solve+=$test_filter_on_fc_solve__proto;
-        test_filter_on_fc_solve__proto(
-            $args,
-            $expected_output,
-            "$blurb - ENV",
-        );
+        test_filter_on_fc_solve__proto( $args, $expected_output,
+            "$blurb - ENV", );
     }
 
     {
         # TEST:$test_filter_on_fc_solve+=$test_filter_on_fc_solve__proto;
-        test_filter_on_fc_solve__proto([ @$args, $input_filename],
-            $expected_output,
-            "$blurb - arg",
-        );
+        test_filter_on_fc_solve__proto( [ @$args, $input_filename ],
+            $expected_output, "$blurb - arg", );
     }
 }
 

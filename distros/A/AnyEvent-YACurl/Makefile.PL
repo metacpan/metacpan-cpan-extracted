@@ -4,21 +4,6 @@ use Cwd;
 
 # I realize that having this in Makefile.PL isn't nice... but it's just so much easier.
 my $cwd= cwd;
-if (! -f "libbrotli-lib/lib/libbrotlidec.a") {
-    chdir("libbrotli-src");
-    system("./configure",
-        "--prefix=$cwd/libbrotli-lib",
-        "--disable-shared",
-        "--enable-static",
-        "--with-pic",
-        split(/\s/, $ENV{YACURL_BROTLI_OPTS}||'')
-    ) and exit $?;
-    system("make") and exit $?;
-    system("make", "check") and exit $?;
-    system("make", "install") and exit $?;
-    chdir("..");
-}
-
 if (! -f "nghttp2-lib/lib/libnghttp2.a") {
     chdir("nghttp2-src");
     system("./configure",
@@ -56,7 +41,6 @@ if (! -f "curl-lib/lib/libcurl.a") {
     system("./configure",
         "--with-zlib",
         "--with-nghttp2=$cwd/nghttp2-lib",
-        "--with-brotli=$cwd/libbrotli-lib",
         "--enable-ares=$cwd/c-ares-lib",
         "--disable-shared",
         "--enable-static",

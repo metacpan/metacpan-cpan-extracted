@@ -2,7 +2,7 @@ package App::Utils;
 # App::Utils - some useful command-line utilities
 # 2020 Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
-our $VERSION = 0.053;
+our $VERSION = 0.054;
 
 =head1 NAME
 

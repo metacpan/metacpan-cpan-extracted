@@ -1,11 +1,11 @@
 package Mail::BIMI::VMC::Chain;
 # ABSTRACT: Class to model a VMC Chain
-our $VERSION = '2.20201006.1'; # VERSION
+our $VERSION = '2.20201013.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
 use Mail::BIMI::VMC::Cert;
-use Crypt::OpenSSL::X509 1.813;
+use Crypt::OpenSSL::X509 1.812;
 use Crypt::OpenSSL::Verify 0.20;
 use File::Slurp qw{ read_file write_file };
 use File::Temp;
@@ -190,7 +190,7 @@ Mail::BIMI::VMC::Chain - Class to model a VMC Chain
 
 =head1 VERSION
 
-version 2.20201006.1
+version 2.20201013.2
 
 =head1 DESCRIPTION
 

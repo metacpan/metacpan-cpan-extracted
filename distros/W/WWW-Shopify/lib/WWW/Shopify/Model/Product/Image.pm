@@ -12,8 +12,11 @@ my $fields; sub fields { return $fields; }
 BEGIN { $fields = {
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"position" => new WWW::Shopify::Field::Int(),
+	"width" => new WWW::Shopify::Field::Int(),
+	"height" => new WWW::Shopify::Field::Int(),
 	"src" => new WWW::Shopify::Field::String::URL::Image(),
 	"attachment" => new WWW::Shopify::Field::Text(),
+	"alt" => new WWW::Shopify::Field::String(),
 	"filename" => new WWW::Shopify::Field::String(),
 	"product_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Product'),
 	"created_at" => new WWW::Shopify::Field::Date(),
@@ -26,6 +29,7 @@ BEGIN { $fields = {
 sub creation_filled { return qw(id created_at ); }
 sub update_filled { return qw(updated_at); } 
 sub update_fields { return qw(metafields position variant_ids); }
+sub get_fields { return qw(id position width height src filename product_id created_at updated_at variant_ids metafields) }
 
 sub read_scope { return "read_products"; }
 sub write_scope { return "write_products"; }

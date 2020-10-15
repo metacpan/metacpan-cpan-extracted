@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '2.20201006.1'; # VERSION
+our $VERSION = '2.20201013.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -22,11 +22,11 @@ has data => ( is => 'rw', isa => 'Str', lazy => 1, builder => '_build_data', tra
   documentation => 'inputs: Raw data of the VMC contents; Fetched from authority URI if not given', );
 has cert_list => ( is => 'rw', isa => 'ArrayRef', lazy => 1, builder => '_build_cert_list', traits => ['Cacheable'],
   documentation => 'ArrayRef of individual Certificates in the chain' );
-has chain_object => ( is => 'rw', lazy => 1, builder => '_build_chain_object', traits => ['Cacheable'],
+has chain_object => ( is => 'rw', lazy => 1, builder => '_build_chain_object',
   documentation => 'Mail::BIMI::VMC::Chain object for this Chain' );
 has is_valid => ( is => 'rw', lazy => 1, builder => '_build_is_valid', traits => ['Cacheable'],
   documentation => 'Is this VMC valid' );
-has vmc_object => ( is => 'rw', lazy => 1, builder => '_build_vmc_object', traits => ['Cacheable'],
+has vmc_object => ( is => 'rw', lazy => 1, builder => '_build_vmc_object',
   documentation => 'Mail::BIMI::VMC::Cert object for this VMC Set' );
 has is_cert_valid => ( is => 'rw', lazy => 1, builder => '_build_is_cert_valid', traits => ['Cacheable'],
   documentation => 'Is this Certificate Set valid' );
@@ -198,7 +198,7 @@ sub _build_indicator($self) {
   if ( $uri =~ /^data:image\/svg\+xml;base64,/ ) {
     my ( $null, $base64 ) = split( ',', $uri );
     my $data = MIME::Base64::decode($base64);
-    return Mail::BIMI::Indicator->new( location => $self->indicator_uri, data => $data, bimi_object => $self->bimi_object, source => 'VMC' );
+    return Mail::BIMI::Indicator->new( uri => $self->uri, data => $data, bimi_object => $self->bimi_object, source => 'VMC' );
   }
   else {
     $self->add_error('VMC_PARSE_ERROR','Could not extract SVG from VMC');
@@ -276,7 +276,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 2.20201006.1
+version 2.20201013.2
 
 =head1 DESCRIPTION
 

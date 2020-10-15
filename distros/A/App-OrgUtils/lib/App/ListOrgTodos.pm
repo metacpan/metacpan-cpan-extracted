@@ -1,7 +1,7 @@
 package App::ListOrgTodos;
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.479'; # VERSION
+our $DATE = '2020-10-14'; # DATE
+our $VERSION = '0.481'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,7 +55,7 @@ App::ListOrgTodos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.479 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 

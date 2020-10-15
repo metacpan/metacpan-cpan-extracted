@@ -3745,6 +3745,14 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\easygetopt.c"
+			>
+			</File>
+			<File
+				RelativePath="..\..\..\..\lib\easyoptions.c"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\escape.c"
 			>
 			</File>
@@ -3949,10 +3957,6 @@
 			>
 			</File>
 			<File
-				RelativePath="..\..\..\..\lib\security.c"
-			>
-			</File>
-			<File
 				RelativePath="..\..\..\..\lib\select.c"
 			>
 			</File>
@@ -4061,6 +4065,10 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\version_win32.c"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\warnless.c"
 			>
 			</File>
@@ -4153,6 +4161,10 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\curl_krb5.h"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\curl_ldap.h"
 			>
 			</File>
@@ -4205,10 +4217,6 @@
 			>
 			</File>
 			<File
-				RelativePath="..\..\..\..\lib\curl_sec.h"
-			>
-			</File>
-			<File
 				RelativePath="..\..\..\..\lib\curl_setup.h"
 			>
 			</File>
@@ -4250,6 +4258,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\easyif.h"
+			>
+			</File>
+			<File
+				RelativePath="..\..\..\..\lib\easyoptions.h"
 			>
 			</File>
 			<File
@@ -4518,6 +4530,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\url.h"
+			>
+			</File>
+			<File
+				RelativePath="..\..\..\..\lib\version_win32.h"
 			>
 			</File>
 			<File

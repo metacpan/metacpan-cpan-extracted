@@ -8,7 +8,7 @@
 
 package Mail::Box::FastScalar;
 use vars '$VERSION';
-$VERSION = '3.009';
+$VERSION = '3.010';
 
 
 use strict;

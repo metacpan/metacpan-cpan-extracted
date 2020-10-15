@@ -10,9 +10,11 @@ use parent "WWW::Shopify::Model::Item";
 
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
-	"created_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00', max => 'now'),
+	"created_at" => new WWW::Shopify::Field::Date(),
 	"name" => new WWW::Shopify::Field::Identifier::String()};
 }
+
+sub needs_login { 1; }
 
 sub creatable($) { return undef; }
 sub updatable($) { return undef; }

@@ -1,76 +1,78 @@
 #!/usr/bin/perl
 # remove-empty-dirs - remove recursively empty directories
-# 2002-2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+# 2002-2020 Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
 $| = 1;
 &remove_empty_dirs(@ARGV);
 
 sub remove_empty_dirs {
-    my $count = 0;
-    while ($#_ > -1) {
-	   my $dir = shift;
-	   # symbolic link
-	   if (-l $dir) { next }
+  my $count = 0;
+  while ($#_ > -1) {
+    my $dir = shift;
+    # symbolic link
+    if (-l $dir) { next }
 
-	   next if not -e $dir;
+    next if not -e $dir;
 
-	   # file
-	   if (not -d $dir) { next }
+    # file
+    if (not -d $dir) { next }
 	   
-	   local ($_, *DIR);
-	   opendir(DIR, $dir) || die "can't opendir $dir: $!";
-	   map { /^\.\.?$/ ? '' : ($count += &remove_empty_dirs("$dir/$_")) } readdir(DIR);
-	   closedir(DIR);
+    local ($_, *DIR);
+    opendir(DIR, $dir) || die "can't opendir $dir: $!";
+    map { /^\.\.?$/ ? '' : ($count += &remove_empty_dirs("$dir/$_")) }
+      readdir(DIR);
+    closedir(DIR);
 
-	   # is it empty?
-	   my $count1 = 0;
-	   opendir(DIR, $dir) || die "can't opendir $dir: $!";
-	   map { /^\.\.?$/ ? '' : ($count1 += 1) } readdir(DIR);
-	   closedir(DIR);
-	   if ($count1 == 0) {
-	       print "Removing $dir (empty dir)\n";
-	       rmdir $dir or die "Error removing $dir: $!";
-	       $count += 1;
-	   }
-       }
-    return $count;
+    # is it empty?
+    my $count1 = 0;
+    opendir(DIR, $dir) || die "can't opendir $dir: $!";
+    map { /^\.\.?$/ ? '' : ($count1 += 1) } readdir(DIR);
+    closedir(DIR);
+    if ($count1 == 0) {
+      print "Removing $dir (empty dir)\n";
+      rmdir $dir or die "Error removing $dir: $!";
+      $count += 1;
+    }
+  }
+  return $count;
 }
 
+exit 0;
 __END__ # Documentation
 
 =head1 NAME
 
 remove-empty-dirs - remove recursively empty directories
 
-=head1 DESCRIPTION
-
-The command C<remove-empty-dirs> removes recursively all empty directories
-that are subdirectories of the directories given in the argument line.
-
 =head1 SYNOPSIS
 
  $ remove-empty-dirs .
 
-Removes all empty subdirectories recursively of the current directory.
+Removes all empty subdirectories recursively of the current directory,
+and any subdirectories.
+
+=head1 DESCRIPTION
+
+The command C<remove-empty-dirs> recursively visits all subdirectories of
+the directories given in the command line removes all empty directories.
+It will remove also directories that become empty after recursivelly removing
+their empty subdirectories.
 
 =head1 AUTHOR
 
-Vlado Keselj http://web.cs.dal.ca/~vlado
+Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
 =head1 LICENSE
 
-Artistic License 1.0 L<perlartistic>
+Perl License (perl)
 
-=head1 INSTALLATION
+=head1 SCRIPT CATEGORIES
 
-Using C<cpan>:
+CPAN
+Unix/System_administration
 
- $ cpan App::Utils
+=head1 README
 
-Manual install:
-
- $ perl Makefile.PL
- $ make
- $ make install
+remove-empty-dirs - remove recursively empty directories
 
 =cut

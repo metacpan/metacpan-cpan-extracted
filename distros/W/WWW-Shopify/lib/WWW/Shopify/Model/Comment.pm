@@ -14,14 +14,15 @@ BEGIN { $fields = {
 	"blog_id" => new WWW::Shopify::Field::Relation::ReferenceOne("WWW::Shopify::Model::Blog"),
 	"body" => new WWW::Shopify::Field::Text(),
 	"body_html" => new WWW::Shopify::Field::Text::HTML(),
-	"created_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00'),
+	"created_at" => new WWW::Shopify::Field::Date(),
 	"email" => new WWW::Shopify::Field::String::Email(),
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"ip" => new WWW::Shopify::Field::String::IPAddress(),
-	"published_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00'),
+	"published_at" => new WWW::Shopify::Field::Date(),
 	"status" => new WWW::Shopify::Field::String::Enum([qw(removed unapproved published spam)]),
-	"updated_at" => new WWW::Shopify::Field::Date(min => '2010-01-01 00:00:00'),
-	"user_agent" => new WWW::Shopify::Field::String::Enum(["Mozilla/5.0"]),
+	"updated_at" => new WWW::Shopify::Field::Date(),
+	"user_agent" => new WWW::Shopify::Field::String(),
+	"author" => new WWW::Shopify::Field::String()
 
 }; }
 
@@ -30,13 +31,7 @@ BEGIN { $queries = {
 	article_id => new WWW::Shopify::Query::Match('article_id'),
 	blog_id => new WWW::Shopify::Query::Match('blog_id'),
 	since_id => new WWW::Shopify::Query::LowerBound('id'),
-	published_status => new WWW::Shopify::Query::Custom("published_status", sub { 
-		my ($rs, $value) = @_;
-		return $rs->search({ 'status' => 'published' }) if $value eq "published";
-		return $rs->search({ 'status' => { '!=' => 'published' } }) if $value eq "unpublished";
-		return $rs if $value eq "any";
-		die new WWW::Shopify::Exception("Unknown published status: $value.");
-	}),
+	published_status => new WWW::Shopify::Query::Enum("published_status", [{ "published" => { status => "published" } }, { "unpublished" => { status => {"!=" => "published"} } }, { "any" => { } }]),
 	status => new WWW::Shopify::Query::Match('status'),
 	created_at_min => new WWW::Shopify::Query::LowerBound('created_at'),
 	created_at_max => new WWW::Shopify::Query::UpperBound('created_at'),

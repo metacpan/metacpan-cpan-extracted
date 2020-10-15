@@ -1,9 +1,9 @@
 package Sah::SchemaR::urls;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["array",[{of=>"url*"}],["array"]];
+our $rschema = ["array",[{examples=>[{valid=>1,value=>[]},{valid=>0,value=>[""]}],of=>"url*"}],["array"]];
 
 1;
 # ABSTRACT: 
@@ -20,7 +20,7 @@ Sah::SchemaR::urls -
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::SchemaR::urls (from Perl distribution Sah-Schemas-URL), released on 2019-11-29.
+This document describes version 0.012 of Sah::SchemaR::urls (from Perl distribution Sah-Schemas-URL), released on 2020-05-27.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

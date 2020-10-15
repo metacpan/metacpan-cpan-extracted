@@ -15,11 +15,9 @@ use XML::Twig ;
 use File::Share ':all'; 
 use Carp qw (cluck croak carp) ;
 
-use Metabolomics::Banks qw( :all ) ;
+use base qw( Metabolomics::Banks ) ;
 
 require Exporter;
-
-our @ISA = qw(Exporter);
  
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -82,7 +80,6 @@ our $VERSION = '0.1';
 sub new {
     ## Variables
     my $self={};
-    bless($self) ;
     
     $self = Metabolomics::Banks->new() ;
     
@@ -92,7 +89,7 @@ sub new {
     $self->{_DATABASE_URL_} = 'http://www.knapsackfamily.com/KNApSAcK_Family/' ;
     $self->{_DATABASE_DOI_} = '10.1093/pcp/pct176' ;
     ## _DATABASE_ENTRIES_
-    
+    bless($self) ;
     return $self ;
 }
 ### END of SUB

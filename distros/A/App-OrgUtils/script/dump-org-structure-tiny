@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-21'; # DATE
+our $DATE = '2020-10-14'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.479'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ dump-org-structure-tiny - Dump Org document structure (using Org::Parser::Tiny)
 
 =head1 VERSION
 
-This document describes version 0.479 of dump-org-structure-tiny (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of dump-org-structure-tiny (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 SYNOPSIS
 

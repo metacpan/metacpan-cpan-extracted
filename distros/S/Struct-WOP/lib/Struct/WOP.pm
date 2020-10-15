@@ -7,7 +7,7 @@ use warnings;
 use Scalar::Util qw/reftype refaddr/;
 use Encode qw/decode encode/;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our (%HELP, @MAYBE, $caller, $destruct);
 BEGIN {
 	%HELP = (
@@ -66,7 +66,7 @@ Struct::WOP - deeply encode/decode a struct
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

@@ -56,7 +56,7 @@ Archive::BagIt::Plugin::Manifest::MD5 - The role to load md5 plugin (default for
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 AVAILABILITY
 

@@ -1,14 +1,15 @@
 Changes
-Digest.pm
-Digest/base.pm
-Digest/file.pm
 digest-bench
-MANIFEST
+lib/Digest.pm
+lib/Digest/base.pm
+lib/Digest/file.pm
 Makefile.PL
+MANIFEST			This list of files
 README
 t/base.t
 t/digest.t
 t/file.t
 t/lib/Digest/Dummy.pm
 t/security.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

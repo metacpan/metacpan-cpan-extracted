@@ -19,10 +19,10 @@ has content => ( is => 'rw', default => '', isa => 'Str' );
 has preferred => ( is => 'rw', default => 0, isa => 'Bool' );
 
 subtype 'TelType' => as 'Str' => where {
-    m/^(?:work|home|pref)$/is or                                #common
+    m/^(?:work|home|pref)$/is ||                                #common
         m/^(?:text|voice|fax|cell|video|pager|textphone)$/is    # for tel
 } => message {"The text you provided, $_, was not supported in 'TelType'"};
-has types => ( is => 'rw', isa => 'ArrayRef[Maybe[TelType]]', default => sub { [] }, );
+has types => ( is => 'rw', isa => 'ArrayRef[Maybe[TelType]]', default => sub { [] } );
 
 override 'as_string' => sub {
     my ($self) = @_;
@@ -31,7 +31,7 @@ override 'as_string' => sub {
     push @lines, 'ALTID=' . $self->altID() if $self->can('altID') and $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->can('pid') and $self->pid();
 
-    push my @types, grep { length $_ } map { uc $_ if defined $_ } @{ $self->types() };
+    push my @types, map { uc $_ } grep { length $_ } @{ $self->types() };
     push @types, 'PREF' if $self->preferred();
     my $types = 'TYPE="' . join( ',', @types ) . '"' if @types;
     push @lines, $types if $types;

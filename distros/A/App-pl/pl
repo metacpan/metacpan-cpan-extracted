@@ -4,7 +4,7 @@
 
 our $VERSION;
 BEGIN {
-    $VERSION = '0.58.0';
+    $VERSION = '0.59.0';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
     my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
@@ -110,17 +110,55 @@ our( $A, @A,
 
 
 
-# Echo
-sub echo(@) { local( $,, $\ )     = (' ', "\n");  print &pl::pretty }
+# Echo remove quine
+sub echo(@) {
+    if( wantarray ) {
+	my @ret = &Echo;
+	$ret[-1] .= "\n" if @ret;
+	@ret;
+    } elsif( defined wantarray ) {
+	join( ' ', &Echo ) . "\n";
+    } else {
+	local $, = ' ';
+	say &Echo;
+    }
+}
 
 # Echo without newline
-sub Echo(@) { local( $,, $\, $| ) = (' ', '', 1); print &pl::pretty }
+sub Echo(@) {
+    if( wantarray ) {
+	map {
+	    if( ! defined ) {
+		"$pl::c{I}undef$pl::c{E}";
+	    } elsif( !ref ) {
+		$_;
+	    } elsif( eval { $_->can( '(""' ) } ) {
+		"$_";
+	    } else {
+		require Data::Dumper;
+		my $ret = Data::Dumper::Dumper( $_ );
+		$ret =~ s/;?\n?$//s;
+		$ret =~ s/\bundef\b/$pl::c{I}undef$pl::c{E}/gs;
+		$ret;
+	    }
+	} @_ ? @_ : $_;
+    } elsif( defined wantarray ) {
+	join ' ', &Echo;
+    } else {
+	local( $,, $\, $| ) = (' ', '', 1);
+	print &Echo;
+    }
+}
 
-# Builtin format is useless in one-liners, but not overridable
-sub form($@) {		  printf shift() . "\n", &pl::pretty }
+# Would call it format, but that's not overridable.
+sub form($@) {
+    echo sprintf shift, &Echo;
+}
 
-# Format without newline
-sub Form($@) { local $| = 1; printf shift,		 &pl::pretty }
+# Form without newline
+sub Form($@) {
+    Echo sprintf shift, &Echo;
+}
 
 
 sub benchmark(&@) {
@@ -130,10 +168,10 @@ sub benchmark(&@) {
     require Benchmark;
     local $SIG{__WARN__} = sub { die @_ };
     if( @args ) {
-	echo Benchmark::timestr( Benchmark::countit( 10, $code )), "$name: $_"
+	say Benchmark::timestr( Benchmark::countit( 10, $code )), " $name: $_"
 	    for @args;
     } else {
-	echo Benchmark::timestr( Benchmark::countit( 10, $code )), " $name";
+	say Benchmark::timestr( Benchmark::countit( 10, $code )), " $name";
     }
 }
 
@@ -159,15 +197,15 @@ sub Config(@) {
 }
 
 sub Date(@) {
-    my( $s, $us, $z, $zo );
+    my( $s, $us, $tz, $tzo );
     require Time::HiRes;
     for( @_ ) {
 	if( ref ) {
 	    ($s, $us) = @$_;
 	} elsif( /^([-+]?)(1[0-4]|0?[0-9])(?:\.([0-9])([0-9])?|:([0-5])?([0-9]))?$/i ) {
-	    $z = $2 * 3600  +  ($3 ? ($3.($4//0)) * 36  :  $6 ? (($5//0).$6) * 60  :  0);
-	    $zo = sprintf ' %s%02d:%02d', $1 || '+', $z / 3600, $z % 3600 / 60;
-	    $z = -$z if $1 eq '-';
+	    $tz = $2 * 3600  +  ($3 ? ($3.($4//0)) * 36  :  $6 ? (($5//0).$6) * 60  :  0);
+	    $tzo = sprintf ' %s%02d:%02d', $1 || '+', $tz / 3600, $tz % 3600 / 60;
+	    $tz = -$tz if $1 eq '-';
 	} elsif( /^([-+]?)(?=.)([0-9]*)(?:\.([0-9]*))?$/i ) {
 	    my $nus = substr +($3 // '') . '0'x6, 0, 6;
 	    if( $1 ) {
@@ -188,15 +226,15 @@ sub Date(@) {
 	}
     }
     ($s, $us) = Time::HiRes::gettimeofday() unless defined $s;
-    if( $pl::isodate ) {
-	my @time = reverse +(defined( $z ) ? gmtime $s + $z : localtime $s)[0..5];
-	$s = sprintf '%04d-%02d-%02dT%02d:%02d:%02d.%06d%s', 1900 + shift( @time ), 1 + shift( @time ), @time, $us, $zo // '';
+    if( $pl::isodate ) {;
+	my @time = reverse +(defined( $tz ) ? gmtime $s + $tz : localtime $s)[0..5];
+	$s = sprintf '%04d-%02d-%02dT%02d:%02d:%02d.%06d%s', 1900 + shift( @time ), 1 + shift( @time ), @time, $us, $tzo // '';
     } else {
-	$s = defined( $z ) ? gmtime $s + $z : localtime $s;
-	substr $s, 19, 0, $zo if $zo;
+	$s = defined( $tz ) ? gmtime $s + $tz : localtime $s;
+	substr $s, 19, 0, $tzo if $tzo;
 	substr $s, 19, 0, sprintf '.%06d', $us // 0;
     }
-    defined wantarray ? $s : echo $s;
+    defined wantarray ? $s : say $s;
 }
 
 sub Isodate(@) {
@@ -291,7 +329,6 @@ sub piped(&$@) {
     &$code() while <$fd>;
 }
 
-
 sub help(;$) {
     if( @_ && ! defined $_[0] ) {
 	print <<\EOF;
@@ -307,7 +344,7 @@ usage: pl {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [
   --color[=when]    colorize the output; when can be 'never', 'always', or 'auto' (the default)
 These options are handled by perl:
 EOF
-	piped { Echo if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
+	piped { print if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
     }
     print <<\EOF;
 Predefined functions:
@@ -339,177 +376,155 @@ EOF
 
 # \todo help doc readline test:my
 {
-package pl;
+    package pl;
 
-our %c;
+    our %c;
 
-# It's annoyingly hard to figure out if all are unique & lexically compatible numbers, or whether to sort textually.
-sub sort_keys(\%) {
-    my $hash = $_[0];
-    return () unless keys %$hash;
-    goto TXT if $::TXT_SORT;
-    my( $hex, $perl, $no_oct, %seen, @seen_oct ) = $::HEX_SORT;
-    for( keys %$hash ) {
-	goto TXT if /[^0-9a-fx._+-]/i;
-	$hex = 0, last unless /^[0-9a-f](?:_?[0-9a-f]+)*$/i;
-	goto TXT if exists $seen{hex $_};
-	undef $seen{hex $_};
-    }
-    return sort { hex $a <=> hex $b } keys %$hash if $hex;
+    # It's annoyingly hard to figure out if all are unique & lexically compatible numbers, or whether to sort textually.
+    sub sort_keys(\%) {
+	my $hash = $_[0];
+	return () unless keys %$hash;
+	goto TXT if $::TXT_SORT;
+	my( $hex, $perl, $no_oct, %seen, @seen_oct ) = $::HEX_SORT;
+	for( keys %$hash ) {
+	    goto TXT if /[^0-9a-fx._+-]/i;
+	    $hex = 0, last unless /^[0-9a-f](?:_?[0-9a-f]+)*$/i;
+	    goto TXT if exists $seen{hex $_};
+	    undef $seen{hex $_};
+	}
+	return sort { hex $a <=> hex $b } keys %$hash if $hex;
 
-    %seen = ();
-    for( keys %$hash ) {
-	unless( $no_oct ||= /^[+-]?0(?=.*[89])/ ) {
-	    if( /^[+-]?0(?:b(?:_?[01]+)*|x(?:_?[0-9a-f]+)*)$/i ) {
-		goto TXT if exists $seen{eval $_};
-		undef $seen{eval $_};
-		$perl = 1, next;
+	%seen = ();
+	for( keys %$hash ) {
+	    unless( $no_oct ||= /^[+-]?0(?=.*[89])/ ) {
+		if( /^[+-]?0(?:b(?:_?[01]+)*|x(?:_?[0-9a-f]+)*)$/i ) {
+		    goto TXT if exists $seen{eval $_};
+		    undef $seen{eval $_};
+		    $perl = 1, next;
+		}
+		if( /^[+-]?0(?:_?[0-7]+)*$/ ) {
+		    push @seen_oct, $_; # can't decide yet
+		    next;
+		}
 	    }
-	    if( /^[+-]?0(?:_?[0-7]+)*$/ ) {
-		push @seen_oct, $_; # can't decide yet
+
+	    if( /^[+-]?(?=.)[0-9]*(?:\.[0-9]*)?(?:(?<=.)e[+-]?[0-9]+)?$/i ) {
+		goto TXT if exists $seen{0 + $_};
+		undef $seen{0 + $_};
 		next;
 	    }
-	}
 
-	if( /^[+-]?(?=.)[0-9]*(?:\.[0-9]*)?(?:(?<=.)e[+-]?[0-9]+)?$/i ) {
-	    goto TXT if exists $seen{0 + $_};
-	    undef $seen{0 + $_};
-	    next;
+	    goto TXT;
 	}
-
-	goto TXT;
-    }
-    if( $perl ) {
-	goto TXT if $no_oct;
-	for( @seen_oct  ) {
-	    goto TXT if exists $seen{eval $_};
-	    undef $seen{eval $_};
-	}
-	return sort { eval $a <=> eval $b } keys %$hash;
-    } else {
-	for( @seen_oct  ) {
-	    goto TXT if exists $seen{0 + $_};
-	    undef $seen{0 + $_};
-	}
-	return sort { $a <=> $b } keys %$hash;
-    }
-
-  TXT:				# clearest solution here
-    sort keys %$hash;
-}
-
-
-sub keydiff() {
-    goto &_keydiff if $c{E} && eval { require Algorithm::Diff };
-    for my $key ( sort_keys %::KEYDIFF ) {
-	my( $same, $str ) = 1;
-	$#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
-	for( @{$::KEYDIFF{$key}} ) {
-	    $str ||= $_ // '$pl::n_a';
-	    $same = $str eq ($_ // '$pl::n_a');
-	    last unless $same;
-	}
-	next if $same;
-	::echo "$c{B}$key$c{E}";
-	::echo defined() ? "\t$_" : "\t$c{I}n/a$c{E}"
-	    for @{$::KEYDIFF{$key}};
-    }
-}
-sub _keydiff() {
-    for my $key ( sort_keys %::KEYDIFF ) {
-	my( $max, $n, $ref ) = (0, 0);
-	for( @{$::KEYDIFF{$key}} ) {
-	    next unless defined;
-	    $max = length if $max < length;
-	    ++$n;
-	    if( $ref ) {
-		$ref = Algorithm::Diff::LCS( $ref, [split //] );
-	    } else {
-		$ref = [split //];
+	if( $perl ) {
+	    goto TXT if $no_oct;
+	    for( @seen_oct  ) {
+		goto TXT if exists $seen{eval $_};
+		undef $seen{eval $_};
 	    }
+	    return sort { eval $a <=> eval $b } keys %$hash;
+	} else {
+	    for( @seen_oct  ) {
+		goto TXT if exists $seen{0 + $_};
+		undef $seen{0 + $_};
+	    }
+	    return sort { $a <=> $b } keys %$hash;
 	}
-	next if $n == $ARGIND && @$ref == $max;
-	::echo "$c{B}$key$c{E}";
-	$#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
-	for( @{$::KEYDIFF{$key}} ) {
-	    if( defined ) {
-		if( ! @$ref ) {
-		    substr $_, 0, 0, $c{R};
-		} elsif( @$ref == length ) {
-		    substr $_, 0, 0, $c{G};
+
+      TXT:				# clearest solution here
+	sort keys %$hash;
+    }
+
+
+    sub keydiff() {
+	goto &_keydiff if $c{E} && eval { require Algorithm::Diff };
+	for my $key ( sort_keys %::KEYDIFF ) {
+	    my( $same, $str ) = 1;
+	    $#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
+	    for( @{$::KEYDIFF{$key}} ) {
+		$str ||= $_ // '$pl::n_a';
+		$same = $str eq ($_ // '$pl::n_a');
+		last unless $same;
+	    }
+	    next if $same;
+	    say "$c{B}$key$c{E}";
+	    say defined() ? "\t$_" : "\t$c{I}n/a$c{E}"
+		for @{$::KEYDIFF{$key}};
+	}
+    }
+    sub _keydiff() {
+	for my $key ( sort_keys %::KEYDIFF ) {
+	    my( $max, $n, $ref ) = (0, 0);
+	    for( @{$::KEYDIFF{$key}} ) {
+		next unless defined;
+		$max = length if $max < length;
+		++$n;
+		if( $ref ) {
+		    $ref = Algorithm::Diff::LCS( $ref, [split //] );
 		} else {
-		    my( undef, $idx ) = Algorithm::Diff::LCSidx( $ref, [split //] );
-		    for my $i ( reverse @$idx ) {
-			substr $_, $i + 1, 0, $c{R};
-			substr $_, $i, 0, $c{G};
-		    }
-		    substr $_, 0, 0, $c{R};
-		    s/\e\[3.m(?=\e\[3.m|$)//g;
-		    1 while s/(\e\[3.m)[^\e]+\K\1//;
+		    $ref = [split //];
 		}
+	    }
+	    next if $n == $ARGIND && @$ref == $max;
+	    say "$c{B}$key$c{E}";
+	    $#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
+	    for( @{$::KEYDIFF{$key}} ) {
+		if( defined ) {
+		    if( ! @$ref ) {
+			substr $_, 0, 0, $c{R};
+		    } elsif( @$ref == length ) {
+			substr $_, 0, 0, $c{G};
+		    } else {
+			my( undef, $idx ) = Algorithm::Diff::LCSidx( $ref, [split //] );
+			for my $i ( reverse @$idx ) {
+			    substr $_, $i + 1, 0, $c{R};
+			    substr $_, $i, 0, $c{G};
+			}
+			substr $_, 0, 0, $c{R};
+			s/\e\[3.m(?=\e\[3.m|$)//g;
+			() while s/(\e\[3.m)[^\e]+\K\1//;
+		    }
+		} else {
+		    $_ = "$c{I}n/a";
+		}
+		say "\t$_$c{E}";
+	    }
+	}
+    }
+
+    sub getline {
+	{ local $\ = ''; print STDERR defined() ? '>> ' : '> ' }
+	my $part = <>;
+	if( defined $part ) {
+	    if( defined ) {
+		$_ .= "\n" . $part;
 	    } else {
-		$_ = "$c{I}n/a";
+		$_ = $part;
 	    }
-	    ::echo "\t$_$c{E}";
+	} else {
+	    say '';
+	    exit;
 	}
     }
-}
-
-sub pretty {
-    map {
-	if( ! defined ) {
-	    "$c{I}undef$c{E}";
-	} elsif( !ref ) {
-	    $_;
-	} elsif( eval { $_->can( '(""' ) } ) {
-	    "$_";
-	} else {
-	    require Data::Dumper;
-	    my $ret = Data::Dumper::Dumper( $_ );
-	    $ret =~ s/;?\n?$//s;
-	    $ret;
-	}
-    } @_ ? @_ : $_;
-}
-
-sub getline {
-    { local $\ = ''; print STDERR defined() ? '>> ' : '> ' }
-    my $part = <>;
-    if( defined $part ) {
-	if( defined ) {
-	    $_ .= "\n" . $part;
-	} else {
-	    $_ = $part;
-	}
-    } else {
-	say '';
-	exit;
-    }
-}
-sub shell {
-    # No my, as that would inject into eval.
-    our $lp = eval { require Lexical::Persistence; Lexical::Persistence->new() };
-    while( 1 ) {
-	our $lines = undef;
-	for( $lines ) {
-	    &getline;
-	    &getline while s/\\$//s;
-	    if( /\{$/s ) {
-		&getline until /\n\}$/s;
+    sub shell {
+	# No my, as that would inject into eval.
+	our $lp = eval { require Lexical::Persistence; Lexical::Persistence->new() };
+	while( 1 ) {
+	    our $lines = undef;
+	    for( $lines ) {
+		&getline;
+		&getline while s/\\$//s;
+		if( /\{$/s ) {
+		    &getline until /\n\}$/s;
+		}
 	    }
+	    {
+		package main;
+		$lp ? $lp->do( $lines ) : eval $lines;
+	    }
+	    warn $@ if $@;
 	}
-	{
-	    package main;
-	    $lp ? $lp->do( $lines ) : eval $lines;
-	}
-	warn $@ if $@;
     }
-}
-
-sub selftest {
-    eval join '', <::DATA>;
-    warn $@ if $@;
-}
 }
 
 
@@ -561,7 +576,7 @@ BEGIN {
 		help undef;
 		exit;
 	    } elsif( /v/ ) {
-		echo "This is pl v$VERSION, with perl $^V
+		say "This is pl v$VERSION, with perl $^V
 
 Copyright 1997-2020, Daniel Pfeiffer
 
@@ -579,10 +594,11 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
 		} elsif( /B/ ) {
 		    $prog[0] = $bit;
 		} elsif( /e/ ) {
-		    $prog[8] = "\nINIT { \$pl::_e = sub { $bit }}";
+		    # append 1 to not leak any wantarray into $bit
+		    $prog[8] = "\nINIT { \$pl::_e = sub { $bit 1 }}";
 		    $pl::_e = '&$pl::_e();';
 		} else {
-		    $prog[9] = "\n;END { $bit }";
+		    $prog[9] = "\n;END { $bit 1 }";
 		}
 	    }
 	    @prog[3, 14] =
@@ -612,7 +628,7 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
     };
     #no warnings 'experimental';	# overridden by -W
     no strict;
-    if( $ENV{PLDUMP} ) { open STDOUT, '| perltidy -cb'; echo; exit }
+    if( $ENV{PLDUMP} ) { open STDOUT, '| perltidy -cb'; say; exit }
     eval;
     if( $@ ) {
 	warn $@;
@@ -624,99 +640,6 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
       ('')x5;
 }
 &pl::prog; # will be called repeatedly if -n
-
-__DATA__
-
-# Code for pl::selftest
-
-sub assert($$$) {
-    my( $msg, $exp, $res ) = @_;
-    warn "[[$msg]]\n" if defined $msg;
-    warn pretty "  expected: ", $exp, "  got: ", $res
-	if defined $exp ? (defined $res ? $exp ne $res : 1) : defined $res;
-}
-
-# Emulate -n from in-memory files.
-sub n_loop(&@) {
-    my $code = shift;
-    $::I = 0;
-    for my $arg ( @_ ) {
-	open my $fd, '<', \$arg;
-	$::A = "file$::I";
-	&$code() for <$fd>;
-	++$::I;
-    }
-}
-
-sub stdout(&) {
-    open my $fd, '>', \my $str;
-    my $orig = select $fd;
-    eval { $_[0]->() };
-    warn $@ if $@;
-    select $orig;
-    close $fd;
-    $str;
-}
-
-sub test_sort_keys(&$@) {
-    my( $cmp, $msg ) = splice @_, 0, 2;
-    warn "[[sort_$msg]]\n" if defined $msg;
-    my( %x, $prev, $res );
-    for( 0..9 ) {		# Retry, one sorting bug was key order related.
-	@x{@_} = ();
-	if( defined $prev ) {
-	    $res = join '|', sort_keys %x;
-	    last if $res ne $prev;
-	} else {
-	    $prev = join '|', sort_keys %x;
-	}
-    }
-    assert undef, join( '|', $cmp ? sort $cmp @_ : sort @_ ), $res eq $prev ? $res : "$res\n\tand also: $prev";
-}
-
-warn "Starting tests\n";
-# assert assert_ok1 => undef, undef;
-# assert assert_ok2 => 1, 1;
-# assert assert_ok3 => '', '';
-# assert assert_fail1 => undef, 1;
-# assert assert_fail2 => 1, undef;
-# assert assert_fail3 => 0, 1;
-
-# assert stdout => "$_\n", stdout \&::echo for 'foo', 'bar';
-
-# assert n_loop => "file0 a\n\nfile0 b\nfile1 c\n\nfile2 d\n\nfile2 e\n\nfile2 f\n",
-#     stdout { n_loop { ::echo $::A, $_ } "a\nb", "c\n", "d\ne\nf" };
-
-my @l = qw(0 a b c aa bb cc 0b1 0b2 07 08 babe bad be);
-( $H, $T ) = 0;
-test_sort_keys undef, no_hex => @l;
-$H = 1;
-test_sort_keys { hex $a <=> hex $b } hex => @l;
-$T = 1;
-test_sort_keys undef, hex_txt => @l;
-$T = 0;
-test_sort_keys undef, txt => @l, 'z';
-test_sort_keys undef, hex_mix => @l, qw(1.1 +2);
-test_sort_keys undef, hex_dup => @l, 'c_c';
-test_sort_keys undef, dupcasehex => @l, 'CC';
-test_sort_keys { $a <=> $b } num => qw(-1 -.5 0 1 +2 3 04);
-@l = qw(-1 0 1 -1.1 .2 +.3 5. -1e-2 +1e-2 -1.e2 -.1e2 1.E2 -0X2 0x0_2 -0b1_1 0B1_1 04 -04);
-test_sort_keys { eval $a <=> eval $b } pl => @l;
-test_sort_keys undef, no_oct => @l, '08';
-test_sort_keys undef, dupx => @l, '0X2';
-test_sort_keys undef, dupn => @l, 100;
-
-my $stdin = <<\EOF;
-echo 1
-echo 2\
-, 3
-for( 4, 5 ) {
-    echo;
-}
-EOF
-#close STDIN; open STDIN, '<', \$stdin;
-#::echo '[[', stdout( \&shell ), ']]';
-warn "Ending tests\n";
 
 
 
@@ -779,8 +702,9 @@ Count hits in magic statistics hash C<%N(UMBER)>:
 
 Though they are sometimes slightly, sometimes quite a bit more complicated,
 most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>
-(pl has only one, but you can just as well concatenate them with C<;>).  See
-L<minor differences|/"Minor Differences with perl -e"> for exceptions.
+(pl has only one main program, but you can just as well concatenate the C<-e>s
+with C<;>).  See L<minor differences|/"Minor Differences with perl -e"> for
+exceptions.  There are L<many varied examples|examples>.
 
 =head1 DESCRIPTION
 
@@ -803,6 +727,10 @@ the way to go.
 =head1 DOCUMENTATION
 
 =head2 Options
+
+Many of perl's options are also available in pl, sometimes enhanced with extra
+functionality.  And the new options complement what perl offers, specifically
+oriented towards one liners.
 
 =over
 
@@ -893,6 +821,8 @@ Assume C<for(@ARGV) { ... }> loop around main program.  In this case B<-p> doesn
 
 =item C<-pI<[number]>>
 
+I<Does C<pl -penis> do pussy?  B< >It implements C<cat>. :-*>
+
 I<perl++:> On each loop C<print> (also B<-o>/B<-O>) iteration.  If number is given, print at most number times.
 
 =item C<-PI<[number]>>
@@ -943,21 +873,28 @@ I<perl:> Disable all warnings.
 
 =head2 Functions
 
+There are various functions, always also with a one letter alias, which
+perform little tasks that can be useful in one liners.
+
 =over
 
-=item C<benchmark { } I<[name[, arg...]]>>
+=item C<benchmark { } I<[name[, arg...]]>> |
+C<b { } I<[name[, arg...]]>>
 
-Benchmark slow code for 10s, display name, looping over args.  (Abbrev: C<b>)
+Benchmark slow code for 10s, display name, looping over args.
 
-=item C<Benchmark { } I<[name[, arg...]]>>
+=item C<Benchmark { } I<[name[, arg...]]>> |
+C<B { } I<[name[, arg...]]>>
 
-Same, but run code 100 times in benchmark, to reduce overhead.  (Abbrev: C<B>)
+Same, but run code 100 times in benchmark, to reduce overhead.
 
-=item C<Config I<[regexp...]>>
+=item C<Config I<[regexp...]>> |
+C<C I<[regexp...]>>
 
-Import and return C<%Config>, e.g. C<< Config->{sitelib} >>, optionally only part matching regexps.  (Abbrev: C<C>)
+Import and return C<%Config>, e.g. C<< Config->{sitelib} >>, optionally only part matching regexps.
 
-=item C<Date I<[arg...][, tz]>>
+=item C<Date I<[arg...][, tz]>> |
+C<D I<[arg...][, tz]>>
 
 I<Why is Halloween Christmas?  Because Oct. 31 = Dec. 25. ;-)>
 
@@ -965,97 +902,131 @@ Date (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff}).
 Microseconds should be passed as strings, because floats have
 implementation-dependent rounding issues.  Positive offsets must be passed as
 strings, because otherwise the C<+> gets lost.  Returns the date, if called in
-some context, else echoes it.  (Abbrev: C<D>)
+some context, else echoes it.
 
     pl 'Date; $_ = Date -86400, "+3600"; e $_, " -- ", Date "+8:45"'
     pl 'D; $_ = D -86400, "+3600"; e $_, " -- ", D "+8:45"'
 
-    >   Thu Sep  3 22:51:31.778038 2020
-    >   Wed Sep  2 23:51:31.778104 2020  --  Fri Sep  4 05:36:31.778129 +08:45 2020
+    >   Tue Oct 13 23:45:16.858884 2020
+    >   Tue Oct 13 00:45:16.858968 2020  --  Wed Oct 14 06:30:16.859009 +08:45 2020
 
-=item C<echo I<[arg...]>>
+=item C<echo I<[arg...]>> |
+C<e I<[arg...]>>
 
-Echo prettified args or C<$_> with spaces and newline.  (Abbrev: C<e>)
+Echo prettified args or C<$_> with spaces and newline.  Prettified means,
+C<undef> becomes that string, italic if B<--color> is active.  Anything that
+can be stringified, is.  Any other reference goes through C<Data::Dumper>,
+which is loaded only if needed.
 
-=item C<Echo I<[arg...]>>
+If it is called in scalar context (e.g. C<$x = echo ...>) instead return the
+same as it would echo, in one string.  If it is called in list context
+(e.g. C<@l = echo ...>) return each arg prettified individually, with a
+newline on the last one.
 
-Same, but no newline.  (Abbrev: C<E>)
+=item C<Echo I<[arg...]>> |
+C<E I<[arg...]>>
 
-=item C<form I<format, arg...>>
+Same, but no newline.
 
-Form(at) prettified args with newline.  (Abbrev: C<f>)
+=item C<form I<format, [arg...]>> |
+C<f I<format, [arg...]>>
 
-=item C<Form I<format, arg...>>
+Form(at) and echo prettified args or C<$_> with newline.  If it is called in
+scalar or list context (e.g. C<$x = form ...>) instead return the same as it
+would echo, in one string.
 
-Same, but no newline.  (Abbrev: C<F>)
+=item C<Form I<format, [arg...]>> |
+C<F I<format, [arg...]>>
 
-=item C<Isodate [arg...][, tz]>
+Same, but no newline.
 
-Same as C<D(ate)>, but uses ISO format.  (Abbrev: C<I>)
+=item C<Isodate I<[arg...][, tz]>> |
+C<I I<[arg...][, tz]>>
+
+Same as C<D(ate)>, but uses ISO format.
 
     pl 'Isodate; $_ = Isodate 7 * -86400; e $_, " -- ", Isodate "+8.75"'
     pl 'I; $_ = I 7 * -86400; e $_, " -- ", I "+8.75"'
 
-    >   2020-09-03T22:51:31.793797
-    >   2020-08-27T22:51:31.793927  --  2020-09-04T05:36:31.793948 +08:45
+    >   2020-10-13T23:45:16.879861
+    >   2020-10-06T23:45:16.879925  --  2020-10-14T06:30:16.879948 +08:45
 
-=item C<keydiff I<[key[, value]]>>
+=item C<keydiff I<[key[, value]]>> |
+C<k I<[key[, value]]>>
 
 Store value or chomped C<$_> in C<$KEYDIFF{key or $1}[$ARGIND]>.  At the
 C<END> for each key (sorted numerically if possible) all values are
-diffed. (Abbrev: C<k>)
+diffed.
 
-=item C<Keydiff I<[number[, value]]>>
+=item C<Keydiff I<[number[, value]]>> |
+C<K I<[number[, value]]>>
 
-Same, but key is C<$FIELD[number]> or C<$F[0]>.  (Abbrev: C<K>)
+Same, but key is C<$FIELD[number]> or C<$F[0]>.
 
-=item C<Number I<[n]>>
+=item C<Number I<[n]>> |
+C<N I<[n]>>
 
-Trim C<%N(UMBER)> values less than n (default 2) e.g.; C<B<-E>Number> or C<B<-E> 'N 5'>.  (Abbrev: C<N>)
+Trim C<%N(UMBER)> values less than n (default 2) e.g.; C<B<-E>Number> or C<B<-E> 'N 5'>.
 
-=item C<piped { } I<cmd[, arg...]>>
+=item C<piped { } I<cmd[, arg...]>> |
+C<p { } I<cmd[, arg...]>>
 
-Open pipe from cmd and loop over it.  (Abbrev: C<p>)
+Open pipe from cmd and loop over it.
 
 =back
 
 =head2 Variables
 
+There are various variables, always also with a one letter alias, many of
+which perform magic tasks at the C<END>.
+
 =over
 
-=item C<*ARGV>
+=item C<*ARGV> |
+C<*A>
 
-I<perl:> C<ARGV>, C<$ARGV> & C<@ARGV> are all aliased to C<A>, C<$A> & C<@A>.  (Abbrev: C<*A>)
+I<perl:> C<ARGV>, C<$ARGV> & C<@ARGV> are all aliased to C<A>, C<$A> & C<@A>.
 
-=item C<$ARGIND>
+=item C<$ARGIND> |
+C<$I>
 
-Index of ARG currently being processed in B<-o>, B<-n> or B<-p>.  (Abbrev: C<$I>)
+Index of ARG currently being processed in B<-o>, B<-n> or B<-p>.
 
-=item C<@FIELD>
+=item C<@FIELD> |
+C<@F>
 
-I<perl:> This is an alias to loop autosplit variable C<@F>.  (Abbrev: C<@F>)
+I<perl:> This is an alias to loop autosplit variable C<@F>.
 
-=item C<$quote>
+=item C<$quote> |
+C<$q>
 
-Predefined to a single quote C<'>.  There is no magic associated.  (Abbrev: C<$q>)
+Predefined to a single quote C<'>.  There is no magic associated.  Perl's
+C<q()> makes it easy to integrate functional quotes under all circumstances.
+This does the same for literal quotes.
 
-=item C<$Quote>
+=item C<$Quote> |
+C<$Q>
 
-Predefined to a double quote C<">.  There is no magic associated.  (Abbrev: C<$Q>)
+Predefined to a double quote C<">.  There is no magic associated.  Perl's
+C<qq()> makes it easy to integrate functional quotes under all circumstances.
+This does the same for literal quotes.
 
-=item C<%KEYDIFF>
+=item C<%KEYDIFF> |
+C<%K>
 
 At END, sort by keys, print keydiff of C<$ARGIND> array elements.  Filled by
-C<keydiff>.  (Abbrev: C<%K>)
+C<keydiff>.
 
-=item C<%NUMBER>
+=item C<%NUMBER> |
+C<%N>
 
-At END, sort numerically by values.  (Abbrev: C<%N>)
+At END, sort numerically by values.
 
-=item C<*RESULT>
+=item C<*RESULT> |
+C<*R>
 
 At END, echo C<$RESULT> if defined, then C<@RESULT> one per line if not empty,
-then C<%RESULT> sorted by keys.  (Abbrev: C<*R>)
+then C<%RESULT> sorted by keys.
 
 =back
 

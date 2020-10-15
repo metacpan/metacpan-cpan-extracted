@@ -2,9 +2,9 @@ BEGIN:VCARD
 VERSION:4.0
 FN:Forrest Gump
 N:Gump;Forrest;;Mr.;
-ADR;TYPE=WORK;PREF=1:;100;Waters Edge;Baytown;LA;30314;United States of
+ADR;TYPE="WORK";PREF=1:;100;Waters Edge;Baytown;LA;30314;United States of
   America
-ADR;TYPE=HOME:;42;Plantation St.;Baytown;LA;30314;United States of America
+ADR;TYPE="HOME":;42;Plantation St.;Baytown;LA;30314;United States of America
 TEL;VALUE=uri;TYPE="WORK,VOICE":tel:(111) 555-1212
 TEL;VALUE=uri;TYPE="HOME,VOICE":tel:(404) 555-1212
 EMAIL:forrestgump@example.com

@@ -17,7 +17,7 @@ BEGIN { $fields = {
 	"last_name" => new WWW::Shopify::Field::String::LastName(),
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"im" => new WWW::Shopify::Field::String::Email(),
-	"permissions" => new WWW::Shopify::Field::Freeform(),
+	"permissions" => new WWW::Shopify::Field::Freeform::Array(),
 	"phone" => new WWW::Shopify::Field::String::Phone(),
 	"receive_announcements" => new WWW::Shopify::Field::Int(),
 	"url" => new WWW::Shopify::Field::String::URL(),
@@ -25,10 +25,15 @@ BEGIN { $fields = {
 }; }
 
 sub needs_plus { return 1; }
+sub error_codes_if_unavailable { (403, 404) }
 sub countable { return undef; }
 sub creatable { return undef; }
 sub deletable { return undef; }
 sub updatable { return undef; }
+
+
+sub read_scope { return "read_users"; }
+sub write_scope { return undef; }
 
 eval(__PACKAGE__->generate_accessors); die $@ if $@;
 

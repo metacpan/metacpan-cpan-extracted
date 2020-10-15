@@ -482,7 +482,6 @@ parts/todo/5032000
 parts/todo/5033000
 parts/todo/5033001
 parts/todo/5033002
-PPPort.pm
 PPPort.xs
 ppport_h.PL
 PPPort_pm.PL

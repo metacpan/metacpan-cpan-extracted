@@ -14,12 +14,15 @@ BEGIN { $fields = {
 	"id" => new WWW::Shopify::Field::Identifier(),
 	"order_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Order'),
 	"service" => new WWW::Shopify::Field::String::Enum(["manual", "automatic"]),
-	"status" => new WWW::Shopify::Field::String::Enum(["success", "failure"]),
+	"status" => new WWW::Shopify::Field::String::Enum(["success", "failure", "open", "error", "cancelled", "pending"]),
+	"location_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::Location'),
+	"name" => new WWW::Shopify::Field::String(),
+	"shipment_status" => new WWW::Shopify::Field::String(),
 	"tracking_company" => new WWW::Shopify::Field::String(),
-	"tracking_number" => new WWW::Shopify::Field::String(),
-	"tracking_numbers" => new WWW::Shopify::Field::Freeform(),
-	"tracking_url" => new WWW::Shopify::Field::String::URL(),
-	"tracking_urls" => new WWW::Shopify::Field::Freeform(),
+	"tracking_number" => new WWW::Shopify::Field::Text(),
+	"tracking_numbers" => new WWW::Shopify::Field::Freeform::Array(),
+	"tracking_url" => new WWW::Shopify::Field::Text::URL(),
+	"tracking_urls" => new WWW::Shopify::Field::Freeform::Array(),
 	"updated_at" => new WWW::Shopify::Field::Date(),
 	"receipt" => new WWW::Shopify::Field::Relation::OwnOne('WWW::Shopify::Model::Order::Fulfillment::Receipt'),
 	"line_items" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Order::Fulfillment::LineItem', 1),
@@ -32,6 +35,7 @@ sub read_scope { return "read_orders"; }
 sub write_scope { return "write_orders"; }
 
 sub parent { return 'WWW::Shopify::Model::Order'; }
+sub actions { return qw(complete open cancel); }
 
 # Can be tracking number or tracking numbers.
 #sub creation_minimal { return qw(tracking_number); }

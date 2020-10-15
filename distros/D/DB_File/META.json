@@ -43,6 +43,6 @@
          "web" : "https://github.com/pmqs/DB_File"
       }
    },
-   "version" : "1.854",
+   "version" : "1.855",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

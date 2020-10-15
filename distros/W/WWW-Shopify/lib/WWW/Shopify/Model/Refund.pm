@@ -11,12 +11,15 @@ use parent 'WWW::Shopify::Model::Item';
 my $fields; sub fields { return $fields; } 
 BEGIN { $fields = {
 	"created_at" => new WWW::Shopify::Field::Date(),
+	"processed_at" => new WWW::Shopify::Field::Date(),
 	"id" => new WWW::Shopify::Field::Identifier(),
-	"note" => new WWW::Shopify::Field::String(),
+	"note" => new WWW::Shopify::Field::Text(),
 	"refund_line_items" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::LineItem'),
 	"restock" => new WWW::Shopify::Field::Boolean(),
 	"transactions" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::Transaction'),
-	"user_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::User')
+	"user_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::User'),
+	"order_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Order'),
+	"order_adjustments" => new WWW::Shopify::Field::Relation::Many('WWW::Shopify::Model::Refund::OrderAdjustment')
 }; }
 
 sub parent { return 'WWW::Shopify::Model::Order'; }

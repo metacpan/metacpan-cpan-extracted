@@ -18,7 +18,7 @@ no warnings 'experimental::signatures';
 use Exporter 'import';
 
 our @EXPORT_OK = (qw(&run_curl_tests $server));
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 $Data::Dumper::Useqq = 1;
 
@@ -77,7 +77,7 @@ sub curl_request( @args ) {
             # Let's ignore the order of the headers:
             my @sent = grep {/^> /} split /\r?\n/, $stderr;
             if( !($sent[0] =~ m!^> ([A-Z]+) (.*?) (HTTP/.*?)$!)) {
-                $res{ error } = "Couldn't find a method in curl output '$sent[0]'. STDERR is $stderr";
+                $res{ error } = "Couldn't find a method in curl output '$sent[0]'. STDERR is [[$stderr]]";
             };
             shift @sent;
             $res{ method } = $1;
@@ -107,6 +107,12 @@ sub curl_request( @args ) {
 
             push @res, \%res,
         };
+
+        if( ! @requests) {
+            diag "Weirdo output from curl that didn't produce any requests:";
+            diag "STDOUT: [[$stdout]]";
+            diag "STDERR: [[$stderr]]";
+        };
     } else {
         my %res;
         $res{ error } = "Curl exit code $exit";
@@ -114,7 +120,7 @@ sub curl_request( @args ) {
         push @res, \%res
     };
 
-    @res
+    return @res
 }
 
 sub compiles_ok( $code, $name ) {
@@ -174,8 +180,14 @@ sub identical_headers_ok( $code, $expected_request, $name,
     my @log = split /\n/, $log;
     my @exp = split /\n/, $expected_request;
 
-    is_deeply \@log, \@exp, $name
-        or diag $log;
+    my $res = is_deeply \@log, \@exp, $name;
+    if(! $res) {
+        diag "Expected:";
+        diag $expected_request;
+        diag "Got:";
+        diag $log;
+    };
+    return $res
 }
 
 my $version = curl_version( $curl );
@@ -308,7 +320,7 @@ sub request_identical_ok( $test ) {
     my $org_accept_encoding = $1;
 
     my @curl_log = split /^(?=Request:)/m, $log;
-    note sprintf "Received %d curl requests", 0+@curl_log;
+    diag sprintf "Received %d curl requests", 0+@curl_log;
 
     my @r = HTTP::Request::FromCurl->new(
         argv => $cmd,
@@ -453,9 +465,13 @@ sub request_identical_ok( $test ) {
                 push @lwp_ignore, 'TE';
             };
 
+            my $h = $test->{ignore_headers} || [];
+            $h = [$h]
+                unless ref $h;
+
             identical_headers_ok( $code, $curl_log,
                 "We create (almost) the same headers with LWP",
-                ignore_headers => ['Connection', @lwp_ignore],
+                ignore_headers => ['Connection', @lwp_ignore, @$h],
                 boundary       => $boundary,
             ) or diag $code;
 
@@ -466,7 +482,7 @@ sub request_identical_ok( $test ) {
                 or diag $code;
             identical_headers_ok( $code, $curl_log,
                 "We create (almost) the same headers with HTTP::Tiny",
-                ignore_headers => ['Host','Connection'],
+                ignore_headers => ['Host','Connection', @$h],
                 boundary       => $boundary,
             ) or diag $code;
 
@@ -480,6 +496,20 @@ sub request_identical_ok( $test ) {
 
 sub run_curl_tests( @tests ) {
     my $testcount = 0;
+
+    # Clean out environment variables that might mess up
+    # the HTTP connection to a local host
+    local @ENV{qw(
+        HTTP_PROXY
+        http_proxy
+        HTTP_PROXY_ALL
+        http_proxy_all
+        HTTPS_PROXY
+        https_proxy
+        CGI_HTTP_PROXY
+        ALL_PROXY
+        all_proxy
+    )};
 
     for( @tests ) {
         my $request_count = $_->{request_count} || 1;

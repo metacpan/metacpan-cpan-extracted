@@ -39,6 +39,7 @@ do { my $x = {
                                    'Test2::Tools::Explain' => '0',
                                    'Test::Builder' => '0',
                                    'Test::CPAN::Meta' => '0',
+                                   'Test::MockModule' => '0.175',
                                    'Test::More' => '0'
                                  }
                  }

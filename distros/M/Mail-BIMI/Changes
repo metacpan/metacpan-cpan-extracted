@@ -1,3 +1,10 @@
+2.20201013.2 2020-10-13 UTC
+  - Fix bug in cacheing VMC Indicators
+
+2.20201013.1 2020-10-13 UTC
+  - Crypt::OpenSSL::X509 1.812 is packaged in buster, and is good enough
+  - Don't try and cache Certificate objects
+
 2.20201006.1 2020-10-06 UTC
   - Require newer Crypt::OpenSSL::X509 object
     Older versions will not extract extensions properly

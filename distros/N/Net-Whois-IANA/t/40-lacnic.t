@@ -10,9 +10,9 @@ use Net::Whois::IANA;
 my $iana = Net::Whois::IANA->new;
 
 my %tests = (
-    '200.16.98.2'     => 'AR',
-    '200.77.236.16'   => 'MX',
-    '200.189.169.141' => 'BR',
+    '200.16.98.2'   => 'AR',
+    '200.77.236.16' => 'MX',
+    '200.189.169.0' => 'BR',
 );
 
 foreach my $ip ( sort keys %tests ) {

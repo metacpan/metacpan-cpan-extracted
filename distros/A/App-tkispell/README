@@ -1,0 +1,43 @@
+Tkispell 
+
+
+Tkispell is a Perl/Tk user interface to the GNU ispell program.
+
+
+INSTALLATION
+
+First make sure that GNU ispell is installed and works correctly on
+your system.  Ispell is at: ftp://ftp.gnu.org/ispell/, or in package
+format for many Unixes.  Make sure that it is working correctly by
+spell checking a file using the command line interface.
+
+Then, follow the normal installation for Perl modules.
+
+    $ perl Makefile.PL
+    $ make
+    $ su
+    # make install
+
+There are a few options at the start of the tkispell script
+that you can edit, namely, the X11 font (which must be
+a X Logical Font Descriptor.  Refer to the xlsfonts(1) man page
+for an explanation), and the name of your personal dictionary.
+
+A description of the program's functions is contained in the program's
+manual page: tkispell(1).
+
+
+TROUBLESHOOTING
+
+If tkispell prints an error message like:
+
+  tkispell: file not found
+
+edit the first line of 'tkispell with the path name of the system's
+perl binary, normally /usr/bin/perl or /usr/local/bin/perl.  If perl
+isn't in either place, try using the output of "which perl."
+
+Tkispell is licensed under the same terms as Perl.  Please
+refer to the file "Artistic."  
+
+$Id: README,v 1.3 2004/02/28 21:35:08 kiesling Exp $

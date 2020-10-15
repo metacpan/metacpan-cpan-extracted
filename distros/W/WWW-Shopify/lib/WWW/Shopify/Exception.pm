@@ -32,6 +32,15 @@ package WWW::Shopify::Exception::CallLimit;
 use parent 'WWW::Shopify::Exception';
 sub default_error { return "Call limit reached."; }
 
+# Thrown from QL only.
+package WWW::Shopify::Exception::ExceededCost;
+use parent 'WWW::Shopify::Exception';
+sub default_error { return "Exceeded query cost."; }
+
+package WWW::Shopify::Exception::QueryParamTooLong;
+use parent 'WWW::Shopify::Exception';
+sub default_error { return "Query param too long."; }
+
 package WWW::Shopify::Exception::InvalidKey;
 use parent 'WWW::Shopify::Exception';
 sub default_error { return "Invalid API key."; }

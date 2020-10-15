@@ -20,15 +20,18 @@ BEGIN { $fields = {
 	"authorization" => new WWW::Shopify::Field::String(),
 	"gateway" => new WWW::Shopify::Field::String::Enum(["bogus", "real"]),
 	"order_id" => new WWW::Shopify::Field::Relation::Parent('WWW::Shopify::Model::Order'),
+	"parent_id" => new WWW::Shopify::Field::Relation::ReferenceOne('WWW::Shopify::Model::Transaction'),
 	"test" => new WWW::Shopify::Field::Boolean(),
 	"error_code" => new WWW::Shopify::Field::String(),
 	"signature" => new WWW::Shopify::Field::String(),
 	"source_name" => new WWW::Shopify::Field::String(),
 	"currency" => new WWW::Shopify::Field::String(),
-	"message" => new WWW::Shopify::Field::String(),
+	"message" => new WWW::Shopify::Field::Text(),
 	"payment_details" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Transaction::PaymentDetails"),
-	"user_id" => new WWW::Shopify::Field::String(), 
-	"device_id" => new WWW::Shopify::Field::String() };
+	"user_id" => new WWW::Shopify::Field::Relation::ReferenceOne("WWW::Shopify::Model::User"), 
+	"device_id" => new WWW::Shopify::Field::String(),
+	"currency_exchange_adjustment" => new WWW::Shopify::Field::Relation::OwnOne("WWW::Shopify::Model::Transaction::CurrencyExchangeAdjustment")
+	};
 }
 sub creation_minimal { return qw(kind); }
 sub creation_filled { return qw(id created_at); }

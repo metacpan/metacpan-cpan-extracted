@@ -1,7 +1,6 @@
 'digraph Perl {
  graph [ label="Record demo 4 - Set record shapes in various ways" ]
- node [ color="magenta" shape="oval" ]
- edge [ color="grey" ]
+ node [ color="magenta" ]
  "One" [ label="" shape="Mrecord" ]
  "Two" [ label="<port1> Left|<port2> Right" shape="Mrecord" ]
  "Three" [ color="black" label="<port1> Good|<port2> Bad" shape="record" ]

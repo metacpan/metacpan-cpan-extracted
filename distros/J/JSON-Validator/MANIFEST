@@ -27,6 +27,7 @@ lib/JSON/Validator/Schema/Draft201909.pm
 lib/JSON/Validator/Schema/Draft4.pm
 lib/JSON/Validator/Schema/Draft6.pm
 lib/JSON/Validator/Schema/Draft7.pm
+lib/JSON/Validator/Store.pm
 lib/JSON/Validator/Util.pm
 Makefile.PL
 MANIFEST			This list of files

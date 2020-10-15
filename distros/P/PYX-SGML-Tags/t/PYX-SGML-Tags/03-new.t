@@ -6,18 +6,8 @@ use Error::Pure::Utils qw(clean);
 use PYX::SGML::Tags;
 use Tags::Output::Raw;
 use Tags::Output::Indent;
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 5;
 use Test::NoWarnings;
-
-# Test.
-eval {
-	PYX::SGML::Tags->new(
-		'tags' => undef,
-	);
-};
-is($EVAL_ERROR, "Bad 'Tags::Output::*' object.\n",
-	"Bad 'Tags::Output::*' object - undef");
-clean();
 
 # Test.
 eval {

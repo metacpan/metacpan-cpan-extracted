@@ -4,7 +4,7 @@ Applify - Write object oriented scripts with ease
 
 # VERSION
 
-0.21
+0.22
 
 # DESCRIPTION
 
@@ -88,7 +88,7 @@ This module will generate an application class, which `$app` inside the
 This function is used to define options which can be given to this
 application. See ["SYNOPSIS"](#synopsis) for example code. This function can also be
 called as a method on `$script`. Additionally, similar to
-[Moose attributes](https://metacpan.org/pod/Moose::Manual::Attributes#Predicate-and-clearer-methods), a
+[Moose attributes](https://metacpan.org/pod/Moose%3A%3AManual%3A%3AAttributes%23Predicate-and-clearer-methods), a
 `has_$name` method will be generated, which can be called on `$app` to
 determine if the ["option"](#option) has been set, either by a user or from the
 `$default`.
@@ -149,22 +149,22 @@ determine if the ["option"](#option) has been set, either by a user or from the
     - `n_of`
 
         Allow the option to hold a list of values. Examples: "@", "4", "1,3".
-        See ["Options-with-multiple-values" in Getopt::Long](https://metacpan.org/pod/Getopt::Long#Options-with-multiple-values) for details.
+        See ["Options-with-multiple-values" in Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong#Options-with-multiple-values) for details.
 
     - `isa`
 
         Can be used to either specify a class that the value should be instantiated
-        as, or a [Type::Tiny](https://metacpan.org/pod/Type::Tiny) object that will be used for coercion and/or type
+        as, or a [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) object that will be used for coercion and/or type
         validation.
 
         Example using a class:
 
             option file => output => "output file", isa => "Mojo::File";
 
-        The `output()` attribute will then later return an object of [Mojo::File](https://metacpan.org/pod/Mojo::File),
+        The `output()` attribute will then later return an object of [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile),
         instead of just a plain string.
 
-        Example using [Type::Tiny](https://metacpan.org/pod/Type::Tiny):
+        Example using [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny):
 
             use Types::Standard "Int";
             option num => age => "Your age", isa => Int;

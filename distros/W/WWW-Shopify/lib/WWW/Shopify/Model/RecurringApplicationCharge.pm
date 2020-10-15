@@ -23,6 +23,8 @@ BEGIN { $fields = {
 	"trial_days" => new WWW::Shopify::Field::Int(0, 31),
 	"trial_ends_on" => new WWW::Shopify::Field::Date(),
 	"updated_at" => new WWW::Shopify::Field::Date(),
+	"capped_amount" => new WWW::Shopify::Field::Money(),
+	"terms" => new WWW::Shopify::Field::String(),
 	"confirmation_url" => new WWW::Shopify::Field::String::URL()};
 }
 sub countable() { return undef; }

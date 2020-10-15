@@ -13,7 +13,7 @@ WWW::Mechanize::FAQ - Frequently Asked Questions about WWW::Mechanize
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 How to get help with WWW::Mechanize
 

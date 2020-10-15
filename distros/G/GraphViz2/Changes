@@ -1,3 +1,17 @@
+2.57 2020-10-15
+- drop unnecessary use of "open" and "charnames"
+- setting defaults for subgraphs no longer affects outside those
+- now let DOT figure out inheritance rather than respecifying everything in subgraphs
+- fixed docs on controlling subgraph attributes
+
+2.56 2020-10-13
+- fix problem when "which" returns empty list not scalar - thanks @eserte for report
+
+2.55 2020-10-13
+- fix bugs in webgen scripts
+- make dot_input be lazy-built
+- zap undoc-ed dependency method that actually belongs in ::Parse::ISA
+
 2.54 2020-10-09
 - zap report_valid_attributes method
 - drop Log::Handler, any object that can "debug" or "error" works

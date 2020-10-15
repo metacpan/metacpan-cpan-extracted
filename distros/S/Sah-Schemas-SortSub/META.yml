@@ -19,7 +19,7 @@ name: Sah-Schemas-SortSub
 requires:
   Complete::Sequence: '0.002'
   Complete::Util: '0.608'
-  Log::ger: '0.027'
+  Log::ger: '0.037'
   Module::List::Tiny: '0'
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-SortSub
   homepage: https://metacpan.org/release/Sah-Schemas-SortSub
   repository: git://github.com/perlancar/perl-Sah-Schemas-SortSub.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -40,7 +40,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000036'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.016'
+      version: '0.019'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -106,17 +106,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.600'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -295,11 +291,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.081'
+              version: '0.082'
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.05'
+              version: '0.063'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -349,9 +345,11 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
           finder:
-            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.003
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

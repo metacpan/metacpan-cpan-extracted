@@ -16,4 +16,5 @@ t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-rinci.t
+t/release-sah-schema.t
 weaver.ini

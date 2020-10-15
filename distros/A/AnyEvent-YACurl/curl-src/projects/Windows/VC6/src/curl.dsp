@@ -687,11 +687,19 @@ SOURCE=..\..\..\..\lib\curl_multibyte.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\dynbuf.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\nonblock.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\strtoofft.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\version_win32.c
 # End Source File
 # Begin Source File
 
@@ -883,11 +891,19 @@ SOURCE=..\..\..\..\lib\curl_setup.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\dynbuf.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\nonblock.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\strtoofft.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\version_win32.h
 # End Source File
 # Begin Source File
 

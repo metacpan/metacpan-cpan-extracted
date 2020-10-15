@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -285,6 +285,13 @@ sub title {
         $self->{title} = $p->header('Title');
     }
     return $self->{title};
+}
+
+
+sub redirects {
+    my $self = shift;
+
+    return $self->response->redirects;
 }
 
 
@@ -985,6 +992,7 @@ sub click_button {
         $request = $input->click( $form, $args{x}, $args{y} );
     }
     elsif ( $args{number} ) {
+        # changing this 'submit' to qw/submit button image/ will probably break people's code
         my $input = $form->find_input( undef, 'submit', $args{number} );
         $request = $input->click( $form, $args{x}, $args{y} );
     }
@@ -992,14 +1000,13 @@ sub click_button {
         $request = $args{input}->click( $form, $args{x}, $args{y} );
     }
     elsif ( $args{value} ) {
-        my $i = 1;
-        while ( my $input = $form->find_input(undef, 'submit', $i) ) {
-            if ( $args{value} && ($args{value} eq $input->value) ) {
+        my @inputs = map { $form->find_input(undef, $_) } qw/submit button image/;
+        foreach  my $input ( @inputs ) {
+            if ( $input->value && ($args{value} eq $input->value) ) {
                 $request = $input->click( $form, $args{x}, $args{y} );
                 last;
             }
-            $i++;
-        } # while
+        } # foreach
     } # $args{value}
 
     return $self->request( $request );
@@ -1762,7 +1769,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 
@@ -2202,6 +2209,15 @@ HTTP headers.
 Returns the contents of the C<< <TITLE> >> tag, as parsed by
 L<HTML::HeadParser>.  Returns undef if the content is not HTML.
 
+=head2 $mech->redirects()
+
+Convenience method to get the L<< redirects|HTTP::Response/$r->redirects >> from the most recent L<HTTP::Response>.
+
+Note that you can also use L<< is_redirect|HTTP::Response/$r->is_redirect >> to see if the most recent response was a redirect like this.
+
+    $mech->get($url);
+    do_stuff() if $mech->res->is_redirect;
+
 =head1 CONTENT-HANDLING METHODS
 
 =head2 $mech->content(...)
@@ -2251,6 +2267,9 @@ Returns C<< $self->response()->decoded_content(charset => $charset) >>
 To preserve backwards compatibility, additional parameters will be
 ignored unless none of C<< raw | decoded_by_headers | charset >> is
 specified and the text is HTML, in which case an error will be triggered.
+
+A fresh instance of WWW::Mechanize will return C<undef> when C<< $mech->content() >>
+is called, because no content is present before a request has been made.
 
 =head2 $mech->text()
 
@@ -2817,9 +2836,10 @@ Returns an L<HTTP::Response> object.
 =head2 $mech->click_button( ... )
 
 Has the effect of clicking a button on the current form by specifying
-its name, value, or index.  Its arguments are a list of key/value
-pairs.  Only one of name, number, input or value must be specified in
-the keys.
+its attributes. The arguments are a list of key/value pairs. Only one
+of name, id, number, input or value must be specified in the keys.
+
+Dies if no button is found.
 
 =over 4
 
@@ -2833,7 +2853,8 @@ Clicks the button with the id I<id> in the current form.
 
 =item * C<< number => n >>
 
-Clicks the I<n>th button in the current form. Numbering starts at 1.
+Clicks the I<n>th button with type I<submit> in the current form.
+Numbering starts at 1.
 
 =item * C<< value => value >>
 
@@ -2846,7 +2867,7 @@ L<HTML::Form::SubmitInput> obtained e.g. from
 
     $mech->current_form()->find_input( undef, 'submit' )
 
-$inputobject must belong to the current form.
+C<$inputobject> must belong to the current form.
 
 =item * C<< x => x >>
 

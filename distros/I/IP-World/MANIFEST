@@ -30,3 +30,4 @@ t/4tinyPerl-byname.t
 t/lib/tests.pm
 t/coverage.sh
 MANIFEST.SKIP
+ARTISTIC.txt

@@ -1,7 +1,6 @@
 'digraph Perl {
- graph [ rankdir="TB" ]
+ graph [ rankdir="LR" ]
  node [ shape="oval" ]
- edge [ color="grey" ]
  "Embedded\\nnewline\\nnode\\nname"
  "Embedded newline label name" [ label="Embedded\\nnewline\\nlabel" ]
  "Embedded\\ndouble-quote\\nnode\\nname\\n\\""

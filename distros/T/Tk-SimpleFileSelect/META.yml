@@ -17,5 +17,7 @@ no_index:
   directory:
     - t
     - inc
-version: 0.7
+requires:
+  Tk: '800.004'
+version: 0.71
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,15 @@
+#title Image rotation
+#lang en
+
+[[myimage.png 25 r a90]]
+
+[[myimage.png 25 l a270]]
+
+[[myimage.png f a180]]
+
+
+[[myimage.png a90]]
+
+[[myimage.png a270]]
+
+[[myimage.png f a90]]

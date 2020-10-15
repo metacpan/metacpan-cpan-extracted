@@ -20,7 +20,7 @@ docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 VERSION
 
-version 0.1000
+version 0.1002
 
 =head1 SYNOPSIS
 
@@ -139,30 +139,6 @@ Behave like make in building files only if their dependencies are newer.
 =head2 EXAMPLES
 
 There are some examples for sample invocation in the Synopsis.
-
-=head1 SUPPORT
-
-You can look for information at:
-
-=over 4
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/App-XML-DocBook-Docmake/>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/App::XML::DocBook::Docmake>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/App::XML::DocBook::Docmake>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::XML::DocBook::Docmake>
-
-=back
 
 =head1 SEE ALSO
 

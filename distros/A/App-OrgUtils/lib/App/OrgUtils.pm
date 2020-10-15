@@ -1,9 +1,9 @@
 package App::OrgUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-21'; # DATE
+our $DATE = '2020-10-14'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.479'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 use 5.010;
 use strict;
@@ -287,7 +287,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.479 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2020-07-21.
+This document describes version 0.481 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2020-10-14.
 
 =head1 DESCRIPTION
 
