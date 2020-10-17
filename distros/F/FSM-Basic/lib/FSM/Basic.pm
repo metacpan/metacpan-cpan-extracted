@@ -10,11 +10,11 @@ FSM::Basic - Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.18
+Version 0.21
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
@@ -98,17 +98,48 @@ The keys are the states name.
 
 =item executable code:
 
-
 "do" for perl code
 
 
 "exec" for system code,
 
 
-for "do" and "exec" it is possible to use a parameter from the command inside the "do" or "exec"
-All parameters are splitted over space and put in an array
-Each element are a substitution for __NBR__ where NBR is the array index
+and 4 dedicated commands:
 
+"cat" just reading the file content provided in parameter).
+
+"catRAND" chose randomly one of the files provided in parameter space separated
+
+"catWRAND" chose randomly (weighted) one of the files provided in parameter space separatedwith a : to separate the weight
+
+e.g. 'catWRAND' => './t/test_cat.txt:1 ./t/test_cat1.txt:50',   in this case the file ./t/test_cat1.txt get 50 more chance to be selected than file ./t/test_cat.txt
+
+"catSEQ" read sequentialy the next files provided in parameter space separated
+        if "catSEQ_idx" is defined, that file is used to keep the state. Otherwise , the state file is named used
+        all the files name from "catSEQ" concatenated with a final '.tate'. All spaces are replaced by an underscore
+
+=back
+
+=over 2
+
+It is possible to use a regex to allow generics commands
+
+e.g.
+"h(elp)?|\\?": {
+        "output": "default\nexit\ntimeoutA\n__PROMPT__"
+      }
+
+This json section match for 'h' 'help' or '?'
+
+
+
+In the regex, the group capture could be used in the command parameter as a substitution
+
+1st group is substituted by __1__
+
+2nd group is substituted by __2__
+
+..
 e.g. for a ping
 
 "ping (.*)"      => {"exec" => "ping -c 3 __1__"},
@@ -119,32 +150,12 @@ If you run the command "ping 127.0.0.1" the exec run the command "ping -c 3 127.
 
 Other example:
 
-      "test (.*)": {
-        "exec": "ping -c 3 __2__"
+
+      "cat /tmp/test/((\\w)(\\d))": {
+        "cat": "/tmp/test/__3__"
       }
       
-If you call with "test other 127.0.0.1" the exec run the command "ping -c 3 127.0.0.1"     
-
-=back
-
-and 4 dedicated commands:
-
-=over 4
-
-=item *
-"cat" just reading the file content provided in parameter).
-
-=item *
-"catRAND" chose randomly one of the files provided in parameter space separated
-
-=item *
-"catWRAND" chose randomly (weighted) one of the files provided in parameter space separatedwith a : to separate the weight
-e.g. 'catWRAND' => './t/test_cat.txt:1 ./t/test_cat1.txt:50',   in this case the file ./t/test_cat1.txt get 50 more chance to be selected than file ./t/test_cat.txt
-
-=item *
-"catSEQ" read sequentialy the next files provided in parameter space separated
-        if "catSEQ_idx" is defined, that file is used to keep the state. Otherwise , the state file is named used
-        all the files name from "catSEQ" concatenated with a final '.tate'. All spaces are replaced by an underscore
+If you call with "cat /tmp/test/a1 the cat read the file /tmp/test/1" (without the 'a' because the group 3 is matching a single digit after a single character    
 
 =back
 
@@ -237,7 +248,7 @@ sub run {
             && $self->{states_list}{ $self->{state} }{repeat} <= 0)
         {
             $self->{previous_state} = $self->{state};
-            $self->{state} = $self->{states_list}{ $self->{state} }{expect}{not_matching0} // $self->{states_list}{ $self->{state} }{not_matching0};
+            $self->{state}          = $self->{states_list}{ $self->{state} }{expect}{not_matching0} // $self->{states_list}{ $self->{state} }{not_matching0};
             if (exists $self->{states_list}{ $self->{previous_state} }{not_matching_info_last}) {
                 $output = $self->{states_list}{ $self->{previous_state} }{not_matching_info_last};
             }
@@ -259,14 +270,22 @@ sub run {
             {
                 $in = $1;
             }
-            my @all = split /\s+/, $in;
             if (exists $self->{states_list}{ $self->{state} }{expect}{$in}) {
                 $state = $self->{states_list}{ $self->{state} }{expect}{$in};
             } else {
                 foreach my $key (keys %{ $self->{states_list}{ $self->{state} }{expect} }) {
                     if ($in =~ /$key/) {
-                        $state =
-                          $self->{states_list}{ $self->{state} }{expect}{$key};
+                        if (@+) {
+                            for my $nbr (1 .. (scalar(@+)-1)) {
+                                if ( defined $-[$nbr] ) {
+                                    my $match = substr($in, $-[$nbr], $+[$nbr] - $-[$nbr]);
+                                    if (defined($+[$nbr])) {
+                                        $self->{cmd_regex}{$nbr} = substr($in, $-[$nbr], $+[$nbr] - $-[$nbr]);
+                                    }
+                                }
+                            }
+                        }
+                        $state = $self->{states_list}{ $self->{state} }{expect}{$key};
                     }
                 }
             }
@@ -288,28 +307,35 @@ sub run {
                 }
                 if (exists $state->{exec}) {
                     my $old_exec = $state->{exec};
-                    for (my $nbr = 0 ; $nbr <= $#all ; $nbr++) {
-                        my $str = '__' . $nbr . '__';
-                        $state->{exec} =~ s/$str/$all[$nbr]/g;
-                    }
                     $state->{exec} =~ s/__IN__/$in/g;
+                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                        my $v = $self->{cmd_regex}{$k};
+                        my $K = '__'.$k.'__';
+                        $state->{exec} =~ s/$K/$v/g;
+                    }
                     my $string = `$state->{exec}`;
                     $output = sprintf("%s", $string) . $output;
                     $state->{exec} = $old_exec;
                 }
                 if (exists $state->{do}) {
                     my $old_do = $state->{do};
-                    for (my $nbr = 0 ; $nbr <= $#all ; $nbr++) {
-                        my $str = '__' . $nbr . '__';
-                        $state->{do} =~ s/$str/$all[$nbr]/g;
-                    }
                     $state->{do} =~ s/__IN__/$in/g;
+                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                        my $v = $self->{cmd_regex}{$k};
+                        my $K = '__'.$k.'__';
+                        $state->{do} =~ s/$K/$v/g;
+                    }
                     $output = (eval $state->{do}) . $output;
                     $state->{do} = $old_do;
                 }
                 if (exists $state->{cat}) {
                     my $old_cat = $state->{cat};
                     $state->{cat} =~ s/__IN__/$in/g;
+                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                        my $v = $self->{cmd_regex}{$k};
+                        my $K = '__'.$k.'__';
+                        $state->{cat} =~ s/$K/$v/g;
+                    }
                     my $string = do { local (@ARGV, $/) = $state->{cat}; <> };
                     $output = sprintf("%s", $string) . $output;
                     $state->{cat} = $old_cat;
@@ -317,6 +343,11 @@ sub run {
                 if (exists $state->{catRAND}) {
                     my $old_cat = $state->{catRAND};
                     $state->{catRAND} =~ s/__IN__/$in/g;
+                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                        my $v = $self->{cmd_regex}{$k};
+                        my $K = '__'.$k.'__';
+                        $state->{catRAND} =~ s/$K/$v/g;
+                    }
                     my @files  = split /\s+/, $state->{catRAND};
                     my $file   = $files[ rand @files ];
                     my $string = do { local (@ARGV, $/) = $file; <> };
@@ -326,37 +357,47 @@ sub run {
                 if (exists $state->{catWRAND}) {
                     my $old_cat = $state->{catWRAND};
                     $state->{catWRAND} =~ s/__IN__/$in/g;
-                    my %files =  map { split /:/} split /\s+/, $state->{catWRAND};
-                    my $file  ;
+                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                        my $v = $self->{cmd_regex}{$k};
+                        my $K = '__'.$k.'__';
+                        $state->{catWRAND} =~ s/$K/$v/g;
+                    }
+                    my %files = map { split /:/ } split /\s+/, $state->{catWRAND};
+                    my $file;
                     my $weight;
-                    while ( my ( $p, $w ) = each %files ) {
-                       $w //=1;
-                       $weight += $w//1;
-                       $file = $p if rand($weight) < $w;
+                    while (my ($p, $w) = each %files) {
+                        $w //= 1;
+                        $weight += $w // 1;
+                        $file = $p if rand($weight) < $w;
                     }
                     my $string = do { local (@ARGV, $/) = $file; <> };
                     $output = sprintf("%s", $string) . $output;
                     $state->{catWRAND} = $old_cat;
                 }
                 if (exists $state->{catSEQ}) {
-                    my $old_cat =$state->{catSEQ};
+                    my $old_cat = $state->{catSEQ};
                     my $state_file;
                     if (exists $state->{catSEQ_idx}) {
-                    $state_file= $state->{catSEQ_idx}
-                    }else{
-                    $state_file = $old_cat . '.state';
-                    $state_file =~ s/\s/_/g;
+                        $state_file = $state->{catSEQ_idx};
+                    } else {
+                        $state_file = $old_cat . '.state';
+                        $state_file =~ s/\s/_/g;
 
-                     }
+                    }
                     $state->{catSEQ} =~ s/__IN__/$in/g;
+                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                        my $v = $self->{cmd_regex}{$k};
+                        my $K = '__'.$k.'__';
+                        $state->{catSEQ} =~ s/$K/$v/g;
+                    }
                     my @files = split /\s+/, $state->{catSEQ};
                     tie my $nbr => 'FSM::Basic::Modulo', scalar @files, 0;
-                        if (-f $state_file) {
-                            $nbr = do {
-                                local (@ARGV, $/) = $state_file;
-                                <>;
-                            };
-                        }
+                    if (-f $state_file) {
+                        $nbr = do {
+                            local (@ARGV, $/) = $state_file;
+                            <>;
+                        };
+                    }
                     my $file = $files[ $nbr++ ];
                     my $string = do { local (@ARGV, $/) = $file; <> };
                     $output = sprintf("%s", $string) . $output;
@@ -365,7 +406,7 @@ sub run {
                 }
             } else {
                 $self->{previous_state} = $self->{state};
-                $self->{state} = $self->{states_list}{ $self->{state} }{not_matching} // $self->{state};
+                $self->{state}          = $self->{states_list}{ $self->{state} }{not_matching} // $self->{state};
                 $self->{states_list}{ $self->{state} }{repeat}--
                   if exists $self->{states_list}{ $self->{state} }{repeat};
                 $output .= $self->{states_list}{ $self->{state} }{output} // '';
@@ -388,13 +429,10 @@ sub set {
 
 sub write_file {
     my ($file, $content) = @_;
-    open my $fh, '>' , $file or die "Error opening file for write $file: $!\n";
+    open my $fh, '>', $file or die "Error opening file for write $file: $!\n";
     print $fh $content;
     close $fh or die "Error closing file $file: $!\n";
 }
-
-
-
 
 package FSM::Basic::Modulo;
 sub TIESCALAR { bless [ $_[2] || 0, $_[1] ] => $_[0] }
@@ -489,6 +527,11 @@ add "edit" to allow on the fly modification of the states definition
 
 add "verify_states" to check all states are reachable from a original state
 
+=head1 SEE ALSO
+
+FSA::Rules
+
+https://metacpan.org/pod/FSA::Rules
 
 
 =head1 AUTHOR
@@ -536,7 +579,7 @@ L<http://search.cpan.org/dist/FSM-Basic/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 DULAUNOY Fabrice.
+Copyright 2008 - 2020 DULAUNOY Fabrice.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

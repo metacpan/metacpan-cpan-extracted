@@ -48,6 +48,7 @@
             "Exporter" : "0",
             "File::ShareDir" : "0",
             "FindBin" : "0",
+            "HTML::Scrubber" : "0.19",
             "HTML::Strip" : "2.10",
             "HTTP::Request::Common" : "6.18",
             "IO::Socket::SSL" : "2.066",
@@ -69,7 +70,7 @@
             "Plack::Middleware::ConditionalGET" : "0",
             "Pod::Find" : "0",
             "Pod::Usage" : "0",
-            "RapidApp" : "1.3200",
+            "RapidApp" : "1.3301",
             "RapidApp::Builder" : "0",
             "RapidApp::Module::DbicPropPage" : "0",
             "RapidApp::Module::DbicRowDV" : "0",
@@ -116,6 +117,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.1301"
+   "version" : "1.1400"
 }
 

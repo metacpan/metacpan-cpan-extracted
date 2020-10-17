@@ -1,7 +1,9 @@
 package Perinci::CmdLine::Lite::Patch::DumpMeta;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-17'; # DATE
+our $DIST = 'Perinci-CmdLine-Lite-Patch-DumpMeta'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +37,7 @@ sub patch_data {
 }
 
 1;
-# ABSTRACT: Patch Perinci::CmdLine::Lite's action_call() to dump meta first
+# ABSTRACT: (DEPRECATED) Patch Perinci::CmdLine::Lite's action_call() to dump meta first
 
 __END__
 
@@ -45,17 +47,20 @@ __END__
 
 =head1 NAME
 
-Perinci::CmdLine::Lite::Patch::DumpMeta - Patch Perinci::CmdLine::Lite's action_call() to dump meta first
+Perinci::CmdLine::Lite::Patch::DumpMeta - (DEPRECATED) Patch Perinci::CmdLine::Lite's action_call() to dump meta first
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::CmdLine::Lite::Patch::DumpMeta (from Perl distribution Perinci-CmdLine-Lite-Patch-DumpMeta), released on 2018-12-07.
+This document describes version 0.002 of Perinci::CmdLine::Lite::Patch::DumpMeta (from Perl distribution Perinci-CmdLine-Lite-Patch-DumpMeta), released on 2020-10-17.
 
 =head1 SYNOPSIS
 
  % PERL5OPT=-MPerinci::CmdLine::Lite::Patch::DumpMeta yourscript.pl ...
 
 =head1 DESCRIPTION
+
+B<DEPRECATION NOTICE.> Deprecated in favor of
+L<Perinci::CmdLine::Plugin::DumpMeta>.
 
 This patch can be used for debugging. It wraps action_call() to dump
 Rinci metadata first.
@@ -84,7 +89,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

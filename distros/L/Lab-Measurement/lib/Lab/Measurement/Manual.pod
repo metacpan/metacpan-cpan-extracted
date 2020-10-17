@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.721
+version 3.722
 
 =head1 OVERVIEW
 
@@ -131,6 +131,8 @@ instruments and the high-level Lab::XPRESS interface
 =item * L<Lab::Moose::Instrument::HP34410A>
 
 alias: L<Lab::Moose::Instrument::Agilent34410A>
+
+=item * L<Lab::Moose::Instrument::Agilent34460A>
 
 =item * L<Lab::Moose::Instrument::Keysight34470A>
 
@@ -679,7 +681,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
-            2020       Sam Bingner, Simon Reinhardt
+            2020       Andreas K. Huettel, Sam Bingner, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

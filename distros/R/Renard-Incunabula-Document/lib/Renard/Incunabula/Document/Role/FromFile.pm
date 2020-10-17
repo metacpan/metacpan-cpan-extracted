@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document::Role::FromFile;
 # ABSTRACT: Role that provides a filename for a document
-$Renard::Incunabula::Document::Role::FromFile::VERSION = '0.004';
+$Renard::Incunabula::Document::Role::FromFile::VERSION = '0.005';
 use Moo::Role;
 use Renard::Incunabula::Common::Types qw(File FileUri);
 
@@ -34,7 +34,7 @@ Renard::Incunabula::Document::Role::FromFile - Role that provides a filename for
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments before validation",
+  "ABSTRACT" => "(DEPRECATED) Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments before validation",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation",
   "PREREQ_PM" => {
     "Data::Dump::Color" => 0,
-    "Module::Patch" => "0.270",
+    "Module::Patch" => "0.276",
     "base" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Patch" => "0.270",
+  "Module::Patch" => "0.276",
   "Test::More" => 0,
   "base" => 0,
   "strict" => 0,

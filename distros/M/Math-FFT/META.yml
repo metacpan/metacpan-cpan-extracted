@@ -7,13 +7,11 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Module::Build: '0.28'
   Test::More: '0.88'
   lib: '0'
   parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  Module::Build: '0.28'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -24,7 +22,7 @@ name: Math-FFT
 provides:
   Math::FFT:
     file: lib/Math/FFT.pm
-    version: '1.35'
+    version: '1.36'
 requires:
   DynaLoader: '0'
   perl: '5.008'
@@ -35,7 +33,7 @@ resources:
   bugtracker: https://github.com/shlomif/perl-Math-FFT/issues
   homepage: http://metacpan.org/release/Math-FFT
   repository: git://github.com/shlomif/perl-Math-FFT.git
-version: '1.35'
+version: '1.36'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -135,13 +133,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Filter/MetaResources'
-      version: '6.015'
-    -
-      class: Dist::Zilla::Plugin::ModuleBuild
-      config:
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
-      name: '@Filter/ModuleBuild'
       version: '6.015'
     -
       class: Dist::Zilla::Plugin::PkgVersion

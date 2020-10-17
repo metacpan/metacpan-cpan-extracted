@@ -158,7 +158,7 @@ sub _glob_to_re_str {
 
 sub _get_path_list_regex_string {
   my ($self, @paths) = @_;
-  return undef unless (scalar(@paths) > 0);
+  return $self->__re_never unless (scalar(@paths) > 0);
   
   my @gList  = ();
   my @eqList = ();

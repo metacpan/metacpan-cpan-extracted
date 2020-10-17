@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Page::Null;
 # ABSTRACT: A null page
-$Renard::Incunabula::Page::Null::VERSION = '0.004';
+$Renard::Incunabula::Page::Null::VERSION = '0.005';
 use Moo;
 
 1;
@@ -18,7 +18,7 @@ Renard::Incunabula::Page::Null - A null page
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

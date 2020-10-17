@@ -4,6 +4,7 @@ use Modern::Perl;
 
 use Test2::V0;
 use Test2::Require::Perl 'v5.20';
+use Test2::Require::EnvVar 'RELEASE_TESTING';
 
 use Test2::Tools::PerlCritic;
 

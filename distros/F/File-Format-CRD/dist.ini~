@@ -1,8 +1,9 @@
-name    = File-Format-CRD
-author  = Shlomi Fish <shlomif@cpan.org>
+name = File-Format-CRD
+author = Shlomi Fish <shlomif@cpan.org>
 license = MIT
 copyright_holder = Shlomi Fish
-copyright_year   = 2010
+copyright_year = 2010
+version = 0.2.1
 
 [@Filter]
 -bundle = @SHLOMIF

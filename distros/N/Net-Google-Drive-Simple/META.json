@@ -3,8 +3,8 @@
    "author" : [
       "Mike Schilli <cpan@perlmeister.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,44 +15,80 @@
    "name" : "Net-Google-Drive-Simple",
    "no_index" : {
       "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.4",
+            "Test::CPAN::Meta" : "0",
+            "Test::CheckManifest" : "1.29",
+            "Test::Kwalitee" : "1.22",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::Spelling::CommonMistakes" : "1.000",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "2.00"
          }
       },
       "runtime" : {
          "requires" : {
-            "Crypt::SSLeay" : "0.72",
-            "File::MMagic" : "1.29",
-            "JSON" : "2.53",
-            "LWP::Protocol::https" : "6.04",
-            "LWP::UserAgent" : "6.02",
-            "Log::Log4perl" : "1",
-            "Mojolicious" : "4.13",
-            "OAuth::Cmdline" : "0.04",
-            "Pod::Usage" : "1.36",
-            "Sysadm::Install" : "0.43",
-            "YAML" : "0.71"
+            "Crypt::SSLeay" : "0",
+            "File::MMagic" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Log4perl" : "0",
+            "Mojolicious" : "0",
+            "OAuth::Cmdline" : "0",
+            "Pod::Usage" : "0",
+            "Sysadm::Install" : "0",
+            "YAML" : "0.71",
+            "perl" : "5.016"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
-            "Test2::Bundle::Extended" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
-            "Test::MockModule" : "v0.171.0"
+            "Test2::V0" : "0",
+            "Test::MockModule" : "0.171",
+            "Test::More" : "0",
+            "perl" : "5.016"
          }
+      }
+   },
+   "provides" : {
+      "Net::Google::Drive::Simple" : {
+         "file" : "lib/Net/Google/Drive/Simple.pm",
+         "version" : "0.18"
+      },
+      "Net::Google::Drive::Simple::Item" : {
+         "file" : "lib/Net/Google/Drive/Simple/Item.pm",
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -60,10 +96,33 @@
       "bugtracker" : {
          "web" : "https://github.com/mschilli/net-google-drive-simple/issues"
       },
+      "homepage" : "https://github.com/mschilli/net-google-drive-simple",
       "repository" : {
-         "url" : "http://github.com/mschilli/net-google-drive-simple.git"
+         "type" : "git",
+         "url" : "https://github.com/mschilli/net-google-drive-simple.git",
+         "web" : "https://github.com/mschilli/net-google-drive-simple"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.18",
+   "x_contributors" : [
+      "Andy Bircumshaw <github.com@networkned.co.uk>",
+      "Arnaud (Arhuman) ASSAD <arhuman@gmail.com>",
+      "Emmanuel Rodriguez <emmanuel.rodriguez@gmail.com>",
+      "Matthias Bloch <matthias.bloch@puffin.ch>",
+      "Max Maischein <corion@corion.net>",
+      "Mike Schilli <github@perlmeister.com>",
+      "Mike Schilli <m@perlmeister.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nicolas R <atoomic@cpan.org>",
+      "Nicolas R <cpan@atoomic.org>",
+      "\u2115icolas \u211d <nicolas@atoomic.org>",
+      "Peter Scott <peter@computerpros.com.au>",
+      "Tim Mullin <tim@cpanel.net>",
+      "Todd Rinaldo <toddr@cpan.org>",
+      "Yxes <wells@cedarnet.org>"
+   ],
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

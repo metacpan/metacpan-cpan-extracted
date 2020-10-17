@@ -13,20 +13,23 @@ use Statistics::Descriptive;
 
 {
     # test #1
-    my $stat = Statistics::Descriptive::Full->new();
+    my $stat    = Statistics::Descriptive::Full->new();
     my @results = $stat->least_squares_fit();
+
     # TEST
-    ok (!scalar(@results), "Least-squares results on a non-filled object are empty.");
+    ok( !scalar(@results),
+        "Least-squares results on a non-filled object are empty." );
 
     # test #2
     # data are y = 2*x - 1
 
     $stat->add_data( 1, 3, 5, 7 );
     @results = $stat->least_squares_fit();
+
     # TEST
-    is_deeply (
-        [@results[0..1]],
-        [-1, 2],
+    is_deeply(
+        [ @results[ 0 .. 1 ] ],
+        [ -1, 2 ],
         "least_squares_fit returns the correct result."
     );
 }
@@ -37,10 +40,10 @@ use Statistics::Descriptive;
     my $stat = Statistics::Descriptive::Full->new();
     $stat->add_data( 1.1, 2.9, 4.9, 0.0 );
     my $single_result = $stat->harmonic_mean();
+
     # TEST
-    ok (!defined($single_result),
-        "harmonic_mean is undefined if there's a 0 datum."
-    );
+    ok( !defined($single_result),
+        "harmonic_mean is undefined if there's a 0 datum." );
 }
 
 {
@@ -49,10 +52,10 @@ use Statistics::Descriptive;
     my $stat = Statistics::Descriptive::Full->new();
     $stat->add_data( 1.0, -1.0 );
     my $single_result = $stat->harmonic_mean();
+
     # TEST
-    ok (!defined($single_result),
-        "harmonic_mean is undefined if the sum of the reciprocals is zero."
-    );
+    ok( !defined($single_result),
+        "harmonic_mean is undefined if the sum of the reciprocals is zero." );
 }
 
 {
@@ -62,20 +65,22 @@ use Statistics::Descriptive;
     local $Statistics::Descriptive::Tolerance = 0.1;
     $stat->add_data( 1.01, -1.0 );
     my $single_result = $stat->harmonic_mean();
+
     # TEST
-    ok (! defined( $single_result ),
-        "test error condition on harmonic mean : sum of elements near zero"
-    );
+    ok( !defined($single_result),
+        "test error condition on harmonic mean : sum of elements near zero" );
 }
 
 {
     # test #6
     # test normal function of harmonic mean
     my $stat = Statistics::Descriptive::Full->new();
-    $stat->add_data( 1,2,3 );
+    $stat->add_data( 1, 2, 3 );
     my $single_result = $stat->harmonic_mean();
+
     # TEST
-    ok (scalar(abs( $single_result - 1.6363 ) < 0.001),
+    ok(
+        scalar( abs( $single_result - 1.6363 ) < 0.001 ),
         "test normal function of harmonic mean",
     );
 }
@@ -84,55 +89,41 @@ use Statistics::Descriptive;
     # test #7
     # test stringification of hash keys in frequency distribution
     my $stat = Statistics::Descriptive::Full->new();
-    $stat->add_data(0.1,
-                    0.15,
-                    0.16,
-                   1/3);
+    $stat->add_data( 0.1, 0.15, 0.16, 1 / 3 );
     my %f = $stat->frequency_distribution(2);
 
     # TEST
     compare_hash_by_ranges(
         \%f,
-        [[0.216666,0.216667,3],[0.3333,0.3334,1]],
+        [ [ 0.216666, 0.216667, 3 ], [ 0.3333, 0.3334, 1 ] ],
         "Test stringification of hash keys in frequency distribution",
     );
 
     # test #8
     ##Test memorization of last frequency distribution
     my %g = $stat->frequency_distribution();
+
     # TEST
-    is_deeply(
-        \%f,
-        \%g,
-        "memorization of last frequency distribution"
-    );
+    is_deeply( \%f, \%g, "memorization of last frequency distribution" );
 }
 
 {
     # test #9
     # test the frequency distribution with specified bins
-    my $stat = Statistics::Descriptive::Full->new();
-    my @freq_bins=(20,40,60,80,100);
-    $stat->add_data(23.92,
-                    32.30,
-                    15.27,
-                    39.89,
-                    8.96,
-                    40.71,
-                    16.20,
-                    34.61,
-                    27.98,
-                    74.40);
-    my %f = $stat->frequency_distribution(\@freq_bins);
+    my $stat      = Statistics::Descriptive::Full->new();
+    my @freq_bins = ( 20, 40, 60, 80, 100 );
+    $stat->add_data( 23.92, 32.30, 15.27, 39.89, 8.96, 40.71, 16.20, 34.61,
+        27.98, 74.40 );
+    my %f = $stat->frequency_distribution( \@freq_bins );
 
     # TEST
     is_deeply(
         \%f,
         {
-            20 => 3,
-            40 => 5,
-            60 => 1,
-            80 => 1,
+            20  => 3,
+            40  => 5,
+            60  => 1,
+            80  => 1,
             100 => 0,
         },
         "Test the frequency distribution with specified bins"
@@ -143,93 +134,69 @@ use Statistics::Descriptive;
     # test #10 and #11
     # Test the percentile function and caching
     my $stat = Statistics::Descriptive::Full->new();
-    $stat->add_data(-5,-2,4,7,7,18);
+    $stat->add_data( -5, -2, 4, 7, 7, 18 );
     ##Check algorithm
     # TEST
-    is ($stat->percentile(50),
-        4,
-        "percentile function and caching - 1",
-    );
+    is( $stat->percentile(50), 4, "percentile function and caching - 1", );
+
     # TEST
-    is ($stat->percentile(25),
-        -2,
-        "percentile function and caching - 2",
-    );
+    is( $stat->percentile(25), -2, "percentile function and caching - 2", );
 }
 
 {
     # tests #12 and #13
     # Check correct parsing of method parameters
     my $stat = Statistics::Descriptive::Full->new();
-    $stat->add_data(1,2,3,4,5,6,7,8,9,10);
+    $stat->add_data( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+
     # TEST
     is(
-        $stat->trimmed_mean(0.1,0.1),
+        $stat->trimmed_mean( 0.1, 0.1 ),
         $stat->trimmed_mean(0.1),
         "correct parsing of method parameters",
     );
 
     # TEST
-    is ($stat->trimmed_mean(0.1,0),
-        6,
-        "correct parsing of method parameters - 2",
+    is(
+        $stat->trimmed_mean( 0.1, 0 ),
+        6, "correct parsing of method parameters - 2",
     );
 }
 
 {
     my $stat = Statistics::Descriptive::Full->new();
 
-    $stat->add_data((0.001) x 6);
+    $stat->add_data( (0.001) x 6 );
 
     # TEST
-    is_between ($stat->variance(),
-        0,
-        0.00001,
-        "Workaround to avoid rounding errors that yield negative variance."
-    );
+    is_between( $stat->variance(), 0, 0.00001,
+        "Workaround to avoid rounding errors that yield negative variance." );
 
     # TEST
-    is_between ($stat->standard_deviation(),
-        0,
-        0.00001,
-        "Workaround to avoid rounding errors that yield negative std-dev."
-    );
+    is_between( $stat->standard_deviation(),
+        0, 0.00001,
+        "Workaround to avoid rounding errors that yield negative std-dev." );
 }
 
 {
     my $stat = Statistics::Descriptive::Full->new();
 
-    $stat->add_data(1, 2, 3, 5);
+    $stat->add_data( 1, 2, 3, 5 );
 
     # TEST
-    is ($stat->count(),
-        4,
-        "There are 4 elements."
-    );
+    is( $stat->count(), 4, "There are 4 elements." );
 
     # TEST
-    is ($stat->sum(),
-        11,
-        "The sum is 11",
-    );
+    is( $stat->sum(), 11, "The sum is 11", );
 
     # TEST
-    is ($stat->sumsq(),
-        39,
-        "The sum of squares is 39"
-    );
+    is( $stat->sumsq(), 39, "The sum of squares is 39" );
 
     # TEST
-    is ($stat->min(),
-        1,
-        "The minimum is 1."
-    );
+    is( $stat->min(), 1, "The minimum is 1." );
 
     # TEST
-    is ($stat->max(),
-        5,
-        "The maximum is 5."
-    );
+    is( $stat->max(), 5, "The maximum is 5." );
 }
 
 {
@@ -237,29 +204,21 @@ use Statistics::Descriptive;
     # test the frequency distribution with specified bins
     my $stat = Statistics::Descriptive::Full->new();
 
-    my @freq_bins=(20,40,60,80,100);
+    my @freq_bins = ( 20, 40, 60, 80, 100 );
 
-    $stat->add_data(23.92,
-                    32.30,
-                    15.27,
-                    39.89,
-                    8.96,
-                    40.71,
-                    16.20,
-                    34.61,
-                    27.98,
-                    74.40);
+    $stat->add_data( 23.92, 32.30, 15.27, 39.89, 8.96, 40.71, 16.20, 34.61,
+        27.98, 74.40 );
 
-    my $f_d = $stat->frequency_distribution_ref(\@freq_bins);
+    my $f_d = $stat->frequency_distribution_ref( \@freq_bins );
 
     # TEST
     is_deeply(
         $f_d,
         {
-            20 => 3,
-            40 => 5,
-            60 => 1,
-            80 => 1,
+            20  => 3,
+            40  => 5,
+            60  => 1,
+            80  => 1,
             100 => 0,
         },
         "Test the frequency distribution returned as a scalar reference"
@@ -271,13 +230,13 @@ use Statistics::Descriptive;
     # test the frequency distribution with specified bins
     my $stat = Statistics::Descriptive::Full->new();
 
-    $stat->add_data(2, 4, 8);
+    $stat->add_data( 2, 4, 8 );
 
     # TEST
     is_between(
         $stat->geometric_mean(),
-        (4-1e-4),
-        (4+1e-4),
+        ( 4 - 1e-4 ),
+        ( 4 + 1e-4 ),
         "Geometric Mean Test #1",
     )
 }
@@ -286,11 +245,12 @@ use Statistics::Descriptive;
     my $stat = Statistics::Descriptive::Full->new();
     my $expected;
 
-    $stat->add_data(1 .. 9, 100);
+    $stat->add_data( 1 .. 9, 100 );
 
     # TEST
     $expected = 3.11889574523909;
-    is_between ($stat->skewness(),
+    is_between(
+        $stat->skewness(),
         $expected - 1E-13,
         $expected + 1E-13,
         "Skewness of $expected +/- 1E-13"
@@ -298,19 +258,21 @@ use Statistics::Descriptive;
 
     # TEST
     $expected = 9.79924471616366;
-    is_between ($stat->kurtosis(),
+    is_between(
+        $stat->kurtosis(),
         $expected - 1E-13,
         $expected + 1E-13,
         "Kurtosis of $expected +/- 1E-13"
     );
 
-    $stat->add_data(100 .. 110);
+    $stat->add_data( 100 .. 110 );
 
     #  now check that cached skew and kurt values are recalculated
 
     # TEST
     $expected = -0.306705104889384;
-    is_between ($stat->skewness(),
+    is_between(
+        $stat->skewness(),
         $expected - 1E-13,
         $expected + 1E-13,
         "Skewness of $expected +/- 1E-13"
@@ -318,7 +280,8 @@ use Statistics::Descriptive;
 
     # TEST
     $expected = -2.09839497356215;
-    is_between ($stat->kurtosis(),
+    is_between(
+        $stat->kurtosis(),
         $expected - 1E-13,
         $expected + 1E-13,
         "Kurtosis of $expected +/- 1E-13"
@@ -328,24 +291,18 @@ use Statistics::Descriptive;
 {
     my $stat = Statistics::Descriptive::Full->new();
 
-    $stat->add_data(1,2);
+    $stat->add_data( 1, 2 );
     my $def;
 
     # TEST
     $def = defined $stat->skewness() ? 1 : 0;
-    is ($def,
-        0,
-        'Skewness is undef for 2 samples'
-    );
+    is( $def, 0, 'Skewness is undef for 2 samples' );
 
-    $stat->add_data (1);
+    $stat->add_data(1);
 
     # TEST
     $def = defined $stat->kurtosis() ? 1 : 0;
-    is ($def,
-        0,
-        'Kurtosis is undef for 3 samples'
-    );
+    is( $def, 0, 'Kurtosis is undef for 3 samples' );
 
 }
 
@@ -358,15 +315,13 @@ use Statistics::Descriptive;
     my $ret = $stat->percentile(100);
 
     # TEST
-    ok (!defined($ret), 'Returns undef and does not die.');
+    ok( !defined($ret), 'Returns undef and does not die.' );
 }
-
-
 
 #  test stats when no data have been added
 {
     my $stat = Statistics::Descriptive::Full->new();
-    my ($result, $str);
+    my ( $result, $str );
 
     #  An accessor method for _permitted would be handy,
     #  or one to get all the stats methods
@@ -378,37 +333,43 @@ use Statistics::Descriptive;
         mode least_squares_fit
         percentile frequency_distribution
     };
-    #  least_squares_fit is handled in an earlier test, so is actually a duplicate here
+
+#  least_squares_fit is handled in an earlier test, so is actually a duplicate here
 
     #diag 'Results are undef when no data added';
     #  need to update next line when new methods are tested here
     # TEST:$method_count=18
-    foreach my $method (sort @methods) {
+    foreach my $method ( sort @methods )
+    {
         $result = $stat->$method;
+
         # TEST*$method_count
-        ok (!defined ($result), "$method is undef when object has no data.");
+        ok( !defined($result), "$method is undef when object has no data." );
     }
 
-    #  quantile and trimmed_mean require valid args, so don't test in the method loop
+#  quantile and trimmed_mean require valid args, so don't test in the method loop
     my $method = 'quantile';
     $result = $stat->$method(1);
+
     # TEST
-    ok (!defined ($result), "$method is undef when object has no data.");
+    ok( !defined($result), "$method is undef when object has no data." );
 
     $method = 'trimmed_mean';
     $result = $stat->$method(0.1);
+
     # TEST
-    ok (!defined ($result), "$method is undef when object has no data.");
+    ok( !defined($result), "$method is undef when object has no data." );
 }
 
 #  test SD when only one value added
 {
     my $stat = Statistics::Descriptive::Full->new();
-    $stat->add_data( 1 );
+    $stat->add_data(1);
 
     my $result = $stat->standard_deviation();
+
     # TEST
-    ok ($result == 0, "SD is zero when object has one record.");
+    ok( $result == 0, "SD is zero when object has one record." );
 }
 
 # Test function returns undef in list context when no data added.
@@ -435,7 +396,8 @@ use Statistics::Descriptive;
 {
     my $stats = Statistics::Descriptive::Full->new();
 
-    $stats->add_data_with_samples([{1 => 10}, {2 => 20}, {3 => 30}, {4 => 40}, {5 => 50}]);
+    $stats->add_data_with_samples(
+        [ { 1 => 10 }, { 2 => 20 }, { 3 => 30 }, { 4 => 40 }, { 5 => 50 } ] );
 
     # TEST
     is_deeply(
@@ -457,66 +419,64 @@ use Statistics::Descriptive;
 #  including when new data are added which should not change the values
 {
     my $stats_class = 'Statistics::Descriptive::Full';
-    my $stat1 = $stats_class->new();
+    my $stat1       = $stats_class->new();
 
-    my @data1 = (20, 1 .. 3, 100, 1..5);
-    my @data2 = (25, 30);
+    my @data1 = ( 20, 1 .. 3, 100, 1 .. 5 );
+    my @data2 = ( 25, 30 );
 
     my $e_maxdex = 4;
     my $e_mindex = 1;
 
-    $stat1->add_data(@data1);     # initialise
+    $stat1->add_data(@data1);    # initialise
 
     # TEST*2
-    is ($stat1->mindex, $e_mindex, "initial mindex is correct");
-    is ($stat1->maxdex, $e_maxdex, "initial maxdex is correct");
+    is( $stat1->mindex, $e_mindex, "initial mindex is correct" );
+    is( $stat1->maxdex, $e_maxdex, "initial maxdex is correct" );
 
     # TEST*2
-    $stat1->add_data(@data2);     #  add new data
-    is ($stat1->mindex, $e_mindex, "mindex is correct after new data added");
-    is ($stat1->maxdex, $e_maxdex, "maxdex is correct after new data added");
+    $stat1->add_data(@data2);    #  add new data
+    is( $stat1->mindex, $e_mindex, "mindex is correct after new data added" );
+    is( $stat1->maxdex, $e_maxdex, "maxdex is correct after new data added" );
 
     # TEST*2
-    $stat1->median;  #  trigger a sort
+    $stat1->median;              #  trigger a sort
     $e_maxdex = scalar @data1 + scalar @data2 - 1;
-    is ($stat1->mindex, 0, "mindex is correct after sorting");
-    is ($stat1->maxdex, $e_maxdex, "maxdex is correct after sorting");
+    is( $stat1->mindex, 0,         "mindex is correct after sorting" );
+    is( $stat1->maxdex, $e_maxdex, "maxdex is correct after sorting" );
 
 }
-
 
 #  what happens when we add new data?
 #  Recycle the same data so mean, sd etc remain the same
 {
     my $stats_class = 'Statistics::Descriptive::Full';
-    my $stat1 = $stats_class->new();
-    my $stat2 = $stats_class->new();
+    my $stat1       = $stats_class->new();
+    my $stat2       = $stats_class->new();
 
-    my @data1 = (1 .. 9, 100);
-    my @data2 = (100 .. 110);
+    my @data1 = ( 1 .. 9, 100 );
+    my @data2 = ( 100 .. 110 );
 
     #  sample of methods
     my @methods = qw /mean standard_deviation count skewness kurtosis median/;
 
-    $stat1->add_data(@data1);     # initialise
-    foreach my $meth (@methods) { #  run some methods
+    $stat1->add_data(@data1);    # initialise
+    foreach my $meth (@methods)
+    {                            #  run some methods
         $stat1->$meth;
     }
-    $stat1->add_data(@data2);     #  add new data
-    foreach my $meth (@methods) { #  re-run some methods
+    $stat1->add_data(@data2);    #  add new data
+    foreach my $meth (@methods)
+    {                            #  re-run some methods
         $stat1->$meth;
     }
 
-    $stat2->add_data(@data1, @data2);  #  initialise with all data
-    foreach my $meth (@methods) { #  run some methods
+    $stat2->add_data( @data1, @data2 );    #  initialise with all data
+    foreach my $meth (@methods)
+    {                                      #  run some methods
         $stat2->$meth;
     }
 
     # TEST
-    is_deeply (
-        $stat1,
-        $stat2,
-        'stats consistent after adding new data',
-    );
+    is_deeply( $stat1, $stat2, 'stats consistent after adding new data', );
 
 }

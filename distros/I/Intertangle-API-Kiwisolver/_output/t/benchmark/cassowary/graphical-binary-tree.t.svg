@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<rect height="150" style="fill: none; stroke: black; stroke-width: 1" width="600" x="0" y="0" />
+	<rect height="4" width="4" x="298" y="8" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="300" x2="152.698412698413" y1="10" y2="30" />
+	<rect height="4" width="4" x="150.698412698413" y="28" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="152.698412698413" x2="79.0476190476191" y1="30" y2="50" />
+	<rect height="4" width="4" x="77.0476190476191" y="48" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="79.0476190476191" x2="42.2222222222223" y1="50" y2="70" />
+	<rect height="4" width="4" x="40.2222222222223" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="42.2222222222223" x2="23.8095238095239" y1="70" y2="90" />
+	<rect height="4" width="4" x="21.8095238095239" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="23.8095238095239" x2="14.6031746031746" y1="90" y2="110" />
+	<rect height="4" width="4" x="12.6031746031746" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="14.6031746031746" x2="9.99999999999994" y1="110" y2="130" />
+	<rect height="4" width="4" x="7.99999999999994" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="14.6031746031746" x2="19.2063492063492" y1="110" y2="130" />
+	<rect height="4" width="4" x="17.2063492063492" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="23.8095238095239" x2="33.0158730158731" y1="90" y2="110" />
+	<rect height="4" width="4" x="31.0158730158731" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="33.0158730158731" x2="28.4126984126984" y1="110" y2="130" />
+	<rect height="4" width="4" x="26.4126984126984" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="33.0158730158731" x2="37.6190476190475" y1="110" y2="130" />
+	<rect height="4" width="4" x="35.6190476190475" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="42.2222222222223" x2="60.6349206349207" y1="70" y2="90" />
+	<rect height="4" width="4" x="58.6349206349207" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="60.6349206349207" x2="51.4285714285715" y1="90" y2="110" />
+	<rect height="4" width="4" x="49.4285714285715" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="51.4285714285715" x2="46.8253968253968" y1="110" y2="130" />
+	<rect height="4" width="4" x="44.8253968253968" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="51.4285714285715" x2="56.031746031746" y1="110" y2="130" />
+	<rect height="4" width="4" x="54.031746031746" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="60.6349206349207" x2="69.84126984127" y1="90" y2="110" />
+	<rect height="4" width="4" x="67.84126984127" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="69.84126984127" x2="65.2380952380952" y1="110" y2="130" />
+	<rect height="4" width="4" x="63.2380952380952" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="69.84126984127" x2="74.4444444444446" y1="110" y2="130" />
+	<rect height="4" width="4" x="72.4444444444446" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="79.0476190476191" x2="115.873015873016" y1="50" y2="70" />
+	<rect height="4" width="4" x="113.873015873016" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="115.873015873016" x2="97.4603174603175" y1="70" y2="90" />
+	<rect height="4" width="4" x="95.4603174603175" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="97.4603174603175" x2="88.2539682539684" y1="90" y2="110" />
+	<rect height="4" width="4" x="86.2539682539684" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="88.2539682539684" x2="83.6507936507937" y1="110" y2="130" />
+	<rect height="4" width="4" x="81.6507936507937" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="88.2539682539684" x2="92.857142857143" y1="110" y2="130" />
+	<rect height="4" width="4" x="90.857142857143" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="97.4603174603175" x2="106.666666666667" y1="90" y2="110" />
+	<rect height="4" width="4" x="104.666666666667" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="106.666666666667" x2="102.063492063492" y1="110" y2="130" />
+	<rect height="4" width="4" x="100.063492063492" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="106.666666666667" x2="111.269841269841" y1="110" y2="130" />
+	<rect height="4" width="4" x="109.269841269841" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="115.873015873016" x2="134.285714285714" y1="70" y2="90" />
+	<rect height="4" width="4" x="132.285714285714" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="134.285714285714" x2="125.079365079365" y1="90" y2="110" />
+	<rect height="4" width="4" x="123.079365079365" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="125.079365079365" x2="120.476190476191" y1="110" y2="130" />
+	<rect height="4" width="4" x="118.476190476191" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="125.079365079365" x2="129.68253968254" y1="110" y2="130" />
+	<rect height="4" width="4" x="127.68253968254" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="134.285714285714" x2="143.492063492064" y1="90" y2="110" />
+	<rect height="4" width="4" x="141.492063492064" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="143.492063492064" x2="138.888888888889" y1="110" y2="130" />
+	<rect height="4" width="4" x="136.888888888889" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="143.492063492064" x2="148.095238095238" y1="110" y2="130" />
+	<rect height="4" width="4" x="146.095238095238" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="152.698412698413" x2="226.349206349206" y1="30" y2="50" />
+	<rect height="4" width="4" x="224.349206349206" y="48" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="226.349206349206" x2="189.52380952381" y1="50" y2="70" />
+	<rect height="4" width="4" x="187.52380952381" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="189.52380952381" x2="171.111111111111" y1="70" y2="90" />
+	<rect height="4" width="4" x="169.111111111111" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="171.111111111111" x2="161.904761904762" y1="90" y2="110" />
+	<rect height="4" width="4" x="159.904761904762" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="161.904761904762" x2="157.301587301587" y1="110" y2="130" />
+	<rect height="4" width="4" x="155.301587301587" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="161.904761904762" x2="166.507936507937" y1="110" y2="130" />
+	<rect height="4" width="4" x="164.507936507937" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="171.111111111111" x2="180.31746031746" y1="90" y2="110" />
+	<rect height="4" width="4" x="178.31746031746" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="180.31746031746" x2="175.714285714286" y1="110" y2="130" />
+	<rect height="4" width="4" x="173.714285714286" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="180.31746031746" x2="184.920634920635" y1="110" y2="130" />
+	<rect height="4" width="4" x="182.920634920635" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="189.52380952381" x2="207.936507936508" y1="70" y2="90" />
+	<rect height="4" width="4" x="205.936507936508" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="207.936507936508" x2="198.730158730159" y1="90" y2="110" />
+	<rect height="4" width="4" x="196.730158730159" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="198.730158730159" x2="194.126984126984" y1="110" y2="130" />
+	<rect height="4" width="4" x="192.126984126984" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="198.730158730159" x2="203.333333333333" y1="110" y2="130" />
+	<rect height="4" width="4" x="201.333333333333" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="207.936507936508" x2="217.142857142857" y1="90" y2="110" />
+	<rect height="4" width="4" x="215.142857142857" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="217.142857142857" x2="212.539682539683" y1="110" y2="130" />
+	<rect height="4" width="4" x="210.539682539683" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="217.142857142857" x2="221.746031746032" y1="110" y2="130" />
+	<rect height="4" width="4" x="219.746031746032" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="226.349206349206" x2="263.174603174603" y1="50" y2="70" />
+	<rect height="4" width="4" x="261.174603174603" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="263.174603174603" x2="244.761904761905" y1="70" y2="90" />
+	<rect height="4" width="4" x="242.761904761905" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="244.761904761905" x2="235.555555555556" y1="90" y2="110" />
+	<rect height="4" width="4" x="233.555555555556" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="235.555555555556" x2="230.952380952381" y1="110" y2="130" />
+	<rect height="4" width="4" x="228.952380952381" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="235.555555555556" x2="240.15873015873" y1="110" y2="130" />
+	<rect height="4" width="4" x="238.15873015873" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="244.761904761905" x2="253.968253968254" y1="90" y2="110" />
+	<rect height="4" width="4" x="251.968253968254" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="253.968253968254" x2="249.36507936508" y1="110" y2="130" />
+	<rect height="4" width="4" x="247.36507936508" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="253.968253968254" x2="258.571428571429" y1="110" y2="130" />
+	<rect height="4" width="4" x="256.571428571429" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="263.174603174603" x2="281.587301587302" y1="70" y2="90" />
+	<rect height="4" width="4" x="279.587301587302" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="281.587301587302" x2="272.380952380952" y1="90" y2="110" />
+	<rect height="4" width="4" x="270.380952380952" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="272.380952380952" x2="267.777777777778" y1="110" y2="130" />
+	<rect height="4" width="4" x="265.777777777778" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="272.380952380952" x2="276.984126984127" y1="110" y2="130" />
+	<rect height="4" width="4" x="274.984126984127" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="281.587301587302" x2="290.793650793651" y1="90" y2="110" />
+	<rect height="4" width="4" x="288.793650793651" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="290.793650793651" x2="286.190476190476" y1="110" y2="130" />
+	<rect height="4" width="4" x="284.190476190476" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="290.793650793651" x2="295.396825396825" y1="110" y2="130" />
+	<rect height="4" width="4" x="293.396825396825" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="300" x2="447.301587301587" y1="10" y2="30" />
+	<rect height="4" width="4" x="445.301587301587" y="28" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="447.301587301587" x2="373.650793650794" y1="30" y2="50" />
+	<rect height="4" width="4" x="371.650793650794" y="48" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="373.650793650794" x2="336.825396825397" y1="50" y2="70" />
+	<rect height="4" width="4" x="334.825396825397" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="336.825396825397" x2="318.412698412699" y1="70" y2="90" />
+	<rect height="4" width="4" x="316.412698412699" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="318.412698412699" x2="309.206349206349" y1="90" y2="110" />
+	<rect height="4" width="4" x="307.206349206349" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="309.206349206349" x2="304.603174603175" y1="110" y2="130" />
+	<rect height="4" width="4" x="302.603174603175" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="309.206349206349" x2="313.809523809524" y1="110" y2="130" />
+	<rect height="4" width="4" x="311.809523809524" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="318.412698412699" x2="327.619047619048" y1="90" y2="110" />
+	<rect height="4" width="4" x="325.619047619048" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="327.619047619048" x2="323.015873015873" y1="110" y2="130" />
+	<rect height="4" width="4" x="321.015873015873" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="327.619047619048" x2="332.222222222222" y1="110" y2="130" />
+	<rect height="4" width="4" x="330.222222222222" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="336.825396825397" x2="355.238095238095" y1="70" y2="90" />
+	<rect height="4" width="4" x="353.238095238095" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="355.238095238095" x2="346.031746031746" y1="90" y2="110" />
+	<rect height="4" width="4" x="344.031746031746" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="346.031746031746" x2="341.428571428572" y1="110" y2="130" />
+	<rect height="4" width="4" x="339.428571428572" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="346.031746031746" x2="350.634920634921" y1="110" y2="130" />
+	<rect height="4" width="4" x="348.634920634921" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="355.238095238095" x2="364.444444444445" y1="90" y2="110" />
+	<rect height="4" width="4" x="362.444444444445" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="364.444444444445" x2="359.84126984127" y1="110" y2="130" />
+	<rect height="4" width="4" x="357.84126984127" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="364.444444444445" x2="369.047619047619" y1="110" y2="130" />
+	<rect height="4" width="4" x="367.047619047619" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="373.650793650794" x2="410.476190476191" y1="50" y2="70" />
+	<rect height="4" width="4" x="408.476190476191" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="410.476190476191" x2="392.063492063492" y1="70" y2="90" />
+	<rect height="4" width="4" x="390.063492063492" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="392.063492063492" x2="382.857142857143" y1="90" y2="110" />
+	<rect height="4" width="4" x="380.857142857143" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="382.857142857143" x2="378.253968253968" y1="110" y2="130" />
+	<rect height="4" width="4" x="376.253968253968" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="382.857142857143" x2="387.460317460318" y1="110" y2="130" />
+	<rect height="4" width="4" x="385.460317460318" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="392.063492063492" x2="401.269841269841" y1="90" y2="110" />
+	<rect height="4" width="4" x="399.269841269841" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="401.269841269841" x2="396.666666666667" y1="110" y2="130" />
+	<rect height="4" width="4" x="394.666666666667" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="401.269841269841" x2="405.873015873016" y1="110" y2="130" />
+	<rect height="4" width="4" x="403.873015873016" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="410.476190476191" x2="428.888888888889" y1="70" y2="90" />
+	<rect height="4" width="4" x="426.888888888889" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="428.888888888889" x2="419.68253968254" y1="90" y2="110" />
+	<rect height="4" width="4" x="417.68253968254" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="419.68253968254" x2="415.079365079365" y1="110" y2="130" />
+	<rect height="4" width="4" x="413.079365079365" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="419.68253968254" x2="424.285714285715" y1="110" y2="130" />
+	<rect height="4" width="4" x="422.285714285715" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="428.888888888889" x2="438.095238095239" y1="90" y2="110" />
+	<rect height="4" width="4" x="436.095238095239" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="438.095238095239" x2="433.492063492064" y1="110" y2="130" />
+	<rect height="4" width="4" x="431.492063492064" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="438.095238095239" x2="442.698412698413" y1="110" y2="130" />
+	<rect height="4" width="4" x="440.698412698413" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="447.301587301587" x2="520.952380952381" y1="30" y2="50" />
+	<rect height="4" width="4" x="518.952380952381" y="48" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="520.952380952381" x2="484.126984126984" y1="50" y2="70" />
+	<rect height="4" width="4" x="482.126984126984" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="484.126984126984" x2="465.714285714286" y1="70" y2="90" />
+	<rect height="4" width="4" x="463.714285714286" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="465.714285714286" x2="456.507936507937" y1="90" y2="110" />
+	<rect height="4" width="4" x="454.507936507937" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="456.507936507937" x2="451.904761904762" y1="110" y2="130" />
+	<rect height="4" width="4" x="449.904761904762" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="456.507936507937" x2="461.111111111112" y1="110" y2="130" />
+	<rect height="4" width="4" x="459.111111111112" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="465.714285714286" x2="474.920634920635" y1="90" y2="110" />
+	<rect height="4" width="4" x="472.920634920635" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="474.920634920635" x2="470.317460317461" y1="110" y2="130" />
+	<rect height="4" width="4" x="468.317460317461" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="474.920634920635" x2="479.52380952381" y1="110" y2="130" />
+	<rect height="4" width="4" x="477.52380952381" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="484.126984126984" x2="502.539682539683" y1="70" y2="90" />
+	<rect height="4" width="4" x="500.539682539683" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="502.539682539683" x2="493.333333333334" y1="90" y2="110" />
+	<rect height="4" width="4" x="491.333333333334" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="493.333333333334" x2="488.730158730159" y1="110" y2="130" />
+	<rect height="4" width="4" x="486.730158730159" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="493.333333333334" x2="497.936507936508" y1="110" y2="130" />
+	<rect height="4" width="4" x="495.936507936508" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="502.539682539683" x2="511.746031746032" y1="90" y2="110" />
+	<rect height="4" width="4" x="509.746031746032" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="511.746031746032" x2="507.142857142858" y1="110" y2="130" />
+	<rect height="4" width="4" x="505.142857142858" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="511.746031746032" x2="516.349206349206" y1="110" y2="130" />
+	<rect height="4" width="4" x="514.349206349206" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="520.952380952381" x2="557.777777777778" y1="50" y2="70" />
+	<rect height="4" width="4" x="555.777777777778" y="68" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="557.777777777778" x2="539.36507936508" y1="70" y2="90" />
+	<rect height="4" width="4" x="537.36507936508" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="539.36507936508" x2="530.15873015873" y1="90" y2="110" />
+	<rect height="4" width="4" x="528.15873015873" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="530.15873015873" x2="525.555555555556" y1="110" y2="130" />
+	<rect height="4" width="4" x="523.555555555556" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="530.15873015873" x2="534.761904761905" y1="110" y2="130" />
+	<rect height="4" width="4" x="532.761904761905" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="539.36507936508" x2="548.571428571429" y1="90" y2="110" />
+	<rect height="4" width="4" x="546.571428571429" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="548.571428571429" x2="543.968253968254" y1="110" y2="130" />
+	<rect height="4" width="4" x="541.968253968254" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="548.571428571429" x2="553.174603174603" y1="110" y2="130" />
+	<rect height="4" width="4" x="551.174603174603" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="557.777777777778" x2="576.190476190476" y1="70" y2="90" />
+	<rect height="4" width="4" x="574.190476190476" y="88" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="576.190476190476" x2="566.984126984127" y1="90" y2="110" />
+	<rect height="4" width="4" x="564.984126984127" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="566.984126984127" x2="562.380952380953" y1="110" y2="130" />
+	<rect height="4" width="4" x="560.380952380953" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="566.984126984127" x2="571.587301587302" y1="110" y2="130" />
+	<rect height="4" width="4" x="569.587301587302" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="576.190476190476" x2="585.396825396826" y1="90" y2="110" />
+	<rect height="4" width="4" x="583.396825396826" y="108" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="585.396825396826" x2="580.793650793651" y1="110" y2="130" />
+	<rect height="4" width="4" x="578.793650793651" y="128" />
+	<line style="stroke: rgb(255,0,0); stroke-width: 1" x1="585.396825396826" x2="590" y1="110" y2="130" />
+	<rect height="4" width="4" x="588" y="128" />
+	<!--
+	Generated using the Perl SVG Module V2.84
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+	-->
+</svg>

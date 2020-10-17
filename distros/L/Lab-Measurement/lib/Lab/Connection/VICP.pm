@@ -1,6 +1,6 @@
 package Lab::Connection::VICP;
 #ABSTRACT: VICP ethernet protocol connection
-$Lab::Connection::VICP::VERSION = '3.721';
+$Lab::Connection::VICP::VERSION = '3.722';
 use v5.20;
 
 use strict;
@@ -90,7 +90,7 @@ Lab::Connection::VICP - VICP ethernet protocol connection
 
 =head1 VERSION
 
-version 3.721
+version 3.722
 
 =head1 SYNOPSIS
 

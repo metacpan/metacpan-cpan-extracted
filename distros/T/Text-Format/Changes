@@ -1,5 +1,11 @@
 Revision history for Perl extension Text::Format.
 
+0.62    2020-10-16
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+    - Fix the URL to the VCS repository.
+
 0.61    2018-05-21
     - Convert to Dist-Zilla .
 

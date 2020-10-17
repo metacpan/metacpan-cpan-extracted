@@ -4,7 +4,7 @@ use Modern::Perl;
 use Readonly;
 use Scalar::Util 'reftype';
 
-our $VERSION = q/1.14/;
+our $VERSION = q/1.15/;
 
 # Exporter
 Readonly our @EXPORT      => qw(jsdump hjsdump);
@@ -32,6 +32,7 @@ sub import {
   my @import           = ();
   my %allowable        = map { $_ => 1 } ( @EXPORT, @EXPORT_OK );
 
+  # This is the madness for the JS version
   for my $arg (@args) {
     if ( ref $arg eq 'HASH' ) {
       if ( exists $arg->{JS} )    { $opt{JS}    = $arg->{JS}; }
@@ -104,7 +105,6 @@ sub jsdump {
   return wantarray ? @res : join qq/\n/, @res, q//;
 }
 
-## RJEWKno critic (RequireCheckingReturnValueOfEval, RequireInterpolationOfMetachars, ProhibitStringyEval)
 sub __quotemeta {
   my ($input) = @_;
 
@@ -215,11 +215,14 @@ Data::JavaScript - Dump perl data structures into JavaScript code
 
 =head1 SYNOPSIS
 
-  use Data::JavaScript;                     # Use defaults
+  # Compatibility mode
+  {
+    use Data::JavaScript;                     # Use defaults
   
-  @code =  jsdump('my_array',  $array_ref); # Return array for formatting
-  $code =  jsdump('my_object', $hash_ref);  # Return convenient string
-  $html = hjsdump('my_stuff',  $reference); # Convenience wrapper
+    my @code =  jsdump('my_array',  $array_ref); # Return array for formatting
+    my $code =  jsdump('my_object', $hash_ref);  # Return convenient string
+    my $html = hjsdump('my_stuff',  $reference); # Convenience wrapper
+  };
 
 =head1 DESCRIPTION
 

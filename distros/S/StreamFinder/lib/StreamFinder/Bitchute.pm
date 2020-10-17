@@ -107,11 +107,11 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<url> [, I<-youtube> => (yes)|no|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
+=item B<new>(I<url> [, I<-youtube> => yes|(no)|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
 
 Accepts a bitchute.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Bitchute video or no streams are found.  
-The URL can be the full URL, ie. https://www.bitchute.com/B<video-id>, 
+The URL can be the full URL, ie. https://www.bitchute.com/video/B<video-id>, 
 or just I<video-id>.
 
 The optional I<keep> argument can be either a comma-separated string or an array 
@@ -129,10 +129,7 @@ NOTE:  I<keep> is ignored if I<youtube> is set to "only".
 The optional I<youtube> argument can be set to "yes" - also include streams 
 youtube-dl finds, "no" - only include streams embedded in the video's 
 bitchute.com page, or "only" - only include streams youtube-dl finds.  Default 
-is B<"yes">.  This is needed because currently the streams on the page: (mpd plays 
-best but is unseekable, and the m3u8 (HLS) stream doesn't seem to work well).  
-youtube-dl also returns a "chunky" m3u8 (HLS) stream that is seekable and seems 
-to work ok.
+is B<"no">.
 
 =item $video->B<get>()
 
@@ -435,6 +432,7 @@ sub new
 		}
 	}
 	$html =~ s/\\\"/\&quot\;/gs;
+	$html =~ s/\\u00([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
 		my $videotag = $1;
 		my $streams = '';

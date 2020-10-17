@@ -1,3 +1,8 @@
+1.85    2020-10-15      Add Linux::Raspbian and Linux::Ubuntu;
+                        Add Linux::RealDebian for *actual* Debian Linux;
+                        Add Linux::UnknownDebianLike for anything else that's like Debian;
+                        Linux::Debian has become a family that includes all the above
+
 1.84    2020-10-05      Add some more versions of MacOS;
                         Note change of name Mac OS X -> MacOS, but don't
                           change the module name for backward compatibility;

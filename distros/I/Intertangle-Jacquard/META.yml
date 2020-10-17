@@ -1,0 +1,48 @@
+---
+abstract: 'A high-level structured graphics library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  SVG: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Intertangle-Jacquard
+requires:
+  Intertangle::Punchcard::Attributes: '0'
+  Intertangle::Punchcard::Backend::Kiwisolver::Context: '0'
+  Intertangle::Yarn::Graphene: '0'
+  Intertangle::Yarn::Types: '0'
+  List::AllUtils: '0'
+  Modern::Perl: '0'
+  Module::Load: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Role::Logger: '0'
+  MooseX::ClassAttribute: '0'
+  Mu: '0'
+  Mu::Role: '0'
+  Renard::Incunabula: '0.004'
+  Renard::Incunabula::Common::Setup: '0'
+  Renard::Incunabula::Common::Types: '0'
+  Tree::DAG_Node: '0'
+  Type::Library: '0.008'
+  Type::Utils: '0'
+  custom::failures: '0'
+  perl: '5.012'
+resources:
+  homepage: https://github.com/Intertangle/p5-Intertangle-Jacquard
+  repository: https://github.com/Intertangle/p5-Intertangle-Jacquard.git
+version: '0.001'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

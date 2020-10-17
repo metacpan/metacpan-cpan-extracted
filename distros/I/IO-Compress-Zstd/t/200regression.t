@@ -26,7 +26,7 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 3 + $extra ;
+    plan tests => 6 + $extra ;
 
 }
 
@@ -53,21 +53,38 @@ SKIP:
         unless -e $filename ;
 
     eval { require Digest::MD5 }
-    or skip "Digest::MD5 not available";
+        or skip "Digest::MD5 not available";
 
+    my $original_compressed = readFile($filename);
 
     my $IN = new IO::Uncompress::UnZstd $filename
         or die "cannot open '$filename': $!\n";
 
     my $length = 0;
     my $md5 = Digest::MD5->new ;
+    my $uncompressed;
 
     while (<$IN>)
     {
         $length += length($_);
         $md5->add($_);
+        $uncompressed .= $_ ;
     }
 
     is $length, 17204641, "Length matches";
-    is $md5->hexdigest, '3f5b564eea6aa4bb39ebecad0b98d70b', 'MD5 checksums match'
+    is $md5->hexdigest, '3f5b564eea6aa4bb39ebecad0b98d70b', 'MD5 checksums match';
+
+    use IO::Compress::Zstd qw(zstd);
+    use IO::Uncompress::UnZstd qw(unzstd);
+
+    my $compressed;
+    ok zstd \$uncompressed => \$compressed;
+
+    ok $compressed eq $original_compressed;
+    is length($compressed), length($original_compressed);
+
+    my $new_uncompressed;
+    unzstd \$compressed => \$new_uncompressed;
+
+    is $new_uncompressed, $uncompressed;
 }

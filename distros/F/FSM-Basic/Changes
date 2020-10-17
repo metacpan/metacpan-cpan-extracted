@@ -1,6 +1,15 @@
 Revision history for FSM-Basic
 
-0.18   Thu Apr 16 23:27:12 2020 +0200
+0.21    Sat Oct 17 18:05:35 2020 +0200
+            fix 01-exec.t test (typo)
+
+0.20    Fri Oct 16 18:37:19 2020 +0200
+            avoid warning if no regex in the command
+
+0.19    Fri Oct 16 15:48:47 2020 +0200
+            better regex substitution and extand the concept to all commands
+
+0.18    Thu Apr 16 23:27:12 2020 +0200
             fix for ping on FreeBSD (ticket #132361)
 
 0.17    Tue Apr 7 18:39:30 2020 +0200

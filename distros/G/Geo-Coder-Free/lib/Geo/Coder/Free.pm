@@ -21,11 +21,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.27.1
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27.1';
+our $VERSION = '0.28';
 
 our $alternatives;
 our $abbreviations;
@@ -396,6 +396,46 @@ VWF, OpenAddresses, MaxMind and geonames.
 
 See L<Geo::Coder::Free::OpenAddresses> for instructions creating the SQLite database from
 L<http://results.openaddresses.io/>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Geo::Coder::Free
+
+You can also look for information at:
+
+=over 4
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Geo-Coder-Free>
+
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Free>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/Geo-Coder-Free>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Geo-Coder-Free>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Geo-Coder-Free>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=Geo::Coder::Free>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Geo-Coder-Free/>
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

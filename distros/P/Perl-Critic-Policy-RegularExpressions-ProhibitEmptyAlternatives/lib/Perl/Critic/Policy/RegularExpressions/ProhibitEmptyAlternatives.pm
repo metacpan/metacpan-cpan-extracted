@@ -14,7 +14,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 # The problem we are solving with the following is that older Perls do
 # not like the underscore in a development version number. I do not
 # believe this violates the spirit of the disabled policy.

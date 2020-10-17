@@ -1,5 +1,10 @@
 Revision history for Perl extension File-Remove
 
+1.59    2020-10-16 - Shlomi Fish
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 1.58    2018-10-04 - Shlomi Fish
     - Added [MetaJSON] to dist.ini, so releases include a META.json
 

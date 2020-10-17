@@ -60,6 +60,7 @@ share/tests/draft2019-09/oneOf.json
 share/tests/draft2019-09/optional/bignum.json
 share/tests/draft2019-09/optional/content.json
 share/tests/draft2019-09/optional/ecmascript-regex.json
+share/tests/draft2019-09/optional/float-overflow.json
 share/tests/draft2019-09/optional/format/date-time.json
 share/tests/draft2019-09/optional/format/date.json
 share/tests/draft2019-09/optional/format/duration.json
@@ -155,6 +156,7 @@ share/tests/draft4/not.json
 share/tests/draft4/oneOf.json
 share/tests/draft4/optional/bignum.json
 share/tests/draft4/optional/ecmascript-regex.json
+share/tests/draft4/optional/float-overflow.json
 share/tests/draft4/optional/format.json
 share/tests/draft4/optional/format/date-time.json
 share/tests/draft4/optional/format/email.json
@@ -200,6 +202,7 @@ share/tests/draft6/not.json
 share/tests/draft6/oneOf.json
 share/tests/draft6/optional/bignum.json
 share/tests/draft6/optional/ecmascript-regex.json
+share/tests/draft6/optional/float-overflow.json
 share/tests/draft6/optional/format.json
 share/tests/draft6/optional/format/date-time.json
 share/tests/draft6/optional/format/email.json
@@ -250,6 +253,7 @@ share/tests/draft7/oneOf.json
 share/tests/draft7/optional/bignum.json
 share/tests/draft7/optional/content.json
 share/tests/draft7/optional/ecmascript-regex.json
+share/tests/draft7/optional/float-overflow.json
 share/tests/draft7/optional/format/date-time.json
 share/tests/draft7/optional/format/date.json
 share/tests/draft7/optional/format/ecmascript-regex.json

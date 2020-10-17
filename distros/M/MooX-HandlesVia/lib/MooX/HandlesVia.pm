@@ -1,6 +1,6 @@
 package MooX::HandlesVia;
 # ABSTRACT: NativeTrait-like behavior for Moo.
-$MooX::HandlesVia::VERSION = '0.001008';
+$MooX::HandlesVia::VERSION = '0.001009';
 use strict;
 use warnings;
 
@@ -99,7 +99,7 @@ MooX::HandlesVia - NativeTrait-like behavior for Moo.
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 SYNOPSIS
 
@@ -155,6 +155,11 @@ cannot modify the attributes value, rendering them largely useless.
 
 =back
 
+If these are issues for you, consider L<Sub::HandlesVia>, which uses a
+different architecture, respecting triggers and coercions, and allowing
+read-write access to non-reference values. It should be possible to use
+Sub::HandlesVia as a drop-in replacement for MooX::HandlesVia.
+
 =head1 PROVIDED INTERFACE/FUNCTIONS
 
 =over 4
@@ -207,15 +212,21 @@ L<Data::Perl>:
 
 =item * L<MooX::late>
 
+=item * L<Sub::HandlesVia>
+
 =back
 
-=head1 AUTHOR
+=head1 ORIGINAL AUTHOR
 
 Matthew Phillips <mattp@cpan.org>
 
+=head1 AUTHOR
+
+Toby Inkster <tobyink@cpan.org>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

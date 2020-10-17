@@ -3,10 +3,16 @@ use warnings;
 
 use Test::More;
 use FindBin;
+
 use lib "$FindBin::Bin/../lib";
 use FSM::Basic;
 
 plan tests => 2;
+
+my $P= 0;
+$P = 1 if -f '/bin/ping';
+$P = 2 if -f  '/sbin/ping';
+
 
 my %states = (
     'accept' => {
@@ -29,8 +35,10 @@ my %states = (
                 'matching' => 'close',
                 'final'    => 0
             },
-            "ping (.*)" => { "exec" => "ping -c 3 __1__" },
-            "test (.*)" => { "exec" => "ping -c 3 __2__" },
+            "ping1 (.*)"           => { "exec" => "/bin/ping -c 3 __1__" },
+            "test1 (\\w+)\\s+(.*)" => { "exec" => "/bin/ping -c 3 __2__" },
+            "ping2 (.*)"           => { "exec" => "/sbin/ping -c 3 __1__" },
+            "test2 (\\w+)\\s+(.*)" => { "exec" => "/sbin/ping -c 3 __2__" }
         },
         'not_matching_info' => '% Unknown command or computer name, or unable to find computer address',
         'output'            => 'Switch> '
@@ -42,12 +50,18 @@ my $fsm = FSM::Basic->new(\%states, 'accept');
 my $final = 0;
 my $out;
 ($final, $out) = $fsm->run('default');
-($final, $out) = $fsm->run('ping 127.0.0.1');
-
-ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
-
-($final, $out) = $fsm->run('test on 127.0.0.1');
-ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
-
+if ($P == 1 ) {
+    ($final, $out) = $fsm->run('ping1 127.0.0.1');
+    ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
+    ($final, $out) = $fsm->run('test1 on 127.0.0.1');
+    ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
+} elsif ($P ==2 ) {
+    ($final, $out) = $fsm->run('ping2 127.0.0.1');
+    ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
+    ($final, $out) = $fsm->run('test2 on 127.0.0.1');
+    ok($out =~ /3 packets transmitted, 3 (.*)received/mg);
+}else {
+    BAIL_OUT( "no binary ping in /bin nor /sbin" );
+}
 last if $final;
 

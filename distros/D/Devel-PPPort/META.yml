@@ -20,9 +20,9 @@ no_index:
 provides:
   Devel::PPPort:
     file: PPPort.pm
-    version: '3.61'
+    version: '3.62'
 resources:
   bugtracker: https://github.com/Dual-Life/Devel-PPPort/issues
   repository: git://github.com/Dual-Life/Devel-PPPort.git
-version: '3.61'
+version: '3.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

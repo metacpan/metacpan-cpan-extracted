@@ -1,3 +1,8 @@
+0.003   2020-10-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Deprecate in favor of Perinci::CmdLine::Plugin::DumpArgs.
+
+
 0.002   2020-01-01  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

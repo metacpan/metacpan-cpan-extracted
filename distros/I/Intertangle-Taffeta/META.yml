@@ -1,0 +1,56 @@
+---
+abstract: 'Low-level graphics layer'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Module::List: '0'
+  Module::Load: '0'
+  Renard::Incunabula::Devel::TestHelper: '0'
+  Test2::Compare::Float: '0'
+  Test2::Tools::Class: '0'
+  Test2::V0: '0'
+  Test::Exception: '0.42'
+  Test::Most: '0'
+  Test::TypeTiny: '0'
+  lib: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Intertangle-Taffeta
+requires:
+  Cairo: '0'
+  Color::Library: '0'
+  Image::Size: '0'
+  Intertangle::Yarn::Graphene: '0'
+  Intertangle::Yarn::Types: '0'
+  List::AllUtils: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::ShortHas: '0'
+  MooX::StrictConstructor: '0'
+  Mu: '0'
+  Mu::Role: '0'
+  Renard::Incunabula::Common::Setup: '0'
+  Renard::Incunabula::Common::Types: '0'
+  SVG: '0'
+  Type::Library: '0.008'
+  Type::Utils: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: '5.012'
+resources:
+  homepage: https://github.com/Intertangle/p5-Intertangle-Taffeta
+  repository: https://github.com/Intertangle/p5-Intertangle-Taffeta.git
+version: '0.001'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -15,36 +15,6 @@ File::Format::CRD - Distribution for reading the Windows CRD format.
 
 See L<File::Format::CRD::Reader> .
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc File::Format::CRD
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Format-CRD>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/File-Format-CRD>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/File-Format-CRD>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/File-Format-CRD/>
-
-=back
-
-
 =head1 ACKNOWLEDGEMENTS
 
 This module is based on L<http://ihaa.com/english/crd2html.html> by

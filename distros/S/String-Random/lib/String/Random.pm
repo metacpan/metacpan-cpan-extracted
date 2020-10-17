@@ -11,7 +11,7 @@
 # $Id: Random.pm,v 1.4 2006/09/21 17:34:07 steve Exp $
 
 package String::Random;
-$String::Random::VERSION = '0.30';
+$String::Random::VERSION = '0.31';
 require 5.006_001;
 
 use strict;
@@ -332,7 +332,7 @@ String::Random - Perl module to generate random strings based on a pattern
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -503,10 +503,6 @@ synposis for example.
 
 =back
 
-=head1 VERSION
-
-version 0.30
-
 =head1 BUGS
 
 This is Bug Free™ code.  (At least until somebody finds one…)
@@ -530,35 +526,9 @@ under the same terms as Perl itself.
 
 perl(1).
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Shlomi Fish.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/string-random/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc String::Random
 
 =head2 Websites
 
@@ -577,35 +547,11 @@ L<https://metacpan.org/release/String-Random>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/String-Random>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Random>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/String-Random>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/String-Random>
 
 =item *
 
@@ -656,6 +602,26 @@ from your repository :)
 L<https://github.com/shlomif/string-random>
 
   git clone http://github.com/shlomif/String-Random
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/string-random/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Shlomi Fish.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 

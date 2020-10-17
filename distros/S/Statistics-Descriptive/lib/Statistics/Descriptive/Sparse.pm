@@ -1,33 +1,37 @@
 package Statistics::Descriptive::Sparse;
-$Statistics::Descriptive::Sparse::VERSION = '3.0702';
+$Statistics::Descriptive::Sparse::VERSION = '3.0800';
 use strict;
 use warnings;
 
 use vars qw(%fields);
-use Carp;
+use Carp qw/ carp /;
 require Statistics::Descriptive;
-use Statistics::Descriptive::Smoother;
+use Statistics::Descriptive::Smoother ();
+
+## no critic (ProhibitExplicitReturnUndef)
 
 sub _make_accessors
 {
-    my ($pkg, $methods) = @_;
+    my ( $pkg, $methods ) = @_;
 
+    ## no critic
     no strict 'refs';
+    ## use critic
     foreach my $method (@$methods)
     {
-        *{$pkg."::".$method} =
-            do {
-                my $m = $method;
-                sub {
-                    my $self = shift;
+        *{ $pkg . "::" . $method } = do
+        {
+            my $m = $method;
+            sub {
+                my $self = shift;
 
-                    if (@_)
-                    {
-                        $self->{$m} = shift;
-                    }
-                    return $self->{$m};
-                };
+                if (@_)
+                {
+                    $self->{$m} = shift;
+                }
+                return $self->{$m};
             };
+        };
     }
 
     return;
@@ -35,24 +39,26 @@ sub _make_accessors
 
 sub _make_private_accessors
 {
-    my ($pkg, $methods) = @_;
+    my ( $pkg, $methods ) = @_;
 
+    ## no critic
     no strict 'refs';
+    ## use critic
     foreach my $method (@$methods)
     {
-        *{$pkg."::_".$method} =
-            do {
-                my $m = $method;
-                sub {
-                    my $self = shift;
+        *{ $pkg . "::_" . $method } = do
+        {
+            my $m = $method;
+            sub {
+                my $self = shift;
 
-                    if (@_)
-                    {
-                        $self->{$m} = shift;
-                    }
-                    return $self->{$m};
-                };
+                if (@_)
+                {
+                    $self->{$m} = shift;
+                }
+                return $self->{$m};
             };
+        };
     }
 
     return;
@@ -60,71 +66,73 @@ sub _make_private_accessors
 
 ##Define the fields to be used as methods
 %fields = (
-  count                 => 0,
-  mean                  => undef,
-  sum                   => undef,
-  sumsq                 => undef,
-  min                   => undef,
-  max                   => undef,
-  mindex                => undef,
-  maxdex                => undef,
-  sample_range          => undef,
-  variance              => undef,
-  );
+    count        => 0,
+    mean         => undef,
+    sum          => undef,
+    sumsq        => undef,
+    min          => undef,
+    max          => undef,
+    mindex       => undef,
+    maxdex       => undef,
+    sample_range => undef,
+    variance     => undef,
+);
 
 __PACKAGE__->_make_accessors( [ grep { $_ ne "variance" } keys(%fields) ] );
 __PACKAGE__->_make_accessors( ["_permitted"] );
-__PACKAGE__->_make_private_accessors(["variance"]);
+__PACKAGE__->_make_private_accessors( ["variance"] );
 
-sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
-  my $self = {
-    %fields,
-  };
-  bless ($self, $class);
-  $self->_permitted(\%fields);
-  return $self;
+sub new
+{
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $self  = { %fields, };
+    bless( $self, $class );
+    $self->_permitted( \%fields );
+    return $self;
 }
 
 sub _is_permitted
 {
     my $self = shift;
-    my $key = shift;
+    my $key  = shift;
 
-    return exists($self->_permitted()->{$key});
+    return exists( $self->_permitted()->{$key} );
 }
 
-sub add_data {
-    my $self = shift;  ##Myself
+sub add_data
+{
+    my $self = shift;    ##Myself
     my $oldmean;
-    my ($min,$mindex,$max,$maxdex,$sum,$sumsq,$count);
+    my ( $min, $mindex, $max, $maxdex, $sum, $sumsq, $count );
     my $aref;
 
-    if (ref $_[0] eq 'ARRAY') {
+    if ( ref $_[0] eq 'ARRAY' )
+    {
         $aref = $_[0];
     }
-    else {
+    else
+    {
         $aref = \@_;
     }
 
     ##If we were given no data, we do nothing.
-    return 1 if (!@{ $aref });
+    return 1 if ( !@{$aref} );
 
     ##Take care of appending to an existing data set
 
-    if (!defined($min = $self->min()))
+    if ( !defined( $min = $self->min() ) )
     {
-        $min = $aref->[$mindex = 0];
+        $min = $aref->[ $mindex = 0 ];
     }
     else
     {
         $mindex = $self->mindex();
     }
 
-    if (!defined($max = $self->max()))
+    if ( !defined( $max = $self->max() ) )
     {
-        $max = $aref->[$maxdex = 0];
+        $max = $aref->[ $maxdex = 0 ];
     }
     else
     {
@@ -136,17 +144,20 @@ sub add_data {
     $count = $self->count();
 
     ##Calculate new mean, sumsq, min and max;
-    foreach ( @{ $aref } ) {
-        $sum += $_;
+    foreach ( @{$aref} )
+    {
+        $sum   += $_;
         $sumsq += $_**2;
-        $count++;
-        if ($_ >= $max) {
-            $max = $_;
-            $maxdex = $count-1;
+        ++$count;
+        if ( $_ >= $max )
+        {
+            $max    = $_;
+            $maxdex = $count - 1;
         }
-        if ($_ <= $min) {
-            $min = $_;
-            $mindex = $count-1;
+        if ( $_ <= $min )
+        {
+            $min    = $_;
+            $mindex = $count - 1;
         }
     }
 
@@ -154,10 +165,10 @@ sub add_data {
     $self->mindex($mindex);
     $self->max($max);
     $self->maxdex($maxdex);
-    $self->sample_range($max - $min);
+    $self->sample_range( $max - $min );
     $self->sum($sum);
     $self->sumsq($sumsq);
-    $self->mean($sum / $count);
+    $self->mean( $sum / $count );
     $self->count($count);
     ##indicator the value is not cached.  Variance isn't commonly enough
     ##used to recompute every single data add.
@@ -165,16 +176,17 @@ sub add_data {
     return 1;
 }
 
-
-sub standard_deviation {
-  my $self = shift;  ##Myself
-  return undef if (!$self->count());
-  return sqrt($self->variance());
+sub standard_deviation
+{
+    my $self = shift;    ##Myself
+    return undef if ( !$self->count() );
+    return sqrt( $self->variance() );
 }
 
 ##Return variance; if needed, compute and cache it.
-sub variance {
-    my $self = shift;  ##Myself
+sub variance
+{
+    my $self = shift;    ##Myself
 
     my $count = $self->count();
 
@@ -182,8 +194,9 @@ sub variance {
 
     return 0 if $count == 1;
 
-    if (!defined($self->_variance())) {
-        my $variance = ($self->sumsq()- $count * $self->mean()**2);
+    if ( !defined( $self->_variance() ) )
+    {
+        my $variance = ( $self->sumsq() - $count * $self->mean()**2 );
 
         # Sometimes due to rounding errors we get a number below 0.
         # This makes sure this is handled as gracefully as possible.
@@ -192,7 +205,7 @@ sub variance {
         #
         # https://rt.cpan.org/Public/Bug/Display.html?id=46026
 
-        $variance = $variance < 0 ? 0 : $variance / ($count - 1);
+        $variance = $variance < 0 ? 0 : $variance / ( $count - 1 );
 
         $self->_variance($variance);
 
@@ -206,14 +219,16 @@ sub variance {
 
 ##Clear a stat.  More efficient than destroying an object and calling
 ##new.
-sub clear {
-  my $self = shift;  ##Myself
-  my $key;
+sub clear
+{
+    my $self = shift;    ##Myself
+    my $key;
 
-  return if (!$self->count());
-  while (my($field, $value) = each %fields) {  #  could use a slice assignment here
-    $self->{$field} = $value;
-  }
+    return if ( !$self->count() );
+    while ( my ( $field, $value ) = each %fields )
+    {                    #  could use a slice assignment here
+        $self->{$field} = $value;
+    }
 }
 
 1;
@@ -230,7 +245,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0702
+version 3.0800
 
 =head1 SYNOPSIS
 
@@ -259,10 +274,6 @@ of very small denominators.
 
 Many of the methods (both Sparse and Full) cache values so that subsequent
 calls with the same arguments are faster.
-
-=head1 VERSION
-
-version 3.0702
 
 =head1 METHODS
 
@@ -761,35 +772,9 @@ and/or modify it under the same terms as Perl itself.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Statistics::Descriptive::Sparse
 
 =head2 Websites
 
@@ -808,35 +793,11 @@ L<https://metacpan.org/release/Statistics-Descriptive>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Statistics-Descriptive>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Statistics-Descriptive>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Statistics-Descriptive>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Statistics-Descriptive>
 
 =item *
 
@@ -887,5 +848,25 @@ from your repository :)
 L<https://github.com/shlomif/perl-Statistics-Descriptive>
 
   git clone git://github.com/shlomif/perl-Statistics-Descriptive.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

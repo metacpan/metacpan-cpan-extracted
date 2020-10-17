@@ -1,17 +1,12 @@
+## no critic (Miscellanea::ProhibitUnrestrictedNoCritic, ValuesAndExpressions::ProhibitVersionStrings)
 package Scientist;
 
-# Explicitly enabling strict and warnings, despite Moo doing this also
-# for two reasons, A) to make perlcritic pass and B) in case we change
-# modules later to use soemthing else. Suggestions welcomed though.
-use strict;
-use warnings;
-
-our $VERSION = '0.012'; # VERSION
-
 use Moo;
-use Test2::Compare qw/compare strict_convert/;
+use Test2::Compare v0.0.121 qw/compare strict_convert/;
 use Time::HiRes qw/time/;
 use Types::Standard qw/Bool Str CodeRef HashRef/;
+
+our $VERSION = '0.013'; # VERSION
 
 # ABSTRACT: Perl module inspired by https://github.com/github/scientist
 # https://github.com/lancew/Scientist
@@ -97,7 +92,7 @@ sub run {
     }
 
     my $delta = compare(\@candidate, \@control, \&strict_convert);
-    my $diag  = join "\n", $delta ? $delta->table : ();
+    my $diag  = $delta ? $delta->table->as_string : '';
 
     $result{matched}    = $diag eq '';
     $result{mismatched} = $diag ne '';

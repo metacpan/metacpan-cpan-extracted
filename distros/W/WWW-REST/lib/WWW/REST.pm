@@ -1,7 +1,7 @@
 use 5.006;
 package WWW::REST;
 # $WWW::REST::VERSION = '0.011';
-$WWW::REST::VERSION = '0.022';
+$WWW::REST::VERSION = '0.023';
 use strict;
 use vars '$AUTOLOAD';
 
@@ -112,13 +112,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 WWW::REST - Base class for REST resources
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -144,12 +146,6 @@ This module is a mixin of L<URI>, L<LWP::UserAgent>, L<HTTP::Response>
 and a user-defined dispatch module.  It is currently just a proof of
 concept for a resource-oriented API framework, also known as B<REST>
 (Representational State Transfer).
-
-=encoding utf-8
-
-=head1 VERSION
-
-version 0.022
 
 =head1 METHODS
 
@@ -236,39 +232,9 @@ This work is published from Taiwan.
 
 L<http://creativecommons.org/publicdomain/zero/1.0>
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-
-Audrey Tang has dedicated the work to the Commons by waiving all of his
-or her rights to the work worldwide under copyright law and all related or
-neighboring legal rights he or she had in the work, to the extent allowable by
-law.
-
-Works under CC0 do not require attribution. When citing the work, you should
-not imply endorsement by the author.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/www-rest/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc WWW::REST
 
 =head2 Websites
 
@@ -287,35 +253,11 @@ L<https://metacpan.org/release/WWW-REST>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/WWW-REST>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-REST>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/WWW-REST>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/WWW-REST>
 
 =item *
 
@@ -366,5 +308,29 @@ from your repository :)
 L<https://github.com/shlomif/perl-WWW-REST>
 
   git clone https://github.com/shlomif/perl-WWW-REST.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-WWW-REST/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+
+Audrey Tang has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
 
 =cut

@@ -8,6 +8,7 @@ my %TEST_REQUIRES = (
   'FindBin'      => '0',
   'Test2::V0'    => '0',
   'B::Debug'     => '0',
+  'Perl::Critic' => '0',
 );
 
 if ( $] >= 5.020 ) {

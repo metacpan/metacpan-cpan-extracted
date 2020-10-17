@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/cpanelinc/Test2-Harness-Renderer-JUnit/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpanelinc/Test2-Harness-Renderer-JUnit
-version: '1.000000'
+version: '1.000002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,9 @@
+0.002   2020-10-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Deprecate in favor of Perinci::CmdLine::Plugin::DumpConfig.
+
+
+0.001   2018-04-04  Released-By: PERLANCAR; Released: no
+
+        - First release.
+

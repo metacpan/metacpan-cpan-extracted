@@ -15,12 +15,8 @@ use Statistics::Descriptive;
     my $mad = $stat->median_absolute_deviation();
 
     # TEST
-    ok (defined($mad),
-        "median_absolute_deviation is not undefined"
-    );
+    ok( defined($mad), "median_absolute_deviation is not undefined" );
 
     # TEST
-    is($mad, 1,
-        "median_absolute_deviation is correct"
-    );
+    is( $mad, 1, "median_absolute_deviation is correct" );
 }

@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::Hostname;
-$Util::Medley::Roles::Attributes::Hostname::VERSION = '0.044';
+$Util::Medley::Roles::Attributes::Hostname::VERSION = '0.047';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::Hostname;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::Hostname
 
 =head1 VERSION
 
-version 0.044
+version 0.047
 
 =cut
 

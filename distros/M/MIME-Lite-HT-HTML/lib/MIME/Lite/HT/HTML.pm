@@ -12,7 +12,7 @@ use HTML::FormatText::WithLinks;
 use DateTime::Format::Mail;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -54,7 +54,7 @@ return L<MIME::Lite> object with HTML mail format.
 
 =back
 
-=head1 ADITIONAL OPTIONS
+=head1 ADDITIONAL OPTIONS
 
 =head2 Template
 
@@ -62,11 +62,11 @@ This is a mapping of filenames to the two variants of templates (HTML or text).
 You define, which file will be used for the HTML-part and the plain/text part.
 
 The filenames will be passed to the constructor of HTML::Template, as
-arument of the filename option. See L<HTML::Template> for more information.
+argument of the filename option. See L<HTML::Template> for more information.
 
 =head2 TmplParams
 
-The parameters of a template are set to this options.
+The parameters of a template are set to these options.
 This parameter must be the reference of hash.
 
 =head2 TmplOptions
@@ -76,7 +76,7 @@ die_on_bad_params or path).
 
 =head2 TimeZone
 
-You can specified the time zone of the mail date:
+You can specify the time zone of the mail date:
 
     TimeZone => 'Asia/Shanghai',
 
@@ -84,7 +84,7 @@ default using 'UTC' if not defined.
 
 =head2 Encoding
 
-Mail body will be encoded for tranfer.
+Mail body will be encoded for transfer.
 
    Use encoding:     | If your message contains:
    ------------------------------------------------------------
@@ -97,12 +97,12 @@ default using '7bit' if not defined.
 
 =head2 Charset
 
-You can specified the charset of your mail, both subject and body will using the charset
+You can specify the charset of your mail, both subject and body will using the charset
 to make mail reader's client satisfied.
 
    Charset => 'big5',
 
-And, if you giving the orignal words as UTF8 and attempt to mail them as GB2312 charset,
+And, if you are giving the original words as UTF8 and attempt to mail them as GB2312 charset,
 you can define the charset like:
 
    Charset => [ 'utf8' => 'gb2312' ], 
@@ -198,7 +198,7 @@ sub remove_utf8_flag {
 
 =head1 AUTHOR
 
-Alexander Becker E<lt>c a p f a n _a.t_ g m x . d eE<gt>
+Alexander Becker E<lt>asb@cpan.orgE<gt>
 But all I did was c&p from L<MIME::Lite::TT::HTML>
 
 =head1 SEE ALSO

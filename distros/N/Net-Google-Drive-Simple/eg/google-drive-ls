@@ -15,7 +15,8 @@ Log::Log4perl->easy_init( {
 
 my $gd = Net::Google::Drive::Simple->new();
 
-my $gd_dir = "/top";
+my $gd_dir = $ARGV[0];
+$gd_dir = q[/] unless defined $gd_dir;
 
 INFO "Listing $gd_dir on Google Drive";
 

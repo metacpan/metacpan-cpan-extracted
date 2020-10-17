@@ -1,5 +1,5 @@
 package Text::Format;
-$Text::Format::VERSION = '0.61';
+$Text::Format::VERSION = '0.62';
 require 5.006;
 
 
@@ -120,7 +120,7 @@ sub format($@)
             && length( $this->{'_hindcurr'} ) < 1
             && $caller ne 'Text::Format::paragraphs';
         my ($fchar) = $wrap[0] =~ /(\S)/;
-        my $white = index $wrap[0], $fchar;
+        my $white   = index $wrap[0], $fchar;
         if ( $white - $this->{'_lmargin'} - 1 > length( $this->{'_hindcurr'} ) )
         {
             $white = length( $this->{'_hindcurr'} ) + $this->{'_lmargin'};
@@ -683,7 +683,7 @@ sub __do_break($$$)
         unless ref $this;
     my ( $line, $next_line ) = @_;
     my $no_break = 0;
-    my @words = split /\s+/, $line
+    my @words    = split /\s+/, $line
         if defined $line;
     my $last_word = $words[$#words];
 
@@ -735,7 +735,7 @@ B<Text::Format> - Various subroutines to format text.
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -973,10 +973,6 @@ abbreviations.
 
 =back
 
-=head1 VERSION
-
-version 0.61
-
 =head1 EXAMPLE
 
     use Text::Format;
@@ -1075,35 +1071,9 @@ B<noBreakRegex> , thanks to a report with a problem.
 
 =head1 TODO
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Gabor Egressy.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/text-format/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Text::Format
 
 =head2 Websites
 
@@ -1122,35 +1092,11 @@ L<https://metacpan.org/release/Text-Format>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Text-Format>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Format>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Text-Format>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Text-Format>
 
 =item *
 
@@ -1198,8 +1144,28 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/text-format>
+L<https://github.com/shlomif/perl-Module-Format>
 
   git clone https://github.com/shlomif/perl-Module-Format
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Module-Format/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Gabor Egressy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

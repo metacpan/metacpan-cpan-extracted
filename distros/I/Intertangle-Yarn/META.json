@@ -1,0 +1,83 @@
+{
+   "abstract" : "Geometry primitives for graphics",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Intertangle-Yarn",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Inline" : "0.67",
+            "Inline::C" : "0.62"
+         },
+         "requires" : {
+            "Alien::Graphene" : "0",
+            "DynaLoader" : "0",
+            "Env" : "0",
+            "Glib::Object::Introspection" : "0",
+            "Hash::Merge" : "0",
+            "Intertangle::API::Glib" : "0",
+            "Modern::Perl" : "0",
+            "Module::Load" : "0",
+            "Role::Tiny" : "0",
+            "Role::Tiny::With" : "0",
+            "Scalar::Util" : "0",
+            "Type::Library" : "0.008",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
+            "overload" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::Most" : "0",
+            "Test::Requires" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Intertangle/p5-Intertangle-Yarn",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Intertangle/p5-Intertangle-Yarn.git",
+         "web" : "https://github.com/Intertangle/p5-Intertangle-Yarn"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

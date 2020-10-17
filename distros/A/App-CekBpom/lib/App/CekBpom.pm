@@ -1,9 +1,9 @@
 package App::CekBpom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-09'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -196,6 +196,11 @@ sub cek_bpom {
     my %resmeta;
     $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar/];
 
+    unless (@all_rows) {
+        $resmeta{'cmdline.result'} = "No results found for ".join(", ", @$queries).
+            " (search types: ".join(", ", @$search_types).". Perhaps try other spelling variations or additional search types.";
+    }
+
     [200, "OK", \@all_rows, \%resmeta];
 }
 
@@ -214,7 +219,7 @@ App::CekBpom - Check BPOM products via the command-line (CLI interface for cekbp
 
 =head1 VERSION
 
-This document describes version 0.007 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-09-09.
+This document describes version 0.008 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-10-16.
 
 =head1 DESCRIPTION
 

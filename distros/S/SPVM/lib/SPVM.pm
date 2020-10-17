@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0921';
+our $VERSION = '0.0924';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -140,6 +140,11 @@ sub call_sub {
   SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::call_sub($BUILDER->{env}, @_);
 }
+sub new_string_array {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_string_array($BUILDER->{env}, @_);
+}
+
 sub new_byte_array {
   SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_byte_array($BUILDER->{env}, @_);
@@ -211,6 +216,36 @@ sub new_mulnum_array {
 sub new_mulnum_array_from_bin {
   SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_mulnum_array_from_bin($BUILDER->{env}, @_);
+}
+
+sub new_byte_array_len {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_byte_array_len($BUILDER->{env}, @_);
+}
+
+sub new_short_array_len {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_short_array_len($BUILDER->{env}, @_);
+}
+
+sub new_int_array_len {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_int_array_len($BUILDER->{env}, @_);
+}
+
+sub new_long_array_len {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_long_array_len($BUILDER->{env}, @_);
+}
+
+sub new_float_array_len {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_float_array_len($BUILDER->{env}, @_);
+}
+
+sub new_double_array_len {
+  SPVM::init() unless $SPVM_INITED;
+  SPVM::ExchangeAPI::new_double_array_len($BUILDER->{env}, @_);
 }
 
 1;

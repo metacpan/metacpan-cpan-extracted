@@ -59,6 +59,6 @@ eval {
     });
 };
 
-is $@->message, '/SOAP - 401 Unauthorized';
+like $@->message, qr{^/SOAP - 401 Unauthorized};
 
 done_testing;

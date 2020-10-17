@@ -6,12 +6,19 @@ Source: https://metacpan.org/release/Return-Type
 Files: Changes
  META.json
  META.yml
+ Makefile.PL
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
+Files: t/01basic.t
+ t/02sugar.t
+ t/03coerce.t
+ t/04void.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
  LICENSE
  t/benchmarks.pl
 Copyright: Unknown
@@ -23,31 +30,24 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/01basic.t
- t/02sugar.t
- t/03coerce.t
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Makefile.PL
- dist.ini
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: README
  lib/Return/Type.pm
 Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

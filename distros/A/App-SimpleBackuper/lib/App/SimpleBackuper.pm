@@ -3,6 +3,6 @@ package App::SimpleBackuper;
 use strict;
 use warnings;
 use 5.014;
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.3';
 
 1;

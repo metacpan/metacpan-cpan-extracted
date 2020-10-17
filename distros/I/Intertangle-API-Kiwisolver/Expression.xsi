@@ -1,0 +1,31 @@
+MODE: INLINE
+
+#include <xs.h>
+#include <kiwi/kiwi.h>
+
+namespace xs {
+    template <>
+    struct Typemap<kiwi::Expression*> : TypemapObject<kiwi::Expression*, kiwi::Expression*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "Intertangle::API::Kiwisolver::Expression"; }
+    };
+}
+
+MODULE = Intertangle::API::Kiwisolver                PACKAGE = Intertangle::API::Kiwisolver::Expression
+PROTOTYPES: DISABLE
+
+std::vector<kiwi::Term*> kiwi::Expression::terms() {
+	std::vector<kiwi::Term> terms = THIS->terms();
+	size_t n = terms.size();
+	RETVAL = std::vector<kiwi::Term*>(n);
+	for( int i = 0; i < n; i++ ) {
+		RETVAL[i] = new kiwi::Term(terms[i]);
+	}
+}
+
+double kiwi::Expression::constant()
+
+double kiwi::Expression::value()
+
+BOOT {
+	Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+}

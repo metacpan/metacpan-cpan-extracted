@@ -16,7 +16,7 @@ use Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives;
 use Pod::Usage;
 use Readonly;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
 Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;

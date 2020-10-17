@@ -24,6 +24,7 @@ lib/App/Yath/Command/reload.pm
 lib/App/Yath/Command/replay.pm
 lib/App/Yath/Command/run.pm
 lib/App/Yath/Command/runner.pm
+lib/App/Yath/Command/spawn.pm
 lib/App/Yath/Command/speedtag.pm
 lib/App/Yath/Command/start.pm
 lib/App/Yath/Command/stop.pm
@@ -81,6 +82,7 @@ lib/Test2/Harness/Runner/Preloader.pm
 lib/Test2/Harness/Runner/Preloader/Stage.pm
 lib/Test2/Harness/Runner/Resource.pm
 lib/Test2/Harness/Runner/Run.pm
+lib/Test2/Harness/Runner/Spawn.pm
 lib/Test2/Harness/Runner/State.pm
 lib/Test2/Harness/Settings.pm
 lib/Test2/Harness/Settings/Prefix.pm

@@ -1,5 +1,5 @@
 package Data::Perl::Collection::Hash::MooseLike;
-$Data::Perl::Collection::Hash::MooseLike::VERSION = '0.001008';
+$Data::Perl::Collection::Hash::MooseLike::VERSION = '0.001009';
 # ABSTRACT: Collection::Hash subclass that simulates Moose's native traits.
 
 use strictures 1;
@@ -33,7 +33,7 @@ Data::Perl::Collection::Hash::MooseLike - Collection::Hash subclass that simulat
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 SYNOPSIS
 
@@ -91,11 +91,11 @@ In scalar context it returns the value for the last key specified.
 
 =head1 AUTHOR
 
-Matthew Phillips <mattp@cpan.org>
+Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

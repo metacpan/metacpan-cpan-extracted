@@ -39,7 +39,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.000'
+    version: '1.001'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
@@ -63,10 +63,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.000'
+version: '1.001'
 x_Dist_Zilla:
   perl:
-    version: '5.032000'
+    version: '5.033002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -110,7 +110,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: 'Gather sharedir'
-      version: '2.046'
+      version: '2.047'
     -
       class: inc::OldShareDirFiles
       name: =inc::OldShareDirFiles
@@ -159,7 +159,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -608,7 +608,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200717'
+          Module::CoreList: '5.20200920'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -636,7 +636,7 @@ x_Dist_Zilla:
           git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -678,7 +678,7 @@ x_Dist_Zilla:
           git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
@@ -748,6 +748,7 @@ x_Dist_Zilla:
           add_files_in:
             - .
           commit_msg: '%N-%v%t%n%n%c'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CONTRIBUTING
@@ -763,7 +764,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/release snapshot'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -771,7 +772,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000
+          tag: v1.001
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -780,7 +781,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -803,6 +804,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'increment $VERSION after %v release'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Build.PL
@@ -817,7 +819,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -837,7 +839,7 @@ x_Dist_Zilla:
           git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
@@ -955,9 +957,8 @@ x_Dist_Zilla:
 x_authority: cpan:RELEQUEST
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
-  - 'Ben Hutton <relequestual@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.33.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT
 x_static_install: 0

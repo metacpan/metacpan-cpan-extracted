@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
     "File::RandomGenerator" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.044",
+  "VERSION" => "0.047",
   "test" => {
     "TESTS" => "t/*.t"
   }

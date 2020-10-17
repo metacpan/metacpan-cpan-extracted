@@ -192,6 +192,7 @@ lib/Lab/Moose/DataFolder.pm
 lib/Lab/Moose/Instrument.pm
 lib/Lab/Moose/Instrument/AdjustRange.pm
 lib/Lab/Moose/Instrument/Agilent34410A.pm
+lib/Lab/Moose/Instrument/Agilent34460A.pm
 lib/Lab/Moose/Instrument/Cache.pm
 lib/Lab/Moose/Instrument/Common.pm
 lib/Lab/Moose/Instrument/DisplayXY.pm

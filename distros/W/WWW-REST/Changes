@@ -1,3 +1,9 @@
+0.023   2020-10-16
+
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 0.022   2018-02-13
 
         * Convert License module to CC0_1_0 .

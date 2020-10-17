@@ -1,5 +1,5 @@
 package Data::Perl::Bool::MooseLike;
-$Data::Perl::Bool::MooseLike::VERSION = '0.001008';
+$Data::Perl::Bool::MooseLike::VERSION = '0.001009';
 # ABSTRACT: data::Perl::Bool subclass that simulates Moose's native traits.
 
 use strictures 1;
@@ -29,7 +29,7 @@ Data::Perl::Bool::MooseLike - data::Perl::Bool subclass that simulates Moose's n
 
 =head1 VERSION
 
-version 0.001008
+version 0.001009
 
 =head1 SYNOPSIS
 
@@ -53,11 +53,11 @@ native traits.
 
 =head1 AUTHOR
 
-Matthew Phillips <mattp@cpan.org>
+Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

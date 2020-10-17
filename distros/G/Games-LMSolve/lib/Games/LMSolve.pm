@@ -1,5 +1,5 @@
 package Games::LMSolve;
-$Games::LMSolve::VERSION = '0.14.1';
+$Games::LMSolve::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -133,7 +133,7 @@ Games::LMSolve - base class for LM-Solve solvers factories
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 
@@ -212,51 +212,15 @@ L<Games::LMSolve::Base>
 
 L<http://www.shlomifish.org/lm-solve/> - the LM-Solve homepage.
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-games-lmsolve at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-LMSolve>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Games::LMSolve
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Games-LMSolve>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Games-LMSolve>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-LMSolve>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Games-LMSolve>
-
-=back
-
 =head1 AUTHORS
 
 Shlomi Fish, L<http://www.shlomifish.org/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2002 Shlomi Fish, all rights reserved.
+Copyright 2002 Shlomi Fish.
 
-This program is released under the following license: MIT X11.
+This program is released under the following license: MIT / Expat.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -16,9 +16,7 @@ use IO::All qw/ io /;
 use Test::Differences (qw( eq_or_diff ));
 
 {
-    eval {
-        require DataSplitValidateHashTest2;
-    };
+    eval { require DataSplitValidateHashTest2; };
 
     # TEST
     like(

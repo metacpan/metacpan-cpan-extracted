@@ -1,5 +1,5 @@
 package Test::Data::Split;
-$Test::Data::Split::VERSION = '0.2.1';
+$Test::Data::Split::VERSION = '0.2.2';
 use strict;
 use warnings;
 use autodie;
@@ -11,34 +11,39 @@ use IO::All qw/ io /;
 
 use MooX qw/ late /;
 
-has '_target_dir' => (is => 'ro', isa => 'Str', required => 1, init_arg => 'target_dir',);
-has ['_filename_cb'] => (is => 'ro', isa => 'CodeRef', required => 1, init_arg => 'filename_cb',);
-has ['_contents_cb'] => (is => 'ro', isa => 'CodeRef', required => 1, init_arg => 'contents_cb',);
-has '_data_obj' => (is => 'ro', required => 1, init_arg => 'data_obj');
+has '_target_dir' =>
+    ( is => 'ro', isa => 'Str', required => 1, init_arg => 'target_dir', );
+has ['_filename_cb'] =>
+    ( is => 'ro', isa => 'CodeRef', required => 1, init_arg => 'filename_cb', );
+has ['_contents_cb'] =>
+    ( is => 'ro', isa => 'CodeRef', required => 1, init_arg => 'contents_cb', );
+has '_data_obj' => ( is => 'ro', required => 1, init_arg => 'data_obj' );
 
 
 sub run
 {
     my $self = shift;
 
-    my $target_dir = $self->_target_dir;
+    my $target_dir  = $self->_target_dir;
     my $filename_cb = $self->_filename_cb;
     my $contents_cb = $self->_contents_cb;
 
     my $data_obj = $self->_data_obj;
 
-    foreach my $id (@{ $data_obj->list_ids() })
+    foreach my $id ( @{ $data_obj->list_ids() } )
     {
         # Croak on bad IDs.
-        if ($id !~ /\A[A-Za-z_\-0-9]{1,80}\z/)
+        if ( $id !~ /\A[A-Za-z_\-0-9]{1,80}\z/ )
         {
             die "Invalid id '$id'.";
         }
 
-        io->catfile($target_dir, $filename_cb->($self, { id => $id, }, ))
-          ->assert->print(
-              $contents_cb->($self, { id => $id, data => $data_obj->lookup_data($id) },)
-          );
+        io->catfile( $target_dir, $filename_cb->( $self, { id => $id, }, ) )
+            ->assert->print(
+            $contents_cb->(
+                $self, { id => $id, data => $data_obj->lookup_data($id) },
+            )
+            );
     }
 
     return;
@@ -50,13 +55,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Test::Data::Split - split data-driven tests into several test scripts.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -110,10 +117,6 @@ version 0.2.1
 This module splits a set of data with IDs and arbitrary values into one
 test file per (key+value) for easy parallelisation.
 
-=head1 VERSION
-
-version 0.2.1
-
 =head1 METHODS
 
 =head2 my $obj = Test::Data::Split->new({ %PARAMS })
@@ -150,36 +153,9 @@ An example for using it can be found in the synopsis.
 
 Generate the files.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2014 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Test-Data-Split/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Test::Data::Split
 
 =head2 Websites
 
@@ -198,35 +174,11 @@ L<https://metacpan.org/release/Test-Data-Split>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Test-Data-Split>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Data-Split>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Data-Split>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Test-Data-Split>
 
 =item *
 
@@ -277,5 +229,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-Test-Data-Split>
 
   git clone git://github.com/shlomif/perl-Test-Data-Split.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Test-Data-Split/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

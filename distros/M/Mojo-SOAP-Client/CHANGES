@@ -1,3 +1,7 @@
+0.1.8 2020-10-17 17:41:04 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix test regression
+
 0.1.7 2020-10-15 12:01:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - more detailed error messages

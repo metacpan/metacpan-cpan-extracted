@@ -1,7 +1,13 @@
 CHANGES
 -------
 
-  2.097 11 Ovtober 2020
+  2.098 17 October 2020
+
+      * Fix dependency issue
+        https://github.com/pmqs/IO-Compress-Zstd/issues/2
+        b4493a50ebcc0226120784268cf7b514349f668f
+
+  2.097 11 October 2020
 
       * Fix for uncompression of long content
         https://github.com/pmqs/IO-Compress-Zstd/issues/1

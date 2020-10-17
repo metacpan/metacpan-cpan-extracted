@@ -36,6 +36,24 @@ DESCRIPTION
           }
        }
 
+    The return value is not type checked if the function is called in void
+    context.
+
+       # Note that the ~Any type is the opposite of Any.
+       # So all values will fail the type check.
+       # That means that the following function can only
+       # be called in void context.
+       #
+       sub foo :ReturnType(scalar => ~Any, list => ~Any) {
+          ...;
+       }
+   
+       # Shortcut for the above.
+       #
+       sub foo :ReturnType(Void) {
+          ...;
+       }
+
     Note that because type constraint libraries are really aimed at validating
     scalars, the type constraint for the list is specified as a *hashref* of
     numbers and not a hash of numbers! For the purposes of validation against

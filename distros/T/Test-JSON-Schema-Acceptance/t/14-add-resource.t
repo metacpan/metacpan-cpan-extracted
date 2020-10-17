@@ -31,8 +31,8 @@ $accepter->acceptance(
 cmp_deeply(
   \%additional_resources,
   {
-    'http://localhost:1234/remote1.json' => { '$defs' => { foo => JSON::PP::true } },
-    'http://localhost:1234/subfolder/remote2.json' => { '$defs' => { bar => JSON::PP::false } },
+    'http://localhost:1234/remote1.json' => { '$defs' => { foo => bool(1) } },
+    'http://localhost:1234/subfolder/remote2.json' => { '$defs' => { bar => bool(0) } },
   },
   'user-supplied subref is called with additional resources found in test directory',
 );

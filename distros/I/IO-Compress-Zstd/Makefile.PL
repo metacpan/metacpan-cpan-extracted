@@ -3,7 +3,7 @@
 use strict ;
 require 5.006 ;
 
-$::VERSION = '2.097' ;
+$::VERSION = '2.098' ;
 
 use lib '.';
 use private::MakeUtil;
@@ -25,8 +25,8 @@ WriteMakefile(
       $ENV{SKIP_FOR_CORE}
         ? (MAN3PODS    => {})
 	    : (PREREQ_PM   => { 'Compress::Stream::Zstd'    => 0,
-		                    'IO::Compress::Base'        => $::VERSION,
-		                    'IO::Uncompress::Base'      => $::VERSION,
+		                    'IO::Compress::Base'        => '2.096',
+		                    'IO::Uncompress::Base'      => '2.096',
 		                    $] >= 5.005 && $] < 5.006
                                 ? ('File::BSDGlob' => 0)
                                 : () }

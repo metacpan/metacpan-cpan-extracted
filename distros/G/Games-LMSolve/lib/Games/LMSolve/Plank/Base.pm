@@ -1,5 +1,5 @@
 package Games::LMSolve::Plank::Base;
-$Games::LMSolve::Plank::Base::VERSION = '0.14.1';
+$Games::LMSolve::Plank::Base::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -575,7 +575,7 @@ Games::LMSolve::Plank::Base - driver for solving the rectangular Plank puzzles
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

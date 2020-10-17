@@ -1,0 +1,96 @@
+use alienfile;
+
+use strict;
+use warnings;
+
+use File::Path qw(make_path);
+use Alien::Build::CommandSequence;
+
+share {
+	requires 'Net::SSLeay' => 0;
+	requires 'IO::Socket::SSL' => 0;
+
+	plugin Download => (
+		url => 'https://github.com/mjwybrow/adaptagrams/archive/master.zip',
+	);
+
+	plugin Extract => 'zip';
+
+	patch sub {
+		my ($build) = @_;
+
+		my $config_ac = Path::Tiny->new('cola/configure.ac');
+		$config_ac->edit_lines(sub {
+			s{^\QLT_INIT\E$}
+			{LT_INIT([win32-dll])}g;
+		});
+
+		my $test_mingw32 = <<'EOF';
+if test "x$host_os" = "xmingw32"; then
+  AM_LDFLAGS="$AM_LDFLAGS -no-undefined"
+fi
+EOF
+		my $replacement_mingw = <<'EOF';
+case "$host_os" in
+  mingw*)
+    AM_LDFLAGS="$AM_LDFLAGS -no-undefined"
+    ;;
+esac
+EOF
+		$config_ac->edit(sub {
+			s{\Q$test_mingw32\E}
+			{$replacement_mingw}sg;
+		});
+
+		my $colafd = Path::Tiny->new('cola/libcola/colafd.cpp');
+		$build->log("Patching $colafd");
+		$colafd->edit_lines(sub {
+			s{\QRectangle *r = rs\E}
+			{vpsc::Rectangle *r = rs}g;
+		});
+
+		if( exists $ENV{MSYSTEM} ) {
+			my $io = Path::Tiny->new('cola/libdialect/io.cpp');
+			$io->edit_lines(sub {
+				s{\Q#include <string>\E}{#include <cstring>\n$&}g;
+			});
+		}
+	};
+
+
+	plugin 'Build::Autoconf';
+	build [
+		sub {
+			my ($build) = @_;
+			make_path 'cola/m4';
+		},
+		q{sh -c 'autoreconf --install --verbose cola'},
+		sub {
+			my ($build) = @_;
+
+			chdir 'cola';
+			Alien::Build::CommandSequence->new(
+				'%{configure}'
+			)->execute($build);
+			chdir '..';
+		},
+		'%{make} -C cola',
+		#'%{make} -C cola check',
+		'%{make} -C cola install',
+	];
+
+	gather sub {
+		my($build) = @_;
+		my $prefix = $build->runtime_prop->{prefix};
+
+		my @libs = qw(avoid cola dialect topology vpsc);
+
+		my $cflags = "-I$prefix/include";
+		my $libs = join " ", "-L$prefix/lib", (map { "-l$_" } @libs);
+
+		$build->runtime_prop->{cflags}        = $cflags;
+		$build->runtime_prop->{cflags_static} = $cflags;
+		$build->runtime_prop->{libs}          = $libs;
+		$build->runtime_prop->{libs_static}   = $libs;
+	};
+};

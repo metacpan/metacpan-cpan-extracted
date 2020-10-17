@@ -88,59 +88,59 @@
    "provides" : {
       "Games::LMSolve" : {
          "file" : "lib/Games/LMSolve.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Alice" : {
          "file" : "lib/Games/LMSolve/Alice.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Base" : {
          "file" : "lib/Games/LMSolve/Base.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Input" : {
          "file" : "lib/Games/LMSolve/Input.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Input::Scalar::FH" : {
          "file" : "lib/Games/LMSolve/Input.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Minotaur" : {
          "file" : "lib/Games/LMSolve/Minotaur.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Numbers" : {
          "file" : "lib/Games/LMSolve/Numbers.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Plank::Base" : {
          "file" : "lib/Games/LMSolve/Plank/Base.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Plank::Hex" : {
          "file" : "lib/Games/LMSolve/Plank/Hex.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Registry" : {
          "file" : "lib/Games/LMSolve/Registry.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Tilt::Base" : {
          "file" : "lib/Games/LMSolve/Tilt/Base.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Tilt::Multi" : {
          "file" : "lib/Games/LMSolve/Tilt/Multi.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Tilt::RedBlue" : {
          "file" : "lib/Games/LMSolve/Tilt/RedBlue.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       },
       "Games::LMSolve::Tilt::Single" : {
          "file" : "lib/Games/LMSolve/Tilt/Single.pm",
-         "version" : "v0.14.1"
+         "version" : "v0.14.2"
       }
    },
    "release_status" : "stable",
@@ -155,10 +155,10 @@
          "web" : "https://github.com/shlomif/lm-solve-source"
       }
    },
-   "version" : "0.14.1",
+   "version" : "0.14.2",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030003"
+         "version" : "5.032000"
       },
       "plugins" : [
          {
@@ -667,8 +667,8 @@
          "version" : "6.015"
       }
    },
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "MIT"
 }
 

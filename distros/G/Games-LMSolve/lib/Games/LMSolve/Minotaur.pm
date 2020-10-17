@@ -1,5 +1,5 @@
 package Games::LMSolve::Minotaur;
-$Games::LMSolve::Minotaur::VERSION = '0.14.1';
+$Games::LMSolve::Minotaur::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -226,7 +226,7 @@ mazes.
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

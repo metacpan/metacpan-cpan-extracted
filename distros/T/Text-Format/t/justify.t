@@ -102,7 +102,7 @@ sub chk_data
     my @gen = @_;
     my @dat = get_data();
 
-    scalar @gen == scalar @dat || return (1);
+    scalar @gen == scalar @dat               || return (1);
     join( "\n", @gen ) eq join( "\n", @dat ) || return (1);
     return (0);
 }

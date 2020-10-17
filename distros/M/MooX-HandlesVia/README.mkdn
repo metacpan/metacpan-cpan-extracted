@@ -4,7 +4,7 @@ MooX::HandlesVia - NativeTrait-like behavior for Moo.
 
 # VERSION
 
-version 0.001008
+version 0.001009
 
 # SYNOPSIS
 
@@ -55,6 +55,11 @@ is fine for references (objects, arrays, hashrefs..) it means simple scalar
 types are **READ ONLY**. This unfortunately means Number, String, Counter, Bool
 cannot modify the attributes value, rendering them largely useless.
 
+If these are issues for you, consider [Sub::HandlesVia](https://metacpan.org/pod/Sub::HandlesVia), which uses a
+different architecture, respecting triggers and coercions, and allowing
+read-write access to non-reference values. It should be possible to use
+Sub::HandlesVia as a drop-in replacement for MooX::HandlesVia.
+
 # PROVIDED INTERFACE/FUNCTIONS
 
 - **process\_has(@\_)**
@@ -90,14 +95,19 @@ The following handles\_via keywords are reserved as shorthand for mapping to
 
 - [Moo](https://metacpan.org/pod/Moo)
 - [MooX::late](https://metacpan.org/pod/MooX::late)
+- [Sub::HandlesVia](https://metacpan.org/pod/Sub::HandlesVia)
 
-# AUTHOR
+# ORIGINAL AUTHOR
 
 Matthew Phillips <mattp@cpan.org>
 
+# AUTHOR
+
+Toby Inkster <tobyink@cpan.org>
+
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use 5.12.5;
 
@@ -10,10 +10,10 @@ use MooseX::Types::DateTime qw(TimeZone);
 
 use Carp;
 use Data::UUID;
-use Encode;
 use Text::LineFold;
 use URI;
 use Path::Tiny;
+use Encode qw(encode decode);
 
 =encoding utf8
 
@@ -23,6 +23,7 @@ Text::vCard::Precisely::V3 - Read, Write and Edit B<just ONLY vCards 3.0> precis
 
 =head1 SYNOPSIS
 
+ use Text::vCard::Precisely;
  my $vc = Text::vCard::Precisely->new();
  # Or you can write like below if you want to be expressly using 3.0:
  my $vc3 = Text::vCard::Precisely->new( version => '3.0' );
@@ -103,6 +104,7 @@ use Text::vFile::asData;
 my $vf = Text::vFile::asData->new( { preserve_params => 1 } );
 
 use Text::vCard::Precisely::V3::Node;
+use Text::vCard::Precisely::V3::Node::MultiContent;
 use Text::vCard::Precisely::V3::Node::N;
 use Text::vCard::Precisely::V3::Node::Address;
 use Text::vCard::Precisely::V3::Node::Tel;
@@ -200,7 +202,7 @@ sub load_string {
     my ( $self, $str ) = @_;
     my @lines   = split /\r\n/, $str;
     my $data    = $vf->parse_lines(@lines);
-    my $hashref = $self->_make_hashref( $data->{'objects'}[0]->{properties} );
+    my $hashref = $self->_make_hashref( $data->{'objects'}[0]->{'properties'} );
     $self->load_hashref($hashref);
 }
 
@@ -263,23 +265,21 @@ sub _parse_param {
 =head2 as_string()
 
 Returns the vCard as a string.
-You have to use C<Encode::encode_utf8()> if your vCard is written in utf8
+You have to use C<Encode::encode_utf8()> if your vCard is written in UTF-8
 
 =cut
 
 my $cr = "\x0D\x0A";
 our $will_be_deprecated = [qw(name profile mailer agent class)];
 
-my @types = (
-    qw(
-        FN N NICKNAME
-        ADR LABEL TEL EMAIL GEO
-        ORG TITLE ROLE CATEGORIES
-        NOTE SOUND UID URL KEY
-        SOCIALPROFILE PHOTO LOGO SOURCE
-        SORT-STRING
-        ), map {uc} @$will_be_deprecated
-);
+my @types = qw(
+    FN N NICKNAME
+    ADR LABEL TEL EMAIL GEO
+    ORG TITLE ROLE CATEGORIES
+    NOTE SOUND UID URL KEY
+    SOCIALPROFILE PHOTO LOGO SOURCE
+    SORT-STRING
+    ), map {uc} @$will_be_deprecated;
 
 sub as_string {
     my ($self) = @_;
@@ -289,8 +289,7 @@ sub as_string {
     $str .= 'UID:' . $self->uid() . $cr   if $self->uid();
     $str .= $self->_footer();
     $str = $self->_fold($str);
-    return decode( $self->encoding_out(), $str ) unless $self->encoding_out() eq 'none';
-    return $str;
+    return decode( $self->encoding_out(), $str );
 }
 
 sub _header {
@@ -310,6 +309,10 @@ sub _make_types {
         croak "the Method you provided, $node is not supported." unless $method;
         if ( ref $self->$method eq 'ARRAY' ) {
             foreach my $item ( @{ $self->$method } ) {
+
+                #if ( $item->isa('Text::vCard::Precisely::V3::Node::MultiContent') ) {
+                #    $str .= $item->as_string();
+                #} els
                 if ( $item->isa('Text::vCard::Precisely::V3::Node') ) {
                     $str .= $item->as_string();
                 } elsif ($item) {
@@ -577,7 +580,7 @@ coerce 'Photos', from 'HashRef', via {
     ]
 }, from 'ArrayRef[HashRef]', via {
     [   map {
-            if ( ref $_->{types} eq 'ARRAY' ) {
+            if ( ref $_->{'types'} eq 'ARRAY' ) {
                 ( $_->{'media_type'} ) = @{ $_->{'types'} };
                 delete $_->{'types'};
             }
@@ -611,7 +614,12 @@ To specify supplemental information or a comment that is associated with the vCa
 =head2 org(), title(), role(), categories()
 
 To specify additional information for your jobs
- 
+
+In these, C<CATEGORIES> may have multiple content with being separated by COMMA.
+multiple content is expressed by using ArrayRef like this:
+
+ $vc->categories([qw(Internet Travel)]);
+
 =head2 fn(), full_name(), fullname()
 
 A person's entire name as they would like to see it displayed
@@ -619,6 +627,22 @@ A person's entire name as they would like to see it displayed
 =head2 nickname()
 
 To specify the text corresponding to the nickname of the object the vCard represents
+
+Like C<CATEGORIES>, It ALSO may have multiple content with being separated by COMMA.
+
+ $vc->nickname([qw(Johny John)]);
+
+=cut
+
+subtype 'SeparatedByComma' => as 'Text::vCard::Precisely::V3::Node::MultiContent';
+coerce 'SeparatedByComma', from 'Str', via {
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
+    return Text::vCard::Precisely::V3::Node::MultiContent->new( { name => $name, content => [$_] } )
+}, from 'ArrayRef[Str]', via {
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
+    return Text::vCard::Precisely::V3::Node::MultiContent->new( { name => $name, content => $_ } )
+};
+has [qw|categories nickname|] => ( is => 'rw', isa => 'SeparatedByComma', coerce => 1 );
 
 =head2 geo()
 
@@ -635,8 +659,8 @@ To specify the formatted text corresponding to delivery address of the object th
 
 =cut
 
-subtype 'Node' => as 'ArrayRef[Text::vCard::Precisely::V3::Node]';
-coerce 'Node', from 'Str', via {
+subtype 'Nodes' => as 'ArrayRef[Text::vCard::Precisely::V3::Node]';
+coerce 'Nodes', from 'Str', via {
     my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [ Text::vCard::Precisely::V3::Node->new( { name => $name, content => $_ } ) ]
 }, from 'HashRef', via {
@@ -662,8 +686,7 @@ coerce 'Node', from 'Str', via {
         } @$_
     ]
 };
-has [qw|note org title role categories fn nickname geo key label|] =>
-    ( is => 'rw', isa => 'Node', coerce => 1 );
+has [qw|note org title role fn geo key label|] => ( is => 'rw', isa => 'Nodes', coerce => 1 );
 
 =head2 sort_string()
 
@@ -675,7 +698,7 @@ L<Text::vCard::Precisely::V4|https://metacpan.org/pod/Text::vCard::Precisely::V4
 
 =cut
 
-has sort_string => ( is => 'rw', isa => 'Node', coerce => 1 );
+has sort_string => ( is => 'rw', isa => 'Nodes', coerce => 1 );
 
 =head2 uid()
 

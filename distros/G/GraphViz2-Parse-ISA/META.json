@@ -38,13 +38,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Algorithm::Dependency" : "1.11",
-            "Algorithm::Dependency::Source::HoA" : "1.11",
-            "Class::ISA" : "0.36",
             "Class::Load" : "0.23",
             "GraphViz2" : "2.48",
             "Moo" : "2.001001",
-            "Tree::DAG_Node" : "1.06",
             "perl" : "5.010001"
          }
       },
@@ -70,6 +66,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2-Parse-ISA"
       }
    },
-   "version" : "2.52",
+   "version" : "2.53",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

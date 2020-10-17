@@ -1,3 +1,7 @@
+0.1.6 2020-10-17 17:44:55 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - update error check to work with soap client 0.1.8 errors
+
 0.1.5 2020-01-10 09:45:27 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - require XML::Compile::SOAP < 3.26

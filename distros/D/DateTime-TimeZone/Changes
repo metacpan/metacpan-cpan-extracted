@@ -1,3 +1,9 @@
+2.42    2020-10-16
+
+- This release is based on version 2020c of the Olson database. This release
+  includes contemporary changes for Fiji.
+
+
 2.41    2020-10-07
 
 - The last release was missing all the generated data files. Oops! Reported by

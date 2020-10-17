@@ -1,5 +1,10 @@
 Revision history for Perl extension String::Random:
 
+0.31    2020-10-17
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 0.30    2018-05-22
     - Convert to Dist-Zilla.
 

@@ -1,9 +1,9 @@
 package App::BrowserUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-07'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -44,7 +44,7 @@ our %browsers = (
             do { $p->{_note} = "fname looks like chrome"; goto FOUND } if $p->{fname} =~ /\A(chrome)\z/;
             goto NOT_FOUND;
           FOUND:
-            log_trace "Found firefox process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            log_trace "Found chrome process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
             return 1;
           NOT_FOUND:
             0;
@@ -603,7 +603,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.011 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-10-07.
+This document describes version 0.012 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-10-16.
 
 =head1 SYNOPSIS
 

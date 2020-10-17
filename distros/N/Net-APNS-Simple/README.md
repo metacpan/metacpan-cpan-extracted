@@ -9,12 +9,11 @@ This library uses Protocol::HTTP2::Client as http2 backend.
 And it also supports multiple stream at one connection.
 (It does not correspond to parallel stream because APNS server returns SETTINGS\_MAX\_CONCURRENT\_STREAMS = 1.)
 
-    You can not use the key obtained from Apple at the moment, see the item of Caution below.
-
 # SYNOPSIS
 
     use Net::APNS::Simple;
 
+    # With provider authentication tokens
     my $apns = Net::APNS::Simple->new(
         # enable if development
         # development => 1,
@@ -22,8 +21,16 @@ And it also supports multiple stream at one connection.
         key_id => 'AUTH_KEY_ID',
         team_id => 'APP_PREFIX',
         bundle_id => 'APP_ID',
-        apns_expiration => 0,
-        apns_priority => 10,
+    );
+
+    # With SSL certificates
+    my $apns = Net::APNS::Simple->new(
+        # enable if development
+        # development => 1,
+        cert_file => '/path/to/cert.pem',
+        key_file => '/path/to/key.pem',
+        passwd_cb => sub { return 'key-password' },
+        bundle_id => 'APP_ID',
     );
 
     # 1st request
@@ -67,7 +74,7 @@ And it also supports multiple stream at one connection.
 
 - development : bool
 
-    Switch API's URL to 'api.development.push.apple.com' if enabled.
+    Switch API's URL to 'api.sandbox.push.apple.com' if enabled.
 
 - auth\_key : string
 
@@ -81,13 +88,37 @@ And it also supports multiple stream at one connection.
 
     Bundle ID (App ID)
 
+- cert\_file : string
+
+    SSL certificate file.
+
+- key\_file : string
+
+    SSL key file.
+
+- passwd\_cb : sub reference
+
+    If the private key is encrypted, this should be a reference to a subroutine that should return the password required to decrypt your private key.
+
+- apns\_id : string
+
+    Canonical UUID that identifies the notification (apns-id header).
+
 - apns\_expiration : number
 
-    Default 0.
+    Sets the apns-expiration header.
 
 - apns\_priority : number
 
-    Default 10.
+    Sets the apns-priority header. Default 10.
+
+- apns\_collapse\_id : string
+
+    Sets the apns-collapse-id header.
+
+- proxy : string
+
+    URL of a proxy server. Default $ENV{https\_proxy}. Pass undef to disable proxy.
 
     All properties can be accessed as Getter/Setter like `$apns->development`.
 
@@ -104,12 +135,6 @@ Payload please refer: https://developer.apple.com/library/content/documentation/
 
 Execute notification.
 Multiple notifications can be executed with one SSL connection.
-
-# CAUTION
-
-Crypt::PK::ECC can not import the key obtained from Apple as it is. This is currently being handled as Issue. Please use the openssl command to specify the converted key as follows until the modified version appears.
-
-    openssl pkcs8 -in APNs-apple.p8 -inform PEM -out APNs-resaved.p8 -outform PEM -nocrypt
 
 # LICENSE
 

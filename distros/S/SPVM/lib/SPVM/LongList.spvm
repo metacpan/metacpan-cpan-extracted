@@ -5,18 +5,9 @@ package SPVM::LongList {
   has capacity : ro int;
   has length   : ro int;
   
-  sub new : SPVM::LongList () {
-    my $capacity = 16;
-    my $values = new long[$capacity];
-    
-    my $self = new SPVM::LongList;
-    $self->{capacity} = $capacity;
-    $self->{length} = 0;
-    $self->{values} = $values;
-    
-    return $self;
+  private enum {
+    DEFAULT_CAPACITY = 16,
   }
-
   sub new_capacity : SPVM::LongList ($capacity : int) {
     my $self = new SPVM::LongList;
     unless ($capacity > 0) {
@@ -27,19 +18,44 @@ package SPVM::LongList {
     return $self;
   }
 
-  sub newa : SPVM::LongList ($array : long[]) {
+  sub new : SPVM::LongList ($array : long[]) {
     my $self = new SPVM::LongList;
     my $length = @$array;
     
-    my $values = new long[$length];
+    my $capacity = 0;
+    if ($length < DEFAULT_CAPACITY()) {
+      $capacity = DEFAULT_CAPACITY();
+    }
+    else {
+      $capacity = $length;
+    }
+    $self->{capacity} = $capacity;
+    my $values = new long[$capacity];
     
-    $self->{capacity} = $length;
     $self->{length} = $length;
     
     memcpyl($values, 0, $array, 0, $length);
     
     $self->{values} = $values;
     
+    return $self;
+  }
+
+  sub new_len : SPVM::LongList ($length : int) {
+    my $self = new SPVM::LongList;
+    unless ($length >= 0) {
+      die "length must be more than or equals to zero";
+    }
+    my $capacity = 0;
+    if ($length < DEFAULT_CAPACITY()) {
+      $capacity = DEFAULT_CAPACITY();
+    }
+    else {
+      $capacity = $length;
+    }
+    $self->{capacity} = $capacity;
+    $self->{length} = $length;
+    $self->{values} = new long[$capacity];
     return $self;
   }
   
@@ -66,7 +82,7 @@ package SPVM::LongList {
       die "Out of range";
     }
     
-    if ($length > $capacity - 1) {
+    if ($length >= $capacity) {
       $self->_extend;
     }
     
@@ -106,7 +122,7 @@ package SPVM::LongList {
     my $length = $self->{length};
     my $capacity = $self->{capacity};
     
-    if ($length > $capacity - 1) {
+    if ($length >= $capacity) {
       $self->_extend;
     }
     
@@ -133,7 +149,7 @@ package SPVM::LongList {
     my $length = $self->{length};
     my $capacity = $self->{capacity};
     
-    if ($length > $capacity - 1) {
+    if ($length >= $capacity) {
       $self->_extend;
     }
     

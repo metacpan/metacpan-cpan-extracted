@@ -1,5 +1,8 @@
 Revision history for HTML-T5
 
+0.010  2020-10-16
+    - Remove stale links from the POD and other documentation cleanups.
+
 0.009  2020-02-05
     - Fix the Alien configure_requires in the META.yml
         - https://rt.cpan.org/Ticket/Display.html?id=131678

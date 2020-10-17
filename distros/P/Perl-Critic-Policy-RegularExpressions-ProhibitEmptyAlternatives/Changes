@@ -1,2 +1,6 @@
+0.002		2020-10-16	T. R. Wyant
+    Fix metadata errors in repository and issue URLs. No change in
+    code.
+
 0.001		2020-03-01	T. R. Wyant
     First production release to CPAN.

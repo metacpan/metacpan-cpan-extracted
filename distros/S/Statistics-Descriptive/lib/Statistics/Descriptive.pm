@@ -1,5 +1,5 @@
 package Statistics::Descriptive;
-
+$Statistics::Descriptive::VERSION = '3.0800';
 use strict;
 use warnings;
 
@@ -9,13 +9,11 @@ use 5.006;
 
 use vars (qw($Tolerance $Min_samples_number));
 
-our $VERSION = '3.0702';
-
-$Tolerance = 0.0;
+$Tolerance          = 0.0;
 $Min_samples_number = 4;
 
-use Statistics::Descriptive::Sparse;
-use Statistics::Descriptive::Full;
+use Statistics::Descriptive::Sparse ();
+use Statistics::Descriptive::Full   ();
 
 package Statistics::Descriptive;
 
@@ -34,7 +32,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0702
+version 3.0800
 
 =head1 SYNOPSIS
 
@@ -63,10 +61,6 @@ of very small denominators.
 
 Many of the methods (both Sparse and Full) cache values so that subsequent
 calls with the same arguments are faster.
-
-=head1 VERSION
-
-version 3.0702
 
 =head1 METHODS
 
@@ -560,35 +554,9 @@ and/or modify it under the same terms as Perl itself.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Statistics::Descriptive
 
 =head2 Websites
 
@@ -607,35 +575,11 @@ L<https://metacpan.org/release/Statistics-Descriptive>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Statistics-Descriptive>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Statistics-Descriptive>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Statistics-Descriptive>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Statistics-Descriptive>
 
 =item *
 
@@ -686,5 +630,25 @@ from your repository :)
 L<https://github.com/shlomif/perl-Statistics-Descriptive>
 
   git clone git://github.com/shlomif/perl-Statistics-Descriptive.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

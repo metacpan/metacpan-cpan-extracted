@@ -3,15 +3,13 @@
 use strict;
 use warnings;
 
-use IO::All;
+use Path::Tiny qw/ path /;
 
 my ($version) =
-    (map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-    io->file('lib/Statistics/Descriptive.pm')->getlines()
-    )
-    ;
+    ( map { m{\Aversion * = *(\S+)} ? ($1) : () }
+        path("./dist.ini")->lines_utf8() );
 
-if (!defined ($version))
+if ( !defined($version) )
 {
     die "Version is undefined!";
 }
@@ -22,6 +20,5 @@ my @cmd = (
     "releases/$version",
 );
 
-print join(" ", @cmd), "\n";
+print join( " ", @cmd ), "\n";
 exec(@cmd);
-

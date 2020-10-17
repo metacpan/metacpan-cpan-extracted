@@ -1,16 +1,17 @@
 package Statistics::Descriptive::Smoother::Weightedexponential;
+$Statistics::Descriptive::Smoother::Weightedexponential::VERSION = '3.0800';
 use strict;
 use warnings;
 
-use Carp;
-use base 'Statistics::Descriptive::Smoother';
+use Carp qw/ carp /;
+use parent 'Statistics::Descriptive::Smoother';
 
-our $VERSION = '3.0702';
+sub _new
+{
+    my ( $class, $args ) = @_;
 
-sub _new {
-    my ($class, $args) = @_;
-
-    if (scalar @{$args->{data}} != scalar @{$args->{samples}}) {
+    if ( scalar @{ $args->{data} } != scalar @{ $args->{samples} } )
+    {
         carp("Number of data values and samples need to be the same\n");
         return;
     }
@@ -19,55 +20,63 @@ sub _new {
 }
 
 # The name of the variables used in the code refers to the explanation in the pod
-sub get_smoothed_data {
+sub get_smoothed_data
+{
     my ($self) = @_;
 
-    my (@smoothed_values, @Wts);
+    my ( @smoothed_values, @Wts );
+
     # W(0) = N(0)
-    push @Wts, @{$self->{samples}}[0];
+    push @Wts, @{ $self->{samples} }[0];
+
     # S(0) = X(0)
-    push @smoothed_values, @{$self->{data}}[0];
+    push @smoothed_values, @{ $self->{data} }[0];
     my $C = $self->get_smoothing_coeff();
 
-    foreach my $idx (1 .. ($self->{count} -1)) {
+    foreach my $idx ( 1 .. ( $self->{count} - 1 ) )
+    {
         my $Xt   = $self->{data}->[$idx];
         my $Nt   = $self->{samples}->[$idx];
         my $St_1 = $smoothed_values[-1];
         my $Wt_1 = $Wts[-1];
 
-        push @Wts, $self->_get_Wt($Wt_1, $Nt);
+        push @Wts, $self->_get_Wt( $Wt_1, $Nt );
 
-        my $coeff_a = $self->_get_coeff_A($Wt_1, $Nt);
-        my $coeff_b = $self->_get_coeff_B($Wt_1, $Nt);
+        my $coeff_a = $self->_get_coeff_A( $Wt_1, $Nt );
+        my $coeff_b = $self->_get_coeff_B( $Wt_1, $Nt );
 
-        my $smoothed_value = ( $St_1 * $coeff_a + $Xt * $coeff_b ) / ( $coeff_a + $coeff_b );
+        my $smoothed_value =
+            ( $St_1 * $coeff_a + $Xt * $coeff_b ) / ( $coeff_a + $coeff_b );
         push @smoothed_values, $smoothed_value;
     }
     return @smoothed_values;
 }
 
-sub _get_Wt {
-    my ($self, $Wt_1, $Nt) = @_;
+sub _get_Wt
+{
+    my ( $self, $Wt_1, $Nt ) = @_;
 
-    my $C = $self->get_smoothing_coeff();
-    my $coeff_a = $self->_get_coeff_A($Wt_1, $Nt);
-    my $coeff_b = $self->_get_coeff_B($Wt_1, $Nt);;
+    my $C       = $self->get_smoothing_coeff();
+    my $coeff_a = $self->_get_coeff_A( $Wt_1, $Nt );
+    my $coeff_b = $self->_get_coeff_B( $Wt_1, $Nt );
 
-    return (($Wt_1 * $coeff_a + $Nt * $coeff_b)/($coeff_a + $coeff_b));
+    return ( ( $Wt_1 * $coeff_a + $Nt * $coeff_b ) / ( $coeff_a + $coeff_b ) );
 }
 
-sub _get_coeff_A {
-    my ($self, $Wt_1, $Nt) = @_;
+sub _get_coeff_A
+{
+    my ( $self, $Wt_1, $Nt ) = @_;
 
     my $C = $self->get_smoothing_coeff();
-    return $C * ( $Wt_1 / ($Wt_1 + $Nt) );
+    return $C * ( $Wt_1 / ( $Wt_1 + $Nt ) );
 }
 
-sub _get_coeff_B {
-    my ($self, $Wt_1, $Nt) = @_;
+sub _get_coeff_B
+{
+    my ( $self, $Wt_1, $Nt ) = @_;
 
     my $C = $self->get_smoothing_coeff();
-    return (1 - $C) * ( $Nt / ($Nt + $Wt_1) );
+    return ( 1 - $C ) * ( $Nt / ( $Nt + $Wt_1 ) );
 }
 
 1;
@@ -85,7 +94,7 @@ exponential smoothing
 
 =head1 VERSION
 
-version 3.0702
+version 3.0800
 
 =head1 SYNOPSIS
 
@@ -133,10 +142,6 @@ while C<1> the series is universally equal to the initial unsmoothed value.
 
 =back
 
-=head1 VERSION
-
-version 3.0702
-
 =head1 METHODS
 
 =over 5
@@ -178,35 +183,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Statistics::Descriptive::Smoother::Weightedexponential
 
 =head2 Websites
 
@@ -225,35 +204,11 @@ L<https://metacpan.org/release/Statistics-Descriptive>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Statistics-Descriptive>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Statistics-Descriptive>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Statistics-Descriptive>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Statistics-Descriptive>
 
 =item *
 
@@ -304,5 +259,25 @@ from your repository :)
 L<https://github.com/shlomif/perl-Statistics-Descriptive>
 
   git clone git://github.com/shlomif/perl-Statistics-Descriptive.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -13,7 +13,7 @@ require DynaLoader;
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 bootstrap Math::FFT $VERSION;
 
@@ -699,7 +699,7 @@ Math::FFT - Perl module to calculate Fast Fourier Transforms
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -1242,7 +1242,7 @@ the data set used in creating C<$fft> will be used.
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 BUGS
 

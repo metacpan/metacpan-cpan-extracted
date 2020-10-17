@@ -6,7 +6,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-scripts/dependency.pl
 scripts/parse.isa.pl
 t/lib/Adult.pm
 t/lib/Adult/Child/Grandchild.pm

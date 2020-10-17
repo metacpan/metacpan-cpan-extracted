@@ -1,5 +1,5 @@
 package Statistics::Descriptive::Full;
-$Statistics::Descriptive::Full::VERSION = '3.0702';
+$Statistics::Descriptive::Full::VERSION = '3.0800';
 use strict;
 use warnings;
 
@@ -12,86 +12,92 @@ use vars qw($a $b %fields);
 use parent qw(Statistics::Descriptive::Sparse);
 
 use List::MoreUtils ();
-use List::Util ();
+use List::Util      ();
 
+## no critic (ProhibitExplicitReturnUndef)
 ##Create a list of fields not to remove when data is updated
 %fields = (
-  _permitted => undef,  ##Place holder for the inherited key hash
-  data       => undef,  ##Our data
-  samples    => undef,  ##Number of samples for each value of the data set
-  presorted  => undef,  ##Flag to indicate the data is already sorted
-  _reserved  => undef,  ##Place holder for this lookup hash
+    _permitted => undef,    ##Place holder for the inherited key hash
+    data       => undef,    ##Our data
+    samples    => undef,    ##Number of samples for each value of the data set
+    presorted  => undef,    ##Flag to indicate the data is already sorted
+    _reserved  => undef,    ##Place holder for this lookup hash
 );
 
 __PACKAGE__->_make_private_accessors(
-    [qw(data samples frequency geometric_mean harmonic_mean
-        least_squares_fit median mode
-        skewness kurtosis median_absolute_deviation
-       )
+    [
+        qw(data samples frequency geometric_mean harmonic_mean
+            least_squares_fit median mode
+            skewness kurtosis median_absolute_deviation
+            )
     ]
 );
-__PACKAGE__->_make_accessors([qw(presorted _reserved _trimmed_mean_cache)]);
+__PACKAGE__->_make_accessors( [qw(presorted _reserved _trimmed_mean_cache)] );
 
 sub _clear_fields
 {
     my $self = shift;
 
     # Empty array ref for holding data later!
-    $self->_data([]);
-    $self->_samples([]);
-    $self->_reserved(\%fields);
+    $self->_data( [] );
+    $self->_samples( [] );
+    $self->_reserved( \%fields );
     $self->presorted(0);
-    $self->_trimmed_mean_cache(+{});
+    $self->_trimmed_mean_cache( +{} );
 
     return;
 }
 
 ##Have to override the base method to add the data to the object
 ##The proxy method from above is still valid
-sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
-  # Create my self re SUPER
-  my $self = $class->SUPER::new();
-  bless ($self, $class);  #Re-anneal the object
-  $self->_clear_fields();
-  return $self;
+sub new
+{
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+
+    # Create my self re SUPER
+    my $self = $class->SUPER::new();
+    bless( $self, $class );    #Re-anneal the object
+    $self->_clear_fields();
+    return $self;
 }
 
 sub _is_reserved
 {
-    my $self = shift;
+    my $self  = shift;
     my $field = shift;
 
-    return exists($self->_reserved->{$field});
+    return exists( $self->_reserved->{$field} );
 }
 
 sub _delete_all_cached_keys
 {
     my $self = shift;
 
-    my %keys = %{ $self };
+    my %keys = %{$self};
 
     # Remove reserved keys for this class from the deletion list
-    delete @keys{keys %{$self->_reserved}};
-    delete @keys{keys %{$self->_permitted}};
+    delete @keys{ keys %{ $self->_reserved } };
+    delete @keys{ keys %{ $self->_permitted } };
     delete $keys{_trimmed_mean_cache};
 
-    KEYS_LOOP:
-    foreach my $key (keys %keys) { # Check each key in the object
-        delete $self->{$key};  # Delete any out of date cached key
+KEYS_LOOP:
+    foreach my $key ( keys %keys )
+    {    # Check each key in the object
+        delete $self->{$key};    # Delete any out of date cached key
     }
-    $self->{_trimmed_mean_cache} = {};  #  just reset this one
+    $self->{_trimmed_mean_cache} = {};    #  just reset this one
     return;
 }
 
 ##Clear a stat.  More efficient than destroying an object and calling
 ##new.
-sub clear {
-    my $self = shift;  ##Myself
+sub clear
+{
+    my $self = shift;                     ##Myself
     my $key;
 
-    if (!$self->count())
+    if ( !$self->count() )
     {
         return;
     }
@@ -101,36 +107,41 @@ sub clear {
     $self->_clear_fields();
 }
 
-sub add_data {
-    my $self = shift;  ##Myself
+sub add_data
+{
+    my $self = shift;    ##Myself
 
     my $aref;
 
-    if (ref $_[0] eq 'ARRAY') {
-      $aref = $_[0];
+    if ( ref $_[0] eq 'ARRAY' )
+    {
+        $aref = $_[0];
     }
-    else {
-      $aref = \@_;
+    else
+    {
+        $aref = \@_;
     }
 
     ##If we were given no data, we do nothing.
-    return 1 if (!@{ $aref });
+    return 1 if ( !@{$aref} );
 
     my $oldmean;
-    my ($min, $max, $sum, $sumsq);
+    my ( $min, $max, $sum, $sumsq );
     my $count = $self->count;
 
     #  $count is modified lower down, but we need this flag after that
     my $has_existing_data = $count;
 
     # Take care of appending to an existing data set
-    if ($has_existing_data) {
+    if ($has_existing_data)
+    {
         $min   = $self->min();
         $max   = $self->max();
         $sum   = $self->sum();
         $sumsq = $self->sumsq();
     }
-    else {
+    else
+    {
         $min   = $aref->[0];
         $max   = $aref->[0];
         $sum   = 0;
@@ -138,16 +149,16 @@ sub add_data {
     }
 
     #  need to allow for already having data
-    $sum    += List::Util::sum (@$aref);
-    $sumsq  += List::Util::sum (map {$_ ** 2} @$aref);
-    $max    =  List::Util::max ($max, @$aref);
-    $min    =  List::Util::min ($min, @$aref);
-    $count  +=  scalar @$aref;
+    $sum   += List::Util::sum(@$aref);
+    $sumsq += List::Util::sum( map { $_**2 } @$aref );
+    $max = List::Util::max( $max, @$aref );
+    $min = List::Util::min( $min, @$aref );
+    $count += scalar @$aref;
     my $mean = $sum / $count;
 
     $self->min($min);
     $self->max($max);
-    $self->sample_range($max - $min);
+    $self->sample_range( $max - $min );
     $self->sum($sum);
     $self->sumsq($sumsq);
     $self->mean($mean);
@@ -157,12 +168,13 @@ sub add_data {
     ##used to recompute every single data add, so just clear its cache.
     $self->_variance(undef);
 
-    push @{ $self->_data() }, @{ $aref };
+    push @{ $self->_data() }, @{$aref};
 
     #  no need to clear keys if we are a newly populated object,
     #  and profiling shows it takes a long time when creating
     #  and populating many stats objects
-    if ($has_existing_data) {
+    if ($has_existing_data)
+    {
         ##Clear the presorted flag
         $self->presorted(0);
         $self->_delete_all_cached_keys();
@@ -171,57 +183,66 @@ sub add_data {
     return 1;
 }
 
+sub add_data_with_samples
+{
+    my ( $self, $aref_values ) = @_;
 
-sub add_data_with_samples {
-    my ($self,$aref_values) = @_;
+    return 1 if ( !@{$aref_values} );
 
-    return 1 if (!@{ $aref_values });
-
-    my $aref_data = [map { keys %$_ } @{ $aref_values }];
-    my $aref_samples = [map { values %$_ } @{ $aref_values }];
+    my $aref_data    = [ map { keys %$_ } @{$aref_values} ];
+    my $aref_samples = [ map { values %$_ } @{$aref_values} ];
 
     $self->add_data($aref_data);
-    push @{ $self->_samples() }, @{ $aref_samples };
+    push @{ $self->_samples() }, @{$aref_samples};
 
     return 1;
 }
 
-
-sub get_data {
-  my $self = shift;
-  return @{ $self->_data() };
+sub get_data
+{
+    my $self = shift;
+    return @{ $self->_data() };
 }
 
-sub get_data_without_outliers {
+sub get_data_without_outliers
+{
     my $self = shift;
 
-    if ($self->count() < $Statistics::Descriptive::Min_samples_number) {
-        carp("Need at least $Statistics::Descriptive::Min_samples_number samples\n");
+    if ( $self->count() < $Statistics::Descriptive::Min_samples_number )
+    {
+        carp(
+"Need at least $Statistics::Descriptive::Min_samples_number samples\n"
+        );
         return;
     }
 
-    if (!defined $self->{_outlier_filter}) {
+    if ( !defined $self->{_outlier_filter} )
+    {
         carp("Outliers filter not defined\n");
         return;
     }
 
     my $outlier_candidate_index = $self->_outlier_candidate_index;
-    my $possible_outlier = ($self->_data())->[$outlier_candidate_index];
-    my $is_outlier = $self->{_outlier_filter}->($self, $possible_outlier);
+    my $possible_outlier = ( $self->_data() )->[$outlier_candidate_index];
+    my $is_outlier = $self->{_outlier_filter}->( $self, $possible_outlier );
 
     return $self->get_data unless $is_outlier;
-    # Removing the outlier from the dataset
-    my @good_indexes = grep { $_ != $outlier_candidate_index } (0 .. $self->count() - 1);
 
-    my @data = $self->get_data;
+    # Removing the outlier from the dataset
+    my @good_indexes =
+        grep { $_ != $outlier_candidate_index } ( 0 .. $self->count() - 1 );
+
+    my @data          = $self->get_data;
     my @filtered_data = @data[@good_indexes];
     return @filtered_data;
 }
 
-sub set_outlier_filter {
-    my ($self, $code_ref) = @_;
+sub set_outlier_filter
+{
+    my ( $self, $code_ref ) = @_;
 
-    if (!$code_ref || ref($code_ref) ne "CODE") {
+    if ( !$code_ref || ref($code_ref) ne "CODE" )
+    {
         carp("Need to pass a code reference");
         return;
     }
@@ -230,24 +251,28 @@ sub set_outlier_filter {
     return 1;
 }
 
-sub _outlier_candidate_index {
+sub _outlier_candidate_index
+{
     my $self = shift;
 
-    my $mean = $self->mean();
+    my $mean                    = $self->mean();
     my $outlier_candidate_index = 0;
-    my $max_std_deviation = abs(($self->_data())->[0] - $mean);
-    foreach my $idx (1 .. ($self->count() - 1) ) {
-        my $curr_value = ($self->_data())->[$idx];
-        if ($max_std_deviation  <  abs($curr_value - $mean) ) {
+    my $max_std_deviation       = abs( ( $self->_data() )->[0] - $mean );
+    foreach my $idx ( 1 .. ( $self->count() - 1 ) )
+    {
+        my $curr_value = ( $self->_data() )->[$idx];
+        if ( $max_std_deviation < abs( $curr_value - $mean ) )
+        {
             $outlier_candidate_index = $idx;
-            $max_std_deviation = abs($curr_value - $mean);
+            $max_std_deviation       = abs( $curr_value - $mean );
         }
     }
     return $outlier_candidate_index;
 }
 
-sub set_smoother {
-    my ($self, $args) = @_;
+sub set_smoother
+{
+    my ( $self, $args ) = @_;
 
     $args->{data}    = $self->_data();
     $args->{samples} = $self->_samples();
@@ -255,28 +280,33 @@ sub set_smoother {
     $self->{_smoother} = Statistics::Descriptive::Smoother->instantiate($args);
 }
 
-sub get_smoothed_data {
-    my ($self, $args) = @_;
+sub get_smoothed_data
+{
+    my ( $self, $args ) = @_;
 
-    if (!defined $self->{_smoother}) {
+    if ( !defined $self->{_smoother} )
+    {
         carp("Smoother object not defined\n");
         return;
     }
     $self->{_smoother}->get_smoothed_data();
 }
 
-sub maxdex {
+sub maxdex
+{
     my $self = shift;
 
     return undef if !$self->count;
     my $maxdex;
 
-    if ($self->presorted) {
+    if ( $self->presorted )
+    {
         $maxdex = $self->count - 1;
     }
-    else {
+    else
+    {
         my $max = $self->max;
-        $maxdex =  List::MoreUtils::first_index {$_ == $max} $self->get_data;
+        $maxdex = List::MoreUtils::first_index { $_ == $max } $self->get_data;
     }
 
     $self->{maxdex} = $maxdex;
@@ -284,20 +314,24 @@ sub maxdex {
     return $maxdex;
 }
 
-sub mindex {
+sub mindex
+{
     my $self = shift;
 
     return undef if !$self->count;
+
     #my $maxdex = $self->{maxdex};
     #return $maxdex if defined $maxdex;
     my $mindex;
 
-    if ($self->presorted) {
+    if ( $self->presorted )
+    {
         $mindex = 0;
     }
-    else {
+    else
+    {
         my $min = $self->min;
-        $mindex = List::MoreUtils::first_index {$_ == $min} $self->get_data;
+        $mindex = List::MoreUtils::first_index { $_ == $min } $self->get_data;
     }
 
     $self->{mindex} = $mindex;
@@ -305,24 +339,26 @@ sub mindex {
     return $mindex;
 }
 
-sub sort_data {
-  my $self = shift;
+sub sort_data
+{
+    my $self = shift;
 
-  if (! $self->presorted())
-  {
-      ##Sort the data in descending order
-      $self->_data([ sort {$a <=> $b} @{$self->_data()} ]);
-      $self->presorted(1);
-      ##Fix the maxima and minima indices - no, this is unnecessary now we have methods
-      #$self->mindex(0);
-      #$self->maxdex($#{$self->_data()});
-  }
+    if ( !$self->presorted() )
+    {
+        ##Sort the data in descending order
+        $self->_data( [ sort { $a <=> $b } @{ $self->_data() } ] );
+        $self->presorted(1);
+        ##Fix the maxima and minima indices - no, this is unnecessary now we have methods
+        #$self->mindex(0);
+        #$self->maxdex($#{$self->_data()});
+    }
 
-  return 1;
+    return 1;
 }
 
-sub percentile {
-    my $self = shift;
+sub percentile
+{
+    my $self       = shift;
     my $percentile = shift || 0;
     ##Since we're returning a single value there's no real need
     ##to cache this.
@@ -332,60 +368,64 @@ sub percentile {
     ##POD below.
     my $count = $self->count();
 
-    if ((! $count) || ($percentile < 100 / $count))
+    if ( ( !$count ) || ( $percentile < 100 / $count ) )
     {
-        return;  #  allow for both scalar and list context
+        return;    #  allow for both scalar and list context
     }
 
     $self->sort_data();
-    my $num = $count*$percentile/100;
+    my $num   = $count * $percentile / 100;
     my $index = &POSIX::ceil($num) - 1;
-    my $val = $self->_data->[$index];
+    my $val   = $self->_data->[$index];
     return wantarray
-    ? ($val, $index)
-    : $val
-    ;
+        ? ( $val, $index )
+        : $val;
 }
 
 sub _calc_new_median
 {
-    my $self = shift;
+    my $self  = shift;
     my $count = $self->count();
 
     ##Even or odd
-    if ($count % 2)
+    if ( $count % 2 )
     {
-        return $self->_data->[($count-1)/2];
+        return $self->_data->[ ( $count - 1 ) / 2 ];
     }
     else
     {
-        return
-        (
-            ($self->_data->[($count)/2] + $self->_data->[($count-2)/2] ) / 2
+        return (
+            (
+                $self->_data->[ ($count) / 2 ] +
+                    $self->_data->[ ( $count - 2 ) / 2 ]
+            ) / 2
         );
     }
 }
 
-sub median {
+sub median
+{
     my $self = shift;
 
     return undef if !$self->count;
 
     ##Cached?
-    if (! defined($self->_median()))
+    if ( !defined( $self->_median() ) )
     {
         $self->sort_data();
-        $self->_median($self->_calc_new_median());
+        $self->_median( $self->_calc_new_median() );
     }
     return $self->_median();
 }
 
-sub quantile {
+sub quantile
+{
     my ( $self, $QuantileNumber ) = @_;
 
-    unless ( defined $QuantileNumber and $QuantileNumber =~ m/^0|1|2|3|4$/ ) {
-       carp("Bad quartile type, must be 0, 1, 2, 3 or 4\n");
-       return;
+    unless ( defined $QuantileNumber and $QuantileNumber =~ m/^0|1|2|3|4$/ )
+    {
+        carp("Bad quartile type, must be 0, 1, 2, 3 or 4\n");
+        return;
     }
 
     #  check data count after the args are checked - should help debugging
@@ -404,36 +444,36 @@ sub quantile {
     $K_quantile = POSIX::floor($K_quantile);
 
     # interpolation
-    my $aK_quantile     = $self->_data->[ $K_quantile - 1 ];
+    my $aK_quantile = $self->_data->[ $K_quantile - 1 ];
     return $aK_quantile if ( $F_quantile == 0 );
     my $aKPlus_quantile = $self->_data->[$K_quantile];
 
     # Calcul quantile
-    my $quantile = $aK_quantile
-      + ( $F_quantile * ( $aKPlus_quantile - $aK_quantile ) );
+    my $quantile =
+        $aK_quantile + ( $F_quantile * ( $aKPlus_quantile - $aK_quantile ) );
 
     return $quantile;
 }
 
 sub _real_calc_trimmed_mean
 {
-    my $self = shift;
+    my $self  = shift;
     my $lower = shift;
     my $upper = shift;
 
-    my $lower_trim = int ($self->count()*$lower);
-    my $upper_trim = int ($self->count()*$upper);
-    my ($val,$oldmean) = (0,0);
-    my ($tm_count,$tm_mean,$index) = (0,0,$lower_trim);
+    my $lower_trim = int( $self->count() * $lower );
+    my $upper_trim = int( $self->count() * $upper );
+    my ( $val, $oldmean ) = ( 0, 0 );
+    my ( $tm_count, $tm_mean, $index ) = ( 0, 0, $lower_trim );
 
     $self->sort_data();
-    while ($index <= $self->count() - $upper_trim -1)
+    while ( $index <= $self->count() - $upper_trim - 1 )
     {
-        $val = $self->_data()->[$index];
+        $val     = $self->_data()->[$index];
         $oldmean = $tm_mean;
-        $index++;
-        $tm_count++;
-        $tm_mean += ($val - $oldmean) / $tm_count;
+        ++$index;
+        ++$tm_count;
+        $tm_mean += ( $val - $oldmean ) / $tm_count;
     }
 
     return $tm_mean;
@@ -442,26 +482,27 @@ sub _real_calc_trimmed_mean
 sub trimmed_mean
 {
     my $self = shift;
-    my ($lower,$upper);
+    my ( $lower, $upper );
+
     #upper bound is in arg list or is same as lower
-    if (@_ == 1)
+    if ( @_ == 1 )
     {
-        ($lower,$upper) = ($_[0],$_[0]);
+        ( $lower, $upper ) = ( $_[0], $_[0] );
     }
     else
     {
-        ($lower,$upper) = ($_[0],$_[1]);
+        ( $lower, $upper ) = ( $_[0], $_[1] );
     }
 
     #  check data count after the args
     return undef if !$self->count;
 
     ##Cache
-    my $thistm = join ':',$lower,$upper;
-    my $cache = $self->_trimmed_mean_cache();
-    if (!exists($cache->{$thistm}))
+    my $thistm = join ':', $lower, $upper;
+    my $cache  = $self->_trimmed_mean_cache();
+    if ( !exists( $cache->{$thistm} ) )
     {
-        $cache->{$thistm} = $self->_real_calc_trimmed_mean($lower, $upper);
+        $cache->{$thistm} = $self->_real_calc_trimmed_mean( $lower, $upper );
     }
 
     return $cache->{$thistm};
@@ -470,9 +511,9 @@ sub trimmed_mean
 sub _test_for_too_small_val
 {
     my $self = shift;
-    my $val = shift;
+    my $val  = shift;
 
-    return (abs($val) <= $Statistics::Descriptive::Tolerance);
+    return ( abs($val) <= $Statistics::Descriptive::Tolerance );
 }
 
 sub _calc_harmonic_mean
@@ -481,32 +522,32 @@ sub _calc_harmonic_mean
 
     my $hs = 0;
 
-    foreach my $item ( @{$self->_data()} )
+    foreach my $item ( @{ $self->_data() } )
     {
         ##Guarantee that there are no divide by zeros
-        if ($self->_test_for_too_small_val($item))
+        if ( $self->_test_for_too_small_val($item) )
         {
             return;
         }
 
-        $hs += 1/$item;
+        $hs += 1 / $item;
     }
 
-    if ($self->_test_for_too_small_val($hs))
+    if ( $self->_test_for_too_small_val($hs) )
     {
         return;
     }
 
-    return $self->count()/$hs;
+    return $self->count() / $hs;
 }
 
 sub harmonic_mean
 {
     my $self = shift;
 
-    if (!defined($self->_harmonic_mean()))
+    if ( !defined( $self->_harmonic_mean() ) )
     {
-        $self->_harmonic_mean(scalar($self->_calc_harmonic_mean()));
+        $self->_harmonic_mean( scalar( $self->_calc_harmonic_mean() ) );
     }
 
     return $self->_harmonic_mean();
@@ -516,27 +557,27 @@ sub mode
 {
     my $self = shift;
 
-    if (!defined ($self->_mode()))
+    if ( !defined( $self->_mode() ) )
     {
-        my $mode = 0;
+        my $mode       = 0;
         my $occurances = 0;
 
         my %count;
 
-        foreach my $item (@{ $self->_data() })
+        foreach my $item ( @{ $self->_data() } )
         {
             my $count = ++$count{$item};
-            if ($count > $occurances)
+            if ( $count > $occurances )
             {
-                $mode = $item;
+                $mode       = $item;
                 $occurances = $count;
             }
         }
 
         $self->_mode(
-            ($occurances > 1)
-            ? {exists => 1, mode => $mode}
-            : {exists => 0,}
+              ( $occurances > 1 )
+            ? { exists => 1, mode => $mode }
+            : { exists => 0, }
         );
     }
 
@@ -545,19 +586,20 @@ sub mode
     return $m->{'exists'} ? $m->{mode} : undef;
 }
 
-sub geometric_mean {
+sub geometric_mean
+{
     my $self = shift;
 
     return undef if !$self->count;
 
-    if (!defined($self->_geometric_mean()))
+    if ( !defined( $self->_geometric_mean() ) )
     {
-        my $gm = 1;
-        my $exponent = 1/$self->count();
+        my $gm       = 1;
+        my $exponent = 1 / $self->count();
 
-        for my $val (@{ $self->_data() })
+        for my $val ( @{ $self->_data() } )
         {
-            if ($val < 0)
+            if ( $val < 0 )
             {
                 return undef;
             }
@@ -570,28 +612,30 @@ sub geometric_mean {
     return $self->_geometric_mean();
 }
 
-sub skewness {
+sub skewness
+{
     my $self = shift;
 
-    if (!defined($self->_skewness()))
+    if ( !defined( $self->_skewness() ) )
     {
-        my $n    = $self->count();
-        my $sd   = $self->standard_deviation();
+        my $n  = $self->count();
+        my $sd = $self->standard_deviation();
 
         my $skew;
 
         #  skip if insufficient records
-        if ( $sd && $n > 2) {
+        if ( $sd && $n > 2 )
+        {
 
             my $mean = $self->mean();
 
             my $sum_pow3;
-            foreach my $rec ( $self->get_data ) {
-                $sum_pow3 += (($rec - $mean) / $sd) ** 3;
+            foreach my $rec ( $self->get_data )
+            {
+                $sum_pow3 += ( ( $rec - $mean ) / $sd )**3;
             }
 
-
-            my $correction = $n / ( ($n-1) * ($n-2) );
+            my $correction = $n / ( ( $n - 1 ) * ( $n - 2 ) );
 
             $skew = $correction * $sum_pow3;
         }
@@ -602,27 +646,32 @@ sub skewness {
     return $self->_skewness();
 }
 
-sub kurtosis {
+sub kurtosis
+{
     my $self = shift;
 
-    if (!defined($self->_kurtosis()))
+    if ( !defined( $self->_kurtosis() ) )
     {
         my $kurt;
 
         my $n  = $self->count();
         my $sd = $self->standard_deviation();
 
-        if ( $sd && $n > 3) {
+        if ( $sd && $n > 3 )
+        {
 
             my $mean = $self->mean();
 
             my $sum_pow4;
-            foreach my $rec ( $self->get_data ) {
-                $sum_pow4 += ( ($rec - $mean ) / $sd ) ** 4;
+            foreach my $rec ( $self->get_data )
+            {
+                $sum_pow4 += ( ( $rec - $mean ) / $sd )**4;
             }
 
-            my $correction1 = ( $n * ($n+1) ) / ( ($n-1) * ($n-2) * ($n-3) );
-            my $correction2 = ( 3  * ($n-1) ** 2) / ( ($n-2) * ($n-3) );
+            my $correction1 =
+                ( $n * ( $n + 1 ) ) / ( ( $n - 1 ) * ( $n - 2 ) * ( $n - 3 ) );
+            my $correction2 =
+                ( 3 * ( $n - 1 )**2 ) / ( ( $n - 2 ) * ( $n - 3 ) );
 
             $kurt = ( $correction1 * $sum_pow4 ) - $correction2;
         }
@@ -633,35 +682,39 @@ sub kurtosis {
     return $self->_kurtosis();
 }
 
-
 sub frequency_distribution_ref
 {
     my $self = shift;
-    my @k = ();
+    my @k    = ();
+
     # Must have at least two elements
-    if ($self->count() < 2)
+    if ( $self->count() < 2 )
     {
         return undef;
     }
 
-    if ((!@_) && (defined $self->_frequency()))
+    if ( ( !@_ ) && ( defined $self->_frequency() ) )
     {
-        return $self->_frequency()
+        return $self->_frequency();
     }
 
     my %bins;
     my $partitions = shift;
 
-    if (ref($partitions) eq 'ARRAY')
+    if ( ref($partitions) eq 'ARRAY' )
     {
-        @k = @{ $partitions };
-        return undef unless @k;  ##Empty array
-        if (@k > 1) {
+        @k = @{$partitions};
+        return undef unless @k;    ##Empty array
+        if ( @k > 1 )
+        {
             ##Check for monotonicity
             my $element = $k[0];
-            for my $next_elem (@k[1..$#k]) {
-                if ($element > $next_elem) {
-                    carp "Non monotonic array cannot be used as frequency bins!\n";
+            for my $next_elem ( @k[ 1 .. $#k ] )
+            {
+                if ( $element > $next_elem )
+                {
+                    carp
+"Non monotonic array cannot be used as frequency bins!\n";
                     return undef;
                 }
                 $element = $next_elem;
@@ -673,22 +726,22 @@ sub frequency_distribution_ref
     {
         return undef unless $partitions >= 1;
         my $interval = $self->sample_range() / $partitions;
-        foreach my $idx (1 .. ($partitions-1))
+        foreach my $idx ( 1 .. ( $partitions - 1 ) )
         {
-            push @k, ($self->min() + $idx * $interval);
+            push @k, ( $self->min() + $idx * $interval );
         }
 
-        $bins{$self->max()} = 0;
+        $bins{ $self->max() } = 0;
 
         push @k, $self->max();
     }
 
-    ELEMENT:
-    foreach my $element (@{$self->_data()})
+ELEMENT:
+    foreach my $element ( @{ $self->_data() } )
     {
         foreach my $limit (@k)
         {
-            if ($element <= $limit)
+            if ( $element <= $limit )
             {
                 $bins{$limit}++;
                 next ELEMENT;
@@ -696,15 +749,16 @@ sub frequency_distribution_ref
         }
     }
 
-    return $self->_frequency(\%bins);
+    return $self->_frequency( \%bins );
 }
 
-sub frequency_distribution {
+sub frequency_distribution
+{
     my $self = shift;
 
     my $ret = $self->frequency_distribution_ref(@_);
 
-    if (!defined($ret))
+    if ( !defined($ret) )
     {
         return undef;
     }
@@ -714,97 +768,102 @@ sub frequency_distribution {
     }
 }
 
-sub least_squares_fit {
-  my $self = shift;
-  return () if $self->count() < 2;
+sub least_squares_fit
+{
+    my $self = shift;
+    return () if $self->count() < 2;
 
-  ##Sigma sums
-  my ($sigmaxy, $sigmax, $sigmaxx, $sigmayy, $sigmay) = (0,0,0,0,$self->sum);
-  my ($xvar, $yvar, $err);
+    ##Sigma sums
+    my ( $sigmaxy, $sigmax, $sigmaxx, $sigmayy, $sigmay ) =
+        ( 0, 0, 0, 0, $self->sum );
+    my ( $xvar, $yvar, $err );
 
-  ##Work variables
-  my ($iter,$y,$x,$denom) = (0,0,0,0);
-  my $count = $self->count();
-  my @x;
+    ##Work variables
+    my ( $iter, $y, $x, $denom ) = ( 0, 0, 0, 0 );
+    my $count = $self->count();
+    my @x;
 
-  ##Outputs
-  my ($m, $q, $r, $rms);
+    ##Outputs
+    my ( $m, $q, $r, $rms );
 
-  if (!defined $_[1]) {
-    @x = 1..$self->count();
-  }
-  else {
-    @x = @_;
-    if ( $self->count() != scalar @x) {
-      carp "Range and domain are of unequal length.";
-      return ();
+    if ( !defined $_[1] )
+    {
+        @x = 1 .. $self->count();
     }
-  }
-  foreach $x (@x) {
-    $y = $self->_data->[$iter];
-    $sigmayy += $y * $y;
-    $sigmaxx += $x * $x;
-    $sigmaxy += $x * $y;
-    $sigmax  += $x;
-    $iter++;
-  }
-  $denom = $count * $sigmaxx - $sigmax*$sigmax;
-  return ()
-    unless abs( $denom ) > $Statistics::Descriptive::Tolerance;
+    else
+    {
+        @x = @_;
+        if ( $self->count() != scalar @x )
+        {
+            carp "Range and domain are of unequal length.";
+            return ();
+        }
+    }
+    foreach my $x_val (@x)
+    {
+        $y = $self->_data->[$iter];
+        $sigmayy += $y * $y;
+        $sigmaxx += $x_val * $x_val;
+        $sigmaxy += $x_val * $y;
+        $sigmax  += $x_val;
+        ++$iter;
+    }
+    $denom = $count * $sigmaxx - $sigmax * $sigmax;
+    return ()
+        unless abs($denom) > $Statistics::Descriptive::Tolerance;
 
-  $m = ($count*$sigmaxy - $sigmax*$sigmay) / $denom;
-  $q = ($sigmaxx*$sigmay - $sigmax*$sigmaxy ) / $denom;
+    $m = ( $count * $sigmaxy - $sigmax * $sigmay ) / $denom;
+    $q = ( $sigmaxx * $sigmay - $sigmax * $sigmaxy ) / $denom;
 
-  $xvar = $sigmaxx - $sigmax*$sigmax / $count;
-  $yvar = $sigmayy - $sigmay*$sigmay / $count;
+    $xvar = $sigmaxx - $sigmax * $sigmax / $count;
+    $yvar = $sigmayy - $sigmay * $sigmay / $count;
 
-  $denom = sqrt( $xvar * $yvar );
-  return () unless (abs( $denom ) > $Statistics::Descriptive::Tolerance);
-  $r = ($sigmaxy - $sigmax*$sigmay / $count )/ $denom;
+    $denom = sqrt( $xvar * $yvar );
+    return () unless ( abs($denom) > $Statistics::Descriptive::Tolerance );
+    $r = ( $sigmaxy - $sigmax * $sigmay / $count ) / $denom;
 
-  $iter = 0;
-  $rms = 0.0;
-  foreach (@x) {
-    ##Error = Real y - calculated y
-    $err = $self->_data->[$iter] - ( $m * $_ + $q );
-    $rms += $err*$err;
-    $iter++;
-  }
+    $iter = 0;
+    $rms  = 0.0;
+    foreach (@x)
+    {
+        ##Error = Real y - calculated y
+        $err = $self->_data->[$iter] - ( $m * $_ + $q );
+        $rms += $err * $err;
+        ++$iter;
+    }
 
-  $rms = sqrt($rms / $count);
+    $rms = sqrt( $rms / $count );
 
-  $self->_least_squares_fit([$q, $m, $r, $rms]);
+    $self->_least_squares_fit( [ $q, $m, $r, $rms ] );
 
-  return @{ $self->_least_squares_fit() };
+    return @{ $self->_least_squares_fit() };
 }
 
-sub median_absolute_deviation {
+sub median_absolute_deviation
+{
     my ($self) = @_;
 
-    if (!defined($self->_median_absolute_deviation()))
+    if ( !defined( $self->_median_absolute_deviation() ) )
     {
         my $stat = $self->new;
-        $stat->add_data(map { abs($_ - $self->median) } $self->get_data);
-        $self->_median_absolute_deviation($stat->median);
+        $stat->add_data( map { abs( $_ - $self->median ) } $self->get_data );
+        $self->_median_absolute_deviation( $stat->median );
     }
 
     return $self->_median_absolute_deviation();
 }
 
-sub summary {
+sub summary
+{
     my ($self) = @_;
 
     my $FMT = '%.5e';
 
-    return sprintf("Min: $FMT\nMax: $FMT\nMean: $FMT\nMedian: $FMT\n" .
-        "1st quantile: $FMT\n3rd quantile: $FMT\n",
-        $self->min,
-        $self->max,
-        $self->mean,
-        $self->median,
-        $self->quantile(1),
-        $self->quantile(3),
-    );
+    return
+        sprintf( "Min: $FMT\nMax: $FMT\nMean: $FMT\nMedian: $FMT\n"
+            . "1st quantile: $FMT\n3rd quantile: $FMT\n",
+        $self->min, $self->max, $self->mean, $self->median, $self->quantile(1),
+        $self->quantile(3), );
 
 }
 1;
@@ -821,7 +880,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0702
+version 3.0800
 
 =head1 SYNOPSIS
 
@@ -850,10 +909,6 @@ of very small denominators.
 
 Many of the methods (both Sparse and Full) cache values so that subsequent
 calls with the same arguments are faster.
-
-=head1 VERSION
-
-version 3.0702
 
 =head1 METHODS
 
@@ -1359,35 +1414,9 @@ and/or modify it under the same terms as Perl itself.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Statistics::Descriptive::Full
 
 =head2 Websites
 
@@ -1406,35 +1435,11 @@ L<https://metacpan.org/release/Statistics-Descriptive>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Statistics-Descriptive>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Statistics-Descriptive>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Statistics-Descriptive>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Statistics-Descriptive>
 
 =item *
 
@@ -1485,5 +1490,25 @@ from your repository :)
 L<https://github.com/shlomif/perl-Statistics-Descriptive>
 
   git clone git://github.com/shlomif/perl-Statistics-Descriptive.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Statistics-Descriptive/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1997 by Jason Kastner, Andrea Spinelli, Colin Kuskie, and others.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

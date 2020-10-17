@@ -278,13 +278,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 File::Remove - Remove files and directories
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -315,10 +317,6 @@ It also accepts wildcards, * and ?, as arguments for filenames.
 B<File::Remove::trash> accepts the same arguments as B<remove>, with
 the addition of an optional, infrequently used "other platforms"
 hashref.
-
-=head1 VERSION
-
-version 1.58
 
 =head1 SUBROUTINES
 
@@ -424,36 +422,9 @@ Original copyright: 1998 by Gabor Egressy, E<lt>gabor@vmunix.comE<gt>.
 This program is free software; you can redistribute and/or modify it under
 the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 1998 by Gabor Egressy.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Remove> or by email to
-L<bug-file-remove@rt.cpan.org|mailto:bug-file-remove@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc File::Remove
 
 =head2 Websites
 
@@ -472,35 +443,11 @@ L<https://metacpan.org/release/File-Remove>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/File-Remove>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Remove>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Remove>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/File-Remove>
 
 =item *
 
@@ -551,5 +498,26 @@ from your repository :)
 L<https://github.com/shlomif/File-Remove>
 
   git clone git://github.com/shlomif/File-Remove.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Remove> or by email to
+L<bug-file-remove@rt.cpan.org|mailto:bug-file-remove@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1998 by Gabor Egressy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

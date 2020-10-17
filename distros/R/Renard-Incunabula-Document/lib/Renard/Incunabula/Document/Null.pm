@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document::Null;
 # ABSTRACT: A null document
-$Renard::Incunabula::Document::Null::VERSION = '0.004';
+$Renard::Incunabula::Document::Null::VERSION = '0.005';
 use Moo;
 use Renard::Incunabula::Common::Types qw(ArrayRef InstanceOf);
 
@@ -33,7 +33,7 @@ Renard::Incunabula::Document::Null - A null document
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

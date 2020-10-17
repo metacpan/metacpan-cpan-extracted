@@ -1,0 +1,11 @@
+native:
+  debian:
+    packages:
+      - pkg-config
+      - libglib2.0-dev
+  macos-homebrew:
+    packages:
+      - glib
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-glib2

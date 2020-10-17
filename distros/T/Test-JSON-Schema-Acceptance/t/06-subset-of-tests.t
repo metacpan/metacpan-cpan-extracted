@@ -15,6 +15,10 @@ use SchemaParser;
 my $accepter = Test::JSON::Schema::Acceptance->new(test_dir => 't/tests/subset');
 my $parser = SchemaParser->new;
 
+# bar contains only failing tests (3x3)
+# baz contains only passing tests (3)
+# foo contains only passing tests (3x3)
+
 foreach my $test (
   # run tests in this file
   { count => [0,0,9], tests => { file => 'foo.json' } },
@@ -85,8 +89,9 @@ foreach my $test (
       map +(
         $count->[$_] ? +{
           file => str([ qw(bar.json baz.json foo.json) ]->[$_]),
-          pass => 0+$count->[$_],
-          fail => 0,
+          pass => ($_ ? 0+$count->[$_] : 0),
+          todo_fail => 0,
+          fail => ($_ ? 0 : 0+$count->[$_]),
         } : ()
       ), (0..2)
     ],

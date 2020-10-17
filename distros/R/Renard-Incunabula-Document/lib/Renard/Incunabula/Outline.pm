@@ -1,12 +1,13 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Outline;
 # ABSTRACT: Model that represents a document outline
-$Renard::Incunabula::Outline::VERSION = '0.004';
+$Renard::Incunabula::Outline::VERSION = '0.005';
 use Moo;
 use Renard::Incunabula::Common::Types qw(
 	ArrayRef Dict
-	PositiveOrZeroInt Str
-	InstanceOf );
+	PositiveOrZeroInt Str Bool
+	InstanceOf
+	Optional);
 use Renard::Incunabula::Document::Types qw(LaxPageNumber);
 use Type::Utils qw( declare as where message );
 use Module::Load;
@@ -15,7 +16,8 @@ my $Outline = declare
 	as ArrayRef[Dict[
 			level => PositiveOrZeroInt,
 			text => Str,
-			page => LaxPageNumber
+			open => Optional[Bool],
+			page => Optional[LaxPageNumber]
 		]];
 my $OutlineLevelCheck = declare
 	as $Outline,
@@ -105,7 +107,7 @@ Renard::Incunabula::Outline - Model that represents a document outline
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

@@ -41,6 +41,7 @@ enum {
   SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_FLOAT,
   SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_DOUBLE,
   SPVM_TYPE_C_RUNTIME_TYPE_VOID,
+  SPVM_TYPE_C_RUNTIME_TYPE_STRING,
 };
 
 extern const char* const SPVM_TYPE_RUNTIME_TYPE_C_ID_NAMES[];
@@ -128,7 +129,6 @@ int32_t SPVM_TYPE_is_value_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_
 int32_t SPVM_TYPE_is_value_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_basic_type_is_multi_numeric_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_byte_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
-int32_t SPVM_TYPE_is_string_compatible_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 int32_t SPVM_TYPE_is_oarray_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_object_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);

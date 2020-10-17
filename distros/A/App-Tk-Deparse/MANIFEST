@@ -1,0 +1,10 @@
+bin/perl-deparse
+Changes
+CONTRIBUTING.md
+lib/App/Tk/Deparse.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

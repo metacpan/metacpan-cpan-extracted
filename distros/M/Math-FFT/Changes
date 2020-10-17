@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::FFT.
 
+1.36  2020-10-17
+    - Avoid including Build.PL to fix cpan installs.
+        - https://github.com/shlomif/perl-Math-FFT/issues/4
+        - Thanks to @eserte / SREZIC for the issue report.
+
 1.35  2020-10-15
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Inspired by Lady_Aleena.

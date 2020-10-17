@@ -13,11 +13,11 @@ HTML::T5 - HTML validation in a Perl object
 
 =head1 VERSION
 
-Version 0.009
+Version 0.010
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 =head1 SYNOPSIS
 
@@ -402,7 +402,7 @@ prerequisite modules.
 =head1 BUGS & FEEDBACK
 
 Please report any bugs or feature requests at the issue tracker on github
-L<http://github.com/petdance/html-tidy5/issues>.  I will be notified,
+L<http://github.com/shlomif/html-tidy5/issues>.  I will be notified,
 and then you'll automatically be notified of progress on your bug as I
 make changes.
 
@@ -421,10 +421,6 @@ You can also look for information at:
 =item * HTML::T5's issue queue at github
 
 L<http://github.com/shlomif/html-tidy5/issues>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/HTML-T5>
 
 =item * CPAN Ratings
 
@@ -456,6 +452,8 @@ Jonathan Rockway,
 and Robert Bachmann for contributions.
 
 Thanks to L<https://github.com/robrwo> for the code to use L<Alien::TidyHTML5> .
+
+Thanks to Andy Lester for maintaining L<HTML::Tidy5> and L<HTML::Tidy>.
 
 =head1 AUTHOR
 

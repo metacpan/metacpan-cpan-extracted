@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document;
 # ABSTRACT: Base class for representing documents
-$Renard::Incunabula::Document::VERSION = '0.004';
+$Renard::Incunabula::Document::VERSION = '0.005';
 use Moo;
 
 1;
@@ -18,7 +18,7 @@ Renard::Incunabula::Document - Base class for representing documents
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

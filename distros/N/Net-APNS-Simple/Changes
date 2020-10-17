@@ -1,5 +1,14 @@
 Revision history for Perl extension Net-APNS-Simple
 
+0.05 2020-10-17T02:49:56Z
+    - Add some modules to test requirements.
+
+0.04 2020-10-16T06:47:55Z
+    - Add support for SSL certificate authentication.
+    - Add support for proxy.
+    - Add support for apns-id and apns-collapse-id headers.
+    - Load the Crypt::JWT and Net::HTTP modules only on demand.
+
 0.03 2016-12-15T02:12:45Z
 
     - Changed to use Crypt::PK::ECC instead of external command `openssl`.

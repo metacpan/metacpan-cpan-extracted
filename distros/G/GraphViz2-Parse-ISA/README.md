@@ -2,41 +2,27 @@
 
 [GraphViz2::Parse::ISA](https://metacpan.org/pod/GraphViz2::Parse::ISA) - Visualize N Perl class hierarchies as a graph
 
-# Synopsis
-
-        #!/usr/bin/env perl
+# SYNOPSIS
 
         use strict;
         use warnings;
-
         use File::Spec;
-
-        use GraphViz2;
         use GraphViz2::Parse::ISA;
 
-        my($graph) = GraphViz2 -> new
-                (
-                 edge   => {color => 'grey'},
-                 global => {directed => 1},
-                 graph  => {rankdir => 'BT'},
-                 node   => {color => 'blue', shape => 'Mrecord'},
-                );
-        my($parser) = GraphViz2::Parse::ISA -> new(graph => $graph);
-
+        my $parser = GraphViz2::Parse::ISA->new;
         unshift @INC, 't/lib';
+        $parser->add(class => 'Adult::Child::Grandchild', ignore => []);
+        $parser->add(class => 'HybridVariety', ignore => []);
+        $parser->generate_graph;
 
-        $parser -> add(class => 'Adult::Child::Grandchild', ignore => []);
-        $parser -> add(class => 'Hybrid', ignore => []);
-        $parser -> generate_graph;
+        my $format      = shift || 'svg';
+        my $output_file = shift || "parse.code.$format";
 
-        my($format)      = shift || 'svg';
-        my($output_file) = shift || File::Spec -> catfile('html', "parse.code.$format");
+        $parser->graph->run(format => $format, output_file => $output_file);
 
-        $graph -> run(format => $format, output_file => $output_file);
+See scripts/parse.isa.pl.
 
-See scripts/parse.isa.pl (["Scripts Shipped with this Module" in GraphViz2](https://metacpan.org/pod/GraphViz2#Scripts-Shipped-with-this-Module)).
-
-# Description
+# DESCRIPTION
 
 Takes a class name and converts its class hierarchy into a graph. This can be done for N different classes before the graph is generated.
 
@@ -46,7 +32,7 @@ You can write the result in any format supported by [Graphviz](http://www.graphv
 
 ## Calling new()
 
-`new()` is called as `my($obj) = GraphViz2::Parse::ISA -> new(k1 => v1, k2 => v2, ...)`.
+`new()` is called as `my($obj) = GraphViz2::Parse::ISA->new(k1 => v1, k2 => v2, ...)`.
 
 It returns a new object of type `GraphViz2::Parse::ISA`.
 
@@ -63,7 +49,7 @@ Key-value pairs accepted in the parameter list:
 
     This key is optional.
 
-# Methods
+# METHODS
 
 ## add(class => $class\[, ignore => $ignore\])
 
@@ -95,19 +81,14 @@ Returns the graph object, either the one supplied to new() or the one created du
 
 # Scripts Shipped with this Module
 
-## scripts/dependency.pl
-
-Demonstrates graphing an [Algorithm::Dependency](https://metacpan.org/pod/Algorithm::Dependency) source.
-
-Outputs to ./html/dependency.svg by default.
-
 ## scripts/parse.isa.pl
 
 Demonstrates combining 2 Perl class hierarchies on the same graph.
 
-Outputs to ./html/parse.isa.svg by default.
+Outputs to ./html/parse.isa.svg by default. Change this by providing a
+format argument (e.g. `svg`) and a filename argument.
 
-# Thanks
+# THANKS
 
 Many thanks are due to the people who chose to make [Graphviz](http://www.graphviz.org/) Open Source.
 
@@ -116,13 +97,13 @@ And thanks to [Leon Brocard](http://search.cpan.org/~lbrocard/), who wrote [Grap
 The code in add() was adapted from [GraphViz::ISA::Multi](https://metacpan.org/pod/GraphViz::ISA::Multi) by Marcus Thiesen, but that code gobbled up package declarations
 in comments and POD, so I used [Pod::Simple](https://metacpan.org/pod/Pod::Simple) to give me just the source code.
 
-# Author
+# AUTHOR
 
 [GraphViz2](https://metacpan.org/pod/GraphViz2) was written by Ron Savage _<ron@savage.net.au>_ in 2011.
 
 Home page: [http://savage.net.au/index.html](http://savage.net.au/index.html).
 
-# Copyright
+# COPYRIGHT
 
 Australian copyright (c) 2011, Ron Savage.
 

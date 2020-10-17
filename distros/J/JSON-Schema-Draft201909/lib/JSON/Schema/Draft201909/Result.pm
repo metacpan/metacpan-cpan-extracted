@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -70,25 +70,30 @@ sub format {
     };
   }
   if ($style eq 'terse') {
+    my @errors = grep {
+        my ($keyword, $error) = ($_->keyword, $_->error);
+        not $keyword
+          or ($keyword =~ /^unevaluated(?:Items|Properties)$/
+            and $error =~ /"$keyword" keyword present, but/)
+          or (
+            not grep $keyword eq $_, qw(allOf anyOf if then else dependentSchemas items propertyNames)
+            and ($keyword ne 'oneOf' or $error ne 'no subschemas are valid')
+            and (not grep $keyword eq $_, qw(additionalItems unevaluatedItems)
+              or $error eq 'additional item not permitted')
+            and (not grep $keyword eq $_, qw(properties patternProperties)
+              or $error eq 'property not permitted')
+            and (not grep $keyword eq $_, qw(additionalProperties unevaluatedProperties)
+              or $error eq 'additional property not permitted'))
+      }
+      $self->errors;
+
+    die 'uh oh, have no errors left to report' if not $self->result and not @errors;
+
     return +{
       valid => $self->result,
       $self->result
         ? ($self->annotation_count ? (annotations => [ map $_->TO_JSON, $self->annotations ]) : ())
-        : (errors => [ map $_->TO_JSON,
-            grep {
-              my ($keyword, $error) = ($_->keyword, $_->error);
-              not $keyword
-                or (
-                  not grep $keyword eq $_, qw(allOf anyOf if then else dependentSchemas items propertyNames)
-                  and ($keyword ne 'oneOf' or $error ne 'no subschemas are valid')
-                  and (not grep $keyword eq $_, qw(additionalItems unevaluatedItems)
-                    or $error eq 'additional item not permitted')
-                  and (not grep $keyword eq $_, qw(properties patternProperties)
-                    or $error eq 'property not permitted')
-                  and (not grep $keyword eq $_, qw(additionalProperties unevaluatedProperties)
-                    or $error eq 'additional property not permitted'))
-            }
-            $self->errors ]),
+        : (errors => [ map $_->TO_JSON, @errors ]),
     };
   }
 
@@ -116,7 +121,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -166,7 +171,7 @@ One of: C<flag>, C<basic>, C<detailed>, C<verbose>, C<terse>. Defaults to C<basi
 Returns a data structure suitable for serialization; requires one argument specifying the output
 format to use, which corresponds to the formats documented in
 L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10.4>. The only supported
-formats at this time are C<flag> and C<basic>.
+formats at this time are C<flag>, C<basic> and C<terse>.
 
 =head2 TO_JSON
 

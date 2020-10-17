@@ -1,0 +1,28 @@
+MODE: INLINE
+
+#include <xs.h>
+#include <kiwi/kiwi.h>
+
+namespace xs {
+    template <>
+    struct Typemap<kiwi::Constraint*> : TypemapObject<kiwi::Constraint*, kiwi::Constraint*, ObjectTypeRefcntPtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "Intertangle::API::Kiwisolver::Constraint"; }
+    };
+}
+
+MODULE = Intertangle::API::Kiwisolver                PACKAGE = Intertangle::API::Kiwisolver::Constraint
+PROTOTYPES: DISABLE
+
+kiwi::Expression* kiwi::Constraint::expression() {
+	RETVAL = &( const_cast<kiwi::Expression&>( THIS->expression() ) );
+}
+
+double kiwi::Constraint::strength()
+
+bool kiwi::Constraint::_op_neg() (OVERLOAD: neg) {
+	RETVAL = !(*THIS);
+}
+
+BOOT {
+	Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+}

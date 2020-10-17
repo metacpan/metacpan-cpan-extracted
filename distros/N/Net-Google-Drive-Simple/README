@@ -1,29 +1,28 @@
-######################################################################
-    Net::Google::Drive::Simple 0.13
-######################################################################
-
 NAME
     Net::Google::Drive::Simple - Simple modification of Google Drive data
 
 SYNOPSIS
+        use feature 'say';
         use Net::Google::Drive::Simple;
 
-          # requires a ~/.google-drive.yml file with an access token,
-          # see description below.
+        # requires a ~/.google-drive.yml file with an access token,
+        # see description below.
         my $gd = Net::Google::Drive::Simple->new();
 
-        my $children = $gd->children( "/folder/path" );
+        my $children = $gd->children( "/" ); # or any other folder /path/location
 
-        for my $child ( @$children ) {
+        foreach my $item ( @$children ) {
 
-            next if $child->kind() ne 'drive#file';
+            # item is a Net::Google::Drive::Simple::Item object
 
-            next if !$child->can( "downloadUrl" );
-
-            print $child->originalFilename(),
-                  " can be downloaded at ",
-                  $child->downloadUrl(),
-                  "\n";
+            if ( $item->is_folder ) {
+                say "** ", $item->title, " is a folder";
+            } else {
+                say $item->title, " is a file ", $item->mimeType;
+                eval { # originalFilename not necessary available for all files
+                  say $item->originalFilename(), " can be downloaded at ", $item->downloadUrl();
+                };
+            }
         }
 
 DESCRIPTION
@@ -130,6 +129,15 @@ METHODS
         Create a new folder as a child of the folder with the id $parent_id.
         Returns the ID of the new folder or undef in case of an error.
 
+    "my $id = $gd->file_create( "folder-name", "mime-type", $parent_id )"
+        Create a new file with the given mime type as a child of the folder
+        with the id $parent_id. Returns the ID of the new file or undef in
+        case of an error.
+
+        Example to create an empty google spreadsheet:
+
+            my $id = $gd->file_create( "Quarter Results", "application/vnd.google-apps.spreadsheet", "root" );
+
     "$gd->file_upload( $file, $dir_id )"
         Uploads the content of the file $file into the directory with the ID
         $dir_id on Google Drive. Uses $file as the file name.
@@ -214,7 +222,27 @@ METHODS
         a new parent.
 
     "my $metadata_hash_ref = $gd->file_metadata( file_id )"
-        Return metadata about the file with the specified ID from Google Drive.
+        Return metadata about the file with the specified ID from Google
+        Drive.
+
+    "api_test"
+        Used at init time to check that the connection is correct.
+
+    "children_by_folder_id"
+    "data_factory"
+    "error"
+    "file_mime_type"
+    "file_mvdir"
+    "file_url"
+    "http_delete"
+    "http_json"
+    "http_loop"
+    "http_put"
+    "init"
+        Internal initialization to setup the connection.
+
+    "item_iterator"
+    "path_resolve"
 
 Error handling
     In case of an error while retrieving information from the Google Drive
@@ -231,10 +259,11 @@ LOGGING/DEBUGGING
         Log::Log4perl->easy_init($DEBUG);
 
 LEGALESE
-    Copyright 2019 by Mike Schilli, all rights reserved. This program is
-    free software, you can redistribute it and/or modify it under the same
-    terms as Perl itself.
+    Copyright 2012-2019 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
 
 AUTHOR
-    2012-2019, Mike Schilli <cpan@perlmeister.com>
+    2019, Nicolas R. <cpan@atoomic.org> 2012-2019, Mike Schilli
+    <cpan@perlmeister.com>
 

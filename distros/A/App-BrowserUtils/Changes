@@ -1,3 +1,8 @@
+0.012   2020-10-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix copy-paste mistake in log statement.
+
+
 0.011   2020-10-07  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Detect Firefox process when it is upgraded.

@@ -1,5 +1,5 @@
 package Games::LMSolve::Registry;
-$Games::LMSolve::Registry::VERSION = '0.14.1';
+$Games::LMSolve::Registry::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ Games::LMSolve::Registry - the registry of all LM-Solve drivers.
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 DESCRIPTION
 

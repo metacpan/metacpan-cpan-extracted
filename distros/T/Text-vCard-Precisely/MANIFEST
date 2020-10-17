@@ -12,6 +12,7 @@ lib/Text/vCard/Precisely/V3/Node.pm
 lib/Text/vCard/Precisely/V3/Node/Address.pm
 lib/Text/vCard/Precisely/V3/Node/Email.pm
 lib/Text/vCard/Precisely/V3/Node/Image.pm
+lib/Text/vCard/Precisely/V3/Node/MultiContent.pm
 lib/Text/vCard/Precisely/V3/Node/N.pm
 lib/Text/vCard/Precisely/V3/Node/SocialProfile.pm
 lib/Text/vCard/Precisely/V3/Node/Tel.pm

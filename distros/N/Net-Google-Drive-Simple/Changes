@@ -1,6 +1,12 @@
 ######################################################################
 Revision history for Perl extension Net::Google::Drive::Simple
 
+0.18      2020-10-16
+
+- Escape single quotes in file and folder names
+- Bump min Perl version to 5.016 (Mojolicious requirement)
+- Switch distro to Dist::Zilla
+
 0.17 (2020/01/31)
         * Add 'rename' support to rename files or folder
         (implemented by Andy Bircumshaw )

@@ -1,3 +1,11 @@
+0.008   2020-10-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] When there are no results found, return a helpful tip to
+	  search other spelling variations or try additional search types.
+
+
 0.007   2020-09-09  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

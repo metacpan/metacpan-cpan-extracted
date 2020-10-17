@@ -18,7 +18,7 @@ has types => ( is => 'rw', isa => 'SocialProfileType', required => 1 );
 
 has userid => ( is => 'rw', isa => 'Str' );
 
-subtype 'SocialProfileName' => as 'Str' => where { use utf8; decode_utf8($_) =~ m/^[\w\s]+$/s }
+subtype 'SocialProfileName' => as 'Str' => where { decode_utf8($_) =~ m/^[\w\s]+$/s }
 => message {"The text you provided, $_, was not supported in 'SocialProfileName'"};
 coerce 'SocialProfileName', from 'Str', via { encode_utf8($_) };
 has displayname => ( is => 'rw', isa => 'SocialProfileName', coerce => 1 );

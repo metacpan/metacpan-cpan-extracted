@@ -1,5 +1,5 @@
 package File::Format::CRD::Reader;
-$File::Format::CRD::Reader::VERSION = '0.2.0';
+$File::Format::CRD::Reader::VERSION = '0.2.2';
 use warnings;
 use strict;
 
@@ -186,7 +186,7 @@ File::Format::CRD::Reader - read Windows .CRD files.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -231,40 +231,6 @@ certain encoding.
 
 Shlomi Fish, L<http://www.shlomifish.org/>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-file-format-crd at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Format-CRD>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc File::Format::CRD::Reader
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Format-CRD>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/File-Format-CRD>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/File-Format-CRD>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/File-Format-CRD/>
-
-=back
-
 =head1 ACKNOWLEDGEMENTS
 
 This module is based on L<http://ihaa.com/english/crd2html.html> by
@@ -274,7 +240,7 @@ ihaa.com.
 
 Copyright 2010 Shlomi Fish.
 
-This program is distributed under the MIT (X11) License:
+This program is distributed under the MIT (Expat) License:
 L<http://www.opensource.org/licenses/mit-license.php>
 
 Permission is hereby granted, free of charge, to any person
@@ -298,36 +264,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2010 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-file-format-crd/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc File::Format::CRD::Reader
 
 =head2 Websites
 
@@ -346,35 +285,11 @@ L<https://metacpan.org/release/File-Format-CRD>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/File-Format-CRD>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Format-CRD>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Format-CRD>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/File-Format-CRD>
 
 =item *
 
@@ -425,5 +340,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-file-format-crd>
 
   git clone git://github.com/shlomif/perl-file-format-crd.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-file-format-crd/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2010 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

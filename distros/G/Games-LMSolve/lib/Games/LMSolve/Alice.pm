@@ -1,5 +1,5 @@
 package Games::LMSolve::Alice;
-$Games::LMSolve::Alice::VERSION = '0.14.1';
+$Games::LMSolve::Alice::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -90,7 +90,7 @@ INPUT_LOOP: while ( $read_line->() )
                                 . ")" );
                     }
                     $board[$y][$x] = {
-                        'dirs' => { map { $_ => $cell_dirs{$_} } @dirs },
+                        'dirs'  => { map { $_ => $cell_dirs{$_} } @dirs },
                         'flags' =>
                             { map { $_ => $cell_flags{$_} } @flag_flags },
                     };
@@ -264,7 +264,7 @@ mazes.
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

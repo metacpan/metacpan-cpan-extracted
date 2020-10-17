@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: RapidApp-powered blog
 
-use RapidApp 1.3200;
+use RapidApp 1.3301;
 
 use Moose;
 extends 'RapidApp::Builder';
@@ -18,11 +18,12 @@ use FindBin;
 require Module::Locate;
 use Path::Class qw/file dir/;
 use YAML::XS 0.64 'LoadFile';
+use HTML::Scrubber;
 
 use Rapi::Blog::Scaffold;
 use Rapi::Blog::Scaffold::Set;
 
-our $VERSION = '1.1301';
+our $VERSION = '1.1400';
 our $TITLE = "Rapi::Blog v" . $VERSION;
 
 has 'site_path',        is => 'ro', required => 1;
@@ -41,6 +42,29 @@ has 'smtp_config', is => 'ro', isa => Maybe[HashRef], default => sub { undef };
 has 'override_email_recipient', is => 'ro', isa => Maybe[Str], default => sub { undef };
 
 has 'recaptcha_config', is => 'ro', isa => Maybe[HashRef[Str]], default => sub { undef };
+
+# constructor argument for HTML::Scrubber
+has 'input_scrubber_cfg', is => 'ro', default => sub {
+  my @exclude_tags = qw(script link style object embed iframe);
+  my @limit_attrs  = qw(style alt src href title class);
+  return {
+    rules => [
+      # ALLOW ALL TAGS:
+      '*' => 1,
+
+      # EXCEPT ONES IN @exclude_tags:
+      (map { $_ => 0 } @exclude_tags)
+    ],
+    default => [ undef, {
+       # DENY ALL ATTRIBUTES:
+      '*' => 0,
+
+      # EXCEPT ONES IN @limit_attrs:
+      (map { $_ => 1 } @limit_attrs)
+    }]
+  }
+}, isa => HashRef;
+
 
 
 has '+base_appname', default => sub { 'Rapi::Blog::App' };
@@ -90,6 +114,11 @@ has '+inject_components', default => sub {
   ]
 };
 
+has 'input_Scrubber', is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+  my $cfg = $self->input_scrubber_cfg or die "Failed to load input_scrubber_cfg";
+  HTML::Scrubber->new( %$cfg )
+}, isa => InstanceOf['HTML::Scrubber'];
 
 
 has 'site_dir', is => 'ro', init_arg => undef, lazy => 1, default => sub {

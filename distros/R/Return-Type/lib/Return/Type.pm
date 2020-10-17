@@ -5,7 +5,7 @@ use warnings;
 package Return::Type;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.007';
 
 use Attribute::Handlers;
 use Eval::TypeTiny qw( eval_closure );
@@ -105,9 +105,20 @@ sub wrap_sub
 	return set_subname(subname($sub), $rv);
 }
 
+my $Void;
+
 sub UNIVERSAL::ReturnType :ATTR(CODE)
 {
 	my ($package, $symbol, $referent, $attr, $data) = @_;
+	
+	if ( (ref($data)||'') ne 'ARRAY' ) {
+		$data = [ $data ];
+	}
+
+	if (@$data == 1 and $data->[0] eq 'Void') {
+		$Void ||= Any->complementary_type->create_child_type(name => 'Void');
+		$data = [ scalar => $Void, list => $Void ];
+	}
 	
 	no warnings qw(redefine);
 	my %args = (@$data % 2) ? (scalar => @$data) : @$data;
@@ -160,6 +171,24 @@ list context:
       else {
          return 42;
       }
+   }
+
+The return value is not type checked if the function is called in void
+context.
+
+   # Note that the ~Any type is the opposite of Any.
+   # So all values will fail the type check.
+   # That means that the following function can only
+   # be called in void context.
+   #
+   sub foo :ReturnType(scalar => ~Any, list => ~Any) {
+      ...;
+   }
+   
+   # Shortcut for the above.
+   #
+   sub foo :ReturnType(Void) {
+      ...;
    }
 
 Note that because type constraint libraries are really aimed at

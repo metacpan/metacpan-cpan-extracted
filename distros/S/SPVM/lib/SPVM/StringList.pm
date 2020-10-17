@@ -11,10 +11,10 @@ SPVM::StringList - Continuous dynamic string array
   use SPVM::StringList;
   
   # Create a string list
-  my $string_list = SPVM::StringList->new;
+  my $string_list = SPVM::StringList->new_len(10);
 
   # Create a string list with array
-  my $string_list = SPVM::StringList->newa(["abc", "def", "ghi"]);
+  my $string_list = SPVM::StringList->new(["abc", "def", "ghi"]);
   
   # Get list length
   my $length = $string_list->length;
@@ -54,15 +54,15 @@ L<SPVM::StringList> is continuous dynamic string array.
 
 =head2 new
 
-    sub new : SPVM::StringList ()
-
-Create a new L<SPVM::StringList> object.
-
-=head2 newa
-
-    sub newa : SPVM::StringList ($array : string[])
+    sub new : SPVM::StringList ($array : string[])
 
 Create a new L<SPVM::StringList> object with specific C<string> array.
+
+=head2 new_len
+
+    sub new_len : SPVM::StringList ($length : int)
+
+Create a new L<SPVM::StringList> object with array length.
 
 =head1 INSTANCE METHODS
 

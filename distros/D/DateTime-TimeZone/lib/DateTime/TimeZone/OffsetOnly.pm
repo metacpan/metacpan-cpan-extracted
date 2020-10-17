@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.41';
+our $VERSION = '2.42';
 
 use parent 'DateTime::TimeZone';
 
@@ -95,7 +95,7 @@ DateTime::TimeZone::OffsetOnly - A DateTime::TimeZone object that just contains 
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 SYNOPSIS
 

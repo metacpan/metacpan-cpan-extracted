@@ -1,10 +1,10 @@
 package Games::LMSolve::Input;
-$Games::LMSolve::Input::VERSION = '0.14.1';
+$Games::LMSolve::Input::VERSION = '0.14.2';
 use strict;
 use warnings;
 
 package Games::LMSolve::Input::Scalar::FH;
-$Games::LMSolve::Input::Scalar::FH::VERSION = '0.14.1';
+$Games::LMSolve::Input::Scalar::FH::VERSION = '0.14.2';
 sub TIEHANDLE
 {
     my $class  = shift;
@@ -363,7 +363,7 @@ Games::LMSolve::Input - input class for LM-Solve
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

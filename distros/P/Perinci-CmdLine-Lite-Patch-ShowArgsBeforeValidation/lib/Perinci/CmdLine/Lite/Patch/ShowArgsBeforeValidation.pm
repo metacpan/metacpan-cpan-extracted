@@ -1,7 +1,9 @@
 package Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation;
 
-our $DATE = '2020-01-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-16'; # DATE
+our $DIST = 'Perinci-CmdLine-Lite-Patch-ShowArgsBeforeValidation'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +38,7 @@ sub patch_data {
 }
 
 1;
-# ABSTRACT: Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments before validation
+# ABSTRACT: (DEPRECATED) Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments before validation
 
 __END__
 
@@ -46,17 +48,20 @@ __END__
 
 =head1 NAME
 
-Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation - Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments before validation
+Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation - (DEPRECATED) Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments before validation
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation (from Perl distribution Perinci-CmdLine-Lite-Patch-ShowArgsBeforeValidation), released on 2020-01-01.
+This document describes version 0.003 of Perinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation (from Perl distribution Perinci-CmdLine-Lite-Patch-ShowArgsBeforeValidation), released on 2020-10-16.
 
 =head1 SYNOPSIS
 
  % PERL5OPT=-MPerinci::CmdLine::Lite::Patch::ShowArgsBeforeValidation yourscript.pl ...
 
 =head1 DESCRIPTION
+
+B<DEPRECATION NOTICE.> Deprecated in favor of
+L<Perinci::CmdLine::Plugin::DumpArgs>.
 
 This patch can be used for debugging.
 

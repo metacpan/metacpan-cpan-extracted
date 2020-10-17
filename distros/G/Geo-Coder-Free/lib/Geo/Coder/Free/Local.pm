@@ -20,11 +20,11 @@ inspecting GeoTagged photographs.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.28
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.28';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;

@@ -1,0 +1,20 @@
+MODE: INLINE
+
+#include <xs.h>
+#include <kiwi/kiwi.h>
+
+MODULE = Intertangle::API::Kiwisolver                PACKAGE = Intertangle::API::Kiwisolver::Strength
+PROTOTYPES: DISABLE
+
+double create( double a, double b, double c, double w = 1.0 ) {
+	RETVAL = kiwi::strength::create(a, b, c, w);
+}
+
+BOOT {
+	Stash stash = Stash(__PACKAGE__, GV_ADD);
+	stash.mark_as_loaded(__MODULE__);
+	stash.add_const_sub("REQUIRED" , Simple(kiwi::strength::required) );
+	stash.add_const_sub("STRONG"   , Simple(kiwi::strength::strong)   );
+	stash.add_const_sub("MEDIUM"   , Simple(kiwi::strength::medium)   );
+	stash.add_const_sub("WEAK"     , Simple(kiwi::strength::weak)     );
+}

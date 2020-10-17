@@ -64,7 +64,7 @@ eval {
     });
 };
 
-is $@->message, '/SOAP - 401 Unauthorized',"Check SOAP Exception";
+like $@->message, qr{^/SOAP - 401 Unauthorized},"Check SOAP Exception";
 
 $t->get_ok('/soapGwTest')
     -> status_is(200)

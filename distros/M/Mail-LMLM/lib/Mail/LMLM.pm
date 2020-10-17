@@ -1,25 +1,21 @@
 package Mail::LMLM;
-$Mail::LMLM::VERSION = '0.6806';
+$Mail::LMLM::VERSION = '0.6807';
 use strict;
 use warnings;
+use autodie;
 
 use 5.008;
 
-use Mail::LMLM::Object;
+use parent 'Mail::LMLM::Object';
 
-use vars qw(@ISA);
-
-@ISA = qw(Mail::LMLM::Object);
-
-use Mail::LMLM::Render::HTML;
-
-use Mail::LMLM::Types::Ezmlm;
-use Mail::LMLM::Types::Egroups;
-use Mail::LMLM::Types::Listar;
-use Mail::LMLM::Types::Majordomo;
-use Mail::LMLM::Types::Listserv;
-use Mail::LMLM::Types::Mailman;
-use Mail::LMLM::Types::GoogleGroups;
+use Mail::LMLM::Render::HTML        ();
+use Mail::LMLM::Types::Ezmlm        ();
+use Mail::LMLM::Types::Egroups      ();
+use Mail::LMLM::Types::Listar       ();
+use Mail::LMLM::Types::Majordomo    ();
+use Mail::LMLM::Types::Listserv     ();
+use Mail::LMLM::Types::Mailman      ();
+use Mail::LMLM::Types::GoogleGroups ();
 
 use vars qw(%mailing_list_classes);
 
@@ -94,15 +90,14 @@ sub initialize
 {
     my $self = shift;
 
-    my ( $key, $value );
     $self->{'title'}         = "List of Mailing Lists";
     $self->{'headline'}      = "List of Mailing Lists";
     $self->{'prolog'}        = $self->{'epilog'} = \&_do_nothing;
     $self->{'extra_classes'} = {};
     while ( scalar(@_) )
     {
-        $key   = shift;
-        $value = shift;
+        my $key   = shift;
+        my $value = shift;
         if ( $key =~ /^-?lists$/ )
         {
             $self->{'lists'} = $value;
@@ -140,38 +135,29 @@ sub render
 {
     my $self = shift;
 
-    my ( $mail_lister, $mailing_list, $o, $r, $main_o, $main_r, $filename );
-
-    local (*INDEX);
-
-    open INDEX, ">index.html";
-    $main_r = Mail::LMLM::Render::HTML->new( \*INDEX );
+    open my $index_fh, ">", "index.html";
+    my $main_r = Mail::LMLM::Render::HTML->new( \$index_fh );
 
     $main_r->start_document( $self->{'title'}, $self->{'headline'}, );
 
     $self->{'prolog'}->( $self, $main_r );
 
-    local (*O);
-
-    foreach $mailing_list ( @{ $self->{'lists'} } )
+    foreach my $mailing_list ( @{ $self->{'lists'} } )
     {
-        $filename = $mailing_list->{'id'} . ".html";
-        open O, ">" . $filename;
-        $r = Mail::LMLM::Render::HTML->new( \*O );
+        my $filename = $mailing_list->{'id'} . ".html";
+        open my $o_fh, ">", $filename;
+        my $r = Mail::LMLM::Render::HTML->new( \$o_fh );
 
         my $class_name = $mailing_list->{'class'};
         my $class =
                $mailing_list_classes{$class_name}
             || $self->{'extra_classes'}->{$class_name}
             || die "Mail::LMLM: Unknown Class \"$class_name\"";
-        if ( ref($class) eq "CODE" )
-        {
-            $mail_lister = $class->(%$mailing_list);
-        }
-        else
-        {
-            $mail_lister = $class->new(%$mailing_list);
-        }
+        my $mail_lister = (
+            ( ref($class) eq "CODE" )
+            ? $class->(%$mailing_list)
+            : $class->new(%$mailing_list)
+        );
 
         my $title =
             exists( $mailing_list->{'title'} )
@@ -194,22 +180,21 @@ sub render
 
         $r->end_document();
 
-        close(O);
+        close($o_fh);
     }
 
     $self->{'epilog'}->( $self, $main_r );
 
     $main_r->end_document();
-    close(INDEX);
+    close($index_fh);
 
-    local (*STYLE);
-    open STYLE, ">style.css";
-    print STYLE <<"EOF";
+    open my $STYLE, ">", "style.css";
+    print {$STYLE} <<"EOF";
 a:hover { background-color : LightGreen }
 div.indent { margin-left : 3em }
 EOF
 
-    close(STYLE);
+    close($STYLE);
 }
 
 #### Documentation
@@ -226,7 +211,7 @@ Mail::LMLM - List of Mailing Lists Manager
 
 =head1 VERSION
 
-version 0.6806
+version 0.6807
 
 =head1 SYNOPSIS
 
@@ -401,36 +386,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 (This is the MIT X11 License).
 
-=head1 AUTHOR
-
-unknown
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2019 by unknown.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-mail-lmlm/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Mail::LMLM
 
 =head2 Websites
 
@@ -449,35 +407,11 @@ L<https://metacpan.org/release/Mail-LMLM>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Mail-LMLM>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-LMLM>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Mail-LMLM>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Mail-LMLM>
 
 =item *
 
@@ -528,5 +462,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-mail-lmlm>
 
   git clone git://github.com/shlomif/perl-mail-lmlm.git
+
+=head1 AUTHOR
+
+Shlomi Fish
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

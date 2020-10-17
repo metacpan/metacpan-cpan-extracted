@@ -1,5 +1,11 @@
 Revision history for Rapi::Blog
 
+1.1400 2020-10-17
+    - Require RapidApp 1.3301 (VANSTYN)
+    - Post comments now sanitised using HTML::Scrubber (VANSTYN)
+    - Post body now sanitised using HTML::Scrubber (VANSTYN)
+    - New Comment accessor method body_html adds newlines unless html is already present (VANSTYN)
+
 1.1301 2019-10-17
     - Remove the no longer accessible "Pre-Auth" user profile link (VANSTYN)
 

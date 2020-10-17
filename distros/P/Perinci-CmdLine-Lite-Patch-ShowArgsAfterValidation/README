@@ -1,18 +1,21 @@
 NAME
-    Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation - Patch
-    Perinci::CmdLine::Lite's hook_before_action() to show arguments after
-    validation
+    Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation - (DEPRECATED)
+    Patch Perinci::CmdLine::Lite's hook_before_action() to show arguments
+    after validation
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Perinci::CmdLine::Lite::Patch::ShowArgsAfterValidation (from Perl
     distribution Perinci-CmdLine-Lite-Patch-ShowArgsAfterValidation),
-    released on 2020-01-01.
+    released on 2020-10-16.
 
 SYNOPSIS
      % PERL5OPT=-MPerinci::CmdLine::Lite::Patch::ShowArgsAfterValidation yourscript.pl ...
 
 DESCRIPTION
+    DEPRECATION NOTICE. Deprecated in favor of
+    Perinci::CmdLine::Plugin::DumpArgs.
+
     This patch can be used for debugging.
 
 HOMEPAGE

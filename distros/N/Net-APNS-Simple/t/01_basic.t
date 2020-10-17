@@ -22,7 +22,7 @@ is($apns->apns_priority => 5);
 is($apns->algorithm => 'ES256');
 is($apns->_host => 'api.push.apple.com');
 $apns->development(1);
-is($apns->_host => 'api.development.push.apple.com');
+is($apns->_host => 'api.sandbox.push.apple.com');
 is($apns->_port => 443);
 
 done_testing;

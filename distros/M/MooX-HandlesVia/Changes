@@ -1,3 +1,8 @@
+0.001009  2020-10-16 10:53:01+01:00 Europe/London
+  - new maintainer (@mattp -> @tobyink)
+  - update repo links
+  - mention Sub::HandlesVia in documentation
+
 0.001008  2015-03-30 21:33:17-04:00 America/New_York
   - fix a bug inheriting from nonmoo classes
   - remove strictures dependency for laxer strict/warnings

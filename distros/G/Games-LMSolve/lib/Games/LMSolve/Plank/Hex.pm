@@ -1,5 +1,5 @@
 package Games::LMSolve::Plank::Hex;
-$Games::LMSolve::Plank::Hex::VERSION = '0.14.1';
+$Games::LMSolve::Plank::Hex::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Games::LMSolve::Plank::Hex - driver for solving the hex plank puzzles
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

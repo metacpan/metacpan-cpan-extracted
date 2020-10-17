@@ -1,16 +1,16 @@
 {
    "abstract" : "NativeTrait-like behavior for Moo.",
    "author" : [
-      "Matthew Phillips <mattp@cpan.org>"
+      "Toby Inkster <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-HandlesVia",
    "prereqs" : {
@@ -48,10 +48,12 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mattp-/MooX-HandlesVia.git",
-         "web" : "https://github.com/mattp-/MooX-HandlesVia"
+         "url" : "git://github.com/tobyink/MooX-HandlesVia.git",
+         "web" : "https://github.com/tobyink/MooX-HandlesVia"
       }
    },
-   "version" : "0.001008"
+   "version" : "0.001009",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

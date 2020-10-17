@@ -4,37 +4,47 @@ use strict;
 use warnings;
 
 require Exporter;
-our @ISA = qw/Exporter/;
+our @ISA       = qw/Exporter/;
 our @EXPORT_OK = qw/is_between compare_hash_by_ranges is_array_between/;
 
 use Test::More;
 
-sub is_between {
+sub is_between
+{
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my ($have, $want_bottom, $want_top, $blurb) = @_;
+    my ( $have, $want_bottom, $want_top, $blurb ) = @_;
 
-    ok (
-        _is_between($have, $want_bottom, $want_top),
-        $blurb
-    );
+    ok( _is_between( $have, $want_bottom, $want_top ), $blurb );
 }
 
-sub is_array_between {
+sub is_array_between
+{
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my ($got_array_ref, $expected_array_ref, $low_tolerance, $high_tolerance, $blurb) = @_;
+    my ( $got_array_ref, $expected_array_ref, $low_tolerance, $high_tolerance,
+        $blurb )
+        = @_;
 
     my $success = 1;
-    if (scalar @$expected_array_ref != scalar @$got_array_ref) {
+    if ( scalar @$expected_array_ref != scalar @$got_array_ref )
+    {
         $success = 0;
         diag('Arrays have different lengths');
     }
-    else {
-        for my $idx (0 .. $#$got_array_ref) {
+    else
+    {
+        for my $idx ( 0 .. $#$got_array_ref )
+        {
             my $expected_bottom = $expected_array_ref->[$idx] - $low_tolerance;
-            my $expected_top = $expected_array_ref->[$idx] + $high_tolerance;
-            unless (_is_between($got_array_ref->[$idx], $expected_bottom, $expected_top)) {
+            my $expected_top    = $expected_array_ref->[$idx] + $high_tolerance;
+            unless (
+                _is_between(
+                    $got_array_ref->[$idx],
+                    $expected_bottom, $expected_top
+                )
+                )
+            {
                 $success = 0;
                 diag(<<"EOF");
 Value $idx is out of range:
@@ -46,7 +56,7 @@ EOF
             }
         }
     }
-    ok($success, $blurb);
+    ok( $success, $blurb );
 }
 
 sub compare_hash_by_ranges
@@ -54,38 +64,38 @@ sub compare_hash_by_ranges
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $got_hash_ref = shift;
-    my $expected = shift;
-    my $blurb = shift;
+    my $expected     = shift;
+    my $blurb        = shift;
 
-    my $got =
-        [
-            map { [$_, $got_hash_ref->{$_} ] }
+    my $got = [
+        map      { [ $_, $got_hash_ref->{$_} ] }
             sort { $a <=> $b }
             keys(%$got_hash_ref)
-        ]
-        ;
+    ];
 
     my $success = 1;
 
-    if (scalar(@$expected) != scalar(@$got))
+    if ( scalar(@$expected) != scalar(@$got) )
     {
         $success = 0;
         diag("Number of keys differ in hashes.");
     }
     else
     {
-        COMPARE_KEYS:
-        for my $idx (0 .. $#$got)
+    COMPARE_KEYS:
+        for my $idx ( 0 .. $#$got )
         {
-            my ($got_key, $got_val) = @{$got->[$idx]};
-            my ($expected_bottom, $expected_top, $expected_val)
-                = @{$expected->[$idx]};
+            my ( $got_key, $got_val ) = @{ $got->[$idx] };
+            my ( $expected_bottom, $expected_top, $expected_val ) =
+                @{ $expected->[$idx] };
 
-            if (! (    ($got_key >= $expected_bottom)
-                    && ($got_key <= $expected_top)
-                    && ($got_val == $expected_val)
+            if (
+                !(
+                       ( $got_key >= $expected_bottom )
+                    && ( $got_key <= $expected_top )
+                    && ( $got_val == $expected_val )
                 )
-            )
+                )
             {
                 $success = 0;
                 diag(<<"EOF");
@@ -99,13 +109,14 @@ EOF
         }
     }
 
-    ok($success, $blurb);
+    ok( $success, $blurb );
 }
 
-sub _is_between {
-    my ($have, $want_bottom, $want_top,) = @_;
+sub _is_between
+{
+    my ( $have, $want_bottom, $want_top, ) = @_;
 
-    return (($have >= $want_bottom) && ($want_top >= $have));
+    return ( ( $have >= $want_bottom ) && ( $want_top >= $have ) );
 }
 
 1;

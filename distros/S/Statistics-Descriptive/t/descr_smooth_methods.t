@@ -9,20 +9,27 @@ use Statistics::Descriptive;
 
 local $SIG{__WARN__} = sub { };
 
-my @original_data = (1 .. 10);
+my @original_data = ( 1 .. 10 );
 
 {
     # testing set_smoother
     my $stats = Statistics::Descriptive::Full->new();
 
-    $stats->add_data(\@original_data );
+    $stats->add_data( \@original_data );
 
-    $stats->set_smoother({
-           method   => 'exponential',
-           coeff    => 0,
-    });
+    $stats->set_smoother(
+        {
+            method => 'exponential',
+            coeff  => 0,
+        }
+    );
+
     # TEST
-    isa_ok ( $stats->{_smoother}, 'Statistics::Descriptive::Smoother::Exponential', 'set_smoother: smoother set correctly');
+    isa_ok(
+        $stats->{_smoother},
+        'Statistics::Descriptive::Smoother::Exponential',
+        'set_smoother: smoother set correctly'
+    );
 
 }
 
@@ -31,32 +38,28 @@ my @original_data = (1 .. 10);
     my $stats = Statistics::Descriptive::Full->new();
 
     # TEST
-    is ( $stats->get_smoothed_data(), undef, 'get_smoothed_data: smoother needs to be defined');
+    is( $stats->get_smoothed_data(),
+        undef, 'get_smoothed_data: smoother needs to be defined' );
 
-    $stats->add_data(\@original_data );
+    $stats->add_data( \@original_data );
 
-    $stats->set_smoother({
-           method   => 'exponential',
-           coeff    => 0.5,
-    });
+    $stats->set_smoother(
+        {
+            method => 'exponential',
+            coeff  => 0.5,
+        }
+    );
 
     my @expected_values = (
-          1,
-          1.5,
-          2.25,
-          3.125,
-          4.0625,
-          5.03125,
-          6.015625,
-          7.0078125,
-          8.00390625,
-          9.001953125,
+        1,          1.5,     2.25,     3.125,
+        4.0625,     5.03125, 6.015625, 7.0078125,
+        8.00390625, 9.001953125,
     );
 
     my @smoothed_data = $stats->get_smoothed_data();
 
     # TEST
-    is_deeply( \@smoothed_data, \@expected_values, 'Smoothing with C=0.5');
+    is_deeply( \@smoothed_data, \@expected_values, 'Smoothing with C=0.5' );
 }
 
 =pod

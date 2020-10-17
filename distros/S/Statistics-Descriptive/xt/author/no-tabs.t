@@ -14,7 +14,6 @@ my @files = (
     'lib/Statistics/Descriptive/Smoother/Weightedexponential.pm',
     'lib/Statistics/Descriptive/Sparse.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/boilerplate.t',
     't/descr.t',
     't/descr_smooth_methods.t',

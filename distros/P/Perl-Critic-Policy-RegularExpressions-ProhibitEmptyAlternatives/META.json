@@ -45,24 +45,24 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/ProhibitEmptyAlternatives.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-Alternative"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-Alternative.git",
-         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-Alternative"
+         "url" : "git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives.git",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

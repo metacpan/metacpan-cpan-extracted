@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.999-18-g5f865f3
+package Test::JSON::Schema::Acceptance; # git description: v1.000-12-g4d5051c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 use 5.014;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -20,7 +20,7 @@ use MooX::TypeTiny 0.002002;
 use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use Path::Tiny 0.062;
-use List::Util 1.33 qw(any max);
+use List::Util 1.33 qw(any max sum0);
 use namespace::clean;
 
 has specification => (
@@ -63,8 +63,7 @@ has results => (
   init_arg => undef,
   isa => ArrayRef[Dict[
            file => InstanceOf['Path::Tiny'],
-           pass => PositiveOrZeroInt,
-           fail => PositiveOrZeroInt,
+           map +($_ => PositiveOrZeroInt), qw(pass todo_fail fail),
          ]],
 );
 
@@ -96,7 +95,7 @@ sub acceptance {
 
   if ($options->{add_resource}) {
     my $base = 'http://localhost:1234'; # TODO? make this customizable
-    $ctx->note('adding resources under '.$base.'...');
+    $ctx->note('adding resources from '.$self->additional_resources.' with the base URI "'.$base.'"...');
     $self->additional_resources->visit(
       sub {
         my ($path) = @_;
@@ -137,12 +136,31 @@ sub acceptance {
             (ref $options->{tests}{test_description} eq 'ARRAY'
               ? @{$options->{tests}{test_description}} : $options->{tests}{test_description});
 
+        my $todo;
+        $todo = Test2::Todo->new(reason => 'Test marked TODO via deprecated "skip_tests"')
+          if ref $options->{skip_tests} eq 'ARRAY'
+            and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
+              @{$options->{skip_tests}};
+
+        $todo = Test2::Todo->new(reason => 'Test marked TODO via "todo_tests"')
+          if $options->{todo_tests}
+            and any {
+              my $o = $_;
+              (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+                and
+              (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+                and
+              (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
+            }
+            @{$options->{todo_tests}};
+
         my $result = $self->_run_test($one_file, $test_group, $test, $options);
-        ++$results{ $result ? 'pass' : 'fail' };
+
+        ++$results{ $result ? 'pass' : $todo ? 'todo_fail' : 'fail' };
       }
     }
 
-    push @results, { file => $one_file->{file}, pass => 0, fail => 0, %results };
+    push @results, { file => $one_file->{file}, pass => 0, 'todo_fail' => 0, fail => 0, %results };
   }
 
   $self->_set_results(\@results);
@@ -160,10 +178,14 @@ sub acceptance {
 
   $ctx->$diag('');
   my $length = max(10, map length $_->{file}, @$tests);
-  $ctx->$diag(sprintf('%-'.$length.'s  pass  fail', 'filename'));
-  $ctx->$diag('-'x($length + 12));
-  $ctx->$diag(sprintf('%-'.$length.'s   %3d   %3d', @{$_}{qw(file pass fail)}))
+  $ctx->$diag(sprintf('%-'.$length.'s  pass  todo-fail  fail', 'filename'));
+  $ctx->$diag('-'x($length + 23));
+  $ctx->$diag(sprintf('%-'.$length.'s % 5d       % 4d  % 4d', @{$_}{qw(file pass todo_fail fail)}))
     foreach @results;
+
+  my $total = +{ map { my $type = $_; $type => sum0(map $_->{$type}, @results) } qw(pass todo_fail fail) };
+  $ctx->$diag('-'x($length + 23));
+  $ctx->$diag(sprintf('%-'.$length.'s % 5d      % 5d % 5d', 'TOTAL', @{$total}{qw(pass todo_fail fail)}));
   $ctx->$diag('');
 
   $ctx->release;
@@ -171,24 +193,6 @@ sub acceptance {
 
 sub _run_test {
   my ($self, $one_file, $test_group, $test, $options) = @_;
-
-  my $todo;
-  $todo = Test2::Todo->new(reason => 'Test marked TODO via deprecated "skip_tests"')
-    if ref $options->{skip_tests} eq 'ARRAY'
-      and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
-        @{$options->{skip_tests}};
-
-  $todo = Test2::Todo->new(reason => 'Test marked TODO via "todo_tests"')
-    if $options->{todo_tests}
-      and any {
-        my $o = $_;
-        (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
-          and
-        (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
-          and
-        (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
-      }
-      @{$options->{todo_tests}};
 
   my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
 
@@ -219,17 +223,23 @@ sub _run_test {
 
   my $ctx = Test2::API::context;
 
-  my $pass = Test2::API::run_subtest($test_name,
+  my $pass; # ignores TODO status
+
+  Test2::API::run_subtest($test_name,
     sub {
       my $ctx = Test2::API::context;
-      $exception
-        ? $ctx->fail('died: '.$exception)
-        : Test2::Tools::Compare::is($got, $expected, 'result is '.($test->{valid}?'':'in').'valid');
 
-      Test2::Tools::Compare::is($data_after, $data_before, 'evaluator did not mutate data')
-        if not $exception and $data_before ne $data_after;
-      Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema')
-        if not $exception and $schema_before ne $schema_after;
+      if ($exception) {
+        $ctx->fail('died: '.$exception);
+      }
+      else {
+        $pass = Test2::Tools::Compare::is($got, $expected, 'result is '.($test->{valid}?'':'in').'valid');
+
+        $pass &&= Test2::Tools::Compare::is($data_after, $data_before, 'evaluator did not mutate data')
+          if $data_before ne $data_after;
+        $pass &&= Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema')
+          if $schema_before ne $schema_after;
+      }
 
       $ctx->release;
     },
@@ -316,7 +326,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -542,7 +552,7 @@ the same hashref structure as L</tests> above, which are ORed together.
 =head2 results
 
 After calling L</acceptance>, a list of test results are provided here. It is an arrayref of
-hashrefs with three keys:
+hashrefs with four keys:
 
 =over 4
 
@@ -556,7 +566,11 @@ pass - the number of pass results for that file
 
 =item *
 
-fail - the number of fail results for that file (including TODO tests)
+todo_fail - the number of fail results for that file that were marked TODO
+
+=item *
+
+fail - the number of fail results for that file (not including TODO tests)
 
 =back
 
@@ -580,17 +594,13 @@ Ben Hutton (@relequestual) <relequest@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Ben Hutton Daniel Perrett
+=for stopwords Karen Etheridge Daniel Perrett
 
 =over 4
 
 =item *
 
 Karen Etheridge <ether@cpan.org>
-
-=item *
-
-Ben Hutton <relequestual@cpan.org>
 
 =item *
 

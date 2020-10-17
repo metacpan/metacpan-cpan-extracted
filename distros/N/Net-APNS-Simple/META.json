@@ -41,8 +41,12 @@
          }
       },
       "runtime" : {
-         "requires" : {
+         "recommends" : {
             "Crypt::JWT" : "0.018",
+            "Crypt::PK::ECC" : "0.059",
+            "Net::HTTP" : "0"
+         },
+         "requires" : {
             "IO::Socket::SSL" : "2.038",
             "JSON" : "0",
             "Moo" : "0",
@@ -53,6 +57,8 @@
       },
       "test" : {
          "requires" : {
+            "Crypt::JWT" : "0.018",
+            "Crypt::PK::ECC" : "0.059",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "Test::More" : "0.98"
@@ -62,7 +68,7 @@
    "provides" : {
       "Net::APNS::Simple" : {
          "file" : "lib/Net/APNS/Simple.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -76,8 +82,9 @@
          "web" : "https://github.com/rockbone/p5-Net-APNS-Simple"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_contributors" : [
+      "Nikolay Pelov <npelov@gmail.com>",
       "Tooru Tsurukawa <rockbone.g@gmail.com>"
    ]
 }

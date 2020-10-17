@@ -1,5 +1,5 @@
 package Test::Data::Split::Backend::ValidateHash;
-$Test::Data::Split::Backend::ValidateHash::VERSION = '0.2.1';
+$Test::Data::Split::Backend::ValidateHash::VERSION = '0.2.2';
 use strict;
 use warnings;
 
@@ -9,25 +9,26 @@ use parent 'Test::Data::Split::Backend::Hash';
 
 sub populate
 {
-    my ($self, $array_ref) = @_;
+    my ( $self, $array_ref ) = @_;
 
     my @l = @$array_ref;
 
     my $tests = $self->get_hash;
 
-    if (@l & 0x1)
+    if ( @l & 0x1 )
     {
         confess("Input length is not even.");
     }
     while (@l)
     {
-        my $key = shift@l;
-        my $val = shift@l;
-        if (exists($tests->{$key}))
+        my $key = shift @l;
+        my $val = shift @l;
+        if ( exists( $tests->{$key} ) )
         {
             confess("Duplicate key '$key'!");
         }
-        $tests->{$key} = $self->validate_and_transform({id => $key, data => $val,});
+        $tests->{$key} =
+            $self->validate_and_transform( { id => $key, data => $val, } );
     }
 
     return;
@@ -39,6 +40,8 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Test::Data::Split::Backend::ValidateHash - hash backend with input validation
@@ -46,7 +49,7 @@ and transformation.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -55,10 +58,6 @@ See the tests.
 =head1 DESCRIPTION
 
 This inherits from L<Test::Data::Split::Backend::Hash> .
-
-=head1 VERSION
-
-version 0.2.1
 
 =head1 METHODS
 
@@ -72,36 +71,9 @@ The accepts an C<< {id => $id, data => $data} >> hash reference and either
 throws an exception or returns the transformed/mutated data (which can be the
 same as the original.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2014 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Test-Data-Split/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Test::Data::Split::Backend::ValidateHash
 
 =head2 Websites
 
@@ -120,35 +92,11 @@ L<https://metacpan.org/release/Test-Data-Split>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Test-Data-Split>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Data-Split>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Data-Split>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Test-Data-Split>
 
 =item *
 
@@ -199,5 +147,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-Test-Data-Split>
 
   git clone git://github.com/shlomif/perl-Test-Data-Split.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Test-Data-Split/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

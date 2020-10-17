@@ -129,6 +129,23 @@ sub html_id {
 }
 
 
+sub body_html {
+  my $self = shift;
+  
+  my $body = $self->get_column('body');
+  
+  # We are doing it this way for speed; if there are no characters which look
+  # like tags, convert newlimes to <br> otherwise assume the content is already
+  # HTML and return as-is
+  return $body if ($body =~ /\<.+\>/);
+
+  $body =~ s/\r?\n/\<br\>\r\n/g; 
+
+  return $body
+}
+
+
+
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;

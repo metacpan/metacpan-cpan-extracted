@@ -45,11 +45,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.10
+Version 0.28
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -115,6 +115,11 @@ sub new {
     # @locations = $geocoder->geocode('Portland, USA');
     # diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
 
+    # This will return one place in New Brunwsick, not them all
+    # TODO: Arguably it should get them all from the database (or at least say the first 100) and return the central location
+    my @locations = $geocoder->geocode({ location => 'New Brunswick, Canada' });
+    die if(scalar(@locations) != 1);
+
 =cut
 
 sub geocode {
@@ -156,6 +161,7 @@ sub geocode {
 	my $country;
 	my $country_code;
 	my $concatenated_codes;
+	my $region_only;
 	my ($first, $second, $third);
 
 	if($location =~ /^([\w\s\-]+),([\w\s]+),([\w\s]+)?$/) {
@@ -194,13 +200,15 @@ sub geocode {
 		$location =~ s/\s$//g;
 		$country = uc($region);
 	} elsif($location =~ /^([\w\s-]+),\s*(\w+)$/) {
-	# } elsif(0) {
+		# e.g. a county in the UK or a state in the US
 		$county = $1;
 		$country = $2;
 		$county =~ s/^\s//g;
 		$county =~ s/\s$//g;
 		# $country =~ s/^\s//g;
 		$country =~ s/\s$//g;
+		# ::diag(__LINE__, "$county, $country");
+		$region_only = 1;	# Will only return one match, not every match in the region
 	} else {
 		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
 		return;
@@ -262,11 +270,13 @@ sub geocode {
 			if(my $twoletterstate = Locale::US->new()->{state2code}{uc($county)}) {
 				$county = $twoletterstate;
 			}
+			# ::diag(__LINE__, ": $location, $county, $country");
 		}
 		if($state && (length($state) > 2)) {
 			if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
 				$state = $twoletterstate;
 			}
+			# ::diag(__LINE__, ": $location, $state, $country");
 		}
 	} elsif(($country eq 'Canada') && $state && (length($state) > 2)) {
 		# ::diag(__LINE__, ": $state");
@@ -381,10 +391,14 @@ sub geocode {
 
 	my $options;
 	if(defined($county) && ($county =~ /^[A-Z]{2}$/) && ($country =~ /^(United States|USA|US)$/)) {
-		$options = {};
+		$options = { Country => 'us' };
 	} else {
-		$options = { City => lc($location) };
-		$options->{'City'} =~ s/,\s*\w+$//;
+		if($region_only) {
+			$options = {};
+		} else {
+			$options = { City => lc($location) };
+			$options->{'City'} =~ s/,\s*\w+$//;
+		}
 	}
 	if($region) {
 		if($region =~ /^.+\.(.+)$/) {
@@ -412,7 +426,7 @@ sub geocode {
 	}
 	# ::diag(__LINE__, ': ', Data::Dumper->new([$options])->Dump());
 	# This case nonsense is because DBD::CSV changes the columns to lowercase, wherease DBD::SQLite does not
-	if(wantarray) {
+	if(wantarray && !$region_only) {
 		my @rc = $self->{'cities'}->selectall_hash($options);
 		if(scalar(@rc) == 0) {
 			if((!defined($region)) && !defined($param{'region'})) {
@@ -439,7 +453,8 @@ sub geocode {
 				$city->{'state'} = uc(delete $city->{'Region'});
 			}
 			if($city->{'City'}) {
-				$city->{'city'} = uc(delete $city->{'City'});
+				$city->{'city'} = uc(delete $city->{'AccentCity'});
+				delete $city->{'City'};
 				# Less likely to get false positives with long words
 				if(length($city->{'city'}) > 10) {
 					if($confidence <= 0.8) {
@@ -468,7 +483,8 @@ sub geocode {
 					'lat' => $l->{'latitude'},
 					'long' => $l->{'longitude'},
 					'location' => $location,
-					'database' => 'MaxMind'
+					'database' => 'MaxMind',
+					'maxmind' => $l,
 				});
 			# } else {
 				# Carp::carp(__PACKAGE__, ": $location has latitude of 0");
@@ -486,8 +502,8 @@ sub geocode {
 			if($region =~ /^.+\.(.+)$/) {
 				$region = $1;
 			}
-			if($country =~ /^(Canada|United States|USA|US)$/) {
-				next unless($region =~ /^[A-Z]{2}$/);
+			if($country =~ /^(United States|USA|US)$/) {
+				next unless($region =~ /^[A-Z]{2}$/);	# In the US, the regions are the states
 			}
 			$options->{'Region'} = $region;
 			$city = $self->{'cities'}->fetchrow_hashref($options);
@@ -623,7 +639,7 @@ The database contains Canadian cities, but not provinces, so a search for "New B
 The GeoNames admin databases are in this class, they should be in Geo::Coder::GeoNames.
 
 The data at
-L<https://github.com/apache/commons-csv/blob/master/src/test/resources/perf/worldcitiespop.txt.gz?raw=true>
+L<https://github.com/apache/commons-csv/blob/master/src/test/resources/org/apache/commons/csv/perf/worldcitiespop.txt.gz?raw=true>
 are 7 years out of date,
 and are unconsistent with the Geonames database.
 
@@ -648,6 +664,7 @@ must apply in writing for a licence for use from Nigel Horne at `<njh at nigelho
 
 This product includes GeoLite2 data created by MaxMind, available from
 L<https://www.maxmind.com/en/home>.
+(Note that this currently gives a 403 error - I need to find the latest URL).
 
 =cut
 

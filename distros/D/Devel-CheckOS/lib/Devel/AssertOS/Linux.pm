@@ -7,7 +7,6 @@ no warnings 'redefine';
 
 our $VERSION = '1.3';
 
-
 sub subtypes { qw(Android) }
 sub matches { ('Linux', subtypes()) }
 

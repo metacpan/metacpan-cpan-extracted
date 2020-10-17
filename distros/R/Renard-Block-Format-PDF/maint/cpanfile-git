@@ -1,0 +1,12 @@
+requires 'Renard::Incunabula',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
+	branch => 'master';
+requires 'Renard::Incunabula::Document',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula-Document.git',
+	branch => 'master';
+requires 'Renard::Block::Format::Cairo',
+	git => 'https://github.com/project-renard/p5-Renard-Block-Format-Cairo.git',
+	branch => 'master';
+requires 'Renard::API::MuPDF::mutool',
+	git => 'https://github.com/project-renard/p5-Renard-API-MuPDF-mutool.git',
+	branch => 'master';

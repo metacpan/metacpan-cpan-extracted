@@ -161,3 +161,14 @@ Revision history for StreamFinder
 1.31    2020/08/10
         - Add StreamFinder::Blogger (www.blogger.com) for Blogger videos.
         - Add StreamFinder::Bitchute (www.bitchute.com) for Bitchute videos.
+1.32    2020/10/16
+        - Remove StreamFinder::BannedVideo as banned.video has become so 
+        paranoid as to add sophisticated anti-bot/scraping detection that I 
+        have been unable to figure out how to circumvent.
+        NOTE/RANT:  They claim to be pro freedom / anti-big tech spying, etc. 
+        but their site has become unusable without third-party / Google 
+        javascripts, and other malware nasties we and our users are trying to 
+        avoid for our own safety!  Most of their videos can now also be 
+        found on Bitchute anyway!
+        - StreamFinder::Youtube: Fix minor bug that sometimes returned no 
+        streams.

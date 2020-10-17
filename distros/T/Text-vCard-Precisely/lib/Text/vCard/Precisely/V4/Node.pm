@@ -9,10 +9,9 @@ use Moose::Util::TypeConstraints;
 extends 'Text::vCard::Precisely::V3::Node';
 
 enum 'Name' => [
-    qw( FN
+    qw( FN ORG TITLE ROLE
         ADR TEL EMAIL PHOTO LOGO URL
-        TZ GEO NICKNAME IMPP LANG XML KEY NOTE
-        ORG TITLE ROLE CATEGORIES
+        TZ GEO IMPP LANG XML KEY NOTE
         SOURCE SOUND FBURL CALADRURI CALURI
         RELATED X-SOCIALPROFILE
         )
@@ -20,7 +19,7 @@ enum 'Name' => [
 has name => ( is => 'rw', required => 1, isa => 'Name' );
 
 subtype 'SortAs' => as 'Str' =>
-    where { use utf8; decode_utf8($_) =~ m|^[\p{ascii}\w\s]+$|s }    # Does everything pass?
+    where { decode_utf8($_) =~ m|^[\p{ascii}\w\s]+$|s }    # Does everything pass?
 => message {"The SORT-AS you provided, $_, was not supported"};
 has sort_as => ( is => 'rw', isa => 'Maybe[SortAs]' );
 

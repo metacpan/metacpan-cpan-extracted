@@ -1,6 +1,6 @@
 #!/usr/bin/env perl -w
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 
@@ -9,39 +9,34 @@ use Test::MockModule;
 local %ENV = ( HOME => '' );
 require Net::Google::Drive::Simple;
 
-my $mock_oauth = Test::MockModule->new( 'OAuth::Cmdline::GoogleDrive' )
-	->redefine( new => sub { bless { '__FAKE__' => 'mocked from '. $0 }, 'OAuth::Cmdline::GoogleDrive' })
-	->redefine( authorization_headers => 1 );
-
+my $mock_oauth = Test::MockModule->new('OAuth::Cmdline::GoogleDrive')->redefine( new => sub { bless { '__FAKE__' => 'mocked from ' . $0 }, 'OAuth::Cmdline::GoogleDrive' } )->redefine( authorization_headers => 1 );
 
 my $json = JSON->new->allow_nonref;
 
-my $data = join "", <DATA>;
-my $json_data = $json->decode( $data ) or die $data;
+my $data      = join "", <DATA>;
+my $json_data = $json->decode($data) or die $data;
 
 my $counter = 1;
 
-my $mock_gd = Test::MockModule->new( 'Net::Google::Drive::Simple' )
-	->redefine( path_resolve => sub { ( 'root', 'root' ) })
-	->redefine( init => 1 )
-	->redefine( http_json => sub {
-		return $json_data if $counter++ == 1;
-		return;
-	});
+my $mock_gd = Test::MockModule->new('Net::Google::Drive::Simple')->redefine( path_resolve => sub { ( 'root', 'root' ) } )->redefine( init => 1 )->redefine(
+    http_json => sub {
+        return $json_data if $counter++ == 1;
+        return;
+    }
+);
 
-my $mock_uri = Test::MockModule->new( 'URI::https' )
-	->redefine( query_form => 1 );
+my $mock_uri = Test::MockModule->new('URI::https')->redefine( query_form => 1 );
 
 my $drive = Net::Google::Drive::Simple->new;
 
-my $children = $drive->children( "/" ); # or any other folder /path/location
+my $children = $drive->children("/");    # or any other folder /path/location
 
 is scalar @$children, 2, "parsed two files";
 
-my $first_file = $children->[0];
+my $first_file  = $children->[0];
 my $second_file = $children->[1];
 
-isa_ok $first_file, 'Net::Google::Drive::Simple::Item';
+isa_ok $first_file,  'Net::Google::Drive::Simple::Item';
 isa_ok $second_file, 'Net::Google::Drive::Simple::Item';
 
 is $first_file->id, "0B6rF1m0B6rF1m0B6rF1m0B6rF1m0B6rF1m0B6rF1m", 'id';
@@ -49,24 +44,24 @@ is $first_file->Id, $first_file->id, 'Id eq id';
 is $first_file->Id, $first_file->id, 'ID eq id';
 
 is $first_file->labels => {
-  'hidden' => D(),
-  'restricted' => D(),
-  'starred' => D(),
-  'trashed' => D(),
-  'viewed' => D()
-} or diag explain $first_file->labels;
+    'hidden'     => D(),
+    'restricted' => D(),
+    'starred'    => D(),
+    'trashed'    => D(),
+    'viewed'     => D()
+  }
+  or diag explain $first_file->labels;
 
 ok $JSON::true;
 is $first_file->copyable, $JSON::true, "copyable is true";
 
-is $first_file->originalFilename, "sample.vcf", "originalFilename";
-is $first_file->mimeType, "text/x-vcard", "mimeType";
+is $first_file->originalFilename, "sample.vcf",   "originalFilename";
+is $first_file->mimeType,         "text/x-vcard", "mimeType";
 
 ok !$first_file->is_folder, "not a folder";
 ok $first_file->is_file, "first file is a file";
 
 is $second_file->title, "second file title", "title for the second_file";
-
 
 done_testing;
 

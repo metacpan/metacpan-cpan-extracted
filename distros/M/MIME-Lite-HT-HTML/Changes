@@ -1,5 +1,11 @@
 Revision history for Perl extension MIME::Lite::HT::HTML.
 
+0.06
+    - updated AUTHOR mail
+    - avoid running POD tests on install, make them author tests only
+    - reworked README file to be more than just a copy of the POD
+    - fix spelling issues
+
 0.05  Sat Aug 16 20:04:42 2014
 	- untabified Changes file
 	- re-release because of special chars that were in v0.04

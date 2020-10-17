@@ -1,16 +1,16 @@
 {
    "abstract" : "Create HTML mail with MIME::Lite and HTML::Template",
    "author" : [
-      "Alexander Becker <c a p f a n ^at^ g m x -dot- d e>"
+      "Alexander Becker <asb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MIME-Lite-HT-HTML",
    "no_index" : {
@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.98",
-            "Test::Pod" : "1.0",
-            "Test::Pod::Coverage" : "1.08"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -45,6 +42,13 @@
             "MIME::Words" : "0",
             "perl" : "5.006001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.0",
+            "Test::Pod::Coverage" : "1.08"
+         }
       }
    },
    "release_status" : "stable",
@@ -53,5 +57,6 @@
          "url" : "https://github.com/asb-capfan/MIME-Lite-HT-HTML"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

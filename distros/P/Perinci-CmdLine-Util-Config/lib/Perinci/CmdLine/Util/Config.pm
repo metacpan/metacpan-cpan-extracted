@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Util::Config;
 
-our $DATE = '2019-05-29'; # DATE
-our $VERSION = '1.722'; # VERSION
+our $DATE = '2020-10-16'; # DATE
+our $VERSION = '1.723'; # VERSION
 
 use 5.010001;
 use strict;
@@ -315,13 +315,13 @@ sub get_args_from_config {
             if ($copts->{$k} && $copts->{$k}{is_settable_via_config}) {
                 my $sch = $copts->{$k}{schema};
                 if ($sch) {
-                    require Data::Sah::Normalize;
-                    $sch = Data::Sah::Normalize::normalize_schema($sch);
+                    require Data::Sah::Resolve;
+                    my $rsch = Data::Sah::Resolve::resolve_schema($sch);
                     # since IOD might return a scalar or an array (depending on
                     # whether there is a single param=val or multiple param=
                     # lines), we need to arrayify the value if the argument is
                     # expected to be an array.
-                    if (ref($v) ne 'ARRAY' && $sch->[0] eq 'array') {
+                    if (ref($v) ne 'ARRAY' && $rsch->[0] eq 'array') {
                         $v = [$v];
                     }
                 }
@@ -335,9 +335,12 @@ sub get_args_from_config {
                 # whether there is a single param=val or multiple param= lines),
                 # we need to arrayify the value if the argument is expected to
                 # be an array.
-                if (ref($v) ne 'ARRAY' && $as->{$k} && $as->{$k}{schema} &&
-                        $as->{$k}{schema}[0] eq 'array') {
-                    $v = [$v];
+                if (ref($v) ne 'ARRAY' && $as->{$k} && $as->{$k}{schema}) {
+                    require Data::Sah::Resolve;
+                    my $rsch = Data::Sah::Resolve::resolve_schema($as->{$k}{schema});
+                    if ($rsch->[0] eq 'array') {
+                        $v = [$v];
+                    }
                 }
                 $args->{$k} = $v;
             }
@@ -364,7 +367,7 @@ Perinci::CmdLine::Util::Config - Utility routines related to config files
 
 =head1 VERSION
 
-This document describes version 1.722 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2019-05-29.
+This document describes version 1.723 of Perinci::CmdLine::Util::Config (from Perl distribution Perinci-CmdLine-Util-Config), released on 2020-10-16.
 
 =head1 FUNCTIONS
 
@@ -397,6 +400,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<subcommand_name> => I<any>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -409,6 +413,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 get_default_config_dirs
@@ -433,6 +438,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 read_config
 
 Usage:
@@ -454,6 +460,7 @@ Arguments ('*' denotes required arguments):
 =item * B<hook_section> => I<any>
 
 =item * B<program_name> => I<any>
+
 
 =back
 
@@ -490,7 +497,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

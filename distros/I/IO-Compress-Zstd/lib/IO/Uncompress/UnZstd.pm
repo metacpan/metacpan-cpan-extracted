@@ -13,7 +13,7 @@ use IO::Uncompress::Adapter::UnZstd  2.096 ;
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnZstdError);
 
-$VERSION = '2.097';
+$VERSION = '2.098';
 $UnZstdError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );

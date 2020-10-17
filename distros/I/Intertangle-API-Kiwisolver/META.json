@@ -1,0 +1,73 @@
+{
+   "abstract" : "API for Kiwisolver constraint solver",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Intertangle-API-Kiwisolver",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Kiwisolver" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "List::UtilsBy" : "0",
+            "Modern::Perl" : "0",
+            "XS::Framework" : "0",
+            "perl" : "5.004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Renard::Incunabula::Common::Setup" : "0",
+            "XS::Framework" : "0",
+            "XS::Loader" : "0",
+            "overload" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Perl" : "0",
+            "MooX::HandlesVia" : "0",
+            "MooX::InsideOut" : "0",
+            "Mu" : "0",
+            "Path::Tiny" : "0",
+            "SVG" : "0",
+            "Test::Most" : "0",
+            "aliased" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Intertangle/p5-Intertangle-API-Kiwisolver",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Intertangle/p5-Intertangle-API-Kiwisolver.git",
+         "web" : "https://github.com/Intertangle/p5-Intertangle-API-Kiwisolver"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -20,7 +20,7 @@
 #	sqlite3 whosonfirst-data-latest.db
 #	select body from geojson where body like '%north shields%';
 # It'll be slow, but it shows the sort of thing this is about,
-#	You'll see and id: field (e.g. 1108937103), then look at
+#	You'll see an id: field (e.g. 1108937103), then look at
 #	https://spelunker.whosonfirst.org/id/1108937103
 
 # TODO: perhaps use a layered approach to the database schema

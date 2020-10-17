@@ -11,12 +11,8 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl module to calculate Fast Fourier Transforms",
   "AUTHOR" => "Shlomi Fish <shlomif\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Module::Build" => "0.28"
-  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.28"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Math-FFT",
   "LICENSE" => "perl",
@@ -37,7 +33,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.35",
+  "VERSION" => "1.36",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +50,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Build" => "0.28",
   "Test::More" => "0.88",
   "lib" => 0,
   "parent" => 0,

@@ -1,5 +1,5 @@
 package Games::LMSolve::Tilt::Multi;
-$Games::LMSolve::Tilt::Multi::VERSION = '0.14.1';
+$Games::LMSolve::Tilt::Multi::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -168,7 +168,7 @@ Games::LMSolve::Tilt::Multi - driver for solving the multiple-goal tilt mazes
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

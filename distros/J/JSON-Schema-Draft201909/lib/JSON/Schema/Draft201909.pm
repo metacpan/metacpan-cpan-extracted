@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.012-25-gc769be7
+package JSON::Schema::Draft201909; # git description: v0.013-22-gebb56d9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -93,13 +93,13 @@ sub add_schema {
   my $self = shift;
   die 'insufficient arguments' if @_ < 1;
 
+  # TODO: resolve $uri against $self->base_uri
   my $uri = !is_ref($_[0]) ? Mojo::URL->new(shift)
     : $_[0]->$_isa('Mojo::URL') ? shift : Mojo::URL->new;
 
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
 
   if (not @_) {
-    # TODO: resolve $uri against $self->base_uri
     my ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($uri);
     return if not defined $schema or not defined wantarray;
     return $document;
@@ -191,7 +191,7 @@ sub evaluate {
       ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($schema_reference);
     }
     else {
-      $document = $self->add_schema($schema_reference);
+      $document = $self->add_schema($state->{canonical_schema_uri}, $schema_reference);
       ($schema, $canonical_uri) = map $document->$_, qw(schema canonical_uri);
       $document_path = '';
     }
@@ -240,11 +240,11 @@ sub _eval {
   my @parent_annotations = @{$state->{annotations}};
   delete $state->{keyword};
 
-  abort($state, 'maximum traversal depth exceeded')
+  abort($state, 'maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
 
   abort($state, 'infinite loop detected (same location evaluated twice)')
-    if $state->{seen}{$state->{data_path}}{$state->{canonical_schema_uri}.(length($state->{schema_path}) ? '#'.$state->{schema_path} : '')}++;
+    if $state->{seen}{$state->{data_path}}{canonical_schema_uri($state)}++;
 
   my $schema_type = $self->_get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
@@ -314,8 +314,8 @@ sub _eval_keyword_schema {
 
   assert_keyword_type($state, $schema, 'string');
 
-  abort($state, '$schema can only appear at the schema resource root')
-    if length($state->{schema_path});
+  my $uri = canonical_schema_uri($state);
+  abort($state, '$schema can only appear at the schema resource root') if length($uri->fragment);
 
   abort($state, 'custom $schema references are not yet supported')
     if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
@@ -345,7 +345,8 @@ sub _eval_keyword_recursiveAnchor {
 
   # record the canonical location of the current position, to be used against future resolution
   # of a $recursiveRef uri -- as if it was the current location when we encounter a $ref.
-  my $uri = $state->{canonical_schema_uri} ? $state->{canonical_schema_uri}->clone : Mojo::URL->new;
+  my $uri = canonical_schema_uri($state);
+
   abort($state, '"$recursiveAnchor" keyword used without "$id"') if length $uri->fragment;
 
   $state->{recursive_anchor_uri} = $uri;
@@ -445,6 +446,8 @@ sub _eval_keyword_type {
 sub _eval_keyword_enum {
   my ($self, $data, $schema, $state) = @_;
 
+  assert_keyword_type($state, $schema, 'array');
+
   my @s; my $idx = 0;
   return 1 if any { $self->_is_equal($data, $_, $s[$idx++] = {}) } @{$schema->{enum}};
 
@@ -469,7 +472,7 @@ sub _eval_keyword_multipleOf {
   abort($state, 'multipleOf value is not a positive number') if $schema->{multipleOf} <= 0;
 
   my $quotient = $data / $schema->{multipleOf};
-  return 1 if int($quotient) == $quotient;
+  return 1 if int($quotient) == $quotient and $quotient !~ /(?:NaN|Inf)/;
   return E($state, 'value is not a multiple of %g', $schema->{multipleOf});
 }
 
@@ -855,7 +858,7 @@ sub _eval_keyword_items {
       my @annotations = @orig_annotations;
       if ($self->_eval($data->[$idx], $schema->{additionalItems},
           +{ %$state, data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/additionalitems', annotations => \@annotations })) {
+          schema_path => $state->{schema_path}.'/additionalItems', annotations => \@annotations })) {
         push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
         next;
       }
@@ -878,6 +881,8 @@ sub _eval_keyword_unevaluatedItems {
 
   abort($state, '"unevaluatedItems" keyword present, but short_circuit is enabled: results unreliable')
     if $state->{short_circuit};
+
+  return 1 if not $self->_is_type('array', $data);
 
   my @annotations = local_annotations($state);
   my @items_annotations = grep $_->keyword eq 'items', @annotations;
@@ -1001,8 +1006,7 @@ sub _eval_keyword_properties {
       }
 
       $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property),
-          _schema_path_rest => jsonp($state->{schema_path}, 'properties', $property) },
-        'property not permitted');
+        _schema_path_suffix => $property }, 'property not permitted');
     }
     else {
       my @annotations = @orig_annotations;
@@ -1040,9 +1044,7 @@ sub _eval_keyword_patternProperties {
       @matched_properties = grep m/$property_pattern/, keys %$data;
     }
     catch {
-      abort({ %$state,
-        _schema_path_rest => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) },
-      $@);
+      abort({ %$state, _schema_path_suffix => $property_pattern }, $@);
     };
     foreach my $property (sort @matched_properties) {
       if ($self->_is_type('boolean', $schema->{patternProperties}{$property_pattern})) {
@@ -1052,8 +1054,7 @@ sub _eval_keyword_patternProperties {
         }
 
         $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property),
-            _schema_path_rest => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) },
-          'property not permitted');
+          _schema_path_suffix => $property_pattern }, 'property not permitted');
       }
       else {
         my @annotations = @orig_annotations;
@@ -1631,7 +1632,7 @@ has _json_decoder => (
 # shorthand for creating and appending json pointers
 use namespace::clean 'jsonp';
 sub jsonp {
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, @_);
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
 }
 
 # get all annotations produced for the current instance data location
@@ -1641,25 +1642,35 @@ sub local_annotations {
   grep $_->instance_location eq $state->{data_path}, @{$state->{annotations}};
 }
 
+# shorthand for finding the canonical uri of the present schema location
+use namespace::clean 'canonical_schema_uri';
+sub canonical_schema_uri {
+  my ($state, @extra_path) = @_;
+
+  my $uri = $state->{canonical_schema_uri}->clone;
+  $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
+  $uri->fragment(undef) if not length($uri->fragment);
+  $uri;
+}
+
 # shorthand for creating error objects
 use namespace::clean 'E';
 sub E {
   my ($state, $error_string, @args) = @_;
 
   # sometimes the keyword shouldn't be at the very end of the schema path
-  my $schema_path = delete $state->{_schema_path_rest}
-    // $state->{schema_path}.($state->{keyword} ? '/'.$state->{keyword} : '');
+  my $uri = canonical_schema_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
 
-  my $uri = $state->{canonical_schema_uri}->clone;
-  $uri->fragment(($uri->fragment//'').$schema_path);
-  $uri->fragment(undef) if not length($uri->fragment);
-  undef $uri if $uri eq '' and $state->{traversed_schema_path}.$schema_path eq ''
-    or $uri eq '#'.$state->{traversed_schema_path}.$schema_path;
+  my $keyword_location = $state->{traversed_schema_path}
+    .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
+
+  undef $uri if $uri eq '' and $keyword_location eq ''
+    or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
 
   push @{$state->{errors}}, JSON::Schema::Draft201909::Error->new(
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
-    keyword_location => $state->{traversed_schema_path}.$schema_path,
+    keyword_location => $keyword_location,
     defined $uri ? ( absolute_keyword_location => $uri ) : (),
     error => @args ? sprintf($error_string, @args) : $error_string,
   );
@@ -1673,18 +1684,19 @@ sub A {
   my ($state, $annotation) = @_;
   return 1 if not $state->{collect_annotations};
 
-  my $schema_path = $state->{schema_path_rest}
-    // $state->{schema_path}.($state->{keyword} ? '/'.$state->{keyword} : '');
+  my $uri = canonical_schema_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
+
+  my $keyword_location = $state->{traversed_schema_path}
+    .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
+
+  undef $uri if $uri eq '' and $keyword_location eq ''
+    or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
 
   push @{$state->{annotations}}, JSON::Schema::Draft201909::Annotation->new(
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
-    keyword_location => $state->{traversed_schema_path}.$schema_path,
-    !"$state->{canonical_schema_uri}" ? () : ( absolute_keyword_location => do {
-      my $uri = $state->{canonical_schema_uri}->clone;
-      $uri->fragment(($uri->fragment//'').$schema_path) if $schema_path;
-      $uri;
-    } ),
+    keyword_location => $keyword_location,
+    defined $uri ? ( absolute_keyword_location => $uri ) : (),
     annotation => $annotation,
   );
 
@@ -1723,7 +1735,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

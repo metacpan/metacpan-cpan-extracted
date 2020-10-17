@@ -17,7 +17,6 @@ my @files = (
     'lib/Test/Count/Lib.pm',
     'lib/Test/Count/Parser.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/01-parser.t',
     't/02-main.t',
     't/03-filter.t',

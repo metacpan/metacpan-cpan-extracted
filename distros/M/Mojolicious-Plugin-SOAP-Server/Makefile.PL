@@ -21,7 +21,7 @@ WriteMakefile(
     'CGI' => 0,
   },
   TEST_REQUIRES => { 
-    'Mojo::SOAP::Client' => 0,
+    'Mojo::SOAP::Client' => 0.1.8,
   },
   BUILD_REQUIRES => {
     'CPAN::Uploader' => 0,

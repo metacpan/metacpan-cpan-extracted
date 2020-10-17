@@ -6,17 +6,17 @@
             {
                 "description": "integer",
                 "data": 2,
-                "valid": true
+                "valid": false
             },
             {
                 "description": "boolean false",
                 "data": "false",
-                "valid": true
+                "valid": false
             },
             {
                 "description": "boolean true",
                 "data": "true",
-                "valid": true
+                "valid": false
             }
         ]
     },
@@ -27,17 +27,17 @@
             {
                 "description": "integer",
                 "data": 2,
-                "valid": false
+                "valid": true
             },
             {
                 "description": "boolean false",
                 "data": "false",
-                "valid": false
+                "valid": true
             },
             {
                 "description": "boolean true",
                 "data": "true",
-                "valid": false
+                "valid": true
             }
         ]
     },
@@ -48,17 +48,17 @@
             {
                 "description": "integer",
                 "data": 2,
-                "valid": true
+                "valid": false
             },
             {
                 "description": "boolean false",
                 "data": "false",
-                "valid": true
+                "valid": false
             },
             {
                 "description": "boolean true",
                 "data": "true",
-                "valid": true
+                "valid": false
             }
         ]
     }

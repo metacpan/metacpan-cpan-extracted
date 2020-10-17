@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 98;
+use Test::Most tests => 102;
 use Test::Carp;
 use Test::Deep;
 use Test::Number::Delta;
@@ -185,6 +185,15 @@ MAXMIND: {
 			# Check a second lookup still works
 			check($geo_coder, 'Westoe, South Tyneside, England', 54.98, -1.42);
 
+			@locations = $geo_coder->geocode('New Brunswick, Canada');
+			ok(scalar(@locations) == 1);
+			@locations = $geo_coder->geocode('Maryland, USA');
+			ok(scalar(@locations) == 1);
+			cmp_deeply($locations[0],
+				methods('lat' => num(38.25, 1e-2), 'long' => num(-76.74, 1e-2)));
+			@locations = $geo_coder->geocode('Kent, England');
+			ok(scalar(@locations) == 1);
+
 			# like($geo_coder->reverse_geocode(latlng => '51.50,-0.13'), qr/London/i, 'test reverse');
 			@locations = $geo_coder->reverse_geocode(latlng => '51.50,-0.13');
 			ok(scalar(@locations) > 1);
@@ -221,7 +230,7 @@ MAXMIND: {
 			}
 		} else {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 97);
+			skip('Author tests not required for installation', 101);
 		}
 	}
 }
@@ -231,7 +240,7 @@ sub check($$$$) {
 
 	diag($location) if($ENV{'TEST_VERBOSE'});
 	my @rc = $geo_coder->geocode({ location => $location });
-	# diag(Data::Dumper->new([\@rc])->Dump());
+	diag(Data::Dumper->new([\@rc])->Dump()) if($ENV{'TEST_VERBOSE'});
 	ok(scalar(@rc) > 0);
 	cmp_deeply($rc[0],
 		methods('lat' => num($lat, 1e-2), 'long' => num($long, 1e-2)));

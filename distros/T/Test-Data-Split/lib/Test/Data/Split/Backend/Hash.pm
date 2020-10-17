@@ -1,8 +1,7 @@
 package Test::Data::Split::Backend::Hash;
-$Test::Data::Split::Backend::Hash::VERSION = '0.2.1';
+$Test::Data::Split::Backend::Hash::VERSION = '0.2.2';
 use strict;
 use warnings;
-
 
 
 sub new
@@ -30,9 +29,9 @@ sub _hash
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    $self->_hash(scalar ( $self->get_hash() ));
+    $self->_hash( scalar( $self->get_hash() ) );
 
     return;
 }
@@ -41,20 +40,21 @@ sub list_ids
 {
     my ($self) = @_;
 
-    my @keys = keys(%{$self->_hash});
+    my @keys = keys( %{ $self->_hash } );
 
     require List::MoreUtils;
 
-    if (List::MoreUtils::notall( sub { /\A[A-Za-z_\-0-9]{1,80}\z/ }, @keys))
+    if ( List::MoreUtils::notall( sub { /\A[A-Za-z_\-0-9]{1,80}\z/ }, @keys ) )
     {
-        die "Invalid key in hash reference. All keys must be alphanumeric plus underscores and dashes.";
+        die
+"Invalid key in hash reference. All keys must be alphanumeric plus underscores and dashes.";
     }
     return [ sort { $a cmp $b } @keys ];
 }
 
 sub lookup_data
 {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
 
     return $self->_hash->{$id};
 }
@@ -65,13 +65,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Test::Data::Split::Backend::Hash - hash backend.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -102,10 +104,6 @@ version 0.2.1
 
 This is a hash backend for L<Test::Data::Split> .
 
-=head1 VERSION
-
-version 0.2.1
-
 =head1 METHODS
 
 =head2 new()
@@ -125,36 +123,9 @@ Lists the IDs - needed by Test::Data::Split;
 This method should be implemented and return a hash reference to the
 keys/values of the data.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2014 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-Test-Data-Split/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Test::Data::Split::Backend::Hash
 
 =head2 Websites
 
@@ -173,35 +144,11 @@ L<https://metacpan.org/release/Test-Data-Split>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Test-Data-Split>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Data-Split>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Test-Data-Split>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Test-Data-Split>
 
 =item *
 
@@ -252,5 +199,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-Test-Data-Split>
 
   git clone git://github.com/shlomif/perl-Test-Data-Split.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-Test-Data-Split/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

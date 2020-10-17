@@ -1,5 +1,5 @@
 package Games::LMSolve::Tilt::Single;
-$Games::LMSolve::Tilt::Single::VERSION = '0.14.1';
+$Games::LMSolve::Tilt::Single::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -128,7 +128,7 @@ Games::LMSolve::Tilt::Single - driver for solving the single-goal tilt mazes
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

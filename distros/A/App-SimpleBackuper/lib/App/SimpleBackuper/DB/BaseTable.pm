@@ -24,17 +24,16 @@ sub find_all {
 	return \@result;
 }
 
-=pod Binary search
-Parameters:
-	 0	- search query us hashref with fields & values.
-	 	Packed record must begins on this fields.
-		All fields must be a fixed width when packed.
-Result:
-	[0]	- index of begin of range of matches;
-	[1]	- index of end of range of matches;
-	For empty array result always is 0, -1.
-	If nothing found, you can insert new value with queried fields values to index of begin of range of matches and it not broke sorting
-=cut
+# Binary search
+# Parameters:
+#	 0	- search query us hashref with fields & values.
+#	 	Packed record must begins on this fields.
+#		All fields must be a fixed width when packed.
+# Result:
+#	[0]	- index of begin of range of matches;
+#	[1]	- index of end of range of matches;
+#	For empty array result always is 0, -1.
+#	If nothing found, you can insert new value with queried fields values to index of begin of range of matches and it not broke sorting
 sub _find {
 	my($self, $data) = @_;
 	

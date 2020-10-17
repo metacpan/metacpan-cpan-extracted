@@ -7,5 +7,12 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/test-die/die.tx
+t/test-fail/fail.tx
+t/test-ok/pass-1.tx
+t/test-ok/pass-2.tx
+t/test-plan/plan.tx
+t/test-retry/retry.tx
+t/test.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

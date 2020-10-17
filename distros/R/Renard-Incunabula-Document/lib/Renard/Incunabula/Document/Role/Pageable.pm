@@ -1,11 +1,11 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document::Role::Pageable;
 # ABSTRACT: Role for documents that have numbered pages
-$Renard::Incunabula::Document::Role::Pageable::VERSION = '0.004';
+$Renard::Incunabula::Document::Role::Pageable::VERSION = '0.005';
 use Moo::Role;
 use Renard::Incunabula::Common::Types qw(Bool);
 use Renard::Incunabula::Document::Types qw(PageNumber PageCount);
-use MooX::Lsub;
+use MooX::ShortHas;
 
 has first_page_number => (
 	is => 'ro',
@@ -26,11 +26,11 @@ method is_valid_page_number( $page_number ) :ReturnType(Bool) {
 		&& $page_number <= $self->last_page_number
 }
 
-lsub number_of_pages => method() {
+lazy number_of_pages => method() {
 	(PageCount)->(
 		$self->last_page_number - $self->first_page_number + 1
 	);
-};
+}, isa => PageCount;
 
 
 1;
@@ -47,7 +47,7 @@ Renard::Incunabula::Document::Role::Pageable - Role for documents that have numb
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

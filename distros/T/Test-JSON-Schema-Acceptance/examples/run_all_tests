@@ -7,6 +7,7 @@ no if "$]" >= 5.031009, feature => 'indirect';
 # the test suite data in the local share/)
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 
+use Test2::Tools::Basic;
 use Test::JSON::Schema::Acceptance;
 use lib 't/lib';
 use SchemaParser;

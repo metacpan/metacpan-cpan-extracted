@@ -1,5 +1,10 @@
 Revision history for App-intrunningsum
 
+0.0.3      2020-10-17
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 0.0.2      2018-03-18
     - Fix a documentation typo.
 

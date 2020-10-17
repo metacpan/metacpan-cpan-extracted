@@ -45,11 +45,11 @@ Geo::Coder::Free::OpenAddresses - Provides a geocoding functionality to the data
 
 =head1 VERSION
 
-Version 0.09
+Version 0.28
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 

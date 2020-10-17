@@ -1023,15 +1023,19 @@ subtest 'JSON pointer escaping' => sub {
   cmp_deeply(
     $js->evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
-      {
+      my $schema = {
         '$defs' => {
           mydef => {
             properties => {
               '{}' => {
+                properties => {
+                  'my~tilde/slash-property' => false,
+                },
                 patternProperties => {
-                  '~' => { minimum => 5 },
                   '/' => { minimum => 6 },
                   '[~/]' => { minimum => 7 },
+                  '~' => { minimum => 5 },
+                  '~.*/' => false,
                 },
               },
             },
@@ -1042,24 +1046,42 @@ subtest 'JSON pointer escaping' => sub {
     )->TO_JSON,
     {
       valid => bool(0),
-      errors => [
+      errors => my $errors = [
+        {
+          instanceLocation => '/{}/my~0tilde~1slash-property',
+          keywordLocation => '/$ref/properties/{}/properties/my~0tilde~1slash-property',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/properties/my~0tilde~1slash-property',
+          error => 'property not permitted',
+        },
+        {
+          instanceLocation => '/{}',
+          keywordLocation => '/$ref/properties/{}/properties',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/properties',
+          error => 'not all properties are valid',
+        },
         {
           instanceLocation => '/{}/my~0tilde~1slash-property',
           keywordLocation => '/$ref/properties/{}/patternProperties/~1/minimum',
-          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~1/minimum',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~1/minimum',  # /
           error => 'value is smaller than 6',
         },
         {
           instanceLocation => '/{}/my~0tilde~1slash-property',
           keywordLocation => '/$ref/properties/{}/patternProperties/[~0~1]/minimum',
-          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/%5B~0~1%5D/minimum',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/%5B~0~1%5D/minimum',  # [~/]
           error => 'value is smaller than 7',
         },
         {
           instanceLocation => '/{}/my~0tilde~1slash-property',
           keywordLocation => '/$ref/properties/{}/patternProperties/~0/minimum',
-          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~0/minimum',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~0/minimum',  # ~
           error => 'value is smaller than 5',
+        },
+        {
+          instanceLocation => '/{}/my~0tilde~1slash-property',
+          keywordLocation => '/$ref/properties/{}/patternProperties/~0.*~1',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~0.*~1', # ~.*/
+          error => 'property not permitted',
         },
         {
           instanceLocation => '/{}',
@@ -1076,6 +1098,57 @@ subtest 'JSON pointer escaping' => sub {
       ],
     },
     'JSON pointers are properly escaped; URIs doubly so',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      { '{}' => { 'my~tilde/slash-property' => 1 } },
+      $schema->{'$defs'}{mydef},
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        map +{
+          error => $_->{error},
+          instanceLocation => $_->{instanceLocation},
+          keywordLocation => $_->{keywordLocation} =~ s{^/\$ref}{}r,
+        }, @$errors
+      ],
+    },
+    'absoluteKeywordLocation is omitted when paths are the same, not counting uri encoding',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      { '{}' => { 'my~tilde/slash-property' => 1 } },
+      {
+        '$defs' => {
+          mydef => {
+            properties => {
+              '{}' => {
+                patternProperties => {
+                  '(' => { minimum => 2 },  # this is a broken regex
+                },
+              },
+            },
+          },
+        },
+        '$ref' => '#/$defs/mydef',
+      },
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '/{}',
+          keywordLocation => '/$ref/properties/{}/patternProperties/(',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/(',
+          error => re(qr{^\QEXCEPTION: Unmatched ( in regex; marked by <-- HERE in m/( <-- HERE\E}),
+        },
+      ],
+    },
+    # all the other _schema_path_suffix cases are tested in the earlier test case
+    'use of _schema_path_suffix in a fatal error',
   );
 };
 
@@ -1147,6 +1220,33 @@ subtest 'invalid $schema' => sub {
     },
     '$schema can appear adjacent to any $id',
   );
+
+  cmp_deeply(
+    $js->evaluate(
+      1,
+      {
+        '$id' => 'https://bloop3.com',
+        '$defs' => {
+          my_def => {
+            '$schema' => 'https://json-schema.org/draft/2019-09/schema',
+          },
+        },
+        '$ref' => '#/$defs/my_def',
+      },
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/$ref/$schema',
+          absoluteKeywordLocation => 'https://bloop3.com#/$defs/my_def/$schema',
+          error => 'EXCEPTION: $schema can only appear at the schema resource root',
+        },
+      ],
+    },
+    '$state->{schema_path} is empty, but this is still not a resource root',
+  );
 };
 
 subtest 'absoluteKeywordLocation' => sub {
@@ -1162,7 +1262,7 @@ subtest 'absoluteKeywordLocation' => sub {
           instanceLocation => '/0',
           keywordLocation => '/items/$ref',
           absoluteKeywordLocation => '',
-          error => 'EXCEPTION: maximum traversal depth exceeded',
+          error => 'EXCEPTION: maximum evaluation depth exceeded',
         },
       ],
     },

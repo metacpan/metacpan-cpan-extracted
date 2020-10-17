@@ -39,7 +39,8 @@ sub add_comment {
     "Add comment: permission denied"
   );
   
-  my $body = $c->req->params->{body} or return $self->error_response($c,"missing param 'body'");
+  my $raw_body = $c->req->params->{body} or return $self->error_response($c,"missing param 'body'");
+  my $body     = Rapi::Blog::Util->sanitize_input( $raw_body );
   
   my %data;
   my $Post;

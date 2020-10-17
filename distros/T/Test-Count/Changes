@@ -1,5 +1,9 @@
 Revision history for Test::Count
 
+0.1105   2020-10-16
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.1104   2020-06-25
     - Resubmit for PAUSE reindexing.
 

@@ -1,0 +1,57 @@
+MODE: INLINE
+
+#include <xs.h>
+#include <kiwi/kiwi.h>
+
+namespace xs {
+    template <>
+    struct Typemap<kiwi::Solver*> : TypemapObject<kiwi::Solver*, kiwi::Solver*, ObjectTypePtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "Intertangle::API::Kiwisolver::Solver"; }
+    };
+}
+
+MODULE = Intertangle::API::Kiwisolver                PACKAGE = Intertangle::API::Kiwisolver::Solver
+PROTOTYPES: DISABLE
+
+kiwi::Solver* kiwi::Solver::new() { RETVAL = new kiwi::Solver(); }
+
+
+void kiwi::Solver::addConstraint( kiwi::Constraint* constraint ) {
+	THIS->addConstraint( *constraint );
+}
+
+void kiwi::Solver::removeConstraint( kiwi::Constraint* constraint ) {
+	THIS->removeConstraint(*constraint);
+}
+
+bool kiwi::Solver::hasConstraint( kiwi::Constraint* constraint ) {
+	RETVAL = THIS->hasConstraint(*constraint);
+}
+
+void kiwi::Solver::addEditVariable( kiwi::Variable* variable, double strength ) {
+	THIS->addEditVariable(*variable, strength);
+}
+
+void kiwi::Solver::removeEditVariable( kiwi::Variable* variable ) {
+	THIS->removeEditVariable(*variable);
+}
+
+bool kiwi::Solver::hasEditVariable( kiwi::Variable* variable ) {
+	THIS->hasEditVariable(*variable);
+}
+
+void kiwi::Solver::suggestValue( kiwi::Variable* variable, double value ) {
+	THIS->suggestValue(*variable, value);
+}
+
+void kiwi::Solver::updateVariables()
+
+void kiwi::Solver::reset()
+
+void kiwi::Solver::dump()
+
+std::string kiwi::Solver::dumps()
+
+BOOT {
+	Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+}

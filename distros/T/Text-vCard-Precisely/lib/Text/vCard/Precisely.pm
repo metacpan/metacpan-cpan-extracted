@@ -1,6 +1,6 @@
 package Text::vCard::Precisely;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -33,11 +33,12 @@ __END__
 Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisely
 
 =head1 SYNOPSIS
-
+ 
+ use Text::vCard::Precisely;
  my $vc = Text::vCard::Precisely->new();
  # Or now you can write like below if you want to use 4.0:
  my $vc4 = Text::vCard::Precisely->new( version => '4.0' );
- #or $vc4 = Text::vCard::Precisely::V4->new();
+ #or $vc4 = Text::vCard::Precisely::V4->new(); # it's same
 
  $vc->n([ 'Gump', 'Forrest', , 'Mr', '' ]);
  $vc->fn( 'Forrest Gump' );
@@ -274,6 +275,11 @@ To specify supplemental information or a comment that is associated with the vCa
 
 To specify additional information for your jobs
 
+In these, C<CATEGORIES> may have multiple content with being separated by COMMA.
+multiple content is expressed by using ArrayRef like this:
+
+ $vc->categories([qw(Internet Travel)]);
+
 =head2 fn(), full_name(), fullname()
 
 A person's entire name as they would like to see it displayed
@@ -281,6 +287,10 @@ A person's entire name as they would like to see it displayed
 =head2 nickname()
 
 To specify the text corresponding to the nickname of the object the vCard represents
+
+Like C<CATEGORIES>, It ALSO may have multiple content with being separated by COMMA.
+
+ $vc->nickname([qw(Johny John)]);
 
 =head2 geo()
 

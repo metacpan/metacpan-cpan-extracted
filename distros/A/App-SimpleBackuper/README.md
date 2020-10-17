@@ -1,3 +1,5 @@
+[![CPAN](https://img.shields.io/cpan/v/App-SimpleBackuper.svg)](https://metacpan.org/release/App-SimpleBackuper)
+
 # What's this
 **Simple-backuper** is a simple tool for backuping files and restoring it from backups.
 

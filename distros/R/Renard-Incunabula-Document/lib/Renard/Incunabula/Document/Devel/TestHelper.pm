@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document::Devel::TestHelper;
 # ABSTRACT: A helper library for document tests
-$Renard::Incunabula::Document::Devel::TestHelper::VERSION = '0.004';
+$Renard::Incunabula::Document::Devel::TestHelper::VERSION = '0.005';
 use Moo;
 
 classmethod create_null_document( :$repeat = 1 ) {
@@ -32,7 +32,7 @@ Renard::Incunabula::Document::Devel::TestHelper - A helper library for document 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

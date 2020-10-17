@@ -221,8 +221,10 @@ sub insert {
   
   $self->set_inflated_columns($columns) if $columns;
   
+  $self->_sanitize_body;
+  
   $self->_set_column_defaults('insert');
-
+  
   $self->next::method;
   
   $self->_update_tags;
@@ -240,11 +242,18 @@ sub update {
   
   $self->updater_id( $uid );
   
+  $self->_sanitize_body if ($self->is_column_changed('body'));
+  
   $self->_set_column_defaults('update');
   
   $self->_update_tags if ($self->is_column_changed('body'));
   
   $self->next::method;
+}
+
+sub _sanitize_body {
+  my $self = shift;
+  $self->body( Rapi::Blog::Util->sanitize_input( $self->body ) )
 }
 
 sub delete {
@@ -349,11 +358,27 @@ sub _parse_social_entities {
   my $body = $self->body or return ();
   
   my @ents = 
-    grep { ! ($_ =~ /^#\d+$/) } # Exclude hashtags that are only numbers
+    grep { ! $self->_should_ignore_hashtag($_) } 
     $body =~ /(?:^|\s)([#@][-\w]{1,64})\b/g;
   
   return uniq(@ents)
 }
+
+
+sub _should_ignore_hashtag {
+  my ($self, $string) = @_;
+
+  return 1 if ($string =~ /^#\d+$/); # Exclude hashtags that are only numbers
+
+  my $len = length($string);
+  if($len == 4 || $len == 7) {
+    # ignore all strings that look like hex numbers that are 3 or 6 characters long
+    return 1 if ($string =~ /^#[0-9A-Fa-f]+$/);
+  }
+
+  return 0
+}
+
 
 sub _extract_hashtags {
   my $self = shift;

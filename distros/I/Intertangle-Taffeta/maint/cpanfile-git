@@ -1,0 +1,3 @@
+requires 'Intertangle::Yarn',
+	git => 'https://github.com/Intertangle/p5-Intertangle-Yarn.git',
+	branch => 'master';

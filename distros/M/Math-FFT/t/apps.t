@@ -35,7 +35,7 @@ for ( my $i = 0 ; $i < $N ; ++$i )
     $data1->[$i] = cos( 4 * $i * $PI / $N );
     $data2->[$i] = sin( 4 * $i * $PI / $N );
 }
-my $fft  = new Math::FFT($data1);
+my $fft  = Math::FFT->new($data1);
 my $corr = $fft->correl($data2);
 my $y    = 8 / sqrt(2);
 my $true = [ 0, -$y, -8, -$y, 0, $y, 8, $y, 0, -$y, -8, -$y, 0, $y, 8, $y ];
@@ -47,7 +47,7 @@ $corr = $fft->correl($data2);
 
 # TEST
 check_error( 0, $N, $corr, $true );
-my $fft5 = new Math::FFT($data2);
+my $fft5 = Math::FFT->new($data2);
 $corr = $fft->correl($fft5);
 
 # TEST
@@ -80,7 +80,7 @@ for ( my $i = 0 ; $i < $M ; ++$i )
     $data4->[$i] = cos( 4 * $i * $PI / $N );
 }
 $convlv = $fft->convlv($data4);
-my $fft4      = new Math::FFT($convlv);
+my $fft4      = Math::FFT->new($convlv);
 my $orig_data = $fft4->deconvlv($data4);
 
 # TEST
@@ -100,7 +100,7 @@ while ( my $line = <$spctrl> )
 close $spctrl;
 my $max     = 15;
 my $results = results();
-my $s       = new Math::FFT($data);
+my $s       = Math::FFT->new($data);
 my $tol     = 2e-05;
 my $spec    = $s->spctrm( segments => 32, number => 16, overlap => 0 );
 

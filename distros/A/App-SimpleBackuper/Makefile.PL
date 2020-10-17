@@ -5,7 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Manifest qw(mkmanifest);
 
-os_unsupported if $^O eq "MSWin32";
+die "OS unsupported\n" if $^O eq "MSWin32";
 
 mkmanifest();
 

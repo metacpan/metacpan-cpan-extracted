@@ -26,9 +26,6 @@ sub gen_tld_h($) {
         or die "open: $file: $!";
 
     my $header = <<'EOL';
-/* this file was auto-generated at %s */
-
-
 #ifndef TLD_H
 #define TLD_H
 
@@ -40,7 +37,7 @@ typedef struct tld_s {
 } tld_t;
 
 EOL
-    printf $fh $header, POSIX::strftime("%F %T", localtime);
+    printf $fh $header;
 
     print $fh "enum {\n";
     print $fh "    TLD_TYPE_UNUSED, /* tests only */\n";

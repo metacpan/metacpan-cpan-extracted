@@ -24,6 +24,13 @@ use SPVM 'TestCase::Point_3i';
 
 use SPVM 'SPVM::Hash';
 use SPVM 'SPVM::List';
+use SPVM 'SPVM::ByteList';
+use SPVM 'SPVM::ShortList';
+use SPVM 'SPVM::IntList';
+use SPVM 'SPVM::LongList';
+use SPVM 'SPVM::FloatList';
+use SPVM 'SPVM::DoubleList';
+use SPVM 'SPVM::StringList';
 
 use SPVM 'TestCase::Minimal';
 
@@ -46,10 +53,120 @@ my $DBL_MAX = POSIX::DBL_MAX();
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
+# Empty Hash new
+{
+  {
+    my $hash = SPVM::Hash->new([]);
+    is_deeply($hash->count, 0);
+  }
+}
+
+# Empty List push
+{
+  {
+    my $list = SPVM::ByteList->new([]);
+    $list->push(1);
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::ShortList->new([]);
+    $list->push(1);
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::IntList->new([]);
+    $list->push(1);
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::LongList->new([]);
+    $list->push(1);
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::FloatList->new([]);
+    $list->push(1);
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::DoubleList->new([]);
+    $list->push(1);
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::List->new([]);
+    $list->push(SPVM::Int->new(1));
+    is_deeply($list->length, 1);
+  }
+  {
+    my $list = SPVM::StringList->new([]);
+    $list->push("abc");
+    is_deeply($list->length, 1);
+  }
+}
+
+# Empty List new
+{
+  {
+    my $list = SPVM::IntList->new([]);
+    is_deeply($list->length, 0);
+  }
+  {
+    my $list = SPVM::List->new([]);
+    is_deeply($list->length, 0);
+  }
+}
+
+# SPVM::BlessedObject::Array get and set
+{
+  {
+    my $sp_values = SPVM::new_byte_array([0, 0]);
+    $sp_values->set(1, $BYTE_MAX);
+    is_deeply($sp_values->to_elems, [0, $BYTE_MAX]);
+    my $value = $sp_values->get(1);
+    is($value, $BYTE_MAX);
+  }
+  {
+    my $sp_values = SPVM::new_short_array([0, 0]);
+    $sp_values->set(1, $SHORT_MAX);
+    is_deeply($sp_values->to_elems, [0, $SHORT_MAX]);
+    my $value = $sp_values->get(1);
+    is($value, $SHORT_MAX);
+  }
+  {
+    my $sp_values = SPVM::new_int_array([0, 0]);
+    $sp_values->set(1, $INT_MAX);
+    is_deeply($sp_values->to_elems, [0, $INT_MAX]);
+    my $value = $sp_values->get(1);
+    is($value, $INT_MAX);
+  }
+  {
+    my $sp_values = SPVM::new_long_array([0, 0]);
+    $sp_values->set(1, $LONG_MAX);
+    is_deeply($sp_values->to_elems, [0, $LONG_MAX]);
+    my $value = $sp_values->get(1);
+    is($value, $LONG_MAX);
+  }
+  {
+    my $sp_values = SPVM::new_float_array([0, 0]);
+    $sp_values->set(1, $FLOAT_PRECICE);
+    is_deeply($sp_values->to_elems, [0, $FLOAT_PRECICE]);
+    my $value = $sp_values->get(1);
+    is($value, $FLOAT_PRECICE);
+  }
+  {
+    my $sp_values = SPVM::new_double_array([0, 0]);
+    $sp_values->set(1, $DOUBLE_PRECICE);
+    is_deeply($sp_values->to_elems, [0, $DOUBLE_PRECICE]);
+    my $value = $sp_values->get(1);
+    is($value, $DOUBLE_PRECICE);
+  }
+}
+
 # Get hash key - any object
 {
   my $biases = SPVM::new_float_array([1, 2, 3]);
-  my $hash = SPVM::Hash->new;
+  my $hash = SPVM::Hash->new_empty;
   $hash->set(biases => $biases);
   $hash->set("int" => SPVM::Int->new(4));
   my $get_biases = $hash->get("biases");
@@ -224,7 +341,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Pass hash
   {
-    my $hash = SPVM::Hash->newa([x => SPVM::Int->new(1), y => SPVM::Double->new(2.5)]);
+    my $hash = SPVM::Hash->new([x => SPVM::Int->new(1), y => SPVM::Double->new(2.5)]);
     is($hash->get("x")->val, 1);
     is($hash->get("y")->val, 2.5);
   }
@@ -234,7 +351,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Pass list
   {
-    my $list = SPVM::List->newa([SPVM::Int->new(1), SPVM::Double->new(2.5), undef]);
+    my $list = SPVM::List->new([SPVM::Int->new(1), SPVM::Double->new(2.5), undef]);
     my $x = $list->get(0);
     
     is($list->get(0)->val, 1);
@@ -284,7 +401,6 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Any object array
 {
-  # String - UTF-8 string, new_string, new_string_from_bin, to_string, to_bin
   {
     my $bytes = SPVM::new_object_array("SPVM::Byte[]", [SPVM::Byte->new(1), SPVM::Byte->new(2), SPVM::Byte->new(3)]);
     my $ret = TestCase::ExchangeAPI->any_object_array($bytes);
@@ -325,42 +441,30 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Stringfy - stringify overload
   {
-    my $string1 = SPVM::new_string("あいう");
-    my $string2 = SPVM::new_string("");
+    my $string1 = "あいう";
+    my $string2 = "";
     my $string3 = TestCase::ExchangeAPI->string_argments_and_return_value($string1, $string2);
-    isa_ok($string3, 'SPVM::BlessedObject::Array');
+    ok(!ref $string3);
     is("$string3", "あいう");
-  }
-  
-  # Stringify - 0 is true
-  {
-    my $string1 = SPVM::new_string("0");
-    ok($string1);
-    is("$string1", "0");
   }
 }
 
 # String arguments and return value
 {
-  # String - UTF-8 string, new_string, new_string_from_bin, to_string, to_bin
+  # String - UTF-8 string
   {
-    my $string1 = SPVM::new_string("あいう");
-    my $string2 = SPVM::new_string_from_bin(encode('UTF-8', "えお"));
+    my $string1 = "あいう";
+    my $string2 = "えお";
     my $string3 = TestCase::ExchangeAPI->string_argments_and_return_value($string1, $string2);
-    isa_ok($string3, 'SPVM::BlessedObject::Array');
-    is($string3->to_string, "あいうえお");
-    is($string3->to_bin, encode('UTF-8', "あいうえお"));
+    is($string3, "あいうえお");
   }
 
-  # String - ascii string, new_string, new_string_from_bin, to_string, to_bin, to_element
+  # String - ascii string
   {
-    my $string1 = SPVM::new_string_from_bin("abc");
-    my $string2 = SPVM::new_string("de");
+    my $string1 = "abc";
+    my $string2 = "de";
     my $string3 = TestCase::ExchangeAPI->string_argments_and_return_value($string1, $string2);
-    isa_ok($string3, 'SPVM::BlessedObject::Array');
-    is($string3->to_string, "abcde");
-    is($string3->to_bin, "abcde");
-    is_deeply($string3->to_elems, [ord('a'), ord('b'), ord('c'), ord('d'), ord('e')]);
+    is($string3, "abcde");
   }
 }
 
@@ -1042,11 +1146,12 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
   # call_sub can receive array reference - new string array and to_strings
   {
-    my $spvm_values = ["あいう", "えお", "ab", undef];
-    my $values = TestCase::ExchangeAPI->return_string_array_only($spvm_values)->to_strings;
+    my $spvm_values = SPVM::new_string_array(["あいう", "えお", "ab", undef]);
+    my $values = TestCase::ExchangeAPI->return_string_array_only($spvm_values)->to_elems;
     is_deeply($values, ["あいう", "えお", "ab", undef]);
   }
 }
+
 
 # new array
 {
@@ -1085,6 +1190,76 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     my $spvm_values = SPVM::new_double_array([0.5, $DBL_MAX, $DBL_MIN]);
     my $values = $spvm_values->to_elems;
     is_deeply($values, [0.5, $DBL_MAX, $DBL_MIN]);
+  }
+}
+
+# new array_len
+{
+  # new_byte_array_len
+  {
+    my $spvm_values = SPVM::new_byte_array_len(3);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, [0, 0, 0]);
+  }
+  {
+    my $spvm_values = SPVM::new_byte_array_len(0);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, []);
+  }
+  # new_short_array_len
+  {
+    my $spvm_values = SPVM::new_short_array_len(3);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, [0, 0, 0]);
+  }
+  {
+    my $spvm_values = SPVM::new_short_array_len(0);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, []);
+  }
+  # new_int_array_len
+  {
+    my $spvm_values = SPVM::new_int_array_len(3);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, [0, 0, 0]);
+  }
+  {
+    my $spvm_values = SPVM::new_int_array_len(0);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, []);
+  }
+  # new_long_array_len
+  {
+    my $spvm_values = SPVM::new_long_array_len(3);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, [0, 0, 0]);
+  }
+  {
+    my $spvm_values = SPVM::new_long_array_len(0);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, []);
+  }
+  # new_float_array_len
+  {
+    my $spvm_values = SPVM::new_float_array_len(3);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, [0, 0, 0]);
+  }
+  {
+    my $spvm_values = SPVM::new_float_array_len(0);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, []);
+  }
+  # new_double_array_len
+  {
+    my $spvm_values = SPVM::new_double_array_len(3);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, [0, 0, 0]);
+  }
+  {
+    my $spvm_values = SPVM::new_double_array_len(0);
+    my $values = $spvm_values->to_elems;
+    is_deeply($values, []);
   }
 }
 
@@ -1347,7 +1522,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   {
     my $values = TestCase->string_empty();
-    is($values->to_bin, "");
+    is($values, "");
   }
 }
 

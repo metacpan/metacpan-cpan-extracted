@@ -43,6 +43,7 @@
             "Devel::Cover" : "0",
             "Devel::Cover::Report::Coveralls" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
             "Test2::Tools::PerlCritic" : "0",
             "Test2::V0" : "0"
          }
@@ -58,7 +59,7 @@
          "web" : "https://github.com/manchicken/data-javascript"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_contributors" : [
       "Jerrad Pierce <jpierce@cpan.org>",
       "Ariel Brosh <schop cpan.org>"

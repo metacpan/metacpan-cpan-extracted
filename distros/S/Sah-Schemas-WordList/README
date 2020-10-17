@@ -1,0 +1,38 @@
+NAME
+    Sah::Schemas::WordList - Sah schemas related to WordList
+
+VERSION
+    This document describes version 0.002 of Sah::Schemas::WordList (from
+    Perl distribution Sah-Schemas-WordList), released on 2020-05-27.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-WordList>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-WordList>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-WordList>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah - specification
+
+    Data::Sah
+
+    WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

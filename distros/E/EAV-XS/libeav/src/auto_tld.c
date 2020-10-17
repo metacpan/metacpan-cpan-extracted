@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-09-09 21:00:47 */
+/* this file was auto-generated at 2020-10-17 08:12:01 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -642,7 +642,7 @@ const tld_t tld_list[] = {
     { "insurance", 10, TLD_TYPE_GENERIC },
     { "insure", 7, TLD_TYPE_GENERIC },
     { "int", 4, TLD_TYPE_SPONSORED },
-    { "intel", 6, TLD_TYPE_GENERIC },
+    { "intel", 6, TLD_TYPE_NOT_ASSIGNED },
     { "international", 14, TLD_TYPE_GENERIC },
     { "intuit", 7, TLD_TYPE_GENERIC },
     { "investments", 12, TLD_TYPE_GENERIC },
@@ -1183,6 +1183,7 @@ const tld_t tld_list[] = {
     { "song", 5, TLD_TYPE_GENERIC },
     { "sony", 5, TLD_TYPE_GENERIC },
     { "soy", 4, TLD_TYPE_GENERIC },
+    { "spa", 4, TLD_TYPE_GENERIC },
     { "space", 6, TLD_TYPE_GENERIC },
     { "spiegel", 8, TLD_TYPE_NOT_ASSIGNED },
     { "sport", 6, TLD_TYPE_GENERIC },

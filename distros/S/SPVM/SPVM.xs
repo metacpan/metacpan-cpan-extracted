@@ -562,6 +562,63 @@ bind_sub_native(...)
 MODULE = SPVM::ExchangeAPI		PACKAGE = SPVM::ExchangeAPI
 
 SV*
+new_string_array(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_env = ST(0);
+  SV* sv_elems = ST(1);
+
+  // Environment
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  SV* sv_array;
+  if (SvOK(sv_elems)) {
+    if (!sv_derived_from(sv_elems, "ARRAY")) {
+      croak("Argument of SPVM::ExchangeAPI::new_string_array() must be array reference at %s line %d\n", MFILE, __LINE__);
+    }
+
+    AV* av_elems = (AV*)SvRV(sv_elems);
+
+    int32_t length = av_len(av_elems) + 1;
+
+    // New array
+    SPVM_OBJECT* array = env->new_object_array(env, SPVM_BASIC_TYPE_C_ID_STRING, length);
+
+    for (int32_t i = 0; i < length; i++) {
+      SV** sv_str_value_ptr = av_fetch(av_elems, i, 0);
+      SV* sv_str_value = sv_str_value_ptr ? *sv_str_value_ptr : &PL_sv_undef;
+      if (SvOK(sv_str_value)) {
+        // Copy
+        sv_str_value = sv_2mortal(newSVsv(sv_str_value));
+        
+        // Encode to UTF-8
+        sv_utf8_encode(sv_str_value);
+        
+        int32_t length = sv_len(sv_str_value);
+        const char* chars = SvPV_nolen(sv_str_value);
+        
+        void* string = env->new_string_len_raw(env, chars, length);
+        env->set_elem_object(env, array, i, string);
+      }
+      else {
+        env->set_elem_object(env, array, i, NULL);
+      }
+    }
+
+    // New sv array
+    sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  }
+  else {
+    sv_array = &PL_sv_undef;
+  }
+  
+  XPUSHs(sv_array);
+  XSRETURN(1);
+}
+
+SV*
 new_byte_array(...)
   PPCODE:
 {
@@ -1477,6 +1534,243 @@ _new_mulnum_array_from_bin(...)
 }
 
 SV*
+new_byte_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // New array
+  void* array = env->new_byte_array(env, length);
+  
+  // New sv array
+  SV* sv_byte_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_byte_array);
+  XSRETURN(1);
+}
+
+SV*
+new_short_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // New array
+  void* array = env->new_short_array(env, length);
+  
+  // New sv array
+  SV* sv_short_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_short_array);
+  XSRETURN(1);
+}
+
+SV*
+new_int_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // New array
+  void* array = env->new_int_array(env, length);
+  
+  // New sv array
+  SV* sv_int_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_int_array);
+  XSRETURN(1);
+}
+
+SV*
+new_long_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // New array
+  void* array = env->new_long_array(env, length);
+  
+  // New sv array
+  SV* sv_long_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_long_array);
+  XSRETURN(1);
+}
+
+SV*
+new_float_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // New array
+  void* array = env->new_float_array(env, length);
+  
+  // New sv array
+  SV* sv_float_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_float_array);
+  XSRETURN(1);
+}
+
+SV*
+new_double_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // New array
+  void* array = env->new_double_array(env, length);
+  
+  // New sv array
+  SV* sv_double_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_double_array);
+  XSRETURN(1);
+}
+
+SV*
+new_object_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_basic_type_name = ST(1);
+  SV* sv_length = ST(2);
+
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // Element type id
+  const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
+  
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
+  assert(basic_type);
+  
+  // New array
+  void* array = env->new_object_array(env, basic_type->id, length);
+  
+  // New sv array
+  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_array);
+  XSRETURN(1);
+}
+
+SV*
+new_string_array_len(...)
+  PPCODE:
+{
+  (void)RETVAL;
+
+  SV* sv_env = ST(0);
+  SV* sv_length = ST(1);
+
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  if (length < 0) {
+    croak("Length must be more than or equals to 0 at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // Element type id
+  const char* basic_type_name = "string";
+  
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
+  assert(basic_type);
+  
+  // New array
+  void* array = env->new_object_array(env, basic_type->id, length);
+  
+  // New sv array
+  SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+  
+  XPUSHs(sv_array);
+  XSRETURN(1);
+}
+
+SV*
 _get_exception(...)
   PPCODE:
 {
@@ -1618,16 +1912,29 @@ call_sub(...)
       // Convert to runtime type
       int32_t arg_runtime_basic_type_id;
       int32_t arg_runtime_type_dimension;
-      if (arg->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) {
-        arg_runtime_basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
-        arg_runtime_type_dimension = arg->type->dimension + 1;
-      }
-      else {
-        arg_runtime_basic_type_id = arg->type->basic_type->id;
-        arg_runtime_type_dimension = arg->type->dimension;
-      }
+      arg_runtime_basic_type_id = arg->type->basic_type->id;
+      arg_runtime_type_dimension = arg->type->dimension;
       
       switch (arg->runtime_type_category) {
+        case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
+        {
+          // If arument type is string, the value is converted to string
+          // Copy
+          sv_value = sv_2mortal(newSVsv(sv_value));
+          
+          // Encode to UTF-8
+          sv_utf8_encode(sv_value);
+          
+          int32_t length = sv_len(sv_value);
+          const char* chars = SvPV_nolen(sv_value);
+          
+          void* string = env->new_string_len_raw(env, chars, length);
+
+          stack[arg_var_id].oval = string;
+          
+          arg_var_id++;
+          break;
+        }
         case SPVM_TYPE_C_RUNTIME_TYPE_BYTE : {
           int8_t value = (int8_t)SvIV(sv_value);
           stack[arg_var_id].bval = value;
@@ -1947,24 +2254,8 @@ call_sub(...)
             stack[arg_var_id].oval = NULL;
           }
           else {
-            // If arument type is byte[] and value is perl non-ref-scalar, the value is converted to byte[]
-            if (arg_runtime_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg_runtime_type_dimension == 1 && !SvROK(sv_value)) {
-              // Copy
-              sv_value = sv_2mortal(newSVsv(sv_value));
-              
-              // Encode to UTF-8
-              sv_utf8_encode(sv_value);
-              
-              int32_t length = sv_len(sv_value);
-              const char* chars = SvPV_nolen(sv_value);
-              
-              void* string = env->new_string_len_raw(env, chars, length);
-              env->inc_ref_count(env, string);
-              
-              sv_value = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::BlessedObject::Array");
-            }
             // Value is array refence
-            else if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
+            if (SvROK(sv_value) && sv_derived_from(sv_value, "ARRAY")) {
               
               SV* sv_elems = sv_value;
               
@@ -2150,6 +2441,31 @@ call_sub(...)
                         SV** sv_value_ptr = av_fetch(av_elems, i, 0);
                         SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
                         elems[i] = (double)SvNV(sv_value);
+                      }
+                    }
+                    
+                    // New sv array
+                    SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
+                    sv_value = sv_array;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_STRING: {
+                    // New array
+                    void* array = env->new_object_array(env, SPVM_BASIC_TYPE_C_ID_STRING, length);
+
+                    for (int32_t i = 0; i < length; i++) {
+                      SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+                      SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+                      if (SvOK(sv_value)) {
+                        // Encode to UTF-8
+                        sv_utf8_encode(sv_value);
+                        
+                        int32_t string_length = sv_len(sv_value);
+                        const char* chars = SvPV_nolen(sv_value);
+                        
+                        void* string = env->new_string_len_raw(env, chars, string_length);
+                        
+                        env->set_elem_object(env, array, i, string);
                       }
                     }
                     
@@ -2841,6 +3157,30 @@ call_sub(...)
       }
       break;
     }
+    case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
+    {
+      excetpion_flag = env->call_sub(env, sub_id, stack);
+      if (!excetpion_flag) {
+        void* return_value = stack[0].oval;
+        sv_return_value = NULL;
+        if (return_value != NULL) {
+          env->inc_ref_count(env, return_value);
+          
+          const char* bytes = (const char*)env->get_elems_byte(env, return_value);
+          int32_t length = env->length(env, return_value);
+          
+          sv_return_value = sv_2mortal(newSVpv(bytes, length));
+          
+          sv_utf8_decode(sv_return_value);
+          
+          env->dec_ref_count(env, return_value);
+        }
+        else {
+          sv_return_value = &PL_sv_undef;
+        }
+      }
+      break;
+    }
     case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
     {
       excetpion_flag = env->call_sub(env, sub_id, stack);
@@ -3085,7 +3425,7 @@ call_sub(...)
 }
 
 SV*
-to_elems(...)
+array_to_elems(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3180,28 +3520,50 @@ to_elems(...)
       }
     }
     else if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY) {
-      for (int32_t index = 0; index < length; index++) {
-        // Element type id
-        SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, array->basic_type_id);
-
-        // Index
-        SPVM_OBJECT* value = env->get_elem_object(env, array, index);
-        if (value == NULL) {
-          av_push(av_values, &PL_sv_undef);
-        }
-        else {
-          env->inc_ref_count(env, value);
-          int32_t element_type_is_array_type = element_type_dimension > 0;
+      if (basic_type_id == SPVM_BASIC_TYPE_C_ID_STRING) {
+        for (int32_t i = 0; i < length; i++) {
+          void* object = env->get_elem_object(env, array, i);
+          
           SV* sv_value;
-          if (element_type_is_array_type) {
-            sv_value = SPVM_XS_UTIL_new_sv_object(env, value, "SPVM::BlessedObject::Array");
+          if (object != NULL) {
+            const char* string_bytes = (const char*)env->get_elems_byte(env, object);
+            int32_t length = env->length(env, object);
+            
+            sv_value = sv_2mortal(newSVpv(string_bytes, length));
+            
+            sv_utf8_decode(sv_value);
           }
           else {
-            const char* basic_type_name = basic_type->name;
-            SV* sv_basic_type_name = sv_2mortal(newSVpv(basic_type_name, 0));
-            sv_value = SPVM_XS_UTIL_new_sv_object(env, value, SvPV_nolen(sv_basic_type_name));
+            sv_value = &PL_sv_undef;
           }
+          
           av_push(av_values, SvREFCNT_inc(sv_value));
+        }
+      }
+      else {
+        for (int32_t index = 0; index < length; index++) {
+          // Element type id
+          SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, array->basic_type_id);
+
+          // Index
+          SPVM_OBJECT* value = env->get_elem_object(env, array, index);
+          if (value == NULL) {
+            av_push(av_values, &PL_sv_undef);
+          }
+          else {
+            env->inc_ref_count(env, value);
+            int32_t element_type_is_array_type = element_type_dimension > 0;
+            SV* sv_value;
+            if (element_type_is_array_type) {
+              sv_value = SPVM_XS_UTIL_new_sv_object(env, value, "SPVM::BlessedObject::Array");
+            }
+            else {
+              const char* basic_type_name = basic_type->name;
+              SV* sv_basic_type_name = sv_2mortal(newSVpv(basic_type_name, 0));
+              sv_value = SPVM_XS_UTIL_new_sv_object(env, value, SvPV_nolen(sv_basic_type_name));
+            }
+            av_push(av_values, SvREFCNT_inc(sv_value));
+          }
         }
       }
     }
@@ -3289,7 +3651,7 @@ to_elems(...)
 }
 
 SV*
-to_bin(...)
+array_to_bin(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3427,7 +3789,7 @@ to_bin(...)
 }
 
 SV*
-length(...)
+array_length(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3457,5 +3819,239 @@ length(...)
   XPUSHs(sv_length);
   XSRETURN(1);
 }
+
+SV*
+array_set(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_env = ST(0);
+  SV* sv_array = ST(1);
+  SV* sv_index = ST(2);
+  SV* sv_value = ST(3);
+
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  // Index
+  int32_t index = (int32_t)SvIV(sv_index);
+
+  // Array
+  SPVM_OBJECT* array = SPVM_XS_UTIL_get_object(sv_array);
+  
+  // Length
+  int32_t length = env->length(env, array);
+  
+  // Check range
+  if (index < 0 || index > length - 1) {
+    croak("Out of range)");
+  }
+
+  int32_t basic_type_id = array->basic_type_id;
+  int32_t dimension = array->type_dimension;
+
+  if (dimension == 1) {
+    switch (basic_type_id) {
+      case SPVM_BASIC_TYPE_C_ID_BYTE: {
+        // Value
+        int8_t value = (int8_t)SvIV(sv_value);
+        
+        // Set element
+        int8_t* elements = env->get_elems_byte(env, array);
+        
+        elements[index] = value;
+        
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_SHORT: {
+        // Value
+        int16_t value = (int16_t)SvIV(sv_value);
+        
+        // Set element
+        int16_t* elements = env->get_elems_short(env, array);
+        
+        elements[index] = value;
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_INT: {
+        // Value
+        int32_t value = (int32_t)SvIV(sv_value);
+        
+        // Set element
+        int32_t* elements = env->get_elems_int(env, array);
+        
+        elements[index] = value;
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_LONG: {
+        // Value
+        int64_t value = (int64_t)SvIV(sv_value);
+        
+        // Set element
+        int64_t* elements = env->get_elems_long(env, array);
+        
+        elements[index] = value;
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+        // Value
+        float value = (float)SvNV(sv_value);
+        
+        // Set element
+        float* elements = env->get_elems_float(env, array);
+        
+        elements[index] = value;
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+        // Value
+        double value = (double)SvNV(sv_value);
+        
+        // Set element
+        double* elements = env->get_elems_double(env, array);
+        
+        elements[index] = value;
+        break;
+      }
+      default: {
+        // Get object
+        SPVM_OBJECT* value = SPVM_XS_UTIL_get_object(sv_value);
+        
+        env->set_elem_object(env, array, index, value);
+      }
+    }
+  }
+  else if (dimension > 1) {
+    
+    // Get object
+    SPVM_OBJECT* value = SPVM_XS_UTIL_get_object(sv_value);
+    
+    env->set_elem_object(env, array, index, value);
+  }
+  else {
+    assert(0);
+  }
+  
+  XSRETURN(0);
+}
+
+SV*
+array_get(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_env = ST(0);
+  SV* sv_array = ST(1);
+  SV* sv_index = ST(2);
+
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  // Index
+  int32_t index = (int32_t)SvIV(sv_index);
+
+  // Array
+  SPVM_OBJECT* array = SPVM_XS_UTIL_get_object(sv_array);
+  
+  // Length
+  int32_t length = env->length(env, array);
+  
+  // Check range
+  if (index < 0 || index > length - 1) {
+    croak("Out of range)");
+  }
+
+  int32_t basic_type_id = array->basic_type_id;
+  int32_t dimension = array->type_dimension;
+
+  SV* sv_value = NULL;
+  _Bool is_object = 0;
+  if (dimension == 1) {
+    switch (basic_type_id) {
+      case SPVM_BASIC_TYPE_C_ID_BYTE: {
+        // Get element
+        int8_t* elements = env->get_elems_byte(env, array);
+        int8_t value = elements[index];
+        sv_value = sv_2mortal(newSViv(value));
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_SHORT: {
+        // Get element
+        int16_t* elements = env->get_elems_short(env, array);
+        int16_t value = elements[index];
+        sv_value = sv_2mortal(newSViv(value));
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_INT: {
+        // Get element
+        int32_t* elements = env->get_elems_int(env, array);
+        int32_t value = elements[index];
+        sv_value = sv_2mortal(newSViv(value));
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_LONG: {
+        // Get element
+        int64_t* elements = env->get_elems_long(env, array);
+        int64_t value = elements[index];
+        sv_value = sv_2mortal(newSViv(value));
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+        // Get element
+        float* elements = env->get_elems_float(env, array);
+        float value = elements[index];
+        sv_value = sv_2mortal(newSVnv(value));
+        break;
+      }
+      case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+        // Get element
+        double* elements = env->get_elems_double(env, array);
+        double value = elements[index];
+        sv_value = sv_2mortal(newSVnv(value));
+        break;
+      }
+      default:
+        is_object = 1;
+    }
+  }
+  else if (dimension > 1) {
+    is_object = 1;
+  }
+  else {
+    assert(0);
+  }
+  
+  if (is_object) {
+    SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
+    
+    // Element dimension
+    int32_t element_dimension = array->type_dimension - 1;
+    
+    // Element type id
+    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, array->basic_type_id);
+
+    // Index
+    SPVM_OBJECT* value = env->get_elem_object(env, array, index);
+    if (value != NULL) {
+      env->inc_ref_count(env, value);
+    }
+    
+    if (element_dimension == 0) {
+      SV* sv_basic_type_name = sv_2mortal(newSVpv("SPVM::", 0));
+      sv_catpv(sv_basic_type_name, basic_type->name);
+      
+      sv_value = SPVM_XS_UTIL_new_sv_object(env, value, SvPV_nolen(sv_basic_type_name));
+    }
+    else if (element_dimension > 0) {
+      sv_value = SPVM_XS_UTIL_new_sv_object(env, value, "SPVM::Data::Array");
+    }
+  }
+  
+  XPUSHs(sv_value);
+  XSRETURN(1);
+}
+
 
 MODULE = SPVM		PACKAGE = SPVM

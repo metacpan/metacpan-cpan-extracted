@@ -395,20 +395,20 @@ sub new
 	my $try = 0;
 	my ($more, @ytdldata);
 RETRYIT:
+	$_ = '';
 	if (defined($uops{'userid'}) && defined($uops{'userpw'})) {  #USER HAS A LOGIN CONFIGURED:
 		my $uid = $uops{'userid'};
 		my $upw = $uops{'userpw'};
 		$_ = `youtube-dl --username "$uid" --password "$upw" $ytdlArgs "$url"`;
 	} else {
-		$_ = `youtube-dl --get-url $ytdlArgs "$url"`;
+		$_ = `youtube-dl $ytdlArgs "$url"`;
 	}
 	print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
 	@ytdldata = split /\r?\n/s;
 	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		print STDERR "..1:No MP4 streams found, try again for any (audio, etc.)...\n";
 		$try++;
-		$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
-		goto RETRYIT  if ($1);
+		goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//);
 	}
 	return undef unless (scalar(@ytdldata) > 0);
 

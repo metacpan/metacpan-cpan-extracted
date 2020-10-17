@@ -21,10 +21,10 @@ use List::Util ();
 
 use File::Spec;
 
-use Test::Run::Assert;
-use Test::Run::Obj::Error;
-use Test::Run::Straps;
-use Test::Run::Obj::IntOrUnknown;
+use Test::Run::Assert qw/ assert /;
+use Test::Run::Obj::Error ();
+use Test::Run::Straps ();
+use Test::Run::Obj::IntOrUnknown ();
 
 =head1 NAME
 
@@ -32,11 +32,11 @@ Test::Run::Core - Base class to run standard TAP scripts.
 
 =head1 VERSION
 
-Version 0.0304
+Version 0.0305
 
 =cut
 
-$VERSION = '0.0304';
+$VERSION = '0.0305';
 
 $ENV{HARNESS_ACTIVE} = 1;
 $ENV{HARNESS_NG_VERSION} = $VERSION;
@@ -2065,45 +2065,9 @@ Shlomi Fish, L<http://www.shlomifish.org/> .
 Note: this file is a rewrite of the original Test::Run code in order to
 change to a more liberal license.
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-test-run at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test::Run>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Test::Run::Core
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::Core>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test::Run::Core>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test::Run>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Test::Run>
-
-=back
-
 =head1 LICENSE
 
-This file is licensed under the MIT X11 License:
+This file is licensed under the MIT License:
 
 http://www.opensource.org/licenses/mit-license.php
 

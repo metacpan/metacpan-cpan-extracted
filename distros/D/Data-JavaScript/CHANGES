@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::JavaScript.
 
+1.15  Sun Oct 11 11:37:15 EDT 2020
+  - Adding skip check to the perlcritic test to avoid cpan tester issues.
+
 1.14  Fri Oct 8 23:33:20 EDT 2020
   - Modernized codebase
   - Added CI

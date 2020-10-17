@@ -15,15 +15,7 @@ use Fcntl qw(SEEK_SET);
 
 File::Format::CRD::Reader - read Windows .CRD files.
 
-=head1 VERSION
-
-Version 0.0.4
-
 =cut
-
-use vars qw($VERSION);
-
-$VERSION = '0.0.4';
 
 =head1 SYNOPSIS
 

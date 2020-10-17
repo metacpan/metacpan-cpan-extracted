@@ -4,7 +4,7 @@
       "Lance Wicks <lancew@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -33,13 +33,16 @@
             "Test::Portability::Files" : "0",
             "Test::Synopsis" : "0",
             "Test::Vars" : "0",
-            "Test::Version" : "1"
+            "Test::Version" : "1",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Moo" : "0",
-            "Test2::Compare" : "0",
+            "Test2::Compare" : "v0.0.121",
+            "Time::HiRes" : "0",
             "Types::Standard" : "0",
             "perl" : "v5.8.8"
          }
@@ -59,7 +62,7 @@
    "provides" : {
       "Scientist" : {
          "file" : "lib/Scientist.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -74,7 +77,8 @@
          "web" : "https://github.com/lancew/Scientist"
       }
    },
-   "version" : "0.012",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.013",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

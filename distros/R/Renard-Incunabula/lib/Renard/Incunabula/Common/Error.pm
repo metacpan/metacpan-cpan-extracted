@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Renard::Incunabula::Common::Error;
 # ABSTRACT: Exceptions
-$Renard::Incunabula::Common::Error::VERSION = '0.004';
+$Renard::Incunabula::Common::Error::VERSION = '0.005';
 use custom::failures qw/
 	Programmer::Logic
 	IO::FileNotFound
@@ -21,7 +21,7 @@ Renard::Incunabula::Common::Error - Exceptions
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

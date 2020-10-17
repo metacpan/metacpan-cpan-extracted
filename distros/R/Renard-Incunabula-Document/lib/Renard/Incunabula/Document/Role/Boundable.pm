@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document::Role::Boundable;
 # ABSTRACT: Role for documents where each page has bounds
-$Renard::Incunabula::Document::Role::Boundable::VERSION = '0.004';
+$Renard::Incunabula::Document::Role::Boundable::VERSION = '0.005';
 use Moo::Role;
 use Renard::Incunabula::Common::Types qw(ArrayRef HashRef);
 
@@ -24,7 +24,7 @@ Renard::Incunabula::Document::Role::Boundable - Role for documents where each pa
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

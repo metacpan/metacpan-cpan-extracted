@@ -11,7 +11,7 @@ subtest "Null document model" => sub {
 	my @valid_pages = qw(1 2 3 4);
 	my @invalid_pages = qw(0 -1 aa 5 2.0);
 
-	plan tests => 1 + @valid_pages + @invalid_pages;
+	plan tests => 2 + @valid_pages + @invalid_pages;
 
 	can_ok( $null_doc, qw(is_valid_page_number) );
 
@@ -22,6 +22,8 @@ subtest "Null document model" => sub {
 	for (@invalid_pages) {
 		ok( ! $null_doc->is_valid_page_number($_), "$_ is an invalid page" );
 	}
+
+	is $null_doc->number_of_pages, 4, 'Correct number of pages';
 };
 
 done_testing;

@@ -1,0 +1,82 @@
+{
+   "abstract" : "Alien package for the Kiwi C++ implementation of the Cassowary constraint solving algorithm",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Kiwisolver",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Inline" : "0.67",
+            "Inline::CPP" : "0"
+         },
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Intertangle/p5-Alien-Kiwisolver",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Intertangle/p5-Alien-Kiwisolver.git",
+         "web" : "https://github.com/Intertangle/p5-Alien-Kiwisolver"
+      }
+   },
+   "version" : "0.001",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
+      "requires" : {
+         "share" : {
+            "Archive::Zip" : "0",
+            "File::Copy::Recursive" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
+            "Path::Tiny" : "0",
+            "URI" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

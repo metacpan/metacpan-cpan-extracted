@@ -11,11 +11,7 @@ WriteMakefile(
   PREREQ_PM => {
     'GraphViz2' => '2.48',
     'Moo' => '2.001001',
-    'Algorithm::Dependency' => 1.110,
-    'Algorithm::Dependency::Source::HoA' => 1.110,
-    'Class::ISA' => 0.36,
     'Class::Load' => 0.23,
-    'Tree::DAG_Node' => 1.06,
   },
   TEST_REQUIRES => {
     'Test::More' => 1.001002,

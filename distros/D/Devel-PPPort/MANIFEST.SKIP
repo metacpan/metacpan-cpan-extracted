@@ -22,4 +22,3 @@
 Devel-PPPort.*
 Devel-PPPort.*\.tar\.gz$
 .travis.yml
-^PPPort\.pm$

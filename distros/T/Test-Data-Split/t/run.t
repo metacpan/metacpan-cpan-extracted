@@ -37,15 +37,16 @@ sub _hash
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $hash_ref = $args->{hash};
 
-    foreach my $k (keys (%$hash_ref))
+    foreach my $k ( keys(%$hash_ref) )
     {
-        if ($k !~ /\A[A-Za-z_\-0-9]{1,80}\z/)
+        if ( $k !~ /\A[A-Za-z_\-0-9]{1,80}\z/ )
         {
-            die "Invalid key in hash reference. All keys must be alphanumeric plus underscores and dashes.";
+            die
+"Invalid key in hash reference. All keys must be alphanumeric plus underscores and dashes.";
         }
     }
 
@@ -58,12 +59,12 @@ sub list_ids
 {
     my ($self) = @_;
 
-    return [ sort { $a cmp $b } keys(%{$self->_hash}) ];
+    return [ sort { $a cmp $b } keys( %{ $self->_hash } ) ];
 }
 
 sub lookup_data
 {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
 
     return $self->_hash->{$id};
 }
@@ -82,45 +83,39 @@ use Test::Differences (qw( eq_or_diff ));
 
 {
 
-    my $dir = tempdir( CLEANUP => 1);
+    my $dir = tempdir( CLEANUP => 1 );
 
     my $tests_dir = "$dir/t";
 
-    my %hash =
-    (
-        a => { more => "Hello"},
-        b => { more => "Jack"},
-        c => { more => "Sophie"},
-        d => { more => "Danny"},
-        'e100_99' => { more => "Zebra"},
+    my %hash = (
+        a         => { more => "Hello" },
+        b         => { more => "Jack" },
+        c         => { more => "Sophie" },
+        d         => { more => "Danny" },
+        'e100_99' => { more => "Zebra" },
     );
 
     my $data_obj = DataObj->new(
         {
-            hash => (\%hash),
+            hash => ( \%hash ),
         }
     );
 
     # TEST
-    eq_or_diff(
-        $data_obj->list_ids(),
-        [ qw(a b c d e100_99) ],
-        "list_ids",
-    );
-
+    eq_or_diff( $data_obj->list_ids(), [qw(a b c d e100_99)], "list_ids", );
 
     my $obj = Test::Data::Split->new(
         {
-            target_dir => "$tests_dir",
+            target_dir  => "$tests_dir",
             filename_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
                 my $id = $args->{id};
 
                 return "valgrind-$id.t";
             },
             contents_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
                 my $id = $args->{id};
 
@@ -143,7 +138,7 @@ EOF
     );
 
     # TEST
-    ok ($obj, "Object was initted.");
+    ok( $obj, "Object was initted." );
 
     $obj->run;
 
@@ -189,31 +184,29 @@ EOF
 {
     use DataSplitHashTest;
 
-    my $dir = tempdir( CLEANUP => 1);
+    my $dir = tempdir( CLEANUP => 1 );
 
     my $tests_dir = "$dir/t";
 
     my $data_obj = DataSplitHashTest->new;
 
     # TEST
-    eq_or_diff(
-        $data_obj->list_ids(),
-        [ qw(a b c d e100_99) ],
+    eq_or_diff( $data_obj->list_ids(), [qw(a b c d e100_99)],
         "Test::Data::Split::Backend::Hash list_ids",
     );
 
     my $obj = Test::Data::Split->new(
         {
-            target_dir => "$tests_dir",
+            target_dir  => "$tests_dir",
             filename_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
                 my $id = $args->{id};
 
                 return "valgrind-$id.t";
             },
             contents_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
                 my $id = $args->{id};
 
@@ -236,7 +229,7 @@ EOF
     );
 
     # TEST
-    ok ($obj, "Test::Data::Split::Backend::Hash Object was initted.");
+    ok( $obj, "Test::Data::Split::Backend::Hash Object was initted." );
 
     $obj->run;
 
@@ -280,46 +273,43 @@ EOF
 }
 
 {
-    my %hash =
-    (
-        a => { more => "Hello"},
-        b => { more => "Jack"},
-        c => { more => "Sophie"},
-        d => { more => "Danny"},
-        'e100_99' => { more => "Zebra"},
+    my %hash = (
+        a         => { more => "Hello" },
+        b         => { more => "Jack" },
+        c         => { more => "Sophie" },
+        d         => { more => "Danny" },
+        'e100_99' => { more => "Zebra" },
     );
 
     my $data_obj = DataObj->new(
         {
-            hash => (\%hash),
+            hash => ( \%hash ),
         }
     );
 
-    my $dir = tempdir( CLEANUP => 1);
+    my $dir = tempdir( CLEANUP => 1 );
 
     my $tests_dir = "$dir/t";
 
     # TEST
-    eq_or_diff(
-        $data_obj->list_ids(),
-        [ qw(a b c d e100_99) ],
+    eq_or_diff( $data_obj->list_ids(), [qw(a b c d e100_99)],
         "Test::Data::Split::Backend::Hash list_ids",
     );
 
     my $obj = Test::Data::Split->new(
         {
-            target_dir => "$tests_dir",
+            target_dir  => "$tests_dir",
             filename_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
                 my $id = $args->{id};
 
                 return "id_with_data-$id.t";
             },
             contents_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
-                my $id = $args->{id};
+                my $id   = $args->{id};
                 my $data = $args->{data};
 
                 return <<"EOF";
@@ -341,7 +331,7 @@ EOF
     );
 
     # TEST
-    ok ($obj, "Test::Data::Split::Backend::Hash Object was initted.");
+    ok( $obj, "Test::Data::Split::Backend::Hash Object was initted." );
 
     $obj->run;
 

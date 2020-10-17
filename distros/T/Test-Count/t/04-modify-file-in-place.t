@@ -43,7 +43,7 @@ sub _mycopy
     mkdir($temp_lib_dir);
 
     _mycopy(
-        File::Spec->catfile( $orig_dir, "lib", "MyMoreTests.pm" ),
+        File::Spec->catfile( $orig_dir,     "lib", "MyMoreTests.pm" ),
         File::Spec->catfile( $temp_lib_dir, "MyMoreTests.pm" )
     );
 

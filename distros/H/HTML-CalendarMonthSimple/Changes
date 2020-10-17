@@ -1,0 +1,54 @@
+Revision history for Perl module HTML::CalendarMonthSimple
+
+Changes in 1.01: Added VALIGN to cells, to make alignment work with browsers better. Added showweekdayheaders(). Corrected a bug that results in the month not fitting on the grid (e.g. March 2003).  Added getdatehref() and setdatehref(). Corrected a bug that causes a blank week to be printed at the beginning of some months.
+
+Changes in 1.02: Added the color methods.
+
+Changes in 1.03: More color methods!
+
+Changes in 1.04: Added the "which weekday" capability to addcontent(), setcontent(), and getcontent()
+
+Changes in 1.05: addcontent(), et al can now take strings such as '06' or decimals such as '3.14' and will handle them correctly.
+
+Changes in 1.06: Changed the "which weekday" interface a bit; truncations such as "2Tue" no longer work, and must be spelled out entirely ("2Tuesday"). Added "plural weekdays" support (e.g. "wednesdays" for "every wednesday").
+
+Changes in 1.07: Fixed a typo that caused an entirely empty calendar to be displayed very small.
+
+Changes in 1.08: Re-did the bugfixes described in 1.05, handling padded and non-integer dates.
+
+Changes in 1.09: Fixed the "2Monday", et al support; a bug was found by Dale Wellman <dwellman@bpnetworks.com> where the 7th, 14th, 21st, and 28th days weren't properly computing which Nth weekday they were so "1Monday" wouldn't work if the first Monday was the 7th of the month.
+
+Changes in 1.10: Added the headercontentcolor(), weekendheadercontentcolor(), and weekdayheadercontentcolor() methods, and made content headers use bgcolors, etc properly.
+
+Changes in 1.11: The module's VERSION is now properly specified, so "use" statements won't barf if they specify a minimum version. Added the vcellalignment() method so vertical content alignment is independent of horizontal alignment.
+
+Changes in 1.12: Fixed lots of warnings that were generated if B<-w> was used, due to many values defaulting to undef/blank. Added the sharpborders(), nowrap(), cellheight(), cellclass(), and weekdayheadersbig() methods. cellclass(), the beginning of CSS support. Thanks, Bray!
+
+Changes in 1.13: Added more CSS methods: headerclass(), weekdaycellclass(), weekndcellclass(), todaycellclass(). Added a test to the module distribution at the urging of CPAN testers.
+
+Changes in 1.14: Added the contentfontsize() method.
+
+Changes in 1.15: Added the datecolor(), datecontentcolor(), datebordercolor(), and datecellclass() methods, allowind cosmetic attributes to be changed on a per-date basis.
+
+Changes in 1.16: Fixed a very stupid bug that made addcontent() and setcontent() not work. Sorry!
+
+Changes in 1.17: Corrected B<-w> warnings about uninitialized values in as_HTML().
+
+Changes in 1.18: Added methods: tableclass(), sunday(), saturday(), weekdays(). Now day names can be internationalized!
+
+Changes in 1.19: Fixed as_HTML() such that blank/0 values can be used for various values, e.g. border size, colors, etc. Previously, values had to be non-zero or they were assumed to be undefined.
+
+Ver 1.20 was a mistake on my part and was immediately superseded by 1.21.
+
+Changes in 1.21: Fixed the internals of setcontent() et al (see the method's doc for details). Made getdatehref(), setdatehref(), and datecolor() et al, able to handle weekdays in addition to numeric dates.
+
+Changes in 1.22: Added the much-desired weekstartsonmonday() method. Now weeks can start on Monday and end with the weekend, instead of the American style of starting on Sunday.
+
+Changes in 1.23: Added today_year() et al. "Today" can now be overridden in the constructor.
+
+Changes in 1.24: Minor corrections to the HTML so it passes XML validation. Thanks a bundle, Peter!
+
+Changes in 1.25: A minor typo correction. Nothing big.
+
+Changes in 1.26: Added highlight (RT-3899) and Days_in_Month (RT-58547) methods.
+

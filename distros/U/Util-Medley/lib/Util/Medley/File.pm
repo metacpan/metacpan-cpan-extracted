@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.044';
+$Util::Medley::File::VERSION = '0.047';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -24,7 +24,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.044
+version 0.047
 
 =cut
 
@@ -254,7 +254,7 @@ The file path.
 
 multi method dirname (Str :$path!) {
 
-	return $self-dirname($path);
+	return $self->dirname($path);
 }
 
 multi method dirname (Str $path) {

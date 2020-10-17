@@ -45,15 +45,16 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
       $device->set_column( $property => $snmp->$property );
   }
 
-  (my $model = Encode::decode('UTF-8', ($snmp->model || ''))) =~ s/\s+$//;
-  $device->set_column( model => $model  );
-  $device->set_column( serial => Encode::decode('UTF-8', $snmp->serial) );
+  (my $model  = Encode::decode('UTF-8', ($snmp->model  || ''))) =~ s/\s+$//;
+  (my $serial = Encode::decode('UTF-8', ($snmp->serial || ''))) =~ s/\s+$//;
+  $device->set_column( model  => $model  );
+  $device->set_column( serial => $serial );
   $device->set_column( contact => Encode::decode('UTF-8', $snmp->contact) );
   $device->set_column( location => Encode::decode('UTF-8', $snmp->location) );
 
   $device->set_column( num_ports  => $snmp->ports );
   $device->set_column( snmp_class => $snmp->class );
-  $device->set_column( snmp_engineid => unpack('H*', $snmp->snmpEngineID) );
+  $device->set_column( snmp_engineid => unpack('H*', ($snmp->snmpEngineID || '')) );
 
   $device->set_column( last_discover => \'now()' );
 

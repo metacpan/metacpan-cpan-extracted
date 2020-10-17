@@ -19,7 +19,7 @@ no_index:
 provides:
   Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives:
     file: lib/Perl/Critic/Policy/RegularExpressions/ProhibitEmptyAlternatives.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   English: '0'
@@ -33,8 +33,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-Alternative
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-Alternative.git
-version: '0.001'
+  repository: git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives.git
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

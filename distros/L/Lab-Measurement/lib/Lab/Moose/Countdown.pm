@@ -1,5 +1,5 @@
 package Lab::Moose::Countdown;
-$Lab::Moose::Countdown::VERSION = '3.721';
+$Lab::Moose::Countdown::VERSION = '3.722';
 #ABSTRACT: Verbose countdown/delay with pretty printing of remaining time
 
 use v5.20;
@@ -22,7 +22,9 @@ sub countdown {
     my $prefix = shift // "Sleeping for ";
 
     if ( $delay < 0.5 ) {
-        sleep $delay;
+        if ( $delay > 0 ) {
+            sleep $delay;
+        }
         return;
     }
 
@@ -32,8 +34,10 @@ sub countdown {
 
     while () {
         my $remaining = $delay - ( time() - $t1 );
-        if ( $remaining < 0.5 and $remaining > 0 ) {
-            sleep $remaining;
+        if ( $remaining < 0.5 ) {
+            if ( $remaining > 0 ) {
+                sleep $remaining;
+            }
             last;
         }
         $remaining = Time::Seconds->new( int($remaining) + 1 );
@@ -56,7 +60,7 @@ Lab::Moose::Countdown - Verbose countdown/delay with pretty printing of remainin
 
 =head1 VERSION
 
-version 3.721
+version 3.722
 
 =head1 SYNOPSIS
 

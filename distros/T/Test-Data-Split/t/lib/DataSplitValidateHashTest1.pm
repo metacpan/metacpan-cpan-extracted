@@ -7,10 +7,7 @@ use Test::More ();
 
 use parent 'Test::Data::Split::Backend::ValidateHash';
 
-my %hash =
-(
-);
-
+my %hash = ();
 
 sub get_hash
 {
@@ -19,16 +16,16 @@ sub get_hash
 
 sub run_id
 {
-    my ($self, $id) = @_;
+    my ( $self, $id ) = @_;
 
     my $data = $self->lookup_data($id);
 
-    Test::More::is ($data->{a} + $data->{b}, $data->{result}, "Testing $id.");
+    Test::More::is( $data->{a} + $data->{b}, $data->{result}, "Testing $id." );
 }
 
 sub validate_and_transform
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     return 'prefix_' . $args->{data};
 }

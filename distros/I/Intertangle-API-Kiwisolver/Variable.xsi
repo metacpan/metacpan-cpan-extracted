@@ -1,0 +1,32 @@
+MODE: INLINE
+
+#include <xs.h>
+#include <kiwi/kiwi.h>
+
+namespace xs {
+    template <>
+    struct Typemap<kiwi::Variable*> : TypemapObject<kiwi::Variable*, kiwi::Variable*, ObjectTypeRefcntPtr, ObjectStorageMG, StaticCast> {
+        static std::string package () { return "Intertangle::API::Kiwisolver::Variable"; }
+    };
+}
+
+MODULE = Intertangle::API::Kiwisolver                PACKAGE = Intertangle::API::Kiwisolver::Variable
+PROTOTYPES: DISABLE
+
+kiwi::Variable* kiwi::Variable::new( std::string name = "" ) {
+	RETVAL = new kiwi::Variable(name);
+}
+
+std::string kiwi::Variable::name()
+
+void kiwi::Variable::setName( std::string name )
+
+double kiwi::Variable::value()
+
+void kiwi::Variable::setValue( double value )
+
+bool kiwi::Variable::equals( kiwi::Variable& other )
+
+BOOT {
+	Stash(__PACKAGE__, GV_ADD).mark_as_loaded(__MODULE__);
+}

@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues
   repository: https://github.com/DrHyde/perl-modules-Devel-CheckOS
-version: '1.84'
+version: '1.85'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

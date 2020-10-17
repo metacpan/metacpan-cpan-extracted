@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.27 2020-10-16T12:55:18Z
+  - correct spec for RFC2426 again
+  - so categories and nikname can have multiple values separated by comma
+
 0.26 2020-10-15T11:42:59Z
   - made document clear
   - make code & tests strict for RFC6350

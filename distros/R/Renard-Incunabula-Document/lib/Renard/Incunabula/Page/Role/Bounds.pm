@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Page::Role::Bounds;
 # ABSTRACT: Role for pages that have a height and width
-$Renard::Incunabula::Page::Role::Bounds::VERSION = '0.004';
+$Renard::Incunabula::Page::Role::Bounds::VERSION = '0.005';
 use Moo::Role;
 
 requires 'width';
@@ -22,7 +22,7 @@ Renard::Incunabula::Page::Role::Bounds - Role for pages that have a height and w
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

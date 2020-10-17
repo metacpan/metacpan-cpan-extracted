@@ -39,8 +39,8 @@ sub gen_test(@) {
     $csv->getline($io);
 
     # generate tld names list
-    printf $out "# this file was auto-generated at %s\n",
-           POSIX::strftime("%F %T", localtime);
+#    printf $out "# this file was auto-generated at %s\n",
+#           POSIX::strftime("%F %T", localtime);
 
     while ( my $row = $csv->getline($io) ) {
         exists $tld_types{ $row->[1] }

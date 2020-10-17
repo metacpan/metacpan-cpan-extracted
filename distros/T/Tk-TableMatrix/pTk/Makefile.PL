@@ -27,7 +27,7 @@ $ptkPath =~ s/\/Lang.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '1.23',
+    'VERSION'	=> '1.24',
     'XS_VERSION'=> '0.9',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
@@ -231,16 +231,17 @@ sub MY::realclean {
 
 
 sub MY::postamble {
-my $self = shift;
-my $dep = $self->Tk::MMutil::mTk_postamble;
+    my $self = shift;
+    my $dep = $self->Tk::MMutil::mTk_postamble;
 
-$dep .= $self->dir_target(@{$self->{'dir_targets'}}); 
-
-$dep .= "config :: " . join(" \\\n\t",map($self->catfile($_,".exists"),@{$self->{'dir_targets'}})) .
+    $dep .= $self->dir_target(@{$self->{'dir_targets'}}); 
+    
+    # add some additional dir targets - reason currently unknown. Use $(DFSEP) as dir separatir or makefile will not find target (target uses $(DFSEP) too).
+    $dep .= "config :: " . join(" \\\n\t",map($_.'$(DFSEP).exists',@{$self->{'dir_targets'}})) .
         "\n\t".$self->{NOECHO}."\$(NOOP)\n";
 
 
-$dep . '
+    $dep . '
 
 	'.$self->{NOECHO}.'$(NOOP)
 

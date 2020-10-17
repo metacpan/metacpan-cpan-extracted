@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 
 my %WriteMakefileArgs = (
     NAME             => 'Term::ProgressSpinner',
@@ -20,9 +21,23 @@ my %WriteMakefileArgs = (
         'Term::Size::Any' => '0',
         'Term::ANSIColor' => '0',
         'IO::Handle' => '0',
+	'Time::HiRes' => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Term-ProgressSpinner-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/Term-ProgressSpinner.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/Term-ProgressSpinner',
+            },
+        },
+    },
+    META_ADD => {
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+    },
 );
 
 if ($^O eq 'MSWin32') {

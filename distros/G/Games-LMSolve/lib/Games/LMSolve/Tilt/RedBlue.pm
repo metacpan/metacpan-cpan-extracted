@@ -1,5 +1,5 @@
 package Games::LMSolve::Tilt::RedBlue;
-$Games::LMSolve::Tilt::RedBlue::VERSION = '0.14.1';
+$Games::LMSolve::Tilt::RedBlue::VERSION = '0.14.2';
 use strict;
 use warnings;
 
@@ -160,7 +160,7 @@ Games::LMSolve::Tilt::RedBlue - driver for solving the red blue tilt puzzles
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

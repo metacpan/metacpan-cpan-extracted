@@ -1,0 +1,9 @@
+0.001 2020-10-17 03:07:29-0500
+
+  Features
+
+   - First release.
+   - A function to process sentences for a String::Tagged representation of a
+     page.
+   - A function to preprocess acronyms in sentences for use with speech
+     synthesis.

@@ -23,38 +23,6 @@ to L<Task::Test::Run::AllPlugins> for more detailed instructions.
 
 The rest of this page contains some information and links about Test::Run.
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Test::Run
-
-You can also look for information at:
-
-=over 4
-
-=item * Homepage
-
-L<http://web-cpan.shlomifish.org/modules/Test-Run/>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test::Run>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test::Run>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Test::Run>
-
-=back
-
 =head1 LINKS
 
 =over 4

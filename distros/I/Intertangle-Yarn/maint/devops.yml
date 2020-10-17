@@ -1,0 +1,10 @@
+native:
+  debian:
+    packages:
+      #- gir1.2-graphene-1.0
+  macos-homebrew:
+    packages:
+      - graphene
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-graphene

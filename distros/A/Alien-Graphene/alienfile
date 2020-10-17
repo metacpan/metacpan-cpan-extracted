@@ -1,0 +1,34 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'graphene-gobject-1.0';
+
+# http://ebassi.github.io/graphene/
+share {
+	requires 'Alien::Build::Plugin::Gather::Dino';
+	requires 'Devel::FindPerl';
+
+	plugin Download => (
+		url => 'https://github.com/ebassi/graphene/releases',
+		version => qr/([\d\.]+)\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	my $prop = meta_prop;
+
+	my $build_dir = '_build';
+	my @ninja_run = ("%{perl}", "%{.install.root}/../tool/ninja-run.pl");
+	build [
+		[ qw(meson),
+			'--prefix=%{.install.prefix}',
+			'--libdir=lib',
+			'--buildtype=release',
+			'-Dintrospection=true',
+			'-Dgobject_types=true',
+			$build_dir ],
+		[ @ninja_run, qw(-C), $build_dir, "test" ],
+		[ @ninja_run, qw(-C), $build_dir, 'install' ],
+	];
+
+	plugin 'Gather::Dino';
+};

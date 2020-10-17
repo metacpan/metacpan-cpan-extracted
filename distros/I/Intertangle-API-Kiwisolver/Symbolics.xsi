@@ -1,0 +1,14 @@
+MODE: INLINE
+
+#include <xs.h>
+#include <kiwi/kiwi.h>
+
+#define KIWI_MODULE_NS "Intertangle::API::Kiwisolver::"
+
+#define KIWI_CLASS(x)  (KIWI_MODULE_NS ## x)
+
+
+MODULE = Intertangle::API::Kiwisolver                PACKAGE = Intertangle::API::Kiwisolver::Symbolics
+PROTOTYPES: DISABLE
+
+INCLUDE_COMMAND: $^X inc/symbolics.pl

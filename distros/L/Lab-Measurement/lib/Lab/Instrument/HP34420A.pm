@@ -1,6 +1,6 @@
 package Lab::Instrument::HP34420A;
 #ABSTRACT: HP/Agilent 34420A digital multimeter
-$Lab::Instrument::HP34420A::VERSION = '3.721';
+$Lab::Instrument::HP34420A::VERSION = '3.722';
 use v5.20;
 
 use strict;
@@ -449,7 +449,7 @@ Lab::Instrument::HP34420A - HP/Agilent 34420A digital multimeter
 
 =head1 VERSION
 
-version 3.721
+version 3.722
 
 =head1 SYNOPSIS
 

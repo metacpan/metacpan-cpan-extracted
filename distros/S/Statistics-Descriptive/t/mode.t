@@ -15,34 +15,26 @@ use Statistics::Descriptive;
     my $mode = $stat->mode();
 
     # TEST
-    ok (!defined($mode),
-        "No mode for a flat distribution."
-    );
+    ok( !defined($mode), "No mode for a flat distribution." );
 
     my $second_mode = $stat->mode();
 
     # TEST
-    ok (!defined($second_mode),
-        "No mode after a second call."
-    );
+    ok( !defined($second_mode), "No mode after a second call." );
 }
 
 {
     my $stat = Statistics::Descriptive::Full->new();
 
-    $stat->add_data( 1, 5,5,5,10,19,19,30  );
+    $stat->add_data( 1, 5, 5, 5, 10, 19, 19, 30 );
 
     my $mode = $stat->mode();
 
     # TEST
-    is ($mode, 5,
-        "Mode is 5."
-    );
+    is( $mode, 5, "Mode is 5." );
 
     my $second_mode = $stat->mode();
 
     # TEST
-    is ($second_mode, 5,
-        "Second call mode is 5."
-    );
+    is( $second_mode, 5, "Second call mode is 5." );
 }

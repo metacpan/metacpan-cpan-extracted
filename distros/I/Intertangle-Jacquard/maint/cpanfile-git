@@ -1,0 +1,6 @@
+requires 'Intertangle::Taffeta',
+	git => 'https://github.com/Intertangle/p5-Intertangle-Taffeta.git',
+	branch => 'master';
+requires 'Intertangle::Punchcard',
+	git => 'https://github.com/Intertangle/p5-Intertangle-Punchcard.git',
+	branch => 'master';

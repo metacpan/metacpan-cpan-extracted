@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "back-end",
       "harness",
@@ -25,7 +25,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run",
    "prereqs" : {
@@ -63,7 +63,7 @@
       },
       "Test::Run::Assert" : {
          "file" : "lib/Test/Run/Assert.pm",
-         "version" : "0.0304"
+         "version" : "0.0305"
       },
       "Test::Run::Base" : {
          "file" : "lib/Test/Run/Base.pm"
@@ -82,7 +82,7 @@
       },
       "Test::Run::Core" : {
          "file" : "lib/Test/Run/Core.pm",
-         "version" : "0.0304"
+         "version" : "0.0305"
       },
       "Test::Run::Core_GplArt" : {
          "file" : "lib/Test/Run/Core_GplArt.pm"
@@ -92,7 +92,7 @@
       },
       "Test::Run::Obj" : {
          "file" : "lib/Test/Run/Obj.pm",
-         "version" : "0.0304"
+         "version" : "0.0305"
       },
       "Test::Run::Obj::CanonFailedObj" : {
          "file" : "lib/Test/Run/Obj/CanonFailedObj.pm"
@@ -144,7 +144,7 @@
       },
       "Test::Run::Straps" : {
          "file" : "lib/Test/Run/Straps.pm",
-         "version" : "0.0304"
+         "version" : "0.0305"
       },
       "Test::Run::Straps::Base" : {
          "file" : "lib/Test/Run/Straps/Base.pm"
@@ -175,6 +175,6 @@
          "url" : "http://bitbucket.org/shlomif/perl-test-run"
       }
    },
-   "version" : "0.0304",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.0305",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

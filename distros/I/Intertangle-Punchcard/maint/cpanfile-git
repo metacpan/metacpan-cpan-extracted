@@ -1,0 +1,6 @@
+requires 'Renard::Incunabula',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
+	branch => 'master';
+requires 'Intertangle::API::Kiwisolver',
+	git => 'https://github.com/Intertangle/p5-Intertangle-API-Kiwisolver.git',
+	branch => 'master';

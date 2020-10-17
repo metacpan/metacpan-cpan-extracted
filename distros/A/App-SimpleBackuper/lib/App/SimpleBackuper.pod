@@ -1,8 +1,8 @@
 =encoding utf8
 
-=head1 What's this
+=head1 NAME
 
-B<Simple-backuper> is a simple tool for backuping files and restoring it from backups.
+B<App::SimpleBackuper> (B<simple-backuper>) - is a simple tool for backuping files and restoring it from backups.
 
 =head1 Benefits
 
@@ -190,6 +190,10 @@ TARGET_DIR - is dir for restored files.
 
 =back
 
+=head1 AUTHOR
+
+Dmitriy Novozhilov <Dmitry@Novozhilov.ru>
+
 =head1 LICENSE
 
-GPLv3 (see LICENSE file)
+L<GPL v3|https://github.com/dmitry-novozhilov/simple-backuper/blob/master/LICENSE>

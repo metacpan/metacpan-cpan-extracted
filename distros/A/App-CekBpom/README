@@ -3,8 +3,8 @@ NAME
     for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.007 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2020-09-09.
+    This document describes version 0.008 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2020-10-16.
 
 DESCRIPTION
     See included script cek-bpom.

@@ -1,3 +1,8 @@
+2.53 2020-10-16
+- improve POD
+- zap now-irrelevant scripts/dependency.pl
+- drop Class::ISA, Tree::DAG_Node, Algorithm::Dependency, Algorithm::Dependency::Source::HoA
+
 2.52 2020-10-14
 - drop test for GraphViz2->dependency method - thanks @neo1ite for report
 

@@ -4,7 +4,8 @@ package inc::OldShareDirFiles;
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::BeforeRelease';
 use Dist::Zilla::File::InMemory;
-use Capture::Tiny 'capture_stdout';
+use Capture::Tiny 'capture';
+use Path::Tiny;
 use namespace::autoclean;
 
 # for every file leaving the test suite, we must replace it with an empty file so ->_test_data can
@@ -18,7 +19,11 @@ sub gather_files {
   my $self = shift;
 
   foreach my $filename (@{$self->removed}) {
-    $self->add_file(Dist::Zilla::File::InMemory->new({ name => $filename, content => '[]' }))
+    my $content = path('share/tests')->subsumes($filename) ? '[]'
+      : path('share/remotes')->subsumes($filename) ? '{}'
+      : die "don't know how to handle filename '$filename'";
+
+    $self->add_file(Dist::Zilla::File::InMemory->new({ name => $filename, content => $content }))
   }
   return;
 }
@@ -29,9 +34,11 @@ sub before_release {
   my $distname = $self->zilla->name;
   my $version = $self->zilla->version;
 
-  my $diff = capture_stdout {
-    system('diff', '-u', $distname.'-'.($version-0.001).'/MANIFEST', $distname.'-'.$version.'/MANIFEST')
+  my ($diff, $error) = capture {
+    system('diff', '-u', $distname.'-'.sprintf("%.3f", $version-0.001).'/MANIFEST', $distname.'-'.$version.'/MANIFEST');
   };
+
+  die $error if $error;
 
   if (my @missing = map s/^-//r, grep m{^-share/}, split /\n/, $diff) {
     die join "\n", '',

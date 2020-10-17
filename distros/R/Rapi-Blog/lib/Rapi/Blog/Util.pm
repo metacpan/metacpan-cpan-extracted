@@ -144,5 +144,18 @@ sub recaptcha_verify {
   }
 }
 
+sub sanitize_input {
+  shift if ($_[0] && $_[0] eq __PACKAGE__);
+  my $content = shift;
+  
+  my $c = RapidApp->active_request_context or die join('',
+    'Failed to obtain request context $c - ',
+    'sanitize_input() can only be called during a request'
+  );
+  
+  my $Scrubber = $c->ra_builder->input_Scrubber or die "Failed to load HTML::Scrubber object";
+  
+  $Scrubber->scrub( $content )
+}
 
 1;

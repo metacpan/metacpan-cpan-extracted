@@ -1,0 +1,6 @@
+requires 'Alien::Graphene',
+	git => 'https://github.com/Intertangle/p5-Alien-Graphene.git',
+	branch => 'master';
+requires 'Intertangle::API::Glib',
+	git => 'https://github.com/Intertangle/p5-Intertangle-API-Glib.git',
+	branch => 'master';

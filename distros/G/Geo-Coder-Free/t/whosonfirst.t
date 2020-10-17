@@ -1,4 +1,4 @@
-#!perl -wT
+#!perl -w
 
 # TODO:  Try using Test::Without::Module to try without Geo::libpostal is that
 #	is installed

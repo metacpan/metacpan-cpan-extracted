@@ -409,14 +409,14 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Apple BannedVideo Bitchute Blogger Brighteon IHeartRadio
+my @supported_mods = (qw(Apple Bitchute Blogger Brighteon IHeartRadio
 		RadioNet Radionomy Reciva Tunein Vimeo Spreaker Youtube));
 
 my %haveit;
@@ -437,10 +437,10 @@ sub new
 
 	my @args = @_;
 	push @args, ('-debug', $DEBUG)  if ($DEBUG);
-	if ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
-		return new StreamFinder::BannedVideo($url, @args);
-	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
-#		return new StreamFinder::IHeartRadio($url, 'secure_shoutcast', 'secure', 'any', '!rtmp', @args); #DEPRECIATED, USE CONFIG FILE!
+#	if ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
+#		return new StreamFinder::BannedVideo($url, @args);
+#	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
+	if ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 		return new StreamFinder::IHeartRadio($url, @args);
 	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Tunein($url, @args);

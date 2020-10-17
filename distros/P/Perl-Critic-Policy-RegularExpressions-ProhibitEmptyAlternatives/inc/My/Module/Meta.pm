@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our @ISA = qw{ Exporter };
 
@@ -46,14 +46,14 @@ sub meta_merge {
 	dynamic_config	=> 1,
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-Alternative',
+		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives',
 		mailto  => 'wyant@cpan.org',
 	    },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
 		type	=> 'git',
-		url	=> 'git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-Alternative.git',
-		web	=> 'https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-Alternative',
+		url	=> 'git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives.git',
+		web	=> 'https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives',
 	    },
 	},
 	@extra,

@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Common::Types;
 # ABSTRACT: Type library
-$Renard::Incunabula::Common::Types::VERSION = '0.004';
+$Renard::Incunabula::Common::Types::VERSION = '0.005';
 use Type::Library 0.008 -base,
 	-declare => [qw(
 	)];
@@ -39,7 +39,7 @@ Renard::Incunabula::Common::Types - Type library
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

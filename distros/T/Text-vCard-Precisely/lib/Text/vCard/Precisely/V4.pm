@@ -1,6 +1,6 @@
 package Text::vCard::Precisely::V4;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -21,6 +21,7 @@ Text::vCard::Precisely::V4 - Read, Write and Edit B<vCards 4.0>
  
 You can unlock types that will be available in vCard4.0
 
+ use Text::vCard::Precisely;
  my $vc = Text::vCard::Precisely->new( version => '4.0' );
  # Or you can write like below:
  my $vc4 = Text::vCard::Precisely::V4->new();
@@ -101,8 +102,6 @@ my @types = qw(
     XML KEY SOCIALPROFILE PHOTO LOGO SOURCE
 );
 
-# ToDo: to accept SORT-AS param in FN,N,ORG
-
 sub as_string {
     my ($self) = @_;
     my $str = $self->_header();
@@ -118,8 +117,7 @@ sub as_string {
 
     $str .= $self->_footer();
     $str = $self->_fold($str);
-    return decode( $self->encoding_out(), $str ) unless $self->encoding_out() eq 'none';
-    return $str;
+    return decode( $self->encoding_out(), $str );
 }
 
 =head2 as_file($filename)
@@ -313,8 +311,8 @@ The format is SAME as 3.0
 
 =cut
 
-subtype 'v4Node' => as 'ArrayRef[Text::vCard::Precisely::V4::Node]';
-coerce 'v4Node', from 'Str', via {
+subtype 'v4Nodes' => as 'ArrayRef[Text::vCard::Precisely::V4::Node]';
+coerce 'v4Nodes', from 'Str', via {
     my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
     return [ Text::vCard::Precisely::V4::Node->new( { name => $name, content => $_ } ) ]
 }, from 'HashRef', via {
@@ -327,6 +325,14 @@ coerce 'v4Node', from 'Str', via {
                 content => $_->{'content'} || croak "No value in HashRef!",
             }
         )
+    ]
+}, from 'ArrayRef[Str]', via {
+    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    return [
+        map {
+            Text::vCard::Precisely::V4::Node->new(
+                { name => $name, content => $_ || croak "No value in ArrayRef[Str]!", } )
+        } @$_
     ]
 }, from 'ArrayRef[HashRef]', via {
     my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
@@ -342,8 +348,8 @@ coerce 'v4Node', from 'Str', via {
         } @$_
     ]
 };
-has [qw|note org title role categories fn nickname lang impp xml geo key|] =>
-    ( is => 'rw', isa => 'v4Node', coerce => 1 );
+has [qw|note org title role fn lang impp xml geo key|] =>
+    ( is => 'rw', isa => 'v4Nodes', coerce => 1 );
 
 =head2 source(), sound()
 

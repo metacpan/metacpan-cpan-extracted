@@ -18,10 +18,17 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Term::ProgressSpinner:
+    file: lib/Term/ProgressSpinner.pm
+    version: '0.04'
 requires:
   IO::Handle: '0'
   Term::ANSIColor: '0'
   Term::Size::Any: '0'
+  Time::HiRes: '0'
   perl: '5.006'
-version: '0.03'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Term-ProgressSpinner.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

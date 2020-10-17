@@ -1,0 +1,56 @@
+use alienfile;
+
+use strict;
+use warnings;
+
+share {
+	requires 'Net::SSLeay' => 0;
+	requires 'IO::Socket::SSL' => 0;
+	requires 'File::Copy::Recursive' => 0;
+	requires 'Path::Tiny' => 0;
+
+	plugin Download => (
+		url => 'https://github.com/nucleic/kiwi/archive/master.zip',
+	);
+
+	plugin Extract => 'zip';
+
+	patch sub {
+		Path::Tiny->new("kiwi/variable.h")->edit_utf8(sub {
+			s/private:\n/$&friend int* get_refcount( kiwi::Variable* obj );/s;
+		});
+		Path::Tiny->new("kiwi/constraint.h")->edit_utf8(sub {
+			s/private:\n/$&friend int* get_refcount( kiwi::Constraint* obj );/s;
+		});
+	};
+
+	build [
+		sub {
+			my ($build) = @_;
+
+			my @dirs;
+
+			$build->log("copy to prefix");
+			my $prefix_abs = Path::Tiny::path($build->install_prop->{prefix});
+
+			my $kiwi_include_dest = $prefix_abs->child('include');
+			$kiwi_include_dest->mkpath;
+
+			File::Copy::Recursive::dircopy( 'kiwi', $kiwi_include_dest->child('kiwi') );
+		},
+	];
+
+	gather sub {
+		my($build) = @_;
+		my $prefix = $build->runtime_prop->{prefix};
+
+		my $cflags = "-I$prefix/include";
+		my $libs = "";
+
+		$build->runtime_prop->{cflags}        = $cflags;
+		$build->runtime_prop->{cflags_static} = $cflags;
+		$build->runtime_prop->{libs}          = $libs;
+		$build->runtime_prop->{libs_static}   = $libs;
+	};
+};
+

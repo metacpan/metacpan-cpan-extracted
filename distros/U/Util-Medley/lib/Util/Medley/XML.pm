@@ -1,5 +1,5 @@
 package Util::Medley::XML;
-$Util::Medley::XML::VERSION = '0.044';
+$Util::Medley::XML::VERSION = '0.047';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -16,7 +16,7 @@ Util::Medley::XML - utility XML methods
 
 =head1 VERSION
 
-version 0.044
+version 0.047
 
 =cut
 

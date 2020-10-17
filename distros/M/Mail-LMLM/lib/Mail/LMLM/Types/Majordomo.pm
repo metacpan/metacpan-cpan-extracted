@@ -1,5 +1,5 @@
 package Mail::LMLM::Types::Majordomo;
-$Mail::LMLM::Types::Majordomo::VERSION = '0.6806';
+$Mail::LMLM::Types::Majordomo::VERSION = '0.6807';
 use strict;
 use warnings;
 
@@ -132,7 +132,7 @@ lists.
 
 =head1 VERSION
 
-version 0.6806
+version 0.6807
 
 =head1 METHODS
 
@@ -168,36 +168,9 @@ L<Mail::LMLM::Types::Base>
 
 Shlomi Fish, L<http://www.shlomifish.org/>.
 
-=head1 AUTHOR
-
-unknown
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2019 by unknown.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-mail-lmlm/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Mail::LMLM::Types::Majordomo
 
 =head2 Websites
 
@@ -216,35 +189,11 @@ L<https://metacpan.org/release/Mail-LMLM>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Mail-LMLM>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-LMLM>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Mail-LMLM>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Mail-LMLM>
 
 =item *
 
@@ -295,5 +244,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-mail-lmlm>
 
   git clone git://github.com/shlomif/perl-mail-lmlm.git
+
+=head1 AUTHOR
+
+Shlomi Fish
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-mail-lmlm/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

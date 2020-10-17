@@ -1,0 +1,10 @@
+
+0.01 2020.10.17
+    - Initial release
+
+    - Show a defaults Perl code
+    - Allow the user to type in different code.
+    - Rub B::Deparse on the code and show in the other display.
+    - Options -d, -p. -q, -P are working.
+    - HTML-based About box
+    - Menu items.

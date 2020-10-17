@@ -478,7 +478,7 @@ Games::LMSolve::Base - base class for puzzle solvers.
 
 =head1 VERSION
 
-version 0.14.1
+version 0.14.2
 
 =head1 SYNOPSIS
 

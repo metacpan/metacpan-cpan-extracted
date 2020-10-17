@@ -11,7 +11,7 @@ build_requires:
   parent: '0'
   perl: v5.8.8
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,15 +20,17 @@ name: Scientist
 provides:
   Scientist:
     file: lib/Scientist.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Moo: '0'
-  Test2::Compare: '0'
+  Test2::Compare: v0.0.121
+  Time::HiRes: '0'
   Types::Standard: '0'
   perl: v5.8.8
 resources:
   bugtracker: https://github.com/lancew/Scientist/issues
   homepage: https://metacpan.org/release/Scientist
   repository: git://github.com/lancew/Scientist.git
-version: '0.012'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.013'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -18,6 +18,7 @@ my @files = (
     't/additional-tests.t',
     't/additional-tests/README',
     't/additional-tests/anchor.json',
+    't/additional-tests/faux-buggy-schemas.json',
     't/additional-tests/format-duration.json',
     't/additional-tests/future-keywords-draft2019-09.json',
     't/additional-tests/id.json',

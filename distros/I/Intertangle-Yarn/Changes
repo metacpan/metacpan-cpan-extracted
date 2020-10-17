@@ -1,0 +1,10 @@
+0.001 2020-10-17 00:55:16-0500
+
+  Features
+
+   - First release.
+   - Uses Alien::Graphene to build .gir files on Windows and Travis CI (older
+     distribution). See
+       - <https://github.com/Intertangle/p5-Intertangle-Yarn/issues/1>,
+       - <https://github.com/Intertangle/p5-Intertangle-Yarn/issues/2>,
+       - <https://github.com/Intertangle/p5-Intertangle-Yarn/pull/3>.

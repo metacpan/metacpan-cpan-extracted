@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula;
 # ABSTRACT: The base library for Project Renard
-$Renard::Incunabula::VERSION = '0.004';
+$Renard::Incunabula::VERSION = '0.005';
 1;
 
 __END__
@@ -16,7 +16,7 @@ Renard::Incunabula - The base library for Project Renard
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,46 @@
 ==================================================
-Changes from 2019-09-29 00:00:00 +0000 to present.
+Changes from 2019-10-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.044 at 2020-09-28 18:45:49 +0000
+version 0.047 at 2020-10-15 20:13:07 +0000
+------------------------------------------
+
+  Change: b940409eb67d0c24b301b1700d9d6b1e4e0908cb
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-15 15:12:53 +0000
+
+    fixed bug in Util::Medley::File::dirname() (thanks Marty Sandidge) 
+
+------------------------------------------
+version 0.046 at 2020-10-15 20:09:50 +0000
+------------------------------------------
+
+  Change: 526c8051ccb94d612c975bee115af55d39ac4d1d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-15 15:09:50 +0000
+
+    added method repoQuery to lib/Util/Medley/Linux/Yum.pm 
+
+  Change: e1e437f2805a148d71513881625b2efb4c53b984
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-15 15:05:11 +0000
+
+    renamed: lib/Util/Medley/Roles/Attributes/Linux/Zip.pm ->
+    lib/Util/Medley/Roles/Attributes/Linux/Yum.pm 
+
+------------------------------------------
+version 0.045 at 2020-10-15 19:00:13 +0000
+------------------------------------------
+
+  Change: 68f6b66b010b42ab734b253f350a42c63db26a75
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-15 14:00:13 +0000
+
+    added Util::Medley::Linux::Yum 
+
+------------------------------------------
+version 0.044 at 2020-09-28 18:45:43 +0000
 ------------------------------------------
 
   Change: 9d9f0cbd3df56d3842cbd2815d45ea3271ab88de

@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Document::Types;
 # ABSTRACT: Type library for document types
-$Renard::Incunabula::Document::Types::VERSION = '0.004';
+$Renard::Incunabula::Document::Types::VERSION = '0.005';
 use Type::Library 0.008 -base,
 	-declare => [qw(
 		DocumentModel
@@ -39,7 +39,7 @@ Renard::Incunabula::Document::Types - Type library for document types
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

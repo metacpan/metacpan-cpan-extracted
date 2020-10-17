@@ -1,0 +1,75 @@
+0.005 2020-10-17 02:47:41-0500
+
+  Renamed from Renard::Incunabula::Format::PDF (previous version
+  <https://metacpan.org/release/ZMUGHAL/Renard-Incunabula-Format-PDF-0.004>).
+
+  Features
+
+   - Create String::Tagged from mutool stext output. See
+     <https://github.com/project-renard/p5-Renard-Block-Format-PDF/pull/3>
+
+   - Add class that contains helpers for accessing PDF test document
+     <https://github.com/project-renard/p5-Renard-Block-Format-PDF/pull/9>.
+
+  Refactoring
+
+   - Renaming as mentioned above.
+
+  Bug fixes
+
+   - Use CropBox instead of MediaBox to obtain bounds.
+
+  Build changes
+
+   - Set minimum version for CairoRenderableFromPNG module to 0.004.
+
+
+0.004 2018-01-06 00:52:40-0600
+
+  Features
+   - Retrieve document information dictionary.
+
+     Connects with <https://github.com/project-renard/curie/issues/13>.
+
+     See <https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF/pull/5>.
+
+  Refactoring
+   - Update to use the split Renard-Incunabula distributions.
+
+     See
+
+       - <https://github.com/project-renard/p5-Renard-Incunabula/issues/5>,
+       - <https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF/pull/7>.
+
+0.003 2017-07-11 23:17:34-0500
+  - Split off from Renard-Curie-0.002.
+
+    project-renard/p5-Renard-Incunabula
+      s/Renard::Curie::Setup/Renard::Incunabula::Common::Setup
+      s/Renard::Curie::Types/Renard::Incunabula::Common::Types
+      s/Renard::Curie::Error/Renard::Incunabula::Common::Error/
+      s/Renard::Curie::Model::Document/Renard::Incunabula::Document/
+      s/Renard::Curie::Model::Outline/Renard::Incunabula::Outline/
+      s/Renard::Curie::Model::Document::Role::FromFile/Renard::Incunabula::Document::Role::FromFile
+      s/Renard::Curie::Model::Document::Role::Pageable/Renard::Incunabula::Document::Role::Pageable
+      s/Renard::Curie::Model::Document::Role::Cacheable/Renard::Incunabula::Document::Role::Cacheable
+      s/Renard::Curie::Model::Document::Role::Renderable/Renard::Incunabula::Document::Role::Renderable
+      s/Renard::Curie::Model::Document::Role::Boundable/Renard::Incunabula::Document::Role::Boundable
+      s/Renard::Curie::Model::Document::Role::Outlineable/Renard::Incunabula::Document::Role::Outlineable
+      s/Renard::Curie::Model::Page::Role::CairoRenderableFromPNG/Renard::Incunabula::Page::Role::CairoRenderableFromPNG/
+      s/Renard::Curie::Model::Page::Role::Bounds/Renard::Incunabula::Page::Role::Bounds/
+      s/Renard::Curie::Model::Page::Role::BoundsFromCairoImageSurface/Renard::Incunabula::Page::Role::BoundsFromCairoImageSurface/
+      s/Renard::Curie::Model::Page::Role::CairoRenderable/Renard::Incunabula::Page::Role::CairoRenderable/
+      s/Renard::Curie::Model::Page::CairoImageSurface/Renard::Incunabula::Page::CairoImageSurface/
+      s/Renard::Curie::Model::Page::RenderedFromPNG/Renard::Incunabula::Page::RenderedFromPNG/
+      s/Renard::Curie::Model::Document::CairoImageSurface/Renard::Incunabula::Format::Cairo::ImageSurface::Document/
+
+    project-renard/p5-Renard-Incunabula-MuPDF-mutool
+      s/Renard::Curie::Data::PDF/Renard::Incunabula::MuPDF::mutool/
+
+    project-renard/p5-Renard-Incunabula-Format-PDF
+      s/Renard::Curie::Model::Document::PDF/Renard::Incunabula::Format::PDF::Document/
+      s/Renard::Curie::Model::Page::PDF/Renard::Incunabula::Format::PDF::Page/
+
+    See <https://github.com/project-renard/curie/issues/26>,
+    <https://github.com/project-renard/curie/pull/210>.

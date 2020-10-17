@@ -1,3 +1,44 @@
+0.0924 2020-10-16
+  - add real string type. before this relese runtime string type is same as byte[] type, but in this release string type is string type in also runtime
+  - implicite conversion from byte[] to string become occur compile error
+  - type conversion from byte[] to string become copy instead of reference copy
+  - type conversion from string[] to byte become copy instead of reference copy
+0.0923 2020-10-14
+  - add SPVM::BlessedObject::Array set method
+  - add SPVM::BlessedObject::Array get method
+  - add SPVM::ByteList->new_len
+  - add SPVM::ShortList->new_len
+  - add SPVM::IntList->new_len
+  - add SPVM::LongList->new_len
+  - add SPVM::FloatList->new_len
+  - add SPVM::DoubleList->new_len
+  - add SPVM::StringList->new_len
+  - add SPVM::List->new_len
+  - SPVM::ByteList->newa is rename to new, and original new is removed
+  - SPVM::ShortList->newa is rename to new, and original new is removed
+  - SPVM::IntList->newa is rename to new, and original new is removed
+  - SPVM::LongList->newa is rename to new, and original new is removed
+  - SPVM::FloatList->newa is rename to new, and original new is removed
+  - SPVM::DoubleList->newa is rename to new, and original new is removed
+  - SPVM::StringList->newa is rename to new, and original new is removed
+  - SPVM::List->newa is rename to new, and original new is removed
+  - SPVM::Hash->newa is rename to new, and original new is renamed to new_empty
+  - fix SPVM::ByteList capacity bug
+  - fix SPVM::ShortList capacity bug
+  - fix SPVM::IntList capacity bug
+  - fix SPVM::LongList capacity bug
+  - fix SPVM::FloatList capacity bug
+  - fix SPVM::DobuleList capacity bug
+  - fix SPVM::List capacity bug
+  - fix SPVM::StringList capacity bug
+0.0922 2020-10-12
+  - add SPVM::new_byte_array_len
+  - add SPVM::new_short_array_len
+  - add SPVM::new_int_array_len
+  - add SPVM::new_long_array_len
+  - add SPVM::new_float_array_len
+  - add SPVM::new_double_array_len
+  - add SPVM::new_object_array_len
 0.0921 2020-10-12
   - fix bug that in exchange api, any object return type is wrong.
 0.0920 2020-10-12

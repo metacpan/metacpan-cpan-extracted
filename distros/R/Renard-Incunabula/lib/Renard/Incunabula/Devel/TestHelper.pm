@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Incunabula::Devel::TestHelper;
 # ABSTRACT: A test helper with functions useful for various Renard distributions
-$Renard::Incunabula::Devel::TestHelper::VERSION = '0.004';
+$Renard::Incunabula::Devel::TestHelper::VERSION = '0.005';
 use Renard::Incunabula::Common::Types qw(Dir);
 
 classmethod test_data_directory() :ReturnType(Dir) {
@@ -28,7 +28,7 @@ Renard::Incunabula::Devel::TestHelper - A test helper with functions useful for 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 FUNCTIONS
 
@@ -36,7 +36,7 @@ version 0.004
 
   Renard::Incunabula::Devel::TestHelper->test_data_directory
 
-Returns a L<Path::Class> object that points to the path defined by
+Returns a L<Path::Tiny> object that points to the path defined by
 the environment variable C<RENARD_TEST_DATA_PATH>.
 
 If the environment variable is not defined, throws an error.

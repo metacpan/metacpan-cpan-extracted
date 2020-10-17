@@ -1,6 +1,6 @@
 package Lab::Bus::LinuxGPIB;
 #ABSTRACT: LinuxGPIB bus
-$Lab::Bus::LinuxGPIB::VERSION = '3.721';
+$Lab::Bus::LinuxGPIB::VERSION = '3.722';
 use v5.20;
 
 use strict;
@@ -492,7 +492,7 @@ Lab::Bus::LinuxGPIB - LinuxGPIB bus
 
 =head1 VERSION
 
-version 3.721
+version 3.722
 
 =head1 SYNOPSIS
 

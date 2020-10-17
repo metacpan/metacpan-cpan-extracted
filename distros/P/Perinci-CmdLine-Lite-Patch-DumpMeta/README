@@ -1,16 +1,19 @@
 NAME
-    Perinci::CmdLine::Lite::Patch::DumpMeta - Patch Perinci::CmdLine::Lite's
-    action_call() to dump meta first
+    Perinci::CmdLine::Lite::Patch::DumpMeta - (DEPRECATED) Patch
+    Perinci::CmdLine::Lite's action_call() to dump meta first
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Perinci::CmdLine::Lite::Patch::DumpMeta (from Perl distribution
-    Perinci-CmdLine-Lite-Patch-DumpMeta), released on 2018-12-07.
+    Perinci-CmdLine-Lite-Patch-DumpMeta), released on 2020-10-17.
 
 SYNOPSIS
      % PERL5OPT=-MPerinci::CmdLine::Lite::Patch::DumpMeta yourscript.pl ...
 
 DESCRIPTION
+    DEPRECATION NOTICE. Deprecated in favor of
+    Perinci::CmdLine::Plugin::DumpMeta.
+
     This patch can be used for debugging. It wraps action_call() to dump
     Rinci metadata first.
 
@@ -34,7 +37,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

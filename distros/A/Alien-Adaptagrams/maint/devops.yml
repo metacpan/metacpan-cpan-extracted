@@ -1,0 +1,18 @@
+native:
+  debian:
+    packages:
+      - pkg-config
+      - autoconf
+      - automake
+      - autotools-dev
+      - libtool
+  macos-homebrew:
+    packages:
+      - pkg-config
+      - autoconf
+      - automake
+      - libtool
+  msys2-mingw64:
+    packages:
+      - pkg-config
+      - unzip

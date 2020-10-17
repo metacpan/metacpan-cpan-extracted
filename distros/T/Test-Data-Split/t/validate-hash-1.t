@@ -18,33 +18,31 @@ use Test::Differences (qw( eq_or_diff ));
 {
     use DataSplitValidateHashTest1;
 
-    my $dir = tempdir( CLEANUP => 1);
+    my $dir = tempdir( CLEANUP => 1 );
 
     my $tests_dir = "$dir/t";
 
     my $data_obj = DataSplitValidateHashTest1->new;
 
     # TEST
-    eq_or_diff(
-        $data_obj->list_ids(),
-        [ qw(test_abc test_foo) ],
+    eq_or_diff( $data_obj->list_ids(), [qw(test_abc test_foo)],
         "Test...ValidateHash list_ids",
     );
 
     my $obj = Test::Data::Split->new(
         {
-            target_dir => "$tests_dir",
+            target_dir  => "$tests_dir",
             filename_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
                 my $id = $args->{id};
 
                 return "valgrind-$id.t";
             },
             contents_cb => sub {
-                my ($self, $args) = @_;
+                my ( $self, $args ) = @_;
 
-                my $id = $args->{id};
+                my $id   = $args->{id};
                 my $data = $args->{data};
 
                 return <<"EOF";
@@ -66,7 +64,7 @@ EOF
     );
 
     # TEST
-    ok ($obj, "Test...ValidateHash Object was initted.");
+    ok( $obj, "Test...ValidateHash Object was initted." );
 
     $obj->run;
 

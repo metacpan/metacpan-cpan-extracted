@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.721';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.722';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use v5.20;
@@ -206,7 +206,7 @@ sub set_pid {
     my ( $loop, $P, $I, $D ) = delete @args{qw/loop P I D/};
     $loop = $loop // $self->default_loop();
     $self->write(
-        command => sprintf( "PID $loop, %f.1, %f.1, %d", $P, $I, $D ),
+        command => sprintf( "PID $loop, %.1f, %.1f, %d", $P, $I, $D ),
         %args
     );
 }
@@ -286,7 +286,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.721
+version 3.722
 
 =head1 SYNOPSIS
 

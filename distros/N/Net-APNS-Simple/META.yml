@@ -3,6 +3,8 @@ abstract: 'APNS Perl implementation'
 author:
   - 'Tooru Tsurukawa <rockbone.g at gmail.com>'
 build_requires:
+  Crypt::JWT: '0.018'
+  Crypt::PK::ECC: '0.059'
   File::Basename: '0'
   File::Spec: '0'
   Test::More: '0.98'
@@ -28,9 +30,12 @@ no_index:
 provides:
   Net::APNS::Simple:
     file: lib/Net/APNS/Simple.pm
-    version: '0.03'
-requires:
+    version: '0.05'
+recommends:
   Crypt::JWT: '0.018'
+  Crypt::PK::ECC: '0.059'
+  Net::HTTP: '0'
+requires:
   IO::Socket::SSL: '2.038'
   JSON: '0'
   Moo: '0'
@@ -41,6 +46,7 @@ resources:
   bugtracker: https://github.com/rockbone/p5-Net-APNS-Simple/issues
   homepage: https://github.com/rockbone/p5-Net-APNS-Simple
   repository: git://github.com/rockbone/p5-Net-APNS-Simple.git
-version: '0.03'
+version: '0.05'
 x_contributors:
+  - 'Nikolay Pelov <npelov@gmail.com>'
   - 'Tooru Tsurukawa <rockbone.g@gmail.com>'

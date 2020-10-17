@@ -1,0 +1,70 @@
+{
+   "abstract" : "Helper for using Glib",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Intertangle-API-Glib",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Inline" : "0.67",
+            "Inline::C" : "0.62"
+         },
+         "requires" : {
+            "ExtUtils::Depends" : "0",
+            "Glib" : "0",
+            "List::MoreUtils" : "0",
+            "Modern::Perl" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Load" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Intertangle/p5-Intertangle-API-Glib",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Intertangle/p5-Intertangle-API-Glib.git",
+         "web" : "https://github.com/Intertangle/p5-Intertangle-API-Glib"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -1,3 +1,11 @@
+0.005 2020-10-17 02:21:52-0500
+
+  Features
+
+   - Make PageNumber optional for outline type check.
+
+   - Add key for whether outline item is open or not to type check.
+
 0.004 2018-01-06 00:34:38-0600
 
   Refactoring

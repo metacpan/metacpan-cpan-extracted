@@ -1,5 +1,5 @@
 package Util::Medley::Spawn;
-$Util::Medley::Spawn::VERSION = '0.044';
+$Util::Medley::Spawn::VERSION = '0.047';
 ###############################################################################
 
 use Modern::Perl;
@@ -18,7 +18,7 @@ Util::Medley::Spawn - utility methods for system commands
 
 =head1 VERSION
 
-version 0.044
+version 0.047
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ write to log if enabled.
  
  ($stdout, $stderr, $exit) = $util->capture(cmd   => $cmd, 
                                            [stdin => $stdin],
-                                           [wantArrayRefs => $wantArrayRef])
+                                           [wantArrayRef => $wantArrayRef])
  
 =item args:
 
@@ -85,7 +85,7 @@ is 0.
 =cut
 
 multi method capture(
-	ArrayRef|Str :$cmd !,
+	ArrayRef|Str :$cmd!,
 	ArrayRef|Str :$stdin,
 	        Bool :$wantArrayRef
   )
@@ -128,8 +128,7 @@ multi method capture(
 }
 
 multi method capture(ArrayRef|Str $cmd, 
-                     ArrayRef|Str $stdin
-	? )
+                     ArrayRef|Str $stdin? )
 {
 
 	my %a;

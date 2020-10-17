@@ -37,16 +37,8 @@
 #include "spvm_array_field_access.h"
 
 void SPVM_OPCODE_BUILDER_get_runtime_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t* runtime_basic_type_id, int32_t* runtime_type_dimension) {
-  // Runtime type
-  const char* runtime_basic_type_name;
-  if (basic_type_id == SPVM_BASIC_TYPE_C_ID_STRING) {
-    *runtime_basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
-    *runtime_type_dimension = dimension + 1;
-  }
-  else {
-    *runtime_basic_type_id = basic_type_id;
-    *runtime_type_dimension = dimension;
-  }
+  *runtime_basic_type_id = basic_type_id;
+  *runtime_type_dimension = dimension;
 }
 
 void SPVM_OPCODE_BUILDER_set_opcode_id(SPVM_COMPILER* compiler, SPVM_OPCODE* opcode, int32_t opcode_id) {
@@ -758,7 +750,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         case SPVM_OP_C_ID_CONCAT: {
                           SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_assign_src->first);
                           
-                          assert(SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag));
+                          assert(SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag));
                           
                           SPVM_OPCODE opcode;
                           memset(&opcode, 0, sizeof(SPVM_OPCODE));
@@ -2809,7 +2801,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                             }
                             else if (SPVM_TYPE_is_string_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_OBJECT);
+                              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                             }
@@ -2838,7 +2830,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                             }
                             else if (SPVM_TYPE_is_byte_array_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_OBJECT);
+                              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CONVERT_STRING_TO_BYTE_ARRAY);
                               mem_id_out = SPVM_OP_get_mem_id(compiler, op_dist_term);
                               mem_id_in = SPVM_OP_get_mem_id(compiler, op_src_term);
                             }

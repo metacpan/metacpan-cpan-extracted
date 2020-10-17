@@ -1,10 +1,10 @@
 {
    "abstract" : "List of Mailing Lists Manager",
    "author" : [
-      "unknown"
+      "Shlomi Fish"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "E-mail",
       "mailing",
@@ -50,6 +50,8 @@
       },
       "runtime" : {
          "requires" : {
+            "autodie" : "0",
+            "parent" : "0",
             "perl" : "5.008",
             "strict" : "0",
             "vars" : "0",
@@ -68,51 +70,51 @@
    "provides" : {
       "Mail::LMLM" : {
          "file" : "lib/Mail/LMLM.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Object" : {
          "file" : "lib/Mail/LMLM/Object.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Render" : {
          "file" : "lib/Mail/LMLM/Render.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Render::HTML" : {
          "file" : "lib/Mail/LMLM/Render/HTML.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Base" : {
          "file" : "lib/Mail/LMLM/Types/Base.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Egroups" : {
          "file" : "lib/Mail/LMLM/Types/Egroups.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Ezmlm" : {
          "file" : "lib/Mail/LMLM/Types/Ezmlm.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::GoogleGroups" : {
          "file" : "lib/Mail/LMLM/Types/GoogleGroups.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Listar" : {
          "file" : "lib/Mail/LMLM/Types/Listar.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Listserv" : {
          "file" : "lib/Mail/LMLM/Types/Listserv.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Mailman" : {
          "file" : "lib/Mail/LMLM/Types/Mailman.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       },
       "Mail::LMLM::Types::Majordomo" : {
          "file" : "lib/Mail/LMLM/Types/Majordomo.pm",
-         "version" : "0.6806"
+         "version" : "0.6807"
       }
    },
    "release_status" : "stable",
@@ -127,10 +129,10 @@
          "web" : "https://github.com/shlomif/perl-mail-lmlm"
       }
    },
-   "version" : "0.6806",
+   "version" : "0.6807",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.032000"
       },
       "plugins" : [
          {
@@ -142,17 +144,17 @@
                }
             },
             "name" : "@SHLOMIF/TestMoreDoneTesting",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@SHLOMIF/AutoPrereqs",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@SHLOMIF/ExecDir",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -168,32 +170,32 @@
                }
             },
             "name" : "@SHLOMIF/GatherDir",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@SHLOMIF/License",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@SHLOMIF/ManifestSkip",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@SHLOMIF/MetaYAML",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@SHLOMIF/PruneCruft",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@SHLOMIF/Readme",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -208,7 +210,7 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@SHLOMIF/ShareDir",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -218,7 +220,7 @@
                }
             },
             "name" : "@SHLOMIF/MakeMaker",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
@@ -228,22 +230,22 @@
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@SHLOMIF/ConfirmRelease",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@SHLOMIF/Manifest",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@SHLOMIF/MetaConfig",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@SHLOMIF/MetaJSON",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -253,7 +255,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@SHLOMIF/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
+                        "version" : "6.015"
                      }
                   ],
                   "include_underscores" : 0
@@ -265,7 +267,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -275,7 +277,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@SHLOMIF/MetaResources",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuild",
@@ -285,22 +287,22 @@
                }
             },
             "name" : "@SHLOMIF/ModuleBuild",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@SHLOMIF/PkgVersion",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@SHLOMIF/PodCoverageTests",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@SHLOMIF/PodSyntaxTests",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -374,7 +376,7 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@SHLOMIF/TestRelease",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -386,6 +388,16 @@
                   ],
                   "plugins" : [
                      {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@SHLOMIF/SingleEncoding",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::WikiDoc",
+                        "name" : "@SHLOMIF/WikiDoc",
+                        "version" : "0.093004"
+                     },
+                     {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
                         "version" : "4.015"
@@ -396,79 +408,109 @@
                         "version" : "4.015"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
-                        "name" : "-SingleEncoding",
-                        "version" : "4.015"
-                     },
-                     {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "NAME",
+                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
-                        "name" : "Version",
+                        "name" : "@SHLOMIF/Version",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "prelude",
+                        "name" : "@SHLOMIF/Prelude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "SYNOPSIS",
+                        "name" : "@SHLOMIF/Synopsis",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "DESCRIPTION",
+                        "name" : "@SHLOMIF/Description",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "OVERVIEW",
+                        "name" : "@SHLOMIF/Usage",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Overview",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Stability",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "ATTRIBUTES",
+                        "name" : "Requirements",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "METHODS",
+                        "name" : "Attributes",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Constructors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Methods",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Functions",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
-                        "name" : "Leftovers",
+                        "name" : "@SHLOMIF/Leftovers",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "postlude",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Authors",
-                        "name" : "Authors",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Legal",
-                        "name" : "Legal",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Bugs",
-                        "name" : "Bugs",
+                        "name" : "@SHLOMIF/postlude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Support",
-                        "name" : "Support",
-                        "version" : "1.010"
+                        "name" : "@SHLOMIF/Support",
+                        "version" : "1.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@SHLOMIF/Authors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Bugs",
+                        "name" : "@SHLOMIF/Bugs",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Contributors",
+                        "name" : "@SHLOMIF/Contributors",
+                        "version" : "0.009"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@SHLOMIF/Legal",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@SHLOMIF/List",
+                        "version" : "4.015"
                      }
                   ]
                }
@@ -479,7 +521,7 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@SHLOMIF/UploadToCPAN",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Keywords",
@@ -518,57 +560,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.012"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@SHLOMIF/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.012"
+            "version" : "6.015"
          }
       ],
       "zilla" : {
@@ -576,10 +618,11 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.012"
+         "version" : "6.015"
       }
    },
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "MIT"
 }
 
