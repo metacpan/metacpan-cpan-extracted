@@ -9,7 +9,7 @@ Dist::Man::App - the code behind the command line program
 use warnings;
 use strict;
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.8';
 
 use Getopt::Long;
 use Pod::Usage;
@@ -79,7 +79,7 @@ sub run
         'license=s'  => \$config{license},
         force        => \$config{force},
         verbose      => \$config{verbose},
-        version      => 
+        version      =>
             sub {
                 require Dist::Man;
                 print "pl-dist-man v$Dist::Man::VERSION\n";

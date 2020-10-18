@@ -1,5 +1,8 @@
 Revision history for HTML-Latemp-News
 
+0.2.1   2019-03-31
+    - Fix the ability to set the channel's pubDate and lastBuildDate .
+
 0.2.0   2019-03-30
     - Add the ability to set the channel's pubDate and lastBuildDate .
 

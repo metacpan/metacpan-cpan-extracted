@@ -18,6 +18,7 @@ meta-spec:
 name: WordListRole-Bloom
 requires:
   Algorithm::BloomFilter: '0'
+  File::ShareDir: '0'
   MIME::Base64: '0'
   Role::Tiny: '0'
   strict: '0'
@@ -26,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordListRole-Bloom
   homepage: https://metacpan.org/release/WordListRole-Bloom
   repository: git://github.com/perlancar/perl-WordListRole-Bloom.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

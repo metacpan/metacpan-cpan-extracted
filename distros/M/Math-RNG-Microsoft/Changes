@@ -1,5 +1,10 @@
 Revision history for Math-RNG-Microsoft
 
+0.0.5   2020-10-18
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 0.0.4   2017-12-24
     - Convert the repo to GitHub.
 

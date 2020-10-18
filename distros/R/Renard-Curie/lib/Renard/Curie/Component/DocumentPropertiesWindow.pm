@@ -1,13 +1,13 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::DocumentPropertiesWindow;
 # ABSTRACT: Component that implements a dialog with document metadata
-$Renard::Curie::Component::DocumentPropertiesWindow::VERSION = '0.004';
+$Renard::Curie::Component::DocumentPropertiesWindow::VERSION = '0.005';
 use Moo;
 use Glib 'TRUE', 'FALSE';
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Intertangle::API::Gtk3::Helper;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 use Renard::Incunabula::Document::Types qw(DocumentModel);
-use Renard::Incunabula::Format::PDF::InformationDictionary;
+use Renard::Block::Format::PDF::InformationDictionary;
 
 has document => (
 	is => 'ro',
@@ -17,13 +17,13 @@ has document => (
 
 has _pdf_information_dictionary => (
 	is => 'lazy',
-	isa => InstanceOf['Renard::Incunabula::Format::PDF::InformationDictionary'],
+	isa => InstanceOf['Renard::Block::Format::PDF::InformationDictionary'],
 );
 
 method _build__pdf_information_dictionary() {
 	my $filename = $self->document->filename;
 
-	Renard::Incunabula::Format::PDF::InformationDictionary->new(
+	Renard::Block::Format::PDF::InformationDictionary->new(
 		filename => $filename,
 	);
 }
@@ -81,8 +81,8 @@ method show_all() {
 
 
 with qw(
-	Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder
-	Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName
+	Intertangle::API::Gtk3::Component::Role::FromBuilder
+	Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName
 );
 
 
@@ -100,7 +100,7 @@ Renard::Curie::Component::DocumentPropertiesWindow - Component that implements a
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 
@@ -114,9 +114,9 @@ version 0.004
 
 =over 4
 
-=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder>
+=item * L<Intertangle::API::Gtk3::Component::Role::FromBuilder>
 
-=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName>
+=item * L<Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName>
 
 =back
 

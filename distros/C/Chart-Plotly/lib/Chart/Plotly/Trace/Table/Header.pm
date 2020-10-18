@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Table::Header::Fill;
 use Chart::Plotly::Trace::Table::Header::Font;
 use Chart::Plotly::Trace::Table::Header::Line;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -122,7 +122,7 @@ Chart::Plotly::Trace::Table::Header - This attribute is one of the possible opti
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

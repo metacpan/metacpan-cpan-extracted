@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Role::Pageable;
 # ABSTRACT: Role for view models that are paged
-$Renard::Curie::Model::View::Role::Pageable::VERSION = '0.004';
+$Renard::Curie::Model::View::Role::Pageable::VERSION = '0.005';
 use Moo::Role;
 use Renard::Incunabula::Common::Types qw(Bool);
 use Renard::Incunabula::Document::Types qw(PageNumber);
@@ -16,11 +16,11 @@ has page_number => (
 requires '_trigger_page_number';
 
 method set_current_page_to_first() {
-	$self->page_number( $self->document->first_page_number );
+	$self->set_page_number_with_scroll( $self->document->first_page_number );
 }
 
 method set_current_page_to_last() {
-	$self->page_number( $self->document->last_page_number );
+	$self->set_page_number_with_scroll( $self->document->last_page_number );
 }
 
 method can_move_to_previous_page() :ReturnType(Bool) {
@@ -33,13 +33,13 @@ method can_move_to_next_page() :ReturnType(Bool) {
 
 method set_current_page_forward() {
 	if( $self->can_move_to_next_page ) {
-		$self->page_number( $self->page_number + 1 );
+		$self->set_page_number_with_scroll( $self->page_number + 1 );
 	}
 }
 
 method set_current_page_back() {
 	if( $self->can_move_to_previous_page ) {
-		$self->page_number( $self->page_number - 1 );
+		$self->set_page_number_with_scroll( $self->page_number - 1 );
 	}
 }
 
@@ -57,7 +57,7 @@ Renard::Curie::Model::View::Role::Pageable - Role for view models that are paged
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

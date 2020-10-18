@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::PageDrawingArea::Role::PageLabel;
 # ABSTRACT: A role for the number of pages label
-$Renard::Curie::Component::PageDrawingArea::Role::PageLabel::VERSION = '0.004';
+$Renard::Curie::Component::PageDrawingArea::Role::PageLabel::VERSION = '0.005';
 use Moo::Role;
 
 after BUILD => method(@) {
@@ -27,7 +27,7 @@ Renard::Curie::Component::PageDrawingArea::Role::PageLabel - A role for the numb
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

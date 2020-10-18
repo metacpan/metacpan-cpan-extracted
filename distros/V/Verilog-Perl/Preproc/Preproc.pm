@@ -11,7 +11,7 @@ use base qw(DynaLoader);
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '3.470';
+$VERSION = '3.472';
 
 ######################################################################
 #### Configuration Section
@@ -171,6 +171,7 @@ sub def_substitute {
 sub include {
     my ($self,$filename)=@_;
     print "INCLUDE $filename\n" if $self->{debug};
+    $self->{options}->includes($self->filename, $filename);
     $self->open(filename => $filename,
 		open_nonfatal => $self->{include_open_nonfatal},
 		);
@@ -197,7 +198,7 @@ sub def_params {
     # Return define parameters
     my $self = shift;
     my $val = $self->{options}->defparams(@_);
-    #printf "DEFEXISTS @_ -> %s\n", $val if $self->{debug};
+    #printf "DEFPARAMS @_ -> %s\n", $val if $self->{debug};
     $val = "" if !defined $val;
     return $val;
 }
@@ -367,7 +368,7 @@ With synthesis set, define SYNTHESIS, and ignore text between "ambit",
 "pragma", "synopsys" or "synthesis" translate_off and translate_on meta
 comments.  Note using metacomments is discouraged as they have led to
 silicon bugs (versus ifdef SYNTHESIS); see
-L<http://www.veripool.org/papers/TenIPEdits_SNUGBos07_paper.pdf>.
+L<https://www.veripool.org/papers/TenIPEdits_SNUGBos07_paper.pdf>.
 
 =back
 
@@ -395,11 +396,12 @@ Called with each `undefineall.  Defaults to use options object.
 
 Called with each `define.  Defaults to use options object.
 
-=item $self->def_exists(I<defname>)
+=item $self->def_params(I<defname>)
 
-Called to determine if the define exists.  Return true if the define
-exists, or argument list with leading parenthesis if the define has
-arguments.  Defaults to use options object.
+Called to determine if the define exists and the parameters it expects.
+Return undef if the define doesn't exist, 0 if the define exists with no
+arguments, or argument list with leading parenthesis if the define has
+arguments.  Defaults to use options object's defparams method.
 
 =item $self->def_substitute(I<string>)
 
@@ -461,9 +463,9 @@ These are useful for error macros, similar to assert() in C++.
 
 =head1 DISTRIBUTION
 
-Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
+Verilog-Perl is part of the L<https://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.org/verilog-perl>.
+L<https://www.veripool.org/verilog-perl>.
 
 Copyright 2000-2020 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU

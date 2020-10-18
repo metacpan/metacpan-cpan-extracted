@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Indicator::Gauge::Axis::Tickfont;
 use Chart::Plotly::Trace::Indicator::Gauge::Axis::Tickformatstop;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace indicator.
 
@@ -202,7 +202,7 @@ Chart::Plotly::Trace::Indicator::Gauge::Axis - This attribute is one of the poss
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

@@ -4,12 +4,12 @@ use Test::Most tests => 3;
 
 use lib 't/lib';
 use CurieTestHelper;
-use Renard::Incunabula::Format::Cairo::Devel::TestHelper;
+use Renard::Block::Format::Cairo::Devel::TestHelper;
 
 use Renard::Incunabula::Common::Setup;
 use Renard::Curie::App;
 
-my $cairo_doc = Renard::Incunabula::Format::Cairo::Devel::TestHelper->create_cairo_document;
+my $cairo_doc = Renard::Block::Format::Cairo::Devel::TestHelper->create_cairo_document;
 
 subtest 'Check that moving forward and backward changes the page number' => sub {
 	my ($app, $page_comp) = CurieTestHelper->create_app_with_document($cairo_doc);
@@ -71,7 +71,7 @@ subtest 'Check that the current button sensitivity is set on the first and last 
 	ok   $forward_button->is_sensitive, 'button-forward is enabled on first page';
 
 	$last_button->clicked;
-	$page_comp->refresh_drawing_area;
+	$page_comp->refresh_drawing_area( $page_comp->view );
 
 	is $page_comp->view->page_number, 4, 'On page 4 after hitting button-last';
 

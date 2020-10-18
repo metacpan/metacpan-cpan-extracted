@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: SVN-Pusher
 provides:
   SVN::Pusher:
     file: lib/SVN/Pusher.pm
-    version: '0.09'
+    version: '0.10'
   SVN::Pusher::CmdLine:
     file: lib/SVN/Pusher/CmdLine.pm
   SVN::Pusher::MirrorEditor:
@@ -29,5 +29,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/shlomif/perl-svn-pusher
-version: '0.09'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

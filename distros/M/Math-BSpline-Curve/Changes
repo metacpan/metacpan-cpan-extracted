@@ -1,0 +1,6 @@
+Revision history for Math-BSpline-Curve
+
+0.001     2020-10-18 11:04:14+00:00 UTC
+          - evaluate curve
+          - evaluate derivatives
+          - create derivative curve

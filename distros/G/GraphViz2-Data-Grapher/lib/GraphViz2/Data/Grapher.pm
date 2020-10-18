@@ -4,21 +4,12 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
-our $VERSION = '2.50';
+our $VERSION = '2.51';
 
 use GraphViz2;
-use HTML::Entities::Interpolate;
 use Moo;
 use Scalar::Util qw(blessed reftype);
 use Tree::DAG_Node;
-
-has current =>
-(
-	default  => sub{return ''},
-	is       => 'rw',
-	#isa     => 'Str',
-	required => 0,
-);
 
 has graph =>
 (
@@ -37,7 +28,6 @@ has graph =>
 
 has tree =>
 (
-	default  => sub{return Tree::DAG_Node -> new},
 	is       => 'rw',
 	#isa     => 'Tree::DAG_Node',
 	required => 0,
@@ -55,106 +45,33 @@ sub address
 
 } # End of address;
 
-# -----------------------------------------------
-
-sub add_record
-{
-	my($self, $seen, $parent, @node) = @_;
-	my(@label) = ();
-	my($name)  = address($parent -> address) . '_kids';
-	my($port)  = 0;
-
-	for my $node (@node)
-	{
-		$port++;
-
-		$$seen{$node -> address} = 1;
-
-		$node -> attributes({record => "$name:port$port"});
-
-		# Comment out HTML labels since I can't get them to work.
-		# It seems only a shape of plaintext works with HTML.
-
-#		push @label, qq|<td border="0" port="port$port">| . $Entitize{$node -> name} . '</td>';
-		push @label, "<port$port> " . $node -> name;
+sub build_graph {
+	my ($graph, $tree, $from) = @_;
+	return unless my @child = $tree->daughters;
+	my @label = map $_->name, @child;
+	my $name = address($tree->address) . '_kids';
+	my $to = "$name:port" . (int($#child / 2) + 1);
+	my $one_ref = (@child == 1) && ($child[0]->name =~ /^(?:\&CODE|\$REF)/);
+	if ($one_ref) {
+		$to = $label[0];
+		$graph->add_node(
+			name => $to,
+			color => 'grey', fontcolor => 'red',
+			shape => 'oval',
+		);
+	} else {
+		$graph->add_node(
+			name => $name, label => \@label,
+			color => 'grey', fontcolor => 'blue',
+			shape => $graph->global->{record_shape},
+		);
 	}
-
-#	my($label) = '<<table border="0"><tr>' . join('', @label) . '</tr></table>>';
-	my($label) = join('|', @label);
-
-	if ( ($#node == 0) && ($node[0] -> name =~ /^(?:\&CODE|\$REF)/) )
-	{
-		$node[0] -> attributes({record => $node[0] -> name});
-	}
-	else
-	{
-		my(%global) = %{$self -> graph -> global};
-		my($shape)  = $global{record_shape};
-
-		$self -> graph -> add_node(color => 'grey', fontcolor => 'blue', name => $name, label => $label, shape => $shape);
-	}
-
-	return $self;
-
-} # End of add_record;
-
-sub BUILD
-{
-	my($self) = @_;
-
-	# Make the root the 'current' node.
-	# get_reftype() will use current().
-
-	$self -> current($self -> tree);
-
-} # End of BUILD.
-
-sub build_graph
-{
-	my($self, $seen, $node) = @_;
-
-	my(@child)  = $node -> daughters;
-	my($mother) = $node -> mother;
-
-	if (@child)
-	{
-		# Add a 'record' type node for all children,
-		# except if the only child is a code ref or a ref,
-		# which we add below to make them stand out.
-
-		$self -> add_record($seen, $node, @child);
-
-		# Add an edge from the parent to the middle of the child list.
-
-		my($child) = $child[int($#child / 2)];
-		$child     = $child[0] if ( ($#child == 0) && ($child[0] -> name =~ /^(?:\&CODE|\$REF)/) );
-		my($from)  = ${$node -> attributes}{record};
-		my($to)    = ${$child -> attributes}{record};
-
-		if ( ($#child == 0) && ($child[0] -> name =~ /^(?:\&CODE|\$REF)/) )
-		{
-			$self -> graph -> add_node(color => 'grey', fontcolor => 'red', name => $child[0] -> name, shape => 'oval');
-		}
-
-		$self -> graph -> add_edge(from => $from, to => $to);
-
-		# Recurse to handle the grandkids.
-
-		$self -> build_graph($seen, $_) for @child;
-	}
-	elsif (! $$seen{$node -> address})
-	{
-		$$seen{$node -> address} = 1;
-
-		$self -> graph -> add_node(name => address($node -> address), label => $node -> name, shape => 'circle');
-		$self -> graph -> add_edge(from => ${$mother -> attributes}{record}, to => address($node -> address) );
-	}
-
-	return $self;
-
-} # End of build_graph.
-
-# -----------------------------------------------
+	# Add an edge from the parent to the middle of the child list.
+	$graph->add_edge(from => $from, to => $to);
+	# Recurse to handle the grandkids.
+	my $port = 0;
+	build_graph($graph, $_, ($one_ref ? $to : "$name:port".++$port)) for @child;
+}
 
 # gives stable sequential ID number for references
 my %ref2id;
@@ -165,150 +82,62 @@ sub _gen_id {
   $ref2id{$ref} = ref($ref) . ++$ref_counter;
 }
 
-sub build_tree
-{
-	my($self, $name, $item) = @_;
-
-	my($current);
-	my($daughter);
-
-	my($ref) = reftype $item;
-
-	if (defined $ref)
-	{
-		my($blessed) = blessed $item;
-
-		if ($blessed)
-		{
-			$daughter = Tree::DAG_Node -> new;
-
-			$daughter -> name($blessed);
-			$self -> current -> add_daughter($daughter);
-			$self -> current -> name($blessed);
+sub build_tree {
+	my ($name, $item) = @_;
+	my $current = Tree::DAG_Node->new;
+	if (defined(my $ref = reftype $item)) {
+		if (my $blessed = blessed $item) {
+			$current->new_daughter({name => $blessed});
+			$current->name($blessed);
 		}
 		elsif ($ref =~ /^ARRAY/)
 		{
-			$self -> current -> name('@$' . $name);
+			$current->name('@$' . $name);
 
-			for my $key (@$item)
-			{
-				$current  = $self -> current;
-				$daughter = Tree::DAG_Node -> new;
-
-				$self -> current -> add_daughter($daughter);
-				$self -> current($daughter);
-				$self -> build_tree(_gen_id($item), $key);
-				$self -> current($current);
-			}
+			$current->add_daughter(build_tree(_gen_id($item), $_)) for @$item;
 		}
 		elsif ($ref =~ /^CODE/)
 		{
-			$daughter = Tree::DAG_Node -> new;
-
-			$daughter -> name('&' . _gen_id $item);
-			$self -> current -> add_daughter($daughter);
-			$self -> current -> name('$' . $name);
+			$current->new_daughter({name => '&' . _gen_id $item});
+			$current->name('$' . $name);
 		}
 		elsif ($ref =~ /^HASH/)
 		{
-			$self -> current -> name('%$' . $name);
-
+			$current->name('%$' . $name);
 			for my $key (sort keys %$item)
 			{
-				$current  = $self -> current;
-				$daughter = Tree::DAG_Node -> new;
-
-				$self -> current -> add_daughter($daughter);
-				$self -> current($daughter);
-				$self -> build_tree($key, $key);
-
-				$daughter = Tree::DAG_Node -> new;
-
-				$self -> current -> add_daughter($daughter);
-				$self -> current($daughter);
-				$self -> build_tree($key, $$item{$key});
-				$self -> current($current);
+				$current->add_daughter(my $d = build_tree($key, $key));
+				$d->add_daughter(build_tree($key, $$item{$key}));
 			}
 		}
 		elsif ($ref =~ /^SCALAR/)
 		{
-			$self -> current -> name("\$ " . _gen_id($item) . " - Not used");
-		}
-		elsif ($ref)
-		{
-			$self -> current -> name("Object: $name");
-
-			$current  = $self -> current;
-			$daughter = Tree::DAG_Node -> new;
-
-			$self -> current -> add_daughter($daughter);
-			$self -> current($daughter);
-			$self -> build_tree(_gen_id($item), $$item);
-			$self -> current($current);
+			$current->name("\$ " . _gen_id($item) . " - Not used");
 		}
 		else
 		{
-			$self -> current -> name(_gen_id($item) . " - Not used");
+			$current->name("Object: $name");
+			$current->add_daughter(build_tree(_gen_id($item), $$item));
 		}
 	}
 	else
 	{
-		$self -> current -> name($item);
+		$current->name($item);
 	}
-
-	return $self;
-
-} # End of build_tree.
+	$current;
+}
 
 # -----------------------------------------------
 
 sub create
 {
 	my($self, %arg) = @_;
-	my(%form) =
-		(
-		 '@' =>
-		 {
-			 color => 'brown',
-			 shape => 'house',
-		 },
-		 '%' =>
-		 {
-			 color => 'blue',
-			 shape => 'doubleoctagon',
-		 },
-		 '$' =>
-		 {
-			 color => 'black',
-			 shape => 'box',
-		 },
-		 '&' =>
-		 {
-			 color => 'green',
-			 shape => 'ellipse',
-		 },
-		);
-
-	$self -> build_tree($arg{name} => $arg{thing});
-	$self -> tree -> attributes({record => address($self -> tree -> address)});
-	$self -> graph -> add_node(color => 'green', name => address($self -> tree -> address), label => $self -> tree -> name, shape => 'doubleoctagon');
-	$self -> build_graph({$self -> tree -> address => 1}, $self -> tree);
-
+	$self->tree(build_tree($arg{name} => $arg{thing}));
+	my $a2 = address(my $a1 = $self->tree->address);
+	$self->graph->add_node(color => 'green', name => $a2, label => $self->tree->name, shape => 'doubleoctagon');
+	build_graph($self->graph, $self->tree, $a2);
 	return $self;
-
-}	# End of create.
-
-# -----------------------------------------------
-
-sub DESTROY
-{
-	my($self) = @_;
-
-	$self -> tree -> delete_tree;
-
-} # End of DESTROY.
-
-# -----------------------------------------------
+}
 
 1;
 
@@ -459,11 +288,6 @@ Returns the graph object, either the one supplied to new() or the one created du
 =head2 tree()
 
 Returns the tree object (of type L<Tree::DAG_Node>) built before it is traversed to generate the nodes and edges.
-
-Traversal does change the attributes of nodes, by storing {record => $string} there, so that
-edges can be plotted from a parent to its daughters.
-
-Warning: As the L<GraphViz2::Data::Grapher> object exits its scope, $self -> tree -> delete_tree is called.
 
 =head1 Scripts Shipped with this Module
 

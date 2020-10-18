@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Pie::Textfont;
 use Chart::Plotly::Trace::Pie::Title;
 use Chart::Plotly::Trace::Pie::Transform;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
@@ -333,7 +333,7 @@ Chart::Plotly::Trace::Pie - A data visualized by the sectors of the pie is set i
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

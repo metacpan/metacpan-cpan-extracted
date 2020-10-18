@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::Role::HasParentMainWindow;
 # ABSTRACT: Role that links a component to the parent main window
-$Renard::Curie::Component::Role::HasParentMainWindow::VERSION = '0.004';
+$Renard::Curie::Component::Role::HasParentMainWindow::VERSION = '0.005';
 use Moo::Role;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 
@@ -25,7 +25,7 @@ Renard::Curie::Component::Role::HasParentMainWindow - Role that links a componen
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

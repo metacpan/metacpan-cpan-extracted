@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.002';    # VERSION
+our $VERSION = '0.003';    # VERSION
 use English '-no_match_vars';
 use Moose;
 use MooseX::Has::Sugar;
@@ -63,7 +63,7 @@ sub release {
     try { $sftp->put( ("$archive") x 2 ) } catch { $self->log_fatal($ARG) };
 
     my $remote_size = $sftp->stat("$archive")->size || 0;
-    my $local_size = $archive->stat->size;
+    my $local_size  = $archive->stat->size;
     if ( $remote_size != $local_size ) {
         $self->log( "Uploaded file is $remote_size bytes, "
                 . "but local file is $local_size bytes" );
@@ -82,8 +82,8 @@ __END__
 
 =pod
 
-=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url annocpan anno bugtracker rt
-cpants kwalitee diff irc mailto metadata placeholders
+=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url bugtracker rt cpants kwalitee
+diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -91,7 +91,7 @@ Dist::Zilla::Plugin::UploadToSFTP - Upload tarball to my own site
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -165,41 +165,17 @@ in addition to those websites please use your favorite search engine to discover
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annonations of Perl module documentation.
-
-L<http://annocpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-UploadToSFTP>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/Dist-Zilla-Plugin-UploadToSFTP>
+L<http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-UploadToSFTP>
 
@@ -207,7 +183,7 @@ L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-UploadToSFTP>
 
 CPAN Testers Matrix
 
-The CPAN Testers Matrix is a website that provides a visual way to determine what Perls/platforms PASSed for a distribution.
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
 
 L<http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-UploadToSFTP>
 

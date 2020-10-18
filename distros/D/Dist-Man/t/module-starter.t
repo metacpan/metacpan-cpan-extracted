@@ -308,7 +308,7 @@ sub run_module_starter {
     }
   }
 
-  my $starter_dir = 
+  my $starter_dir =
     (ref $opts{module} eq 'ARRAY' ? $opts{module}->[0] : $opts{module} );
 
   $starter_dir =~ s/::/-/g;

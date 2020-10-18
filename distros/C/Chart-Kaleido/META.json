@@ -4,7 +4,7 @@
       "Stephan Loyd <sloyd@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,8 @@
       },
       "test" : {
          "requires" : {
+            "Chart::Plotly::Plot" : "0",
+            "Chart::Plotly::Trace::Scatter" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -54,11 +56,11 @@
    "provides" : {
       "Chart::Kaleido" : {
          "file" : "lib/Chart/Kaleido.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Chart::Kaleido::Plotly" : {
          "file" : "lib/Chart/Kaleido/Plotly.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -67,11 +69,12 @@
          "url" : "https://github.com/stphnlyd/perl5-Chart-Kaleido.git"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"
    ],
    "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

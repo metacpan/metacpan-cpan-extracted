@@ -23,7 +23,6 @@ no_index:
     - inc
 requires:
   GraphViz2: '2.48'
-  HTML::Entities::Interpolate: '1.04'
   Moo: '2.001001'
   Scalar::Util: '1.23'
   Tree::DAG_Node: '1.06'
@@ -33,5 +32,5 @@ resources:
   bugtracker: https://github.com/graphviz-perl/GraphViz2-Data-Grapher/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphviz-perl/GraphViz2-Data-Grapher.git
-version: '2.50'
+version: '2.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-B<App::SimpleBackuper> (B<simple-backuper>) - is a simple tool for backuping files and restoring it from backups.
+L<App::SimpleBackuper|https://metacpan.org/pod/App::SimpleBackuper> - is a simple tool for backuping files and restoring it from backups.
 
 =head1 Benefits
 
@@ -69,6 +69,9 @@ C<cpan install App::SimpleBackuper>
 =item * C<perl Makefile.pl>
 
 =item * C<sudo make install>
+
+Required libraries you can install from your distro package manager:
+C<apt install libcrypt-rijndael-perl libcrypt-openssl-rsa-perl libcompress-raw-lzma-perl libdigest-sha-perl libtext-glob-perl libtry-tiny-perl libnet-sftp-foreign-perl libconst-fast-perl libmime-base64-perl libjson-pp-perl>
 
 =back
 

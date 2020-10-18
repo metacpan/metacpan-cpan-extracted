@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Renard::Curie::Error;
 # ABSTRACT: Exceptions for Curie
-$Renard::Curie::Error::VERSION = '0.004';
+$Renard::Curie::Error::VERSION = '0.005';
 use custom::failures qw/
 	User::InvalidPageNumber
 	ViewOptions::InvalidGridOptions
@@ -21,7 +21,7 @@ Renard::Curie::Error - Exceptions for Curie
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

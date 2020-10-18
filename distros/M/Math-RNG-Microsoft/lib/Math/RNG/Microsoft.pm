@@ -1,5 +1,5 @@
 package Math::RNG::Microsoft;
-$Math::RNG::Microsoft::VERSION = '0.0.4';
+$Math::RNG::Microsoft::VERSION = '0.0.5';
 use 5.006;
 use strict;
 use warnings;
@@ -9,33 +9,34 @@ use integer;
 
 use Class::XSAccessor {
     constructor => 'new',
-    accessors => [qw(seed)],
+    accessors   => [qw(seed)],
 };
 
 sub rand
 {
     my $self = shift;
-    $self->seed(($self->seed() * 214013 + 2531011) & (0x7FFF_FFFF));
-    return (($self->seed >> 16) & 0x7fff);
+    $self->seed( ( $self->seed() * 214013 + 2531011 ) & (0x7FFF_FFFF) );
+    return ( ( $self->seed >> 16 ) & 0x7fff );
 }
 
 sub max_rand
 {
-    my ($self, $max) = @_;
+    my ( $self, $max ) = @_;
 
-    return ($self->rand() % $max);
+    return ( $self->rand() % $max );
 }
 
 sub shuffle
 {
-    my ($self, $deck) = @_;
+    my ( $self, $deck ) = @_;
 
     if (@$deck)
     {
         my $i = @$deck;
-        while (--$i) {
-            my $j = $self->max_rand($i+1);
-            @$deck[$i,$j] = @$deck[$j,$i];
+        while ( --$i )
+        {
+            my $j = $self->max_rand( $i + 1 );
+            @$deck[ $i, $j ] = @$deck[ $j, $i ];
         }
     }
 
@@ -43,11 +44,13 @@ sub shuffle
 }
 
 
-1; # End of Math::RNG::Microsoft
+1;    # End of Math::RNG::Microsoft
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -56,7 +59,7 @@ with Visual C.
 
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 SYNOPSIS
 
@@ -77,10 +80,6 @@ L<http://en.wikipedia.org/wiki/FreeCell_%28Windows%29> ).
 B<NOTE:> This is not a cryptologically secure random number generator,
 nor is it a particularly good one, so its use is discouraged unless
 compatibility with the Windows C Run-time-library is needed.
-
-=head1 VERSION
-
-version 0.0.4
 
 =head1 SUBROUTINES/METHODS
 
@@ -112,38 +111,9 @@ Can be used to re-assign the seed of the randomizer (though not recommended).
 Shuffles the array reference of the first argument, B<destroys it> and returns
 it. This is using the fisher-yates shuffle.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2013 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-RNG-Microsoft> or by email
-to
-L<bug-math-rng-microsoft@rt.cpan.org|mailto:bug-math-rng-microsoft@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Math::RNG::Microsoft
 
 =head2 Websites
 
@@ -162,35 +132,11 @@ L<https://metacpan.org/release/Math-RNG-Microsoft>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Math-RNG-Microsoft>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-RNG-Microsoft>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Math-RNG-Microsoft>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Math-RNG-Microsoft>
 
 =item *
 
@@ -241,5 +187,28 @@ from your repository :)
 L<https://github.com/shlomif/abc-path>
 
   git clone https://github.com/shlomif/abc-path
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-RNG-Microsoft> or by email
+to
+L<bug-math-rng-microsoft@rt.cpan.org|mailto:bug-math-rng-microsoft@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

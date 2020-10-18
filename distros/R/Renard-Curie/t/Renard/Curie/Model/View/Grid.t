@@ -11,10 +11,10 @@ use Renard::Curie::Model::ViewOptions::Grid;
 
 use lib 't/lib';
 use CurieTestHelper;
-use Renard::Incunabula::Format::Cairo::Devel::TestHelper;
+use Renard::Block::Format::Cairo::Devel::TestHelper;
 
 fun create_grid_view( :$rows, :$columns ) {
-	my $doc = Renard::Incunabula::Format::Cairo::Devel::TestHelper->create_cairo_document( repeat => 2, width => 200, height => 800 );
+	my $doc = Renard::Block::Format::Cairo::Devel::TestHelper->create_cairo_document( repeat => 2, width => 200, height => 800 );
 	my $grid_view = Renard::Curie::Model::View::Grid->new(
 		view_options => Renard::Curie::Model::ViewOptions->new(
 			grid_options => Renard::Curie::Model::ViewOptions::Grid->new(

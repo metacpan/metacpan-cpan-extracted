@@ -4,7 +4,7 @@ package Dist::Zilla::Plugin::RequiresExternal;
 
 use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '1.008';     # VERSION
+our $VERSION = '1.009';     # VERSION
 use utf8;
 
 #pod =for test_synopsis
@@ -73,7 +73,7 @@ has _requires => (
     is       => 'lazy',
     isa      => Maybe [ ArrayRef [Str] ],
     init_arg => 'requires',
-    default => sub { [] },
+    default  => sub { [] },
 );
 
 #pod =attr fatal
@@ -161,9 +161,8 @@ __END__
 
 =encoding utf8
 
-=for :stopwords Mark Gardner Joenio Costa GSI Commerce and cpan testmatrix url annocpan
-anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
-metacpan
+=for :stopwords Mark Gardner Joenio Costa GSI Commerce and cpan testmatrix url bugtracker
+rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -171,7 +170,7 @@ Dist::Zilla::Plugin::RequiresExternal - make dists require external commands
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =for test_synopsis BEGIN { die "SKIP: this is ini, not perl\n" }
 
@@ -251,30 +250,6 @@ in addition to those websites please use your favorite search engine to discover
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Dist-Zilla-Plugin-RequiresExternal>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Dist-Zilla-Plugin-RequiresExternal>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-RequiresExternal>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -285,7 +260,7 @@ L<http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-RequiresExternal>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-RequiresExternal>
 
@@ -339,7 +314,7 @@ Joenio Costa <joenio@joenio.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by GSI Commerce and Joenio Costa.
+This software is copyright (c) 2020 by GSI Commerce and Joenio Costa.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

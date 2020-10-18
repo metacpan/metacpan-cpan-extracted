@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::MenuBar;
 # ABSTRACT: Role for menu bar
-$Renard::Curie::Component::MainWindow::Role::MenuBar::VERSION = '0.004';
+$Renard::Curie::Component::MainWindow::Role::MenuBar::VERSION = '0.005';
 use Moo::Role;
 
 use Renard::Curie::Component::MenuBar;
@@ -66,7 +66,7 @@ Renard::Curie::Component::MainWindow::Role::MenuBar - Role for menu bar
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

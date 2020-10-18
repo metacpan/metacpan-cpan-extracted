@@ -14,7 +14,7 @@ use vars qw($VERSION);
 ######################################################################
 #### Configuration Section
 
-$VERSION = '3.470';
+$VERSION = '3.472';
 
 #######################################################################
 # It's a PITRA to have pure datafiles get installed properly, so we have
@@ -113,9 +113,9 @@ unspecified.
 
 =head1 DISTRIBUTION
 
-Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
+Verilog-Perl is part of the L<https://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.org/verilog-perl>.
+L<https://www.veripool.org/verilog-perl>.
 
 Copyright 2009-2020 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU

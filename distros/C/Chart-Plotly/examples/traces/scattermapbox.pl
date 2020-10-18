@@ -21,7 +21,7 @@ my $scattermapbox = Chart::Plotly::Trace::Scattermapbox->new(
                 marker => Chart::Plotly::Trace::Scattermapbox::Marker->new( size => 9 ),
 );
 my $plot = Chart::Plotly::Plot->new( traces => [$scattermapbox],
-                                     layout => { autosize  => 'True',
+                                     layout => { autosize  => JSON::true,
                                                  hovermode => 'closest',
                                                  mapbox    => {
                                                              style       => 'open-street-map',

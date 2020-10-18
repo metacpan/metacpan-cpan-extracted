@@ -1,5 +1,8 @@
 Revision history for Math-BSpline-Basis
 
+0.002     2020-10-18 11:03:09+00:00 UTC
+          docu improvements
+
 0.001     2020-09-15 17:33:30+00:00 UTC
-    - evaluate basis functions
-    - evaluate derivatives of basis functions
+          - evaluate basis functions
+          - evaluate derivatives of basis functions

@@ -1,9 +1,9 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::FileChooser;
 # ABSTRACT: Component that implements a file chooser dialog
-$Renard::Curie::Component::FileChooser::VERSION = '0.004';
+$Renard::Curie::Component::FileChooser::VERSION = '0.005';
 use Moo;
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Intertangle::API::Gtk3::Helper;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 
 has all_filter => (
@@ -71,7 +71,7 @@ Renard::Curie::Component::FileChooser - Component that implements a file chooser
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

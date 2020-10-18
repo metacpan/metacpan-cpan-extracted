@@ -1,14 +1,14 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::DragAndDrop;
 # ABSTRACT: Role for drag-and-drop
-$Renard::Curie::Component::MainWindow::Role::DragAndDrop::VERSION = '0.004';
+$Renard::Curie::Component::MainWindow::Role::DragAndDrop::VERSION = '0.005';
 use Moo::Role;
-use MooX::Lsub;
+use MooX::ShortHas;
 
 use URI::file;
 
-lsub DND_TARGET_URI_LIST => sub { 0 };
-lsub DND_TARGET_TEXT     => sub { 1 };
+lazy DND_TARGET_URI_LIST => sub { 0 };
+lazy DND_TARGET_TEXT     => sub { 1 };
 
 requires 'content_box';
 
@@ -64,7 +64,7 @@ Renard::Curie::Component::MainWindow::Role::DragAndDrop - Role for drag-and-drop
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

@@ -1,13 +1,13 @@
 package HTML::Latemp::News;
-$HTML::Latemp::News::VERSION = '0.2.1';
+$HTML::Latemp::News::VERSION = '0.2.2';
 use warnings;
 use strict;
-
+use autodie;
 use 5.014;
 
 
 package HTML::Latemp::News::Base;
-$HTML::Latemp::News::Base::VERSION = '0.2.1';
+$HTML::Latemp::News::Base::VERSION = '0.2.2';
 use CGI ();
 
 sub new
@@ -20,7 +20,7 @@ sub new
 }
 
 package HTML::Latemp::News::Item;
-$HTML::Latemp::News::Item::VERSION = '0.2.1';
+$HTML::Latemp::News::Item::VERSION = '0.2.2';
 our @ISA = (qw(HTML::Latemp::News::Base));
 
 sub author
@@ -211,7 +211,7 @@ sub language
     return $self->{language};
 }
 
-sub link
+sub link_
 {
     my $self = shift;
 
@@ -337,7 +337,7 @@ sub initialize
     $self->items( $self->input_items($items) );
 
     $self->title( $args{'title'} );
-    $self->link( $args{'link'} );
+    $self->link_( $args{'link'} );
     $self->language( $args{'language'} );
     $self->rating( $args{'rating'}
             || '(PICS-1.1 "http://www.classify.org/safesurf/" 1 r (SS~~000 1))'
@@ -389,7 +389,7 @@ sub get_item_url
 {
     my $self = shift;
     my $item = shift;
-    return $self->link() . $self->get_item_rel_url($item);
+    return $self->link_() . $self->get_item_rel_url($item);
 }
 
 sub get_item_rel_url
@@ -424,13 +424,13 @@ sub generate_rss_feed
 
     my $rss_feed = XML::RSS->new( 'version' => "2.0" );
     $rss_feed->channel(
-        'title'       => $self->title(),
-        'link'        => $self->link(),
-        'language'    => $self->language(),
-        'description' => $self->description(),
-        'rating'      => $self->rating(),
-        'copyright'   => $self->copyright(),
-        'pubDate'     => ( $self->pubDate // ( scalar( localtime() ) ) ),
+        'title'         => $self->title(),
+        'link'          => $self->link_(),
+        'language'      => $self->language(),
+        'description'   => $self->description(),
+        'rating'        => $self->rating(),
+        'copyright'     => $self->copyright(),
+        'pubDate'       => ( $self->pubDate // ( scalar( localtime() ) ) ),
         'lastBuildDate' =>
             ( $self->lastBuildDate // ( scalar( localtime() ) ) ),
         'docs'           => $self->docs(),
@@ -561,7 +561,7 @@ web frameworks)
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -616,11 +616,7 @@ This is a module that maintains news item for a web-site. It can generate
 an RSS feed, as well as a news page, and an HTML newsbox, all from the same
 data.
 
-=head1 VERSION
-
-version 0.2.1
-
-=head1 FUNCTION
+=head1 FUNCTIONS
 
 =head2 HTML::Latemp::News->new(...)
 
@@ -721,57 +717,22 @@ This generates an HTML news box with the recent headlines.
 
 Shlomi Fish, L<http://www.shlomifish.org/> .
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-html-latemp-news@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Latemp-News>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
 =head1 SEE ALSO
 
-L<XML::RSS>, L<HTML::Widgets::NavMenu>.
+L<XML::RSS>, L<HTML::Widgets::NavMenu> .
 
 =head1 ACKNOWLEDGEMENTS
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005 Shlomi Fish, All Rights Reserved.
+Copyright 2005 Shlomi Fish.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the MIT X11 license.
+under the terms of the MIT / Expat license.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2005 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/html-latemp-news/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Latemp::News
 
 =head2 Websites
 
@@ -790,35 +751,11 @@ L<https://metacpan.org/release/HTML-Latemp-News>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/HTML-Latemp-News>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Latemp-News>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Latemp-News>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/HTML-Latemp-News>
 
 =item *
 
@@ -869,5 +806,26 @@ from your repository :)
 L<https://github.com/shlomif/html-latemp-news>
 
   git clone git://github.com/shlomif/html-latemp-news.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/html-latemp-news/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2005 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

@@ -70,7 +70,7 @@
    "provides" : {
       "Text::Sprintf::Named" : {
          "file" : "lib/Text/Sprintf/Named.pm",
-         "version" : "0.0404"
+         "version" : "0.0405"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/shlomif/text-sprintf-named"
       }
    },
-   "version" : "0.0404",
+   "version" : "0.0405",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -157,7 +157,7 @@
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "9"
                }
             },
             "name" : "@SHLOMIF/RunExtraTests",
@@ -172,7 +172,7 @@
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "9"
                }
             },
             "name" : "@SHLOMIF/MakeMaker",
@@ -239,7 +239,7 @@
             "class" : "Dist::Zilla::Plugin::ModuleBuild",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "9"
                }
             },
             "name" : "@SHLOMIF/ModuleBuild",

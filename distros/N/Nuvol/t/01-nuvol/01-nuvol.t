@@ -4,7 +4,7 @@ use Test::More;
 
 my $package;
 
-my @functions = qw|connect|;
+my @functions = qw|autoconnect connect|;
 
 BEGIN {
   $package = 'Nuvol';

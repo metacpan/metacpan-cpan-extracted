@@ -41,7 +41,7 @@ END_OF_TEXT
 # TODO: Seems there is an issue with IPC::Run and File::Temp on Windows,
 # that if a tempdir is created before IPC::Run::start, it can have
 # permission error..
-if ($^O eq 'MSWin32') {
+if ( $^O eq 'MSWin32' ) {
     $kaleido->ensure_kaleido;
 }
 my $tempdir = Path::Tiny->tempdir;
@@ -65,5 +65,24 @@ $kaleido->save(
 );
 ok( ( -f $svg_file ), "generate svg" );
 check_file_type( $svg_file, qr/^(image\/svg|text\/plain)/ );
+
+SKIP: {
+    eval {
+        require Chart::Plotly::Plot;
+        require Chart::Plotly::Trace::Scatter;
+    };
+    if ($@) {
+        skip "requires Chart::Plot", 1;
+    }
+
+    my $x       = [ 1 .. 15 ];
+    my $y       = [ map { rand 10 } @$x ];
+    my $scatter = Chart::Plotly::Trace::Scatter->new( x => $x, y => $y );
+    my $plot    = Chart::Plotly::Plot->new();
+    $plot->add_trace($scatter);
+
+    $kaleido->transform(plot => $plot);
+    pass("Chart::Plotly::Plot object as 'plot' parameter");
+}
 
 done_testing;

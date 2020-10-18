@@ -59,7 +59,7 @@ BEGIN {
                         :                  $nok_sub
                     ),
                     ignore_case => $ignore_case
-                    };
+                };
             }
         }
     }

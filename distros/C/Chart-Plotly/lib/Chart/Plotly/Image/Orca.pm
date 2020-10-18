@@ -12,7 +12,7 @@ use Path::Tiny;
 use File::ShareDir qw(dist_file);
 use utf8;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 my $ORCA_COMMAND = 'orca';
 
@@ -50,7 +50,7 @@ sub orca {
         unless ( defined $format ) {
             ($format) = $file =~ /\.([^\.]+)$/;
         }
-        my $plotlyjs = $params{plotly} // _plotlyjs;
+        my $plotlyjs = $params{plotlyjs} // $params{plotly} // _plotlyjs;
 
         my $tmp_json = Path::Tiny->tempfile( SUFFIX => '.json' );
         $tmp_json->spew_raw( $plot->to_json_text );
@@ -60,8 +60,7 @@ sub orca {
         # See https://github.com/plotly/orca/issues/101
         my @orca_line = (
                  $ORCA_COMMAND, 'graph', $tmp_json, '--plotlyjs', $plotlyjs, '-d', $file->parent, '-o', $file->basename,
-                 ( $format ? ( '--format', $format ) : () )
-        );
+                 ( $format ? ( '--format', $format ) : () ) );
         for my $arg (qw(mathjax scale width height)) {
             if ( my $val = $params{$arg} ) {
                 push @orca_line, ( "--${arg}", $val );
@@ -113,7 +112,7 @@ sub orca_version {
         return Alien::Plotly::Orca->version;
     }
     if ( orca_available($force_check) ) {
-        my $version = `$ORCA_COMMAND --version`;
+        $version = `$ORCA_COMMAND --version`;
         chomp($version);
         return $version;
     }
@@ -134,7 +133,7 @@ Chart::Plotly::Image::Orca - Export static images of Plotly charts using orca
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -214,6 +213,14 @@ Sets the image width.
 =item height
 
 Sets the image height.
+
+=item plotlyjs
+
+Sets plotlyjs file path. Default is the bundled plotly.min.js file.
+
+=item plotly
+
+This is same as the C<plotlyjs> parameter mentioned above.
 
 =item mathjax
 

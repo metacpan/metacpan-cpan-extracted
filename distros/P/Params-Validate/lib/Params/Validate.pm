@@ -5,7 +5,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use Exporter;
 use Module::Implementation;
@@ -38,7 +38,7 @@ our %EXPORT_TAGS = (
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{all} }, 'set_options' );
-our @EXPORT = qw( validate validate_pos );
+our @EXPORT    = qw( validate validate_pos );
 
 $NO_VALIDATION = $ENV{PERL_NO_VALIDATION};
 
@@ -77,7 +77,7 @@ Params::Validate - Validate method/function parameters
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 
@@ -836,7 +836,7 @@ figures out how to do this, please let me know.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate> or via email to L<bug-params-validate@rt.cpan.org|mailto:bug-params-validate@rt.cpan.org>.
+Bugs may be submitted at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate> or via email to L<bug-params-validate@rt.cpan.org|mailto:bug-params-validate@rt.cpan.org>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
@@ -859,7 +859,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHORS
 
@@ -877,13 +877,17 @@ Ilya Martynov <ilya@martynov.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Grundman E. Choroba Ivan Bessarabov J.R. Mash Karen Etheridge Noel Maddy Olivier Mengué Tony Cook Vincent Pit
+=for stopwords Andy Grundman Diab Jerius E. Choroba Ivan Bessarabov J.R. Mash Karen Etheridge Noel Maddy Olivier Mengué Tony Cook Vincent Pit
 
 =over 4
 
 =item *
 
 Andy Grundman <andyg@activestate.com>
+
+=item *
+
+Diab Jerius <djerius@cfa.harvard.edu>
 
 =item *
 
@@ -921,7 +925,7 @@ Vincent Pit <perl@profvince.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2001 - 2017 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2001 - 2020 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 

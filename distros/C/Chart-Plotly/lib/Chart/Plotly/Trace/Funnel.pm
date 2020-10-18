@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Funnel::Stream;
 use Chart::Plotly::Trace::Funnel::Textfont;
 use Chart::Plotly::Trace::Funnel::Transform;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: Visualize stages in a process using length-encoded bars. This trace can be used to show data in either a part-to-whole representation wherein each item appears in a single stage, or in a "drop-off" representation wherein each item appears in each stage it traversed. See also the "funnelarea" trace type for a different approach to visualizing funnel data.
 
@@ -369,7 +369,7 @@ Chart::Plotly::Trace::Funnel - Visualize stages in a process using length-encode
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

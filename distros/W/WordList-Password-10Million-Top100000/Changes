@@ -1,0 +1,13 @@
+0.003   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Put bloom filter in share dir (size=260K, k=12, fp=0.00468%).
+
+
+0.002   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Use bloom filter by default.
+
+
+0.001   2020-05-23  Released-By: PERLANCAR
+
+        - First release, split from WordLists-Password-10Million distribution.

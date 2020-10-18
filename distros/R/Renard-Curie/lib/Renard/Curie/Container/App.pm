@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Container::App;
 # ABSTRACT: A Bread::Board container for the application
-$Renard::Curie::Container::App::VERSION = '0.004';
+$Renard::Curie::Container::App::VERSION = '0.005';
 use Moose;
 use Bread::Board::Declare;
 
@@ -27,11 +27,18 @@ has log_window => (
 	lifecycle => 'Singleton',
 );
 
+has tts_window => (
+	is => 'ro',
+	isa => 'Renard::Curie::Component::TTSWindow',
+	infer => 1,
+	lifecycle => 'Singleton',
+);
+
 # Main component
 has main_window => (
 	is => 'ro',
 	isa => 'Renard::Curie::Component::MainWindow',
-	dependencies => [qw(log_window outline menu_bar view_manager)],
+	dependencies => [qw(log_window outline menu_bar view_manager tts_window)],
 	lifecycle => 'Singleton',
 );
 
@@ -68,13 +75,13 @@ Renard::Curie::Container::App - A Bread::Board container for the application
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 
 =over 4
 
-=item * L<Moose::Meta::Class::__ANON__::SERIAL::32>
+=item * L<Moose::Meta::Class::__ANON__::SERIAL::35>
 
 =back
 

@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::PageDrawingArea::Role::PageEntry;
 # ABSTRACT: A role for the text entry box for the page number
-$Renard::Curie::Component::PageDrawingArea::Role::PageEntry::VERSION = '0.004';
+$Renard::Curie::Component::PageDrawingArea::Role::PageEntry::VERSION = '0.005';
 use Moo::Role;
 
 after BUILD => method(@) {
@@ -15,8 +15,9 @@ method setup_text_entry_events() {
 
 callback on_activate_page_number_entry_cb( $entry, $self ) {
 	my $text = $entry->get_text;
+	$entry->set_text("");
 	if( $self->view->document->is_valid_page_number($text) ) {
-		$self->view->page_number( $text );
+		$self->view->set_page_number_with_scroll( $text );
 	} else {
 		Renard::Curie::Error::User::InvalidPageNumber->throw({
 			payload => {
@@ -44,7 +45,7 @@ Renard::Curie::Component::PageDrawingArea::Role::PageEntry - A role for the text
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

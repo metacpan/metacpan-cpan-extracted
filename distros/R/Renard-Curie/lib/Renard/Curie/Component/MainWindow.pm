@@ -1,8 +1,8 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow;
 # ABSTRACT: Main window of the application
-$Renard::Curie::Component::MainWindow::VERSION = '0.004';
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+$Renard::Curie::Component::MainWindow::VERSION = '0.005';
+use Intertangle::API::Gtk3::Helper;
 
 use Gtk3;
 use Cairo;
@@ -12,22 +12,30 @@ use Glib 'TRUE', 'FALSE';
 use Moo 2.001001;
 
 use MooX::Role::Logger ();
-use MooX::Lsub;
+use MooX::ShortHas;
 
 use Renard::Incunabula::Common::Types qw(InstanceOf Path Str);
 use Renard::Incunabula::Document::Types qw(DocumentModel);
 
-lsub window => method() { # :ReturnType(InstanceOf['Gtk3::Window'])
+use IO::Async::Loop::Glib;
+
+has loop => ( is => 'lazy' );
+
+sub _build_loop {
+	IO::Async::Loop::Glib->new;
+}
+
+lazy window => method() {
 	(InstanceOf['Gtk3::Window'])->(
 		$self->builder->get_object('main-window')
 	);
-};
+}, isa => InstanceOf['Gtk3::Window'];
 
-lsub content_box => method() { # :ReturnType(InstanceOf['Gtk3::Box'])
+lazy content_box => method() {
 	(InstanceOf['Gtk3::Box'])->(
 		Gtk3::Box->new( 'horizontal', 0 )
 	);
-};
+}, isa => InstanceOf['Gtk3::Box'];
 
 method setup_window() {
 	$self->builder->get_object('application-vbox')
@@ -53,8 +61,8 @@ callback on_application_quit_cb( $event, $self ) {
 # }}}
 
 with qw(
-	Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder
-	Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName
+	Intertangle::API::Gtk3::Component::Role::FromBuilder
+	Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName
 	MooX::Role::Logger
 
 	Renard::Curie::Component::MainWindow::Role::PageDrawingArea
@@ -64,6 +72,7 @@ with qw(
 	Renard::Curie::Component::MainWindow::Role::AccelMap
 	Renard::Curie::Component::MainWindow::Role::MenuBar
 	Renard::Curie::Component::MainWindow::Role::Outline
+	Renard::Curie::Component::MainWindow::Role::TTSWindow
 	Renard::Curie::Component::MainWindow::Role::ExceptionHandler
 );
 
@@ -81,7 +90,7 @@ Renard::Curie::Component::MainWindow - Main window of the application
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 
@@ -94,6 +103,10 @@ version 0.004
 =head1 CONSUMES
 
 =over 4
+
+=item * L<Intertangle::API::Gtk3::Component::Role::FromBuilder>
+
+=item * L<Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName>
 
 =item * L<MooX::Role::Logger>
 
@@ -111,13 +124,15 @@ version 0.004
 
 =item * L<Renard::Curie::Component::MainWindow::Role::PageDrawingArea>
 
-=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder>
-
-=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName>
+=item * L<Renard::Curie::Component::MainWindow::Role::TTSWindow>
 
 =back
 
 =head1 ATTRIBUTES
+
+=head2 loop
+
+Glib event loop.
 
 =head2 window
 

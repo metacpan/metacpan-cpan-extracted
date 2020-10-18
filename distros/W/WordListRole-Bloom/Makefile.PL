@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "WordListRole::Bloom",
   "PREREQ_PM" => {
     "Algorithm::BloomFilter" => 0,
+    "File::ShareDir" => 0,
     "MIME::Base64" => 0,
     "Role::Tiny" => 0,
     "strict" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Algorithm::BloomFilter" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

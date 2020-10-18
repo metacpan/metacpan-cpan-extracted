@@ -32,11 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::JWT" : "0",
-            "CryptX" : "0",
-            "Import::Export" : "0",
-            "MIME::Base64" : "0",
-            "URI" : "0",
+            "Crypt::JWT" : "0.029",
+            "CryptX" : "0.069",
+            "Import::Export" : "1.00",
+            "MIME::Base64" : "3.16",
+            "URI" : "1.76",
             "perl" : "5.006"
          }
       },
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Scattermapbox::Selected::Marker;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattermapbox.
 
@@ -53,7 +53,7 @@ Chart::Plotly::Trace::Scattermapbox::Selected - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ version 0.039
                  marker => Chart::Plotly::Trace::Scattermapbox::Marker->new( size => 9 ),
  );
  my $plot = Chart::Plotly::Plot->new( traces => [$scattermapbox],
-                                      layout => { autosize  => 'True',
+                                      layout => { autosize  => JSON::true,
                                                   hovermode => 'closest',
                                                   mapbox    => {
                                                               style       => 'open-street-map',

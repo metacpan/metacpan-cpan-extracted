@@ -1,5 +1,17 @@
 Revision history for Plack-App-Prerender:
 
+v0.2.0    2020-10-18 12:13:43+01:00 Europe/London
+  [Enhancements]
+  - The request and response attributes can take a hash reference
+    of headers to forward.
+
+  - The cache is now optional, GH#3.
+
+  [Tests]
+  - Ensure chrome services are closed when tests finish.
+
+  - Skip tests if Chrome browser cannot be started.
+
 v0.1.2    2020-10-14 15:01:42+01:00 Europe/London
   [Bug Fixes]
   - The User-Agent header is forwarded as X-Forwarded-User-Agent, GH#1.

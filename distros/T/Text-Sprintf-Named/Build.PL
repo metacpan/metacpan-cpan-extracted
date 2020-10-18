@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Text-Sprintf-Named",
-  "dist_version" => "0.0404",
+  "dist_version" => "0.0405",
   "license" => "mit",
   "module_name" => "Text::Sprintf::Named",
   "recursive_test_files" => 1,

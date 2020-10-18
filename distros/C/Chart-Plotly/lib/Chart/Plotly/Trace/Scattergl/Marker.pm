@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Scattergl::Marker::Colorbar;
 use Chart::Plotly::Trace::Scattergl::Marker::Line;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattergl.
 
@@ -183,7 +183,7 @@ Chart::Plotly::Trace::Scattergl::Marker - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

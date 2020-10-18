@@ -17,7 +17,7 @@ use Verilog::Getopt;
 use strict;
 use vars qw($Debug $VERSION);
 
-$VERSION = '3.470';
+$VERSION = '3.472';
 
 ######################################################################
 # main
@@ -34,6 +34,7 @@ my $Opt = new Verilog::Getopt(filename_expansion=>1);
 my $Opt_Cells;
 my $Opt_Modules;
 my $Opt_ModFiles;
+my $Opt_Includes;
 my $Opt_InFiles;
 my $Opt_Missing = 1;
 my $Opt_Missing_Modules;
@@ -58,6 +59,7 @@ if (! GetOptions (
 		  "cells!"	=> \$Opt_Cells,
 		  "module-files!"	=> \$Opt_ModFiles,
 		  "modules!"		=> \$Opt_Modules,
+		  "includes!"		=> \$Opt_Includes,
 		  "input-files!"	=> \$Opt_InFiles,
 		  "resolve-files!"	=> \$Opt_ResolveFiles,
 		  "skiplist=s"		=> \$opt_skiplist,
@@ -80,16 +82,17 @@ if (!@opt_files) {
     die "%Error: vhier: No input filenames specified.\n";
 }
 
-my $fh = IO::File->new;
-if ($opt_output_filename) {
-    $fh->open(">$opt_output_filename") or die "%Error: $! $opt_output_filename\n";
-} else {
-    $fh->open(">-") or die;
+{
+    my $fh = IO::File->new;
+    if ($opt_output_filename) {
+	$fh->open(">$opt_output_filename") or die "%Error: $! $opt_output_filename\n";
+    } else {
+	$fh->open(">-") or die;
+    }
+    read_skiplist($opt_skiplist) if $opt_skiplist;
+    vhier($fh, @opt_files);
+    $fh->close;
 }
-
-read_skiplist($opt_skiplist) if $opt_skiplist;
-
-vhier($fh, @opt_files);
 
 exit(0);
 
@@ -195,6 +198,19 @@ sub vhier {
 	    $fh->print("  <file>$filename</file>\n") if $Opt_Xml;
 	}
 	$fh->print(" </input_files>\n") if $Opt_Xml;
+    }
+
+    if ($Opt_Includes) {
+	$fh->print(" <includes>\n") if $Opt_Xml;
+	foreach my $filename (sort keys %{$Opt->includes}) {
+	    $fh->print("  $filename\n") if !$Opt_Xml;
+	    $fh->print("  <file>$filename</file>\n") if $Opt_Xml;
+	    foreach my $incname (@{$Opt->{includes}{$filename}}) {
+		$fh->print("    $incname\n") if !$Opt_Xml;
+		$fh->print("    <inc>$incname</inc>\n") if $Opt_Xml;
+	    }
+	}
+	$fh->print(" </includes>\n") if $Opt_Xml;
     }
 
     if ($Opt_Missing_Modules) {
@@ -482,6 +498,12 @@ Show "ASCII-art" hierarchy tree of all cells (like ps --forest)
 Show all input filenames.  Copying all of these files should result in only
 those files needed to represent the entire design.
 
+=item --includes
+
+Show each source filename that includes another filename.  The included
+filename will be as specified in the original source filename, so it may be
+necessary to resolve it into an absolute path for further processing.
+
 =item --instance
 
 With --cells or --forest, show module instance names.
@@ -530,7 +552,7 @@ Define SYNTHESIS, and ignore text between "ambit", "pragma", "synopsys" or
 "synthesis" translate_off and translate_on meta comments.  Note using
 metacomments is discouraged as they have led to silicon bugs (versus ifdef
 SYNTHESIS); see
-L<http://www.veripool.org/papers/TenIPEdits_SNUGBos07_paper.pdf>.
+L<https://www.veripool.org/papers/TenIPEdits_SNUGBos07_paper.pdf>.
 
 =item --top-module I<module>
 
@@ -556,9 +578,9 @@ Create output in XML format.
 
 =head1 DISTRIBUTION
 
-Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
+Verilog-Perl is part of the L<https://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.org/verilog-perl>.
+L<https://www.veripool.org/verilog-perl>.
 
 Copyright 2005-2020 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU

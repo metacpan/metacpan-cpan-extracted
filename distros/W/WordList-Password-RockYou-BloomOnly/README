@@ -1,0 +1,46 @@
+NAME
+    WordList::Password::RockYou::BloomOnly - RockYou password wordlist
+    (~14.3mil passwords) (bloom-only edition)
+
+VERSION
+    This document describes version 0.002 of
+    WordList::Password::RockYou::BloomOnly (from Perl distribution
+    WordList-Password-RockYou-BloomOnly), released on 2020-05-24.
+
+DESCRIPTION
+    "word_exists()" can be used to test a string against the RockYou
+    password wordlist (~14.3 million passwords). You can use it with, e.g.
+    App::PasswordWordListUtils's exists-in-password-wordlist. Uses bloom
+    filter (bloom size=33M, k=13, false-positve rate=0.01245%).
+
+    The other methods like "each_word()", "all_words()", "first_word()",
+    "next_word()" will return empty list of words, because this distribution
+    only contains the bloom filter and not the actual wordlist.
+
+METHODS
+  word_exists
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Password-RockYou-BloomOnly>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Password-RockYou-BloomOnly>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Password-Roc
+    kYou-BloomOnly>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

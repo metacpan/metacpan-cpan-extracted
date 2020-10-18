@@ -133,7 +133,7 @@ use Test::More;
 
 {
     my @spec = (
-        { optional => 1,   depends    => 4 },
+        { optional => 1, depends => 4 },
         { optional => 1 }, { optional => 1 },
         { optional => 1 }
     );

@@ -10,7 +10,7 @@
  *
  * Author: Wilson Snyder <wsnyder@wsnyder.org>
  *
- * Code available from: http://www.veripool.org/systemperl
+ * Code available from: https://www.veripool.org/verilog-perl
  *
  ******************************************************************************
  *
@@ -65,6 +65,13 @@ void yyerrorf(const char* format, ...) {
     va_end(ap);
 
     yyerror(msg);
+}
+
+static bool isWhitespace(const std::string& str) {
+    for (std::string::const_iterator pos = str.begin(); pos != str.end(); ++pos) {
+        if (!isspace(*pos)) return false;
+    }
+    return true;
 }
 
 /**********************************************************************/
@@ -247,6 +254,12 @@ prag_trans_on	({ws}*{pragma_tools}{ws}+{translate_on}{ws}*)
 			  // Note paren level 0 means before "(" of starting args
 			  // Level 1 means "," between arguments
 			  // Level 2+ means one argument's internal ()
+                          if (LEXP->m_parenLevel == 1) {  // Starting (
+                              if (!isWhitespace(LEXP->m_defValue)) {
+                                  yyerrorf("Illegal text before '(' that starts define arguments: '%s'",
+                                           LEXP->m_defValue.c_str());
+                              }
+                          }
 			  if (LEXP->m_parenLevel>1) {
 			      appendDefValue(yytext,yyleng);
 			  } else {

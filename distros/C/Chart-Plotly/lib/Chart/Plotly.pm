@@ -18,7 +18,7 @@ use UUID::Tiny ':std';
 use File::ShareDir;
 use Path::Tiny;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
@@ -166,7 +166,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -317,7 +317,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords Roy Storey stphnlyd weatherwax
+=for stopwords Roy Storey Stephan Loyd weatherwax
 
 =over 4
 
@@ -327,7 +327,7 @@ Roy Storey <kiwiroy@users.noreply.github.com>
 
 =item *
 
-stphnlyd <stephanloyd9@gmail.com>
+Stephan Loyd <stephanloyd9@gmail.com>
 
 =item *
 

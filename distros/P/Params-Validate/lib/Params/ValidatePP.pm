@@ -1,7 +1,7 @@
 package    # hide from PAUSE
     Params::Validate;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 BEGIN { $ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'PP' }
 use Params::Validate;

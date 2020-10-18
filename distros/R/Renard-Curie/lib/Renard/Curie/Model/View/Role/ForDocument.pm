@@ -1,9 +1,9 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::View::Role::ForDocument;
 # ABSTRACT: Role for view model based on a document
-$Renard::Curie::Model::View::Role::ForDocument::VERSION = '0.004';
+$Renard::Curie::Model::View::Role::ForDocument::VERSION = '0.005';
 use Moo::Role;
-use Renard::Incunabula::Format::Cairo::Types qw(RenderableDocumentModel);
+use Renard::Block::Format::Cairo::Types qw(RenderableDocumentModel);
 
 has document => (
 	is => 'rw',
@@ -25,13 +25,13 @@ Renard::Curie::Model::View::Role::ForDocument - Role for view model based on a d
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 
 =head2 document
 
-The L<RenderableDocumentModel|Renard::Incunabula::Format::Cairo::Types/RenderableDocumentModel> that
+The L<RenderableDocumentModel|Renard::Block::Format::Cairo::Types/RenderableDocumentModel> that
 this view model represents.
 
 =head1 AUTHOR

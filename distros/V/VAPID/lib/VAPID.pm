@@ -1,5 +1,5 @@
 package VAPID;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use Crypt::JWT qw(encode_jwt); use Crypt::PK::ECC; use URI;
 use MIME::Base64 qw/encode_base64url decode_base64url/;
 use base 'Import::Export';
@@ -19,7 +19,6 @@ BEGIN {
 		validate_expiration_key => [qw/all validate/],
 		validate_expiration => [qw/all validate/],
 	);
-
 }
 
 sub generate_vapid_keys {
@@ -45,7 +44,7 @@ sub generate_vapid_keys {
 }
 
 sub generate_vapid_header {
-	my ($aud, $subject, $pub, $priv, $expiration) = @_;
+	my ($aud, $subject, $pub, $priv, $expiration, $enc) = @_;
 
 	if (!$aud) {
 		die "No audience could be generated for VAPID.";
@@ -81,6 +80,7 @@ sub generate_vapid_header {
 		->import_key_raw($priv, 'prime256v1')
 		->export_key_pem('private');
 
+
 	my $jwt_token = encode_jwt(
 		payload=>$payload, 
 		extra_headers => { typ => 'JWT' }, 
@@ -88,10 +88,14 @@ sub generate_vapid_header {
 		key => \$key
 	);
 
-	return {
-		Authorization => 'WebPush ' . $jwt_token,
-      		'Crypto-Key' => 'p256ecdsa=' . $pub
-	}; 
+	return $enc 
+		? {
+			Authorization => "vapit t=${jwt_token}, k=${pub}"
+		}
+		: {
+			Authorization => 'WebPush ' . $jwt_token,
+      			'Crypto-Key' => 'p256ecdsa=' . $pub
+		}; 
 }
 
 sub generate_future_expiration_timestamp {
@@ -160,7 +164,6 @@ sub validate_private_key {
 	return $priv;
 }
 
-
 sub validate_expiration {
 	my $expiration = shift;
 
@@ -187,7 +190,7 @@ VAPID - Voluntary Application Server Identification
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -208,7 +211,8 @@ Version 0.02
 		'mailto:email@lnation.org',
 		$public,
 		$private,
-		time + 60
+		time + 60,
+		$enc
 	);
 
 =head1 EXPORT

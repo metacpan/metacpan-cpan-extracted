@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.001
+    version 1.002
 
 SYNOPSIS
 
@@ -61,26 +61,6 @@ SUPPORT
     The following websites have more information about this module, and may
     be of help to you. As always, in addition to those websites please use
     your favorite search engine to discover more resources.
-
-      * Search CPAN
-
-      The default CPAN search engine, useful to view POD in HTML format.
-
-      http://search.cpan.org/dist/Data-Compare-Plugins-Set-Object
-
-      * AnnoCPAN
-
-      The AnnoCPAN is a website that allows community annotations of Perl
-      module documentation.
-
-      http://annocpan.org/dist/Data-Compare-Plugins-Set-Object
-
-      * CPAN Ratings
-
-      The CPAN Ratings is a website that allows community ratings and
-      reviews of Perl modules.
-
-      http://cpanratings.perl.org/d/Data-Compare-Plugins-Set-Object
 
       * CPANTS
 

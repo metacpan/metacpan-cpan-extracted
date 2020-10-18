@@ -11,6 +11,11 @@ use File::Spec;
 use GraphViz2;
 use GraphViz2::Data::Grapher;
 
+{
+package FakeObj;
+sub new { bless {} }
+}
+
 my($sub) = sub{};
 my($s)   =
 {
@@ -38,6 +43,9 @@ my($s)   =
 		},
 	},
 	els => [qw(element_1 element_2 element_3)],
+	glob_ref => \*main::,
+	obj => FakeObj->new,
+	scalar_ref => \'hello',
 };
 
 my($graph) = GraphViz2 -> new

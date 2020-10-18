@@ -1,0 +1,10 @@
+0.002   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Put bloom filter data in share/bloom (size=2.1M, k=13,
+	  false-positive rate=0.03259%).
+
+
+0.001   2020-05-23  Released-By: PERLANCAR
+
+        - First release, split from WordLists-Password-10Million distribution.
+          Uses bloom filter by default.

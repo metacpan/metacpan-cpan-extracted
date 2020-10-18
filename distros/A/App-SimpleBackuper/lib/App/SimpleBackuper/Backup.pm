@@ -113,30 +113,30 @@ sub Backup {
 					push @cur_path, $path_node;
 					
 					my $file = $files->find_by_parent_id_name($file_id, $path_node);
-					if(! $file) {
-						my @stat = lstat(join('/', @cur_path) || '/');
-						my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
-						$file = {
-							parent_id	=> $file_id,
-							id			=> ++$state->{last_file_id},
-							name		=> $path_node,
-							versions	=> [
-								{
-									backup_id_min	=> $state->{last_backup_id},
-									backup_id_max	=> $state->{last_backup_id},
-									uid				=> $uid,
-									gid				=> $gid,
-									size			=> $stat[7],
-									mode			=> $stat[2],
-									mtime			=> $stat[9],
-									block_id		=> 0,
-									symlink_to		=> undef,
-									parts			=> [],
-								}
-							],
-						};
-						$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
-					}
+					$file //= {
+						parent_id	=> $file_id,
+						id			=> ++$state->{last_file_id},
+						name		=> $path_node,
+						versions	=> [ { backup_id_min	=> $state->{last_backup_id} } ],
+					};
+						
+					my @stat = lstat(join('/', @cur_path) || '/');
+					my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
+					$file->{versions}->[-1] = {
+						%{ $file->{versions}->[-1] },
+						backup_id_max	=> $state->{last_backup_id},
+						uid				=> $uid,
+						gid				=> $gid,
+						size			=> $stat[7],
+						mode			=> $stat[2],
+						mtime			=> $stat[9],
+						block_id		=> 0,
+						symlink_to		=> undef,
+						parts			=> [],
+					};
+					
+					$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
+					
 					$file_id = $file->{id};
 				}
 			}

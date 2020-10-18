@@ -3,7 +3,7 @@ package Params::Validate::PP;
 use strict;
 use warnings;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use Params::Validate::Constants;
 use Scalar::Util 1.10 ();
@@ -117,7 +117,7 @@ sub validate_pos (\@@) {
                 && ref $specs[$_]
                 && $specs[$_]{untaint}
         } 0 .. $bigger
-        ) {
+    ) {
         ( $p[$_] ) = $p[$_] =~ /(.+)/;
     }
 
@@ -182,7 +182,7 @@ sub _validate_named_depends {
             ref $spec->{depends}
             ? @{ $spec->{depends} }
             : $spec->{depends}
-            ) {
+        ) {
             unless ( exists $p->{$depends_name} ) {
                 my $error
                     = (   "Parameter '$pname' depends on parameter '"
@@ -272,13 +272,13 @@ sub validate (\@$) {
                             && exists $specs->{$_}->{default}
                     }
                     keys %$specs
-                    ) {
+                ) {
                     $ref->{$_} = $specs->{$_}->{default}
                         unless exists $ref->{$_};
                 }
 
                 return $ref;
-                }
+            }
         );
     }
 
@@ -329,14 +329,13 @@ OUTER:
                 )
                 : $spec
             )
-            ) {
+        ) {
             push @missing, $key;
         }
 
         # Can't validate a non hashref spec beyond the presence or
         # absence of the parameter.
         elsif ( ref $spec ) {
-            my $value = defined $p->{$key} ? qq|"$p->{$key}"| : 'undef';
             _validate_one_param(
                 $p->{$key}, $p, $spec,
                 qq{The '$key' parameter (%s)}
@@ -362,7 +361,7 @@ OUTER:
                 && $specs->{$_}{untaint}
         }
         keys %$p
-        ) {
+    ) {
         ( $p->{$key} ) = $p->{$key} =~ /(.+)/;
     }
 
@@ -482,7 +481,7 @@ sub _validate_one_param {
 
             $options->{on_fail}->(
                 sprintf(
-                    "$id to $called was $article '@is', which "
+                          "$id to $called was $article '@is', which "
                         . "is not one of the allowed types: @allowed\n",
                     _stringify($value)
                 )
@@ -504,8 +503,8 @@ sub _validate_one_param {
                     local $@ = q{};
                     eval { $value->isa($_) };
                 }
-                ) {
-                my $is = ref $value ? ref $value : 'plain scalar';
+            ) {
+                my $is       = ref $value ? ref $value   : 'plain scalar';
                 my $article1 = $_ =~ /^[aeiou]/i  ? 'an' : 'a';
                 my $article2 = $is =~ /^[aeiou]/i ? 'an' : 'a';
 
@@ -528,7 +527,7 @@ sub _validate_one_param {
                     local $@ = q{};
                     eval { $value->can($_) };
                 }
-                ) {
+            ) {
                 my $called = _get_called(1);
 
                 $options->{on_fail}->(
@@ -577,7 +576,8 @@ sub _validate_one_param {
                     my $msg = "$id to $called did not pass the '$_' callback";
                     $msg .= ": $e" if length $e;
                     $msg .= "\n";
-                    $options->{on_fail}->( sprintf( $msg, _stringify($value) ) );
+                    $options->{on_fail}
+                        ->( sprintf( $msg, _stringify($value) ) );
                 }
             }
         }
@@ -653,7 +653,7 @@ sub _validate_one_param {
         foreach (
             SCALAR,    ARRAYREF, HASHREF, CODEREF, GLOB, GLOBREF,
             SCALARREF, UNDEF,    OBJECT,  UNKNOWN
-            ) {
+        ) {
             push @types, $type_to_string{$_} if $mask & $_;
         }
         return @types ? @types : ('unknown');

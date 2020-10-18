@@ -20,7 +20,7 @@ Version 0.0.6
 
 =cut
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.8';
 
 =head1 SYNOPSIS
 
@@ -373,10 +373,6 @@ sub _reference_links {
       { nickname => 'RT',
         title    => 'CPAN\'s request tracker',
         link     => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=%s',
-      },
-      { nickname => 'AnnoCPAN',
-        title    => 'Annotated CPAN documentation',
-        link     => 'http://annocpan.org/dist/%s',
       },
       { title    => 'CPAN Ratings',
         link     => 'http://cpanratings.perl.org/d/%s',

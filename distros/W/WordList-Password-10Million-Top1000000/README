@@ -1,0 +1,47 @@
+NAME
+    WordList::Password::10Million::Top1000000 - Top 1,000,000 passwords from
+    10_million_password_list
+
+VERSION
+    This document describes version 0.002 of
+    WordList::Password::10Million::Top1000000 (from Perl distribution
+    WordList-Password-10Million-Top1000000), released on 2020-05-24.
+
+DESCRIPTION
+    Source: <https://weakpass.com/wordlist/50> (retrieved 2018-02-20).
+
+    Wordlist is sorted by popularity (most popular first).
+
+    Duplicate entries in the original list have been removed: pedr (2).
+
+    Uses random-seek pick() which gives higher probability for longer words.
+
+    Uses bloom filter so word_exists() can give a small chance of false
+    positive (bloom filter size=2.1M, k=13, false-positive rate=0.03259%).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Password-10Million-Top1000000>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Password-10Million-Top100000
+    0>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Password-10M
+    illion-Top1000000>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

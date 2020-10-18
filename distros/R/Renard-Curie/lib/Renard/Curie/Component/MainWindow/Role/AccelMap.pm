@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::AccelMap;
 # ABSTRACT: Role for accelerators
-$Renard::Curie::Component::MainWindow::Role::AccelMap::VERSION = '0.004';
+$Renard::Curie::Component::MainWindow::Role::AccelMap::VERSION = '0.005';
 use Moo::Role;
 use Renard::Curie::Component::AccelMap;
 
@@ -23,7 +23,7 @@ Renard::Curie::Component::MainWindow::Role::AccelMap - Role for accelerators
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

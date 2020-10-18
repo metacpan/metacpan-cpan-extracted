@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::PageDrawingArea::Role::NavigationButtons;
 # ABSTRACT: A role for the navigation buttons
-$Renard::Curie::Component::PageDrawingArea::Role::NavigationButtons::VERSION = '0.004';
+$Renard::Curie::Component::PageDrawingArea::Role::NavigationButtons::VERSION = '0.005';
 use Moo::Role;
 
 after BUILD => method(@) {
@@ -67,7 +67,7 @@ Renard::Curie::Component::PageDrawingArea::Role::NavigationButtons - A role for 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

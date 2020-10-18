@@ -4,10 +4,10 @@ use Test::Most tests => 9;
 
 use lib 't/lib';
 use CurieTestHelper;
-use Renard::Incunabula::Devel::TestHelper;
+use Renard::Block::Format::PDF::Devel::TestHelper;
 
 use Renard::Incunabula::Common::Setup;
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Intertangle::API::Gtk3::Helper;
 use Renard::Curie::App;
 use URI::file;
 use List::AllUtils qw(first);
@@ -35,7 +35,7 @@ subtest 'Check that the menu item File -> Open exists' => sub {
 
 subtest "Menu: File -> Open" => sub {
 	my $pdf_ref_path = try {
-		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Block::Format::PDF::Devel::TestHelper->pdf_reference_document_path;
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -51,7 +51,7 @@ subtest "Menu: File -> Open" => sub {
 
 		my $c = CurieTestHelper->get_app_container;
 		my $app = $c->app;
-		Renard::Incunabula::Frontend::Gtk3::Helper->callback( $c->menu_bar,
+		Intertangle::API::Gtk3::Helper->callback( $c->menu_bar,
 			'on_menu_file_open_activate_cb', undef );
 
 		ok( $got_file, "Callback retrieved the filename");
@@ -64,7 +64,7 @@ subtest "Menu: File -> Open" => sub {
 
 		my $c = CurieTestHelper->get_app_container;
 		my $app = $c->app;
-		Renard::Incunabula::Frontend::Gtk3::Helper->callback( $c->menu_bar,
+		Intertangle::API::Gtk3::Helper->callback( $c->menu_bar,
 			'on_menu_file_open_activate_cb', undef );
 		ok(!$got_file, "Callback did not retrieve the filename");
 		ok( $destroyed, "Callback destroyed the dialog");
@@ -73,7 +73,7 @@ subtest "Menu: File -> Open" => sub {
 
 subtest "Menu: File -> Properties" => sub {
 	my $pdf_ref_path = try {
-		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Block::Format::PDF::Devel::TestHelper->pdf_reference_document_path;
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -92,7 +92,7 @@ subtest "Menu: File -> Properties" => sub {
 	my $app = $c->app;
 	$c->view_manager->open_pdf_document( $pdf_ref_path );
 
-	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $c->menu_bar,
+	Intertangle::API::Gtk3::Helper->callback( $c->menu_bar,
 		'on_menu_file_properties_activate_cb', undef );
 	ok( $window_show, "Callback opened the document properties window");
 	is( $path, $pdf_ref_path, "Opened properties of the same file");
@@ -117,7 +117,7 @@ subtest "Menu: File -> Quit" => sub {
 
 subtest "Menu: File -> Recent files" => sub {
 	my $pdf_ref_path = try {
-		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Block::Format::PDF::Devel::TestHelper->pdf_reference_document_path;
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -143,7 +143,7 @@ subtest "Menu: File -> Recent files" => sub {
 
 subtest "Menu: View -> Continuous" => sub {
 	my $pdf_ref_path = try {
-		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Block::Format::PDF::Devel::TestHelper->pdf_reference_document_path;
 	} catch {
 		plan skip_all => "$_";
 	};
@@ -180,7 +180,7 @@ subtest "Menu: View -> Continuous" => sub {
 
 subtest "Menu: View -> Zoom" => sub {
 	my $pdf_ref_path = try {
-		Renard::Incunabula::Devel::TestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+		Renard::Block::Format::PDF::Devel::TestHelper->pdf_reference_document_path;
 	} catch {
 		plan skip_all => "$_";
 	};

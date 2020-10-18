@@ -1,0 +1,9 @@
+0.002   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Update bloom filter, size=33M (previously 66M), k=13, false-positive
+          rate 0.01245%.
+
+
+0.001   2020-05-23  Released-By: PERLANCAR
+
+        - First release.

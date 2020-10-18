@@ -1,21 +1,21 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 
 use lib 't/lib';
 use Renard::Incunabula::Common::Setup;
 use Renard::Curie::App;
 use CurieTestHelper;
-use Renard::Incunabula::Format::Cairo::Devel::TestHelper;
+use Renard::Block::Format::Cairo::Devel::TestHelper;
 use Renard::Incunabula::Common::Types qw(InstanceOf Enum);
 
-my $cairo_doc = Renard::Incunabula::Format::Cairo::Devel::TestHelper->create_cairo_document;
+my $cairo_doc = Renard::Block::Format::Cairo::Devel::TestHelper->create_cairo_document;
 
 fun Scroll_Event( (InstanceOf['Renard::Curie::Component::PageDrawingArea']) $pd,
 		(Enum[qw(up down smooth)]) $direction,
-		$delta = 0) {
+		:$delta = 0, :$control = 0) {
 	my $event = Gtk3::Gdk::Event->new('scroll');
-	$event->state( 'control-mask' );
+	$event->state( 'control-mask' ) if $control;
 	$event->direction( $direction );
 	if ( $direction eq 'smooth' ) {
 		$event->delta_y( $delta );
@@ -29,7 +29,7 @@ subtest 'Check that ctrl+scroll-down zooms out of the page' => sub {
 
 	ok($page_comp->view->zoom_level - 1.0 < .001, 'Start at Zoom Level 1.0' );
 
-	Scroll_Event( $page_comp, 'down' );
+	Scroll_Event( $page_comp, 'down', control => 1 );
 
 	ok($page_comp->view->zoom_level - .95 < .001, 'Reduce Zoom Level to .95');
 
@@ -41,7 +41,7 @@ subtest 'Check that ctrl+scroll-up zooms into the page' => sub {
 
 	ok($page_comp->view->zoom_level - 1.0 < .001, 'Start at Zoom Level 1.0' );
 
-	Scroll_Event( $page_comp, 'up' );
+	Scroll_Event( $page_comp, 'up', control => 1 );
 
 	ok($page_comp->view->zoom_level - 1.05 < .001, 'Reduce Zoom Level to .95');
 
@@ -53,7 +53,7 @@ subtest 'Check that ctrl+smooth-scroll-down zooms out of the page' => sub {
 
 	ok($page_comp->view->zoom_level - 1.0 < .001, 'Start at Zoom Level 1.0' );
 
-	Scroll_Event( $page_comp, 'smooth', -0.05 );
+	Scroll_Event( $page_comp, 'smooth', delta => -0.05, control => 1 );
 
 	ok($page_comp->view->zoom_level - .95 < .001, 'Reduce Zoom Level to .95');
 
@@ -65,7 +65,7 @@ subtest 'Check that ctrl+smooth-scroll-up zooms into the page' => sub {
 
 	ok($page_comp->view->zoom_level - 1.0 < .001, 'Start at Zoom Level 1.0' );
 
-	Scroll_Event( $page_comp, 'smooth', 0.05 );
+	Scroll_Event( $page_comp, 'smooth', delta => 0.05, control => 1 );
 
 	ok($page_comp->view->zoom_level - 1.05 < .001, 'Reduce Zoom Level to .95');
 
@@ -77,6 +77,24 @@ subtest 'Check that zooming out does not become negative' => sub {
 
 	ok($page_comp->compute_zoom_out(1, 2) > 0,
 		'start at zoom = 100% -> zoom out by 200% is still positive' );
+};
+
+subtest 'Check that mouse scroll up and down' => sub {
+	plan tests => 2;
+	my ( $app, $page_comp ) = CurieTestHelper->create_app_with_document($cairo_doc);
+
+	my $vadj = $page_comp->scrolled_window->get_vadjustment;
+	my $current_value = $vadj->get_value;
+	Scroll_Event($page_comp, 'down');
+	Scroll_Event($page_comp, 'down');
+	Scroll_Event($page_comp, 'down');
+	my $next_value = $vadj->get_value;
+	cmp_ok( $current_value, '<', $next_value, 'Page has scrolled down');
+
+	$current_value = $vadj->get_value;
+	Scroll_Event($page_comp, 'up');
+	$next_value = $vadj->get_value;
+	cmp_ok( $current_value, '>', $next_value, 'Page has scrolled up');
 };
 
 done_testing;

@@ -1,9 +1,9 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MenuBar;
 # ABSTRACT: Component that provides a menu bar for the application
-$Renard::Curie::Component::MenuBar::VERSION = '0.004';
+$Renard::Curie::Component::MenuBar::VERSION = '0.005';
 use Moo;
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Intertangle::API::Gtk3::Helper;
 use URI;
 use Glib 'TRUE', 'FALSE';
 use Renard::Incunabula::Common::Types qw(InstanceOf);
@@ -145,15 +145,15 @@ method _build_recent_chooser() :ReturnType(InstanceOf['Gtk3::RecentChooserMenu']
 
 # Callbacks {{{
 callback on_menu_file_open_activate_cb($event, $self) {
-	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $self->main_window, on_open_file_dialog_cb => $event );
+	Intertangle::API::Gtk3::Helper->callback( $self->main_window, on_open_file_dialog_cb => $event );
 }
 
 callback on_menu_file_properties_activate_cb($event, $self) {
-	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $self->main_window, on_document_properties_dialog_cb => $event );
+	Intertangle::API::Gtk3::Helper->callback( $self->main_window, on_document_properties_dialog_cb => $event );
 }
 
 callback on_menu_file_quit_activate_cb($event, $self) {
-	Renard::Incunabula::Frontend::Gtk3::Helper->callback( $self->main_window, on_application_quit_cb => $event );
+	Intertangle::API::Gtk3::Helper->callback( $self->main_window, on_application_quit_cb => $event );
 }
 
 callback on_menu_file_recentfiles_item_activated_cb( (InstanceOf['Gtk3::RecentChooserMenu']) $recent_chooser, $self ) {
@@ -192,8 +192,8 @@ callback on_menu_view_column_item_activate_cb($event, $data) {
 
 
 with qw(
-	Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder
-	Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName
+	Intertangle::API::Gtk3::Component::Role::FromBuilder
+	Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName
 	Renard::Curie::Component::Role::HasParentMainWindow
 );
 
@@ -211,7 +211,7 @@ Renard::Curie::Component::MenuBar - Component that provides a menu bar for the a
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 
@@ -225,11 +225,11 @@ version 0.004
 
 =over 4
 
+=item * L<Intertangle::API::Gtk3::Component::Role::FromBuilder>
+
+=item * L<Intertangle::API::Gtk3::Component::Role::UIFileFromPackageName>
+
 =item * L<Renard::Curie::Component::Role::HasParentMainWindow>
-
-=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder>
-
-=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName>
 
 =back
 

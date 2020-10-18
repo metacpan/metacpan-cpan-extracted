@@ -3,7 +3,7 @@ use Moose;
 use MooseX::ExtraArgs;
 use Moose::Util::TypeConstraints qw(enum union);
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 sub TO_JSON {
     my $self       = shift;
@@ -45,7 +45,7 @@ Chart::Plotly::Trace::Scattermapbox::Marker::Colorbar::Tickformatstops
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ version 0.039
                  marker => Chart::Plotly::Trace::Scattermapbox::Marker->new( size => 9 ),
  );
  my $plot = Chart::Plotly::Plot->new( traces => [$scattermapbox],
-                                      layout => { autosize  => 'True',
+                                      layout => { autosize  => JSON::true,
                                                   hovermode => 'closest',
                                                   mapbox    => {
                                                               style       => 'open-street-map',

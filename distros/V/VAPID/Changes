@@ -3,3 +3,5 @@ Revision history for VAPID
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03    2020/10/18
+	- Update Makefile dependencies with latest versions

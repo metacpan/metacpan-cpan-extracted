@@ -69,15 +69,16 @@ my @Tests = (
     {
         sub    => 'sub3',
         p      => [],
-        expect => qr|^Mandatory parameters 'bar', 'baz', 'brax', 'foo', 'quux' missing|,
+        expect =>
+            qr|^Mandatory parameters 'bar', 'baz', 'brax', 'foo', 'quux' missing|,
     },
 
     # simple types
     {
         sub => 'sub3',
         p   => [
-            foo => 'a',
-            bar => [ 1, 2, 3 ],
+            foo  => 'a',
+            bar  => [ 1, 2, 3 ],
             baz  => { a => 1 },
             quux => 'yadda',
             brax => {qw( a b c d )},
@@ -88,8 +89,8 @@ my @Tests = (
     {
         sub => 'sub3',
         p   => [
-            foo => ['a'],
-            bar => [ 1, 2, 3 ],
+            foo  => ['a'],
+            bar  => [ 1, 2, 3 ],
             baz  => { a => 1 },
             quux => 'yadda',
             brax => {qw( a b c d )},
@@ -101,8 +102,8 @@ my @Tests = (
     {
         sub => 'sub3',
         p   => [
-            foo => 'foobar',
-            bar => [ 1, 2, 3 ],
+            foo  => 'foobar',
+            bar  => [ 1, 2, 3 ],
             baz  => { a => 1 },
             quux => 'yadda',
             brax => [qw( a b c d )],
@@ -114,8 +115,8 @@ my @Tests = (
     {
         sub => 'sub3',
         p   => [
-            foo => 'foobar',
-            bar => { 1, 2, 3, 4 },
+            foo  => 'foobar',
+            bar  => { 1, 2, 3, 4 },
             baz  => { a => 1 },
             quux => 'yadda',
             brax => 'a',
@@ -128,9 +129,9 @@ my @Tests = (
     {
         sub => 'sub4',
         p   => [
-            foo => \$String,
-            bar => do { local *FH; *FH; },
-            baz => \*BAZZY,
+            foo  => \$String,
+            bar  => do { local *FH; *FH; },
+            baz  => \*BAZZY,
             quux => sub {'a coderef'},
         ],
         expect => q{},
@@ -151,9 +152,9 @@ my @Tests = (
     {
         sub => 'sub4',
         p   => [
-            foo => \$String,
-            bar => *GLOBBY,
-            baz => do { local *FH; *FH; },
+            foo  => \$String,
+            bar  => *GLOBBY,
+            baz  => do { local *FH; *FH; },
             quux => sub {'a coderef'},
         ],
         expect =>
@@ -163,9 +164,9 @@ my @Tests = (
     {
         sub => 'sub4',
         p   => [
-            foo => $String,
-            bar => do { local *FH; *FH; },
-            baz => \*BAZZY,
+            foo  => $String,
+            bar  => do { local *FH; *FH; },
+            baz  => \*BAZZY,
             quux => sub {'a coderef'},
         ],
         expect =>
@@ -198,8 +199,8 @@ my @Tests = (
     },
 
     {
-        sub => 'sub4a',
-        p   => [ foo => ['not a handle'] ],
+        sub    => 'sub4a',
+        p      => [ foo => ['not a handle'] ],
         expect =>
             qr|^The 'foo' parameter \("ARRAY\(0x[a-f0-9]+\)"\) to [\w:]+sub4a was an 'arrayref'.* types: glob globref|,
     },
@@ -233,8 +234,8 @@ my @Tests = (
     },
 
     {
-        sub => 'sub6',
-        p   => [ foo => $Foo ],
+        sub    => 'sub6',
+        p      => [ foo => $Foo ],
         expect =>
             qr|^The 'foo' parameter \("Foo=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub6 was not a 'Bar'|,
     }, {
@@ -248,13 +249,13 @@ my @Tests = (
     },
 
     {
-        sub => 'sub7',
-        p   => [ foo => $Foo ],
+        sub    => 'sub7',
+        p      => [ foo => $Foo ],
         expect =>
             qr|^The 'foo' parameter \("Foo=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub7 was not a 'Baz'|,
     }, {
-        sub => 'sub7',
-        p   => [ foo => $Bar ],
+        sub    => 'sub7',
+        p      => [ foo => $Bar ],
         expect =>
             qr|^The 'foo' parameter \("Bar=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub7 was not a 'Baz'|,
     }, {
@@ -264,8 +265,8 @@ my @Tests = (
     },
 
     {
-        sub => 'sub8',
-        p   => [ foo => $Foo ],
+        sub    => 'sub8',
+        p      => [ foo => $Foo ],
         expect =>
             qr|^The 'foo' parameter \("Foo=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub8 was not a 'Yadda'|,
     },
@@ -288,8 +289,8 @@ my @Tests = (
     },
 
     {
-        sub => 'sub9a',
-        p   => [ foo => $Foo ],
+        sub    => 'sub9a',
+        p      => [ foo => $Foo ],
         expect =>
             qr|^The 'foo' parameter \("Foo=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub9a does not have the method: 'barify'|,
     }, {
@@ -299,20 +300,20 @@ my @Tests = (
     },
 
     {
-        sub => 'sub9b',
-        p   => [ foo => $Baz ],
+        sub    => 'sub9b',
+        p      => [ foo => $Baz ],
         expect =>
             qr|^The 'foo' parameter \("Baz=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub9b does not have the method: 'yaddaify'|,
     }, {
-        sub => 'sub9b',
-        p   => [ foo => $Quux ],
+        sub    => 'sub9b',
+        p      => [ foo => $Quux ],
         expect =>
             qr|^The 'foo' parameter \("Quux=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub9b does not have the method: 'barify'|,
     },
 
     {
-        sub => 'sub9c',
-        p   => [ foo => $Bar ],
+        sub    => 'sub9c',
+        p      => [ foo => $Bar ],
         expect =>
             qr|^The 'foo' parameter \("Bar=SCALAR\(0x[a-f0-9]+\)"\) to [\w:]+sub9c does not have the method: 'yaddaify'|,
     },
@@ -337,8 +338,8 @@ my @Tests = (
     },
 
     {
-        sub => 'sub10',
-        p   => [ foo => 20 ],
+        sub    => 'sub10',
+        p      => [ foo => 20 ],
         expect =>
             qr|^The 'foo' parameter \("20"\) to [\w:]+sub10 did not pass the 'less than 20' callback|,
     },
@@ -348,30 +349,30 @@ my @Tests = (
         p      => [ foo => 1 ],
         expect => q{},
     }, {
-        sub => 'sub11',
-        p   => [ foo => 20 ],
+        sub    => 'sub11',
+        p      => [ foo => 20 ],
         expect =>
             qr|^The 'foo' parameter \("20"\) to [\w:]+sub11 did not pass the 'less than 20' callback|,
     },
 
     {
-        sub => 'sub11',
-        p   => [ foo => 0 ],
+        sub    => 'sub11',
+        p      => [ foo => 0 ],
         expect =>
             qr|^The 'foo' parameter \("0"\) to [\w:]+sub11 did not pass the 'more than 0' callback|,
     },
 
     # mix n' match
     {
-        sub => 'sub12',
-        p   => [ foo => 1 ],
+        sub    => 'sub12',
+        p      => [ foo => 1 ],
         expect =>
             qr|^The 'foo' parameter \("1"\) to [\w:]+sub12 was a 'scalar'.* types: arrayref|,
     },
 
     {
-        sub => 'sub12',
-        p   => [ foo => [ 1, 2, 3 ] ],
+        sub    => 'sub12',
+        p      => [ foo => [ 1, 2, 3 ] ],
         expect =>
             qr|^The 'foo' parameter \("ARRAY\(0x[a-f0-9]+\)"\) to [\w:]+sub12 did not pass the '5 elements' callback|,
     },
@@ -390,16 +391,16 @@ my @Tests = (
     },
 
     {
-        sub => 'sub13',
-        p   => [ 'a', [ 1, 2, 3 ] ],
+        sub    => 'sub13',
+        p      => [ 'a', [ 1, 2, 3 ] ],
         expect =>
             qr|^Parameter #2 \("ARRAY\(0x[a-f0-9]+\)"\) to .* did not pass the '5 elements' callback|,
     },
 
     # positional - 2
     {
-        sub => 'sub14',
-        p   => [ 'a', [ 1, 2, 3 ], $Foo ],
+        sub    => 'sub14',
+        p      => [ 'a', [ 1, 2, 3 ], $Foo ],
         expect =>
             qr|^Parameter #3 \("Foo=SCALAR\(0x[a-f0-9]+\)"\) to .* was not a 'Bar'|,
     },
@@ -412,8 +413,8 @@ my @Tests = (
 
     # hashref named params
     {
-        sub => 'sub15',
-        p   => [ { foo => 1, bar => { a => 1 } } ],
+        sub    => 'sub15',
+        p      => [ { foo => 1, bar => { a => 1 } } ],
         expect =>
             qr|^The 'bar' parameter \("HASH\(0x[a-f0-9]+\)"\) to .* was a 'hashref'.* types: arrayref|,
     },
@@ -529,11 +530,11 @@ my @Tests = (
 
     # validation options - allow extra
     {
-        sub => 'Foo::sub18',
-        p   => [ foo => 1, bar => 1 ],
+        sub     => 'Foo::sub18',
+        p       => [ foo => 1, bar => 1 ],
         options => { allow_extra => 1 },
         expect  => q{},
-        return => { foo => 1, bar => 1 },
+        return  => { foo => 1, bar => 1 },
     },
 
     {
@@ -585,8 +586,8 @@ my @Tests = (
     },
 
     {
-        sub => 'sub22',
-        p   => [ foo => [1] ],
+        sub    => 'sub22',
+        p      => [ foo => [1] ],
         expect =>
             qr|^The 'foo' parameter \("ARRAY\(0x[a-f0-9]+\)"\) to .* was an 'arrayref'.*|,
     },
@@ -602,8 +603,8 @@ my @Tests = (
         p      => [],
         expect => q{},
     }, {
-        sub => 'sub22a',
-        p   => [ foo => [1] ],
+        sub    => 'sub22a',
+        p      => [ foo => [1] ],
         expect =>
             qr|^The 'foo' parameter \("ARRAY\(0x[a-f0-9]+\)"\) to .* was an 'arrayref'.*|,
     }, {
@@ -669,7 +670,7 @@ sub run_tests {
             $test->{expect}
             && ( $test->{always_errors}
                 || !$ENV{PERL_NO_VALIDATION} )
-            ) {
+        ) {
             like( $@, $test->{expect}, "expect error with $sub" );
         }
         else {
@@ -711,15 +712,11 @@ sub sub2a {
 sub sub3 {
     validate(
         @_, {
-            foo => { type => SCALAR },
-            bar =>
-                { type => ARRAYREF },
-            baz =>
-                { type => HASHREF },
-            quux =>
-                { type => SCALAR | ARRAYREF },
-            brax =>
-                { type => SCALAR | HASHREF },
+            foo  => { type => SCALAR },
+            bar  => { type => ARRAYREF },
+            baz  => { type => HASHREF },
+            quux => { type => SCALAR | ARRAYREF },
+            brax => { type => SCALAR | HASHREF },
         }
     );
 }
@@ -727,13 +724,10 @@ sub sub3 {
 sub sub4 {
     validate(
         @_, {
-            foo => { type => SCALARREF },
-            bar =>
-                { type => GLOB },
-            baz =>
-                { type => GLOBREF },
-            quux =>
-                { type => CODEREF },
+            foo  => { type => SCALARREF },
+            bar  => { type => GLOB },
+            baz  => { type => GLOBREF },
+            quux => { type => CODEREF },
         }
     );
 }
@@ -926,8 +920,7 @@ sub sub26 {
     validate(
         @_, {
             foo => { type => SCALAR },
-            bar =>
-                { type => HANDLE, optional => 1 },
+            bar => { type => HANDLE, optional => 1 },
         },
     );
 }

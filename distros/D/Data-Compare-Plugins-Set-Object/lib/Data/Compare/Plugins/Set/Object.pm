@@ -20,7 +20,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '1.001';    # VERSION
+our $VERSION = '1.002';    # VERSION
 use English '-no_match_vars';
 use Data::Compare 0.06;
 use List::Util 'first';
@@ -64,8 +64,8 @@ __END__
 
 =encoding utf8
 
-=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
-kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords Mark Gardner cpan testmatrix url bugtracker rt cpants kwalitee diff irc
+mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ Data::Compare::Plugins::Set::Object - plugin for Data::Compare to handle Set::Ob
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -130,30 +130,6 @@ The following websites have more information about this module, and may be of he
 in addition to those websites please use your favorite search engine to discover more resources.
 
 =over 4
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Data-Compare-Plugins-Set-Object>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Data-Compare-Plugins-Set-Object>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Data-Compare-Plugins-Set-Object>
 
 =item *
 

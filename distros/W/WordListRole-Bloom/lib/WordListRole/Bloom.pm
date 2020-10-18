@@ -1,37 +1,52 @@
 package WordListRole::Bloom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-23'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'WordListRole-Bloom'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
 use Role::Tiny;
 
 sub word_exists {
+    no strict 'refs';
+
     require MIME::Base64;
 
     my ($self, $word) = @_;
 
     my $class = $self->{orig_class} || ref($self);
-    my $dyn = ${"$class\::DYNAMIC"};
-    die "Can't use bloom filter on a dynamic wordlist" if $dyn;
 
-    # XXX also search in dist sharedir
 
     my $bloom = ${"$class\::BLOOM_FILTER"};
 
     unless ($bloom) {
-        (my $wl_subpkg = $class) =~ s/\AWordList:://;
-        my $bloom_pkg = "WordListBloom::$wl_subpkg";
-        (my $bloom_pkg_pm = "$bloom_pkg.pm") =~ s!::!/!g;
-        require $bloom_pkg_pm;
-
-        my $fh = \*{"$bloom_pkg\::DATA"};
+        my $dist = ${"$class\::DIST"};
+        my $dir;
+        if ($dist) {
+            # if we are loading the installed version of module
+            require File::ShareDir;
+            eval { $dir = File::ShareDir::share_dir($dist) };
+        }
+        unless ($dir) {
+            # if we are loading the dev version of module
+            (my $classpm = "$class.pm") =~ s!::!/!g;
+            if ($INC{$classpm} && $INC{$classpm} =~ m!.+/!) {
+                $dir = $INC{$classpm};
+                $dir =~ s!(.+)/.+!$1!;
+                my $num_dcolons = 0; $num_dcolons++ while $class =~ /::/g;
+                $dir .= ("/.." x ($num_dcolons + 1)) . "/share";
+            }
+        }
+        die "Can't find share directory for $class" unless $dir;
+        die "No such share directory '$dir' for $class" unless -d $dir;
+        my $path = "$dir/bloom";
+        die "Can't find bloom filter data file in '$path'" unless -f $path;
         my $bloom_str = do {
             local $/;
-            MIME::Base64::decode_base64(<$fh>);
+            open my $fh, "<", $path or die "Can't read bloom filter data file '$path': $!";
+            scalar <$fh>;
         };
 
         require Algorithm::BloomFilter;
@@ -57,45 +72,45 @@ WordListRole::Bloom - Provide word_exists() that uses bloom filter
 
 =head1 VERSION
 
-This document describes version 0.005 of WordListRole::Bloom (from Perl distribution WordListRole-Bloom), released on 2020-05-23.
+This document describes version 0.006 of WordListRole::Bloom (from Perl distribution WordListRole-Bloom), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
-In your F<WordList/EN/Foo.pm>:
+In your F<lib/WordList/EN/Foo.pm>:
 
  package WordList::EN::Foo;
+
+ use parent 'WordList';
+
+ use Role::Tiny::With;
+ with 'WordListRole::Bloom';
 
  __DATA__
  word1
  word2
  ...
 
-In your F<WordListBloom/EN/Foo.pm>:
+In your F<share/bloom>, create your bloom filter data file, e.g. with
+L<bloomgen>:
 
- package WordListBloom::EN::Foo;
- 1;
- __DATA__
- (The actual bloom filter, base64-encoded)
+ % perl -ne 'print if (/^__DATA__$/ .. 0) && $i++' lib/WordList/EN/Foo.pm | \
+   bloomgen -n 1234 -p 0.1% > share/bloom
 
-Then:
+(where C<-n> is set to the number of words, C<-p> to the maximum false-positive
+rate).
 
- use Role::Tiny;
- use WordList::EN::Foo;
+After that, in F<yourscript.pl>:
+
  my $wl = WordList::EN::Foo->new;
- Role::Tiny->apply_roles_to_object($wl, 'WordListRole::Bloom');
-
  $wl->word_exists("foo"); # uses bloom filter to check for existence.
 
 =head1 DESCRIPTION
 
-EXPERIMENTAL.
-
 This role provides an alternative C<word_exists()> method that checks a bloom
-filter located in the data section of C<<
-WordListBloom::<Your_WordList_Subpackage> >>. This provides a low
-startup-overhead way to check an item against a big list (e.g. millions). Note
-that testing using a bloom filter can result in a false positive (i.e.
-C<word_exists()> returns true but the word is not actually in the list.
+filter located in the distribution share directory (F<share/bloom>). This
+provides a low startup-overhead way to check an item against a big list (e.g.
+millions). Note that testing using a bloom filter can result in a false positive
+(i.e. C<word_exists()> returns true but the word is not actually in the list.
 
 =head1 PROVIDED METHODS
 

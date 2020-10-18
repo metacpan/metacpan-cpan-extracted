@@ -80,8 +80,8 @@ sub read {
 
 # Create an object from a string
 sub read_string {
-    my $class = ref $_[0] ? ref shift : shift;
-    my $self = bless [], $class;
+    my $class  = ref $_[0] ? ref shift : shift;
+    my $self   = bless [], $class;
     my $string = $_[0];
     unless ( defined $string ) {
         return $self->_error("Did not provide a string to load");
@@ -100,7 +100,6 @@ sub read_string {
         return $self->_error("Stream has a non UTF-8 BOM");
     }
     else {
-
         # Strip UTF-8 bom if found, we'll just ignore it
         $string =~ s/^\357\273\277//;
     }
@@ -284,7 +283,6 @@ sub _read_array {
                     push @$array, undef;
                 }
                 else {
-
                     # Naked indenter
                     push @$array, [];
                     $self->_read_array( $array->[-1], [ @$indent, $indent2 ],
@@ -366,7 +364,6 @@ sub _read_hash {
                 $lines );
         }
         else {
-
             # An indent
             shift @$lines;
             unless (@$lines) {

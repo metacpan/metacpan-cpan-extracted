@@ -1,5 +1,9 @@
 Revision history for Text::Sprintf::Named
 
+0.0405  2020-10-18
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0404  2020-10-06
         * Dist-Zilla / tidyall / etc. cleanups and corrections.
             * Fairly minor and not related to the production-code.

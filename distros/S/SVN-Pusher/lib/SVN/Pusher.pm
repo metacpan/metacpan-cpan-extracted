@@ -141,7 +141,7 @@ sub get_wc_prop {
 
 package SVN::Pusher ;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use SVN::Core;
 use SVN::Repos;
 use SVN::Fs;
@@ -416,10 +416,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/SVN::Pusher>
 
 =item * CPAN Ratings
 

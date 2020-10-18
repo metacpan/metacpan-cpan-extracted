@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Parcats::Stream;
 use Chart::Plotly::Trace::Parcats::Tickfont;
 use Chart::Plotly::Trace::Parcats::Transform;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: Parallel categories diagram for multidimensional categorical data.
 
@@ -175,7 +175,7 @@ Chart::Plotly::Trace::Parcats - Parallel categories diagram for multidimensional
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

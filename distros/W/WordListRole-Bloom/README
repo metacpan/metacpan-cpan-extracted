@@ -2,45 +2,45 @@ NAME
     WordListRole::Bloom - Provide word_exists() that uses bloom filter
 
 VERSION
-    This document describes version 0.005 of WordListRole::Bloom (from Perl
-    distribution WordListRole-Bloom), released on 2020-05-23.
+    This document describes version 0.006 of WordListRole::Bloom (from Perl
+    distribution WordListRole-Bloom), released on 2020-05-24.
 
 SYNOPSIS
-    In your WordList/EN/Foo.pm:
+    In your lib/WordList/EN/Foo.pm:
 
      package WordList::EN::Foo;
+
+     use parent 'WordList';
+
+     use Role::Tiny::With;
+     with 'WordListRole::Bloom';
 
      __DATA__
      word1
      word2
      ...
 
-    In your WordListBloom/EN/Foo.pm:
+    In your share/bloom, create your bloom filter data file, e.g. with
+    bloomgen:
 
-     package WordListBloom::EN::Foo;
-     1;
-     __DATA__
-     (The actual bloom filter, base64-encoded)
+     % perl -ne 'print if (/^__DATA__$/ .. 0) && $i++' lib/WordList/EN/Foo.pm | \
+       bloomgen -n 1234 -p 0.1% > share/bloom
 
-    Then:
+    (where "-n" is set to the number of words, "-p" to the maximum
+    false-positive rate).
 
-     use Role::Tiny;
-     use WordList::EN::Foo;
+    After that, in yourscript.pl:
+
      my $wl = WordList::EN::Foo->new;
-     Role::Tiny->apply_roles_to_object($wl, 'WordListRole::Bloom');
-
      $wl->word_exists("foo"); # uses bloom filter to check for existence.
 
 DESCRIPTION
-    EXPERIMENTAL.
-
     This role provides an alternative "word_exists()" method that checks a
-    bloom filter located in the data section of
-    "WordListBloom::<Your_WordList_Subpackage>". This provides a low
-    startup-overhead way to check an item against a big list (e.g.
-    millions). Note that testing using a bloom filter can result in a false
-    positive (i.e. "word_exists()" returns true but the word is not actually
-    in the list.
+    bloom filter located in the distribution share directory (share/bloom).
+    This provides a low startup-overhead way to check an item against a big
+    list (e.g. millions). Note that testing using a bloom filter can result
+    in a false positive (i.e. "word_exists()" returns true but the word is
+    not actually in the list.
 
 PROVIDED METHODS
   word_exists

@@ -14,11 +14,10 @@ use Test::More;
 
 my $package   = 'Nuvol::Connector';
 my @constants = qw|API_URL AUTH_URL DEFAULTS INFO_URL NAME TOKEN_URL SERVICE|;
-my @defaults  = qw|app_id redirect_uri response_type scope|;
 my @role_methods
   = qw|_build_url _do_disconnect _get_description _get_name _load_drivelist _load_metadata _update_token|;
 
-sub build_test_connector ($service) {
+sub build_test_connector ($service, $params = {}) {
   note "Create test connector for $service";
 
   use_ok $package or BAIL_OUT "Unable to load $package";
@@ -26,7 +25,7 @@ sub build_test_connector ($service) {
   test_metadata_prerequisites $package, $service;
 
   my $configfile = tempdir->child('testconfig.conf');
-  ok my $object = $package->new($configfile, $service), 'Create object';
+  ok my $object = $package->new($configfile, $service, $params), 'Create object';
 
   return $object;
 }
@@ -45,7 +44,6 @@ sub test_basics ($connector, $service) {
   note 'Basics';
 
   can_ok $connector, $_ for @constants;
-  ok $connector->DEFAULTS->{$_}, "Default $_" for @defaults;
   like $connector->DEFAULTS->{response_type}, qr/code|token/,
     'Default for response_type is code or token';
 
@@ -62,9 +60,9 @@ sub test_config ($connector) {
   ok my $config = $connector->config, 'Get config';
   is $config->file,    $connector->configfile, 'Identical config file';
   is $config->service, $connector->SERVICE,    'Correct service';
-  for (@defaults) {
-    is $config->$_, $connector->DEFAULTS->{$_}, "Correct $_";
-  }
+  # for (@defaults) {
+  #   is $config->$_, $connector->DEFAULTS->{$_}, "Correct $_";
+  # }
 }
 
 sub test_constants ($connector, $constants) {
@@ -78,8 +76,8 @@ sub test_constants ($connector, $constants) {
 sub test_defaults ($connector, $defaults) {
   note 'Defaults';
 
-  for (@defaults) {
-    is $connector->DEFAULTS->{$_}, $defaults->{$_}, "Default $_";
+  for (sort keys $defaults->%*) {
+    ok exists $connector->DEFAULTS->{$_}, "Default $_";
   }
 }
 
@@ -124,6 +122,10 @@ L<Nuvol::Test::Connector> provides test functions for Nuvol connectors.
     $connector = build_test_connector $service;
 
 Returns a L<Nuvol::Connector> for the specified service, using a config file in a temporary folder.
+
+    $connector = build_test_connector $service, $params;
+
+Creates a connector with additional parameters.
 
 =head2 test_authenticate
 

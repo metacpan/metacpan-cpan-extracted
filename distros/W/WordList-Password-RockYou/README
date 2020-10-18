@@ -1,0 +1,40 @@
+NAME
+    WordList::Password::RockYou - RockYou password wordlist (~14.3mil
+    passwords)
+
+VERSION
+    This document describes version 0.001 of WordList::Password::RockYou
+    (from Perl distribution WordList-Password-RockYou), released on
+    2020-05-24.
+
+DESCRIPTION
+    This class' "word_exists()" uses linear search which is unusably slow.
+    For quick checking against wordlist, see
+    WordList::Password::RockYou::BloomOnly which uses bloom filter.
+
+METHODS
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Password-RockYou>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Password-RockYou>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Password-Roc
+    kYou>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,10 +1,10 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::App;
 # ABSTRACT: A document viewing application
-$Renard::Curie::App::VERSION = '0.004';
+$Renard::Curie::App::VERSION = '0.005';
 use Moo 2.001001;
 
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Intertangle::API::Gtk3::Helper;
 
 use File::Spec;
 use File::Basename;
@@ -92,7 +92,7 @@ Renard::Curie::App - A document viewing application
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

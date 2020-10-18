@@ -25,6 +25,7 @@
 You can install simple-backuper from CPAN (perl packages repository) or directly from github.
 
 ## From CPAN
+
 `cpan install App::SimpleBackuper`
 
 ## From GitHub
@@ -34,6 +35,9 @@ You can install simple-backuper from CPAN (perl packages repository) or directly
 - `make`
 - `perl Makefile.pl`
 - `sudo make install`
+
+Required libraries you can install from your distro package manager:
+`apt install libcrypt-rijndael-perl libcrypt-openssl-rsa-perl libcompress-raw-lzma-perl libdigest-sha-perl libtext-glob-perl libtry-tiny-perl libnet-sftp-foreign-perl libconst-fast-perl libmime-base64-perl libjson-pp-perl`
 
 # Configuring
 

@@ -20,27 +20,21 @@ note 'Constants';
 can_ok $package, $_ for qw|CONFIG_PARAMS|;
 
 is $package->CONFIG_PARAMS,
-  'access_token app_id redirect_uri refresh_token response_type scope service validto',
+  'access_token app_id app_secret redirect_uri refresh_token response_type scope service validto',
   'Config param keys';
 
 note 'Create object';
 
 my %test_params = (
   app_id        => 'my app id',
+  app_secret    => 'my app secret',
   redirect_uri  => 'redirect uri',
   response_type => 'response_type',
   scope         => 'none',
   service       => $service
 );
 
-my %config_params;
-for my $key (sort keys %test_params) {
-  eval { $package->new($configfile, \%config_params) };
-  like $@, qr/Parameter $key missing!/, "Error for missing $key";
-  $config_params{$key} = $test_params{$key};
-}
-
-ok my $config = $package->new($configfile, \%config_params), 'Create object';
+ok my $config = $package->new($configfile, \%test_params), 'Create object';
 ok -e $configfile, 'Config file exists';
 
 note 'Content';

@@ -1,130 +1,128 @@
 NAME
+
     Dist::Zilla::Plugin::UploadToSFTP - Upload tarball to my own site
 
 VERSION
-    version 0.002
+
+    version 0.003
 
 DESCRIPTION
+
         ; in dzil.ini
         [UploadToSFTP]
         site        = sftp.geocities.invalid
         directory   = /Heartland/Meadows/3044
         debug       = 0
-
+    
         # in $HOME/.netrc
         machine sftp.geocities.invalid login mjgardner password drowssap
 
-    This is a Dist::Zilla::Role::Releaser plugin that uploads a distribution
-    tarball to an SFTP site. It can be used in addition to
+    This is a Dist::Zilla::Role::Releaser plugin that uploads a
+    distribution tarball to an SFTP site. It can be used in addition to
     Dist::Zilla::Plugin::UploadToCPAN or in its place. In fact I wrote it
     for the latter case so that I could release proprietary distributions
     inhouse.
 
-  .netrc file
+ .netrc file
+
     The .netrc file is described in Net::Netrc and should have an entry in
     it matching the site given in the dzil.ini file and specifying the
     username and password.
 
 ATTRIBUTES
-  site
+
+ site
+
     The SFTP site to upload to.
 
-  directory
+ directory
+
     The directory on the SFTP site to upload the tarball to.
 
-  debug
-    Tells "ssh" to run in verbose mode. Defaults to 0.
+ debug
+
+    Tells ssh to run in verbose mode. Defaults to 0.
 
 METHODS
-  release
+
+ release
+
     Uploads the tarball to the specified site and directory.
 
 SEE ALSO
+
     Dist::Zilla
+
     Dist::Zilla::Plugin::CSJEWELL::FTPUploadToOwnSite
-        The original inspiration for this module.
+
+      The original inspiration for this module.
 
 SUPPORT
-  Perldoc
+
+ Perldoc
+
     You can find documentation for this module with the perldoc command.
 
       perldoc Dist::Zilla::Plugin::UploadToSFTP
 
-  Websites
+ Websites
+
     The following websites have more information about this module, and may
     be of help to you. As always, in addition to those websites please use
     your favorite search engine to discover more resources.
 
-    *   Search CPAN
+      * CPANTS
 
-        The default CPAN search engine, useful to view POD in HTML format.
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
 
-        <http://search.cpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
+      http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-UploadToSFTP
 
-    *   AnnoCPAN
+      * CPAN Testers
 
-        The AnnoCPAN is a website that allows community annonations of Perl
-        module documentation.
+      The CPAN Testers is a network of smoke testers who run automated
+      tests on uploaded CPAN distributions.
 
-        <http://annocpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
+      http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-UploadToSFTP
 
-    *   CPAN Ratings
+      * CPAN Testers Matrix
 
-        The CPAN Ratings is a website that allows community ratings and
-        reviews of Perl modules.
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
 
-        <http://cpanratings.perl.org/d/Dist-Zilla-Plugin-UploadToSFTP>
+      http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-UploadToSFTP
 
-    *   CPANTS
+      * CPAN Testers Dependencies
 
-        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
-        of a distribution.
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
 
-        <http://cpants.perl.org/dist/overview/Dist-Zilla-Plugin-UploadToSFTP
-        >
+      http://deps.cpantesters.org/?module=Dist::Zilla::Plugin::UploadToSFTP
 
-    *   CPAN Testers
+ Bugs / Feature Requests
 
-        The CPAN Testers is a network of smokers who run automated tests on
-        uploaded CPAN distributions.
-
-        <http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-UploadToSFTP>
-
-    *   CPAN Testers Matrix
-
-        The CPAN Testers Matrix is a website that provides a visual way to
-        determine what Perls/platforms PASSed for a distribution.
-
-        <http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-UploadToSFTP>
-
-    *   CPAN Testers Dependencies
-
-        The CPAN Testers Dependencies is a website that shows a chart of the
-        test results of all dependencies for a distribution.
-
-        <http://deps.cpantesters.org/?module=Dist::Zilla::Plugin::UploadToSF
-        TP>
-
-  Bugs / Feature Requests
     Please report any bugs or feature requests through the web interface at
-    <https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP/issues>.
-    You will be automatically notified of any progress on the request by the
+    https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP/issues. You
+    will be automatically notified of any progress on the request by the
     system.
 
-  Source Code
+ Source Code
+
     The code is open to the world, and available for you to hack on. Please
     feel free to browse it and play with it, or whatever. If you want to
     contribute patches, please send me a diff or prod me to pull from your
     repository :)
 
-    <https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP>
+    https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP
 
       git clone git://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP.git
 
 AUTHOR
+
     Mark Gardner <mjgardner@cpan.org>
 
 COPYRIGHT AND LICENSE
+
     This software is copyright (c) 2011 by GSI Commerce.
 
     This is free software; you can redistribute it and/or modify it under

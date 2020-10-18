@@ -1,5 +1,7 @@
 Revision history for Data-Compare-Plugins-Set-Object
 
+1.002     2020-10-17 16:47:23-05:00 America/Chicago
+    Documentation change: remove defunct AnnoCPAN site
 1.001     2017-10-23 13:17:48-05:00 America/Chicago
     Bring up to modern Perl development standards. No functional changes.
     Now requires Perl 5.10.

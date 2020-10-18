@@ -1,5 +1,8 @@
 Revision history for perl distribution Nuvol
 
+0.03 2020-10-18T16:03:42+0200
+  - Nuvol::autoconnect function
+
 0.02 2020-02-24T06:48:10+0100
   - Support for Dropbox
   - Method for realpath

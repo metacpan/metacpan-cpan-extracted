@@ -10,7 +10,7 @@ use Path::Tiny;
 use LWP::UserAgent;
 use utf8;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 sub save_image {
     my %params = @_;
@@ -47,7 +47,7 @@ Chart::Plotly::Image::Orca::Client - Export static images of Plotly charts using
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

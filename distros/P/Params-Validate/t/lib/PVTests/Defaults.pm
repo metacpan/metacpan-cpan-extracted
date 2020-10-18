@@ -126,7 +126,7 @@ sub run_tests {
     }
 
     {
-        my $spec = { foobar => { default => [] } };
+        my $spec  = { foobar => { default => [] } };
         my $test1 = validate_with( params => [], spec => $spec );
         $test1->{foobar} = ['x'];
 
@@ -147,9 +147,9 @@ sub foo {
     return validate(
         @params, {
             a => 1,
-            b => { default => 99 },
+            b => { default  => 99 },
             c => { optional => 1, default => 42 },
-            d => { default => 0 },
+            d => { default  => 0 },
         }
     );
 }

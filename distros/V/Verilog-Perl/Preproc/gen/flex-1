@@ -1352,7 +1352,7 @@ char *yytext;
  *
  * Author: Wilson Snyder <wsnyder@wsnyder.org>
  *
- * Code available from: http://www.veripool.org/systemperl
+ * Code available from: https://www.veripool.org/verilog-perl
  *
  ******************************************************************************
  *
@@ -1409,16 +1409,23 @@ void yyerrorf(const char* format, ...) {
     yyerror(msg);
 }
 
+static bool isWhitespace(const std::string& str) {
+    for (std::string::const_iterator pos = str.begin(); pos != str.end(); ++pos) {
+        if (!isspace(*pos)) return false;
+    }
+    return true;
+}
+
 /**********************************************************************/
-#line 1414 "VPreLex_pretmp.cpp"
+#line 1421 "VPreLex_pretmp.cpp"
 
 /* drop: Drop Ctrl-Z - can't pass thru or may EOF the output too soon */
 /* Where we use symb/symbdef, we must also look for a `` join */
 /* Note in the preprocessor \ESCaped is *not* always special; mantis1537/bug441 */
 /* Case insensitive; unfortunately ?i: isn't in flex 2.5.4 which is popular */
-#line 112 "VPreLex.l"
+#line 119 "VPreLex.l"
 	/**************************************************************/
-#line 1422 "VPreLex_pretmp.cpp"
+#line 1429 "VPreLex_pretmp.cpp"
 
 #define INITIAL 0
 #define CMTMODE 1
@@ -1659,10 +1666,10 @@ YY_DECL
 		}
 
 	{
-#line 113 "VPreLex.l"
+#line 120 "VPreLex.l"
 
 
-#line 1666 "VPreLex_pretmp.cpp"
+#line 1673 "VPreLex_pretmp.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1728,70 +1735,70 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 115 "VPreLex.l"
+#line 122 "VPreLex.l"
 { }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 116 "VPreLex.l"
+#line 123 "VPreLex.l"
 { LEXP->lineDirective(yytext);
 						  return(VP_LINE); }
 	YY_BREAK
 /* Special directives we recognize */
 case 3:
 YY_RULE_SETUP
-#line 120 "VPreLex.l"
+#line 127 "VPreLex.l"
 { return(VP_DEFINE); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 121 "VPreLex.l"
+#line 128 "VPreLex.l"
 { return(VP_ELSE); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 122 "VPreLex.l"
+#line 129 "VPreLex.l"
 { return(VP_ELSIF); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 123 "VPreLex.l"
+#line 130 "VPreLex.l"
 { return(VP_ENDIF); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 124 "VPreLex.l"
+#line 131 "VPreLex.l"
 { return(VP_IFDEF); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 125 "VPreLex.l"
+#line 132 "VPreLex.l"
 { return(VP_IFNDEF); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 126 "VPreLex.l"
+#line 133 "VPreLex.l"
 { return(VP_INCLUDE); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 127 "VPreLex.l"
+#line 134 "VPreLex.l"
 { return(VP_UNDEF); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 128 "VPreLex.l"
+#line 135 "VPreLex.l"
 { return(VP_UNDEFINEALL); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 129 "VPreLex.l"
+#line 136 "VPreLex.l"
 { if (!pedantic()) return (VP_ERROR); else return(VP_DEFREF); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 130 "VPreLex.l"
+#line 137 "VPreLex.l"
 { static string rtnfile;
 			  rtnfile = '"'; rtnfile += LEXP->curFilelinep()->filename();
 			  rtnfile += '"'; yytext=(char*)rtnfile.c_str(); yyleng = rtnfile.length();
@@ -1799,7 +1806,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 134 "VPreLex.l"
+#line 141 "VPreLex.l"
 { static char buf[10];
 			  sprintf(buf, "%d",LEXP->curFilelinep()->lineno());
 	                  yytext = buf; yyleng = strlen(yytext);
@@ -1808,44 +1815,44 @@ YY_RULE_SETUP
 /* Pass-through strings */
 case 15:
 YY_RULE_SETUP
-#line 140 "VPreLex.l"
+#line 147 "VPreLex.l"
 { yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(STRMODE):
-#line 141 "VPreLex.l"
+#line 148 "VPreLex.l"
 { linenoInc(); yyerrorf("EOF in unterminated string"); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 142 "VPreLex.l"
+#line 149 "VPreLex.l"
 { linenoInc(); yyerrorf("Unterminated string"); BEGIN(INITIAL); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 143 "VPreLex.l"
+#line 150 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 144 "VPreLex.l"
+#line 151 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 145 "VPreLex.l"
+#line 152 "VPreLex.l"
 { linenoInc(); yymore(); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 146 "VPreLex.l"
+#line 153 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 147 "VPreLex.l"
+#line 154 "VPreLex.l"
 { yy_pop_state();
 			  if (LEXP->m_parenLevel || LEXP->m_defQuote) { LEXP->m_defQuote=false; appendDefValue(yytext,yyleng); yyleng=0; }
 			  else return (VP_STRING); }
@@ -1853,300 +1860,300 @@ YY_RULE_SETUP
 /* Stringification */
 case 22:
 YY_RULE_SETUP
-#line 152 "VPreLex.l"
+#line 159 "VPreLex.l"
 { yy_push_state(STRIFY); return VP_STRIFY; }
 	YY_BREAK
 case YY_STATE_EOF(STRIFY):
-#line 153 "VPreLex.l"
+#line 160 "VPreLex.l"
 { linenoInc(); yyerrorf("EOF in unterminated '\""); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 154 "VPreLex.l"
+#line 161 "VPreLex.l"
 { return VP_BACKQUOTE; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 155 "VPreLex.l"
+#line 162 "VPreLex.l"
 { yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 156 "VPreLex.l"
+#line 163 "VPreLex.l"
 { yy_pop_state(); return VP_STRIFY; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 157 "VPreLex.l"
+#line 164 "VPreLex.l"
 { return (VP_SYMBOL); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 158 "VPreLex.l"
+#line 165 "VPreLex.l"
 { yyleng-=2; return (VP_SYMBOL_JOIN); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 159 "VPreLex.l"
+#line 166 "VPreLex.l"
 { return (VP_DEFREF); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 160 "VPreLex.l"
+#line 167 "VPreLex.l"
 { yyleng-=2; return (VP_DEFREF_JOIN); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 161 "VPreLex.l"
+#line 168 "VPreLex.l"
 { yyleng-=2; return (VP_JOIN); }
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 162 "VPreLex.l"
+#line 169 "VPreLex.l"
 { linenoInc(); yytext=(char*)"\n"; yyleng=1; return(VP_WHITE); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 163 "VPreLex.l"
+#line 170 "VPreLex.l"
 { return (VP_WHITE); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 164 "VPreLex.l"
+#line 171 "VPreLex.l"
 { }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 165 "VPreLex.l"
+#line 172 "VPreLex.l"
 { }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 166 "VPreLex.l"
+#line 173 "VPreLex.l"
 { return (VP_TEXT); }
 	YY_BREAK
 /* Protected blocks */
 case 36:
 YY_RULE_SETUP
-#line 169 "VPreLex.l"
+#line 176 "VPreLex.l"
 { yy_push_state(PRTMODE); yymore(); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 170 "VPreLex.l"
+#line 177 "VPreLex.l"
 { yy_push_state(PRTMODE); yymore(); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 171 "VPreLex.l"
+#line 178 "VPreLex.l"
 { yy_push_state(PRTMODE); yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(PRTMODE):
-#line 172 "VPreLex.l"
+#line 179 "VPreLex.l"
 { linenoInc(); yyerrorf("EOF in `protected"); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 39:
 /* rule 39 can match eol */
 YY_RULE_SETUP
-#line 173 "VPreLex.l"
+#line 180 "VPreLex.l"
 { linenoInc(); return VP_TEXT; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 174 "VPreLex.l"
+#line 181 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 175 "VPreLex.l"
+#line 182 "VPreLex.l"
 { yy_pop_state(); return VP_TEXT; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 176 "VPreLex.l"
+#line 183 "VPreLex.l"
 { yy_pop_state(); return VP_TEXT; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 177 "VPreLex.l"
+#line 184 "VPreLex.l"
 { yy_pop_state(); return VP_TEXT; }
 	YY_BREAK
 /* Pass-through include <> filenames */
 case YY_STATE_EOF(INCMODE):
-#line 180 "VPreLex.l"
+#line 187 "VPreLex.l"
 { linenoInc(); yyerrorf("EOF in unterminated include filename"); yyleng=0; yyterminate(); }
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 181 "VPreLex.l"
+#line 188 "VPreLex.l"
 { linenoInc(); yyerrorf("Unterminated include filename"); BEGIN(INITIAL); }
 	YY_BREAK
 case 45:
 /* rule 45 can match eol */
 YY_RULE_SETUP
-#line 182 "VPreLex.l"
+#line 189 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 183 "VPreLex.l"
+#line 190 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 184 "VPreLex.l"
+#line 191 "VPreLex.l"
 { yy_pop_state(); return VP_STRING; }
 	YY_BREAK
 /* Reading definition formal parenthesis (or not) to begin formal arguments */
 /* Note '(' must IMMEDIATELY follow definition name */
 case 48:
 YY_RULE_SETUP
-#line 188 "VPreLex.l"
+#line 195 "VPreLex.l"
 { appendDefValue("(",1); LEXP->m_formalLevel=1; BEGIN(DEFFORM); }
 	YY_BREAK
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 189 "VPreLex.l"
+#line 196 "VPreLex.l"
 { yy_pop_state(); unput('\n'); yyleng=0; return VP_DEFFORM; } /* DEFVAL will later grab the return */
 	YY_BREAK
 case YY_STATE_EOF(DEFFPAR):
-#line 190 "VPreLex.l"
+#line 197 "VPreLex.l"
 { yy_pop_state(); return VP_DEFFORM; }  /* empty formals */
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 191 "VPreLex.l"
+#line 198 "VPreLex.l"
 { yy_pop_state(); unput(yytext[yyleng-1]); yyleng=0; return VP_DEFFORM; }  /* empty formals */
 	YY_BREAK
 /* Reading definition formals (declaration of a define) */
 case 51:
 YY_RULE_SETUP
-#line 194 "VPreLex.l"
+#line 201 "VPreLex.l"
 { appendDefValue(yytext,yyleng); yyleng=0; ++LEXP->m_formalLevel; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 195 "VPreLex.l"
+#line 202 "VPreLex.l"
 { appendDefValue(yytext,yyleng); yyleng=0; if ((--LEXP->m_formalLevel)==0) { yy_pop_state(); return VP_DEFFORM; } }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 196 "VPreLex.l"
+#line 203 "VPreLex.l"
 { yy_push_state(CMTMODE); yymore(); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 197 "VPreLex.l"
+#line 204 "VPreLex.l"
 { return (VP_COMMENT);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 198 "VPreLex.l"
+#line 205 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(DEFFORM):
-#line 199 "VPreLex.l"
+#line 206 "VPreLex.l"
 { linenoInc(); yy_pop_state(); yyerrorf("Unterminated ( in define formal arguments."); yyleng=0; return VP_DEFFORM; }
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
 YY_RULE_SETUP
-#line 200 "VPreLex.l"
+#line 207 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\n",1); } /* Include return so can maintain output line count */
 	YY_BREAK
 case 57:
 /* rule 57 can match eol */
 YY_RULE_SETUP
-#line 201 "VPreLex.l"
+#line 208 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\\\n",2); } /* Include return so can maintain output line count */
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 202 "VPreLex.l"
+#line 209 "VPreLex.l"
 { LEXP->m_defQuote=true; yy_push_state(STRMODE); yymore(); }  /* Legal only in default values */
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 203 "VPreLex.l"
+#line 210 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }  /* Maybe illegal, otherwise in default value */
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 204 "VPreLex.l"
+#line 211 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }  /* Maybe illegal, otherwise in default value */
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 205 "VPreLex.l"
+#line 212 "VPreLex.l"
 { LEXP->m_formalLevel++; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 206 "VPreLex.l"
+#line 213 "VPreLex.l"
 { LEXP->m_formalLevel--; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 63:
-#line 208 "VPreLex.l"
+#line 215 "VPreLex.l"
 case 64:
-#line 209 "VPreLex.l"
+#line 216 "VPreLex.l"
 case 65:
 YY_RULE_SETUP
-#line 209 "VPreLex.l"
+#line 216 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }
 	YY_BREAK
 /* Reading definition value (declaration of a define's text) */
 case 66:
 YY_RULE_SETUP
-#line 212 "VPreLex.l"
+#line 219 "VPreLex.l"
 { LEXP->m_defCmtSlash=false; yy_push_state(DEFCMT); yymore(); }  /* Special comment parser */
 	YY_BREAK
 case 67:
 /* rule 67 can match eol */
 YY_RULE_SETUP
-#line 213 "VPreLex.l"
+#line 220 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\n",1); }  /* Spec says // not part of define value */
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 214 "VPreLex.l"
+#line 221 "VPreLex.l"
 { return (VP_COMMENT);}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 215 "VPreLex.l"
+#line 222 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(DEFVAL):
-#line 216 "VPreLex.l"
+#line 223 "VPreLex.l"
 { linenoInc(); yy_pop_state(); yytext=(char*)"\n"; yyleng=1; return (VP_DEFVALUE); } /* Technically illegal, but people complained */
 	YY_BREAK
 case 70:
 /* rule 70 can match eol */
 YY_RULE_SETUP
-#line 217 "VPreLex.l"
+#line 224 "VPreLex.l"
 { linenoInc(); yy_pop_state(); yytext=(char*)"\n"; yyleng=1; return (VP_DEFVALUE); }
 	YY_BREAK
 case 71:
 /* rule 71 can match eol */
 YY_RULE_SETUP
-#line 218 "VPreLex.l"
+#line 225 "VPreLex.l"
 { linenoInc(); appendDefValue((char*)"\\\n",2); } /* Return, AND \ is part of define value */
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 219 "VPreLex.l"
+#line 226 "VPreLex.l"
 { LEXP->m_defQuote=true; yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case 73:
-#line 221 "VPreLex.l"
+#line 228 "VPreLex.l"
 case 74:
-#line 222 "VPreLex.l"
+#line 229 "VPreLex.l"
 case 75:
 YY_RULE_SETUP
-#line 222 "VPreLex.l"
+#line 229 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }
 	YY_BREAK
 /* Comments inside define values - if embedded get added to define value per spec */
@@ -2154,95 +2161,101 @@ YY_RULE_SETUP
 /* - if all but (say) 3rd line is missing \ then it's indeterminate */
 case 76:
 YY_RULE_SETUP
-#line 227 "VPreLex.l"
+#line 234 "VPreLex.l"
 { yy_pop_state(); appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 228 "VPreLex.l"
+#line 235 "VPreLex.l"
 { linenoInc(); LEXP->m_defCmtSlash=true;
 	 		  appendDefValue(yytext,yyleng-2); appendDefValue((char*)"\n",1); }  /* Return but not \ */
 	YY_BREAK
 case 78:
 /* rule 78 can match eol */
 YY_RULE_SETUP
-#line 230 "VPreLex.l"
+#line 237 "VPreLex.l"
 { linenoInc(); yymore(); if (LEXP->m_defCmtSlash) yyerrorf("One line of /* ... */ is missing \\ before newline");
 			  BEGIN(CMTMODE); }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 232 "VPreLex.l"
+#line 239 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 233 "VPreLex.l"
+#line 240 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(DEFCMT):
-#line 234 "VPreLex.l"
+#line 241 "VPreLex.l"
 { yyerrorf("EOF in '/* ... */' block comment\n"); yyleng=0; yyterminate(); }
 	YY_BREAK
 /* Define arguments (use of a define) */
 case 81:
 YY_RULE_SETUP
-#line 237 "VPreLex.l"
+#line 244 "VPreLex.l"
 { yy_push_state(CMTMODE); yymore(); }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 238 "VPreLex.l"
+#line 245 "VPreLex.l"
 { return (VP_COMMENT);}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 239 "VPreLex.l"
+#line 246 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(ARGMODE):
-#line 240 "VPreLex.l"
+#line 247 "VPreLex.l"
 { yyerrorf("EOF in define argument list\n"); yyleng = 0; yyterminate(); }
 	YY_BREAK
 case 84:
 /* rule 84 can match eol */
 YY_RULE_SETUP
-#line 241 "VPreLex.l"
+#line 248 "VPreLex.l"
 { linenoInc(); yytext=(char*)"\n"; yyleng=1; return(VP_WHITE); }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 242 "VPreLex.l"
+#line 249 "VPreLex.l"
 { yy_push_state(STRMODE); yymore(); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 243 "VPreLex.l"
+#line 250 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }  /* Literal text */
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 244 "VPreLex.l"
+#line 251 "VPreLex.l"
 { yy_push_state(STRIFY); return(VP_STRIFY); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 245 "VPreLex.l"
+#line 252 "VPreLex.l"
 { LEXP->m_parenLevel++; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 246 "VPreLex.l"
+#line 253 "VPreLex.l"
 { LEXP->m_parenLevel--; appendDefValue(yytext,yyleng); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 247 "VPreLex.l"
+#line 254 "VPreLex.l"
 { LEXP->m_parenLevel++;
 			  // Note paren level 0 means before "(" of starting args
 			  // Level 1 means "," between arguments
 			  // Level 2+ means one argument's internal ()
+                          if (LEXP->m_parenLevel == 1) {  // Starting (
+                              if (!isWhitespace(LEXP->m_defValue)) {
+                                  yyerrorf("Illegal text before '(' that starts define arguments: '%s'",
+                                           LEXP->m_defValue.c_str());
+                              }
+                          }
 			  if (LEXP->m_parenLevel>1) {
 			      appendDefValue(yytext,yyleng);
 			  } else {
@@ -2251,7 +2264,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 256 "VPreLex.l"
+#line 269 "VPreLex.l"
 { LEXP->m_parenLevel--;
 			  if (LEXP->m_parenLevel>0) {
 			      appendDefValue(yytext,yyleng);
@@ -2261,7 +2274,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 262 "VPreLex.l"
+#line 275 "VPreLex.l"
 { if (LEXP->m_parenLevel>1) {
 			      appendDefValue(yytext,yyleng);
 			  } else {
@@ -2270,37 +2283,37 @@ YY_RULE_SETUP
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 267 "VPreLex.l"
+#line 280 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }  /* defref in defref - outer macro expands first */
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 268 "VPreLex.l"
+#line 281 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }  /* defref in defref - outer macro expands first */
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 269 "VPreLex.l"
+#line 282 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }  /* defref in defref - outer macro expands first */
 	YY_BREAK
 case 96:
-#line 271 "VPreLex.l"
+#line 284 "VPreLex.l"
 case 97:
 YY_RULE_SETUP
-#line 271 "VPreLex.l"
+#line 284 "VPreLex.l"
 { appendDefValue(yytext,yyleng); }
 	YY_BREAK
 /* Translate offs.  Note final newline not included */
 case 98:
 YY_RULE_SETUP
-#line 274 "VPreLex.l"
+#line 287 "VPreLex.l"
 {
 			  if (LEXP->m_synthesis) { yy_push_state(OFFMODE); }
 			  return(VP_COMMENT); }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 277 "VPreLex.l"
+#line 290 "VPreLex.l"
 {
 			  if (LEXP->m_synthesis) { yy_pop_state(); }
 			  return(VP_COMMENT); }
@@ -2308,136 +2321,136 @@ YY_RULE_SETUP
 case 100:
 /* rule 100 can match eol */
 YY_RULE_SETUP
-#line 280 "VPreLex.l"
+#line 293 "VPreLex.l"
 { linenoInc(); yymore(); }  /* Need to end the / / */
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 281 "VPreLex.l"
+#line 294 "VPreLex.l"
 { }
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 282 "VPreLex.l"
+#line 295 "VPreLex.l"
 { }
 	YY_BREAK
 case YY_STATE_EOF(OFFMODE):
-#line 283 "VPreLex.l"
+#line 296 "VPreLex.l"
 { yyerrorf("EOF in '/*synthesis translate_off*/' region\n"); yyleng=0; yyterminate(); }
 	YY_BREAK
 /* One line comments. Note final newline not included */
 case 103:
 YY_RULE_SETUP
-#line 286 "VPreLex.l"
+#line 299 "VPreLex.l"
 { return (VP_COMMENT); }
 	YY_BREAK
 /* C-style comments. */
 /**** See also DEFCMT */
 case 104:
 YY_RULE_SETUP
-#line 290 "VPreLex.l"
+#line 303 "VPreLex.l"
 { yy_push_state(CMTMODE); yymore(); }
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 291 "VPreLex.l"
+#line 304 "VPreLex.l"
 { yy_pop_state(); return(VP_COMMENT); }
 	YY_BREAK
 case 106:
 /* rule 106 can match eol */
 YY_RULE_SETUP
-#line 292 "VPreLex.l"
+#line 305 "VPreLex.l"
 { linenoInc(); yymore(); }
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 293 "VPreLex.l"
+#line 306 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 294 "VPreLex.l"
+#line 307 "VPreLex.l"
 { yymore(); }
 	YY_BREAK
 case YY_STATE_EOF(CMTMODE):
-#line 295 "VPreLex.l"
+#line 308 "VPreLex.l"
 { yyerrorf("EOF in '/* ... */' block comment\n"); yyleng=0; yyterminate(); }
 	YY_BREAK
 /* Define calls */
 /* symbdef prevents normal lex rules from making `\`"foo a symbol {`"foo} instead of a BACKQUOTE */
 case 109:
 YY_RULE_SETUP
-#line 299 "VPreLex.l"
+#line 312 "VPreLex.l"
 { return (VP_DEFREF); }
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 300 "VPreLex.l"
+#line 313 "VPreLex.l"
 { yyleng-=2; return (VP_DEFREF_JOIN); }
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 301 "VPreLex.l"
+#line 314 "VPreLex.l"
 { yyleng-=2; return (VP_JOIN); }
 	YY_BREAK
 /* Generics */
 case YY_STATE_EOF(INITIAL):
-#line 304 "VPreLex.l"
+#line 317 "VPreLex.l"
 { yyterminate(); }  /* A "normal" EOF */
 	YY_BREAK
 case 112:
 /* rule 112 can match eol */
 YY_RULE_SETUP
-#line 305 "VPreLex.l"
+#line 318 "VPreLex.l"
 { linenoInc(); yytext=(char*)"\n"; yyleng=1; return(VP_WHITE); }
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 306 "VPreLex.l"
+#line 319 "VPreLex.l"
 { return (VP_SYMBOL); }
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 307 "VPreLex.l"
+#line 320 "VPreLex.l"
 { yyleng-=2; return (VP_SYMBOL_JOIN); }
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 308 "VPreLex.l"
+#line 321 "VPreLex.l"
 { yyleng-=2; return (VP_JOIN); }
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 309 "VPreLex.l"
+#line 322 "VPreLex.l"
 { }
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 310 "VPreLex.l"
+#line 323 "VPreLex.l"
 { if (!keepWhitespace()) { yytext=(char*)" "; yyleng=1; } return VP_WHITE; }
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 311 "VPreLex.l"
+#line 324 "VPreLex.l"
 { }
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 312 "VPreLex.l"
+#line 325 "VPreLex.l"
 { return (VP_TEXT); }
 	YY_BREAK
 case 120:
 /* rule 120 can match eol */
 YY_RULE_SETUP
-#line 314 "VPreLex.l"
+#line 327 "VPreLex.l"
 { yymore(); }	/* Prevent hitting ECHO; */
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 315 "VPreLex.l"
+#line 328 "VPreLex.l"
 ECHO;
 	YY_BREAK
-#line 2441 "VPreLex_pretmp.cpp"
+#line 2454 "VPreLex_pretmp.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -3489,7 +3502,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 315 "VPreLex.l"
+#line 328 "VPreLex.l"
 
 
 void VPreLex::pushStateDefArg(int level) {

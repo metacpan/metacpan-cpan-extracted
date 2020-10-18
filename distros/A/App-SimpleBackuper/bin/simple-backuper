@@ -41,7 +41,7 @@ GetOptions(
 
 my $command = shift;
 
-$options{cfg} //= '~/.simple-backuper/config' if $command and grep {$command eq $_} qw(backup info storage-check storage-fix stats);
+$options{cfg} //= '~/.simple-backuper/config' if $command and grep {$command eq $_} qw(backup storage-check storage-fix stats);
 
 my %state = (profile => {total => - Time::HiRes::time});
 
@@ -118,7 +118,7 @@ if($options{cfg}) {
 	}
 }
 
-if($options{storage} and grep {$command eq $_} qw(backup restore storage-check storage-fix)) {
+if($options{storage} and grep {$command eq $_} qw(backup restore-db restore storage-check storage-fix)) {
 	if($options{storage} =~ /^[^:]+:/) {
 		$state{storage} = App::SimpleBackuper::StorageSFTP->new( $options{storage} );
 	}
@@ -182,7 +182,8 @@ elsif($command eq 'backup') {
 elsif($command eq 'info') {
 	use Fcntl ':mode'; # For S_ISDIR & same	
 	
-	@{ $state{db}->{backups} } or usage("Database file is not exists or empty. May be your backups database is located in backup storage. You can restore in here with 'restore-db' command");
+	($state{db} and $state{db}->{backups} and @{ $state{db}->{backups} })
+		or usage("Database file is not exists or empty. May be your backups database is located in backup storage. You can restore in here with 'restore-db' command");
 	
 	my $result = App::SimpleBackuper::Info(\%options, \%state);
 	
@@ -245,7 +246,8 @@ elsif($command eq 'info') {
 }
 elsif($command eq 'restore') {
 	
-	@{ $state{db}->{backups} } or usage("Database file is not exists or empty. May be your backups database is located in backup storage. You can restore in here with 'restore-db' command");
+	($state{db}->{backups} and @{ $state{db}->{backups} })
+		or usage("Database file is not exists or empty. May be your backups database is located in backup storage. You can restore in here with 'restore-db' command");
 	
 	$options{$_} or usage("Required option --$_ doesn't specified") foreach qw(path destination storage backup-name);
 	
@@ -259,7 +261,7 @@ elsif($command eq 'restore') {
 }
 elsif($command eq 'restore-db') {
 	
-	! @{ $state{db}->{backups} }
+	! $state{db} or ! @{ $state{db}->{backups} }
 		or usage(qq|Database already exists and contains |.@{ $state{db}->{backups} }.qq| backups. |
 			.qq|If you want to rewrite database file with restored one, please delete current database file $options{db}|);
 	

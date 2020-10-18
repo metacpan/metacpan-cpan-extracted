@@ -1,9 +1,9 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::Outline;
 # ABSTRACT: Component that provides a list of headings for navigating
-$Renard::Curie::Component::Outline::VERSION = '0.004';
+$Renard::Curie::Component::Outline::VERSION = '0.005';
 use Moo;
-use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Intertangle::API::Gtk3::Helper;
 use Glib 'TRUE', 'FALSE';
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 use Renard::Incunabula::Document::Types qw(PageNumber);
@@ -82,7 +82,7 @@ callback on_tree_view_row_activate_cb( $tree_view, $path, $column, $self ) {
 	my $iter = $self->model->get_iter( $path );
 	my $page_num = $self->model->get_value($iter, 1);
 
-	PageNumber->check($page_num) and $self->view_manager->current_view->page_number( $page_num );
+	PageNumber->check($page_num) and $self->view_manager->current_view->set_page_number_with_scroll( $page_num );
 }
 
 method reveal( $should_reveal ) {
@@ -104,7 +104,7 @@ Renard::Curie::Component::Outline - Component that provides a list of headings f
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

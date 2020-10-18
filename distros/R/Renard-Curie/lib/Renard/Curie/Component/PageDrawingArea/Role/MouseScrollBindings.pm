@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::PageDrawingArea::Role::MouseScrollBindings;
 # ABSTRACT: A role to setup the bindings for mouse wheel scrolling for a page drawing area
-$Renard::Curie::Component::PageDrawingArea::Role::MouseScrollBindings::VERSION = '0.004';
+$Renard::Curie::Component::PageDrawingArea::Role::MouseScrollBindings::VERSION = '0.005';
 use Moo::Role;
 
 use Renard::Incunabula::Document::Types qw(ZoomLevel);
@@ -19,16 +19,17 @@ method setup_scroll_bindings() {
 }
 
 callback on_scroll_event_cb($window, $event, $self) {
+	my $zoom_level = $self->view->view_options->zoom_options->zoom_level;
 	if ( $event->state == 'control-mask' && $event->direction eq 'smooth') {
 		my ($delta_x, $delta_y) =  $event->get_scroll_deltas();
-		if ( $delta_y < 0 ) { $self->view_manager->set_zoom_level( $self->compute_zoom_out($self->view->zoom_level)  ); }
-		elsif ( $delta_y > 0 ) { $self->view_manager->set_zoom_level( $self->compute_zoom_in($self->view->zoom_level) ); }
+		if ( $delta_y < 0 ) { $self->view_manager->set_zoom_level( $self->compute_zoom_out($zoom_level)  ); }
+		elsif ( $delta_y > 0 ) { $self->view_manager->set_zoom_level( $self->compute_zoom_in($zoom_level) ); }
 		return 1;
 	} elsif ( $event->state == 'control-mask' && $event->direction eq 'up' ) {
-		$self->view_manager->set_zoom_level( $self->compute_zoom_in($self->view->zoom_level) );
+		$self->view_manager->set_zoom_level( $self->compute_zoom_in($zoom_level) );
 		return 1;
 	} elsif ( $event->state == 'control-mask' && $event->direction eq 'down' ) {
-		$self->view_manager->set_zoom_level( $self->compute_zoom_out($self->view->zoom_level) );
+		$self->view_manager->set_zoom_level( $self->compute_zoom_out($zoom_level) );
 		return 1;
 	}
 	return 0;
@@ -56,7 +57,7 @@ Renard::Curie::Component::PageDrawingArea::Role::MouseScrollBindings - A role to
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

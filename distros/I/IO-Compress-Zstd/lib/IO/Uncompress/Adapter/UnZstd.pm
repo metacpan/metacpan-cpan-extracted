@@ -8,7 +8,7 @@ use IO::Compress::Base::Common  2.096 qw(:Status);
 use Compress::Stream::Zstd ;
 use Compress::Stream::Zstd::Decompressor qw(ZSTD_DSTREAM_IN_SIZE);
 our ($VERSION, @ISA);
-$VERSION = '2.098';
+$VERSION = '2.099';
 
 
 sub mkUncompObject

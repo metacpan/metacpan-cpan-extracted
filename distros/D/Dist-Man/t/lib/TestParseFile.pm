@@ -480,15 +480,6 @@ sub parse_module_start {
     # TEST:$cnt++
     $self->parse_paras(
         [
-            { re => q/=item \* AnnoCPAN:[^\n]*/, },
-            "L<http://annocpan.org/dist/$dist_name>",
-        ],
-        "AnnoCPAN",
-    );
-
-    # TEST:$cnt++
-    $self->parse_paras(
-        [
             { re => q/=item \* CPAN Ratings[^\n]*/, },
             "L<http://cpanratings.perl.org/d/$dist_name>",
         ],

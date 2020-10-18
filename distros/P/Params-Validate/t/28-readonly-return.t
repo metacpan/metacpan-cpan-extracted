@@ -27,7 +27,7 @@ use Params::Validate qw( validate SCALAR HANDLE );
 
     my $live = 0;
 
-    sub new { $live++; bless {}, shift }
+    sub new     { $live++; bless {}, shift }
     sub DESTROY { $live-- }
 
     sub Live {$live}

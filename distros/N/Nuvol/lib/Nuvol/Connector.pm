@@ -23,9 +23,11 @@ sub new ($class, $configfile, $service = '', $params = {}) {
   else {
     Carp::croak 'Service missing!' unless $service;
     $self->with_roles("Nuvol::${service}::Connector");
-    my %config_params = (configfile => $self->configfile, service => $self->SERVICE);
-    $config_params{$_} = $params->{$_} || $self->DEFAULTS->{$_}
-      for qw|app_id redirect_uri response_type scope|;
+    my %config_params = (service => $self->SERVICE);
+    for (sort keys $self->DEFAULTS->%*) {
+      $config_params{$_} = $params->{$_} || $self->DEFAULTS->{$_}
+        or Carp::croak "Parameter $_ missing!";
+    }
     Nuvol::Config->new($configfile, \%config_params);
   }
 
@@ -212,16 +214,17 @@ Nuvol::Connector - Base class for Nuvol connectors
 
 =head1 SYNOPSIS
 
-    # existing config file
     use Nuvol;
     my $configfile = '/path/to/configfile';
+    
+    # existing config file
     my $connector  = Nuvol::connect($configfile);
 
-    # new config file
-    use Nuvol::Connector;
-    my $connector = Nuvol::Connector->new($configfile, $service);
+    # new or existing config file
+    my $connector  = Nuvol::autoconnect($configfile);
 
     # with additional parameters
+    use Nuvol::Connector;
     my $connector = Nuvol::Connector->new($configfile, $service, $params);
 
     $connector->authenticate;
@@ -244,9 +247,10 @@ L<Nuvol::Connector> is the base class for Nuvol connectors.
 
     use Nuvol;
     $configfile = '/path/to/configfile';
-    $connector  = Nuvol::connect($configfile);
+    $connector  = Nuvol::connect($configfile);      # existing config file
+    $connector  = Nuvol::autoconnect($configfile);  # new or existing config file
 
-Connections with existing config files are opened with L<Nuvol::connect>.
+Connections are opened with L<Nuvol::connect> or L<Nuvol::autoconnect>.
 
 =head2 new
 

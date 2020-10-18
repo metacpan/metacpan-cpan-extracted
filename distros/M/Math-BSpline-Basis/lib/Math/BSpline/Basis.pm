@@ -1,5 +1,5 @@
 package Math::BSpline::Basis;
-$Math::BSpline::Basis::VERSION = '0.001';
+$Math::BSpline::Basis::VERSION = '0.002';
 use 5.014;
 use warnings;
 
@@ -310,7 +310,7 @@ Math::BSpline::Basis - B-spline basis functions
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -415,6 +415,9 @@ the indexing right:
         $value += $N->[$i] * $P->[$s-$p+$i];
     }
 
+Have a look at L<Math::BSpline::Curve|Math::BSpline::Curve> if you
+would like to work with B-spline curves (or even functions).
+
 =head1 CONSTRUCTORS
 
 =head3 new
@@ -459,9 +462,10 @@ last p+1 values are identical.
 =item breakpoint multiplicity
 
 The multiplicity of the first and last breakpoint is limited to p+1,
-the multiplicity of each internal breakpoint is limited to p. It
-generally does not make sense to increase breakpoint multiplicity
-any further.
+the multiplicity of each internal breakpoint is limited to
+p. Increasing breakpoint multiplicity any further would lead to
+basis functions that are discontinous at the respective
+breakpoint. This is currently not supported.
 
 =back
 
@@ -480,7 +484,7 @@ be modified afterwards.
 
 =head3 knot_vector
 
-The knot vector of the B-splines. Can only set at
+The knot vector of the B-splines. Can only be set at
 construction. Defaults to [0,...,0, 1,...,1] resulting in a Bezier
 spline.
 

@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Heatmapgl::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Heatmapgl::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Heatmapgl::Colorbar::Title;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace heatmapgl.
 
@@ -281,7 +281,7 @@ Chart::Plotly::Trace::Heatmapgl::Colorbar - This attribute is one of the possibl
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

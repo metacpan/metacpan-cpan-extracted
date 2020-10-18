@@ -9,7 +9,7 @@ use Chart::Plotly::Trace::Scatter;
 
 extends 'Chart::Plotly::Adapter';
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 sub traces {
     my $self       = shift();
@@ -39,7 +39,7 @@ Chart::Plotly::Adapter::Data::Frame
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

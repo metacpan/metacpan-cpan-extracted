@@ -26,6 +26,8 @@ sub Restore {
 		return {error => 'NOT_FOUND'} if ! $file;
 	}
 	
+	$options->{destination} =~ s/\/$//g;
+	
 	_proc_file($options, $state, $file, join('/', @cur_path) || '/', $options->{destination});
 	
 	print "Backup '$options->{'backup-name'}' was successful restored.\n" if ! $options->{quiet};
@@ -41,7 +43,7 @@ sub _restore_part {
 	$reg_file->decrypt($part->{aes_key}, $part->{aes_iv});
 	print "decrypted, " if $options->{verbose};
 	my $ratio = $reg_file->decompress();
-	printf "decompressed (x%d)", 1 / (1e-6 + $ratio) if $options->{verbose};
+	printf "decompressed (x%d)", $ratio if $options->{verbose};
 	$reg_file->write($number);
 	print " and restored.\n" if $options->{verbose};
 }
@@ -149,9 +151,13 @@ sub _proc_file {
 		if($need2rewrite_whole_file) {
 			if($options->{write}) {
 				my $reg_file = App::SimpleBackuper::RegularFile->new($fs_path, $options, $state);
-				for my $part_number (0 .. $#{ $version->{parts} }) {
-					print "\tpart #$part_number hash is ".fmt_hex2base64($version->{parts}->[ $part_number ]->{hash}).": " if $options->{verbose};
-					_restore_part($options, $reg_file, $state->{storage}, $version->{parts}->[ $part_number ], $part_number);
+				if(@{ $version->{parts} }) {
+					for my $part_number (0 .. $#{ $version->{parts} }) {
+						print "\tpart #$part_number hash is ".fmt_hex2base64($version->{parts}->[ $part_number ]->{hash}).": " if $options->{verbose};
+						_restore_part($options, $reg_file, $state->{storage}, $version->{parts}->[ $part_number ], $part_number);
+					}
+				} else {
+					$reg_file->set_write_mode();
 				}
 			} else {
 				print "\tfile will be restored.\n" if $options->{verbose};
@@ -186,7 +192,7 @@ sub _proc_file {
 	
 	
 	if(S_ISDIR $version->{mode}) {
-		foreach my $subfile (map {@$_} $state->{db}->{files}->find_all({parent_id => $file->{id}})) {
+		foreach my $subfile (sort {$a->{name} cmp $b->{name}} map {@$_} $state->{db}->{files}->find_all({parent_id => $file->{id}})) {
 			_proc_file($options, $state, $subfile, $backup_path.'/'.$subfile->{name}, $fs_path.'/'.$subfile->{name});
 		}
 	}

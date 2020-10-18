@@ -15,7 +15,7 @@ version 0.0.6
 
 =cut
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.8';
 
 =head1 SYNOPSIS
 
@@ -121,10 +121,6 @@ You can also look for information at:
 =item * Source code at Berlios.de
 
 B<FILL IN>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Dist-Man>
 
 =item * CPAN Ratings
 

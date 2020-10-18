@@ -4,7 +4,7 @@
       "Rolf Stöckli <tekki@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -55,7 +55,7 @@
          "web" : "https://github.com/Tekki/nuvol"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

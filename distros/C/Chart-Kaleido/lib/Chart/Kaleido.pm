@@ -6,14 +6,14 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Moo;
 use Config;
 use JSON;
 use Types::Standard qw(Int Str);
 use File::Which qw(which);
-use IPC::Run qw(timeout);
+use IPC::Run qw();
 use namespace::autoclean;
 
 use constant KALEIDO => 'kaleido';
@@ -25,23 +25,6 @@ has timeout => (
     default => 30,
 );
 
-has all_formats => (
-    is       => 'ro',
-    init_arg => 0,
-    default  => sub { [] },
-);
-
-has scope_name => (
-    is       => 'ro',
-    init_arg => 0,
-);
-
-has scope_flags => (
-    is       => 'ro',
-    init_arg => 0,
-    default  => sub { [] },
-);
-
 has base_args => (
     is       => 'ro',
     init_arg => 0,
@@ -49,8 +32,9 @@ has base_args => (
 );
 
 has _stall_timeout => (
-    is      => 'lazy',
-    builder => sub { timeout( $_[0]->timeout, name => 'stall timeout' ) },
+    is => 'lazy',
+    builder =>
+      sub { IPC::Run::timeout( $_[0]->timeout, name => 'stall timeout' ) },
 );
 
 has _h => ( is => 'rw' );
@@ -61,6 +45,11 @@ has _ios => (
         return { map { $_ => '' } qw(in out err) };
     },
 );
+
+# class attributes
+sub all_formats { [] }
+sub scope_name  { "" }
+sub scope_flags { [] }
 
 sub DEMOLISH {
     my ($self) = @_;
@@ -142,7 +131,9 @@ sub do_transform {
     my ( $self, $data ) = @_;
 
     $self->ensure_kaleido;
-    $self->_ios->{in} .= encode_json($data) . "\n";
+
+    my $json = JSON->new->allow_blessed(1)->convert_blessed(1);
+    $self->_ios->{in} .= $json->encode($data) . "\n";
     $self->_stall_timeout->start;
     my $resp = $self->_get_kaleido_out;
     return $resp;
@@ -253,7 +244,7 @@ Chart::Kaleido - Base class for Chart::Kaleido
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

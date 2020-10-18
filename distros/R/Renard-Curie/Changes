@@ -1,3 +1,51 @@
+0.005 2020-10-17 22:47:00-0500
+
+  Features
+
+   - Basic support for speech synthesis (only on Linux for now).
+
+     See <https://github.com/project-renard/curie/pull/152>,
+     <https://github.com/project-renard/curie/pull/226>,
+     <https://github.com/project-renard/curie/pull/231>.
+
+   - Scene graph / canvas implementation of PDF drawing and layout.
+
+     See <https://github.com/project-renard/curie/pull/237>,
+     <https://github.com/project-renard/curie/pull/238>,
+     <https://github.com/project-renard/curie/pull/239>.
+
+     Closes <https://github.com/project-renard/curie/issues/27>.
+
+     New features:
+
+      - Draws only the pages in the viewport in a grid layout with margins.
+      - Changes the mouse cursor to an I-beam pointer when over text region.
+
+     Preserves old features:
+
+      - Continuous view
+      - Zoom
+      - № of columns
+      - Sidebar - jump to page
+      - Page number text field - go to page
+      - Highlight TTS sentence
+
+   - Copy selection into primary clipboard. See
+     <https://github.com/project-renard/curie/pull/241>.
+
+  Refactoring
+
+   - Refactor into roles:
+
+      - View manager: <https://github.com/project-renard/curie/pull/227>,
+      - Speech synthesis: <https://github.com/project-renard/curie/pull/228>.
+
+  Bug fixes
+
+   - Enable scrolling using scroll wheel buttons for older mice (not kinectic
+     scrolling that is often found on new touchpads — which was already
+     supported). See <https://github.com/project-renard/curie/pull/230>.
+
 0.004 2018-01-06 01:12:22-0600
 
   Features

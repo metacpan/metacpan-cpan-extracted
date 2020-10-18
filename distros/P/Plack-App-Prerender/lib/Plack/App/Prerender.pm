@@ -6,7 +6,7 @@ use v5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.2.0';
 
 use parent qw/ Plack::Component /;
 
@@ -42,27 +42,37 @@ sub prepare_app {
 
     unless ($self->request) {
         $self->request(
-            [
-             qw/
-             X-Forwarded-For
-             X-Forwarded-Host
-             X-Forwarded-Port
-             X-Forwarded-Proto
-             /
-            ]
+            {
+                'User-Agent' => 'X-Forwarded-User-Agent',
+                ( map { $_ => $_ } qw/
+                  X-Forwarded-For
+                  X-Forwarded-Host
+                  X-Forwarded-Port
+                  X-Forwarded-Proto
+                  /
+                ),
+            }
         );
     }
+    if (is_plain_arrayref($self->request)) {
+        $self->request( { map { $_ => $_ } @{ $self->request } } );
+    }
+
 
     unless ($self->response) {
         $self->response(
-            [
-             qw/
-             Content-Type
-             Expires
-             Last-Modified
-             /
-            ]
+            {
+                ( map { $_ => $_ } qw/
+                  Content-Type
+                  Expires
+                  Last-Modified
+                  /
+                ),
+            }
         );
+    }
+    if (is_plain_arrayref($self->response)) {
+        $self->response( { map { $_ => $_ } @{ $self->response } } );
     }
 
     unless ($self->max_age) {
@@ -91,7 +101,7 @@ sub call {
     return $url if (is_plain_arrayref($url));
 
     my $cache = $self->cache;
-    my $data  = $cache->get($path_query);
+    my $data  = $cache ? $cache->get($path_query) : undef;
     if (defined $data) {
 
         return $data;
@@ -103,12 +113,11 @@ sub call {
         $mech->reset_headers;
 
         my $req_head = $req->headers;
-        for my $field (@{ $self->request }) {
+        for my $field (keys %{ $self->request }) {
             my $value = $req_head->header($field) // next;
-            $mech->add_header( $field => $value );
-        }
-        if (my $ua = $req_head->header('User-Agent')) {
-            $mech->add_header( 'X-Forwarded-User-Agent' => $ua );
+            my $send = $self->request->{$field} or next;
+            $send = $field if $send eq "1";
+            $mech->add_header( $send => $value );
         }
 
         my $res  = $mech->get( $url );
@@ -123,25 +132,29 @@ sub call {
 
         my $head = $res->headers;
         my $h = Plack::Util::headers([ 'X-Renderer' => __PACKAGE__ ]);
-        for my $field (@{ $self->response }) {
+        for my $field (keys %{ $self->response }) {
             my $value = $head->header($field) // next;
             $value =~ tr/\n/ /;
-            $h->set( $field => $value );
+            my $send = $self->response->{$field} or next;
+            $send = $field if $send eq "1";
+            $h->set( $send => $value );
         }
 
         if ($res->code == HTTP_OK) {
 
-            my $age;
-            if (my $value = $head->header("Cache-Control")) {
-                ($age) = $value =~ /(?:s\-)?max-age=([0-9]+)\b/;
-                if ($age && $age > $self->max_age) {
-                    $age = $self->max_age;
-                }
-            }
-
             $data = [ HTTP_OK, $h->headers, [$body] ];
 
-            $cache->set( $path_query, $data, $age // $self->max_age );
+            if ($cache) {
+                my $age;
+                if (my $value = $head->header("Cache-Control")) {
+                    ($age) = $value =~ /(?:s\-)?max-age=([0-9]+)\b/;
+                    if ($age && $age > $self->max_age) {
+                        $age = $self->max_age;
+                    }
+                }
+
+                $cache->set( $path_query, $data, $age // $self->max_age );
+            }
 
             return $data;
 
@@ -170,7 +183,7 @@ Plack::App::Prerender - a simple prerendering proxy for Plack
 
 =head1 VERSION
 
-version v0.1.2
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -244,6 +257,8 @@ This can be used for simple request validation.  For example,
 
 This is the cache handling interface. See L<CHI>.
 
+If no cache is specified (v0.2.0), then the result will not be cached.
+
 =head2 max_age
 
 This is the maximum time (in seconds) to cache content.  If the page
@@ -252,8 +267,17 @@ used instead.
 
 =head2 request
 
-This is an array reference of request headers to pass through the
-proxy.  These default to the reverse proxy forwarding headers:
+This is a hash reference (since v0.2.0) of request headers to pass
+through the proxy.  The keys are the request header fieldss, and the
+values are the headers that will be passed to the L</rewrite> URL.
+
+Values of C<1> will be a synonym for the same header, and false values
+will mean that the header is skipped.
+
+An array reference can be used to simply pass through a list of
+headers unchanged.
+
+It will default to the following headers:
 
 =over
 
@@ -271,8 +295,17 @@ The C<User-Agent> is forwarded as C<X-Forwarded-User-Agent>.
 
 =head2 response
 
-This is an array reference of response headers to pass from the
-result.  It defaults to the following headers:
+This is a hash reference (since v0.2.0) of request headers to return
+from the proxy.  The keys are the response header fields, and the
+values are the headers that will be returned from the proxy.
+
+Values of C<1> will be a synonym for the same header, and false values
+will mean that the header is skipped.
+
+An array reference can be used to simply pass through a list of
+headers unchanged.
+
+It will default to the following headers:
 
 =over
 

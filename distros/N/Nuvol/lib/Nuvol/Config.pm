@@ -3,11 +3,12 @@ use Mojo::Base -base, -signatures;
 
 use Mojo::File 'path';
 use Mojo::JSON qw|decode_json encode_json|;
+use Mojo::Util 'monkey_patch';
 
 # constants
 
 use constant CONFIG_PARAMS =>
-  'access_token app_id redirect_uri refresh_token response_type scope service validto';
+  'access_token app_id app_secret redirect_uri refresh_token response_type scope service validto';
 
 # constructor
 
@@ -25,11 +26,6 @@ sub new ($class, $configfile, $params = {}) {
     }
   } else {
 
-    # check params
-    for (qw|app_id redirect_uri response_type scope service|) {
-      Carp::croak "Parameter $_ missing!" unless $params->{$_};
-    }
-
     $self = {file => $file, $params->%*};
     $file->dirname->make_path;
     $file->spurt(encode_json $self)->chmod(0700);
@@ -42,12 +38,9 @@ sub new ($class, $configfile, $params = {}) {
 # methods
 
 has [qw|access_token hash refresh_token scope validto|];
-
-sub app_id ($self)        { return $self->{app_id}; }
-sub digest ($self)        { return $self->{digest}; }
-sub file ($self)          { return $self->{file}; }
-sub redirect_uri ($self)  { return $self->{redirect_uri}; }
-sub response_type ($self) { return $self->{response_type}; }
+for my $attr (qw|app_id app_secret digest file redirect_uri response_type|) {
+  monkey_patch(__PACKAGE__, $attr => sub ($self) { return $self->{$attr} });
+}
 
 sub save ($self) {
   my $file = $self->file;
@@ -76,6 +69,7 @@ Nuvol::Config - Config for Nuvol connectors
 
     $config->access_token;
     $config->app_id;
+    $config->app_secret;
     $config->digest;
     $config->file;
     $config->redirect_uri;
@@ -108,6 +102,7 @@ In daily use a L<Nuvol::Config> is created with L<Nuvol::Connector/config>.
 
     %params = (
       app_id       => $app_id,
+      app_secret   => $app_secret,
       redirect_uri => $redirect_uri,
       scope        => $scope,
       service      => $service,
@@ -130,6 +125,12 @@ Getter and setter for the access token.
     $app_id = $config->app_id;
 
 Getter for the app id.
+
+=head2 app_secret
+
+    $app_secret = $config->app_secret;
+
+Getter for the app secret.
 
 =head2 digest
 

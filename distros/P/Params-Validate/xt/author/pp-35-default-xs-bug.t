@@ -21,7 +21,9 @@ sub default_test {
     );
 
     is( $first, undef, 'no default for first parameter' );
-    is( $second, 'must be second one',
-        'default for second parameter is applied' );
+    is(
+        $second, 'must be second one',
+        'default for second parameter is applied'
+    );
 }
 

@@ -1,13 +1,13 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Model::ViewOptions::Grid;
 # ABSTRACT: A set of options for grids
-$Renard::Curie::Model::ViewOptions::Grid::VERSION = '0.004';
+$Renard::Curie::Model::ViewOptions::Grid::VERSION = '0.005';
 use Moo;
-use MooX::Lsub;
-use Renard::Incunabula::Common::Types qw(Maybe PositiveInt);
+use MooX::ShortHas;
+use Renard::Incunabula::Common::Types qw(Maybe PositiveInt Bool);
 use Renard::Curie::Error;
 
-# Need to use the ::BuildArgs version since is_continuous_view is a lsub.
+# Need to use the ::BuildArgs version since is_continuous_view is lazy.
 with qw(MooX::BuildArgs MooX::Role::CloneSet::BuildArgs);
 
 has [ qw/rows columns/ ] => (
@@ -21,10 +21,10 @@ has [ qw/rows columns/ ] => (
 	},
 );
 
-lsub is_continuous_view => method() {
+lazy is_continuous_view => method() {
 	defined $self->rows xor
 		defined $self->columns;
-};
+}, isa => Bool;
 
 method BUILD() {
 	unless( defined $self->rows or defined $self->columns ) {
@@ -48,7 +48,7 @@ Renard::Curie::Model::ViewOptions::Grid - A set of options for grids
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

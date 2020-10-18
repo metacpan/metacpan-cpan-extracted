@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie;
 # ABSTRACT: A document reader written with GTK+.
-$Renard::Curie::VERSION = '0.004';
+$Renard::Curie::VERSION = '0.005';
 1;
 
 __END__
@@ -16,7 +16,7 @@ Renard::Curie - A document reader written with GTK+.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SEE ALSO
 

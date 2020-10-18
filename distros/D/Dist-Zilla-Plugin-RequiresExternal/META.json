@@ -5,7 +5,7 @@
       "Joenio Costa <joenio@joenio.me>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -83,7 +83,6 @@
             "Test::More" : "0.94",
             "Test::Most" : "0",
             "Test::Output" : "1.031",
-            "blib" : "1.01",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -93,11 +92,11 @@
    "provides" : {
       "Dist::Zilla::App::Command::externaldeps" : {
          "file" : "lib/Dist/Zilla/App/Command/externaldeps.pm",
-         "version" : "1.008"
+         "version" : "1.009"
       },
       "Dist::Zilla::Plugin::RequiresExternal" : {
          "file" : "lib/Dist/Zilla/Plugin/RequiresExternal.pm",
-         "version" : "1.008"
+         "version" : "1.009"
       }
    },
    "release_status" : "stable",
@@ -112,7 +111,9 @@
          "web" : "https://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal"
       }
    },
-   "version" : "1.008",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "1.009",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

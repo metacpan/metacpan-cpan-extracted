@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist::Man
 
+0.0.8      2020-10-18
+    * Remove stale links.
+
 0.0.7      Sun  2 Feb 22:16:53 IST 2014
     * Fix the LICENSE header hopefully better ( CPANTS ).
 

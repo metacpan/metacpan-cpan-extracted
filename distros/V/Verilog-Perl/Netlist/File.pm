@@ -12,7 +12,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::File::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.470';
+$VERSION = '3.472';
 
 structs('new',
 	'Verilog::Netlist::File::Struct'
@@ -375,22 +375,6 @@ sub pinselects {
     $self->{_cmtref} = $pinref;
 }
 
-sub ppdefine {
-    my $self = shift;
-    my $defvar = shift;
-    my $definition = shift;
-    if ($self->{netlist}{options}) {
-	$self->{netlist}{options}->defvalue($defvar,$definition);
-    }
-}
-
-sub ppinclude {
-    my $self = shift;
-    my $defvar = shift;
-    my $definition = shift;
-    $self->error("No `includes yet.\n");
-}
-
 sub keyword {
     # OVERRIDE Verilog::Parse calls when keyword occurs
     # Note we use_cb_keyword only if comments are parsed!
@@ -573,9 +557,9 @@ Prints debugging information for this file.
 
 =head1 DISTRIBUTION
 
-Verilog-Perl is part of the L<http://www.veripool.org/> free Verilog EDA
+Verilog-Perl is part of the L<https://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
-L<http://www.veripool.org/verilog-perl>.
+L<https://www.veripool.org/verilog-perl>.
 
 Copyright 2000-2020 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU

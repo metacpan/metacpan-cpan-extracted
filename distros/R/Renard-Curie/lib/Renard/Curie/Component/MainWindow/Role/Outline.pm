@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::Outline;
 # ABSTRACT: Role for outline
-$Renard::Curie::Component::MainWindow::Role::Outline::VERSION = '0.004';
+$Renard::Curie::Component::MainWindow::Role::Outline::VERSION = '0.005';
 use Moo::Role;
 use Renard::Curie::Component::Outline;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
@@ -39,7 +39,7 @@ Renard::Curie::Component::MainWindow::Role::Outline - Role for outline
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

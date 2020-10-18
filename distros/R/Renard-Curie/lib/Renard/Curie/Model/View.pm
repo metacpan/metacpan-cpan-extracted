@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Renard::Curie::Model::View;
 # ABSTRACT: A base class for a view
-$Renard::Curie::Model::View::VERSION = '0.004';
+$Renard::Curie::Model::View::VERSION = '0.005';
 use Moo;
 
 use Glib::Object::Subclass
@@ -26,7 +26,7 @@ Renard::Curie::Model::View - A base class for a view
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 EXTENDS
 

@@ -1,9 +1,19 @@
 package Nuvol;
 use Mojo::Base -strict, -signatures;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # functions
+
+sub autoconnect ($configfile, $service) {
+  require Nuvol::Connector;
+
+  if (-f $configfile) {
+    return Nuvol::Connector->new($configfile);
+  } else {
+    return Nuvol::Connector->new($configfile, $service)->authenticate;
+  }
+}
 
 sub connect ($configfile) {
   require Nuvol::Connector;
@@ -24,17 +34,18 @@ Nuvol - A cloud toolkit
 
     # connect to a service
     my $configfile = '/path/to/configfile';
-    my $connector  = Nuvol::connect($configfile);
+    my $service    = '...';  # one of Dropbox, Office365
+    my $connector  = Nuvol::autoconnect($configfile, $service);
 
     # get main drive
     my $drive = $connector->drive('~');
 
     # upload a file
     use Mojo::File 'path';
-    my $file = $drive->item('My Text.txt')->copy_from(path 'Text on my PC.txt');
+    my $file = $drive->item('/My Text.txt')->copy_from(path 'Text on my PC.txt');
 
     # copy to another file
-    my $file_2 = $file->copy_to('path/to/Text Copy.txt');
+    my $file_2 = $file->copy_to('/path/to/Text Copy.txt');
 
     # download
     my $downloaded = $file_2->copy_to(path 'Downloaded Text.txt');
@@ -50,9 +61,9 @@ Nuvol - A cloud toolkit
 
 =head1 DESCRIPTION
 
-L<Nuvol> is a toolkit to manipulate files and folders on cloud services. For the beginning it
-supports L<Dropbox|Nuvol::Dropbox>, L<Office 365|Nuvol::Office365>, and a L<Dummy
-service|Nuvol::Dummy>.
+L<Nuvol> is a toolkit to manipulate files and folders on cloud services. For
+the beginning it supports L<Dropbox|Nuvol::Dropbox>, L<Office
+365|Nuvol::Office365>, and a L<Dummy service|Nuvol::Dummy>.
 
     Nuvol
     └── Connector
@@ -101,14 +112,21 @@ recognize most of the methods.
 
 None of the functions is exported.
 
+=head2 autoconnect
+
+    use Nuvol;
+    $connector = Nuvol::autoconnect($configfile, $service);
+
+Opens a connection using an existing config file, or starts an interactive
+authentication process if the file doesn't exist. Returns a
+L<Nuvol::Connector>.
+
 =head2 connect
 
     use Nuvol;
     $connector = Nuvol::connect($configfile);
 
 Opens a connection using an existing config file. Returns a L<Nuvol::Connector>.
-
-To create new config files L<Nuvol::Connector/new> has to be used.
 
 =head1 AUTHOR & COPYRIGHT
 

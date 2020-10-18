@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scattermapbox::Textfont;
 use Chart::Plotly::Trace::Scattermapbox::Transform;
 use Chart::Plotly::Trace::Scattermapbox::Unselected;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point, lines or marker symbols on a Mapbox GL geographic map is provided by longitude/latitude pairs in `lon` and `lat`.
 
@@ -314,7 +314,7 @@ Chart::Plotly::Trace::Scattermapbox - The data visualized as scatter point, line
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -341,7 +341,7 @@ version 0.039
                  marker => Chart::Plotly::Trace::Scattermapbox::Marker->new( size => 9 ),
  );
  my $plot = Chart::Plotly::Plot->new( traces => [$scattermapbox],
-                                      layout => { autosize  => 'True',
+                                      layout => { autosize  => JSON::true,
                                                   hovermode => 'closest',
                                                   mapbox    => {
                                                               style       => 'open-street-map',

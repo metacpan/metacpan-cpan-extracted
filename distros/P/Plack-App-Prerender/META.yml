@@ -33,7 +33,7 @@ name: Plack-App-Prerender
 provides:
   Plack::App::Prerender:
     file: lib/Plack/App/Prerender.pm
-    version: v0.1.2
+    version: v0.2.0
 recommends:
   CHI: '0'
   Log::Log4perl: '0'
@@ -58,7 +58,7 @@ resources:
   bugtracker: https://github.com/robrwo/perl-Plack-App-Prerender/issues
   homepage: https://metacpan.org/release/Plack-App-Prerender
   repository: git://github.com/robrwo/perl-Plack-App-Prerender.git
-version: v0.1.2
+version: v0.2.0
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

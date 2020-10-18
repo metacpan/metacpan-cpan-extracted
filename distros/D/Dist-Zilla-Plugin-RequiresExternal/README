@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.008
+    version 1.009
 
 SYNOPSIS
 
@@ -75,26 +75,6 @@ SUPPORT
     be of help to you. As always, in addition to those websites please use
     your favorite search engine to discover more resources.
 
-      * Search CPAN
-
-      The default CPAN search engine, useful to view POD in HTML format.
-
-      http://search.cpan.org/dist/Dist-Zilla-Plugin-RequiresExternal
-
-      * AnnoCPAN
-
-      The AnnoCPAN is a website that allows community annotations of Perl
-      module documentation.
-
-      http://annocpan.org/dist/Dist-Zilla-Plugin-RequiresExternal
-
-      * CPAN Ratings
-
-      The CPAN Ratings is a website that allows community ratings and
-      reviews of Perl modules.
-
-      http://cpanratings.perl.org/d/Dist-Zilla-Plugin-RequiresExternal
-
       * CPANTS
 
       The CPANTS is a website that analyzes the Kwalitee ( code metrics )
@@ -104,8 +84,8 @@ SUPPORT
 
       * CPAN Testers
 
-      The CPAN Testers is a network of smokers who run automated tests on
-      uploaded CPAN distributions.
+      The CPAN Testers is a network of smoke testers who run automated
+      tests on uploaded CPAN distributions.
 
       http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-RequiresExternal
 
@@ -149,7 +129,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by GSI Commerce and Joenio Costa.
+    This software is copyright (c) 2020 by GSI Commerce and Joenio Costa.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

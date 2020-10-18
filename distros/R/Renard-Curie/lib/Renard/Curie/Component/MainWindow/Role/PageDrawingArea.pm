@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::MainWindow::Role::PageDrawingArea;
 # ABSTRACT: Role for the page drawing area
-$Renard::Curie::Component::MainWindow::Role::PageDrawingArea::VERSION = '0.004';
+$Renard::Curie::Component::MainWindow::Role::PageDrawingArea::VERSION = '0.005';
 use Moo::Role;
 use Renard::Curie::Component::PageDrawingArea;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
@@ -72,7 +72,7 @@ Renard::Curie::Component::MainWindow::Role::PageDrawingArea - Role for the page 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 

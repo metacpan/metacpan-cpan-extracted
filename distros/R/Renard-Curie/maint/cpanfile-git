@@ -1,9 +1,15 @@
 requires 'Renard::Incunabula',
 	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
 	branch => 'master';
-requires 'Renard::Incunabula::Format::PDF',
-	git => 'https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF.git',
+requires 'Renard::Block::Format::PDF',
+	git => 'https://github.com/project-renard/p5-Renard-Block-Format-PDF.git',
 	branch => 'master';
-requires 'Renard::Incunabula::Frontend::Gtk3',
-	git => 'https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3.git',
+requires 'Intertangle::API::Gtk3',
+	git => 'https://github.com/Intertangle/p5-Intertangle-API-Gtk3.git',
+	branch => 'master';
+requires 'Renard::Block::NLP',
+	git => 'https://github.com/project-renard/p5-Renard-Block-NLP.git',
+	branch => 'master';
+requires 'Intertangle::Jacquard',
+	git => 'https://github.com/Intertangle/p5-Intertangle-Jacquard.git',
 	branch => 'master';

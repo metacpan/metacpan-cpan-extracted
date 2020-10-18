@@ -6,57 +6,18 @@ DESCRIPTION
 
     The Verilog-Perl distribution provides Perl parsing and utilities for
     the Verilog Language. This file provides an overview of the
-    distribution, for specific details on each component, see that
-    component's manpage.
+    distribution.
+
+    Verilog-Perl is currently a mature tool. Bugs are fixed and IEEE
+    language capabilities updated as needed, but the basic features and API
+    are not expected to change.
+
+    For general information see <https://www.veripool.org/verilog-perl>.
+
+    For specific details on each component, see that component's manpage.
 
     You may also want to try the AUTO features present in
-    <http://www.veripool.org/verilog-mode> Verilog-Mode.
-
-INSTALLATION
-
-    Skip this section if Verilog-Perl has already been installed.
-
-  Supported Systems
-
-    Verilog-Perl should run on any system with Perl, G++, Flex, and Bison.
-    It is known to work on at least:
-
-    *   sparc-sun-solaris2.5.1
-
-    *   i386-linux
-
-    *   i686-w2k-cygwin
-
-  CPAN Installation
-
-        Easiest installation is using the "CPAN" command line that comes
-        with Perl. After configuring CPAN the first time, simply
-
-           $ cpan
-           cpan> install Verilog-Perl
-
-        Read the rest of this file for details on the programs provided.
-
-  Manual Installation
-
-        Download the latest version from <http://www.perl.org/CPAN/>, or
-        from <http://www.veripool.org/verilog-perl>.
-
-        "cd" to the directory containing this README notice.
-
-        Type "perl Makefile.PL" to configure Verilog for your system.
-
-        Type "make" to compile Verilog. Some Solaris users have had trouble
-        with "open" being redefined. If this happens, try editing the
-        Makefile to change _FILE_OFFSET_BITS to 32 instead of 64.
-
-        Type "make test" to check the package. If you don't have Synopsys'
-        VCS, the test will print a warning, which you can ignore.
-
-        Type "make install" to install the programs and any data files and
-        documentation.
-
-        Read the rest of this file for details on the programs provided.
+    <https://www.veripool.org/verilog-mode> Verilog-Mode.
 
 SCRIPTS
 
@@ -174,10 +135,8 @@ WHICH PARSER PACKAGE?
         nodes as would be needed to follow signals. Not all keywords have
         been implemented; many are parsed but otherwise ignored. A complete
         Ast tree would allow any arbitrary transformation of Verilog syntax
-        (everything is known excluding whitespace). Long term the authors
-        would be interested in collaborating on a general parser, but for
-        now, applications can leverage the C++ code or use Verilator's XML
-        output (below).
+        (everything is known excluding whitespace). For these applications
+        consider Verilator's XML output (below).
 
     Verilog::SigParser
         Verilog::SigParser is useful when you need a list of modules,
@@ -225,6 +184,50 @@ WHICH PARSER PACKAGE?
         for others to update the design. It's also in very common usage,
         including by many IP providers.
 
+INSTALLATION
+
+    Skip this section if Verilog-Perl has already been installed.
+
+    Verilog-Perl should run on any system with Perl, G++, Flex, and Bison.
+    It is known to work on most Linux distributions, plus Cygwin.
+
+    You may install using either CPAN, or the sources. If you plan to do any
+    development on Verilog-Perl, use the sources.
+
+  CPAN Installation
+
+    Option 1: Easiest installation is using the "CPAN" command line that
+    comes with Perl. After configuring CPAN the first time, simply
+
+       cpan install Verilog-Perl
+       # And see the documentation
+       man Verilog-Perl
+       # Or, sometimes the capitalization is changed
+       man verilog-perl
+
+    Read the rest of this file for details on the programs provided.
+
+  Manual Installation from Repository
+
+    Option 2: Build any version using the source development repository
+    with:
+
+       git clone http://git.veripool.org/git/Verilog-Perl  # Only first time
+       cd Verilog-Perl
+       git pull        # Make sure we're up-to-date
+       git tag         # See what versions exist (recent GITs only)
+       #git checkout master      # Use development branch (e.g. recent bug fix)
+       #git checkout stable      # Use most recent release
+       #git checkout v{version}  # Switch to specified release version
+
+       perl Makefile.PL
+       # Ignore warning about README, this file will be generated
+       make
+       make test
+       make install
+
+    Read the rest of this file for details on the programs provided.
+
 FAQ
 
     Why do I get "unexpected `do'" or "unexpected `bit'" errors?
@@ -254,9 +257,9 @@ FAQ
 
 DISTRIBUTION
 
-    Verilog-Perl is part of the <http://www.veripool.org/> free Verilog EDA
+    Verilog-Perl is part of the <https://www.veripool.org/> free Verilog EDA
     software tool suite. The latest version is available from CPAN and from
-    <http://www.veripool.org/verilog-perl>.
+    <https://www.veripool.org/verilog-perl>.
 
     Copyright 2000-2020 by Wilson Snyder. This package is free software; you
     can redistribute it and/or modify it under the terms of either the GNU
@@ -283,6 +286,6 @@ SEE ALSO
     Verilog::Netlist::Net, Verilog::Netlist::Pin, Verilog::Netlist::Port,
     Verilog::Netlist::Subclass,
 
-    And the <http://www.veripool.org/verilog-mode>Verilog-Mode package for
+    And the <https://www.veripool.org/verilog-mode>Verilog-Mode package for
     Emacs.
 

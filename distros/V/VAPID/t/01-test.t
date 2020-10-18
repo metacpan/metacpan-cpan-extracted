@@ -15,6 +15,5 @@ ok(my $header = generate_vapid_header(
 	$priv,
 	time + 60
 ));
-diag explain $header;
 
 done_testing();

@@ -1,26 +1,31 @@
 CHANGES
 -------
 
-  2.098 17 October 2020
+2.099 18 October 2020
 
-      * Fix dependency issue
-        https://github.com/pmqs/IO-Compress-Zstd/issues/2
-        b4493a50ebcc0226120784268cf7b514349f668f
+  * Fix skip number
+    bbf234d6d65d764e752db4c9afa92f8ae9f61c0f
 
-  2.097 11 October 2020
+2.098 17 October 2020
 
-      * Fix for uncompression of long content
-        https://github.com/pmqs/IO-Compress-Zstd/issues/1
-        0fbed1190cb80c26c2940238d0d6c94325fb733d
+    * Fix dependency issue
+      https://github.com/pmqs/IO-Compress-Zstd/issues/2
+      b4493a50ebcc0226120784268cf7b514349f668f
 
-  2.096 31 July 2020
+2.097 11 October 2020
 
-      * set level default to 3. Matches zstd commandline
-        ab446b18f564c0e547619e740b2dce62899af7a7
+    * Fix for uncompression of long content
+      https://github.com/pmqs/IO-Compress-Zstd/issues/1
+      0fbed1190cb80c26c2940238d0d6c94325fb733d
 
-      * Add test files for Zstd support in zip/unzip
-        8faacd10944ae68570135780a7bf2c875108fdaf
+2.096 31 July 2020
+
+    * set level default to 3. Matches zstd commandline
+      ab446b18f564c0e547619e740b2dce62899af7a7
+
+    * Add test files for Zstd support in zip/unzip
+      8faacd10944ae68570135780a7bf2c875108fdaf
 
 2.095 19 July 2020
 
-      * First Release
+    * First Release

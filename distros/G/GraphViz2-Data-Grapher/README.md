@@ -133,11 +133,6 @@ Returns the graph object, either the one supplied to new() or the one created du
 
 Returns the tree object (of type [Tree::DAG\_Node](https://metacpan.org/pod/Tree::DAG_Node)) built before it is traversed to generate the nodes and edges.
 
-Traversal does change the attributes of nodes, by storing {record => $string} there, so that
-edges can be plotted from a parent to its daughters.
-
-Warning: As the [GraphViz2::Data::Grapher](https://metacpan.org/pod/GraphViz2::Data::Grapher) object exits its scope, $self -> tree -> delete\_tree is called.
-
 # Scripts Shipped with this Module
 
 ## scripts/parse.data.pl

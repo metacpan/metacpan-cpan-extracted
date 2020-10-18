@@ -8,8 +8,7 @@ use Test::EOL;
 
 my @files = (
     'lib/HTML/Latemp/News.pm',
-    't/00-compile.t',
-    't/00-load.t'
+    't/00-compile.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

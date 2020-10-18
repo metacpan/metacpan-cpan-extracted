@@ -11,7 +11,6 @@ WriteMakefile(
   PREREQ_PM => {
     'GraphViz2' => '2.48',
     'Moo' => '2.001001',
-    'HTML::Entities::Interpolate' => 1.04,
     'Scalar::Util' => 1.23,
     'Tree::DAG_Node' => 1.06,
   },

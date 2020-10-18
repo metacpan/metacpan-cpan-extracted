@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scatterpolargl::Textfont;
 use Chart::Plotly::Trace::Scatterpolargl::Transform;
 use Chart::Plotly::Trace::Scatterpolargl::Unselected;
 
-our $VERSION = '0.039';    # VERSION
+our $VERSION = '0.040';    # VERSION
 
 # ABSTRACT: The scatterpolargl trace type encompasses line charts, scatter charts, and bubble charts in polar coordinates using the WebGL plotting engine. The data visualized as scatter point or lines is set in `r` (radial) and `theta` (angular) coordinates Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -349,7 +349,7 @@ Chart::Plotly::Trace::Scatterpolargl - The scatterpolargl trace type encompasses
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 

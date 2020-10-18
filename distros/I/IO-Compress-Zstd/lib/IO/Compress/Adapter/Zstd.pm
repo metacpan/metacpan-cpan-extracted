@@ -9,7 +9,7 @@ use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 use Compress::Stream::Zstd::Compressor qw(ZSTD_CSTREAM_IN_SIZE);
 
 our ($VERSION);
-$VERSION = '2.098';
+$VERSION = '2.099';
 
 sub mkCompObject
 {
@@ -47,7 +47,7 @@ sub compr
     $self->{Error}   = '';
     $self->{ErrorNo} = 0;
 
-     return STATUS_OK;
+    return STATUS_OK;
 }
 
 sub flush
@@ -66,7 +66,7 @@ sub flush
 
     $self->{ErrorNo} = 0;
 
-     return STATUS_OK;
+    return STATUS_OK;
 }
 
 sub close
@@ -84,7 +84,7 @@ sub close
     }
     $self->{ErrorNo} = 0;
 
-     return STATUS_OK;
+    return STATUS_OK;
 }
 
 
@@ -105,7 +105,7 @@ sub reset
 
     $self->{ErrorNo} = 0;
 
-     return STATUS_OK;
+    return STATUS_OK;
 }
 
 sub compressedBytes

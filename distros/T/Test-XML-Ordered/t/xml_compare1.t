@@ -10,7 +10,7 @@ use Test::XML::Ordered qw(is_xml_ordered);
 
 use Test::More tests => 4;
 
-my @common = (validation => 0, load_ext_dtd => 0, no_network => 1);
+my @common = ( validation => 0, load_ext_dtd => 0, no_network => 1 );
 
 {
     my $xml_source = <<'EOF';
@@ -88,9 +88,8 @@ EOF
     # TEST
     is_xml_ordered(
         [ string => $final_source, @common, ],
-        [ string => $xml_source, @common, ],
-        {},
-        "XMLs are equivalent.",
+        [ string => $xml_source,   @common, ],
+        {}, "XMLs are equivalent.",
     );
 
 }
@@ -161,9 +160,8 @@ EOF
     # TEST
     is_xml_ordered(
         [ string => $final_source, @common, ],
-        [ string => $xml_source, @common, ],
-        {},
-        "<info /> and <db:info /> where xmlns:db == xmlns",
+        [ string => $xml_source,   @common, ],
+        {}, "<info /> and <db:info /> where xmlns:db == xmlns",
     );
 
 }
@@ -249,12 +247,11 @@ EOF
     # TEST
     is_xml_ordered(
         [ string => $final_source, @common, ],
-        [ string => $xml_source, @common, ],
-        {},
-        "<image /> with empty tag",
+        [ string => $xml_source,   @common, ],
+        {}, "<image /> with empty tag",
     );
 
 }
 
 # TEST
-ok (1, "Finished");
+ok( 1, "Finished" );

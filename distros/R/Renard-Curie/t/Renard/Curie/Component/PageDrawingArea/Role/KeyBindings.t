@@ -6,10 +6,10 @@ use lib 't/lib';
 use Renard::Incunabula::Common::Setup;
 use Renard::Curie::App;
 use CurieTestHelper;
-use Renard::Incunabula::Format::Cairo::Devel::TestHelper;
+use Renard::Block::Format::Cairo::Devel::TestHelper;
 use Renard::Incunabula::Common::Types qw(Int InstanceOf);
 
-my $cairo_doc = Renard::Incunabula::Format::Cairo::Devel::TestHelper->create_cairo_document;
+my $cairo_doc = Renard::Block::Format::Cairo::Devel::TestHelper->create_cairo_document;
 
 fun Key_Event( (InstanceOf['Renard::Curie::Component::PageDrawingArea']) $pd, (Int) $key) {
 	my $event = Gtk3::Gdk::Event->new('key-press');

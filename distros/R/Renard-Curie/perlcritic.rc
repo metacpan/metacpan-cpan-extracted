@@ -1,6 +1,8 @@
 theme = ( core + pbp + security + maintenance ) * bugs
 include = CodeLayout::ProhibitSpaceIndentation CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireConsistentNewlines CodeLayout::TabIndentSpaceAlign
 
+[-Subroutines::ProhibitSubroutinePrototypes]
+
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Modern::Perl Moo Moo::Role Renard::Incunabula::Common::Setup
 

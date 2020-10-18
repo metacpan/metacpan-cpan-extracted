@@ -21,6 +21,7 @@ my @files = (
     't/000-report-versions.t',
     't/author-critic.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
@@ -38,7 +39,6 @@ my @files = (
     't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
-    't/release-minimum-version.t',
     't/release-portability.t',
     't/release-unused-vars.t',
     't/test.t'

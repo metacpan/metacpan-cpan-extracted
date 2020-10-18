@@ -4,7 +4,7 @@ Params::Validate - Validate method/function parameters
 
 # VERSION
 
-version 1.29
+version 1.30
 
 # SYNOPSIS
 
@@ -89,10 +89,10 @@ version 1.29
 
 # DESCRIPTION
 
-**I would recommend you consider using [Params::ValidationCompiler](https://metacpan.org/pod/Params::ValidationCompiler)
+**I would recommend you consider using [Params::ValidationCompiler](https://metacpan.org/pod/Params%3A%3AValidationCompiler)
 instead. That module, despite being pure Perl, is _significantly_ faster than
 this one, at the cost of having to adopt a type system such as [Specio](https://metacpan.org/pod/Specio),
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny), or the one shipped with [Moose](https://metacpan.org/pod/Moose)**.
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), or the one shipped with [Moose](https://metacpan.org/pod/Moose)**.
 
 This module allows you to validate method or function call parameters to an
 arbitrary level of specificity. At the simplest level, it is capable of
@@ -117,7 +117,7 @@ In addition, it can export the following constants, which are used as
 part of the type checking. These are `SCALAR`, `ARRAYREF`,
 `HASHREF`, `CODEREF`, `GLOB`, `GLOBREF`, and `SCALARREF`,
 `UNDEF`, `OBJECT`, `BOOLEAN`, and `HANDLE`. These are explained
-in the section on [Type Validation](https://metacpan.org/pod/Params::Validate#Type-Validation).
+in the section on [Type Validation](https://metacpan.org/pod/Params%3A%3AValidate#Type-Validation).
 
 The constants are available via the export tag `:types`. There is
 also an `:all` tag which includes all of the constants as well as the
@@ -491,7 +491,7 @@ returned, as appropriate.
 
 By default, when validation fails `Params::Validate` calls
 `Carp::confess()`. This can be overridden by setting the `on_fail`
-option, which is described in the ["GLOBAL" OPTIONS](https://metacpan.org/pod/&#x22;GLOBAL&#x22;&#x20;OPTIONS)
+option, which is described in the ["GLOBAL" OPTIONS](https://metacpan.org/pod/%22GLOBAL%22%20OPTIONS)
 section.
 
 ## Method calls
@@ -755,7 +755,7 @@ figures out how to do this, please let me know.
 
 # SUPPORT
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate](http://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate) or via email to [bug-params-validate@rt.cpan.org](mailto:bug-params-validate@rt.cpan.org).
+Bugs may be submitted at [https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate](https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate) or via email to [bug-params-validate@rt.cpan.org](mailto:bug-params-validate@rt.cpan.org).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
@@ -778,7 +778,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHORS
 
@@ -788,6 +788,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 # CONTRIBUTORS
 
 - Andy Grundman <andyg@activestate.com>
+- Diab Jerius <djerius@cfa.harvard.edu>
 - E. Choroba <choroba@matfyz.cz>
 - Ivan Bessarabov <ivan@bessarabov.ru>
 - J.R. Mash <jmash.code@gmail.com>
@@ -799,7 +800,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2001 - 2017 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2001 - 2020 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 

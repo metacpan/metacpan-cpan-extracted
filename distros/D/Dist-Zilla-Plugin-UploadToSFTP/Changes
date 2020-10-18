@@ -1,5 +1,7 @@
 Revision history for Dist-Zilla-Plugin-UploadToSFTP
 
+0.003     2020-10-17 17:31:51-05:00 America/Chicago
+  - Remove AnnoCPAN from documentation
 0.002     2011-11-21 14:36:15 America/New_York
   - use Net::SFTP::Foreign directly (Torsten Schoenfeld++)
   - fix size comparison test (Torsten Schoenfeld++)
