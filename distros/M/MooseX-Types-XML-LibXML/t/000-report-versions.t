@@ -80,8 +80,8 @@ sub read {
 
 # Create an object from a string
 sub read_string {
-    my $class = ref $_[0] ? ref shift : shift;
-    my $self = bless [], $class;
+    my $class  = ref $_[0] ? ref shift : shift;
+    my $self   = bless [], $class;
     my $string = $_[0];
     unless ( defined $string ) {
         return $self->_error("Did not provide a string to load");

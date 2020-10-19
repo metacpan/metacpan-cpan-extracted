@@ -47,6 +47,7 @@ t/gen.trivial.t
 t/gen.unnamed.sub.graph.t
 t/gen.utf8.1.t
 t/methods.t
+t/record.old.t
 t/sample.stt.1.dat
 t/sample.stt.2.dat
 t/snapshots/gen_anonymous_t/dot_file
@@ -81,6 +82,7 @@ t/snapshots/gen_sub_sub_graph_t/dot_file
 t/snapshots/gen_trivial_t/dot_file
 t/snapshots/gen_unnamed_sub_graph_t/dot_file
 t/snapshots/gen_utf8_1_t/dot_file
+t/snapshots/record_old_t/dot_file
 xt/author/pod.t
 xt/manifest.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

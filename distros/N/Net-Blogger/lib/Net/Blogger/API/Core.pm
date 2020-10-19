@@ -6,11 +6,11 @@ Net::Blogger::API::Core - Blogger API methods
 
 =head1 SYNOPSIS
 
- It's very dark in here because this is a black box. 
+ It's very dark in here because this is a black box.
 
 =head1 DESCRIPTION
 
-Net::Blogger::API::Core defined methods that correspond to the 
+Net::Blogger::API::Core defined methods that correspond to the
 Blogger API.
 
 It is inherited by I<Net::Blogger::Engine::Base.pm>
@@ -20,7 +20,7 @@ It is inherited by I<Net::Blogger::Engine::Base.pm>
 package Net::Blogger::API::Core;
 use strict;
 
-$Net::Blogger::API::Core::VERSION   = '1.0';
+$Net::Blogger::API::Core::VERSION   = '1.01';
 @Net::Blogger::API::Core::ISA       = qw ( Exporter );
 @Net::Blogger::API::Core::EXPORT    = qw ();
 @Net::Blogger::API::Core::EXPORT_OK = qw ();
@@ -31,7 +31,7 @@ use Exporter;
 
 =head2 $pkg->getUsersBlogs()
 
-Fetch the I<blogid>, I<url> and I<blogName> for each of the Blogger blogs 
+Fetch the I<blogid>, I<url> and I<blogName> for each of the Blogger blogs
 the current user is registered to.
 
 Returns an array ref of hashes.
@@ -41,7 +41,7 @@ Returns an array ref of hashes.
 sub getUsersBlogs {
     my $self  = shift;
     my $blogs = [];
-    
+
     my $call = $self->_Client->call(
 				    "blogger.getUsersBlogs",
 				    $self->_Type(string=>$self->AppKey()),
@@ -54,7 +54,7 @@ sub getUsersBlogs {
 
 =head2 $pkg->newPost(\%args)
 
-Add a new post to the Blogger server. 
+Add a new post to the Blogger server.
 
 Valid arguments are :
 
@@ -68,14 +68,14 @@ Scalar ref.
 
 =item *
 
-B<publish> 
+B<publish>
 
 Boolean.
 
 =back
 
-If the length of I<postbody> exceeds maximum length allowed by the Blogger servers 
--- 65,536 characters -- currently  the text will be chunked into smaller pieces are 
+If the length of I<postbody> exceeds maximum length allowed by the Blogger servers
+-- 65,536 characters -- currently  the text will be chunked into smaller pieces are
 each piece will be posted separately.
 
 Releases prior to Net::Blogger 0.85 accepted a list of arguments
@@ -89,12 +89,12 @@ sub newPost {
     my $self = shift;
     my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
 
-    if (! $self->check_newPost($args)) { 
-      return 0; 
+    if (! $self->check_newPost($args)) {
+      return 0;
     }
 
-    if ($self->check_exceedsMaxLength($args)) { 
-      return $self->_PostInChunks(%$args); 
+    if ($self->check_exceedsMaxLength($args)) {
+      return $self->_PostInChunks(%$args);
     }
 
     my $postbody = $args->{'postbody'};
@@ -109,13 +109,13 @@ sub newPost {
 				    $self->_Type(string=>$$postbody),
 				    $self->_Type(boolean=>$publish),
 				    );
-    
+
     return ($call) ? $call->result() : return 0;
 }
 
 =head2 $pkg->getPost($postid)
 
-Returns a hash ref, containing the following keys : userid, postid, 
+Returns a hash ref, containing the following keys : userid, postid,
 content and dateCreated.
 
 =cut
@@ -124,10 +124,10 @@ sub getPost {
     my $self   = shift;
     my $postid = shift;
 
-    if (! $self->check_getPost($postid)) { 
+    if (! $self->check_getPost($postid)) {
       return 0;
     }
-    
+
     my $call = $self->_Client->call(
 				    "blogger.getPost",
 				    $self->_Type(string=>$self->AppKey()),
@@ -152,10 +152,10 @@ sub getPost {
 
 =head2 $pkg->getRecentPosts(\%args)
 
-Fetch the latest (n) number of posts for a given blog. The most recent posts 
+Fetch the latest (n) number of posts for a given blog. The most recent posts
 are returned first.
 
-Valid arguments are 
+Valid arguments are
 
 =over 4
 
@@ -165,8 +165,8 @@ B<numposts>
 
 Int. If no argument is passed to the method, default is 1.
 
-"NumberOfPosts is limited to 20 at this time. Let me know if this 
-gets annoying. Letting this number get too high could result in some 
+"NumberOfPosts is limited to 20 at this time. Let me know if this
+gets annoying. Letting this number get too high could result in some
 expensive db access, so I want to be careful with it." --Ev
 
 =back
@@ -174,7 +174,7 @@ expensive db access, so I want to be careful with it." --Ev
 Releases prior to Net::Blogger 0.85 accepted a list of arguments
 rather than a reference. Version 0.85+ are backwards compatible.
 
-Returns true or false, followed by an array of hash refs. Each hash ref 
+Returns true or false, followed by an array of hash refs. Each hash ref
 contains the following keys : postid,content,userid,dateCreated
 
 =cut
@@ -183,8 +183,8 @@ sub getRecentPosts {
     my $self = shift;
     my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
 
-    if (! $self->check_getRecentPosts($args)) { 
-      return (0); 
+    if (! $self->check_getRecentPosts($args)) {
+      return (0);
     }
 
     my $call = $self->_Client->call(
@@ -222,14 +222,14 @@ String. I<required>
 
 =item *
 
-B<publish> 
+B<publish>
 
 Boolean.
 
 =back
 
-If the length of I<postbody> exceeds maximum length allowed by the Blogger servers 
--- 65,536 characters -- currently  the text will be chunked into smaller pieces are 
+If the length of I<postbody> exceeds maximum length allowed by the Blogger servers
+-- 65,536 characters -- currently  the text will be chunked into smaller pieces are
 each piece will be posted separately.
 
 Releases prior to Net::Blogger 0.85 accepted a list of arguments
@@ -243,17 +243,17 @@ sub editPost {
     my $self = shift;
     my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
 
-    if (! $self->check_editPost($args)) { 
-      return 0; 
+    if (! $self->check_editPost($args)) {
+      return 0;
     }
 
-    if ($self->check_exceedsMaxLength($args)) { 
-      return $self->_PostInChunks(%$args); 
+    if ($self->check_exceedsMaxLength($args)) {
+      return $self->_PostInChunks(%$args);
     }
 
     my $postbody = $args->{'postbody'};
     my $postid   = $args->{'postid'};
-    
+
     if (($self->MaxPostLength()) && (length($$postbody) > $self->MaxPostLength())) {
 	return $self->_PostInChunks(%$args);
     }
@@ -275,7 +275,7 @@ sub editPost {
     ($call) ? return $call->result() : return 0;
 }
 
-=head2 $pkg->deletePost(\%args) 
+=head2 $pkg->deletePost(\%args)
 
 Delete a post from the Blogger server.
 
@@ -285,13 +285,13 @@ Valid arguments are
 
 =item *
 
-B<postid> 
+B<postid>
 
 String. I<required>
 
 =item *
 
-B<publish> 
+B<publish>
 
 Boolean.
 
@@ -308,10 +308,10 @@ sub deletePost {
     my $self = shift;
     my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
 
-    if (! $self->check_deletePost($args)) { 
-      return 0; 
+    if (! $self->check_deletePost($args)) {
+      return 0;
     }
-    
+
     my $postid  = $args->{'postid'};
     my $publish = ($args->{'publish'}) ? 1 : 0;
 
@@ -332,12 +332,12 @@ sub deletePost {
 Set the body of the template matching type I<$type>.
 
  <quote src = "ev">
-  template is the HTML (XML, whatever -- Blogger can output any sort 
-  of text). Must contain opening and closing <Blogger> tags to be 
+  template is the HTML (XML, whatever -- Blogger can output any sort
+  of text). Must contain opening and closing <Blogger> tags to be
   valid and accepted.
  </quote>
 
-Valid arguments are 
+Valid arguments are
 
 =over 4
 
@@ -389,7 +389,7 @@ sub setTemplate {
 
 Fetch the body of the template matching type I<$type>.
 
-Valid types are 
+Valid types are
 
 =over 4
 
@@ -413,7 +413,7 @@ Returns a string.
 sub getTemplate {
     my $self = shift;
     my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
-    
+
     if (! $self->check_getTemplate($args)) {
       return 0;
     }
@@ -453,7 +453,7 @@ sub check_newPost {
     $self->LastError("You must pass postbody as a scalar reference.");
     return 0;
   }
-    
+
   return 1;
 }
 
@@ -474,17 +474,17 @@ sub check_getRecentPosts {
   my $args = shift;
 
   my $num   = (defined $args->{'numposts'}) ? $args->{'numposts'} : 1;
-  
+
   unless ($num =~ /^(\d+)$/) {
     $self->LastError("Argument $args->{'numposts'} isn't numeric.");
     return 0;
   }
-  
+
   unless (($num >= 1) && ($num <= 20)) {
     $self->LastError("You must specify 'numposts' as an integer between 1 and 20.");
     return (0);
   }
-  
+
   return 1;
 }
 
@@ -492,16 +492,16 @@ sub check_editPost {
   my $self = shift;
   my $args = shift;
 
-  if (! $args->{'postid'}) { 
+  if (! $args->{'postid'}) {
     $self->LastError("You must specify a postid.");
-    return 0; 
+    return 0;
   }
-  
+
   if (ref($args->{'postbody'}) ne "SCALAR") {
     $self->LastError("You must pass postbody as a scalar reference.");
     return 0;
   }
-  
+
     return 1;
 }
 
@@ -513,7 +513,7 @@ sub check_deletePost {
     $self->LastError("No post id.");
     return 0;
   }
-  
+
   return 1;
 }
 
@@ -525,7 +525,7 @@ sub check_setTemplate {
     $self->LastError("You must pass template as a scalar reference.");
     return 0;
   }
-  
+
   unless ($args->{'type'} =~ /^(main|archiveIndex)$/) {
     $self->LastError("Valid template types are 'main' and 'archiveIndex'.");
     return 0;
@@ -536,7 +536,7 @@ sub check_setTemplate {
     $self->LastError("Your template must contain opening and closing <Blogger> tags.");
     return 0;
   }
-  
+
   return 1;
 }
 

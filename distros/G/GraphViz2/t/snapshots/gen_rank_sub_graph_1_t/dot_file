@@ -12,13 +12,13 @@
  "Malvern" -> "Oakleigh" [ color="brown" ]
 
  subgraph {
-  rank="same" 
+  rank="same"
   "Malvern" [ color="green" shape="box" ]
   "Prahran"
  }
 
  subgraph {
-  rank="same" 
+  rank="same"
   "Oakleigh" [ color="blue" ]
   "Murrumbeena" [ color="orange" shape="doublecircle" ]
  }

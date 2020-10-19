@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -37,7 +37,7 @@
             "Digest::MD5" : "2.2",
             "IO" : "1.12",
             "Net::IP" : "1.26",
-            "perl" : "v5.10.0"
+            "perl" : "5.010000"
          }
       },
       "test" : {
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.31",
+   "version" : "0.32",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,3 +1,8 @@
+0.003   2020-10-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Acme::CPAN::Testers::DevelCheckOS.
+
+
 0.002   2020-10-10  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

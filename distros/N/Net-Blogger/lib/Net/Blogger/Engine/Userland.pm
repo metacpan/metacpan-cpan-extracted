@@ -10,7 +10,7 @@ Net::Blogger::Engine::Userland - base class for UserLand Blogger API engines
 
 =head1 DESCRIPTION
 
-This package inherits I<Net::Blogger::Engine::Base> and implements shared methods 
+This package inherits I<Net::Blogger::Engine::Base> and implements shared methods
 for the UserLand Manila and RadioUserland XML-RPC servers.
 
 This package should not be called directly. It is a base class used by
@@ -21,7 +21,7 @@ I<Net::Blogger::Engine::Manila> and I<Net::Blogger::Engine::Radio>
 package Net::Blogger::Engine::Userland;
 use strict;
 
-$Net::Blogger::Engine::Userland::VERSION   = '1.0';
+$Net::Blogger::Engine::Userland::VERSION   = '1.01';
 @Net::Blogger::Engine::Userland::ISA       = qw ( Exporter Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Userland::EXPORT    = qw ();
 @Net::Blogger::Engine::Userland::EXPORT_OK = qw ();
@@ -49,7 +49,7 @@ sub init {
     my $args = (ref($_[0]) eq "HASH") ? shift : {@_};
 
     my $child = caller();
-    
+
     if (! $child =~ /^(Net::Blogger::Engine::(Manila|Radio))$/) {
 	return 0;
     }
@@ -69,9 +69,9 @@ Get/set the URI of the Manila->Blogger proxy.
 If no proxy is explicitly defined then the method determines the hostname
 for the Manila server using the current blogid.
 
- "Just to clarify, the URI is /RPC2, even if your blogid (homepage url) is 
-  a sub-site url, like http://www.myserver.com/mysite/. It's never something 
-  like /mysite/RPC2." 
+ "Just to clarify, the URI is /RPC2, even if your blogid (homepage url) is
+  a sub-site url, like http://www.myserver.com/mysite/. It's never something
+  like /mysite/RPC2."
 
     --Jake Savin (Userland)
 
@@ -89,7 +89,7 @@ sub Proxy {
     if ($self->{"_proxy"}) {
 	return $self->{"_proxy"};
     }
-    
+
     if (my $blog = $self->BlogId()) {
 	my $uri = URI->new($blog);
 	$self->{"_proxy"} = $uri->scheme()."://".$uri->host()."/RPC2";
@@ -104,7 +104,7 @@ sub Proxy {
 
 =head2 $pkg->AppKey()
 
-Returns true. Manila does not require a Blogger API key, but specifies 
+Returns true. Manila does not require a Blogger API key, but specifies
 something (anything) all the same.
 
 =cut
@@ -118,7 +118,7 @@ sub AppKey {
 
 Get/Set the current blog id.
 
-Ensures that the blogid contains a trailing slash, without which the Frontier 
+Ensures that the blogid contains a trailing slash, without which the Frontier
 engine freaks out.
 
 =cut
@@ -139,8 +139,8 @@ sub BlogId {
 
 By default, returns undef. In other words, there is no max post length for Manila.
 
- "As far as I know there is no max length for a post, certainly nothing you have 
-  to enforce on your end." 
+ "As far as I know there is no max length for a post, certainly nothing you have
+  to enforce on your end."
 
    --Dave Winer (Userland)
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::watcher:
     file: lib/App/watcher.pm
-    version: '0.12'
+    version: '0.13'
 recommends:
   Linux::Inotify2: '0'
 requires:
@@ -36,12 +36,13 @@ resources:
   bugtracker: https://github.com/tokuhirom/App-watcher/issues
   homepage: https://github.com/tokuhirom/App-watcher
   repository: git://github.com/tokuhirom/App-watcher.git
-version: '0.12'
+version: '0.13'
 x_contributors:
   - 'Neil Bowers <neil@bowers.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
   - 'Yuuki Furuyama <addsict@gmail.com>'
+  - 'hirafoo <hirafoo@cpan.org>'
   - 'issm <issmxx@gmail.com>'
   - 'wenjun.yan <wenjun.yan@linecorp.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

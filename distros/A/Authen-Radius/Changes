@@ -1,5 +1,8 @@
 Revision history for Perl extension Radius.
 
+0.32 Mon Oct 19 10:54:42 2020
+    - Fixed MIN_PERL_VERSION in Makefile.PL, required by ExtUtils::MakeMaker@7.48
+
 0.31 Fri Jun 21 16:10:42 2019
     - Fixed check_pwd() method when dictionaries are not loaded and attribute ID is used instead of Name
       (reported by Christopher Florio).

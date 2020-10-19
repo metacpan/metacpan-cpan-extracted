@@ -5,7 +5,7 @@ WriteMakefile(
     NAME => 'Authen::Radius',
     VERSION_FROM => 'Radius.pm', # finds $VERSION
     PPM_INSTALL_SCRIPT => 'install-radius-db.PL',
-    MIN_PERL_VERSION => "v5.10",
+    MIN_PERL_VERSION => "v5.10.0",
     BUILD_REQUIRES => {
         # Support for TEST_REQUIRES
         'ExtUtils::MakeMaker' => "6.64",

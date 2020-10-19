@@ -1,12 +1,13 @@
 package Mail::BIMI::App::Command::checkvmc;
 # ABSTRACT: Check an VMC for validation
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
 use Mail::BIMI::App -command;
 use Mail::BIMI;
 use Mail::BIMI::Indicator;
+use Mail::BIMI::VMC;
 use Term::ANSIColor qw{ :constants };
 
 
@@ -43,7 +44,7 @@ sub execute($self,$opt,$args) {
 
   my $bimi = Mail::BIMI->new(%bimi_opt);
 
-  my $vmc = Mail::BIMI::VMC->new( uri => $uri, bimi_object => $bimi );
+  my $vmc = Mail::BIMI::VMC->new( check_domain => $opt->domain//'', uri => $uri, bimi_object => $bimi );
   #  $indicator->validator_profile($opt->profile) if $opt->profile;
   say "BIMI VMC checker";
   say '';
@@ -74,7 +75,7 @@ Mail::BIMI::App::Command::checkvmc - Check an VMC for validation
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 
@@ -91,6 +92,8 @@ App::Cmd class implementing the 'mailbimi checksvg' command
 =item * L<Mail::BIMI::Indicator|Mail::BIMI::Indicator>
 
 =item * L<Mail::BIMI::Prelude|Mail::BIMI::Prelude>
+
+=item * L<Mail::BIMI::VMC|Mail::BIMI::VMC>
 
 =item * L<Term::ANSIColor|Term::ANSIColor>
 

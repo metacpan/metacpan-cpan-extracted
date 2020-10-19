@@ -13,11 +13,11 @@ use Net::DNS::Resolver::Mock 1.20200214;
 
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
-my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com');
+my $bimi = Mail::BIMI->new(domain=>'test.com');
 $bimi->resolver($resolver);
 
 subtest 'Null Cache Is Null' => sub{
-  my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',options=>{cache_backend=>'Null'});
+  my $bimi = Mail::BIMI->new(domain=>'cachenull.com',options=>{cache_backend=>'Null'});
   $bimi->resolver($resolver);
   $bimi->record->is_valid; # Make the Fetch Happen
   my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -29,7 +29,7 @@ subtest 'Null Cache Is Null' => sub{
 };
 
 subtest 'Null Cache Is Still Null' => sub{
-  my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',options=>{cache_backend=>'Null'});
+  my $bimi = Mail::BIMI->new(domain=>'cachenull.com',options=>{cache_backend=>'Null'});
   $bimi->resolver($resolver);
   $bimi->record->is_valid; # Make the Fetch Happen
   my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);

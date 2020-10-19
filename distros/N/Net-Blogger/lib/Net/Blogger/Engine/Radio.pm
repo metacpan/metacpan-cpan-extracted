@@ -24,7 +24,7 @@ Net::Blogger::Engine::Radio - UserLand Radio Blogger API engine
 
 =head1 DESCRIPTION
 
-This package inherits I<Net::Blogger::Engine::Userland> and implements 
+This package inherits I<Net::Blogger::Engine::Userland> and implements
 methods specific to a RadioUserLand XML-RPC server.
 
 =cut
@@ -32,7 +32,7 @@ methods specific to a RadioUserLand XML-RPC server.
 package Net::Blogger::Engine::Radio;
 use strict;
 
-$Net::Blogger::Engine::Radio::VERSION   = '1.0';
+$Net::Blogger::Engine::Radio::VERSION   = '1.01';
 @Net::Blogger::Engine::Radio::ISA       = qw (
                                          Exporter
                                          Net::Blogger::Engine::Userland
@@ -61,7 +61,7 @@ sub new {
 
     my $self = {};
     bless $self,$pkg;
-    
+
     if (! $self->SUPER::init(@_)) {
 	return undef;
     }

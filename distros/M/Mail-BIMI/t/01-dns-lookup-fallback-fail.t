@@ -22,12 +22,11 @@ $dmarc->result->result( 'pass' );
 $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 
-$resolver->die_on( 'default._bimi.gallifreyburning.com', 'TXT', 'Fail' );
-$bimi->domain( 'gallifreyburning.com' );
-$bimi->selector( 'foobarMISSING' );
+$resolver->die_on( 'selector._bimi.dnslookupfallbackfail.com', 'TXT', 'Fail' );
+$bimi->domain( 'subdomain.dnslookupfallbackfail.com' );
+$bimi->selector( 'selector' );
 
 my $record = $bimi->record;
-
 is_deeply(
     [ $record->is_valid, $record->error_codes ],
     [ 0, ['DNS_ERROR'] ],

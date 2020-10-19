@@ -10,8 +10,6 @@ META.yml
 README
 README.md
 cpanfile
-doc/MIT-LICENSE
-doc/PERL-LICENSE
 lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm
 lib/App/Perlbrew/Path/Installations.pm

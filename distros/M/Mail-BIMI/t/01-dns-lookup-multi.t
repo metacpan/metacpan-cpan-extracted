@@ -22,7 +22,7 @@ $dmarc->result->result( 'pass' );
 $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 
-$bimi->domain( 'multi.com' );
+$bimi->domain( 'dnslookupmulti.com' );
 $bimi->selector( 'default' );
 
 my $record = $bimi->record;

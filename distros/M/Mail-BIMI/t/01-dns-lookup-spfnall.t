@@ -23,9 +23,9 @@ my $spf_server = Mail::SPF::Server->new(
 my $spf_request = Mail::SPF::Request->new(
  'versions'      => [1],
  'scope'         => 'mfrom',
- 'identity'      => 'test@spfnall.gallifreyburning.com',
+ 'identity'      => 'test@dnslookupspfnall.com',
  'ip_address'    => '66.111.4.25',
- 'helo_identity' => 'spfnall.galllifreyburning.com',
+ 'helo_identity' => 'dnslookupspfnall.com',
 );
 
 my $spf_result = $spf_server->process($spf_request);
@@ -39,12 +39,12 @@ $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 $bimi->spf_object( $spf_result );
 
-$bimi->domain( 'spfall.gallifreyburning.com' );
+$bimi->domain( 'dnslookupspfnall.com' );
 $bimi->selector( 'default' );
 
 my $result = $bimi->result;
 my $auth_results = $result->get_authentication_results;
-my $expected_result = 'bimi=pass header.d=spfall.gallifreyburning.com header.selector=default';
+my $expected_result = 'bimi=pass header.d=dnslookupspfnall.com header.selector=default';
 is( $auth_results, $expected_result, 'Auth results correcct' );
 
 my $expected_headers = {

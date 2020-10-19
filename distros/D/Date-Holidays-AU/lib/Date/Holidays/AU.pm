@@ -10,7 +10,7 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.23';
+our $VERSION   = '0.24';
 
 sub _DEFAULT_STATE { return 'VIC' }
 
@@ -893,7 +893,7 @@ sub _compute_vic_grand_final_eve_day {    # i have no words ...
         2017 => { day => 29, month => 8 },
         2018 => { day => 28, month => 8 },
         2019 => { day => 27, month => 8 },
-        2020 => { day => 25, month => 8 },
+        2020 => { day => 23, month => 9 },    # Technically "Thank you" day.
     );
     if ( $year < 2015 ) {
         return ();

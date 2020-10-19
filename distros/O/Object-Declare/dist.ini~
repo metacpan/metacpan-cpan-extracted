@@ -7,5 +7,8 @@ version = 0.24
 
 [@Filter]
 -bundle = @SHLOMIF
+-remove = License
 dist = Object-Declare
 github_name = perl-Object-Declare
+[Test::Kwalitee]
+[Test::TidyAll]

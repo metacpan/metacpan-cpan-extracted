@@ -12,7 +12,7 @@ Net::Blogger::Engine::Movabletype - Movabletype Blogger API engine
  $mt->Username("foo");
  $mt->Password("bar");
 
- my $postid_1 = $mt->newPost(postbody=>\"hello world") 
+ my $postid_1 = $mt->newPost(postbody=>\"hello world")
     || croak $mt->LastError();
 
  my $postid_2 = $mt->metaWeblog()->newPost(
@@ -23,7 +23,7 @@ Net::Blogger::Engine::Movabletype - Movabletype Blogger API engine
 
 =head1 DESCRIPTION
 
-This package inherits I<Net::Blogger::Engine::Base> and implements 
+This package inherits I<Net::Blogger::Engine::Base> and implements
 methods specific to a MovableType XML-RPC server.
 
 =cut
@@ -31,7 +31,7 @@ methods specific to a MovableType XML-RPC server.
 package Net::Blogger::Engine::Movabletype;
 use strict;
 
-$Net::Blogger::Engine::Movabletype::VERSION   = '1.0';
+$Net::Blogger::Engine::Movabletype::VERSION   = '1.01';
 @Net::Blogger::Engine::Movabletype::ISA       = qw ( Exporter Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Movabletype::EXPORT    = qw ();
 @Net::Blogger::Engine::Movabletype::EXPORT_OK = qw ();

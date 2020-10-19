@@ -6,7 +6,7 @@ use Object::Simple -base;
 use Getopt::Kingpin::Arg;
 use Carp;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 has _args => sub {
     return [];

@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::HasHTTPClient;
 # ABSTRACT: Class to model a HTTP client
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -19,6 +19,7 @@ requires 'http_client_max_fetch_size';
     $http_client = HTTP::Tiny::Paranoid->new(
       agent => $agent,
       max_size => $self->http_client_max_fetch_size,
+      max_redirect => $self->bimi_object->options->http_client_max_redirect,
       timeout => $self->bimi_object->options->http_client_timeout,
       verify_SSL => 1,     # Certificates MUST verify
     );
@@ -40,7 +41,7 @@ Mail::BIMI::Role::HasHTTPClient - Class to model a HTTP client
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 

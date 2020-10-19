@@ -1,3 +1,7 @@
+2.58 2020-10-19
+- add combine_node_and_port global option
+- add_node(label => [{port=>...}]) no need <>
+
 2.57 2020-10-15
 - drop unnecessary use of "open" and "charnames"
 - setting defaults for subgraphs no longer affects outside those

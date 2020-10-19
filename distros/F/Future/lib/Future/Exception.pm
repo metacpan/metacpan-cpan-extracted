@@ -5,10 +5,11 @@
 
 package Future::Exception;
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 =head1 NAME
 

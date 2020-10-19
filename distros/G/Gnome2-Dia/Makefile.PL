@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 use Cwd;
 use File::Spec;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Dia/Makefile.PL,v 1.1 2004/09/14 17:54:16 kaffeetisch Exp $
+# $Id$
 
 our %build_reqs = (
   'perl-ExtUtils-Depends'   => '0.20',
@@ -29,6 +29,8 @@ unless (eval "use ExtUtils::Depends '$build_reqs{'perl-ExtUtils-Depends'}';"
            . "1") {
   warn "$@\n";
   WriteMakefile(
+    # don't clobber the existing META.yml
+    NO_META      => 1,
     PREREQ_FATAL => 1,
     PREREQ_PM    => {
       'Glib'                => $build_reqs{'perl-Glib'},
@@ -79,8 +81,37 @@ WriteMakefile(
   ABSTRACT_FROM => 'Dia.pm',
   XSPROTOARG    => '-noprototypes',
   MAN3PODS      => \%pod_files,
+  # don't clobber the existing META.yml
+  NO_META      => 1,
   $diacanvas->get_makefile_vars,
 );
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-dia
+* Upstream URL: https://sourceforge.net/projects/diacanvas/
+* Last upstream version: 0.15.4 (DiaCanvas2)
+* Last upstream release date: 2007-08-03
+* Migration path for this module: No upstream replacement
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
+
 
 sub MY::postamble {
   return Glib::MakeHelper->postamble_clean ()

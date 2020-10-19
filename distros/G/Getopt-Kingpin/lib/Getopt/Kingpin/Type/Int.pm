@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 sub set_value {
     my $self = shift;

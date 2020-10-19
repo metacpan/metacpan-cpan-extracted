@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@iglu.org.il>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "bundle",
       "shlomif",
@@ -104,7 +104,7 @@
    "provides" : {
       "Task::Sites::ShlomiFish" : {
          "file" : "lib/Task/Sites/ShlomiFish.pm",
-         "version" : "0.0213"
+         "version" : "0.0214"
       }
    },
    "release_status" : "stable",
@@ -117,6 +117,6 @@
          "url" : "https://github.com/thewml/latemp"
       }
    },
-   "version" : "0.0213",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.0214",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

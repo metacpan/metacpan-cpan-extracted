@@ -24,7 +24,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0801
+version 0.0802
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

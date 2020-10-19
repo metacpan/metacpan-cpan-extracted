@@ -26,7 +26,7 @@ use URI;
 
 use Net::Blogger::Engine::Base;
 
-$Net::Blogger::Engine::Slash::slashcode::VERSION   = '1.0';
+$Net::Blogger::Engine::Slash::slashcode::VERSION   = '1.01';
 
 @Net::Blogger::Engine::Slash::slashcode::ISA       = qw ( Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Slash::slashcode::EXPORT    = qw ();

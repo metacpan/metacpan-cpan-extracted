@@ -1,6 +1,6 @@
 package Mail::BIMI::Record::Authority;
 # ABSTRACT: Class to model a BIMI authority
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -53,7 +53,8 @@ sub _build_is_valid($self) {
 sub _build_vmc($self) {
   return if !$self->is_authority_valid;
   return if !$self->is_relevant;
-  return Mail::BIMI::VMC->new( uri => $self->uri, bimi_object => $self->bimi_object );
+  my $check_domain = $self->bimi_object->domain;
+  return Mail::BIMI::VMC->new( check_domain => $check_domain, uri => $self->uri, bimi_object => $self->bimi_object );
 }
 
 
@@ -75,7 +76,7 @@ Mail::BIMI::Record::Authority - Class to model a BIMI authority
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 

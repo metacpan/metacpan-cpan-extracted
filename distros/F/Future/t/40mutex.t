@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 
+use v5.10;
 use strict;
 use warnings;
 
 use Test::More;
+use Test::Refcount;
 
 use Future;
 use Future::Mutex;
@@ -15,10 +17,12 @@ use Future::Mutex;
    ok( $mutex->available, 'Mutex is available' );
 
    my $f;
-   my $lf = $mutex->enter( sub { $f = Future->new } );
+   my $lf = $mutex->enter( sub { $f = t::Future::Subclass->new } );
 
    ok( defined $lf, '->enter returns Future' );
    ok( defined $f, '->enter on new Mutex runs code' );
+
+   isa_ok( $lf, "t::Future::Subclass", '$lf' );
 
    ok( !$mutex->available, 'Mutex is unavailable' );
 
@@ -27,6 +31,9 @@ use Future::Mutex;
    $f->done;
    ok( $lf->is_ready, 'locked future ready after $f->done' );
    ok( $mutex->available, 'Mutex is available again' );
+
+   undef $f;
+   is_oneref( $lf, '$lf has one ref at EOT' );
 }
 
 # done chaining
@@ -34,10 +41,15 @@ use Future::Mutex;
    my $mutex = Future::Mutex->new;
 
    my $f1;
-   my $lf1 = $mutex->enter( sub { $f1 = Future->new } );
+   my $lf1 = $mutex->enter( sub { $f1 = t::Future::Subclass->new } );
 
    my $f2;
-   my $lf2 = $mutex->enter( sub { $f2 = Future->new } );
+   my $lf2 = $mutex->enter( sub { $f2 = t::Future::Subclass->new } );
+
+   isa_ok( $lf1, "t::Future::Subclass", '$lf1' );
+   isa_ok( $lf2, "t::Future::Subclass", '$lf2' );
+
+   is_oneref( $lf2, '$lf2 has one ref' );
 
    ok( !defined $f2, 'second enter not invoked while locked' );
 
@@ -47,6 +59,12 @@ use Future::Mutex;
    $f2->done;
    ok( $lf2->is_ready, 'second locked future ready after $f2->done' );
    ok( $mutex->available, 'Mutex is available again' );
+
+   undef $f1;
+   undef $f2;
+
+   is_oneref( $lf1, '$lf1 has one ref at EOT' );
+   is_oneref( $lf2, '$lf2 has one ref at EOT' );
 }
 
 # fail chaining
@@ -119,10 +137,12 @@ use Future::Mutex;
 
    my ( $f1, $f2, $f3 );
    my $f = Future->needs_all(
-      $mutex->enter( sub { $f1 = Future->new } ),
-      $mutex->enter( sub { $f2 = Future->new } ),
-      $mutex->enter( sub { $f3 = Future->new } ),
+      $mutex->enter( sub { $f1 = t::Future::Subclass->new } ),
+      $mutex->enter( sub { $f2 = t::Future::Subclass->new } ),
+      $mutex->enter( sub { $f3 = t::Future::Subclass->new } ),
    );
+
+   isa_ok( $f, "t::Future::Subclass", '$f' );
 
    ok( defined $f1, '$f1 defined' );
    $f1->done;
@@ -163,3 +183,6 @@ use Future::Mutex;
 }
 
 done_testing;
+
+package t::Future::Subclass;
+use base qw( Future );

@@ -11,7 +11,7 @@ use Net::DNS::Resolver::Mock 1.20200214;
 
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
-my $bimi = Mail::BIMI->new(domain=>'example.com');
+my $bimi = Mail::BIMI->new(domain=>'test.com');
 $bimi->resolver($resolver);
 
 subtest 'No errors' => sub{
@@ -29,7 +29,7 @@ subtest 'Has error' => sub{
 };
 
 subtest 'Deserialize' => sub {
-  my $bimi2 = Mail::BIMI->new(domain=>'example.com');
+  my $bimi2 = Mail::BIMI->new(domain=>'test.com');
   $bimi2->deserialize_errors($serialized);
   is(scalar $bimi2->errors->@*, 2, '2 Errors added');
   subtest 'First Error' => sub {

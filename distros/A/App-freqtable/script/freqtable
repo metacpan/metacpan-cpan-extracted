@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-10-11'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-10-19'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -175,7 +175,7 @@ freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.003 of freqtable (from Perl distribution App-freqtable), released on 2020-10-11.
+This document describes version 0.004 of freqtable (from Perl distribution App-freqtable), released on 2020-10-19.
 
 =head1 SYNOPSIS
 
@@ -313,6 +313,14 @@ This utility counts the occurences of lines (or words/characters) in the input
 then display each unique lines along with their number of occurrences. You can
 also instruct it to only show lines that have a specified number of occurrences.
 
+You can use the following Unix command to count occurences of lines:
+
+ % sort input-lines.txt | uniq -c | sort -nr
+
+and with a bit more work you can also use a combination of existing Unix
+commands to count occurrences of words/characters, as well as filter items that
+have a specified number of occurrences; freqtable basically offers convenience.
+
 =head1 EXIT CODES
 
 0 on success.
@@ -389,7 +397,7 @@ feature.
 
 =head1 SEE ALSO
 
-B<wc>
+Unix commands B<wc>, B<sort>, B<uniq>
 
 =head1 AUTHOR
 

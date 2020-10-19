@@ -62,7 +62,7 @@ use strict;
 use Exporter;
 use Net::Blogger::Engine::Base;
 
-$Net::Blogger::Engine::Movabletype::mt::VERSION   = '1.0';
+$Net::Blogger::Engine::Movabletype::mt::VERSION   = '1.01';
 
 @Net::Blogger::Engine::Movabletype::mt::ISA       = qw ( Exporter Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Movabletype::mt::EXPORT    = qw ();
@@ -82,7 +82,7 @@ Valid arguments are :
 
 B<count>
 
-Int. 
+Int.
 
 The number of post titles to fetch. Default is I<20>
 
@@ -97,7 +97,7 @@ returned 'most recent first'.
 
 =back
 
-Returns an array ref of hash refs. Each hash ref contains the following 
+Returns an array ref of hash refs. Each hash ref contains the following
 keys :
 
 =over 4
@@ -188,7 +188,7 @@ sub getCategoryList {
 
 =head2 $obj->getPostCategories(\%args)
 
-Valid arguments are 
+Valid arguments are
 
 =over
 
@@ -246,13 +246,13 @@ The MT docs state that :
 
 =over 4
 
-=item * 
+=item *
 
-The array categories is an array of structs containing 
+The array categories is an array of structs containing
 
 =over 4
 
-=item * 
+=item *
 
 B<categoryId>
 
@@ -262,8 +262,8 @@ String.
 
 B<isPrimary>
 
-Using isPrimary to set the primary category is optional--in the absence of 
-this flag, the first struct in the array will be assigned the primary category for 
+Using isPrimary to set the primary category is optional--in the absence of
+this flag, the first struct in the array will be assigned the primary category for
 the post
 
 =back
@@ -282,7 +282,7 @@ Returns true or false
 sub setPostCategories {
   my $self = shift;
   my $args = (ref($_[0]) eq "HASH") ? shift : {@_};
-  
+
   if (! $args->{'postid'}) {
     $self->LastError("You must specify a postid");
     return undef;
@@ -327,15 +327,15 @@ Returns an array reference of hash references who keys are :
 
 =over 4
 
-=item * 
+=item *
 
 I<pingTitle>
 
-=item * 
+=item *
 
 I<pingURL>
 
-=item * 
+=item *
 
 I<pingIP>
 
@@ -385,7 +385,7 @@ sub publishPost {
 				      $self->_Type(string=>$self->Password()),
 				      );
 
-    return ($call) ? 1 : 0;    
+    return ($call) ? 1 : 0;
 }
 
 =head1 VERSION
@@ -400,7 +400,7 @@ $Date: 2005/03/26 19:29:08 $
 
 Aaron Straup Cope
 
-=head1 SEE ALSO 
+=head1 SEE ALSO
 
 L<Net::Blogger::Engine::Base>
 

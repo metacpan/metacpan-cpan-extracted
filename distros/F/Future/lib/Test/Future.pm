@@ -5,11 +5,12 @@
 
 package Test::Future;
 
+use v5.10;
 use strict;
 use warnings;
 use base qw( Test::Builder::Module );
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 our @EXPORT = qw(
    no_pending_futures

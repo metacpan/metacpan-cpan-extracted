@@ -23,9 +23,9 @@ my $spf_server = Mail::SPF::Server->new(
 my $spf_request = Mail::SPF::Request->new(
  'versions'      => [1],
  'scope'         => 'mfrom',
- 'identity'      => 'test@spfall.gallifreyburning.com',
+ 'identity'      => 'test@dnslookupspfall.com',
  'ip_address'    => '66.111.4.25',
- 'helo_identity' => 'spfall.galllifreyburning.com',
+ 'helo_identity' => 'dnslookupspfall.com',
 );
 
 my $spf_result = $spf_server->process($spf_request);
@@ -40,7 +40,7 @@ $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 $bimi->spf_object( $spf_result );
 
-$bimi->domain( 'spfall.gallifreyburning.com' );
+$bimi->domain( 'dnslookupspfall.com' );
 $bimi->selector( 'default' );
 
 my $result = $bimi->result;

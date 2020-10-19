@@ -2,8 +2,8 @@ NAME
     Filename::Audio - Check whether filename indicates being an audio file
 
 VERSION
-    This document describes version 0.002 of Filename::Audio (from Perl
-    distribution Filename-Audio), released on 2020-04-01.
+    This document describes version 0.003 of Filename::Audio (from Perl
+    distribution Filename-Audio), released on 2020-05-30.
 
 SYNOPSIS
      use Filename::Audio qw(check_audio_filename);
@@ -36,6 +36,8 @@ SEE ALSO
     Filename::Video
 
     Filename::Image
+
+    Filename::Ebook
 
     Filename::Media
 

@@ -1,5 +1,9 @@
 Revision history for Task-Sites-BetterScm
 
+0.0.4   2020-10-19
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0.3   2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Blogger.
 
+1.03 2020-10-19
+    - Mark deprecated
+
 1.02 Mon Sep 25 19:08:45 2006
     - Fixed META.yml to make CPANTS happy.
 

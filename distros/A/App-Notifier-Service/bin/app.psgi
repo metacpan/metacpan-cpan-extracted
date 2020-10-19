@@ -20,7 +20,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0801
+version 0.0802
 
 =begin comment # use this block if you want to include middleware such as Plack::Middleware::Deflater
 

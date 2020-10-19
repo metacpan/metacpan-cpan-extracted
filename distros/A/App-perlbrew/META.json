@@ -4,7 +4,7 @@
       "Kang-min Liu  C<< <gugod@gugod.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "generated_by" : "App::ModuleBuildTiny version 0.028",
    "license" : [
       "mit"
    ],
@@ -21,16 +21,17 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.027",
+            "App::ModuleBuildTiny" : "0.028",
             "Pod::Markdown" : "2.002"
          }
       },
       "runtime" : {
          "requires" : {
-            "CPAN::Perl::Releases" : "5.20191220",
+            "CPAN::Perl::Releases" : "5.20200920",
             "Capture::Tiny" : "0.36",
-            "Devel::PatchPerl" : "1.80",
+            "Devel::PatchPerl" : "2.00",
             "ExtUtils::MakeMaker" : "7.22",
+            "File::Copy" : "0",
             "File::Temp" : "0.2304",
             "JSON::PP" : "0",
             "Pod::Parser" : "1.63",
@@ -71,7 +72,7 @@
       },
       "App::perlbrew" : {
          "file" : "lib/App/perlbrew.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       }
    },
    "release_status" : "stable",
@@ -82,8 +83,8 @@
          "web" : "https://github.com/gugod/App-perlbrew"
       }
    },
-   "version" : "0.88",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "0.89",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"
 }

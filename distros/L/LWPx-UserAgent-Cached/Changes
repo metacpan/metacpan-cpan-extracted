@@ -1,5 +1,7 @@
 Revision history for perl distribution LWPx-UserAgent-Role-Cached
 
+0.011     2020-10-18 20:58:35-05:00 America/Chicago
+    - remove AnnoCPAN links from docs
 0.010     2018-12-05 12:23:13-06:00 America/Chicago
     - add ignore_headers option to allow for aggressive caching that ignores
       response headers to the contrary

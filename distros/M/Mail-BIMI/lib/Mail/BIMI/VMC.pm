@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -18,6 +18,8 @@ with(
 );
 has uri => ( is => 'rw', isa => 'Str', traits => ['CacheKey'],
   documentation => 'inputs: URI of this VMC', );
+has check_domain => ( is => 'ro', isa => 'Str', required => 1, traits => ['CacheKey'],
+  documentation => 'inputs: Domain to check the alt_name against', );
 has data => ( is => 'rw', isa => 'Str', lazy => 1, builder => '_build_data', traits => ['Cacheable'],
   documentation => 'inputs: Raw data of the VMC contents; Fetched from authority URI if not given', );
 has cert_list => ( is => 'rw', isa => 'ArrayRef', lazy => 1, builder => '_build_cert_list', traits => ['Cacheable'],
@@ -50,13 +52,19 @@ sub _build_data($self) {
   if ($self->bimi_object->options->vmc_from_file) {
     return scalar read_file $self->bimi_object->options->vmc_from_file;
   }
+
+  if ( !( $self->uri =~ /\.pem\?/ || $self->uri =~ /\.pem$/ )) {
+    $self->add_error('VMC_FETCH_ERROR','VMC MUST have .pem extension');
+    return '';
+  }
+
   $self->log_verbose('HTTP Fetch: '.$self->uri);
   my $response = $self->http_client->get( $self->uri );
   if ( !$response->{success} ) {
     if ( $response->{status} == 599 ) {
       $self->add_error('VMC_FETCH_ERROR',$response->{content});
     }
-      else {
+    else {
       $self->add_error('VMC_FETCH_ERROR',$response->{status});
     }
     return '';
@@ -148,9 +156,8 @@ sub alt_name($self) {
 
 
 sub is_valid_alt_name($self) {
-  return 1 if ! $self->authority_object; # Cannot check without context
+  return 1 if !$self->check_domain; # Nothing to check against, default to allow
   return 1 if $self->bimi_object->options->vmc_no_check_alt;
-  my $domain = lc $self->authority_object->record_object->domain;
   return 0 if !$self->alt_name;
   my @alt_names = split( ',', lc $self->alt_name );
   foreach my $alt_name ( @alt_names ) {
@@ -158,7 +165,10 @@ sub is_valid_alt_name($self) {
     $alt_name =~ s/\s+$//;
     next if ! $alt_name =~ /^dns:/;
     $alt_name =~ s/^dns://;
-    return 1 if $alt_name eq $domain;
+    my $check_domain = lc $self->check_domain;
+    return 1 if $alt_name eq $check_domain;
+    my $alt_name_re = quotemeta($alt_name);
+    return 1 if $check_domain =~ /\.$alt_name_re$/;
   }
   return 0;
 }
@@ -276,7 +286,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 
@@ -285,6 +295,12 @@ Class for representing, retrieving, validating, and processing a VMC Set
 =head1 INPUTS
 
 These values are used as inputs for lookups and verifications, they are typically set by the caller based on values found in the message being processed
+
+=head2 check_domain
+
+is=ro required
+
+Domain to check the alt_name against
 
 =head2 data
 

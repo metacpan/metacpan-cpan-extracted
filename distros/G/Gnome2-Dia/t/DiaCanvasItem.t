@@ -4,7 +4,7 @@ use Gnome2::Dia;
 
 use Test::More skip_all => "Currently completely broken", tests => 25;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Dia/t/DiaCanvasItem.t,v 1.2 2004/09/25 19:13:29 kaffeetisch Exp $
+# $Id$
 
 ###############################################################################
 

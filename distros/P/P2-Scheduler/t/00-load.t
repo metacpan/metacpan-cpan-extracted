@@ -10,24 +10,26 @@ BEGIN {
 
 diag( "Testing P2::Scheduler $P2::Scheduler::VERSION, Perl $], $^X" );
 ok( my $o = P2::Scheduler->new(
-        experiments => [[qw(
-                exp-1-1
-                exp-1-2
-                exp-1-3
-                exp-1-4
-                exp-1-5
-                exp-1-6
-                exp-1-7
+        resource_type => 'namespace',
+        resources => [[qw(
+                res-1-1
+                res-1-2
+                res-1-3
+                res-1-4
+                res-1-5
+                res-1-6
+                res-1-7
             )],[qw(
-                exp-2-1
-                exp-2-2
-                exp-2-3
-                exp-2-4
-                exp-2-5
+                res-2-1
+                res-2-2
+                res-2-3
+                res-2-4
+                res-2-5
             )],[qw(
-                exp-3-1
-                exp-3-2
-                exp-3-3
+                res-3-1
+                res-3-2
+                res-3-3
+                a-quite-long-resource-name-that-should-exceed-fourty-characters
             )]],
         weight => [3,2,1],
         spare_days_per_month => 2,
@@ -36,7 +38,9 @@ ok( my $o = P2::Scheduler->new(
         year  => 2020,
         hour_slots => [12,13,14,15],
         fixed_intervals => 1,
-        context => 'test context'
+        context => 'test context',
+        label => 'scale-down-up',
+        action => 'Scale all deployments down and up again',
     ), 'new');
 
 ok( my @business_days = $o->_get_business_days_of_month( 5 ) );

@@ -9,7 +9,7 @@ BEGIN
 
   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-  $VERSION = '1.24';
+  $VERSION = '1.25';
   $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
   require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
 
@@ -83,7 +83,14 @@ Tk::MMutil::TkExtMakefile(
     'LIBS'    => \@libs,
     'OBJECT'  => '$(O_FILES)',
     'clean'      => { FILES => 'pTk/tkConfig.h ' },
-    'PREREQ_PM'  => { Tk => 800.022},
+    'PREREQ_PM'  => {
+        Tk => 800.022,
+    },
+	'CONFIGURE_REQUIRES' => {
+		"ExtUtils::MakeMaker" => 6.52,
+		Tk::MMtry => 0,
+        Tk::MMutil => 0,
+	},
     @macro
    );
 

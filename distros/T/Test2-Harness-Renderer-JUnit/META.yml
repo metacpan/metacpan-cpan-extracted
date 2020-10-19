@@ -3,8 +3,16 @@ abstract: 'Captures Test2::Harness results and emits a junit xml file.'
 author:
   - 'Todd E. Rinaldo <toddr@cpanel.net>'
 build_requires:
+  App::Yath::Tester: '0'
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test2::API: '1.302170'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Tools::Explain: '0'
+  Test2::V0: '0.000127'
   Test::More: '0'
+  XML::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,6 +27,9 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  Cwd: '0'
+  Exporter: '0'
   File::Spec: '0'
   Storable: '0'
   Test2::Harness::Renderer: '1.000000'
@@ -29,5 +40,5 @@ resources:
   bugtracker: https://github.com/cpanelinc/Test2-Harness-Renderer-JUnit/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpanelinc/Test2-Harness-Renderer-JUnit
-version: '1.000002'
+version: '1.000003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.003
+    version 0.004
 
 SYNOPSIS
 
@@ -78,26 +78,6 @@ SUPPORT
     be of help to you. As always, in addition to those websites please use
     your favorite search engine to discover more resources.
 
-      * Search CPAN
-
-      The default CPAN search engine, useful to view POD in HTML format.
-
-      http://search.cpan.org/dist/MooseX-Types-XML-LibXML
-
-      * AnnoCPAN
-
-      The AnnoCPAN is a website that allows community annotations of Perl
-      module documentation.
-
-      http://annocpan.org/dist/MooseX-Types-XML-LibXML
-
-      * CPAN Ratings
-
-      The CPAN Ratings is a website that allows community ratings and
-      reviews of Perl modules.
-
-      http://cpanratings.perl.org/d/MooseX-Types-XML-LibXML
-
       * CPANTS
 
       The CPANTS is a website that analyzes the Kwalitee ( code metrics )
@@ -107,8 +87,8 @@ SUPPORT
 
       * CPAN Testers
 
-      The CPAN Testers is a network of smokers who run automated tests on
-      uploaded CPAN distributions.
+      The CPAN Testers is a network of smoke testers who run automated
+      tests on uploaded CPAN distributions.
 
       http://www.cpantesters.org/distro/M/MooseX-Types-XML-LibXML
 
@@ -149,7 +129,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by GSI Commerce.
+    This software is copyright (c) 2020 by GSI Commerce.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

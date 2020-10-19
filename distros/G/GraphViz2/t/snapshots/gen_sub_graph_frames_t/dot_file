@@ -9,7 +9,7 @@
  subgraph "cluster First subgraph" {
   graph [ label="Child the First" ]
   node [ color="magenta" shape="diamond" ]
-  pencolor="white" 
+  pencolor="white"
   "Three"
   "Four" [ color="orange" shape="rectangle" ]
   "Three" -> "Four"
@@ -18,7 +18,7 @@
  subgraph "cluster Second subgraph" {
   graph [ label="Child the Second" ]
   node [ color="magenta" shape="diamond" ]
-  pencolor="purple" 
+  pencolor="purple"
   "Five" [ color="blue" ]
   "Six" [ color="orange" shape="rectangle" ]
   "Five" -> "Six"

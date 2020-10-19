@@ -1,0 +1,12 @@
+.*~$
+pod2*.tmp$
+.git
+.tar.gz$
+MYMETA.yml
+MYMETA.json
+Makefile
+
+etc/
+inc/
+
+z.*

@@ -1,5 +1,6 @@
 Revision history for Test-Run-CmdLine
 
+0.0132  2020-10-19
 0.0131  2015-01-20
     - Hopefully fix t/03-prove.t on MS Windows and other \r\n systems.
         - The problem appeared to be a bug in the perl 5 regex engine.

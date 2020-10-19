@@ -1,3 +1,7 @@
+1.2.5 2020-10-19
+
+ - Fixed MIN_PERL_VERSION in Makefile.PL, required by ExtUtils::MakeMaker@7.48
+
 1.2.4 2020-07-03
 
  - Use User-Password attribute name instead of Password (RT#132833)

@@ -1,6 +1,6 @@
 package Mail::BIMI::App::Command::checkrecord;
 # ABSTRACT: Validate a given BIMI assertion record
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
@@ -95,7 +95,7 @@ Mail::BIMI::App::Command::checkrecord - Validate a given BIMI assertion record
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 

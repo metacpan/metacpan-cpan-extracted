@@ -18,7 +18,7 @@ is( $test_org_domain, 'fastmail.com', 'Mail::DMARC public suffix list correctly 
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
 
-{
+subtest 'with selector' => sub{
   my $bimi = Mail::BIMI->new;
   $bimi->resolver($resolver);
 
@@ -27,16 +27,16 @@ $resolver->zonefile_read('t/zonefile');
   $dmarc->result->disposition( 'reject' );
   $bimi->dmarc_object( $dmarc->result );
 
-  $bimi->domain( 'gallifreyburning.com' );
-  $bimi->selector( 'FAKEfoobar' );
+  $bimi->domain( 'subdomain.recordfallback.com' );
+  $bimi->selector( 'selector' );
 
   my $record = $bimi->record;
   $record->record_hashref;
-  is_deeply( $record->domain, 'gallifreyburning.com', 'Fallback domain' );
-  is_deeply( $record->selector, 'default', 'Fallback selector' );
-}
+  is_deeply( $record->domain, 'recordfallback.com', 'Fallback domain' );
+  is_deeply( $record->selector, 'selector', 'Fallback selector' );
+};
 
-{
+subtest 'default selector' => sub{
   my $bimi = Mail::BIMI->new;
   $bimi->resolver($resolver);
 
@@ -45,14 +45,14 @@ $resolver->zonefile_read('t/zonefile');
   $dmarc->result->disposition( 'reject' );
   $bimi->dmarc_object( $dmarc->result );
 
-  $bimi->domain( 'no.domain.gallifreyburning.com' );
-  $bimi->selector( 'FAKEfoobar' );
+  $bimi->domain( 'subdomain.recordfallback.com' );
+  $bimi->selector( 'default' );
 
   my $record = $bimi->record;
   $record->record_hashref;
 
-  is_deeply( $record->domain, 'gallifreyburning.com', 'Fallback domain' );
+  is_deeply( $record->domain, 'recordfallback.com', 'Fallback domain' );
   is_deeply( $record->selector, 'default', 'Fallback selector' );
-}
+};
 
 done_testing;

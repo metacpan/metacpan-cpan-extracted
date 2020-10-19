@@ -25,7 +25,7 @@ Net::Blogger::Engine::Slash - Adds support for the Slashcode SOAP API.
 
 =head1 DESCRIPTION
 
-Net::Blogger::Engine::Slash allows a program to interact with the Slashcode 
+Net::Blogger::Engine::Slash allows a program to interact with the Slashcode
 SOAP API using the Blogger API. Neat, huh?
 
 =cut
@@ -38,7 +38,7 @@ use Net::Blogger::Engine::Base;
 
 use CGI qw (unescape);
 
-$Net::Blogger::Engine::Slash::VERSION   = '1.0';
+$Net::Blogger::Engine::Slash::VERSION   = '1.01';
 
 @Net::Blogger::Engine::Slash::ISA       = qw ( Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Slash::EXPORT    = qw ();
@@ -56,17 +56,17 @@ sub getUserBlogs {
   my $self = shift;
 
   if ((! $self->{'__blogs'}) || (! $self->{'__blogs'}->[0]->{'blogName'})) {
-    
+
     my $post = $self->slash()->get_entries($self->Username(),1);
 
     if (ref($post) eq "ARRAY") {
       $post = $post->[0];
-      
+
       $post->{'url'} =~ /^((.*)\/~(.*)\/journal)\/(\d+)$/;
 
       my $url  = $1;
       my $name = &CGI::unescape($3);
-      
+
       # hack
       $self->{'__blogs'} = [
 			    {
@@ -75,7 +75,7 @@ sub getUserBlogs {
 			     blogName => $name."'s journal",
 			    },
 			   ];
-    } 
+    }
 
     # hack hack hack
     else { $self->{'__blogs'} = [{ blogid => $self->Username() }]; }
@@ -95,8 +95,8 @@ sub newPost {
   my $self = shift;
   my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
 
-  if (! $self->check_newPost($args)) { 
-    return 0; 
+  if (! $self->check_newPost($args)) {
+    return 0;
   }
 
   return $self->slash()->add_entry(&_bloggerpost2slash($args->{'postbody'}));
@@ -110,7 +110,7 @@ sub getPost {
   my $self   = shift;
   my $postid = shift;
 
-  if (! $self->check_getPost($postid)) { 
+  if (! $self->check_getPost($postid)) {
     return 0;
   }
 
@@ -130,16 +130,16 @@ sub getRecentPosts {
   my $self = shift;
   my $args = (ref($_[0]) eq "HASH") ? shift : { @_ };
 
-  if (! $self->check_getRecentPosts($args)) { 
-    return (0); 
+  if (! $self->check_getRecentPosts($args)) {
+    return (0);
   }
-  
+
   my $posts = $self->slash()->get_entries($self->Username(),$args->{'numposts'});
 
-  if (! $posts ) { 
-    return (0); 
+  if (! $posts ) {
+    return (0);
   }
-  
+
   map { $_ = &_slashpost2blogger($_); } @$posts;
 
   return (1,@$posts);
@@ -223,8 +223,8 @@ sub slash {
     require Net::Blogger::Engine::Slash::slashcode;
     my $slash = Net::Blogger::Engine::Slash::slashcode->new(debug=>$self->{debug});
 
-    # Note that the order in which these items 
-    # are passed matters. This is so that the 
+    # Note that the order in which these items
+    # are passed matters. This is so that the
     # $slash object has a valid username/password
     # when it creates the cookie required by the
     # Slash server.
@@ -238,7 +238,7 @@ sub slash {
 
 sub _bloggerpost2slash {
   my @post = split("\n",${$_[0]});
-  
+
   return (
 	  subject => $post[0],
 	  body    => ((scalar(@post) > 1) ? join("\n",@post[1..$#post]) : $post[0]),

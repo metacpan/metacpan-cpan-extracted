@@ -1,9 +1,9 @@
 package App::freqtable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-11'; # DATE
+our $DATE = '2020-10-19'; # DATE
 our $DIST = 'App-freqtable'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Print frequency table of lines/words/characters/bytes/numbers
@@ -20,7 +20,7 @@ App::freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.003 of App::freqtable (from Perl distribution App-freqtable), released on 2020-10-11.
+This document describes version 0.004 of App::freqtable (from Perl distribution App-freqtable), released on 2020-10-19.
 
 =head1 SYNOPSIS
 

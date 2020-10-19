@@ -4,12 +4,9 @@ package Dist::Zilla::Plugin::WSDL;
 
 use Modern::Perl '2010';    ## no critic (Modules::ProhibitUseQuotedVersion)
 
-our $VERSION = '0.207';     # VERSION
+our $VERSION = '0.208';     # VERSION
 use utf8;
 
-#pod =for test_synopsis
-#pod BEGIN { die "SKIP: this is ini, not perl\n" }
-#pod
 #pod =head1 SYNOPSIS
 #pod
 #pod In your F<dist.ini>:
@@ -47,7 +44,7 @@ use MooseX::AttributeShortcuts;
 use MooseX::Types::Moose qw(ArrayRef Bool HashRef Str);
 use MooseX::Types::Perl 'ModuleName';
 use MooseX::Types::URI 'Uri';
-use Path::Class;
+use Path::Tiny;
 use SOAP::WSDL::Expat::WSDLParser;
 use SOAP::WSDL::Factory::Generator;
 use Try::Tiny;
@@ -217,10 +214,10 @@ sub before_build {
     );
 
     for my $file ( map { $_->file } grep { $_->is_new() } @generated_files ) {
-        $file->name( file( 'lib', $file->name )->stringify() );
+        $file->name( path( 'lib', $file->name )->stringify() );
         $self->log( 'Saving ' . $file->name );
-        my $file_path = $self->zilla->root->file( $file->name );
-        $file_path->dir->mkpath();
+        my $file_path = $self->zilla->root->path( $file->name );
+        $file_path->parent->mkpath();
         my $fh = $file_path->openw()
             or $self->log_fatal(
             "could not open $file_path for writing: $OS_ERROR");
@@ -240,8 +237,8 @@ __END__
 
 =encoding utf8
 
-=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url annocpan anno bugtracker rt
-cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url bugtracker rt cpants kwalitee
+diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -249,7 +246,7 @@ Dist::Zilla::Plugin::WSDL - WSDL to Perl classes when building your dist
 
 =head1 VERSION
 
-version 0.207
+version 0.208
 
 =head1 SYNOPSIS
 
@@ -317,8 +314,6 @@ Defaults to false.
 Instructs L<SOAP::WSDL|SOAP::WSDL> to generate Perl classes for the provided
 WSDL and gathers them into the C<lib> directory of your distribution.
 
-=for test_synopsis BEGIN { die "SKIP: this is ini, not perl\n" }
-
 =head1 SEE ALSO
 
 =over
@@ -348,30 +343,6 @@ in addition to those websites please use your favorite search engine to discover
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Dist-Zilla-Plugin-WSDL>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Dist-Zilla-Plugin-WSDL>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-WSDL>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -382,7 +353,7 @@ L<http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-WSDL>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-WSDL>
 
@@ -426,7 +397,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by GSI Commerce.
+This software is copyright (c) 2020 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

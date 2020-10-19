@@ -5,7 +5,7 @@ package LWPx::UserAgent::Cached;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 ## no critic (Bangs::ProhibitCommentedOutCode)
 
@@ -288,8 +288,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Mark Gardner ZipRecruiter cpan testmatrix url annocpan anno bugtracker rt
-cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords Mark Gardner ZipRecruiter cpan testmatrix url bugtracker rt cpants kwalitee
+diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -297,7 +297,7 @@ LWPx::UserAgent::Cached - Subclass of LWP::UserAgent that caches HTTP GET reques
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -448,30 +448,6 @@ L<https://metacpan.org/release/LWPx-UserAgent-Cached>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/LWPx-UserAgent-Cached>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/LWPx-UserAgent-Cached>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/LWPx-UserAgent-Cached>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -528,7 +504,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by ZipRecruiter.
+This software is copyright (c) 2020 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

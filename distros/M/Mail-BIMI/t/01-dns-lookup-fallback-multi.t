@@ -22,8 +22,8 @@ $dmarc->result->result( 'pass' );
 $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 
-$bimi->domain( 'multi.com' );
-$bimi->selector( 'foobarMISSING' );
+$bimi->domain( 'subdomain.dnslookupfallbackmulti.com' );
+$bimi->selector( 'selector' );
 
 my $record = $bimi->record;
 is_deeply(

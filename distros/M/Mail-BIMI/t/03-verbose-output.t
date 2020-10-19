@@ -14,7 +14,7 @@ my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
 
 subtest 'Non Verbose' => sub{
-  my $bimi = Mail::BIMI->new(domain=>'example.com',options=>{verbose=>0});
+  my $bimi = Mail::BIMI->new(domain=>'test.com',options=>{verbose=>0});
   $bimi->resolver($resolver);
   my($out,$err,$exit)=capture{
     $bimi->log_verbose('This is verbose output');
@@ -24,7 +24,7 @@ subtest 'Non Verbose' => sub{
 };
 
 subtest 'Verbose' => sub{
-  my $bimi = Mail::BIMI->new(domain=>'example.com',options=>{verbose=>1});
+  my $bimi = Mail::BIMI->new(domain=>'test.com',options=>{verbose=>1});
   $bimi->resolver($resolver);
   my($out,$err,$exit)=capture{
     $bimi->log_verbose('This is verbose output');

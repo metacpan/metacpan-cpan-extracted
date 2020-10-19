@@ -27,7 +27,9 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.52",
+            "Tk::MMtry" : "0",
+            "Tk::MMutil" : "0"
          }
       },
       "runtime" : {
@@ -37,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.24",
+   "version" : "1.25",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

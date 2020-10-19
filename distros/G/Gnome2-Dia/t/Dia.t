@@ -2,7 +2,7 @@
 use strict;
 use Test::More tests => 6;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Dia/t/Dia.t,v 1.1 2004/09/14 17:54:17 kaffeetisch Exp $
+# $Id$
 
 ###############################################################################
 

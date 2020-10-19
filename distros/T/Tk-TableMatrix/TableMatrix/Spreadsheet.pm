@@ -8,17 +8,14 @@ Tk::TableMatrix::Spreadsheet - Table Display with Spreadsheet-like bindings.
   use Tk;
   use Tk::TableMatrix::Spreadsheet;
 
-
-
-  my $t = $top->Scrolled('Spreadsheet', -rows => 21, -cols => 11, 
-                              -width => 6, -height => 6,
-			      -titlerows => 1, -titlecols => 1,
-			      -variable => $arrayVar,
-			      -selectmode => 'extended',
-			      -titlerows => 1,
-			      -titlecols => 1,
-			      -bg => 'white',
-                    );
+  my $t = $top->Scrolled('Spreadsheet',
+    -rows => 21, -cols => 11, 
+    -width => 6, -height => 6,
+    -titlerows => 1, -titlecols => 1,
+    -variable => $arrayVar,
+    -selectmode => 'extended',
+	-bg => 'white',
+  );
 
 =head1 DESCRIPTION
 
@@ -97,7 +94,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 
 Tk::Widget->Construct("Spreadsheet");

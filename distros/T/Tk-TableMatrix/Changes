@@ -2,6 +2,11 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.25   10/19/2020
+
+* add dependencies / RT #133557
+* improve POD (incl. RT #75690)
+
 Release 1.24   10/17/2020
 
 * pTk/Makefile.PL: fix RT #133547

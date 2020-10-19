@@ -1,5 +1,9 @@
 Revision history for Task-Sites-ShlomiFish:
 
+0.0214  2020-10-19
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0213  2019-03-04
         - Avoid installing HTML::Tidy which is no longer needed.
 

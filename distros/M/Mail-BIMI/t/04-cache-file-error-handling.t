@@ -15,20 +15,20 @@ use Net::DNS::Resolver::Mock 1.20200214;
 
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
-my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com');
+my $bimi = Mail::BIMI->new(domain=>'cachefileerrorhandling.com');
 $bimi->resolver($resolver);
 
 my $options = {cache_backend=>'File',cache_file_directory=>'t/tmp/cache/'},
 
 my $hashes = {
   indicator => 't/tmp/cache/mail-bimi-cache-166cc1317749e82abc10e4068941f912fa774baf.cache',
-  record => 't/tmp/cache/mail-bimi-cache-a006e1d871a91903c028e60eaa358fbe117bd8d2.cache',
+  record => 't/tmp/cache/mail-bimi-cache-228d876fef73043dfb570ed9125a2425701b8d07.cache',
 };
 
 subtest 'Write garbage to file' => sub {
   save_cache();
   write_file($hashes->{record},'FooBarBaz');
-  my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1010,options=>$options);
+  my $bimi = Mail::BIMI->new(domain=>'cachefileerrorhandling.com',time=>1010,options=>$options);
   $bimi->resolver($resolver);
   $bimi->record->is_valid; # Make the Fetch Happen
   my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -39,7 +39,7 @@ subtest 'Cache is valid for wrong data' => sub {
   save_cache();
   my $data = scalar read_file($hashes->{indicator});
   write_file($hashes->{record},$data);
-  my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1010,options=>$options);
+  my $bimi = Mail::BIMI->new(domain=>'cachefileerrorhandling.com',time=>1010,options=>$options);
   $bimi->resolver($resolver);
   $bimi->record->is_valid; # Make the Fetch Happen
   my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -58,7 +58,7 @@ sub save_cache {
   cleanup();
   subtest 'Cache saved when finish called' => sub{
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1000,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachefileerrorhandling.com',time=>1000,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -68,7 +68,7 @@ sub save_cache {
       $bimi->finish;
     };
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1010,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachefileerrorhandling.com',time=>1010,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);

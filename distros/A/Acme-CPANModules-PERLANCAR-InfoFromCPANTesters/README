@@ -3,16 +3,19 @@ NAME
     gather information from CPANTesters
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::PERLANCAR::InfoFromCPANTesters (from Perl
     distribution Acme-CPANModules-PERLANCAR-InfoFromCPANTesters), released
-    on 2020-10-10.
+    on 2020-10-19.
 
 MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
     *   Acme::Test::crypt - Check crypt() support in various platforms
 
     *   App::PlatformInfo - Result of Devel::Platform::Info on various
         testing machines
+
+    *   Acme::CPAN::Testers::DevelCheckOS - Result of
+        Devel::CheckOS::{list_platforms,os_is} on various testing machines
 
 FAQ
   What are ways to use this Acme::CPANModules module?

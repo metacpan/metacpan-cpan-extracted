@@ -22,8 +22,8 @@ $dmarc->result->result( 'pass' );
 $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 
-$resolver->die_on( 'foobar._bimi.gallifreyburning.com', 'TXT', 'Fail' );
-$bimi->domain( 'gallifreyburning.com' );
+$resolver->die_on( 'foobar._bimi.dnslookupfail.com', 'TXT', 'Fail' );
+$bimi->domain( 'dnslookupfail.com' );
 $bimi->selector( 'foobar' );
 
 my $record = $bimi->record;

@@ -1,10 +1,8 @@
-#!perl
 
 BEGIN {
     unless ( $ENV{RELEASE_TESTING} ) {
-        require Test::More;
-        Test::More::plan(
-            skip_all => 'these tests are for release candidate testing' );
+        print qq{1..0 # SKIP these tests are for release candidate testing\n};
+        exit;
     }
 }
 
@@ -12,8 +10,9 @@ use Test::More tests => 2;
 
 note 'Checking Changes';
 my $changes_file = 'Changes';
-my $newver       = '0.207';
+my $newver       = '0.208';
 my $trial_token  = '-TRIAL';
+my $encoding     = 'UTF-8';
 
 SKIP: {
     ok( -e $changes_file, "$changes_file file exists" )
@@ -24,14 +23,17 @@ SKIP: {
 
 done_testing;
 
-# _get_changes copied and adapted from Dist::Zilla::Plugin::Git::Commit
-# by Jerome Quelin
 sub _get_changes {
     my $newver = shift;
 
     # parse changelog to find commit message
     open( my $fh, '<', $changes_file ) or die "cannot open $changes_file: $!";
     my $changelog = join( '', <$fh> );
+    if ($encoding) {
+        require Encode;
+        $changelog
+            = Encode::decode( $encoding, $changelog, Encode::FB_CROAK() );
+    }
     close $fh;
 
     my @content

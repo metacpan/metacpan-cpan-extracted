@@ -5,7 +5,7 @@ use warnings;
 
 use vars (qw($VERSION));
 
-$VERSION = '0.0131';
+$VERSION = '0.0132';
 
 use parent 'Test::Run::Trap::Obj';
 
@@ -70,10 +70,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::CmdLine>
 
 =item * CPAN Ratings
 

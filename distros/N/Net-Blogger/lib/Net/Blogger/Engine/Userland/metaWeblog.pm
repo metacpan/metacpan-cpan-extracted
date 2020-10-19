@@ -28,7 +28,7 @@ This package is meant to be subclassed. It should not be used on it's own.
 package Net::Blogger::Engine::Userland::metaWeblog;
 use strict;
 
-$Net::Blogger::Engine::Userland::metaWeblog::VERSION   = '1.0';
+$Net::Blogger::Engine::Userland::metaWeblog::VERSION   = '1.01';
 
 @Net::Blogger::Engine::Userland::metaWeblog::ISA       = qw ( Exporter Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Userland::metaWeblog::EXPORT    = qw ();

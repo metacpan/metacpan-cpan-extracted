@@ -5,11 +5,12 @@
 
 package Future;
 
+use v5.10;
 use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -780,6 +781,9 @@ sub AWAIT_ON_CANCEL
    weaken( $r->[0] );
    weaken( $r->[1] );
 }
+
+# New name for it
+*AWAIT_CHAIN_CANCEL = \&AWAIT_ON_CANCEL;
 
 sub _revoke_on_cancel
 {

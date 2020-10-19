@@ -22,8 +22,8 @@ $dmarc->result->result( 'pass' );
 $dmarc->result->disposition( 'reject' );
 $bimi->dmarc_object( $dmarc->result );
 
-$bimi->domain( 'gallifreyburning.com' );
-$bimi->selector( 'foobar' );
+$bimi->domain( 'dnslookup.com' );
+$bimi->selector( 'selector' );
 
 my $record = $bimi->record;
 
@@ -45,8 +45,8 @@ is_deeply( $record->location->uri, $expected_url, 'URL' );
 
 my $result = $bimi->result;
 my $auth_results = $result->get_authentication_results;
-my $expected_result = 'bimi=pass header.d=gallifreyburning.com header.selector=foobar';
-is( $auth_results, $expected_result, 'Auth results correcct' );
+my $expected_result = 'bimi=pass header.d=dnslookup.com header.selector=selector';
+is( $auth_results, $expected_result, 'Auth results correct' );
 
 my $expected_headers = {
   'BIMI-Indicator' => 'PHN2ZyB2ZXJzaW9uPSIxLjIiIGJhc2VQcm9maWxlPSJ0aW55LXBzIiB4bWxucz0iaHR0cD

@@ -10,7 +10,7 @@ Net::Blogger::Manila - UserLand Manila Blogger API engine
 
 =head1 DESCRIPTION
 
-This package inherits I<Net::Blogger::Engine::Userland> and implements methods 
+This package inherits I<Net::Blogger::Engine::Userland> and implements methods
 specific to  UserLand Manila server.
 
 =cut
@@ -18,7 +18,7 @@ specific to  UserLand Manila server.
 package Net::Blogger::Engine::Manila;
 use strict;
 
-$Net::Blogger::Engine::Manila::VERSION   = '1.0';
+$Net::Blogger::Engine::Manila::VERSION   = '1.01';
 @Net::Blogger::Engine::Manila::ISA       = qw ( Exporter Net::Blogger::Engine::Userland );
 @Net::Blogger::Engine::Manila::EXPORT    = qw ();
 @Net::Blogger::Engine::Manila::EXPORT_OK = qw ();

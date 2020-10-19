@@ -106,183 +106,197 @@ It returns a new object of type `GraphViz2`.
 
 Key-value pairs accepted in the parameter list:
 
-- o edge => $hashref
+### edge => $hashref
 
-    The _edge_ key points to a hashref which is used to set default attributes for edges.
+The _edge_ key points to a hashref which is used to set default attributes for edges.
 
-    Hence, allowable keys and values within that hashref are anything supported by [Graphviz](http://www.graphviz.org/).
+Hence, allowable keys and values within that hashref are anything supported by [Graphviz](http://www.graphviz.org/).
 
-    The default is {}.
+The default is {}.
 
-    This key is optional.
+This key is optional.
 
-- o global => $hashref
+### global => $hashref
 
-    The _global_ key points to a hashref which is used to set attributes for the output stream.
+The _global_ key points to a hashref which is used to set attributes for the output stream.
 
-    Valid keys within this hashref are:
+This key is optional.
 
-    - o directed => $Boolean
+Valid keys within this hashref are:
 
-        This option affects the content of the output stream.
+#### combine\_node\_and\_port
 
-        directed => 1 outputs 'digraph name {...}', while directed => 0 outputs 'graph name {...}'.
+New in 2.58. It defaults to true, but in due course (currently planned
+May 2021) it will default to false. When true, `add_node` and `add_edge`
+will escape only some characters in the label and names, and in particular
+the "from" and "to" parameters on edges will combine the node name
+and port in one string, with a `:` in the middle (except for special
+treatment of double-colons).
 
-        At the Perl level, directed graphs have edges with arrow heads, such as '->', while undirected graphs have
-        unadorned edges, such as '--'.
+When the option is false, any name may be given to nodes, and edges can
+be created between them. To specify ports, give the additional parameter
+of `tailport` or `headport`. Also, `add_node`'s treatment of labels
+is more DWIM, with `{` etc being transparently quoted.
 
-        The default is 0.
+#### directed => $Boolean
 
-        This key is optional.
+This option affects the content of the output stream.
 
-    - o driver => $program\_name
+directed => 1 outputs 'digraph name {...}', while directed => 0 outputs 'graph name {...}'.
 
-        This option specifies which external program to run to process the output stream.
+At the Perl level, directed graphs have edges with arrow heads, such as '->', while undirected graphs have
+unadorned edges, such as '--'.
 
-        The default is to use [File::Which](https://metacpan.org/pod/File::Which)'s which() method to find the 'dot' program.
+The default is 0.
 
-        This key is optional.
+This key is optional.
 
-    - o format => $string
+#### driver => $program\_name
 
-        This option specifies what type of output file to create.
+This option specifies which external program to run to process the output stream.
 
-        The default is 'svg'.
+The default is to use [File::Which](https://metacpan.org/pod/File::Which)'s which() method to find the 'dot' program.
 
-        Output formats of the form 'png:gd' etc are also supported, but only the component before
-        the first ':' is validated by [GraphViz2](https://metacpan.org/pod/GraphViz2).
+This key is optional.
 
-        This key is optional.
+#### format => $string
 
-    - o label => $string
+This option specifies what type of output file to create.
 
-        This option specifies what an edge looks like: '->' for directed graphs and '--' for undirected graphs.
+The default is 'svg'.
 
-        You wouldn't normally need to use this option.
+Output formats of the form 'png:gd' etc are also supported, but only the component before
+the first ':' is validated by [GraphViz2](https://metacpan.org/pod/GraphViz2).
 
-        The default is '->' if directed is 1, and '--' if directed is 0.
+This key is optional.
 
-        This key is optional.
+#### label => $string
 
-    - o name => $string
+This option specifies what an edge looks like: '->' for directed graphs and '--' for undirected graphs.
 
-        This option affects the content of the output stream.
+You wouldn't normally need to use this option.
 
-        name => 'G666' outputs 'digraph G666 {...}'.
+The default is '->' if directed is 1, and '--' if directed is 0.
 
-        The default is 'Perl' :-).
+This key is optional.
 
-        This key is optional.
+#### name => $string
 
-    - o record\_shape => /^(?:M?record)$/
+This option affects the content of the output stream.
 
-        This option affects the shape of records. The value must be 'Mrecord' or 'record'.
+name => 'G666' outputs 'digraph G666 {...}'.
 
-        Mrecords have nice, rounded corners, whereas plain old records have square corners.
+The default is 'Perl' :-).
 
-        The default is 'Mrecord'.
+This key is optional.
 
-        See [Record shapes](http://www.graphviz.org/doc/info/shapes.html#record) for details.
+#### record\_shape => /^(?:M?record)$/
 
-    - o strict => $Boolean
+This option affects the shape of records. The value must be 'Mrecord' or 'record'.
 
-        This option affects the content of the output stream.
+Mrecords have nice, rounded corners, whereas plain old records have square corners.
 
-        strict => 1 outputs 'strict digraph name {...}', while strict => 0 outputs 'digraph name {...}'.
+The default is 'Mrecord'.
 
-        The default is 0.
+See [Record shapes](http://www.graphviz.org/doc/info/shapes.html#record) for details.
 
-        This key is optional.
+#### strict => $Boolean
 
-    - o timeout => $integer
+This option affects the content of the output stream.
 
-        This option specifies how long to wait for the external program before exiting with an error.
+strict => 1 outputs 'strict digraph name {...}', while strict => 0 outputs 'digraph name {...}'.
 
-        The default is 10 (seconds).
+The default is 0.
 
-        This key is optional.
+This key is optional.
 
-    This key (global) is optional.
+#### timeout => $integer
 
-- o graph => $hashref
+This option specifies how long to wait for the external program before exiting with an error.
 
-    The _graph_ key points to a hashref which is used to set default attributes for graphs.
+The default is 10 (seconds).
 
-    Hence, allowable keys and values within that hashref are anything supported by [Graphviz](http://www.graphviz.org/).
+This key is optional.
 
-    The default is {}.
+### graph => $hashref
 
-    This key is optional.
+The _graph_ key points to a hashref which is used to set default attributes for graphs.
 
-- o logger => $logger\_object
+Hence, allowable keys and values within that hashref are anything supported by [Graphviz](http://www.graphviz.org/).
 
-    Provides a logger object so $logger\_object -> $level($message) can be called at certain times. Any object with `debug` and `error` methods
-    will do, since these are the only levels emitted by this module.
-    One option is a [Log::Handler](https://metacpan.org/pod/Log::Handler) object.
+The default is {}.
 
-    Retrieve and update the value with the logger() method.
+This key is optional.
 
-    By default (i.e. without a logger object), [GraphViz2](https://metacpan.org/pod/GraphViz2) prints warning and debug messages to STDOUT,
-    and dies upon errors.
+### logger => $logger\_object
 
-    However, by supplying a log object, you can capture these events.
+Provides a logger object so $logger\_object -> $level($message) can be called at certain times. Any object with `debug` and `error` methods
+will do, since these are the only levels emitted by this module.
+One option is a [Log::Handler](https://metacpan.org/pod/Log::Handler) object.
 
-    Not only that, you can change the behaviour of your log object at any time, by calling
-    ["logger($logger\_object)"](#logger-logger_object).
+Retrieve and update the value with the logger() method.
 
-    See also the verbose option, which can interact with the logger option.
+By default (i.e. without a logger object), [GraphViz2](https://metacpan.org/pod/GraphViz2) prints warning and debug messages to STDOUT,
+and dies upon errors.
 
-    This key is optional.
+However, by supplying a log object, you can capture these events.
 
-- o node => $hashref
+Not only that, you can change the behaviour of your log object at any time, by calling
+["logger($logger\_object)"](#logger-logger_object).
 
-    The _node_ key points to a hashref which is used to set default attributes for nodes.
+See also the verbose option, which can interact with the logger option.
 
-    Hence, allowable keys and values within that hashref are anything supported by [Graphviz](http://www.graphviz.org/).
+This key is optional.
 
-    The default is {}.
+### node => $hashref
 
-    This key is optional.
+The _node_ key points to a hashref which is used to set default attributes for nodes.
 
-- o subgraph => $hashref
+Hence, allowable keys and values within that hashref are anything supported by [Graphviz](http://www.graphviz.org/).
 
-    The _subgraph_ key points to a hashref which is used to set attributes for all subgraphs, unless overridden
-    for specific subgraphs in a call of the form push\_subgraph(subgraph => {$attribute => $string}).
+The default is {}.
 
-    Valid keys within this hashref are:
+This key is optional.
 
-    - o rank => $string
+### subgraph => $hashref
 
-        This option affects the content of all subgraphs, unless overridden later.
+The _subgraph_ key points to a hashref which is used to set attributes for all subgraphs, unless overridden
+for specific subgraphs in a call of the form push\_subgraph(subgraph => {$attribute => $string}).
 
-        A typical usage would be new(subgraph => {rank => 'same'}) so that all nodes mentioned within each subgraph
-        are constrained to be horizontally aligned.
+Valid keys within this hashref are:
 
-        See scripts/rank.sub.graph.1.pl for sample code.
+- rank => $string
 
-        Possible values for $string are: max, min, same, sink and source.
+    This option affects the content of all subgraphs, unless overridden later.
 
-        See the [Graphviz 'rank' docs](http://www.graphviz.org/doc/info/attrs.html#d:rank) for details.
+    A typical usage would be new(subgraph => {rank => 'same'}) so that all nodes mentioned within each subgraph
+    are constrained to be horizontally aligned.
 
-    The default is {}.
+    See scripts/rank.sub.graph.1.pl for sample code.
 
-    This key is optional.
+    Possible values for $string are: max, min, same, sink and source.
 
-- o verbose => $Boolean
+    See the [Graphviz 'rank' docs](http://www.graphviz.org/doc/info/attrs.html#d:rank) for details.
 
-    Provides a way to control the amount of output when a logger is not specified.
+The default is {}.
 
-    Setting verbose to 0 means print nothing.
+This key is optional.
 
-    Setting verbose to 1 means print the log level and the message to STDOUT, when a logger is not specified.
+### verbose => $Boolean
 
-    Retrieve and update the value with the verbose() method.
+Provides a way to control the amount of output when a logger is not specified.
 
-    The default is 0.
+Setting verbose to 0 means print nothing.
 
-    See also the logger option, which can interact with the verbose option.
+Setting verbose to 1 means print the log level and the message to STDOUT, when a logger is not specified.
 
-    This key is optional.
+Retrieve and update the value with the verbose() method.
+
+The default is 0.
+
+See also the logger option, which can interact with the verbose option.
+
+This key is optional.
 
 ## Validating Parameters
 
@@ -341,23 +355,23 @@ See scripts/sub.sub.graph.pl (["Scripts Shipped with this Module" in GraphViz2](
 
 At the moment, due to design defects (IMHO) in the underlying [Graphviz](http://www.graphviz.org/) logic, there are some tiny problems with this:
 
-- o A global frame
+- A global frame
 
     I can't see how to make the graph as a whole (at level 0 in the scope stack) have a frame.
 
-- o Frame color
+- Frame color
 
     When you specify graph => {color => 'red'} at the parent level, the subgraph has a red frame.
 
     I think a subgraph should control its own frame.
 
-- o Parent and child frames
+- Parent and child frames
 
     When you specify graph => {color => 'red'} at the subgraph level, both that subgraph and it children have red frames.
 
     This contradicts what happens at the global level, in that specifying color there does not given the whole graph a frame.
 
-- o Frame visibility
+- Frame visibility
 
     A subgraph whose name starts with 'cluster' is currently forced to have a frame, unless you rig it by specifying a
     color the same as the background.
@@ -426,13 +440,13 @@ That line was copied from maps/demo.3.pl, and there is an identical line in maps
 
 ## The New Parameters to run()
 
-- o im\_format => $str
+- im\_format => $str
 
     Expected values: 'imap' (server-side) and 'cmapx' (client-side).
 
     Default value: 'cmapx'.
 
-- o im\_output\_file => $file\_name
+- im\_output\_file => $file\_name
 
     The name of the output map file.
 
@@ -448,7 +462,7 @@ Each demo, when FTPed to your web server displays some text with an image in the
 you can click on the upper oval to jump to one page, or click on the lower oval to jump to a different
 page, or click anywhere else in the image to jump to a third page.
 
-- o demo.1.\*
+- demo.1.\*
 
     This set demonstrates a server-side image map but does not use `GraphViz2`.
 
@@ -456,7 +470,7 @@ page, or click anywhere else in the image to jump to a third page.
 
     URL: your.domain.name/maps/demo.1.html.
 
-- o demo.2.\*
+- demo.2.\*
 
     This set demonstrates a client-side image map but does not use `GraphViz2`.
 
@@ -465,7 +479,7 @@ page, or click anywhere else in the image to jump to a third page.
 
     URL: your.domain.name/maps/demo.2.html.
 
-- o demo.3.\*
+- demo.3.\*
 
     This set demonstrates a server-side image map using `GraphViz2` via demo.3.pl.
 
@@ -473,7 +487,7 @@ page, or click anywhere else in the image to jump to a third page.
 
     URL: your.domain.name/maps/demo.3.html.
 
-- o demo.4.\*
+- demo.4.\*
 
     This set demonstrates a client-side image map using `GraphViz2` via demo.4.pl.
 
@@ -512,7 +526,25 @@ before calling add\_edge(...).
 These are validated in exactly the same way as the edge parameters in the calls to
 default\_edge(%hash), new(edge => {}) and push\_subgraph(edge => {}).
 
+To make the edge start or finish on a port, see ["combine\_node\_and\_port"](#combine_node_and_port).
+
 ## add\_node(name => $node\_name, \[%hash\])
+
+        my $graph = GraphViz2->new(global => {combine_node_and_port => 0});
+        $graph->add_node(name => 'struct3', shape => 'record', label => [
+                { text => "hello\\nworld" },
+                [
+                        { text => 'b' },
+                        [
+                                { text => 'c{}' }, # reproduced literally
+                                { text => 'd', port => 'here' },
+                                { text => 'e' },
+                        ]
+                        { text => 'f' },
+                ],
+                { text => 'g' },
+                { text => 'h' },
+        ]);
 
 Adds a node to the graph.
 
@@ -533,13 +565,18 @@ The attribute name 'label' may point to a string or an arrayref.
 
 ### If it is a string...
 
-The string is the label.
+The string is the label. If the `shape` is a record, you can give any
+text and it will be passed for interpretation by Graphviz. This means
+you will need to quote < and > (port specifiers), `|` (cell
+separator) and `{` `}` (structure depth) with `\` to make them appear
+literally.
 
-The string may contain ports and orientation markers ({}).
+For records, the cells start horizontal. Each additional layer of
+structure will switch the orientation between horizontal and vertical.
 
 ### If it is an arrayref of strings...
 
-- o The node is forced to be a record
+- The node is forced to be a record
 
     The actual shape, 'record' or 'Mrecord', is set globally, with:
 
@@ -553,31 +590,28 @@ The string may contain ports and orientation markers ({}).
 
             $graph -> add_node(name => 'Three', label => ['Good', 'Bad'], shape => 'record');
 
-- o Each element in the array defines a field in the record
+- Each element in the array defines a field in the record
 
     These fields are combined into a single node
 
-- o Each element is treated as a label
-- o Each label is given a port name (1 .. N) of the form "port&lt;$port\_count>"
-- o Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
+- Each element is treated as a label
+- Each label is given a port name (1 .. N) of the form "port$port\_count"
+- Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
 
 ### If it is an arrayref of hashrefs...
 
-- o The node is forced to be a record
+- The node is forced to be a record
 
     The actual shape, 'record' or 'Mrecord', can be set globally or locally, as explained just above.
 
-- o Each element in the array defines a field in the record
-- o Each element is treated as a hashref with keys 'text' and 'port'
+- Each element in the array defines a field in the record
+- Each element is treated as a hashref with keys 'text' and 'port'
 
     The 'port' key is optional.
 
-- o The value of the 'text' key is the label
-- o The value of the 'port' key is the port
-
-    The format is "&lt;$port\_name>".
-
-- o Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
+- The value of the 'text' key is the label
+- The value of the 'port' key is the port
+- Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
 
 See scripts/html.labels.\*.pl and scripts/record.\*.pl for sample code.
 
@@ -691,12 +725,6 @@ If _from\_port_ is not provided by the caller, it defaults to '' (the empty stri
 it contains a leading ':'. Likewise for _to\_port_.
 
 See scripts/report.nodes.and.edges.pl (a version of scripts/html.labels.1.pl) for a complete example.
-
-## escape\_some\_chars($s)
-
-Escapes various chars in various circumstances, because some chars are treated specially by Graphviz.
-
-See ["Special characters in node names and labels"](#special-characters-in-node-names-and-labels) for a discussion of this tricky topic.
 
 ## log(\[$level, $message\])
 
@@ -840,11 +868,11 @@ to recover the output of the external program is to call dot\_output().
 
 This method performs a series of tasks:
 
-- o Run the chosen external program on the ["dot\_input"](#dot_input)
-- o Capture STDOUT and STDERR from that program
-- o Die if STDERR contains anything
-- o Copies STDOUT to the buffer controlled by the dot\_output() method
-- o Write the captured contents of STDOUT to $output\_file, if $output\_file has a value
+- Run the chosen external program on the ["dot\_input"](#dot_input)
+- Capture STDOUT and STDERR from that program
+- Die if STDERR contains anything
+- Copies STDOUT to the buffer controlled by the dot\_output() method
+- Write the captured contents of STDOUT to $output\_file, if $output\_file has a value
 
 ## stringify\_attributes($context, $option)
 
@@ -905,8 +933,8 @@ leave and terminate.
 
 The [Graphviz](http://www.graphviz.org/) syntax for ports is a bit unusual:
 
-- o This works: "node\_name":port5
-- o This doesn't: "node\_name:port5"
+- This works: "node\_name":port5
+- This doesn't: "node\_name:port5"
 
 Let me repeat - that is Graphviz syntax, not GraphViz2 syntax. In Perl, you must do this:
 
@@ -918,7 +946,7 @@ You don't have to quote all node names in [Graphviz](http://www.graphviz.org/), 
 
 You can specify labels with ports in these ways:
 
-- o As a string
+- As a string
 
             $graph -> add_node(name => 'struct3', label => "hello\nworld |{ b |{c|<here> d|e}| f}| g | h");
 
@@ -932,7 +960,7 @@ You can specify labels with ports in these ways:
 
     The same label is specified in the next case.
 
-- o As an arrayref of hashrefs
+- As an arrayref of hashrefs
 
     From scripts/record.2.pl:
 
@@ -973,7 +1001,7 @@ You can specify labels with ports in these ways:
 
     The same label is specified in the previous case.
 
-- o As an arrayref of strings
+- As an arrayref of strings
 
     From scripts/html.labels.1.pl:
 
@@ -1009,11 +1037,11 @@ An example attribute is `pencolor`, which is used for clusters but not for subgr
 
 # TODO
 
-- o Handle edges such as 1 -> 2 -> {A B}, as seen in [Graphviz](http://www.graphviz.org/)'s graphs/directed/switch.gv
+- Handle edges such as 1 -> 2 -> {A B}, as seen in [Graphviz](http://www.graphviz.org/)'s graphs/directed/switch.gv
 
     But how?
 
-- o Validate parameters more carefully, e.g. to reject non-hashref arguments where appropriate
+- Validate parameters more carefully, e.g. to reject non-hashref arguments where appropriate
 
     Some method parameter lists take keys whose value must be a hashref.
 

@@ -1,0 +1,23 @@
+Changes
+examples/example1.pl
+examples/example1-overload.pl
+examples/example2.pl
+examples/example2-overload.pl
+examples/example3.pl
+examples/lib/Bar.pm
+examples/lib/Foo.pm
+lib/Text/Indent/Tiny.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.md
+t/00-load.t
+t/basic-01-pod-like.t
+t/basic-02-overload.t
+t/common-indent.t
+t/lib/Bar.pm
+t/lib/Foo.pm

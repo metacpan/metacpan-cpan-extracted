@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "cmdline",
       "command-line",
@@ -28,7 +28,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run-CmdLine",
    "prereqs" : {
@@ -59,31 +59,31 @@
    "provides" : {
       "Test::Run::CmdLine" : {
          "file" : "lib/Test/Run/CmdLine.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       },
       "Test::Run::CmdLine::Drivers::Default" : {
          "file" : "lib/Test/Run/CmdLine/Drivers/Default.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       },
       "Test::Run::CmdLine::Iface" : {
          "file" : "lib/Test/Run/CmdLine/Iface.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       },
       "Test::Run::CmdLine::Prove" : {
          "file" : "lib/Test/Run/CmdLine/Prove.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       },
       "Test::Run::CmdLine::Prove::App" : {
          "file" : "lib/Test/Run/CmdLine/Prove/App.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       },
       "Test::Run::CmdLine::Trap::Prove" : {
          "file" : "lib/Test/Run/CmdLine/Trap/Prove.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       },
       "Test::Run::CmdLine::Trap::ProveApp" : {
          "file" : "lib/Test/Run/CmdLine/Trap/ProveApp.pm",
-         "version" : "0.0131"
+         "version" : "0.0132"
       }
    },
    "release_status" : "stable",
@@ -96,6 +96,6 @@
          "url" : "https://bitbucket.org/shlomif/perl-test-run"
       }
    },
-   "version" : "0.0131",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.0132",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

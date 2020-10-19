@@ -42,7 +42,7 @@ use strict;
 
 use vars qw ( $AUTOLOAD );
 
-$Net::Blogger::Engine::Base::VERSION        = '1.0';
+$Net::Blogger::Engine::Base::VERSION        = '1.01';
 @Net::Blogger::Engine::Base::ISA            = qw ( Exporter Net::Blogger::API::Core Net::Blogger::API::Extended );
 @Net::Blogger::Engine::Base::ISA::EXPORT    = qw ();
 @Net::Blogger::Engine::Base::ISA::EXPORT_OK = qw ();

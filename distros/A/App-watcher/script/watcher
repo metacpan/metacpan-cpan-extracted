@@ -34,7 +34,7 @@ pod2usage(1) unless @ARGV;
 $_ = qr/$_/ for @filters;
 
 # default filter
-push @filters, m!^\.[^\.]|[/\\][\._][^\.]|\.bak$|~$|_flymake\.(?:p[lm]|t)!
+push @filters, qr!^\.[^\.]|[/\\][\._][^\.]|\.bak$|~$|_flymake\.(?:p[lm]|t)!
     unless @filters;
 
 if (@exclude_dir) {

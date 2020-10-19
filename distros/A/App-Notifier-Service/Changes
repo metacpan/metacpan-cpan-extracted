@@ -1,5 +1,9 @@
+0.0802   2020-10-19
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0801   2020-04-28
-    - Require minimal version of Dancer2.
+    - Require a minimal version of Dancer2.
         - Due to CPAN Testers failure.
 
 0.0800   2020-04-14

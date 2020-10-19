@@ -1,17 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
 package Future::Mutex;
 
+use v5.10;
 use strict;
 use warnings;
-use 5.010;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Future;
+
+use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -91,6 +93,7 @@ sub new
 
    return bless {
       avail => $params{count} // 1,
+      waitf => undef,
       queue => [],
    }, $class;
 }
@@ -125,7 +128,8 @@ sub enter
       $down_f = Future->done;
    }
    else {
-      push @{ $self->{queue} }, $down_f = Future->new;
+      die "ARGH Need to clone an existing future\n" unless defined $self->{waitf};
+      push @{ $self->{queue} }, $down_f = $self->{waitf}->new;
    }
 
    my $up = sub {
@@ -134,10 +138,13 @@ sub enter
       }
       else {
          $self->{avail}++;
+         undef $self->{waitf};
       }
    };
 
-   $down_f->then( $code )->on_ready( $up );
+   my $retf = $down_f->then( $code )->on_ready( $up );
+   $self->{waitf} or weaken( $self->{waitf} = $retf );
+   return $retf;
 }
 
 =head2 available

@@ -11,7 +11,7 @@ Task::Sites::ShlomiFish - Specifications for modules needed for building www.shl
 
 =cut
 
-our $VERSION = '0.0213';
+our $VERSION = '0.0214';
 
 =head1 DESCRIPTION
 
@@ -90,10 +90,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Task-Sites-ShlomiFish>
 
 =item * CPAN Ratings
 

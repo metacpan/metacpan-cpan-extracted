@@ -42,7 +42,7 @@ delete whatever text was previously there.  Defaults to 0.
 
 Specifies the name of the cursor to show when over borders, a visual 
 indication that interactive resizing is allowed (it is thus affect by 
-the value of -resizeborders).  Defaults to I<crosshair >.  
+the value of -resizeborders).  Defaults to I<crosshair>.  
 
 =item Switch: B<-borderwidth or -bd> 
 
@@ -79,9 +79,9 @@ command as arguments.
 
 A boolean value that specifies whether an 
 internal cache of the table contents should be kept.  This greatly enhances 
-speed performance when used with B<-command > but uses extra memory.  Can maintain 
-state when both B<-command > and B<-variable > are empty.  The cache is automatically 
-flushed whenever the value of B<-cache > or B<-variable > changes, otherwise you 
+speed performance when used with B<-command> but uses extra memory.  Can maintain 
+state when both B<-command> and B<-variable> are empty.  The cache is automatically 
+flushed whenever the value of B<-cache> or B<-variable> changes, otherwise you 
 have to explicitly call B<clear> on it.  Defaults to off.
 
 =item Switch: B<-colorigin> 
@@ -127,33 +127,33 @@ space:
 
 =over 2
 
-=item B<none >  
+=item B<none>  
 
 Columns will not stretch to fill the assigned window space. 
 If the columns are too narrow, there will be a blank space at the right 
 of the table.  This is the default. 
 
-=item B<unset >  
+=item B<unset>  
 
 Only columns that do not have 
 a specific width set will be stretched.
 
-=item B<all >  
+=item B<all>  
 
 All columns will be stretched 
 by the same number of pixels to fill the window space allocated to the 
 table.  This mode can interfere with interactive border resizing which 
 tries to force column width. 
 
-=item B<last >  
+=item B<last> 
 
 The last column will be stretched  
 to fill the window space allocated to the table. 
 
-=item B<fill >
+=item B<fill>
 
 (only valid for 
-B<-rowstretch > currently)  
+B<-rowstretch> currently)  
 
 The table will get more or less columns according 
 to the window space allocated to the table.  This mode has numerous quirks 
@@ -172,7 +172,7 @@ and may disappear in the future.
 Provides the name of a 
 procedure that will be evaluated by the widget to determine the tag to 
 be used for a given column.  When displaying a cell, the table widget will 
-first check to see if a tag has been defined using the B<tag col > widget 
+first check to see if a tag has been defined using the B<tag col> widget 
 method.  If no tag is found, it will evaluate the named procedure passing 
 the column number in question as the sole argument.  The procedure is expected 
 to return the name of a tag to use, or a null string. Errors occuring during 
@@ -199,8 +199,8 @@ Defaults to 10.
 =item Class: B<Command>
 
 Specified a command to use as a procedural interface to 
-cell values. If B<-usecommand > is true, this command will be used instead 
-of any reference to the B<-variable > array.  When retrieving cell values, 
+cell values. If B<-usecommand> is true, this command will be used instead 
+of any reference to the B<-variable> array.  When retrieving cell values, 
 the return value of the command is used as the value for the cell. 
 
 Args passed to this callback: The Set Flag (=1 if setting, else retrieving), the current row, 
@@ -219,28 +219,28 @@ the table drawing mode to one of the following options:
 
 =over 2
 
-=item B<slow >  
+=item B<slow>  
 
 The table 
 is drawn to an offscreen pixmap using the Tk bordering functions (double-buffering). 
 This means there will be no flashing, but this mode is slow for larger 
 tables.
 
-=item B<compatible >  
+=item B<compatible>  
 
 The table is drawn directly to the screen using the 
 Tk border functions. It is faster, but the screen may flash on update.  
 This is the default. 
 
-=item B<fast >  
+=item B<fast>  
 
 The table is drawn directly to the screen and 
 the borders are done with fast X calls, so they are always one pixel wide 
-only.  As a side effect, it restricts B<-borderwidth > to a range of 0 or 1. 
+only.  As a side effect, it restricts B<-borderwidth> to a range of 0 or 1. 
 This mode provides best performance for large tables, but can flash on 
 redraw and is not 100% Tk compatible on the border mode. 
 
-=item B<single >  
+=item B<single>  
 
 The table 
 is drawn to the screen as in fast mode, but only single pixel lines are 
@@ -257,8 +257,8 @@ drawn (not square borders).
 =item Class: B<FlashMode>
 
 A boolean value which specifies whether 
-cells should flash when their value changes.  The table tag B<flash > will 
-be applied to these cells for the duration specified by B<-flashtime >.  Defaults 
+cells should flash when their value changes.  The table tag B<flash> will 
+be applied to these cells for the duration specified by B<-flashtime>.  Defaults 
 to 0.
 
 =item Switch: B<-flashtime> 
@@ -268,7 +268,7 @@ to 0.
 =item Class: B<FlashTime>
 
 The amount of time, in 1/4 second increments, for which a cell 
-should flash when its value has changed.  B<-flashmode > must be on.  Defaults 
+should flash when its value has changed.  B<-flashmode> must be on.  Defaults 
 to 2. 
 
 =item Switch: B<-height> 
@@ -290,7 +290,7 @@ all the rows in the table.  The height can be further limited by B<-maxheight
 
 Specifies whether the foreground and background 
 of an item should simply have their values swapped instead of merging 
-the I<sel > tag options when the cell is selected.  Defaults to 0 (merge I<sel> tag). 
+the I<sel> tag options when the cell is selected.  Defaults to 0 (merge I<sel> tag). 
 
 =item Switch: B<-ipadx> 
 
@@ -433,7 +433,7 @@ data in a table.  By default, rows are separated as tcl lists.
 =item Class: B<StretchMode> 
 
 Specifies the stretch modes for rows to fill extra allocated window space. 
-See B<-colstretchmode > for valid options.  
+See B<-colstretchmode> for valid options.  
 
 =item Switch: B<-rowtagcommand> 
 
@@ -445,7 +445,7 @@ Provides the
 name of a procedure that can evaluated by the widget to determine the 
 tag to be used for a given row.  The procedure must be defined by the user 
 to accept a single argument (the row number), and return a tag name or 
-null string.  This operates in a similar manner as B<-coltagcommand >, except 
+null string.  This operates in a similar manner as B<-coltagcommand>, except 
 that it applies to row tags. 
 
 The Current row number is passed as an argument to the row command.
@@ -458,7 +458,7 @@ The Current row number is passed as an argument to the row command.
 
 Specifies 
 a command (callback) to evaluate when the selection is retrieved from a table via 
-the selection mechanism (ie: evaluating "B<selection get >"). The return value 
+the selection mechanism (ie: evaluating "B<selection get>"). The return value 
 from this command will become the string passed on by the selection mechanism. 
 The following arguments are passed to this callback: The number of rows in the 
 selection, number of columns in the selection, the selection string, the number
@@ -472,8 +472,8 @@ of cell in the selection.
 
 Specifies one of several styles for manipulating the 
 selection.  The value of the option may be arbitrary, but the default bindings 
-expect it to be either B<single >, B<browse >, B<multiple >, or B<extended >; the 
-default value is B<browse >.  These styles are like those for the Tk listbox, 
+expect it to be either B<single>, B<browse>, B<multiple>, or B<extended>; the 
+default value is B<browse>.  These styles are like those for the Tk listbox, 
 except expanded for 2 dimensions.  
 
 =item Switch: B<-selecttitle> 
@@ -492,8 +492,8 @@ cells should be allowed in the selection. Defaults to 0 (disallowed).
 =item Class: B<SelectType> 
 
 Specifies one of several types of selection for the table.  The value 
-of the option may be one of B<row >, B<col >, B<cell >, or B<both > (meaning B<row && 
-col >); the default value is B<cell >.  These types define whether an entire 
+of the option may be one of B<row>, B<col>, B<cell>, or B<both> (meaning B<row && 
+col>); the default value is B<cell>.  These types define whether an entire 
 row/col is affected when a cell's selection is changed (set or clear).  
 
 =item Switch: B<-sparsearray> 
@@ -514,11 +514,11 @@ be maintained.
 
 =item Class: B<State>  
 
-Specifies one of two states for the entry:  B<normal > or B<disabled>.
+Specifies one of two states for the entry:  B<normal> or B<disabled>.
 If the table is disabled then the value may not be changed using widget 
 commands and no insertion cursor will be displayed, even if the input 
 focus is in the widget.  Also, all insert or delete methods will be ignored. 
-Defaults to B<normal >.  
+Defaults to B<normal>.  
 
 =item Switch: B<-titlecols> 
 
@@ -543,9 +543,9 @@ Number of rows to use as a title area.  Defaults to 0.
 
 =item Class: B<UseCommand> 
 
-A boolean value which specifies whether to use the B<command > option. This 
-value sets itself to zero if B<command > is used and returns an error. Defaults 
-to 1 (will use B<command > if specified).  
+A boolean value which specifies whether to use the B<command> option. This 
+value sets itself to zero if B<command> is used and returns an error. Defaults 
+to 1 (will use B<command> if specified).  
 
 =item Switch: B<-validate> 
 
@@ -579,11 +579,11 @@ row, col, oldContents of cell, potential new contents of cell, Current Index in 
 Global Tcl array variable to attach 
 to the table's C array.  It will be created if it doesn't already exist or 
 is a simple variable.  Keys used by the table in the array are of the form 
-I<row >,I<col > for cells and the special key I<active > which contains the value 
+I<row>,I<col> for cells and the special key I<active> which contains the value 
 of the active cell buffer.  The Tcl array is managed as a sparse array 
 (the table doesn't require all valid indices have values).  No stored value 
 for an index is equivalent to the empty string, and clearing a cell will 
-remove that index from the Tcl array, unless the B<-sparsearray > options 
+remove that index from the Tcl array, unless the B<-sparsearray> options 
 is set to 0.  
 
 =item Switch: B<-width> 
@@ -595,7 +595,7 @@ is set to 0.
 Specifies the desired width for the window, in columns. If zero 
 or less, then the desired width for the window is made just large enough 
 to hold all the columns in the table.  The width can be further limited 
-by B<-maxwidth >.  
+by B<-maxwidth>.  
 
 =item Switch: B<-wrap> 
 
@@ -610,22 +610,22 @@ Specifies the default wrap value for tags.  Defaults to 0.
 =head1 DESCRIPTION 
 
 
-The B<TableMatrix > command creates a 2-dimensional grid of cells.  The table can 
+The B<TableMatrix> command creates a 2-dimensional grid of cells.  The table can 
 use a Tcl array variable or Tcl command for data storage and retrieval. 
 The widget has an active cell, the contents of which can be edited (when 
 the state is normal).  The widget supports a default style for the cells 
-and also multiple I<tags >, which can be used to change the style of a row, 
-column or cell (see TAGS for details).  A cell I<flash > can be set up so 
+and also multiple I<tags>, which can be used to change the style of a row, 
+column or cell (see TAGS for details).  A cell I<flash> can be set up so 
 that changed cells will change color for a specified amount of time ("blink"). 
  Cells can have embedded images or windows, as described in L<Tags> and L<Embedded Windows> respectively. 
 
 One or more cells may be selected as described below. 
- If a table is exporting its selection (see B<-exportselection > option), 
+ If a table is exporting its selection (see B<-exportselection> option), 
 then it will observe the standard X11 protocols for handling the selection. 
  See L<the Selection> for details. It is not necessary for all the cells to 
 be displayed in the table window at once; commands described below may 
 be used to change the view in the window. Tables allow scrolling in both 
-directions using the standard B<-xscrollcommand > and B<-yscrollcommand > options. 
+directions using the standard B<-xscrollcommand> and B<-yscrollcommand> options. 
  They also support scanning, as described below. 
 
 In order to obtain good 
@@ -640,43 +640,43 @@ table, in any of the following ways:
 
 =over 1
 
-=item I<number,number >  
+=item I<number,number>  
 
 Specifies the cell 
 as a numerical index of row,col which corresponds to the index of the 
-associated Perl Hash, where B<-roworigin,-colorigin > corresponds to the first 
+associated Perl Hash, where B<-roworigin,-colorigin> corresponds to the first 
 cell in the table (0,0 by default). The values for row
 and column will be constrained to actual values
 in the table, which means a valid cell is
 always found.
 
-=item B<active >  
+=item B<active>  
 
 Indicates the cell that has 
-the location cursor. It is specified with the B<activate > widget command. 
+the location cursor. It is specified with the B<activate> widget command. 
 
-=item B<anchor >  
+=item B<anchor>  
 
 Indicates the anchor point for the selection, which is set with 
-the B<selection anchor > widget command. 
+the B<selection anchor> widget command. 
 
-=item B<bottomright >  
+=item B<bottomright>  
 
 Indicates the bottom-rightmost 
 cell visible in the table. 
 
-=item B<end >  
+=item B<end>  
 
 Indicates the bottom right cell of the 
 table. 
 
-=item B<origin >  
+=item B<origin>  
 
 Indicates the top-leftmost editable cell of the table, not 
 necessarily in the display.  This takes into account the user specified 
 origin and title area. 
 
-=item B<topleft >  
+=item B<topleft>  
 
 Indicates the top-leftmost editable cell 
 visible in the table (this excludes title cells). 
@@ -684,10 +684,10 @@ visible in the table (this excludes title cells).
 =item B<@x,y>  
 
 Indicates the 
-cell that covers the point in the table window specified by I<x > and I<y > 
+cell that covers the point in the table window specified by I<x> and I<y> 
 (in pixel coordinates).  If no cell covers that point, then the closest 
 cell to that point is used. In the widget command descriptions below, arguments 
-named I<index >, I<first >, and I<last > always contain text indices in one of 
+named I<index>, I<first>, and I<last> always contain text indices in one of 
 the above forms.  
 
 =back
@@ -704,24 +704,24 @@ the user and will determine the attributes for special cells:
 
 =over 1
 
-=item B<active >  
+=item B<active>  
 
-This tag is given to the I<active > cell 
+This tag is given to the I<active> cell 
 
-=item B<flash >  
+=item B<flash>  
 
 If flash 
 mode is on, this tag is given to any recently edited cells. 
 
-=item B<sel >  
+=item B<sel>  
 
 This 
 tag is given to any selected cells. 
 
-=item B<title >  
+=item B<title>  
 
 This tag is given to any cells 
-in the title rows and columns.  This tag has B<-state > I<disabled > by default. 
+in the title rows and columns.  This tag has B<-state> I<disabled> by default. 
 
 =back
 
@@ -739,33 +739,33 @@ tags:
 
 Anchor for item in the cell space. 
 
-=item B<-background > or B<-bg > I<color >  
+=item B<-background> or B<-bg> I<color>  
 
 Background color of the cell. 
 
-=item B<-borderwidth > or B<-bd > I<pixel >  
+=item B<-borderwidth> or B<-bd> I<pixel>  
 
 Borderwidth of the cell, of the same format for the table, but may also
 be empty to inherit the default table borderwidth value (the default).
 
-=item B<-font> I<fontName >  
+=item B<-font> I<fontName>  
 
 Font for text in the cell. 
 
-=item B<-foreground> or B<-fg > I<color >  
+=item B<-foreground> or B<-fg> I<color>  
 
 Foreground color of the cell. 
 
-=item B<-justify> I<justify > 
+=item B<-justify> I<justify> 
 
 How to 
-justify multi-line text in a cell. It must be one of B<left >, B<right >, or B<center>. 
+justify multi-line text in a cell. It must be one of B<left>, B<right>, or B<center>. 
 
-=item B<-image> I<imageName >  
+=item B<-image> I<imageName>  
 
 An image to display in the cell instead of text. 
 
-=item B<-multiline> I<boolean >  
+=item B<-multiline> I<boolean>  
 
 Whether to display text with newlines on multiple lines. 
 
@@ -783,7 +783,7 @@ Whether to show the text over an image.
 
 The state of the cell, to allow for certain cells 
 to be disabled. This prevents the cell from being edited by the I<insert 
-> or I<delete > methods, but a direct I<set > will not be prevented. 
+> or I<delete> methods, but a direct I<set> will not be prevented. 
 
 =item B<-wrap> I<boolean>  
 
@@ -810,10 +810,10 @@ widget will be used.
 Images are used for display purposes 
 only.  Editing in that cell will still be enabled and any querying of the 
 cell will show the text value of the cell, regardless of the value of 
-B<-showtext >.  
+B<-showtext>.  
 
-Note: There can be only one tag for a given tag type. ( Tag types = B<flash >, B<active >, B<sel >, B<title >, 
-B<celltag> B<rowtag >, B<coltag >.) For example, you can't apply two cell tags to a single cell (or two row tags to a
+Note: There can be only one tag for a given tag type. ( Tag types = B<flash>, B<active>, B<sel>, B<title>, 
+B<celltag> B<rowtag>, B<coltag>.) For example, you can't apply two cell tags to a single cell (or two row tags to a
 single row, etc) and expect the tag's properties to be merged. The last tag-type applied will be the one that
 is used. 
 
@@ -835,7 +835,7 @@ Windows are used for display purposes only.  A value still exists for that
 cell, but will not be shown unless the window is deleted in some way.  
 If the window is destroyed or lost by the table widget to another geometry 
 manager, then any data associated with it is lost (the cell it occupied 
-will no longer appear in B<window names >).
+will no longer appear in B<window names>).
 
 When an embedded window is added 
 to a table widget with the window configure widget command, several configuration 
@@ -860,12 +860,12 @@ will be evaluated again the next time the cell is displayed.
 Background color of the cell.  If not specified, it uses 
 the table's default background. 
 
-=item B<-borderwidth> or B<-bd> I<pixelList >
+=item B<-borderwidth> or B<-bd> I<pixelList>
 
 Borderwidth of the cell, of the same format for the table, but may also
 be empty to inherit the default table borderwidth value (the default).
 
-=item B<-padx> I<pixels >
+=item B<-padx> I<pixels>
 
 As defined in the Tk options 
 man page. 
@@ -879,10 +879,10 @@ As defined in the Tk options man page.
 The relief to use for the cell in which the window lies.  If not specified, 
 it uses the table's default relief. 
 
-=item B<-sticky> I<sticky > 
+=item B<-sticky> I<sticky> 
 
 Stickiness of the window 
-inside the cell, as defined by the B<grid > command. 
+inside the cell, as defined by the B<grid> command. 
 
 =item B<-window> I<$widget>  
 
@@ -898,18 +898,18 @@ Table selections are available as
 type STRING.  By default, the value of the selection will be the values 
 of the selected cells in nested Tcl list form where each row is a list 
 and each column is an element of a row list. You can change the way this 
-value is interpreted by setting the B<-rowseparator > and B<-colseparator > options. 
- For example, default Excel format would be to set B<-rowseparator > to "\n" 
-and B<-colseparator > to "\t".  Changing these values affects both how the table 
+value is interpreted by setting the B<-rowseparator> and B<-colseparator> options. 
+ For example, default Excel format would be to set B<-rowseparator> to "\n" 
+and B<-colseparator> to "\t".  Changing these values affects both how the table 
 sends out the selection and reads in pasted data, ensuring that the table 
 should always be able to cut and paste to itself.  It is possible to change 
 how pastes are handled by editing the table library procedure B<tk_tablePasteHandler 
->.  This might be necessary if B<-selectioncommand > is set.  
+>.  This might be necessary if B<-selectioncommand> is set.  
 
 =head1 Row/Col Spanning 
 
 Individual cells can span multiple rows and/or columns.  This is done via 
-the B<spans > command (see below for exact arguments).  Cells in the title 
+the B<spans> command (see below for exact arguments).  Cells in the title 
 area that span are not permitted to span beyond the title area, and will 
 be constrained accordingly.  If the title area shrinks during a configure, 
 sanity checking will occur to ensure the above.  You may set spans on regular 
@@ -923,9 +923,9 @@ error and it not allowed. Spans can affect the overall speed of table drawing,
 although not significantly.  If spans are not used, then there is no performance 
 loss. 
 
-Cells I<hidden > by spanning cells still have valid data.  This will 
+Cells I<hidden> by spanning cells still have valid data.  This will 
 be seen during cut and paste operations that involve hidden cells, or 
-through direct access by a command like B<get > or B<set >. 
+through direct access by a command like B<get> or B<set>. 
 
 The drawing properties 
 of spanning cells apply to only the visual area of the cell.  For example, 
@@ -936,47 +936,47 @@ column area will not be considered in the centering calculations.
 =head1 Command Substitution 
 
 The various option based commands that the table supports 
-all support the familiar Tk %-substitution model (see L<Tk::bind > for more details). 
+all support the familiar Tk %-substitution model (see L<Tk::bind> for more details). 
  The following %-sequences are recognized and substituted by the table 
 widget: 
 
 =over 1
 
-=item B<%c >  
+=item B<%c>  
 
-For B<SelectionCommand >, it is the maximum number of columns 
+For B<SelectionCommand>, it is the maximum number of columns 
 in any row in the selection.  Otherwise it is the column of the triggered 
 cell. 
 
-=item B<%C >  
+=item B<%C>  
 
-A convenience substitution for I<%r >,I<%c >. 
+A convenience substitution for I<%r>,I<%c>. 
 
-=item B<%i >  
+=item B<%i>  
 
-For B<SelectionCommand>, it is the total number of cells in the selection. For B<Command >, it is 
+For B<SelectionCommand>, it is the total number of cells in the selection. For B<Command>, it is 
 0 for a read (get) and 1 for a write (set). Otherwise it is the current 
 cursor position in the cell. 
 
 =item B<%r>
 
-For B<SelectionCommand >, it is the number 
+For B<SelectionCommand>, it is the number 
 of rows in the selection. Otherwise it is the row of the triggered cell. 
 
-=item B<%s >  
+=item B<%s>  
 
-For B<ValidateCommand >, it is the current value of the cell being validated. 
-For B<SelectionCommand >, it is the default value of the selection. For B<BrowseCommand 
->, it is the index of the last active cell. For B<Command >, it is empty for 
+For B<ValidateCommand>, it is the current value of the cell being validated. 
+For B<SelectionCommand>, it is the default value of the selection. For B<BrowseCommand 
+>, it is the index of the last active cell. For B<Command>, it is empty for 
 reads (get) and the current value of the cell for writes (set). 
 
-=item B<%S >  
+=item B<%S>  
 
 For 
-B<ValidateCommand >, it is the potential new value of the cell being validated. 
-For B<BrowseCommand >, it is the index of the new active cell. 
+B<ValidateCommand>, it is the potential new value of the cell being validated. 
+For B<BrowseCommand>, it is the index of the new active cell. 
 
-=item B<%W >  
+=item B<%W>  
 
 The pathname 
 to the window for which the command was generated.  
@@ -986,7 +986,7 @@ to the window for which the command was generated.
 =head1 Widget Methods 
 
 The 
-B<$window->E<gt>B<TableMatrix > method creates a widget object. This object supports the B<configure> and B<cget> methods
+B<$window->E<gt>B<TableMatrix> method creates a widget object. This object supports the B<configure> and B<cget> methods
 described in L<Tk::options> which can be used to enquire and
 modify the options described above.
 The widget also inherits all the methods provided by the generic
@@ -1021,19 +1021,19 @@ options:
 
 =item I<$table>-E<gt>B<borderMark>(I<x, y>, ?I<row|col>?)
 
-Records I<x > and I<y > and 
+Records I<x> and I<y> and 
 the row and/or column border under that point in the table window, if 
-any; used in conjunction with later B<border dragto > commands.  Typically 
+any; used in conjunction with later B<border dragto> commands.  Typically 
 this command is associated with a mouse button press in the widget.  If 
-I<row > or I<col > is not specified, it returns a tuple of both border indices 
+I<row> or I<col> is not specified, it returns a tuple of both border indices 
 (an empty item means no border). Otherwise, just the specified item is 
 returned. 
 
 =item I<$table>-E<gt>B<borderDragto>(I<x, y>)
 
 This command computes the difference 
-between its I<x > and I<y > arguments and the I<x > and I<y > arguments to the last 
-B<border mark > command for the widget.  It then adjusts the previously marked 
+between its I<x> and I<y> arguments and the I<x> and I<y> arguments to the last 
+B<border mark> command for the widget.  It then adjusts the previously marked 
 border by the difference.  This command is typically associated with mouse 
 motion events in the widget, to produce the effect of interactive border 
 resizing.  
@@ -1045,14 +1045,14 @@ resizing.
 =item I<$table>-E<gt>B<cget>(I<option>)
 
 Returns the current value of the configuration 
-option given by I<option >.  I<Option > may have any of the values accepted by 
-the B<table > command. 
+option given by I<option>.  I<Option> may have any of the values accepted by 
+the B<table> command. 
 
 =item I<$table>-E<gt>B<clear>(I<option>, ?I<first>?, ?I<last>?)
 
 This command 
 is a convenience routine to clear certain state information managed by 
-the table.  I<first > and I<last > represent valid table indices.  If neither 
+the table.  I<first> and I<last> represent valid table indices.  If neither 
 are specified, then the command operates on the whole table.  The following 
 options are recognized:  
 
@@ -1069,7 +1069,7 @@ the specified section of the cache, if the table has been keeping one.
 
 Clears the specified row and column 
 areas of specific height/width dimensions.  When just one index is specified, 
-for example B<2,0 >, that is interpreted as row 2 B<and > column 0. 
+for example B<2,0>, that is interpreted as row 2 B<and> column 0. 
 
 =item I<$table>-E<gt>B<clearTags>(?I<first>?, ?I<last>?)
 
@@ -1087,14 +1087,14 @@ of the above clear functions on the specified area.
 
 =item I<$table>-E<gt>B<colWidth>(?I<col>?, ?I<value, col, value, ...>?)
 
-If no I<col > is 
+If no I<col> is 
 specified, returns a list describing all cols for which a width has been 
-set.  If B<col > is specified with no value, it prints out the width of that 
+set.  If B<col> is specified with no value, it prints out the width of that 
 col in characters (positive number) or pixels (negative number).  If one 
-or more I<col-value > pairs are specified, then it sets each col to be that 
+or more I<col-value> pairs are specified, then it sets each col to be that 
 width in characters (positive number) or pixels (negative number).  If 
-I<value > is I<default >, then the col uses the default width, specified by 
-B<-colwidth >. 
+I<value> is I<default>, then the col uses the default width, specified by 
+B<-colwidth>. 
 
 
 =over 1
@@ -1102,15 +1102,15 @@ B<-colwidth >.
 =item I<$table>-E<gt>B<configure>(?I<option>?, ?I<value, option, value, ...>?)
 
 Query or modify the configuration options 
-of the widget. If no I<option > is specified, returns a list describing all 
-of the available options for I<pathName > (see B<Tk_ConfigureInfo > for information 
-on the format of this list).  If I<option > is specified with no I<value >, then 
+of the widget. If no I<option> is specified, returns a list describing all 
+of the available options for I<pathName> (see B<Tk_ConfigureInfo> for information 
+on the format of this list).  If I<option> is specified with no I<value>, then 
 the command returns a list describing the one named option (this list 
 will be identical to the corresponding sublist of the value returned if 
-no I<option > is specified).  If one or more I<option-value > pairs are specified, 
+no I<option> is specified).  If one or more I<option-value> pairs are specified, 
 then the command modifies the given widget option(s) to have the given 
-value(s);  in this case the command returns an empty string. I<Option > may 
-have any of the values accepted by the B<table > command. 
+value(s);  in this case the command returns an empty string. I<Option> may 
+have any of the values accepted by the B<table> command. 
 
 =item I<$table>-E<gt>B<curselection>(?I<value>?)
 
@@ -1122,14 +1122,14 @@ state is disabled.
 =item I<$table>-E<gt>B<curvalue>(?I<value>?)
 
 If no value is given, the 
-value of the cell being edited (indexed by B<active >) is returned, else 
+value of the cell being edited (indexed by B<active>) is returned, else 
 it is set to the given value. 
 
 =item I<$table>-E<gt>B<delete>(I<option, arg>, ?I<arg>?)
 
 This 
 command is used to delete various things in a table.  It has several forms, 
-depending on the I<option >:
+depending on the I<option>:
 
 =back
 
@@ -1139,14 +1139,14 @@ depending on the I<option >:
 
 Deletes text from the active cell.  If only one index is given, it deletes the 
 character after that index, otherwise it deletes from the first index 
-to the second.  I<index > can be a number, B<insert > or B<end >. 
+to the second.  I<index> can be a number, B<insert> or B<end>. 
 
 =item I<$table>-E<gt>B<deleteCols>(?I<switches>?, I<index>, ?I<count>?)
 
-Deletes I<count > cols starting at (and 
-including) col I<index >.  The I<index > will be constrained to the limits of 
-the tables.  If I<count > is negative, it deletes cols to the left.  Otherwise 
-it deletes cols to the right.  I<count > defaults to 1 (meaning just the column 
+Deletes I<count> cols starting at (and 
+including) col I<index>.  The I<index> will be constrained to the limits of 
+the tables.  If I<count> is negative, it deletes cols to the left.  Otherwise 
+it deletes cols to the right.  I<count> defaults to 1 (meaning just the column 
 specified).  The selection will be cleared.  At the moment, spans are not 
 adjusted with this action.  Optional switches are:
 
@@ -1154,26 +1154,26 @@ adjusted with this action.  Optional switches are:
 
 =over 3
 
-=item B<-holddimensions >  
+=item B<-holddimensions>  
 
 Causes 
 the table cols to be unaffected by the deletion (empty cols may appear). 
- By default the dimensions are adjusted by B<count >. 
+ By default the dimensions are adjusted by B<count>. 
 
-=item B<-holdtags >  
+=item B<-holdtags>  
 
 Causes the 
-tags specified by the I<tag > method to not move along with the data.  Also 
-prevents specific widths set by the I<width > method from being adjusted. 
+tags specified by the I<tag> method to not move along with the data.  Also 
+prevents specific widths set by the I<width> method from being adjusted. 
  By default, these tags are properly adjusted. 
 
-=item B<-holdwindows >  
+=item B<-holdwindows>  
 
 Causes the 
-embedded windows created with the I<window > method to not move along with 
+embedded windows created with the I<window> method to not move along with 
 the data.  By default, these windows are properly adjusted. 
 
-=item B<-keeptitles > 
+=item B<-keeptitles> 
 
 Prevents title area cells from being changed.  Otherwise they are treated 
 just like regular cells and will move as specified. 
@@ -1184,7 +1184,7 @@ just like regular cells and will move as specified.
 
 =item I<$table>-E<gt>B<deleteRows>(?I<switches>?, I<index>, ?I<count>?)
 
-Deletes B<count > rows starting at (and including) row B<index >.  If B<count > is negative, 
+Deletes B<count> rows starting at (and including) row B<index>.  If B<count> is negative, 
 it deletes rows going up.  Otherwise it deletes rows going down.  The selection 
 will be cleared.  The switches are the same as those for column deletion. 
 
@@ -1195,12 +1195,12 @@ will be cleared.  The switches are the same as those for column deletion.
 =item I<$table>-E<gt>B<get>(I<first>, ?I<last>?)
 
 Returns the value of the cells specified 
-by the table indices I<first > and (optionally) I<last > in a list. 
+by the table indices I<first> and (optionally) I<last> in a list. 
 
 
 =item I<$table>-E<gt>B<hidden>(?I<index>?, ?I<index, ...>?)
 
-When called without args, it returns all the I<hidden > cells 
+When called without args, it returns all the I<hidden> cells 
 (those cells covered by a spanning cell).  If one index is specified, it 
 returns the spanning cell covering that index, if any.  If multiple indices 
 are specified, it returns 1 if all indices are hidden cells, 0 otherwise. 
@@ -1210,20 +1210,20 @@ are specified, it returns 1 if all indices are hidden cells, 0 otherwise.
 With no arguments, prints out the location of 
 the insertion cursor in the active cell.  With one argument, sets the cursor 
 to that point in the string.  0 is before the first character, you can 
-also use B<insert > or B<end > for the current insertion point or the end of 
+also use B<insert> or B<end> for the current insertion point or the end of 
 the text.  If there is no active cell, or the cell or table is disabled, 
 this will return -1. 
 
 =item I<$table>-E<gt>B<index>(I<index>, ?I<row|col>?)
 
 Returns the integer 
-cell coordinate that corresponds to I<index > in the form row,col.  If B<row 
-> or B<col > is specified, then only the row or column index is returned. 
+cell coordinate that corresponds to I<index> in the form row,col.  If B<row 
+> or B<col> is specified, then only the row or column index is returned. 
 
 =item I<$table>-E<gt>B<insert>(I<option, arg, arg>)
 
 This command is used to into various things into 
-a table.  It has several forms, depending on the I<option >:  
+a table.  It has several forms, depending on the I<option>:  
 
 =back
 
@@ -1231,19 +1231,19 @@ a table.  It has several forms, depending on the I<option >:
 
 =item I<$table>-E<gt>B<insertActive>(I<index, value>)
 
-The I<value > is a text string which is inserted at 
-the I<index > postion of the active cell.  The cursor is then positioned after 
-the new text. I<index > can be a number, B<insert > or B<end >. 
+The I<value> is a text string which is inserted at 
+the I<index> postion of the active cell.  The cursor is then positioned after 
+the new text. I<index> can be a number, B<insert> or B<end>. 
 
 =item I<$table>-E<gt>B<insertCols>(?I<switches>?, I<index>, ?I<count>?)
 
-Inserts B<count > cols starting at col B<index >.  If B<count > is negative, it inserts before the specified col.  Otherwise 
+Inserts B<count> cols starting at col B<index>.  If B<count> is negative, it inserts before the specified col.  Otherwise 
 it inserts after the specified col.  The selection will be cleared.  The 
 switches are the same as those for column deletion. 
 
 =item I<$table>-E<gt>B<insertRows>(?I<switches>?, I<index>, ?I<count>?)
 
-Inserts B<count > rows starting at row B<index >.  If B<count > is negative, it inserts before the specified row.  Otherwise 
+Inserts B<count> rows starting at row B<index>.  If B<count> is negative, it inserts before the specified row.  Otherwise 
 it inserts after the specified row.  The selection will be cleared.  The 
 switches are the same as those for column deletion.  
 
@@ -1259,18 +1259,18 @@ binding).
 
 =item I<$table>-E<gt>B<rowHeight>(?I<row>?, ?I<value, row, value, ...>?)
 
-If no I<row > is specified, returns a 
-list describing all rows for which a height has been set.  If B<row > is specified 
+If no I<row> is specified, returns a 
+list describing all rows for which a height has been set.  If B<row> is specified 
 with no value, it prints out the height of that row in characters (positive 
-number) or pixels (negative number).  If one or more I<row-value > pairs are 
+number) or pixels (negative number).  If one or more I<row-value> pairs are 
 specified, then it sets each row to be that height in lines (positive 
-number) or pixels (negative number).  If I<value > is I<default >, then the row 
-uses the default height, specified by B<-rowheight >. 
+number) or pixels (negative number).  If I<value> is I<default>, then the row 
+uses the default height, specified by B<-rowheight>. 
 
 =item I<$table>-E<gt>B<scan>(I<option, args>)
 
 This command is used to implement 
-scanning on tables.  It has two forms, depending on I<option >:  
+scanning on tables.  It has two forms, depending on I<option>:  
 
 =back
 
@@ -1278,16 +1278,16 @@ scanning on tables.  It has two forms, depending on I<option >:
 
 =item I<$table>-E<gt>B<scanMark>(I<x, y>)
 
-Records I<x > and I<y > and the current view in the table window; 
- used in conjunction with later B<scan dragto > commands. Typically this command 
+Records I<x> and I<y> and the current view in the table window; 
+ used in conjunction with later B<scan dragto> commands. Typically this command 
 is associated with a mouse button press in the widget.  It returns an empty 
 string. 
 
 =item I<$table>-E<gt>B<scanDragto>(I<x, y>.)
 
 This command computes the difference 
-between its I<x > and I<y > arguments and the I<x > and I<y > arguments to the last 
-B<scan mark > command for the widget.  It then adjusts the view by 5 times 
+between its I<x> and I<y> arguments and the I<x> and I<y> arguments to the last 
+B<scan mark> command for the widget.  It then adjusts the view by 5 times 
 the difference in coordinates.  This command is typically associated with 
 mouse motion events in the widget, to produce the effect of dragging the 
 list at high speed through the window.  The return value is an empty string. 
@@ -1299,14 +1299,14 @@ list at high speed through the window.  The return value is an empty string.
 =item I<$table>-E<gt>B<see>(I<index>)
 
 Adjust the view in the table so that the cell given 
-by I<index > is positioned as the cell one off from top left (excluding title 
+by I<index> is positioned as the cell one off from top left (excluding title 
 rows and columns) if the cell is not currently visible on the screen.  
 The actual cell may be different to keep the screen full. 
 
 =item I<$table>-E<gt>B<selection>(I<option, arg>)
 
 This command is used to adjust the selection within a table. 
- It has several forms, depending on I<option >:  
+ It has several forms, depending on I<option>:  
 
 =back
 
@@ -1314,25 +1314,25 @@ This command is used to adjust the selection within a table.
 
 =item I<$table>-E<gt>B<selectionAnchor>(I<index>)
 
-Sets the selection anchor to the cell given by I<index >.  The selection 
+Sets the selection anchor to the cell given by I<index>.  The selection 
 anchor is the end of the selection that is fixed while dragging out a 
-selection with the mouse.  The index B<anchor > may be used to refer to the 
+selection with the mouse.  The index B<anchor> may be used to refer to the 
 anchor cell. 
 
 =item I<$table>-E<gt>B<selectionClear>(I<first>?I<last>?)
 
 If any of the cells 
-between I<first > and I<last > (inclusive) are selected, they are deselected. 
- The selection state is not changed for cells outside this range.  I<first > may be specified as B<all > to remove the selection from all cells. 
+between I<first> and I<last> (inclusive) are selected, they are deselected. 
+ The selection state is not changed for cells outside this range.  I<first> may be specified as B<all> to remove the selection from all cells. 
 
 =item I<$table>-E<gt>B<selectionIncludes>(I<index>)
 
-Returns 1 if the cell indicated by I<index > 
+Returns 1 if the cell indicated by I<index> 
 is currently selected, 0 if it isn't. 
 
 =item I<$table>-E<gt>B<selectionSet>(I<first>, ?I<last>?)
 
-Selects all of the cells in the range between I<first > and I<last >, inclusive, 
+Selects all of the cells in the range between I<first> and I<last>, inclusive, 
 without affecting the selection state of cells outside that range.  
 
 =back
@@ -1347,10 +1347,10 @@ perltk note this needs to be perlized
 
 Sets the specified index 
 to the associated value.  Table validation will not be triggered via this 
-method.  If B<row > or B<col > precedes the list of index/value pairs, then the 
+method.  If B<row> or B<col> precedes the list of index/value pairs, then the 
 value is assumed to be a Tcl list whose values will be split and set into 
-the subsequent columns (if B<row > is specified) or rows (for B<col >).  For 
-example, B< set row 2,3 {2,3 2,4 2,5} > will set 3 cells, from 2,3 to 2,5. 
+the subsequent columns (if B<row> is specified) or rows (for B<col>).  For 
+example, B< set row 2,3 {2,3 2,4 2,5}> will set 3 cells, from 2,3 to 2,5. 
 The setting of cells is silently bounded by the known table dimensions. 
 
 =item I<$table>-E<gt>B<spans>(?I<index>?, ?I<rows,cols, index, rows,cols, ...>?)
@@ -1358,17 +1358,17 @@ The setting of cells is silently bounded by the known table dimensions.
 This command is 
 used to manipulate row/col spans.  When called with no arguments, all known 
 spans are returned as a list of tuples of the form {index span}.  When 
-called with only the I<index >, the span for that I<index > only is returned, 
-if any.  Otherwise an even number of I<index rows,cols > pairs are used to 
-set spans.  A span starts at the I<index > and continues for the specified 
+called with only the I<index>, the span for that I<index> only is returned, 
+if any.  Otherwise an even number of I<index rows,cols> pairs are used to 
+set spans.  A span starts at the I<index> and continues for the specified 
 number of rows and cols. Negative spans are not supported.  A span of 0,0 
 unsets any span on that cell.  See EXAMPLES for more info. 
 
 =item I<$table>-E<gt>B<tag>(option, ?I<arg, arg, ...>?)
 
 This command is used to manipulate tags.  The exact 
-behavior of the command depends on the I<option > argument that follows the 
-B<tag > argument. I<cget >, I<cell >, and I<row|col > complain about unknown tag names. 
+behavior of the command depends on the I<option> argument that follows the 
+B<tag> argument. I<cget>, I<cell>, and I<row|col> complain about unknown tag names. 
 The following forms of the command are currently supported:  
 
 =back
@@ -1387,8 +1387,8 @@ not exist, it will be created with the default options.
 =item I<$table>-E<gt>B<tagCget>(I<tagName, option>)
 
 This command returns the current value of the option 
-named I<option > associated with the tag given by I<tagName >.  I<Option > may have 
-any of the values accepted by the B<tag configure > widget command. 
+named I<option> associated with the tag given by I<tagName>.  I<Option> may have 
+any of the values accepted by the B<tag configure> widget command. 
 
 =item I<$table>-E<gt>B<tagCol>(I<tagName, ?col, ...?>)
 
@@ -1402,16 +1402,16 @@ not exist, it will be created with the default options.
 =item I<$table>-E<gt>B<tagConfigure>(I<tagName>, ?I<option>?, ?I<value>?, ?I<option, value, ...>?)
 
 This command is similar 
-to the B<configure > widget command except that it modifies options associated 
-with the tag given by I<tagName > instead of modifying options for the overall 
-table widget.  If no I<option > is specified, the command returns a list describing 
-all of the available options for I<tagName > (see B<Tk_ConfigureInfo > for information 
-on the format of this list).  If I<option > is specified with no I<value >, then 
+to the B<configure> widget command except that it modifies options associated 
+with the tag given by I<tagName> instead of modifying options for the overall 
+table widget.  If no I<option> is specified, the command returns a list describing 
+all of the available options for I<tagName> (see B<Tk_ConfigureInfo> for information 
+on the format of this list).  If I<option> is specified with no I<value>, then 
 the command returns a list describing the one named option (this list 
 will be identical to the corresponding sublist of the value returned if 
-no I<option > is specified).  If one or more I<option-value > pairs are specified, 
+no I<option> is specified).  If one or more I<option-value> pairs are specified, 
 then the command modifies the given option(s) to have the given value(s) 
-in I<tagName >; in this case the command returns an empty string. See TAGS 
+in I<tagName>; in this case the command returns an empty string. See TAGS 
 above for details on the options available for tags. 
 
 =item I<$table>-E<gt>B<tagDelete>(I<tagName>)
@@ -1436,7 +1436,7 @@ to one below I<belowThis>.
 =item I<$table>-E<gt>B<tagNames>(?I<pattern>?)
 
 If no pattern is 
-specified, shows the names of all defined tags. Otherwise the I<pattern > 
+specified, shows the names of all defined tags. Otherwise the I<pattern> 
 is used as a glob pattern to show only tags matching that pattern. 
 Tag names are returned in priority order
 (highest priority tag first).
@@ -1464,7 +1464,7 @@ not exist, it will be created with the default options.
 =item I<$table>-E<gt>B<validate>(I<index>)
 
 Explicitly validates the specified index based on the 
-current B<-validatecommand > and returns 0 or 1 based on whether the cell 
+current B<-validatecommand> and returns 0 or 1 based on whether the cell 
 was validated. 
 
 
@@ -1472,7 +1472,7 @@ was validated.
 
 This command is used to 
 manipulate embedded windows.  The exact behavior of the command depends 
-on the I<option > argument that follows the B<window > argument.  The following 
+on the I<option> argument that follows the B<window> argument.  The following 
 forms of the command are currently supported:  
 
 =back
@@ -1481,22 +1481,22 @@ forms of the command are currently supported:
 
 =item I<$table>-E<gt>B<windowCget>(I<index, option>)
 
-This command returns the current value of the option named I<option > associated with the window given by I<index >.  I<Option > may have any of the 
-values accepted by the B<window configure > widget command. 
+This command returns the current value of the option named I<option> associated with the window given by I<index>.  I<Option> may have any of the 
+values accepted by the B<window configure> widget command. 
 
 =item I<$table>-E<gt>B<windowConfigure>(I<index>, ?I<option>?, ?I<value>?, ?I<option, value, ...>?)
 
 This command is 
-similar to the B<configure > widget command except that it modifies options 
-associated with the embedded window given by I<index > instead of modifying 
-options for the overall table widget.  If no I<option > is specified, the 
+similar to the B<configure> widget command except that it modifies options 
+associated with the embedded window given by I<index> instead of modifying 
+options for the overall table widget.  If no I<option> is specified, the 
 command returns a list describing all of the available options for I<index 
-> (see B<Tk_ConfigureInfo > for information on the format of this list).  If 
-I<option > is specified with no I<value >, then the command returns a list describing 
+> (see B<Tk_ConfigureInfo> for information on the format of this list).  If 
+I<option> is specified with no I<value>, then the command returns a list describing 
 the one named option (this list will be identical to the corresponding 
-sublist of the value returned if no I<option > is specified).  If one or more 
-I<option-value > pairs are specified, then the command modifies the given 
-option(s) to have the given value(s) in I<index >; in this case the command 
+sublist of the value returned if no I<option> is specified).  If one or more 
+I<option-value> pairs are specified, then the command modifies the given 
+option(s) to have the given value(s) in I<index>; in this case the command 
 returns an empty string. See EMBEDDED WINDOWS above for details on the 
 options available for windows. 
 
@@ -1534,28 +1534,28 @@ span that is visible in the window. For example, if the first element is
 .2 and the second element is .6, 20% of the table's text is off-screen to 
 the left, the middle 40% is visible in the window, and 40% of the text 
 is off-screen to the right. These are the same values passed to scrollbars 
-via the B<-xscrollcommand > option. 
+via the B<-xscrollcommand> option. 
 
 =item I<$table>-E<gt>B<xview>(I<index>)
 
 Adjusts the view 
-in the window so that the column given by I<index > is displayed at the left 
+in the window so that the column given by I<index> is displayed at the left 
 edge of the window. 
 
 =item I<$table>-E<gt>B<xviewMoveto>(I<fraction>)
 
 Adjusts the view in 
-the window so that I<fraction > of the total width of the table text is off-screen 
-to the left. I<fraction > must be a fraction between 0 and 1. 
+the window so that I<fraction> of the total width of the table text is off-screen 
+to the left. I<fraction> must be a fraction between 0 and 1. 
 
 =item I<$table>-E<gt>B<xviewScroll>(I<number, what>)
 
 This command shifts the view in the window left or 
-right according to I<number > and I<what >. I<Number > must be an integer. I<What > 
-must be either B<units > or B<pages > or an abbreviation of one of these. If 
-I<what > is B<units >, the view adjusts left or right by I<number > cells  
-on the display;  if it is B<pages > then 
-the view adjusts by I<number > screenfuls. If I<number > is negative then cells 
+right according to I<number> and I<what>. I<Number> must be an integer. I<What> 
+must be either B<units> or B<pages> or an abbreviation of one of these. If 
+I<what> is B<units>, the view adjusts left or right by I<number> cells  
+on the display;  if it is B<pages> then 
+the view adjusts by I<number> screenfuls. If I<number> is negative then cells 
 farther to the left become visible;  if it is positive then cells 
 farther to the right become visible.  
 
@@ -1578,28 +1578,28 @@ the top of the window, relative to the table as a whole (0.5 means it is
 halfway through the table, for example).  The second element gives the 
 position of the table element just after the last one in the window, relative 
 to the table as a whole.  These are the same values passed to scrollbars 
-via the B<-yscrollcommand > option. 
+via the B<-yscrollcommand> option. 
 
 =item I<$table>-E<gt>B<yview>(I<index>)
 
 Adjusts the view 
-in the window so that the row given by I<index > is displayed at the top 
+in the window so that the row given by I<index> is displayed at the top 
 of the window. 
 
 =item I<$table>-E<gt>B<yviewMoveto>(I<fraction>)
 
 Adjusts the view in the 
-window so that the element given by I<fraction > appears at the top of the 
-window. I<Fraction > is a fraction between 0 and 1;  0 indicates the first 
+window so that the element given by I<fraction> appears at the top of the 
+window. I<Fraction> is a fraction between 0 and 1;  0 indicates the first 
 element in the table, 0.33 indicates the element one-third the way through 
 the table, and so on. 
 
 =item I<$table>-E<gt>B<yviewscroll>(I<number, what>)
 
 This command 
-adjusts the view in the window up or down according to I<number > and I<what >.  I<Number > must be an integer.  I<What > must be either B<units > or B<pages >.  If 
-I<what > is B<units >, the view adjusts up or down by I<number > cells; if it is 
-B<pages > then the view adjusts by I<number > screenfuls.  If I<number > is negative 
+adjusts the view in the window up or down according to I<number> and I<what>.  I<Number> must be an integer.  I<What> must be either B<units> or B<pages>.  If 
+I<what> is B<units>, the view adjusts up or down by I<number> cells; if it is 
+B<pages> then the view adjusts by I<number> screenfuls.  If I<number> is negative 
 then earlier elements become visible; if it is positive then later elements 
 become visible.   
 
@@ -1637,7 +1637,7 @@ Home moves the table to have the origin in view.
 =item [5] 
 
 End 
-moves the table to have the B<end > cell in view. 
+moves the table to have the B<end> cell in view. 
 
 =item [6] 
 
@@ -1719,9 +1719,9 @@ the width of the column with the active cell in it.
 Moving the mouse 
 while Button-3 (the right button on Windows) is pressed while you are over 
 a border will cause interactive resizing of that row and/or column to 
-occur, based on the value of B<-resizeborders >. Some bindings may have slightly 
-different behavior dependent on the B<-selectionmode > of the widget. If the 
-widget is disabled using the B<-state > option, then its view can still be 
+occur, based on the value of B<-resizeborders>. Some bindings may have slightly 
+different behavior dependent on the B<-selectionmode> of the widget. If the 
+widget is disabled using the B<-state> option, then its view can still be 
 adjusted and cells can still be selected, but no insertion cursor will 
 be displayed and no cell modifications will take place. The behavior of 
 tables can be changed by defining new bindings for individual widgets 
@@ -1737,7 +1737,7 @@ and columns or a table widget should not significantly affect the speed
 of redraw.  Recalculation and redraw of table parameters and cells is restricted 
 as much as possible. The display cell with the insert cursor is redrawn 
 each time the cursor blinks, which causes a steady stream of graphics 
-traffic.  Set the B<-insertofftime > option to 0 avoid this.  The use of a B<-command>
+traffic.  Set the B<-insertofftime> option to 0 avoid this.  The use of a B<-command>
 with the table without a cache can cause significant slow-down, as the 
 command is called once for each request of a cell value.  
 
@@ -1749,9 +1749,9 @@ Set
 the topleft title area to be one spanning cell.  This overestimates both 
 row and column span by one, but the command does all the constraining 
 for us.  B<$table span [$table cget -roworigin],[$table cget -colorigin] [$table 
-cget -titlerows],[$table cget -titlecols]  >Force a table window refresh 
+cget -titlerows],[$table cget -titlecols]> Force a table window refresh 
 (useful for the slight chance that a bug in the table is not causing proper 
-refresh):  B<$table configure -padx [$table cget -padx]  > 
+refresh):  B<$table configure -padx [$table cget -padx]> 
 
 
 =head1 Keywords 

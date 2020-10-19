@@ -12,7 +12,7 @@ use Mail::BIMI;
 use Mail::BIMI::CacheBackend::Null;
 use Net::DNS::Resolver::Mock 1.20200214;
 
-my $bimi = Mail::BIMI->new(domain=>'example.com');
+my $bimi = Mail::BIMI->new(domain=>'test.com');
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
 $bimi->resolver($resolver);
@@ -25,7 +25,7 @@ subtest 'Not Cacheable' => sub{
 
 subtest 'Cacheable' => sub{
   my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
-  my $expected = 'aa6d7e4b5079194df60db2742dbdf8b1eb1a0514';
+  my $expected = '59744f527a9c2b91ede391e6b30d3502738cb760';
   is($backend->_cache_hash,$expected,'Cache hash is returned');
 };
 

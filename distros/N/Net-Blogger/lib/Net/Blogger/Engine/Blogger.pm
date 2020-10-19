@@ -21,7 +21,7 @@ use strict;
 use constant BLOGGER_PROXY  => "http://plant.blogger.com/api/RPC2";
 use constant MAX_POSTLENGTH => 65536;
 
-$Net::Blogger::Engine::Blogger::VERSION   = '1.0';
+$Net::Blogger::Engine::Blogger::VERSION   = '1.01';
 @Net::Blogger::Engine::Blogger::ISA       = qw ( Exporter Net::Blogger::Engine::Base );
 @Net::Blogger::Engine::Blogger::EXPORT    = qw ();
 @Net::Blogger::Engine::Blogger::EXPORT_OK = qw ();

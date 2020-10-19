@@ -11,9 +11,10 @@ use Moo;
 use IPC::Run3; # For run3().
 use Types::Standard qw/Any ArrayRef HasMethods HashRef Int Str/;
 
-our $VERSION = '2.57';
+our $VERSION = '2.58';
 
 my $DATA_SECTION = get_data_section; # load once
+my $DEFAULT_COMBINE = 1; # default for combine_node_and_port
 
 has command =>
 (
@@ -130,15 +131,9 @@ has verbose =>
 	required => 0,
 );
 
-has valid_attributes =>
-(
-	is       => 'lazy',
-	isa      => HashRef,
-	required => 0,
-);
-
+my $VALID_ATTRIBUTES = _build_valid_attributes();
+sub valid_attributes { $VALID_ATTRIBUTES }
 sub _build_valid_attributes {
-	my($self) = @_;
 	my %data = map +($_ => [
 		grep !/^$/ && !/^(?:\s*)#/, split /\n/, $$DATA_SECTION{$_}
 	]), keys %$DATA_SECTION;
@@ -182,6 +177,7 @@ sub BUILD
 	my($globals) = $self -> global;
 	my($global)  =
 	{
+		combine_node_and_port	=> $$globals{combine_node_and_port} // $DEFAULT_COMBINE,
 		directed		=> $$globals{directed} ? 'digraph' : 'graph',
 		driver			=> $$globals{driver} || scalar(which('dot')),
 		format			=> $$globals{format} ||	'svg',
@@ -268,9 +264,14 @@ sub add_edge
 	$self->validate_params('edge', \%arg);
 
 	my @nodes;
-	for my $name ($from, $to) {
-		# overwrite $name for use after the loop
-		($name, my $port) = $self->_edge_name_port($name);
+	for my $tuple ([ $from, 'tailport' ], [ $to, 'headport' ]) {
+		my ($name, $argname) = @$tuple;
+		my $port = '';
+		if ($self->global->{combine_node_and_port}) {
+			($name, $port) = $self->_edge_name_port($name);
+		} elsif (exists $arg{$argname}) {
+			$port = ':' . delete $arg{$argname};
+		}
 		push @nodes, [ $name, $port ];
 		next if (my $nh = $self->node_hash)->{$name};
 		$self->log(debug => "Implicitly added node: $name");
@@ -278,14 +279,14 @@ sub add_edge
 	}
 
 	# Add this edge to the hashref of all edges.
-	push @{$self->edge_hash->{$from}{$to}}, {
+	push @{$self->edge_hash->{$nodes[0][0]}{$nodes[1][0]}}, {
 		attributes => \%arg,
 		from_port  => $nodes[0][1],
 		to_port    => $nodes[1][1],
 	};
 
 	# Add this edge to the DOT output string.
-	my $dot = $self->stringify_attributes(qq|"$from"$nodes[0][1] ${$self -> global}{label} "$to"$nodes[1][1]|, \%arg);
+	my $dot = $self->stringify_attributes(join(" ${$self->global}{label} ", map qq|"$_->[0]"$_->[1]|, @nodes), \%arg);
 	push @{ $self->command }, _indent($dot, $self->scope);
 	$self -> log(debug => "Added edge: $dot");
 
@@ -298,86 +299,57 @@ sub _indent {
 	(' ' x @$scope) . $text;
 }
 
-# -----------------------------------------------
-
-sub add_node
-{
-	my($self, %arg) = @_;
-	my $name = delete $arg{name} // '';
-
-	$self->validate_params('node', \%arg);
-
-	my($node)                 = $self -> node_hash;
-	$$node{$name}{attributes} = {%{$$node{$name}{attributes} || {}}, %arg};
-	%arg                      = %{$$node{$name}{attributes} };
-	my($label)                = $arg{label} // '';
-	$label                    =~ s/^\s+(<)/$1/;
-	$label                    =~ s/(>)\s+$/$1/;
-	$label                    =~ s/^(<)\n/$1/;
-	$label                    =~ s/\n(>)$/$1/;
-	$arg{label}               = $label if (defined $arg{label});
-
-	# Handle ports.
-
-	if (ref $label eq 'ARRAY')
-	{
-		my($port_count) = 0;
-
-		my(@label);
-		my($port);
-		my($text);
-
-		for my $index (0 .. scalar @$label - 1)
-		{
-			if (ref $$label[$index] eq 'HASH')
-			{
-				$port = $$label[$index]{port} || 0;
-				$text = $$label[$index]{text} || '';
-			}
-			else
-			{
-				$port_count++;
-
-				$port = "<port$port_count>";
-				$text = $$label[$index];
-			}
-
-			$text = $self -> escape_some_chars($text);
-
-			if (ref $$label[$index] eq 'HASH')
-			{
-				push @label, $port ? "$port $text" : $text;
-			}
-			else
-			{
-				push @label, "$port $text";
-			}
+sub _compile_record {
+	my ($port_count, $item, $add_braces, $quote_more) = @_;
+	my $text;
+	if (ref $item eq 'ARRAY') {
+		my @parts;
+		for my $l (@$item) {
+			($port_count, my $t) = _compile_record($port_count, $l, 1, $quote_more);
+			push @parts, $t;
 		}
-
-		$arg{label} = join('|', @label);
-		my(%global) = %{$self -> global};
-		$arg{shape} = $arg{shape} || $global{record_shape};
+		$text = join '|', @parts;
+		$text = "{$text}" if $add_braces;
+	} elsif (ref $item eq 'HASH') {
+		my $port = $item->{port} || 0;
+		$text = escape_some_chars($item->{text} // '', $quote_more);
+		if ($port) {
+			$port =~ s/^\s*<?/</;
+			$port =~ s/>?\s*$/>/;
+			$text = $text;
+			$text = "$port $text";
+		}
+	} else {
+		$text = "<port".++$port_count."> " . escape_some_chars($item, $quote_more);
 	}
-	elsif ($arg{shape} && ( ($arg{shape} =~ /M?record/) || ( ($arg{shape} =~ /(?:none|plaintext)/) && ($label =~ /^</) ) ) )
-	{
+	($port_count, $text);
+}
+
+sub add_node {
+	my ($self, %arg) = @_;
+	my $name = delete $arg{name} // '';
+	$self->validate_params('node', \%arg);
+	my $node                  = $self->node_hash;
+	%arg                      = (%{$$node{$name}{attributes} || {}}, %arg);
+	$$node{$name}{attributes} = \%arg;
+	my $label                 = $arg{label} // '';
+	$label                    =~ s/^\s*(<)\n?/$1/;
+	$label                    =~ s/\n?(>)\s*$/$1/;
+	$arg{label}               = $label if defined $arg{label};
+	# Handle ports.
+	if (ref $label eq 'ARRAY') {
+		(undef, $arg{label}) = _compile_record(0, $label, 0, !$self->global->{combine_node_and_port});
+		$arg{shape} ||= $self->global->{record_shape};
+	} elsif ($arg{shape} && ( ($arg{shape} =~ /M?record/) || ( ($arg{shape} =~ /(?:none|plaintext)/) && ($label =~ /^</) ) ) ) {
 		# Do not escape anything.
+	} elsif ($label) {
+		$arg{label} = escape_some_chars($arg{label});
 	}
-	elsif ($label)
-	{
-		$arg{label} = $self -> escape_some_chars($arg{label});
-	}
-
-	$$node{$name}{attributes} = {%arg};
-	my($dot)                  = $self -> stringify_attributes(qq|"$name"|, {%arg});
-
+	my $dot = $self->stringify_attributes(qq|"$name"|, \%arg);
 	push @{ $self->command }, _indent($dot, $self->scope);
-	$self -> log(debug => "Added node: $dot");
-
+	$self->log(debug => "Added node: $dot");
 	return $self;
-
-} # End of add_node.
-
-# -----------------------------------------------
+}
 
 sub default_edge
 {
@@ -449,42 +421,29 @@ sub default_subgraph
 
 } # End of default_subgraph.
 
-sub escape_some_chars
-{
-	my($self, $s) = @_;
-	my(@s)        = split(//, $s);
-	my($label)    = '';
-
-	for my $i (0 .. $#s)
-	{
-		if ( ($s[$i] eq '[') || ($s[$i] eq ']') )
-		{
-			# Escape if not escaped.
-
-			if ( ($i == 0) || ( ($i > 0) && ($s[$i - 1] ne '\\') ) )
-			{
-				$label .= '\\';
+sub escape_some_chars {
+	my ($s, $quote_more) = @_;
+	my @s        = split(//, $s);
+	my $label    = '';
+	for my $i (0 .. $#s) {
+		my $maybe = 0;
+		if ( ($s[$i] eq '[') || ($s[$i] eq ']') ) {
+			$maybe = 1;
+		} elsif ($s[$i] eq '"') {
+			if (substr($s, 0, 1) ne '<') {
+				$maybe = 1; # It's not a HTML label
 			}
+		} elsif ($quote_more and $s[$i] =~ /[\{\}\|<>"]/) {
+			$maybe = 1;
 		}
-		elsif ($s[$i] eq '"')
-		{
-			if (substr($s, 0, 1) ne '<')
-			{
-				# It's not a HTML label. Escape if not escaped.
-
-				if ( ($i == 0) || ( ($i > 0) && ($s[$i - 1] ne '\\') ) )
-				{
-					$label .= '\\';
-				}
-			}
+		# Escape if not escaped.
+		if ($maybe && (($i == 0) || (($i > 0) && ($s[$i - 1] ne '\\')))) {
+			$label .= '\\';
 		}
-
 		$label .= $s[$i];
 	}
-
 	return $label;
-
-} # End of escape_some_chars.
+}
 
 sub log
 {
@@ -623,46 +582,26 @@ sub run_mapless
 	return $self;
 } # End of run_mapless.
 
-# -----------------------------------------------
-
-sub stringify_attributes
-{
+sub stringify_attributes {
 	my($self, $context, $option) = @_;
-	my($dot) = '';
-
 	# Add double-quotes around anything (e.g. labels) which does not look like HTML.
-
-	for my $key (sort keys %$option)
-	{
-		$$option{$key} //= '';
-		$$option{$key} =~ s/^\s+(<)/$1/;
-		$$option{$key} =~ s/(>)\s+$/$1/;
-		$dot           .= ($$option{$key} =~ /^<.+>$/s) ? qq|$key=$$option{$key} | : qq|$key="$$option{$key}" |;
+	my @pairs;
+	for my $key (sort keys %$option) {
+		my $text = $$option{$key} // '';
+		$text =~ s/^\s+(<)/$1/;
+		$text =~ s/(>)\s+$/$1/;
+		$text = qq|"$text"| if $text !~ /^<.+>$/s;
+		push @pairs, qq|$key=$text|;
 	}
-
-	if ($context eq 'subgraph')
-	{
-		$dot .= "\n";
-	}
-	elsif ($dot)
-	{
-		$dot = "$context [ $dot]\n";
-	}
-	else
-	{
-		$dot = $context =~ /^(?:edge|graph|node)/ ? '' : "$context\n";
-	}
-
-	return $dot;
-
-} # End of stringify_attributes.
-
-# -----------------------------------------------
+	return join(' ', @pairs) . "\n" if $context eq 'subgraph';
+	return join(' ', $context, '[', @pairs, ']') . "\n" if @pairs;
+	$context =~ /^(?:edge|graph|node)/ ? '' : "$context\n";
+}
 
 sub validate_params
 {
 	my($self, $context, $attributes) = @_;
-	my $valid = $self->valid_attributes->{$context};
+	my $valid = $VALID_ATTRIBUTES->{$context};
 	my @invalid = grep !exists $valid->{$_}, keys %$attributes;
 	$self->log(error => "Error: '$_' is not a valid attribute in the '$context' context") for sort @invalid;
 	return $self;
@@ -783,9 +722,7 @@ It returns a new object of type C<GraphViz2>.
 
 Key-value pairs accepted in the parameter list:
 
-=over 4
-
-=item o edge => $hashref
+=head3 edge => $hashref
 
 The I<edge> key points to a hashref which is used to set default attributes for edges.
 
@@ -795,15 +732,29 @@ The default is {}.
 
 This key is optional.
 
-=item o global => $hashref
+=head3 global => $hashref
 
 The I<global> key points to a hashref which is used to set attributes for the output stream.
 
+This key is optional.
+
 Valid keys within this hashref are:
 
-=over 4
+=head4 combine_node_and_port
 
-=item o directed => $Boolean
+New in 2.58. It defaults to true, but in due course (currently planned
+May 2021) it will default to false. When true, C<add_node> and C<add_edge>
+will escape only some characters in the label and names, and in particular
+the "from" and "to" parameters on edges will combine the node name
+and port in one string, with a C<:> in the middle (except for special
+treatment of double-colons).
+
+When the option is false, any name may be given to nodes, and edges can
+be created between them. To specify ports, give the additional parameter
+of C<tailport> or C<headport>. Also, C<add_node>'s treatment of labels
+is more DWIM, with C<{> etc being transparently quoted.
+
+=head4 directed => $Boolean
 
 This option affects the content of the output stream.
 
@@ -816,7 +767,7 @@ The default is 0.
 
 This key is optional.
 
-=item o driver => $program_name
+=head4 driver => $program_name
 
 This option specifies which external program to run to process the output stream.
 
@@ -824,7 +775,7 @@ The default is to use L<File::Which>'s which() method to find the 'dot' program.
 
 This key is optional.
 
-=item o format => $string
+=head4 format => $string
 
 This option specifies what type of output file to create.
 
@@ -835,7 +786,7 @@ the first ':' is validated by L<GraphViz2>.
 
 This key is optional.
 
-=item o label => $string
+=head4 label => $string
 
 This option specifies what an edge looks like: '->' for directed graphs and '--' for undirected graphs.
 
@@ -845,7 +796,7 @@ The default is '->' if directed is 1, and '--' if directed is 0.
 
 This key is optional.
 
-=item o name => $string
+=head4 name => $string
 
 This option affects the content of the output stream.
 
@@ -855,7 +806,7 @@ The default is 'Perl' :-).
 
 This key is optional.
 
-=item o record_shape => /^(?:M?record)$/
+=head4 record_shape => /^(?:M?record)$/
 
 This option affects the shape of records. The value must be 'Mrecord' or 'record'.
 
@@ -865,7 +816,7 @@ The default is 'Mrecord'.
 
 See L<Record shapes|http://www.graphviz.org/doc/info/shapes.html#record> for details.
 
-=item o strict => $Boolean
+=head4 strict => $Boolean
 
 This option affects the content of the output stream.
 
@@ -875,7 +826,7 @@ The default is 0.
 
 This key is optional.
 
-=item o timeout => $integer
+=head4 timeout => $integer
 
 This option specifies how long to wait for the external program before exiting with an error.
 
@@ -883,11 +834,7 @@ The default is 10 (seconds).
 
 This key is optional.
 
-=back
-
-This key (global) is optional.
-
-=item o graph => $hashref
+=head3 graph => $hashref
 
 The I<graph> key points to a hashref which is used to set default attributes for graphs.
 
@@ -897,7 +844,7 @@ The default is {}.
 
 This key is optional.
 
-=item o logger => $logger_object
+=head3 logger => $logger_object
 
 Provides a logger object so $logger_object -> $level($message) can be called at certain times. Any object with C<debug> and C<error> methods
 will do, since these are the only levels emitted by this module.
@@ -917,7 +864,7 @@ See also the verbose option, which can interact with the logger option.
 
 This key is optional.
 
-=item o node => $hashref
+=head3 node => $hashref
 
 The I<node> key points to a hashref which is used to set default attributes for nodes.
 
@@ -927,7 +874,7 @@ The default is {}.
 
 This key is optional.
 
-=item o subgraph => $hashref
+=head3 subgraph => $hashref
 
 The I<subgraph> key points to a hashref which is used to set attributes for all subgraphs, unless overridden
 for specific subgraphs in a call of the form push_subgraph(subgraph => {$attribute => $string}).
@@ -936,7 +883,7 @@ Valid keys within this hashref are:
 
 =over 4
 
-=item o rank => $string
+=item * rank => $string
 
 This option affects the content of all subgraphs, unless overridden later.
 
@@ -955,7 +902,7 @@ The default is {}.
 
 This key is optional.
 
-=item o verbose => $Boolean
+=head3 verbose => $Boolean
 
 Provides a way to control the amount of output when a logger is not specified.
 
@@ -970,8 +917,6 @@ The default is 0.
 See also the logger option, which can interact with the verbose option.
 
 This key is optional.
-
-=back
 
 =head2 Validating Parameters
 
@@ -1032,23 +977,23 @@ At the moment, due to design defects (IMHO) in the underlying L<Graphviz|http://
 
 =over 4
 
-=item o A global frame
+=item * A global frame
 
 I can't see how to make the graph as a whole (at level 0 in the scope stack) have a frame.
 
-=item o Frame color
+=item * Frame color
 
 When you specify graph => {color => 'red'} at the parent level, the subgraph has a red frame.
 
 I think a subgraph should control its own frame.
 
-=item o Parent and child frames
+=item * Parent and child frames
 
 When you specify graph => {color => 'red'} at the subgraph level, both that subgraph and it children have red frames.
 
 This contradicts what happens at the global level, in that specifying color there does not given the whole graph a frame.
 
-=item o Frame visibility
+=item * Frame visibility
 
 A subgraph whose name starts with 'cluster' is currently forced to have a frame, unless you rig it by specifying a
 color the same as the background.
@@ -1121,13 +1066,13 @@ That line was copied from maps/demo.3.pl, and there is an identical line in maps
 
 =over 4
 
-=item o im_format => $str
+=item * im_format => $str
 
 Expected values: 'imap' (server-side) and 'cmapx' (client-side).
 
 Default value: 'cmapx'.
 
-=item o im_output_file => $file_name
+=item * im_output_file => $file_name
 
 The name of the output map file.
 
@@ -1147,7 +1092,7 @@ page, or click anywhere else in the image to jump to a third page.
 
 =over 4
 
-=item o demo.1.*
+=item * demo.1.*
 
 This set demonstrates a server-side image map but does not use C<GraphViz2>.
 
@@ -1155,7 +1100,7 @@ You have to run demo.1.sh which generates demo.1.map, and then you FTP the whole
 
 URL: your.domain.name/maps/demo.1.html.
 
-=item o demo.2.*
+=item * demo.2.*
 
 This set demonstrates a client-side image map but does not use C<GraphViz2>.
 
@@ -1164,7 +1109,7 @@ replacing any version of the map already present. After that you FTP the whole d
 
 URL: your.domain.name/maps/demo.2.html.
 
-=item o demo.3.*
+=item * demo.3.*
 
 This set demonstrates a server-side image map using C<GraphViz2> via demo.3.pl.
 
@@ -1172,7 +1117,7 @@ Note line 54 of demo.3.pl which sets the default C<im_format> to 'imap'.
 
 URL: your.domain.name/maps/demo.3.html.
 
-=item o demo.4.*
+=item * demo.4.*
 
 This set demonstrates a client-side image map using C<GraphViz2> via demo.4.pl.
 
@@ -1213,7 +1158,25 @@ L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
 These are validated in exactly the same way as the edge parameters in the calls to
 default_edge(%hash), new(edge => {}) and push_subgraph(edge => {}).
 
+To make the edge start or finish on a port, see L</combine_node_and_port>.
+
 =head2 add_node(name => $node_name, [%hash])
+
+	my $graph = GraphViz2->new(global => {combine_node_and_port => 0});
+	$graph->add_node(name => 'struct3', shape => 'record', label => [
+		{ text => "hello\\nworld" },
+		[
+			{ text => 'b' },
+			[
+				{ text => 'c{}' }, # reproduced literally
+				{ text => 'd', port => 'here' },
+				{ text => 'e' },
+			]
+			{ text => 'f' },
+		],
+		{ text => 'g' },
+		{ text => 'h' },
+	]);
 
 Adds a node to the graph.
 
@@ -1234,15 +1197,20 @@ The attribute name 'label' may point to a string or an arrayref.
 
 =head3 If it is a string...
 
-The string is the label.
+The string is the label. If the C<shape> is a record, you can give any
+text and it will be passed for interpretation by Graphviz. This means
+you will need to quote E<lt> and E<gt> (port specifiers), C<|> (cell
+separator) and C<{> C<}> (structure depth) with C<\> to make them appear
+literally.
 
-The string may contain ports and orientation markers ({}).
+For records, the cells start horizontal. Each additional layer of
+structure will switch the orientation between horizontal and vertical.
 
 =head3 If it is an arrayref of strings...
 
 =over 4
 
-=item o The node is forced to be a record
+=item * The node is forced to be a record
 
 The actual shape, 'record' or 'Mrecord', is set globally, with:
 
@@ -1256,15 +1224,15 @@ Or set locally with:
 
 	$graph -> add_node(name => 'Three', label => ['Good', 'Bad'], shape => 'record');
 
-=item o Each element in the array defines a field in the record
+=item * Each element in the array defines a field in the record
 
 These fields are combined into a single node
 
-=item o Each element is treated as a label
+=item * Each element is treated as a label
 
-=item o Each label is given a port name (1 .. N) of the form "port<$port_count>"
+=item * Each label is given a port name (1 .. N) of the form "port$port_count"
 
-=item o Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
+=item * Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
 
 =back
 
@@ -1272,23 +1240,21 @@ These fields are combined into a single node
 
 =over 4
 
-=item o The node is forced to be a record
+=item * The node is forced to be a record
 
 The actual shape, 'record' or 'Mrecord', can be set globally or locally, as explained just above.
 
-=item o Each element in the array defines a field in the record
+=item * Each element in the array defines a field in the record
 
-=item o Each element is treated as a hashref with keys 'text' and 'port'
+=item * Each element is treated as a hashref with keys 'text' and 'port'
 
 The 'port' key is optional.
 
-=item o The value of the 'text' key is the label
+=item * The value of the 'text' key is the label
 
-=item o The value of the 'port' key is the port
+=item * The value of the 'port' key is the port
 
-The format is "<$port_name>".
-
-=item o Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
+=item * Judicious use of '{' and '}' in the label can make this record appear horizontally or vertically, and even nested
 
 =back
 
@@ -1404,12 +1370,6 @@ If I<from_port> is not provided by the caller, it defaults to '' (the empty stri
 it contains a leading ':'. Likewise for I<to_port>.
 
 See scripts/report.nodes.and.edges.pl (a version of scripts/html.labels.1.pl) for a complete example.
-
-=head2 escape_some_chars($s)
-
-Escapes various chars in various circumstances, because some chars are treated specially by Graphviz.
-
-See L</Special characters in node names and labels> for a discussion of this tricky topic.
 
 =head2 log([$level, $message])
 
@@ -1555,15 +1515,15 @@ This method performs a series of tasks:
 
 =over 4
 
-=item o Run the chosen external program on the L</dot_input>
+=item * Run the chosen external program on the L</dot_input>
 
-=item o Capture STDOUT and STDERR from that program
+=item * Capture STDOUT and STDERR from that program
 
-=item o Die if STDERR contains anything
+=item * Die if STDERR contains anything
 
-=item o Copies STDOUT to the buffer controlled by the dot_output() method
+=item * Copies STDOUT to the buffer controlled by the dot_output() method
 
-=item o Write the captured contents of STDOUT to $output_file, if $output_file has a value
+=item * Write the captured contents of STDOUT to $output_file, if $output_file has a value
 
 =back
 
@@ -1628,9 +1588,9 @@ The L<Graphviz|http://www.graphviz.org/> syntax for ports is a bit unusual:
 
 =over 4
 
-=item o This works: "node_name":port5
+=item * This works: "node_name":port5
 
-=item o This doesn't: "node_name:port5"
+=item * This doesn't: "node_name:port5"
 
 =back
 
@@ -1646,7 +1606,7 @@ You can specify labels with ports in these ways:
 
 =over 4
 
-=item o As a string
+=item * As a string
 
 	$graph -> add_node(name => 'struct3', label => "hello\nworld |{ b |{c|<here> d|e}| f}| g | h");
 
@@ -1660,7 +1620,7 @@ Then you use $graph -> add_edge(...) to refer to those ports, if desired:
 
 The same label is specified in the next case.
 
-=item o As an arrayref of hashrefs
+=item * As an arrayref of hashrefs
 
 From scripts/record.2.pl:
 
@@ -1701,7 +1661,7 @@ Then you use $graph -> add_edge(...) to refer to those ports, if desired. Again,
 
 The same label is specified in the previous case.
 
-=item o As an arrayref of strings
+=item * As an arrayref of strings
 
 From scripts/html.labels.1.pl:
 
@@ -1741,11 +1701,11 @@ An example attribute is C<pencolor>, which is used for clusters but not for subg
 
 =over 4
 
-=item o Handle edges such as 1 -> 2 -> {A B}, as seen in L<Graphviz|http://www.graphviz.org/>'s graphs/directed/switch.gv
+=item * Handle edges such as 1 -> 2 -> {A B}, as seen in L<Graphviz|http://www.graphviz.org/>'s graphs/directed/switch.gv
 
 But how?
 
-=item o Validate parameters more carefully, e.g. to reject non-hashref arguments where appropriate
+=item * Validate parameters more carefully, e.g. to reject non-hashref arguments where appropriate
 
 Some method parameter lists take keys whose value must be a hashref.
 
@@ -1979,6 +1939,7 @@ xlp => node, edge
 z => node
 
 @@ global
+combine_node_and_port
 directed
 driver
 format

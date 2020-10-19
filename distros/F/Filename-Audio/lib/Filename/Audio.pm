@@ -1,9 +1,9 @@
 package Filename::Audio;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'Filename-Audio'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ Filename::Audio - Check whether filename indicates being an audio file
 
 =head1 VERSION
 
-This document describes version 0.002 of Filename::Audio (from Perl distribution Filename-Audio), released on 2020-04-01.
+This document describes version 0.003 of Filename::Audio (from Perl distribution Filename-Audio), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,8 @@ feature.
 L<Filename::Video>
 
 L<Filename::Image>
+
+L<Filename::Ebook>
 
 L<Filename::Media>
 

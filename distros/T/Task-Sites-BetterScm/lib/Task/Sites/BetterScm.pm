@@ -1,5 +1,5 @@
 package Task::Sites::BetterScm;
-$Task::Sites::BetterScm::VERSION = '0.0.3';
+$Task::Sites::BetterScm::VERSION = '0.0.4';
 use 5.014;
 use warnings;
 use strict;
@@ -19,7 +19,7 @@ Task::Sites::BetterScm - Specifications for modules needed by the better scm sit
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 DESCRIPTION
 
@@ -201,42 +201,6 @@ See L<https://better-scm.shlomifish.org/> and L<https://github.com/shlomif/bette
 
 Shlomi Fish, L<https://www.shlomifish.org/> .
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-task-latemp at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-Latemp>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Task::Latemp
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Task-Latemp>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Task-Latemp>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp>
-
-=item * MetaCPAN
-
-L<https://metacpan.org/release/Task-Latemp>
-
-=back
-
 =head1 ACKNOWLEDGEMENTS
 
 =head1 SEE ALSO
@@ -270,27 +234,11 @@ L<https://metacpan.org/release/Task-Sites-BetterScm>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Task-Sites-BetterScm>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Sites-BetterScm>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Task-Sites-BetterScm>
 
 =item *
 

@@ -3,15 +3,13 @@
 use strict;
 use warnings;
 
-use IO::All;
+use Path::Tiny qw/ path /;
 
 my ($version) =
-    (map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-    io->file('lib/Task/Sites/ShlomiFish.pm')->getlines()
-    )
-    ;
+    ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
+        path('lib/Task/Sites/ShlomiFish.pm')->lines_utf8() );
 
-if (!defined ($version))
+if ( !defined($version) )
 {
     die "Version is undefined!";
 }
@@ -22,6 +20,5 @@ my @cmd = (
     "Perl/Task-Sites-ShlomiFish/releases/$version",
 );
 
-print join(" ", map { /\s/ ? qq{"$_"} : $_ } @cmd), "\n";
+print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);
-

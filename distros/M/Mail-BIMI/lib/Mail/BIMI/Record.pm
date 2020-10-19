@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
 # ABSTRACT: Class to model a BIMI record
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -132,7 +132,7 @@ sub _build_is_valid($self) {
 sub _build_record_hashref($self) {
   my $domain            = $self->domain;
   my $selector          = $self->selector;
-  my $fallback_selector = 'default';
+  my $fallback_selector = $self->selector;
   my $fallback_domain   = Mail::DMARC::PurePerl->new->get_organizational_domain($domain);
 
   my @records;
@@ -279,7 +279,7 @@ Mail::BIMI::Record - Class to model a BIMI record
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 

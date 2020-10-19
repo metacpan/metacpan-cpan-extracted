@@ -40,6 +40,7 @@
       },
       "x_mentions" : {
          "x_mentions" : {
+            "Acme::CPAN::Testers::DevelCheckOS" : "0",
             "Acme::Test::crypt" : "0",
             "App::PlatformInfo" : "0"
          }
@@ -57,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-PERLANCAR-InfoFromCPANTesters"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -162,7 +163,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.603"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

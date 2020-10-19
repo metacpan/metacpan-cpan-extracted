@@ -1,20 +1,74 @@
-_dmarc.example.com TXT "v=DMARC1; p=reject; sp=reject;"
-_dmarc.gallifreyburning.com TXT "v=DMARC1; p=reject; sp=reject;"
-_dmarc.gallifreyburning.org TXT "v=DMARC1; p=reject; sp=reject;"
-_dmarc.multi.com TXT "v=DMARC1; p=reject; sp=reject;"
-_dmarc.nobimi.com TXT "v=DMARC1; p=reject; sp=reject;"
-_dmarc.test.example.com TXT "v=DMARC1; p=reject; sp=reject;"
-default._bimi.gallifreyburning.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
-default._bimi.multi.com TXT "v=bimi1; l=https://bimi.example.com/marks/first.svg"
-default._bimi.multi.com TXT "v=bimi1; l=https://bimi.example.com/marks/second.svg"
-default._bimi.spfall.gallifreyburning.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
-example.com A 1.2.3.4
-foobar._bimi.gallifreyburning.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
-gallifreyburning.com A 1.2.3.4
-gallifreyburning.org A 1.2.3.4
-multi.com A 1.2.3.4
-nobimi.com A 1.2.3.4
-spfall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 +all"
-spfnall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 -all"
-test.example.com A 1.2.3.4
+domain.com A 1.2.3.4
+_dmarc.domain.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.domain.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+domain.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+dnslookupfail.com A 1.2.3.4
+_dmarc.dnslookupfail.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.dnslookupfail.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupfail.com TXT "v=spf1 ip4:1.2.3.4 -all"
+
+dnslookupfallbackfail.com A 1.2.3.4
+_dmarc.dnslookupfallbackfail.com TXT "v=DMARC1; p=reject; sp=reject;"
+selector._bimi.dnslookupfallbackfail.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupfallbackfail.com TXT "v=spf1 ip4:1.2.3.4 -all"
+
+dnslookupfallbackmulti.com A 1.2.3.4
+_dmarc.dnslookupfallbackmulti.com TXT "v=DMARC1; p=reject; sp=reject;"
+selector._bimi.dnslookupfallbackmulti.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+selector._bimi.dnslookupfallbackmulti.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupfallbackmulti.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+dnslookupmulti.com A 1.2.3.4
+_dmarc.dnslookupmulti.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.dnslookupmulti.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+default._bimi.dnslookupmulti.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupmulti.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+dnslookupnorecord.com A 1.2.3.4
+_dmarc.dnslookupnorecord.com TXT "v=DMARC1; p=reject; sp=reject;"
+dnslookupnorecord.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+dnslookupspfall.com A 1.2.3.4
+_dmarc.dnslookupspfall.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.dnslookupspfall.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupspfall.com TXT "v=spf1 ip4:1.2.3.4 +all"
+
+dnslookupspfnall.com A 1.2.3.4
+_dmarc.dnslookupspfnall.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.dnslookupspfnall.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupspfnall.com TXT "v=spf1 ip4:1.2.3.4 -all"
+
+dnslookup.com A 1.2.3.4
+_dmarc.dnslookup.com TXT "v=DMARC1; p=reject; sp=reject;"
+selector._bimi.dnslookup.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookup.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+recordfallback.com A 1.2.3.4
+_dmarc.recordfallback.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.recordfallback.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+selector._bimi.recordfallback.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+recordfallback.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+resultsnobimi.com A 1.2.3.4
+_dmarc.resultsnobimi.com TXT "v=DMARC1; p=reject; sp=reject;"
+
+cachefileerrorhandling.com A 1.2.3.4
+_dmarc.cachefileerrorhandling.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.cachefileerrorhandling.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+cachefileerrorhandling.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+cachenotnull.com A 1.2.3.4
+_dmarc.cachenotnull.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.cachenotnull.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+cachenotnull.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+cachenull.com A 1.2.3.4
+_dmarc.cachenull.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.cachenull.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+cachenull.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
+results.com A 1.2.3.4
+_dmarc.results.com TXT "v=DMARC1; p=reject; sp=reject;"
+
 default._bimi.fastmaildmarc.com TXT "v=BIMI1; l=https://fastmaildmarc.com/FM_BIMI.svg; a="

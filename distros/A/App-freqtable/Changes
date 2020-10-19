@@ -1,3 +1,9 @@
+0.004   2020-10-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Show how to do the same task using Unix commands uniq &
+	  sort.
+
+
 0.003   2020-10-11  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

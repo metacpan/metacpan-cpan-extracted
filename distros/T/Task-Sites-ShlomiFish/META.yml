@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - bundle
   - shlomif
@@ -20,7 +20,7 @@ name: Task-Sites-ShlomiFish
 provides:
   Task::Sites::ShlomiFish:
     file: lib/Task/Sites/ShlomiFish.pm
-    version: '0.0213'
+    version: '0.0214'
 requires:
   App::XML::DocBook::Builder: '0'
   CGI: '0'
@@ -97,5 +97,5 @@ resources:
   homepage: http://web-cpan.shlomifish.org/latemp/
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/thewml/latemp
-version: '0.0213'
+version: '0.0214'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

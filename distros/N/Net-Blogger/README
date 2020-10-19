@@ -1,5 +1,5 @@
 NAME
-    Net::Blogger - an OOP-ish interface for accessing a weblog via the
+    Net::Blogger - (DEPRECATED) an OOP-ish interface for accessing a weblog via the
     Blogger XML-RPC API.
 
 SYNOPSIS
@@ -397,4 +397,3 @@ LICENSE
 
     This is free software, you may use it and distribute it under the same
     terms as Perl itself.
-

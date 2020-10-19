@@ -22,7 +22,7 @@ package MooseX::Types::XML::LibXML;
 use utf8;
 use Modern::Perl;
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.004';    # VERSION
 use English '-no_match_vars';
 use MooseX::Types -declare => [qw(Document XMLNamespaceMap XPathExpression)];
 use MooseX::Types::Moose qw(HashRef Str);
@@ -54,7 +54,7 @@ coerce Document, from File | Uri,    ## no critic (ProhibitBitwiseOperators)
 #pod =cut
 
 subtype XMLNamespaceMap, as HashRef [Uri];
-coerce XMLNamespaceMap, from HashRef [Str], via {
+coerce XMLNamespaceMap,  from HashRef [Str], via {
     ## no critic (ProhibitAccessOfPrivateData)
     my $hashref = $_;
     return { map { $_ => URI->new( $hashref->{$_} ) } keys %{$hashref} };
@@ -79,8 +79,8 @@ __END__
 
 =encoding utf8
 
-=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url annocpan anno bugtracker rt
-cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords Mark Gardner GSI Commerce cpan testmatrix url bugtracker rt cpants kwalitee
+diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -88,7 +88,7 @@ MooseX::Types::XML::LibXML - Type constraints for LibXML classes
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -170,30 +170,6 @@ in addition to those websites please use your favorite search engine to discover
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/MooseX-Types-XML-LibXML>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/MooseX-Types-XML-LibXML>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/MooseX-Types-XML-LibXML>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -204,7 +180,7 @@ L<http://cpants.cpanauthors.org/dist/MooseX-Types-XML-LibXML>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/M/MooseX-Types-XML-LibXML>
 
@@ -248,7 +224,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by GSI Commerce.
+This software is copyright (c) 2020 by GSI Commerce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

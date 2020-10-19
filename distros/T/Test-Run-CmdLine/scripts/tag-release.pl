@@ -3,25 +3,22 @@
 use strict;
 use warnings;
 
-use IO::All;
+use Path::Tiny qw/ path /;
 
 my ($version) =
-    (map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-    io->file('lib/Test/Run/CmdLine.pm')->getlines()
-    )
-    ;
+    ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
+        path('lib/Test/Run/CmdLine.pm')->lines_utf8() );
 
-if (!defined ($version))
+if ( !defined($version) )
 {
     die "Version is undefined!";
 }
 
 my @cmd = (
-    "hg", "tag", "-m",
+    "git", "tag", "-m",
     "Tagging the Test-Run-CmdLine release as $version",
     "releases/modules/Test-Run-CmdLine/$version",
 );
 
-print join(" ", map { /\s/ ? qq{"$_"} : $_ } @cmd), "\n";
+print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);
-

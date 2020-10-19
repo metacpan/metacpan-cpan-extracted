@@ -1,15 +1,16 @@
 package Acme::CPANModules::PERLANCAR::InfoFromCPANTesters;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-10'; # DATE
+our $DATE = '2020-10-19'; # DATE
 our $DIST = 'Acme-CPANModules-PERLANCAR-InfoFromCPANTesters'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'Distributions that gather information from CPANTesters',
     entries => [
         { module => "Acme::Test::crypt", summary => 'Check crypt() support in various platforms' },
         { module => "App::PlatformInfo", summary => 'Result of Devel::Platform::Info on various testing machines' },
+        { module => "Acme::CPAN::Testers::DevelCheckOS", summary => 'Result of Devel::CheckOS::{list_platforms,os_is} on various testing machines' },
     ],
 };
 
@@ -28,7 +29,7 @@ Acme::CPANModules::PERLANCAR::InfoFromCPANTesters - Distributions that gather in
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PERLANCAR::InfoFromCPANTesters (from Perl distribution Acme-CPANModules-PERLANCAR-InfoFromCPANTesters), released on 2020-10-10.
+This document describes version 0.003 of Acme::CPANModules::PERLANCAR::InfoFromCPANTesters (from Perl distribution Acme-CPANModules-PERLANCAR-InfoFromCPANTesters), released on 2020-10-19.
 
 =head1 MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
 
@@ -37,6 +38,8 @@ This document describes version 0.002 of Acme::CPANModules::PERLANCAR::InfoFromC
 =item * L<Acme::Test::crypt> - Check crypt() support in various platforms
 
 =item * L<App::PlatformInfo> - Result of Devel::Platform::Info on various testing machines
+
+=item * L<Acme::CPAN::Testers::DevelCheckOS> - Result of Devel::CheckOS::{list_platforms,os_is} on various testing machines
 
 =back
 

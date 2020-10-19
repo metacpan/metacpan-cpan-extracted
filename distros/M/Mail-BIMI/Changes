@@ -1,3 +1,10 @@
+2.20201019.2 2020-10-19 UTC
+  - VMC MUST have a .pem extension
+  - Option to limit redirects followed by http client
+    http_client_max_redirect / MAIL_BIMI_HTTP_CLIENT_MAX_REDIRECT
+  - Fix bug in cacheing VMC Author Domain
+  - Fallback to selector, not default
+
 2.20201013.2 2020-10-13 UTC
   - Fix bug in cacheing VMC Indicators
 

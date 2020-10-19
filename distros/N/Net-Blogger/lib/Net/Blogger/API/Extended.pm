@@ -18,7 +18,7 @@ methods not defined in the Blogger API.
 package Net::Blogger::API::Extended;
 use strict;
 
-$Net::Blogger::API::Extended::VERSION   = '1.0';
+$Net::Blogger::API::Extended::VERSION   = '1.01';
 @Net::Blogger::API::Extended::ISA       = qw ( Exporter );
 @Net::Blogger::API::Extended::EXPORT    = qw ();
 @Net::Blogger::API::Extended::EXPORT_OK = qw ();

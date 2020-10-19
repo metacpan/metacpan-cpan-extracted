@@ -4,7 +4,7 @@ my %M = (
     NAME         => 'Data::Radius',
     VERSION_FROM => 'lib/Data/Radius.pm',
     LICENSE      => "artistic_2",
-    MIN_PERL_VERSION => "v5.10",
+    MIN_PERL_VERSION => "v5.10.0",
     AUTHOR       => [
         'Sergey Leschenko <sergle.ua at gmail.com>',
         'PortaOne <perl-radius at portaone.com>',

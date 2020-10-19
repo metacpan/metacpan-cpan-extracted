@@ -1,10 +1,16 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Gnome2-Dia
-version:      0.04
+version:      0.05
 version_from: Dia.pm
 installdirs:  site
-requires:
-
+configure_requires:
+    ExtUtils::Depends:             0.20
+    ExtUtils::PkgConfig:           1.03
+    Glib:                          1.040
+    Gnome2::Canvas:                1.00
+    Gnome2::Print:                 0.94
+    Gtk2:                          1.040
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.25
+x_deprecated: 1

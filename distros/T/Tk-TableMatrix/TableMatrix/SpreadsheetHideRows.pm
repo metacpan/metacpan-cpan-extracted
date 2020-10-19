@@ -7,21 +7,17 @@ Tk::TableMatrix::SpreadsheetHideRows - Table Display with selectable hide/un-hid
   use Tk;
   use Tk::TableMatrix::SpreadsheetHideRows
 
-
-
   my $t = $top->Scrolled('SpreadsheetHideRows', 
-  			      -selectorCol => 3,
-			      -expandData => $hashRef,
-			      -rows => 21, -cols => 11, 
-                              -width => 6, -height => 6,
-			      -titlerows => 1, -titlecols => 1,
-			      -variable => $arrayVar,
-			      -selectmode => 'extended',
-			      -resizeborders => 'both',
-			      -titlerows => 1,
-			      -titlecols => 1,
-			      -bg => 'white',
-                    );
+    -selectorCol => 3,
+    -expandData => $hashRef,
+    -rows => 21, -cols => 11, 
+    -width => 6, -height => 6,
+    -titlerows => 1, -titlecols => 1,
+    -variable => $arrayVar,
+    -selectmode => 'extended',
+    -resizeborders => 'both',
+    -bg => 'white',
+  );
 
 =head1 DESCRIPTION
 
@@ -124,7 +120,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix::Spreadsheet/;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 
 Tk::Widget->Construct("SpreadsheetHideRows");

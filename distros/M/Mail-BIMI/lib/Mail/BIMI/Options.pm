@@ -1,6 +1,6 @@
 package Mail::BIMI::Options;
 # ABSTRACT: Shared options
-our $VERSION = '2.20201013.2'; # VERSION
+our $VERSION = '2.20201019.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -14,8 +14,10 @@ has cache_file_directory => ( is => 'rw', lazy => 1, default => sub {return $ENV
   documentation => 'Directory to store Cache files in when using File backend' );
 has force_record => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_FORCE_RECORD}},
   documentation => 'Fake record to use' );
-has http_client_timeout  => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_HTTP_CLIENT_TIMEOUT}//3},
+has http_client_timeout => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_HTTP_CLIENT_TIMEOUT}//3},
   documentation => 'Timeout value for HTTP' );
+has http_client_max_redirect => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_HTTP_CLIENT_MAX_REDIRECT}//3},
+  documentation => 'Maximum redirects to follow for HTTP' );
 has dns_client_timeout  => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_DNS_CLIENT_TIMEOUT}//5},
   documentation => 'Timeout value for DNS' );
 has no_location_with_vmc => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_NO_LOCATION_WITH_VMC}},
@@ -61,7 +63,7 @@ Mail::BIMI::Options - Shared options
 
 =head1 VERSION
 
-version 2.20201013.2
+version 2.20201019.2
 
 =head1 DESCRIPTION
 
@@ -100,6 +102,12 @@ Timeout value for DNS
 is=rw
 
 Fake record to use
+
+=head2 http_client_max_redirect
+
+is=rw
+
+Maximum redirects to follow for HTTP
 
 =head2 http_client_timeout
 

@@ -1,5 +1,9 @@
 Revision history for Perl module App::watcher
 
+0.13 2020-10-19T03:31:16Z
+
+    - bug fix (hirafoo)
+
 0.12 2019-08-06T03:33:02Z
 
     - adding --filter

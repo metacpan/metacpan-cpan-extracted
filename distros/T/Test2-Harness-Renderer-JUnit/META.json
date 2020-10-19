@@ -32,6 +32,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Exporter" : "0",
             "File::Spec" : "0",
             "Storable" : "0",
             "Test2::Harness::Renderer" : "1.000000",
@@ -42,7 +45,15 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "App::Yath::Tester" : "0",
+            "Data::Dumper" : "0",
+            "File::Temp" : "0",
+            "Test2::API" : "1.302170",
+            "Test2::Plugin::NoWarnings" : "0",
+            "Test2::Tools::Explain" : "0",
+            "Test2::V0" : "0.000127",
+            "Test::More" : "0",
+            "XML::Simple" : "0"
          }
       }
    },
@@ -58,6 +69,6 @@
          "url" : "https://github.com/cpanelinc/Test2-Harness-Renderer-JUnit"
       }
    },
-   "version" : "1.000002",
+   "version" : "1.000003",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

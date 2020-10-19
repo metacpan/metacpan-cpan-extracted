@@ -4,7 +4,7 @@ use Gnome2::Dia;
 
 use Test::More tests => 41;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Dia/t/DiaCanvasGroupable.t,v 1.2 2004/09/26 12:05:57 kaffeetisch Exp $
+# $Id$
 
 ###############################################################################
 

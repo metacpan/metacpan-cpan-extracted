@@ -14,7 +14,8 @@ use Net::DNS::Resolver::Mock 1.20200214;
 
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');
-my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com');
+
+my $bimi = Mail::BIMI->new(domain=>'cachenotnull.com');
 $bimi->resolver($resolver);
 
 mkdir 't/tmp' if ! -e 't/tmp';
@@ -26,7 +27,7 @@ subtest 'File Backend' => sub {
     {cache_backend=>'File',cache_file_directory=>'t/tmp/cache/'},
     sub{
       is(-e 't/tmp/cache/mail-bimi-cache-166cc1317749e82abc10e4068941f912fa774baf.cache',1,'Cache file 1 exists');
-      is(-e 't/tmp/cache/mail-bimi-cache-a006e1d871a91903c028e60eaa358fbe117bd8d2.cache',1,'Cache file 2 exists');
+      is(-e 't/tmp/cache/mail-bimi-cache-d9d767042b68a57af17bc49fa23a590f5fc664f8.cache',1,'Cache file 2 exists');
       is(-e 't/tmp/cache/fastmmap',undef,'FastMmap file does not exist');
     },
   );
@@ -41,7 +42,7 @@ subtest 'FastMmap Backend' => sub {
     {cache_backend=>'FastMmap',cache_fastmmap_share_file=>'t/tmp/cache/fastmmap'},
     sub{
       is(-e 't/tmp/cache/mail-bimi-cache-166cc1317749e82abc10e4068941f912fa774baf.cache',undef,'Cache file 1 does not exist');
-      is(-e 't/tmp/cache/mail-bimi-cache-a006e1d871a91903c028e60eaa358fbe117bd8d2.cache',undef,'Cache file 2 does not exist');
+      is(-e 't/tmp/cache/mail-bimi-cache-228d876fef73043dfb570ed9125a2425701b8d07.cache',undef,'Cache file 2 does not exist');
       is(-e 't/tmp/cache/fastmmap',1,'FastMmap file exists');
     },
   );
@@ -52,7 +53,7 @@ sub cache_tests_for {
 
   subtest 'Cache does not save without finish' => sub{
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1000,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachenotnull.com',time=>1000,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -61,7 +62,7 @@ sub cache_tests_for {
       is($bimi->record->version,'foo','Version is set ok');
     };
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1010,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachenotnull.com',time=>1010,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -71,7 +72,7 @@ sub cache_tests_for {
 
   subtest 'Cache saved when finish called' => sub{
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1000,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachenotnull.com',time=>1000,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -81,7 +82,7 @@ sub cache_tests_for {
       $bimi->finish;
     };
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>1010,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachenotnull.com',time=>1010,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
@@ -89,7 +90,7 @@ sub cache_tests_for {
     };
     &$middle;
     {
-      my $bimi = Mail::BIMI->new(domain=>'gallifreyburning.com',time=>4610,options=>$options);
+      my $bimi = Mail::BIMI->new(domain=>'cachenotnull.com',time=>4610,options=>$options);
       $bimi->resolver($resolver);
       $bimi->record->is_valid; # Make the Fetch Happen
       my $backend = Mail::BIMI::CacheBackend::Null->new(parent=>$bimi->record);
