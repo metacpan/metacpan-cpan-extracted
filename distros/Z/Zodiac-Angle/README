@@ -5,7 +5,7 @@ SYNOPSIS
      use Zodiac::Angle;
 
      my $obj = Zodiac::Angle->new(%params);
-     my $zodiac_angle = $obj->angle2zodiac($angle);
+     my $zodiac_angle = $obj->angle2zodiac($angle, $opts_hr);
      my $angle = $obj->zodiac2angle($zodiac_angle);
 
 METHODS
@@ -17,9 +17,16 @@ METHODS
     Returns instance of 'Zodiac::Angle'.
 
   "angle2zodiac"
-     my $zodiac_angle = $obj->angle2zodiac($angle);
+     my $zodiac_angle = $obj->angle2zodiac($angle, $opts_hr);
 
     Convert angle to Zodiac angle.
+
+    Options defined $opts_hr control output. Possible keys in reference to
+    hash are: minute (0/1 print minutes), second (0/1 print second),
+    second_round (number of round numbers, default 4), sign_type (sign or
+    ascii, default sign).
+
+    Default value of $opts_hr is { minute => 1 }.
 
     Returns zodiac angle string.
 
@@ -35,7 +42,10 @@ ERRORS
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
 
-EXAMPLE
+     angle2zodiac():
+             Parameter 'sign_type' is bad. Possible values are 'sign' and 'ascii'.
+
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -64,8 +74,106 @@ EXAMPLE
      # Angle: 0.5
      # Zodiac angle: 0°♈30′
 
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Zodiac::Angle;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Object.
+     my $obj = Zodiac::Angle->new;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 angle\n";
+             exit 1;
+     }
+     my $angle = $ARGV[0];
+
+     my $zodiac_angle = Zodiac::Angle->new->angle2zodiac($angle, {
+             'minute' => 0,
+     });
+
+     # Print out.
+     print 'Angle: '.$angle."\n";
+     print 'Zodiac angle: '.encode_utf8($zodiac_angle)."\n";
+
+     # Output without arguments:
+     # Usage: __SCRIPT__ angle
+
+     # Output with '0.5' argument:
+     # Angle: 0.5
+     # Zodiac angle: 0°♈
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Zodiac::Angle;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Object.
+     my $obj = Zodiac::Angle->new;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 angle\n";
+             exit 1;
+     }
+     my $angle = $ARGV[0];
+
+     my $zodiac_angle = Zodiac::Angle->new->angle2zodiac($angle, {
+             'minute' => 1,
+             'second' => 1,
+             'second_round' => 4,
+     });
+
+     # Print out.
+     print 'Angle: '.$angle."\n";
+     print 'Zodiac angle: '.encode_utf8($zodiac_angle)."\n";
+
+     # Output without arguments:
+     # Usage: __SCRIPT__ angle
+
+     # Output with '0.5' argument:
+     # Angle: 0.5
+     # Zodiac angle: 0°♈30′0.0000′′
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Zodiac::Angle;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Object.
+     my $obj = Zodiac::Angle->new;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 angle\n";
+             exit 1;
+     }
+     my $angle = $ARGV[0];
+
+     my $zodiac_angle = Zodiac::Angle->new->angle2zodiac($angle, {
+             'minute' => 1,
+             'second' => 1,
+             'second_round' => 4,
+             'sign_type' => 'ascii',
+     });
+
+     # Print out.
+     print 'Angle: '.$angle."\n";
+     print 'Zodiac angle: '.encode_utf8($zodiac_angle)."\n";
+
+     # Output without arguments:
+     # Usage: __SCRIPT__ angle
+
+     # Output with '0.5' argument:
+     # Angle: 0.5
+     # Zodiac angle: 0° ar 30'0.0000''
+
 DEPENDENCIES
-    Class::Utils, Readonly, Unicode::UTF8.
+    Class::Utils, Error::Pure, List::MoreUtils, Readonly, Unicode::UTF8.
 
 SEE ALSO
     Zodiac::Angle::SwissEph
@@ -85,5 +193,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

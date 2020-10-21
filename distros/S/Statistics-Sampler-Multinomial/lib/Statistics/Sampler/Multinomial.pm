@@ -4,13 +4,13 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
 use List::Util qw /min sum/;
 use List::MoreUtils qw /first_index/;
-use Scalar::Util qw /blessed/;
+use Scalar::Util qw /blessed looks_like_number/;
 
 sub new {
     my ($class, %args) = @_;
@@ -203,6 +203,37 @@ sub draw_n_samples_with_mask {
     $self->draw_n_samples ($n);
 }
 
+sub update_values {
+    my ($self, %args) = @_;
+    
+    if (!defined $self->{sum}) {
+        $self->_initialise;
+    }
+
+    my $data = $self->{data};
+    my $count = 0;
+    foreach my $iter (keys %args) {
+        croak "iter $iter is not numeric"
+          if !looks_like_number $iter;
+        $self->{sum} += $args{$iter} - ($data->[$iter] // 0);
+        $data->[$iter] = $args{$iter};
+        $count ++;
+    }
+
+    return $count;
+}
+
+sub get_data {
+    my $self = shift;
+    my $data = $self->{data};
+    return wantarray ? @$data : [@$data];
+}
+
+sub get_sum {
+    my $self = shift;
+    return $self->{sum} // do {$self->_initialise; $self->{sum}};
+}
+
 #  Cuckoo package to act as a method wrapper
 #  to use the perl PRNG stream by default.
 # currently croaks because we have no binomial method
@@ -308,6 +339,16 @@ where K is the length of the data array passed in to the call to new.
 e.g. for $n=3 and the K=5 example from above,
 one could get (0,1,2,0,0).
 
+
+=item $object->update_values (1 => 10, 4 => 0.2)
+
+Updates the data values at the specified positions.
+Argument list must be a set of numeric key/value pairs.
+The keys and values are not otherwise checked,
+but the system will follow perl's rules
+regarding non-numeric values under the warnings pragma.
+The same applies for floating point array indices.
+
 =item $object->draw_with_mask ($aref)
 =item $object->draw_n_samples_with_mask ($n, $aref)
 
@@ -321,6 +362,15 @@ then discarded.
 
 Returns the number of classes in the sample,
 or zero if initialise has not yet been run.
+
+=item $object->get_data
+
+Returns a copy of the data array.  In scalar context
+this will be an array ref.
+
+=item $object->get_sum
+
+Returns the sum of the data array values.
 
 =back
 

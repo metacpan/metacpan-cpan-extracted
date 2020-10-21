@@ -1,6 +1,135 @@
 ==================================================
-Changes from 2019-10-14 00:00:00 +0000 to present.
+Changes from 2019-10-22 00:00:00 +0000 to present.
 ==================================================
+
+------------------------------------------
+version 0.069 at 2020-10-21 07:07:34 +0000
+------------------------------------------
+
+  Change: ce177b5df0ba6cb0659f6b94a0411f1c8732ccfa
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-21 09:07:12 +0000
+
+    - fixed warning under Windows, because stat uner windows returns ""
+    for blksize 
+
+------------------------------------------
+version 0.068 at 2020-10-20 13:58:43 +0000
+------------------------------------------
+
+  Change: c6621b85e683fcfb553fe0c855981eae820a1d42
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 15:58:43 +0000
+
+    Released 0.068 
+
+------------------------------------------
+version 0.067 at 2020-10-20 13:55:51 +0000
+------------------------------------------
+
+  Change: 535f8fc84afdc9cbe94448a854623ff8a35e81e4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 15:55:51 +0000
+
+    - removed Module dependency Parallel::Iterator - release branch is
+    only master (to avoid different releases) 
+
+  Change: 385b29cabdf3e71a7dab86d2cfc41f6bc4763f6d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 15:49:51 +0000
+
+    - added notes - added tests with empty payload file 
+
+  Change: 8f03d2d1a8b24042e09f183cdc99d7df00a7f5b4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 15:49:21 +0000
+
+    - typofix 
+
+  Change: fad5d608b78ce150a64a66f8e53048c76c3b067d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 15:27:44 +0000
+
+    - removed stat-call - using $filesize instead multiple '-s _' calls 
+
+  Change: 8b9387042ba260c5150a2d39802adb338b3f269e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 15:14:25 +0000
+
+    - removed unused module 
+
+  Change: 12428a2f6a45b211971f1bb518d29146074bb18d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 13:57:52 +0000
+
+    - bugfix, '-s $file' fails if $file is empty 
+
+  Change: 7b05386cd64e2fb23f84b1041be547af5a6299a1
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 13:14:49 +0000
+
+    - removed parallel support, because it reduced code complexity. A
+    loss of performance should not be significantly measurable. 
+
+  Change: fedbdf628c7036f67d5211551b40f042b35995d0
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:44:19 +0000
+
+    - minor, use get_hash_string() 
+
+  Change: f18092c2a91aca53102d13a2181861407cb10387
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:43:32 +0000
+
+    - fixed namespace - added tests for chomp_portable() 
+
+  Change: 12ba23b0d870d6ea9a9717257654b42ffe4d2d57
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:19:48 +0000
+
+    - more robust test case for Perl 5.10 
+
+  Change: 6b9e78bb1258e044f57f933e85d15e2d09d24615
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:19:48 +0000
+
+    - fix comment 
+
+  Change: d93d05894edd4be928cc0eff7327a9e3ccbb2946
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:19:48 +0000
+
+    - simplified chomp_portable() from object method to class method -
+    extracted normalize_payload_filepath() from
+    Archive::BagIt::Role::Manifest to Archive::BagIt::Role::Portability -
+    extracted check_if_payload_filepath_violates() from
+    Archive::BagIt::Role::Manifest to Archive::BagIt::Role::Portability 
+
+  Change: 2f200f00c1b57e436eafcd85483e5111aa963d3e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:19:48 +0000
+
+    - refactoring, extracted get_optimal_bufsize() to
+    Archive::BagIt::Role::Algorithm 
+
+  Change: 21c7f4cded2986a190bebdd34dc54a53d463ee3d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:19:48 +0000
+
+    - replaces File::stat::stat with '-s $file', resulting in real
+    speedup calculating payload oxum 
+
+  Change: 3a0f8c161eefe3e21411142f6ef0054f4bd59681
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-20 12:19:48 +0000
+
+    - improved __file_find() 
+
+  Change: 05c0cd40f5970c75d1fa5d8bd93c52bb07371df2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-13 17:39:38 +0000
+
+    Released 0.067 
 
 ------------------------------------------
 version 0.066 at 2020-10-13 15:31:45 +0000
@@ -1484,5 +1613,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2019-10-14 00:00:00 +0000.
+Plus 9 releases after 2019-10-22 00:00:00 +0000.
 ================================================

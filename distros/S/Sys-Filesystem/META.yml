@@ -16,7 +16,7 @@ configure_requires:
   Module::Pluggable: '4.8'
   Params::Util: '1.00'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,4 +41,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Sys-Filesystem
   homepage: https://metacpan.org/release/Sys-Filesystem
   repository: https://github.com/rehsack/Sys-Filesystem
-version: '1.406'
+version: '1.408'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

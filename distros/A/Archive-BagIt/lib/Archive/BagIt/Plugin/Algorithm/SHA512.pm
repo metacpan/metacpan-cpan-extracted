@@ -33,12 +33,7 @@ sub _build_digest_sha {
 
 sub get_hash_string {
     my ($self, $fh) = @_;
-    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-        $atime,$mtime,$ctime,$blksize,$blocks)
-        = stat $fh;
-    if ((!defined $blksize) || (length($blksize) < 1) || ($blksize <1)) {
-        $blksize = 8192;
-    }
+    my $blksize = $self->get_optimal_bufsize($fh);
     my $buffer;
     while (read($fh, $buffer, $blksize)) {
         $self->_digest->add($buffer);
@@ -69,7 +64,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 AVAILABILITY
 

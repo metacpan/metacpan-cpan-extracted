@@ -13,6 +13,8 @@
 #include <perl.h>
 #include <XSUB.h>
 #include <embed.h>
+#include <string.h>
+#include "ppport.h"
 
 /* stolen from B::cstring */
 static SV *
@@ -39,7 +41,7 @@ cstring(pTHX_ SV *sv, bool perlstyle)
     sv_catpvs(sstr, "\\@");
       else if (*s == '\\')
       {
-    if (strchr("nrftax\\",*(s+1)))
+    if (memCHRs("nrftaebx\\",*(s+1)))
         sv_catpvn(sstr, s++, 2);
     else
         sv_catpvs(sstr, "\\\\");

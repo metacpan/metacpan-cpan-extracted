@@ -1,18 +1,22 @@
 # $Id: Iterator.pm,v 1.1.1.1 2002/11/08 17:18:36 phish Exp $
 #
 package XML::LibXML::NodeList::Iterator;
-$XML::LibXML::NodeList::Iterator::VERSION = '1.05';
+$XML::LibXML::NodeList::Iterator::VERSION = '1.06';
 use strict;
+use warnings;
+
 use XML::NodeFilter qw(:results);
 
 use vars qw($VERSION);
 $VERSION = "1.03";
 
+## no critic
 use overload
     '++' => sub { $_[0]->nextNode();     $_[0]; },
     '--' => sub { $_[0]->previousNode(); $_[0] },
     '<>' => sub { return wantarray ? $_[0]->_get_all : $_[0]->nextNode(); },
     ;
+## use critic
 
 sub new
 {
@@ -156,7 +160,7 @@ sub iterate
     my $funcref = shift;
     my $rv;
 
-    return unless defined $funcref && ref($funcref) eq 'CODE';
+    return () unless defined $funcref && ref($funcref) eq 'CODE';
 
     $self->[1] = -1;    # first element
     while ( my $node = $self->next )
@@ -194,7 +198,7 @@ XML::LibXML::NodeList::Iterator - Iteration Class for XML::LibXML XPath results
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -270,35 +274,9 @@ Christian Glahn, E<lt>phish@cpan.orgE<gt>
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-unknown
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019 by unknown.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/xml-libxml-iterator/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc XML::LibXML::NodeList::Iterator
 
 =head2 Websites
 
@@ -317,35 +295,11 @@ L<https://metacpan.org/release/XML-LibXML-Iterator>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/XML-LibXML-Iterator>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-LibXML-Iterator>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/XML-LibXML-Iterator>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/XML-LibXML-Iterator>
 
 =item *
 
@@ -396,5 +350,25 @@ from your repository :)
 L<https://github.com/shlomif/xml-libxml-iterator>
 
   git clone git://github.com/shlomif/xml-libxml-iterator.git
+
+=head1 AUTHOR
+
+unknown
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/xml-libxml-iterator/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by unknown.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

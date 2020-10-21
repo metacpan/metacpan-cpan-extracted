@@ -24,7 +24,7 @@ SCOPE:
 
     @o = occurrences grep { /\w+/ } @lorem;
     my $wc = reduce_0 { defined $b ? $a + $_ * scalar @$b : $a } @o;
-    is( $wc, 124, "Words are as many as requested at www.loremipsum.de" );
+    is($wc, 124, "Words are as many as requested at www.loremipsum.de");
 }
 
 SCOPE:
@@ -54,11 +54,11 @@ SCOPE:
 leak_free_ok(
     occurrences => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4);
-        my @o = occurrences @probes;
+        my @o      = occurrences @probes;
     },
     'scalar occurrences' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4);
-        my $o = occurrences @probes;
+        my $o      = occurrences @probes;
     }
 );
 

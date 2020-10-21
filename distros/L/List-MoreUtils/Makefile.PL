@@ -73,7 +73,7 @@ EOSCM
 
 my %RUN_DEPS = (
     'Exporter::Tiny' => '0.038',
-    ($loadable_xs ? ('List::MoreUtils::XS' => '0.426') : ())
+    ($loadable_xs ? ('List::MoreUtils::XS' => '0.430') : ())
 );
 my %BUNDLE_CONFIGURE_DEPS = (
     'inc::latest'      => '0.500',
@@ -116,6 +116,8 @@ WriteMakefile1(
                     'Test::CheckManifest'                 => 0,
                     'Module::CPANTS::Analyse'             => '0.96',
                     'Test::Kwalitee'                      => 0,
+                    'Test::Perl::Critic'                  => 0,
+                    'Test::PerlTidy'                      => 0,
                     'Test::Pod'                           => 0,
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
@@ -192,11 +194,12 @@ sub CheckConflicts
 
         *install = sub {
             my $self = shift;
-            return "\npure_site_install ::\n"
+            (my $targets = $self->SUPER::install) =~ s/^(pure_site_install\s+::?)/$1 delete_conflicting_files/m;
+            return "\ndelete_conflicting_files :\n"
               . join("",
                 map { "\t\$(NOECHO) \$(RM_F) " . $self->quote_literal($self->catfile('$(DESTINSTALLSITEARCH)', $_)) . "\n" }
                   @kill)
-              . $self->SUPER::install;
+              . $targets;
         };
     }
 

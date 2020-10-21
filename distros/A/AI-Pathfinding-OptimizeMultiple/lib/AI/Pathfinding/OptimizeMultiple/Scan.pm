@@ -1,5 +1,5 @@
 package AI::Pathfinding::OptimizeMultiple::Scan;
-$AI::Pathfinding::OptimizeMultiple::Scan::VERSION = '0.0.15';
+$AI::Pathfinding::OptimizeMultiple::Scan::VERSION = '0.0.16';
 use strict;
 use warnings;
 
@@ -7,9 +7,9 @@ use 5.012;
 
 use MooX qw/late/;
 
-has cmd_line => (isa => 'Str', is => 'ro', required => 1,);
-has id => (isa => 'Str', is => 'ro', required => 1,);
-has used => (isa => 'Bool', is => 'rw', default => sub { 0; });
+has cmd_line => ( isa => 'Str',  is => 'ro', required => 1, );
+has id       => ( isa => 'Str',  is => 'ro', required => 1, );
+has used     => ( isa => 'Bool', is => 'rw', default  => sub { 0; } );
 
 sub mark_as_used
 {
@@ -23,14 +23,12 @@ sub is_used
     return $self->used();
 }
 
-
 sub data_file_path
 {
     my $self = shift;
 
-    return "./data/" . $self->id() .  ".data.bin";
+    return "./data/" . $self->id() . ".data.bin";
 }
-
 
 1;
 
@@ -46,11 +44,7 @@ AI::Pathfinding::OptimizeMultiple::Scan
 
 =head1 VERSION
 
-version 0.0.15
-
-=head1 VERSION
-
-version 0.0.15
+version 0.0.16
 
 =head1 SLOTS
 
@@ -82,36 +76,9 @@ Returns whether the scan was used.
 Returns the path to the data file of the scan, where the numbers of iterations
 per board are stored.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2012 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc AI::Pathfinding::OptimizeMultiple
 
 =head2 Websites
 
@@ -126,15 +93,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/AI-Pathfinding-OptimizeMultiple>
+L<https://metacpan.org/release/AI-Pathfinding-OptimizeMultiple>
 
 =item *
 
@@ -143,30 +102,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/AI-Pathfinding-OptimizeMultiple>
 
 =item *
 
@@ -180,7 +115,7 @@ L<http://cpants.cpanauthors.org/dist/AI-Pathfinding-OptimizeMultiple>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/AI-Pathfinding-OptimizeMultiple>
 
@@ -217,5 +152,26 @@ from your repository :)
 L<http://github.com/shlomif/fc-solve>
 
   git clone ssh://git@github.com/shlomif/fc-solve.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

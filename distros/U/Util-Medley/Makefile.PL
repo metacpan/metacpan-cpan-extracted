@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "Data::Printer" => 0,
     "DateTime::Format::ISO8601" => 0,
     "DateTime::Format::ISO8601::Format" => 0,
+    "English" => 0,
     "Fcntl" => 0,
     "File::Basename" => 0,
     "File::LibMagic" => 0,
@@ -81,7 +82,7 @@ my %WriteMakefileArgs = (
     "File::RandomGenerator" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.047",
+  "VERSION" => "0.051",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -99,6 +100,7 @@ my %FallbackPrereqs = (
   "Data::Printer" => 0,
   "DateTime::Format::ISO8601" => 0,
   "DateTime::Format::ISO8601::Format" => 0,
+  "English" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
   "File::LibMagic" => 0,

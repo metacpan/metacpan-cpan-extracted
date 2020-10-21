@@ -1,0 +1,20 @@
+MANIFEST
+Makefile.PL
+README.md
+lib/Gtk3/ImageView.pm
+lib/Gtk3/ImageView/Tool.pm
+lib/Gtk3/ImageView/Tool/Dragger.pm
+lib/Gtk3/ImageView/Tool/Selector.pm
+lib/Gtk3/ImageView/Tool/SelectorDragger.pm
+t/1_basics.t
+t/2_transparent.t
+t/3_zoom.t
+t/4_select.t
+t/90_MANIFEST.t
+t/91_critic.t
+t/bigpic.svg
+t/perlcriticrc
+t/transp-blue.svg
+t/transp-green.svg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

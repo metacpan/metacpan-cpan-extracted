@@ -5,9 +5,11 @@ use warnings ("all");
 use lib ("t/lib");
 use List::MoreUtils::XS (":all");
 
-
 use Test::More;
 use Test::LMU;
+
+use POSIX qw(setlocale LC_COLLATE);
+setlocale(LC_COLLATE, "C");
 
 my @list = reverse 'AA' .. 'ZZ';
 my ($min, $max) = minmaxstr @list;
@@ -45,6 +47,5 @@ leak_free_ok(
 );
 
 done_testing;
-
 
 

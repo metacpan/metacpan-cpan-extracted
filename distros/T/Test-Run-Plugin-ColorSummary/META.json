@@ -4,13 +4,13 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run-Plugin-ColorSummary",
    "prereqs" : {
@@ -40,11 +40,11 @@
    "provides" : {
       "Test::Run::CmdLine::Plugin::ColorSummary" : {
          "file" : "lib/Test/Run/CmdLine/Plugin/ColorSummary.pm",
-         "version" : "0.0202"
+         "version" : "0.0203"
       },
       "Test::Run::Plugin::ColorSummary" : {
          "file" : "lib/Test/Run/Plugin/ColorSummary.pm",
-         "version" : "0.0202"
+         "version" : "0.0203"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "url" : "https://bitbucket.org/shlomif/perl-test-run"
       }
    },
-   "version" : "0.0202",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.0203",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -4,8 +4,8 @@ use Test::LMU;
 
 # Normal cases
 my @list = (1 .. 10000);
-is_true(all_u  { defined } @list);
-is_true(all_u  { $_ > 0 } @list);
+is_true(all_u { defined } @list);
+is_true(all_u { $_ > 0 } @list);
 is_false(all_u { $_ < 5000 } @list);
 is_undef(all_u {});
 

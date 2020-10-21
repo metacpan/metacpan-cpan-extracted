@@ -5,15 +5,17 @@ use strict;
 use warnings;
 
 my $have_xs;
-our $VERSION = '0.428';
+our $VERSION = '0.430';
 
 BEGIN
 {
     unless (defined($have_xs))
     {
+        ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         eval { require List::MoreUtils::XS; } unless $ENV{LIST_MOREUTILS_PP};
+        ## no critic (ErrorHandling::RequireCarping)
         die $@ if $@ && defined $ENV{LIST_MOREUTILS_PP} && $ENV{LIST_MOREUTILS_PP} == 0;
-        $have_xs = 0+defined( $INC{'List/MoreUtils/XS.pm'});
+        $have_xs = 0 + defined($INC{'List/MoreUtils/XS.pm'});
     }
 
     use List::MoreUtils::PP qw();
@@ -43,10 +45,12 @@ my @v0_400 = qw(one any_u all_u none_u notall_u one_u
 );
 my @v0_420 = qw(arrayify duplicates minmaxstr samples zip6 reduce_0 reduce_1 reduce_u
   listcmp frequency occurrences mode
-  binsert bremove equal_range lower_bound upper_bound qsort);
+  binsert bremove equal_range lower_bound upper_bound qsort
+  slide slideatatime);
 
 my @all_functions = (@junctions, @v0_22, @v0_24, @v0_33, @v0_400, @v0_420);
 
+## no critic (TestingAndDebugging::ProhibitNoStrict)
 no strict "refs";
 if ($have_xs)
 {
@@ -58,6 +62,8 @@ if ($have_xs)
 }
 List::MoreUtils->can($_) or *$_ = List::MoreUtils::PP->can($_) for (@all_functions);
 use strict;
+## use critic (TestingAndDebugging::ProhibitNoStrict)
+use parent qw(Exporter::Tiny);
 
 my %alias_list = (
     v0_22 => {
@@ -79,13 +85,12 @@ my %alias_list = (
         bsearch_index => "bsearchidx",
     },
     v0_420 => {
-	bsearch_insert => "binsert",
-	bsearch_remove => "bremove",
-	zip_unflatten  => "zip6",
+        bsearch_insert => "binsert",
+        bsearch_remove => "bremove",
+        zip_unflatten  => "zip6",
     },
 );
 
-our @ISA         = qw(Exporter::Tiny);
 our @EXPORT_OK   = (@all_functions, map { keys %$_ } values %alias_list);
 our %EXPORT_TAGS = (
     all         => \@EXPORT_OK,
@@ -120,10 +125,13 @@ for my $set (values %alias_list)
 {
     for my $alias (keys %$set)
     {
+        ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no strict qw(refs);
         *$alias = __PACKAGE__->can($set->{$alias});
+        ## use critic (TestingAndDebugging::ProhibitNoStrict)
     }
 }
+use strict;
 
 =pod
 
@@ -436,7 +444,7 @@ C<zip_unflatten> is an alias for C<zip6>.
 =head3 listcmp ARRAY0 ARRAY1 [ ARRAY2 ... ]
 
 Returns an associative list of elements and every I<id> of the list it
-was found in. Allowes easy implementation of @a & @b, @a | @b, @a ^ @b and
+was found in. Allows easy implementation of @a & @b, @a | @b, @a ^ @b and
 so on.
 Undefined entries in any given array are skipped.
 
@@ -448,12 +456,12 @@ Undefined entries in any given array are skipped.
   my @seq = (1, 2, 3);
   my @prim = (undef, 2, 3, 5);
   my @fib = (1, 1, 2);
-  my $cmp = listcmp @seq, @prim, @fib;
-  # returns { 1 => [0, 2], 2 => [0, 1, 2], 3 => [0, 1], 5 => [1] }
+  my %cmp = listcmp @seq, @prim, @fib;
+  # returns ( 1 => [0, 2], 2 => [0, 1, 2], 3 => [0, 1], 5 => [1] )
 
 =head3 arrayify LIST[,LIST[,LIST...]]
 
-Returns a list costisting of each element of given arrays. Recursive arrays
+Returns a list consisting of each element of given arrays. Recursive arrays
 are flattened, too.
 
   @a = (1, [[2], 3], 4, [5], 6, [7], 8, 9);
@@ -492,10 +500,11 @@ In scalar context, returns the number of elements occurring only once in LIST.
 
 =head3 duplicates LIST
 
-Returns a new list by stripping values in LIST occuring less than twice by
+Returns a new list by stripping values in LIST occurring less than twice by
 comparing the values as hash keys, except that undef is considered separate
 from ''.  The order of elements in the returned list is the same as in LIST.
-In scalar context, returns the number of elements occurring only once in LIST.
+In scalar context, returns the number of elements occurring more than once
+in LIST.
 
   my @y = duplicates 1,1,2,4,7,2,3,4,6,9; #returns 1,2,4
 
@@ -518,11 +527,21 @@ Returns a new list of frequencies and the corresponding values from LIST.
 =head3 mode LIST
 
 Returns the modal value of LIST. In scalar context, just the modal value
-is returned, in list context all probes occuring I<modal> times are returned,
+is returned, in list context all probes occurring I<modal> times are returned,
 too.
 
   my @m = mode ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4, (7) x 3, (8) x 7);
   #  @m = (7, 4, 8) - bimodal LIST
+
+=head3 slide BLOCK LIST
+
+The function C<slide> operates on pairs of list elements like:
+
+  my @s = slide { "$a and $b" } (0..3);
+  # @s = ("0 and 1", "1 and 2", "2 and 3")
+
+The idea behind this function is a kind of magnifying glass that is moved
+along a list and calls C<BLOCK> every time the next list item is reached.
 
 =head2 Partitioning
 
@@ -572,7 +591,7 @@ Negative values are only ok when they refer to a partition previously created:
 
   my @idx  = ( 0, 1, -1 );
   my $i    = 0;
-  my @part = part { $idx[$++ % 3] } 1 .. 8; # [1, 4, 7], [2, 3, 5, 6, 8]
+  my @part = part { $idx[$i++ % 3] } 1 .. 8; # [1, 4, 7], [2, 3, 5, 6, 8]
 
 =head3 samples COUNT LIST
 
@@ -625,6 +644,30 @@ This prints
 
   a b c
   d e f
+  g
+
+=head3 slideatatime STEP, WINDOW, LIST
+
+Creates an array iterator, for looping over an array in chunks of
+C<$windows-size> items at a time.
+
+The idea behind this function is a kind of magnifying glass (finer
+controllable compared to L</slide>) that is moved along a list.
+
+Example:
+
+  my @x = ('a' .. 'g');
+  my $it = slideatatime 2, 3, @x;
+  while (my @vals = $it->())
+  {
+    print "@vals\n";
+  }
+
+This prints
+
+  a b c
+  c d e
+  e f g
   g
 
 =head2 Searching
@@ -957,7 +1000,7 @@ The idea behind reduce_1 is product of a sequence of numbers.
 =head3 reduce_u BLOCK LIST
 
 Reduce LIST by calling BLOCK in scalar context for each element of LIST.
-C<$a> contains the progressional result and is initialized with 1.
+C<$a> contains the progressional result and is uninitialized.
 C<$b> contains the current processed element of LIST and C<$_> contains the
 index of the element in C<$b>.
 

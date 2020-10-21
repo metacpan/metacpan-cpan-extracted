@@ -7,6 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use FSM::Basic;
 
+
 plan tests => 3;
 
 my %states = (
@@ -42,27 +43,27 @@ mem_usage
 Switch> '
             }
         },
-            'read'      => {'cat' => 'test_cat.txt'},
+        'read'      => {'cat' => 'test_cat.txt'},
         
         'not_matching_info' => '% Unknown command or computer name, or unable to find computer address',
         'output'            => 'Switch> '
     },
     'close' => {'final' => 1},
 );
+unlink './t/test_cat_seq.idx';
 
-my @ins   = qw( default cat);
 my $fsm   = FSM::Basic->new( \%states, 'accept' );
 my $final = 0;
 my $out;
 ( $final, $out ) = $fsm->run( 'default' );
 
-( $final, $out ) = $fsm->run( 'catSEQ' );
+( $final, $out ) = $fsm->run( 'cat' );
 ok( $out eq "Hello World\nSwitch> " );
 
-( $final, $out ) = $fsm->run( 'catSEQ' );
+( $final, $out ) = $fsm->run( 'cat' );
 ok( $out eq "Hello Universe\nSwitch> " );
 
-( $final, $out ) = $fsm->run( 'catSEQ' );
+( $final, $out ) = $fsm->run( 'cat' );
 ok( $out eq "Hello World\nSwitch> " );
 
 last if $final;

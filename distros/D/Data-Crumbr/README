@@ -1,53 +1,50 @@
-NAME
-    Data::Crumbr - Render data structures for easy searching and parsing
-
-VERSION
-    version 0.1.1
-
 SYNOPSIS
-       use Data::Crumber; # imports `crumbr`
 
+       use Data::Crumber; # imports `crumbr`
+    
        # some data to work with
        my $data = { what => 'ever', hey => 'you' };
-
+    
        # crumbr provides an anonyous sub back. This has defaults
        my $csub = crumbr();
-
+    
        # use it to encode the data
        my $encoded = $crumbr->($data);
        # {"here"}{"hey"}:"you"
        # {"here"}{"what"}:"ever"
-
+    
        # URI profile simplifies things but loses something
        $encoded = crumbr(profile => 'URI')->($data);
        # here/hey "you"
        # here/what "ever"
-
+    
        # JSON profile produces valid JSON "slices"
        $encoded = crumbr(profile => 'JSON')->($data);
        # {"here":{"hey":"you"}}
        # {"here":{"what":"ever"}}
-
+    
        # Object Oriented Interface
        my $crobj = Data::Crumbr->new();
        $encoded = $crobj->encode($data); # same as default
 
 DESCRIPTION
+
     Data::Crumbr lets you render data structures in a way that can then be
     easily searched and parsed in "slices". The basic idea is that data
     shaped in this way will then be easily filtered in the shell for
     extracting interesting parts.
 
-    The input data structure is traversed is if it is a tree (so no circular
-    structures please!), and a *record* is generated for each leaf in the
-    tree. Depending on the backend and the configurations, the full path
-    from the root to the parent of the leaf is represented as a sequence of
-    keys (which can be hash keys or array indexes) followed by the value.
-    This should make your life easier e.g. in the shell, so that you can
-    specify the full path to the data structure part you're interested into
-    with common Unix tools like "grep" and/or "sed".
+    The input data structure is traversed is if it is a tree (so no
+    circular structures please!), and a record is generated for each leaf
+    in the tree. Depending on the backend and the configurations, the full
+    path from the root to the parent of the leaf is represented as a
+    sequence of keys (which can be hash keys or array indexes) followed by
+    the value. This should make your life easier e.g. in the shell, so that
+    you can specify the full path to the data structure part you're
+    interested into with common Unix tools like grep and/or sed.
 
-  Example
+ Example
+
     Suppose you have the following data structure in Perl:
 
        my $data = {
@@ -68,8 +65,8 @@ DESCRIPTION
           },
        };
 
-    If you encode this e.g. in JSON, it will be easy to parse with the right
-    program, but not from the shell, even if you pretty print it:
+    If you encode this e.g. in JSON, it will be easy to parse with the
+    right program, but not from the shell, even if you pretty print it:
 
        {
           "hash" : {
@@ -97,8 +94,8 @@ DESCRIPTION
           "false" : false
        }
 
-    How do you get the second item in the array "ar"i inside the hash
-    "hash"? Would you do better with YAML instead?
+    How do you get the second item in the array ari inside the hash hash?
+    Would you do better with YAML instead?
 
        ---
        array:
@@ -147,250 +144,259 @@ DESCRIPTION
        {"two"}:2
 
     Now it should pretty easy for a shell program to get at the data, e.g.
-    with this "sed" substitution:
+    with this sed substitution:
 
        sed -ne 's/^{"hash"}{"ar"}\[2\]://p'
 
-  Profiles
-    If you don't like the default encoding, you can get a different one by
-    using a *profile*. This is a set of configurations for
-    "Data::Crumbr::Default", which is a pretty generic class for
-    representing a wide class of possible record-oriented encodings.
+ Profiles
 
-    A "Data::Crumbr::Default" encoder is defined in terms of the following
+    If you don't like the default encoding, you can get a different one by
+    using a profile. This is a set of configurations for
+    Data::Crumbr::Default, which is a pretty generic class for representing
+    a wide class of possible record-oriented encodings.
+
+    A Data::Crumbr::Default encoder is defined in terms of the following
     parameters:
 
-    "array_open"
-        sequence to put when an array is opened
+    array_open
 
-    "array_close"
-        sequence to put when an array is closed
+      sequence to put when an array is opened
 
-    "array_key_prefix"
-        sequence to put before an array's index
+    array_close
 
-    "array_key_suffix"
-        sequence to put after an array's index
+      sequence to put when an array is closed
 
-    "array_key_encoder"
-        a reference to a function that encodes an array's index
+    array_key_prefix
 
-    "hash_open"
-        sequence to put when a hash is opened
+      sequence to put before an array's index
 
-    "hash_close"
-        sequence to put when a hash is closed
+    array_key_suffix
 
-    "hash_key_prefix"
-        sequence to put before a hash's key
+      sequence to put after an array's index
 
-    "hash_key_suffix"
-        sequence to put after a hash's key
+    array_key_encoder
 
-    "hash_key_encoder"
-        a reference to a function that encodes a hash's key
+      a reference to a function that encodes an array's index
 
-    "value_encoder"
-        a reference to a function that encodes a leaf value
+    hash_open
 
-    "keys_separator"
-        sequence to separate the keys breadcrumb
+      sequence to put when a hash is opened
 
-    "value_separator"
-        sequence to separate the keys from the value
+    hash_close
+
+      sequence to put when a hash is closed
+
+    hash_key_prefix
+
+      sequence to put before a hash's key
+
+    hash_key_suffix
+
+      sequence to put after a hash's key
+
+    hash_key_encoder
+
+      a reference to a function that encodes a hash's key
+
+    value_encoder
+
+      a reference to a function that encodes a leaf value
+
+    keys_separator
+
+      sequence to separate the keys breadcrumb
+
+    value_separator
+
+      sequence to separate the keys from the value
 
     By default, Data::Crumbr ships with the following profiles:
 
     Default
-        i.e. the profile you get by default, and what you saw in action in
-        the example above. It has the following settings:
 
-        *   no openers and closers:
+      i.e. the profile you get by default, and what you saw in action in
+      the example above. It has the following settings:
 
-               array_open  => ''
-               array_close => ''
-               hash_open   => ''
-               hash_close  => ''
+	* no openers and closers:
 
-        *   array keys are printed verbatim, surrounded by square brackets:
+           array_open  => ''
+           array_close => ''
+           hash_open   => ''
+           hash_close  => ''
 
-               array_key_prefix  => '['
-               array_key_suffix  => ']'
-               array_key_encoder => Data::Crumbr::Util::id_encoder
+	* array keys are printed verbatim, surrounded by square brackets:
 
-        *   hash keys encoded as JSON strings, surrounded by curly brackets:
+           array_key_prefix  => '['
+           array_key_suffix  => ']'
+           array_key_encoder => Data::Crumbr::Util::id_encoder
 
-               hash_key_prefix   => '['
-               hash_key_suffix   => ']'
-               hash_key_encoder  => Data::Crumbr::Util::json_leaf_encoder
+	* hash keys encoded as JSON strings, surrounded by curly brackets:
 
-        *   no separator between keys (because they already stand out very
-            clearly, but a colon to separate the sequence of keys from the
-            value:
+           hash_key_prefix   => '['
+           hash_key_suffix   => ']'
+           hash_key_encoder  => Data::Crumbr::Util::json_leaf_encoder
 
-               keys_separator  => ''
-               value_separator => ':'
+	* no separator between keys (because they already stand out very
+	clearly, but a colon to separate the sequence of keys from the
+	value:
 
-        *   leaf values encoded as JSON scalars:
+           keys_separator  => ''
+           value_separator => ':'
 
-               value_encoder => Data::Crumbr::Util::json_leaf_encoder
+	* leaf values encoded as JSON scalars:
 
-        This is quite verbose, but lets you specify very precisely what you
-        are looking for because the hash keys stand out clearly with respect
-        to array identifiers, i.e. there's no chance that you will mistake
-        an array index for a hash key (because they are embedded in
-        different bracket types).
+           value_encoder => Data::Crumbr::Util::json_leaf_encoder
+
+      This is quite verbose, but lets you specify very precisely what you
+      are looking for because the hash keys stand out clearly with respect
+      to array identifiers, i.e. there's no chance that you will mistake an
+      array index for a hash key (because they are embedded in different
+      bracket types).
 
     JSON
-        this profile always provides you compact JSON-compliant string
-        representations that contain only one single leaf value.
 
-        It has the following characteristics:
+      this profile always provides you compact JSON-compliant string
+      representations that contain only one single leaf value.
 
-        *   openers and closers are what you would expect for JSON objects
-            and arrays:
+      It has the following characteristics:
 
-               array_open  => '['
-               array_close => ']'
-               hash_open   => '{'
-               hash_close  => '}'
+	* openers and closers are what you would expect for JSON objects
+	and arrays:
 
-        *   there is only one non-empty suffix, i.e. the hash key suffix, so
-            that we can separate the hash key from the value with ":"
-            according to JSON:
+           array_open  => '['
+           array_close => ']'
+           hash_open   => '{'
+           hash_close  => '}'
 
-               array_key_prefix => ''
-               array_key_suffix => ''
-               hash_key_prefix  => ''
-               hash_key_suffix  => ':'
+	* there is only one non-empty suffix, i.e. the hash key suffix, so
+	that we can separate the hash key from the value with : according
+	to JSON:
 
-        *   array keys are not printed:
+           array_key_prefix => ''
+           array_key_suffix => ''
+           hash_key_prefix  => ''
+           hash_key_suffix  => ':'
 
-               array_key_encoder => sub { }
+	* array keys are not printed:
 
-        *   hash keys are JSON encoded:
+           array_key_encoder => sub { }
 
-               hash_key_encoder  => Data::Crumbr::Util::json_encoder()
+	* hash keys are JSON encoded:
 
-        *   no separators are needed:
+           hash_key_encoder  => Data::Crumbr::Util::json_encoder()
 
-               keys_separator  => ''
-               value_separator => ''
+	* no separators are needed:
 
-        *   leaf values encoded as JSON scalars:
+           keys_separator  => ''
+           value_separator => ''
 
-               value_encoder => Data::Crumbr::Util::json_leaf_encoder
+	* leaf values encoded as JSON scalars:
 
-    URI this is the simplest of the profiles, and sacrifices the possibility
-        to distinguish between hash and array keys to the altar of
-        simplicity.
+           value_encoder => Data::Crumbr::Util::json_leaf_encoder
 
-        It has the following characteristics:
+    URI
 
-        *   no openers, closers, prefixes or suffixes:
+      this is the simplest of the profiles, and sacrifices the possibility
+      to distinguish between hash and array keys to the altar of
+      simplicity.
 
-               array_open  => ''
-               array_close => ''
-               array_key_prefix => ''
-               array_key_suffix => ''
+      It has the following characteristics:
 
-               hash_open   => ''
-               hash_close  => ''
-               hash_key_prefix => ''
-               hash_key_suffix => ''
+	* no openers, closers, prefixes or suffixes:
 
-        *   array keys are printed verbatim
+           array_open  => ''
+           array_close => ''
+           array_key_prefix => ''
+           array_key_suffix => ''
+        
+           hash_open   => ''
+           hash_close  => ''
+           hash_key_prefix => ''
+           hash_key_suffix => ''
 
-        *   hash keys are URI encoded
+	* array keys are printed verbatim
 
-               hash_key_encoder  => Data::Crumbr::Util::uri_encoder
+	* hash keys are URI encoded
 
-        *   keys are separated by a slash character "/" and values are
-            separated by a single space " ":
+           hash_key_encoder  => Data::Crumbr::Util::uri_encoder
 
-               keys_separator  => '/'
-               value_separator => ' '
+	* keys are separated by a slash character / and values are
+	separated by a single space  :
 
-        *   leaf values encoded as JSON scalars:
+           keys_separator  => '/'
+           value_separator => ' '
 
-               value_encoder => Data::Crumbr::Util::json_leaf_encoder
+	* leaf values encoded as JSON scalars:
+
+           value_encoder => Data::Crumbr::Util::json_leaf_encoder
 
 INTERFACE
-    There are two ways to use Data::Crumber: a function "crumbr", that is
+
+    There are two ways to use Data::Crumber: a function crumbr, that is
     exported by default, and the object-oriented interface.
 
     crumbr
-           $subref = crumbr(%args); # OR
-           $subref = crumbr(\%args);
 
-        get a *crumbr* generator based on provided %args.
+         $subref = crumbr(%args); # OR
+         $subref = crumbr(\%args);
 
-        Returns a reference to a sub, which can then be called upon a data
-        structure in order to get the *crumbed* version.
+      get a crumbr generator based on provided %args.
 
-        The input arguments can be:
+      Returns a reference to a sub, which can then be called upon a data
+      structure in order to get the crumbed version.
 
-        "encoder"
-            details about the encoder, see "Profiles" for the available
-            key-value pairs. In addition, you can also set the following:
+      The input arguments can be:
 
-            "output"
-                the output channel to use for sending encoded data. This can
-                be:
+      encoder
 
-                *   *filename*
+	details about the encoder, see "Profiles" for the available
+	key-value pairs. In addition, you can also set the following:
 
-                    this will be opened in raw mode and used to send the
-                    output
+	output
 
-                *   *filehandle*
+	  the output channel to use for sending encoded data. This can be:
 
-                    used directly
+	    * filename
 
-                *   *array reference*
+	    this will be opened in raw mode and used to send the output
 
-                    each output line will be pushed as a new element in the
-                    array
+	    * filehandle
 
-                *   *object reference*
+	    used directly
 
-                    which is assumed to support the "print()" method, that
-                    will be called with each generated line
+	    * array reference
 
-                *   *sub reference*
+	    each output line will be pushed as a new element in the array
 
-                    which will be called with each generated line
+	    * object reference
 
-        "profile"
-            the name of a profile to use as a base - see "Profiles".
-            Settings in the profile are always overridden by corresponding
-            ones in the provided encoder, if any.
+	    which is assumed to support the print() method, that will be
+	    called with each generated line
+
+	    * sub reference
+
+	    which will be called with each generated line
+
+      profile
+
+	the name of a profile to use as a base - see "Profiles". Settings
+	in the profile are always overridden by corresponding ones in the
+	provided encoder, if any.
 
     encode
-           $dc->encode($data_structure);
 
-        generate the encoding for the provided $data_structure. Output is
-        generated depending on how it is specified, see "crumbr" above.
+         $dc->encode($data_structure);
+
+      generate the encoding for the provided $data_structure. Output is
+      generated depending on how it is specified, see "crumbr" above.
 
     new
-           my $dc = Data::Crumber->new(encoder => \%args);
 
-        create a new instance of "Data::Crumbr". Data provided for the
-        "encoder" parameter (i.e. %args) are those discussed in "Profiles".
+         my $dc = Data::Crumber->new(encoder => \%args);
 
-        The new instance can then be used to encode data using the "/encode"
-        method.
+      create a new instance of Data::Crumbr. Data provided for the encoder
+      parameter (i.e. %args) are those discussed in "Profiles".
 
-AUTHOR
-    Flavio Poletti <polettix@cpan.org>
-
-COPYRIGHT AND LICENSE
-    Copyright (C) 2015 by Flavio Poletti <polettix@cpan.org>
-
-    This module is free software. You can redistribute it and/or modify it
-    under the terms of the Artistic License 2.0.
-
-    This program is distributed in the hope that it will be useful, but
-    without any warranty; without even the implied warranty of
-    merchantability or fitness for a particular purpose.
+      The new instance can then be used to encode data using the /encode
+      method.
 

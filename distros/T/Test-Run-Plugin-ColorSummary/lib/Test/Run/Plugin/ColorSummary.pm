@@ -8,7 +8,8 @@ use 5.008;
 use Moose;
 
 use MRO::Compat;
-use Term::ANSIColor;
+use Term::ANSIColor qw/ color /;
+
 # Needed for ->autoflush()
 use IO::Handle;
 
@@ -21,21 +22,20 @@ colors the summary.
 
 =head1 VERSION
 
-0.0202
+0.0203
 
 =cut
 
-our $VERSION = '0.0202';
+our $VERSION = '0.0203';
 
-has 'summary_color_failure' => (is => "rw", isa => "Str");
-has 'summary_color_success' => (is => "rw", isa => "Str");
-
+has 'summary_color_failure' => ( is => "rw", isa => "Str" );
+has 'summary_color_success' => ( is => "rw", isa => "Str" );
 
 sub _get_failure_summary_color
 {
     my $self = shift;
-    return $self->summary_color_failure() ||
-        $self->_get_default_failure_summary_color();
+    return $self->summary_color_failure()
+        || $self->_get_default_failure_summary_color();
 }
 
 sub _get_default_failure_summary_color
@@ -46,8 +46,8 @@ sub _get_default_failure_summary_color
 sub _get_success_summary_color
 {
     my $self = shift;
-    return $self->summary_color_success() ||
-        $self->_get_default_success_summary_color();
+    return $self->summary_color_success()
+        || $self->_get_default_success_summary_color();
 }
 
 sub _get_default_success_summary_color
@@ -97,7 +97,7 @@ in L<Term::ANSIColor>.
 sub _report_success
 {
     my $self = shift;
-    print color($self->_get_success_summary_color());
+    print color( $self->_get_success_summary_color() );
     $self->next::method();
     print color("reset");
 }
@@ -111,13 +111,15 @@ the documentation is the code.
 
 sub _handle_runtests_error_text
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $text = $args->{'text'};
 
     STDERR->autoflush();
     $text =~ s{\n\z}{};
-    die color($self->_get_failure_summary_color()).$text.color("reset")."\n";
+    die color( $self->_get_failure_summary_color() )
+        . $text
+        . color("reset") . "\n";
 }
 
 1;
@@ -143,10 +145,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::Plugin::ColorSummary>
 
 =item * CPAN Ratings
 

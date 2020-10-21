@@ -1,5 +1,5 @@
 package WebService::Blogger;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 use warnings;
 use strict;
 
@@ -78,7 +78,7 @@ sub BUILD {
     my $response = $self->{'ua'}->post('https://accounts.google.com/o/oauth2/auth',
           { basic_authentication => $self->{'base64'},
         	Content_Type         => 'application/x-www-form-urlencoded',
-        	grant_type           => 'client_credentials', 
+        	grant_type           => 'client_credentials',
         	client_id            => $self->{'key'},
         	client_secret        => $self->{'secret'},
           }
@@ -192,18 +192,15 @@ __END__
 
 =head1 NAME
 
-WebService::Blogger - Interface to Google's Blogger service
-
-#############################################################################
-This module is currently under modifications by a new author in order
-to support Google's new authentication method.
-
-Standby for updates
-#############################################################################
+WebService::Blogger - (DEPRECATED) Interface to Google's Blogger service
 
 =cut
 
 =head1 SYNOPSIS
+
+B<DEPRECATION NOTICE.> This module no longer works and is deprecated. In fact,
+as of this writing (2020-10-21), none of the CPAN modules for Blogger currently
+work.
 
 This module provides interface to the Blogger service now run by
 Google. It's built in object-oriented fashion with L<Moose>, which makes
@@ -332,4 +329,3 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-

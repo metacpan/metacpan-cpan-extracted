@@ -1,5 +1,17 @@
 Revision history for CPAN distribution Sys-Filesystem
 
+1.408	2020-10-30
+    - add correct (Apache 2.0) license to meta-data
+    - re-release 1.407_001 without further changes
+
+1.407_001	2020-09-29
+    - improve distribution quality with new author tests
+    - Cygwin: ensure "/" is returned (Fixes RT#102669), thanks to Christian
+      Carey for reporting and providing the fix and to Christian Walde for
+      verifying
+    - Fix minor typos in the POD (Thanks to Mohammad S Anwar)
+    - Mention Sys::Filesystem::MountPoint (fixes RT#61988)
+
 1.406 2014-05-13
     - always use global kernel mount table (/proc/mounts), not the process
       mirror

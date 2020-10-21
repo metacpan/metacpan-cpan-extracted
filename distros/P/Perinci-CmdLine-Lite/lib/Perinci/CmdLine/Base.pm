@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Base;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-26'; # DATE
+our $DATE = '2020-10-21'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.829'; # VERSION
+our $VERSION = '1.900'; # VERSION
 
 use 5.010001;
 use strict;
@@ -433,6 +433,278 @@ _
 
 );
 
+# plugin stuffs
+our @Plugin_Instances;
+our %Handlers; # key=event name, val=[ [$label, $prio, $handler, $epoch], ... ]
+
+my $r;
+
+sub __plugin_run_event {
+    my %args = @_;
+
+    my $name = $args{name};
+    {
+        local $args{code} = '...';
+        local $args{r} = '...';
+        log_trace "[pericmd] -> run_event(%s)", \%args;
+    }
+    defined $name or die "Please supply 'name'";
+    $Handlers{$name} ||= [];
+
+    my $before_name = "before_$name";
+    $Handlers{$before_name} ||= [];
+
+    my $after_name = "after_$name";
+    $Handlers{$after_name} ||= [];
+
+    my $req_handler                          = $args{req_handler};                          $req_handler                          = 0 unless defined $req_handler;
+    my $run_all_handlers                     = $args{run_all_handlers};                     $run_all_handlers                     = 1 unless defined $run_all_handlers;
+    my $allow_before_handler_to_cancel_event = $args{allow_before_handler_to_cancel_event}; $allow_before_handler_to_cancel_event = 1 unless defined $allow_before_handler_to_cancel_event;
+    my $allow_before_handler_to_skip_rest    = $args{allow_before_handler_to_skip_rest};    $allow_before_handler_to_skip_rest    = 1 unless defined $allow_before_handler_to_skip_rest;
+    my $allow_handler_to_skip_rest           = $args{allow_handler_to_skip_rest};           $allow_handler_to_skip_rest           = 1 unless defined $allow_handler_to_skip_rest;
+    my $allow_handler_to_repeat_event        = $args{allow_handler_to_repeat_event};        $allow_handler_to_repeat_event        = 1 unless defined $allow_handler_to_repeat_event;
+    my $allow_after_handler_to_repeat_event  = $args{allow_after_handler_to_repeat_event};  $allow_after_handler_to_repeat_event  = 1 unless defined $allow_after_handler_to_repeat_event;
+    my $allow_after_handler_to_skip_rest     = $args{allow_after_handler_to_skip_rest};     $allow_after_handler_to_skip_rest     = 1 unless defined $allow_after_handler_to_skip_rest;
+    my $stop_after_first_handler_failure     = $args{stop_after_first_handler_failure};     $stop_after_first_handler_failure     = 1 unless defined $stop_after_first_handler_failure;
+
+    my ($res, $is_success);
+
+  RUN_BEFORE_EVENT_HANDLERS:
+    {
+        last if $name =~ /\A(after|before)_/;
+        local $r->{event} = $before_name;
+        my $i = 0;
+        for my $rec (@{ $Handlers{$before_name} }) {
+            $i++;
+            my ($label, $prio, $handler) = @$rec;
+            log_trace "[pericmd] [event %s] [%d/%d] -> handler %s ...",
+                $before_name, $i, scalar(@{ $Handlers{$before_name} }), $label;
+            $res = $handler->($r);
+            $is_success = $res->[0] =~ /\A[123]/;
+            log_trace "[pericmd] [event %s] [%d/%d] <- handler %s: %s (%s)",
+                $before_name, $i, scalar(@{ $Handlers{$before_name} }), $label,
+                $res, $is_success ? "success" : "fail";
+            if ($res->[0] == 601) {
+                if ($allow_before_handler_to_cancel_event) {
+                    log_trace "[pericmd] Cancelling event $name (status 601)";
+                    goto RETURN;
+                } else {
+                    die "$before_name handler returns 601 when allow_before_handler_to_cancel_event is set to false";
+                }
+            }
+            if ($res->[0] == 201) {
+                if ($allow_before_handler_to_skip_rest) {
+                    log_trace "[pericmd] Skipping the rest of the $before_name handlers (status 201)";
+                    last RUN_BEFORE_EVENT_HANDLERS;
+                } else {
+                    log_trace "[pericmd] $before_name handler returns 201, but we ignore it because allow_before_handler_to_skip_rest is set to false";
+                }
+            }
+        }
+    }
+
+  RUN_EVENT_HANDLERS:
+    {
+        local $r->{event} = $name;
+        my $i = 0;
+        $res = [304, "There is no handler for event $name"];
+        $is_success = 1;
+        if ($req_handler) {
+            die "There is no handler for event $name"
+                unless @{ $Handlers{$name} };
+        }
+
+        for my $rec (@{ $Handlers{$name} }) {
+            $i++;
+            my ($label, $prio, $handler) = @$rec;
+            log_trace "[pericmd] [event %s] [%d/%d] -> handler %s ...",
+                $name, $i, scalar(@{ $Handlers{$name} }), $label;
+            $res = $handler->($r);
+            $is_success = $res->[0] =~ /\A[123]/;
+            log_trace "[pericmd] [event %s] [%d/%d] <- handler %s: %s (%s)",
+                $name, $i, scalar(@{ $Handlers{$name} }), $label,
+                $res, $is_success ? "success" : "fail";
+            last RUN_EVENT_HANDLERS if $is_success && !$run_all_handlers;
+            if ($res->[0] == 601) {
+                die "$name handler is not allowed to return 601";
+            }
+            if ($res->[0] == 602) {
+                if ($allow_handler_to_repeat_event) {
+                    log_trace "[pericmd] Repeating event $name (handler returns 602)";
+                    goto RUN_EVENT_HANDLERS;
+                } else {
+                    die "$name handler returns 602 when allow_handler_to_repeat_event is set to false";
+                }
+            }
+            if ($res->[0] == 201) {
+                if ($allow_handler_to_skip_rest) {
+                    log_trace "[pericmd] Skipping the rest of the $name handlers (status 201)";
+                    last RUN_EVENT_HANDLERS;
+                } else {
+                    log_trace "[pericmd] $name handler returns 201, but we ignore it because allow_handler_to_skip_rest is set to false";
+                }
+            }
+            last RUN_EVENT_HANDLERS if !$is_success && $stop_after_first_handler_failure;
+        }
+    }
+
+    if ($is_success && $args{on_success}) {
+        log_trace "[pericmd] Running on_success ...";
+        $args{on_success}->($r);
+    } elsif (!$is_success && $args{on_failure}) {
+        log_trace "[pericmd] Running on_failure ...";
+        $args{on_failure}->($r);
+    }
+
+  RUN_AFTER_EVENT_HANDLERS:
+    {
+        last if $name =~ /\A(after|before)_/;
+        local $r->{event} = $after_name;
+        my $i = 0;
+        for my $rec (@{ $Handlers{$after_name} }) {
+            $i++;
+            my ($label, $prio, $handler) = @$rec;
+            log_trace "[pericmd] [event %s] [%d/%d] -> handler %s ...",
+                $after_name, $i, scalar(@{ $Handlers{$after_name} }), $label;
+            $res = $handler->($r);
+            $is_success = $res->[0] =~ /\A[123]/;
+            log_trace "[pericmd] [event %s] [%d/%d] <- handler %s: %s (%s)",
+                $after_name, $i, scalar(@{ $Handlers{$after_name} }), $label,
+                $res, $is_success ? "success" : "fail";
+            if ($res->[0] == 602) {
+                if ($allow_after_handler_to_repeat_event) {
+                    log_trace "[pericmd] Repeating event $name (status 602)";
+                    goto RUN_EVENT_HANDLERS;
+                } else {
+                    die "$after_name handler returns 602 when allow_after_handler_to_repeat_event it set to false";
+                }
+            }
+            if ($res->[0] == 201) {
+                if ($allow_after_handler_to_skip_rest) {
+                    log_trace "[pericmd] Skipping the rest of the $after_name handlers (status 201)";
+                    last RUN_AFTER_EVENT_HANDLERS;
+                } else {
+                    log_trace "[pericmd] $after_name handler returns 201, but we ignore it because allow_after_handler_to_skip_rest is set to false";
+                }
+            }
+        }
+    }
+
+  RETURN:
+    log_trace "[pericmd] <- run_event(name=%s)", $name;
+    undef;
+}
+
+my $handler_seq = 0;
+sub __plugin_add_handler {
+    my ($event, $label, $prio, $handler) = @_;
+
+    # XXX check for known events?
+    $Handlers{$event} ||= [];
+
+    # keep sorted
+    splice @{ $Handlers{$event} }, 0, scalar(@{ $Handlers{$event} }),
+        (sort { $a->[1] <=> $b->[1] || $a->[3] <=> $b->[3] } @{ $Handlers{$event} },
+         [$label, $prio, $handler, $handler_seq++]);
+}
+
+sub __plugin_activate_single {
+    my ($plugin_name0, $args) = @_;
+
+    my ($plugin_name, $wanted_event, $wanted_prio) =
+        $plugin_name0 =~ /\A(\w+(?:::\w+)*)(?:\@(\w+)(?:\@(\d+))?)?\z/
+        or die "Invalid plugin name syntax, please use Foo::Bar or ".
+        "Foo::Bar\@event or Foo::Bar\@event\@prio\n";
+
+    local $r->{plugin_name} = $plugin_name;
+    local $r->{plugin_args} = $args;
+
+    __plugin_run_event(
+        name => 'activate_plugin',
+        on_success => sub {
+            my $package = "Perinci::CmdLine::Plugin::$plugin_name";
+            (my $package_pm = "$package.pm") =~ s!::!/!g;
+            log_trace "[pericmd] Loading module $package ...";
+            require $package_pm;
+            my $obj = $package->new(%{ $args || {} });
+            $obj->activate($wanted_event, $wanted_prio);
+        },
+        on_failure => sub {
+            die "Cannot activate plugin $plugin_name";
+        },
+    );
+}
+
+sub __plugin_unflatten_import {
+    my ($env, $what) = @_;
+
+    $what ||= "import";
+    my @imports;
+    my $plugin_name0;
+    my @plugin_args;
+
+    my @elems = ref $env eq 'ARRAY' ? @$env : split /,/, $env;
+    while (@elems) {
+        my $el = shift @elems;
+        # dash prefix to disambiguate between plugin name and arguments, e.g.
+        # '-PluginName,argname,argval,argname2,argval2,-Plugin2Name,...'
+        if ($el =~ /\A-(\w+(?:::\w+)*(?:\@.+)?)\z/) {
+            if (defined $plugin_name0) {
+                push @imports, $plugin_name0;
+                push @imports, {@plugin_args} if @plugin_args;
+            }
+            $plugin_name0 = $1;
+            @plugin_args = ();
+            if (!@elems) {
+                push @imports, $1;
+            }
+        } else {
+            die "Invalid syntax in $what, first element needs to be ".
+                "a plugin name (e.g. -Foo), not '$el'"
+                unless defined $plugin_name0;
+                push @plugin_args, $el;
+            if (!@elems) {
+                push @imports, $plugin_name0;
+                push @imports, {@plugin_args} if @plugin_args;
+            }
+        }
+    }
+    @imports;
+}
+
+sub __plugin_activate_plugins {
+    while (@_) {
+        my $plugin_name0 = shift;
+        my $plugin_args = @_ && ref($_[0]) eq 'HASH' ? shift : {};
+        __plugin_activate_single($plugin_name0, $plugin_args);
+    }
+}
+
+my $has_read_env;
+sub __plugin_activate_plugins_in_env {
+    last if $has_read_env;
+
+  READ_PERINCI_CMDLINE_PLUGINS:
+    {
+        last unless defined $ENV{PERINCI_CMDLINE_PLUGINS};
+        log_trace "[pericmd] Reading env variable PERINCI_CMDLINE_PLUGINS ...";
+        __plugin_activate_plugins(__plugin_unflatten_import($ENV{PERINCI_CMDLINE_PLUGINS}, "PERINCI_CMDLINE_PLUGINS"));
+        $has_read_env++;
+        return;
+    }
+
+  READ_PERINCI_CMDLINE_PLUGINS_JSON:
+    {
+        last unless defined $ENV{PERINCI_CMDLINE_JSON};
+        require JSON::PP;
+        log_trace "[pericmd] Reading env variable PERINCI_CMDLINE_PLUGINS_JSON ...";
+        my $imports = JSON::PP::decode_json($ENV{PERINCI_CMDLINE_PLUGINS_JSON});
+        __plugin_active_plugins(@$imports);
+        $has_read_env++;
+        return;
+    }
+}
+
 sub __default_env_name {
     my ($prog) = @_;
 
@@ -587,7 +859,10 @@ sub do_dump_object {
 
     # additional information, because scripts often put their metadata in 'main'
     # package
-    $self->{'x.main.spec'} = \%main::SPEC;
+    {
+        no warnings 'once';
+        $self->{'x.main.spec'} = \%main::SPEC;
+    }
 
     my $label = $ENV{PERINCI_CMDLINE_DUMP_OBJECT} //
         $ENV{PERINCI_CMDLINE_DUMP}; # old name that will be removed
@@ -1036,10 +1311,12 @@ sub _parse_argv2 {
             log_trace("[pericmd] Running hook_after_read_config_file ...");
             $self->hook_after_read_config_file($r);
 
+            my @plugins;
             my $res = Perinci::CmdLine::Util::Config::get_args_from_config(
                 r                  => $r,
                 config             => $r->{config},
                 args               => \%args,
+                plugins            => \@plugins,
                 program_name       => $self->program_name,
                 subcommand_name    => $r->{subcommand_name},
                 config_profile     => $r->{config_profile},
@@ -1048,6 +1325,26 @@ sub _parse_argv2 {
                 meta_is_normalized => 1,
             );
             die $res unless $res->[0] == 200;
+
+            # interpret special parameters (/^-foo/). these will not be
+            # arguments passed to function but instead treated specially
+          TREAT_SPECIAL_PARAMS: {
+
+              PLUGINS_FROM_DASH_PLUGINS: {
+                    my $plugins = delete $args{-plugins};
+                    last unless defined $plugins;
+                    __plugin_activate_plugins(
+                        ref $plugins eq 'ARRAY' ? @$plugins :
+                            __plugin_unflatten_import($plugins)
+                        );
+                } # PLUGINS_FROM_DASH_PLUGINS
+
+              PLUGINS_FROM_CONFIG_SECTIONS: {
+                    last unless @plugins;
+                    __plugin_activate_plugins(@plugins);
+                } # PLUGINS_FROM_CONFIG_SECTIONS
+            } # TREAT_SPECIAL_PARAMS
+
             log_trace("[pericmd] args after reading config files: %s",
                          \%args);
             my $found = $res->[3]{'func.found'};
@@ -1436,12 +1733,13 @@ sub select_output_handle {
     $r->{output_handle} = $handle;
 }
 
+# TODO: move to plugins
 sub save_output {
     my ($self, $r, $dir) = @_;
     $dir //= $ENV{PERINCI_CMDLINE_OUTPUT_DIR};
 
     unless (-d $dir) {
-        warn "Can't save output to $dir: doesn't exist or not a directory,skipped saving program output";
+        warn "Can't save output to $dir: doesn't exist or not a directory, skipped saving program output";
         return;
     }
 
@@ -1580,9 +1878,12 @@ sub run {
 
     my $co = $self->common_opts;
 
-    my $r = {
+    $r = {
         orig_argv   => [@ARGV],
         common_opts => $co,
+        plugin_instances => \@Plugin_Instances,
+        handlers => \%Handlers,
+        cmdline => $self,
     };
 
     # dump object is special case, we delegate to do_dump_object()
@@ -1696,12 +1997,17 @@ sub run {
             goto FORMAT;
         }
         log_trace("[pericmd] Running %s() ...", $meth);
-        $r->{res} = $self->$meth($r);
-        #log_trace("[pericmd] res=%s", $r->{res}); #1
+        __plugin_run_event(
+            name => 'action',
+            on_success => sub {
+                $r->{res} = $self->$meth($r);
+            },
+        );
 
         log_trace("[pericmd] Running hook_after_action ...");
         $self->hook_after_action($r);
     };
+
     my $err = $@;
     if ($err || !$r->{res}) {
         if ($err) {
@@ -1807,7 +2113,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.829 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-05-26.
+This document describes version 1.900 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-10-21.
 
 =head1 DESCRIPTION
 
@@ -1950,6 +2256,86 @@ L<Perinci::Sub::Complete>'s C<complete_cli_arg>.
 
 The result is then output to STDOUT (resume from Run hook_format_result step in
 the normal program flow).
+
+=head1 PLUGINS
+
+My long-term goal is to have L<ScriptX> (which is a plugin-oriented framework)
+as a replacement for Perinci::CmdLine. Since L<ScriptX> is still in early
+development, I am adding plugin support to Perinci::CmdLine too (as of 1.900).
+Plugin support is similar to how ScriptX does plugins. Documentation is
+currently sparse; please see existing plugins in Perinci::CmdLine::Plugin::*,
+the ScriptX documentation, as well as the source code directly to get an idea of
+how plugin works. These are the characteristics of the plugin system: you can
+customize at which event any plugin runs (flexibility), you can customize the
+priority of each plugin for an event (flexibility), a "before-event-foo" plugin
+can cancel the "foo" event, an "after-event-foo" plugin can repeat the "foo"
+event.
+
+With plugin support, the hook_*() methods will be phased out eventually. Some
+features will be moved to plugins in subsequent releases. More plugins will be
+added, either in this distribution, or in separate distributions. More events
+will be added to add more "hooks".
+
+=head2 Plugin events
+
+=over
+
+=item * activate_plugin
+
+This event can be used to disable other plugins (see
+L<Perinci::CmdLine::Plugin::DisablePlugin>) or do things when a plugin is
+loaded.
+
+=item * validate_args
+
+Before this event, C<< $r->{args} >> is already set to the input arguments, but
+they are not validated yet.
+
+After this event, C<< $r->{args} >> should have already been validated.
+
+=item * action
+
+After this event, C<< $r->{res} >> should have already been set to the result.
+
+=back
+
+=head2 Activating plugins
+
+=over
+
+=item * From the source code
+
+(Currently no public API, but you can see the source code, particularly the
+C<__plugin_activate_plugins()> function).
+
+=item * From configuration file (special parameter C<-plugins>)
+
+Special parameters C<-plugins> will activate plugins, e.g.:
+
+ -plugins = -DumpArgs
+
+another example:
+
+ -plugins = ["-DumpArgs", "-DumpRes"]
+
+=item * From configuration file ([plugin=...] sections)
+
+For example:
+
+ [plugin=DumpArgs]
+
+ [plugin=DumpArgs]
+ -event=before_validation
+
+ [plugin=DisablePlugins]
+ plugins = DumpArgs,DumpConfig
+
+=item * From environment variable
+
+See L</PERINCI_CMDLINE_PLUGINS> and L</PERINCI_CMDLINE_PLUGINS_JSON> under
+L</ENVIRONMENT>.
+
+=back
 
 =head1 REQUEST KEYS
 
@@ -2293,6 +2679,10 @@ metadata attribute.
 =head2 attribute: x.perinci.cmdline.base.exit_code => int
 
 This is added by this module, so exit code can be tested.
+
+=head1 CONFIGURATION FILE SUPPORT
+
+TBD.
 
 =head1 ATTRIBUTES
 
@@ -2804,6 +3194,25 @@ L<Data::Clean::JSON>.
 Streaming output will not be saved appropriately, because streaming output
 contains coderef that will be called repeatedly during the normal displaying of
 result.
+
+=head2 PERINCI_CMDLINE_PLUGINS
+
+String. A list of plugins to load at the start of program. Format:
+
+ -PluginName1,arg1name,arg1val,arg2name,arg2val,...,-PluginName2,...
+
+Plugin name is module name without the C<Perinci::CmdLine::Plugin::> prefix. The
+argument list can be skipped if you don't want to pass arguments to a plugin.
+
+=head2 PERINCI_CMDLINE_PLUGINS_JSON
+
+String. Like L</PERINCI_CMDLINE_PLUGINS> but assumed to be in JSON encoding, to
+be able to encode data structure (for complex arguments). Syntax:
+
+ ["PluginName1",{"arg1name":"arg1val","arg2name":"arg2val",...},"PluginName2", ...]
+
+Plugin name is module name without the C<Perinci::CmdLine::Plugin::> prefix. The
+hash can be skipped if you don't want to pass arguments to a plugin.
 
 =head2 PERINCI_CMDLINE_PROGRAM_NAME
 

@@ -2,8 +2,8 @@ NAME
     Filename::Video - Check whether filename indicates being a video file
 
 VERSION
-    This document describes version 0.002 of Filename::Video (from Perl
-    distribution Filename-Video), released on 2020-04-01.
+    This document describes version 0.003 of Filename::Video (from Perl
+    distribution Filename-Video), released on 2020-05-30.
 
 SYNOPSIS
      use Filename::Video qw(check_video_filename);
@@ -36,6 +36,8 @@ SEE ALSO
     Filename::Audio
 
     Filename::Image
+
+    Filename::Ebook
 
     Filename::Media
 

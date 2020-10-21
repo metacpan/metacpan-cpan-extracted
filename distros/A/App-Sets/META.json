@@ -4,7 +4,7 @@
       "Flavio Poletti <polettix@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -21,31 +21,31 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Log4perl::Tiny" : "1.002_003",
-            "perl" : "5.010_000"
+            "Log::Log4perl::Tiny" : "1.002003",
+            "perl" : "5.010000"
          }
       }
    },
    "provides" : {
       "App::Sets" : {
          "file" : "lib/App/Sets.pm",
-         "version" : "0.976"
+         "version" : "0.978"
       },
       "App::Sets::Iterator" : {
          "file" : "lib/App/Sets/Iterator.pm",
-         "version" : "0.976"
+         "version" : "0.978"
       },
       "App::Sets::Operations" : {
          "file" : "lib/App/Sets/Operations.pm",
-         "version" : "0.976"
+         "version" : "0.978"
       },
       "App::Sets::Parser" : {
          "file" : "lib/App/Sets/Parser.pm",
-         "version" : "0.976"
+         "version" : "0.978"
       },
       "App::Sets::Sort" : {
          "file" : "lib/App/Sets/Sort.pm",
-         "version" : "0.976"
+         "version" : "0.978"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,8 @@
          "web" : "https://github.com/polettix/App-sets"
       }
    },
-   "version" : "0.976"
+   "version" : "0.978",
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

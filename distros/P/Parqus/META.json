@@ -45,7 +45,7 @@
          "web" : "https://github.com/davewood/parqus"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.22.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }

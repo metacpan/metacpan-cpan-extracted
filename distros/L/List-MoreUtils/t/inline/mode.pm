@@ -8,7 +8,7 @@ SCOPE:
     my $lorem =
       "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.";
     my @lorem = grep { $_ } split /(?:\b|\s)/, $lorem;
-    my $fl = freeze(\@lorem);
+    my $fl    = freeze(\@lorem);
 
     my $n_comma = scalar(split /,/, $lorem) - 1;
 
@@ -16,8 +16,8 @@ SCOPE:
     is($fl, freeze(\@lorem), "mode:G_ARRAY lorem untouched");
     is_deeply([$n_comma, ','], \@m, "lorem mode as list");
     my $m = mode @lorem;
-    is($fl, freeze(\@lorem), "mode:G_SCALAR lorem untouched");
-    is($n_comma, $m, "lorem mode as scalar");
+    is($fl,      freeze(\@lorem), "mode:G_SCALAR lorem untouched");
+    is($n_comma, $m,              "lorem mode as scalar");
 }
 
 SCOPE:
@@ -29,7 +29,7 @@ SCOPE:
     is_deeply([7, 4], \@m, "unimodal result in list context");
     my $m = mode @probes;
     is($fp, freeze(\@probes), "mode:G_SCALAR probes untouched");
-    is(7, $m, "unimodal result in scalar context");
+    is(7,   $m,               "unimodal result in scalar context");
 }
 
 SCOPE:
@@ -44,7 +44,7 @@ SCOPE:
     is_deeply([7, 4, 8], \@m, "bimodal result in list context");
     $m = mode @probes;
     is($fp, freeze(\@probes), "bimodal mode:G_SCALAR probes untouched");
-    is(7, $m, "bimodal result in scalar context");
+    is(7,   $m,               "bimodal result in scalar context");
 }
 
 SCOPE:
@@ -361,27 +361,27 @@ SCOPE:
 leak_free_ok(
     'mode (unimodal)' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4);
-        my @m = mode @probes;
+        my @m      = mode @probes;
     },
     'scalar mode (unimodal)' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4);
-        my $m = mode @probes;
+        my $m      = mode @probes;
     },
     'mode (bimodal)' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4, (7) x 3, (8) x 7);
-        my @m = mode @probes;
+        my @m      = mode @probes;
     },
     'scalar mode (bimodal)' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4, (7) x 3, (8) x 7);
-        my $m = mode @probes;
+        my $m      = mode @probes;
     },
     'mode (multimodal)' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4, (7) x 3, (8) x 7, (9) x 4, (10) x 3, (11) x 7);
-        my @m = mode @probes;
+        my @m      = mode @probes;
     },
     'scalar mode (multimodal)' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4, (7) x 3, (8) x 7, (9) x 4, (10) x 3, (11) x 7);
-        my $m = mode @probes;
+        my $m      = mode @probes;
     },
 );
 
@@ -420,7 +420,7 @@ leak_free_ok(
         eval {
             my $obj    = DieOnStringify->new;
             my @probes = (
-                (1) x 3, $obj, (2) x 4, $obj, (3) x 2, $obj, (4) x 7, $obj, (5) x 2, $obj, (6) x 4, $obj,
+                (1) x 3, $obj, (2) x 4, $obj, (3) x 2, $obj, (4) x 7,  $obj, (5) x 2, $obj, (6) x 4, $obj,
                 (7) x 3, $obj, (8) x 7, $obj, (9) x 4, $obj, (10) x 3, $obj, (11) x 7
             );
             my @m = mode @probes;
@@ -430,7 +430,7 @@ leak_free_ok(
         eval {
             my $obj    = DieOnStringify->new;
             my @probes = (
-                (1) x 3, $obj, (2) x 4, $obj, (3) x 2, $obj, (4) x 7, $obj, (5) x 2, $obj, (6) x 4, $obj,
+                (1) x 3, $obj, (2) x 4, $obj, (3) x 2, $obj, (4) x 7,  $obj, (5) x 2, $obj, (6) x 4, $obj,
                 (7) x 3, $obj, (8) x 7, $obj, (9) x 4, $obj, (10) x 3, $obj, (11) x 7
             );
             my $m = mode @probes;

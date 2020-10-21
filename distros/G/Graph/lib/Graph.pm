@@ -16,23 +16,20 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-use vars qw($VERSION);
-
-$VERSION = '0.9704';
+our $VERSION = '0.9706';
 
 require 5.006; # Weak references are absolutely required.
 
-my $can_deep_copy_Storable =
-  eval {
-    require Storable;
-    require B::Deparse;
-    Storable->VERSION(2.05);
-    B::Deparse->VERSION(0.61);
-    1;
-  };
-
+my $can_deep_copy_Storable;
 sub _can_deep_copy_Storable () {
-    return $can_deep_copy_Storable;
+    return $can_deep_copy_Storable if defined $can_deep_copy_Storable;
+    eval {
+        require Storable;
+        require B::Deparse;
+        Storable->VERSION(2.05);
+        B::Deparse->VERSION(0.61);
+    };
+    $can_deep_copy_Storable = !$@;
 }
 
 use Graph::AdjacencyMap::Heavy;
@@ -45,11 +42,9 @@ use Graph::MSTHeapElem;
 use Graph::SPTHeapElem;
 use Graph::Undirected;
 
-use Heap071::Fibonacci;
+use Heap::Fibonacci;
 use List::Util qw(shuffle first);
 use Scalar::Util qw(weaken);
-
-use Safe;  # For deep_copy().
 
 sub _F () { 0 } # Flags.
 sub _G () { 1 } # Generation.
@@ -911,7 +906,7 @@ sub _all_successors {
       }
     }
     for my $v (@init) {
-      delete $seen{$v} unless $g->has_edge($v, $v) || $self{$v};
+      delete $seen{$v} unless $g->has_edge($v, $v) || exists $self{$v};
     }
     return values %seen;
 }
@@ -1748,7 +1743,9 @@ sub copy {
 
 sub _deep_copy_Storable {
     my $g = shift;
+    require Safe;   # For deep_copy().
     my $safe = new Safe;
+    $safe->permit(qw/:load/);
     local $Storable::Deparse = 1;
     local $Storable::Eval = sub { $safe->reval($_[0]) };
     return Storable::thaw(Storable::freeze($g));
@@ -1756,6 +1753,7 @@ sub _deep_copy_Storable {
 
 sub _deep_copy_DataDumper {
     my $g = shift;
+    require Data::Dumper;
     my $d = Data::Dumper->new([$g]);
     use vars qw($VAR1);
     $d->Purity(1)->Terse(1)->Deepcopy(1);
@@ -1823,7 +1821,7 @@ sub complete_graph {
 sub complement_graph {
     my $g = shift;
     my $c = $g->new( directed => $g->directed );
-    my @v = $g->vertices05;
+    $c->add_vertices(my @v = $g->vertices05);
     for (my $i = 0; $i <= $#v; $i++ ) {
 	for (my $j = 0; $j <= $#v; $j++ ) {
 	    next if $i >= $j;
@@ -2429,7 +2427,7 @@ sub _heap_walk {
     my ($g, $h, $add, $etc) = splice @_, 0, 4; # Leave %opt in @_.
 
     my ($opt, $unseenh, $unseena, $r, $next, $code, $attr) = $g->_root_opt(@_);
-    my $HF = Heap071::Fibonacci->new;
+    my $HF = Heap::Fibonacci->new;
 
     while (defined $r) {
         # print "r = $r\n";
@@ -3464,7 +3462,7 @@ sub SP_Dijkstra {
 	$seen{$p}++;
 	last if keys %seen == $V || $u eq $v;
     }
-    @path = () if @path && $path[-1] ne $u;
+    return if !@path or $path[-1] ne $u;
     return reverse @path;
 }
 
@@ -3841,23 +3839,14 @@ sub average_path_length {
     my @A = @_;
     my $d = 0;
     my $m = 0;
-    my $n = $g->for_shortest_paths(sub {
-				       my ($t, $u, $v, $n) = @_;
-				       my $l = $t->path_length($u, $v);
-				       if ($l) {
-					   my $c = @A == 0 ||
-					       (@A == 1 && $u eq $A[0]) ||
-						   ((@A == 2) &&
-						    (defined $A[0] &&
-						     $u eq $A[0]) ||
-						    (defined $A[1] &&
-						     $v eq $A[1]));
-					   if ($c) {
-					       $d += $l;
-					       $m++;
-					   }
-				       }
-				   });
+    $g->for_shortest_paths(sub {
+        my ($t, $u, $v, $n) = @_;
+        return unless my $l = $t->path_length($u, $v);
+        return if defined $A[0] && $u ne $A[0];
+        return if defined $A[1] && $v ne $A[1];
+        $d += $l;
+        $m++;
+    });
     return $m ? $d / $m : undef;
 }
 
@@ -3998,11 +3987,12 @@ sub subgraph_by_radius
 
 sub clustering_coefficient {
     my ($g) = @_;
+    return unless my @v = $g->vertices;
     my %clustering;
 
     my $gamma = 0;
 
-    for my $n ($g->vertices()) {
+    for my $n (@v) {
 	my $gamma_v = 0;
 	my @neigh = $g->successors($n);
 	my %c;
@@ -4023,7 +4013,7 @@ sub clustering_coefficient {
 	}
     }
 
-    $gamma /= $g->vertices();
+    $gamma /= @v;
 
     return wantarray ? ($gamma, %clustering) : $gamma;
 }

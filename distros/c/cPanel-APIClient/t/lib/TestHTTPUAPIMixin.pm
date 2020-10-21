@@ -17,6 +17,21 @@ use Test::More;
 use Test::Deep;
 use Test::Fatal;
 
+use constant _CP_REQUIRE => (
+    'MockCpsrvd::cpanel',
+);
+
+sub _set_up_servers : Tests(startup) {
+    my ($self) = @_;
+
+    my $server = MockCpsrvd::cpanel->new();
+    $cPanel::APIClient::Service::cpanel::_PORT = $server->get_port();
+
+    push @{ $self->{'_servers'} }, $server;
+
+    return;
+}
+
 sub no_answer_uapi : Tests(1) {
     my ($self) = shift;
 

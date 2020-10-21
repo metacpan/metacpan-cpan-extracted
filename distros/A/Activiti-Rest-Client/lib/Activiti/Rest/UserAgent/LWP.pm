@@ -20,8 +20,8 @@ sub _build_ua {
     timeout => $self->timeout()
   );
   if(is_string($ENV{LWP_TRACE})){
-    $ua->add_handler("request_send",  sub { shift->dump; return });
-    $ua->add_handler("response_done", sub { shift->dump; return });
+    $ua->add_handler("request_send",  sub { print STDERR shift->as_string; return });
+    $ua->add_handler("response_done", sub { print STDERR shift->as_string; return });
   }
   for my $header(@{ $self->default_headers() }){
     $ua->default_header($header->[0] => $header->[1]);

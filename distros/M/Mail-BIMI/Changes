@@ -1,3 +1,8 @@
+2.20201020.2 2020-10-20 UTC
+  - Better error for an invalid VMC extension
+  - Better attributes for requested vs retrieved domain/selector
+  - Invalidate cache on version change
+
 2.20201019.2 2020-10-19 UTC
   - VMC MUST have a .pem extension
   - Option to limit redirects followed by http client

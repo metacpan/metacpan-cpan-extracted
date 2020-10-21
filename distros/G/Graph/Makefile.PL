@@ -1,7 +1,7 @@
+use strict; use warnings;
 use ExtUtils::MakeMaker;
 
 require 5.006;
-use Getopt::Long;
 
 my $mm_ver = $ExtUtils::MakeMaker::VERSION;
 if ($mm_ver =~ /_/) { # dev version
@@ -9,19 +9,11 @@ if ($mm_ver =~ /_/) { # dev version
     die $@ if $@;
 }
 
-my $renum;
-
-GetOptions('renumber' => \$renum);
-
-do 'util/renum.pl' if $renum;
-
-my %PREREQ_PM =
-    (
+my %PREREQ_PM = (
     'List::Util'	=> 0,
     'Scalar::Util'	=> 0,
-    'Math::Complex'	=> 0,
-    'Test::More'	=> 0
-    );
+    'Heap'	        => '0.80',
+);
 
 if ($] >= 5.008) {
     $PREREQ_PM{'Storable'} = '2.05';
@@ -49,16 +41,23 @@ WriteMakefile(
         : (META_MERGE => {
             'meta-spec' => { version => 2 },
             resources => {
-                bugtracker  => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Graph',
+                bugtracker  => { web => 'https://github.com/neilb/Graph/issues' },
                 repository  => {
                     type => 'git',
-                    web  => 'https://github.com/neilbowers/Graph',
-                    url  => 'git://github.com/neilbowers/Graph.git',
+                    web  => 'https://github.com/neilb/Graph',
+                    url  => 'git://github.com/neilb/Graph.git',
                 },
             },
-          })
+            prereqs => {
+                test => {
+                    requires => {
+                        'Test::More'	=> 0,
+                        'Math::Complex'	=> 0,
+                    },
+                },
+            },
+        })
     ),
-
 );
 
 # Some Debian distributions have a broken List::Util (see rt.cpan.org #9568)

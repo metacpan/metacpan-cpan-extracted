@@ -4,7 +4,7 @@
 #############################################################################
 
 package Graph::Easy::As_svg;
-$Graph::Easy::As_svg::VERSION = '0.27';
+$Graph::Easy::As_svg::VERSION = '0.28';
 use 5.010;
 
 
@@ -2127,13 +2127,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Graph::Easy::As_svg - Output a Graph::Easy as Scalable Vector Graphics (SVG)
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -2158,10 +2160,6 @@ X<scalable>
 X<vector>
 X<grafics>
 
-=head1 VERSION
-
-version 0.27
-
 =head1 EXPORT
 
 Exports nothing.
@@ -2178,36 +2176,9 @@ See the LICENSE file for information.
 
 X<tels>
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2004 by Tels.
-
-This is free software, licensed under:
-
-  The GNU General Public License, Version 2, June 1991
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/Graph-Easy-As_svg/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Graph::Easy::As_svg
 
 =head2 Websites
 
@@ -2222,15 +2193,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Graph-Easy-As_svg>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Graph-Easy-As_svg>
+L<https://metacpan.org/release/Graph-Easy-As_svg>
 
 =item *
 
@@ -2239,30 +2202,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Graph-Easy-As_svg>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Graph-Easy-As_svg>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Graph-Easy-As_svg>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Graph-Easy-As_svg>
 
 =item *
 
@@ -2276,7 +2215,7 @@ L<http://cpants.cpanauthors.org/dist/Graph-Easy-As_svg>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/G/Graph-Easy-As_svg>
 
@@ -2313,5 +2252,26 @@ from your repository :)
 L<https://github.com/shlomif/Graph-Easy-As_svg>
 
   git clone https://github.com/shlomif/Graph-Easy-As_svg.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/Graph-Easy-As_svg/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2004 by Tels.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
 
 =cut

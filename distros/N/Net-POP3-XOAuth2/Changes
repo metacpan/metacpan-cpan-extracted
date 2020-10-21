@@ -1,5 +1,10 @@
 Revision history for Perl extension Net-POP3-XOAuth2
 
+0.0.2 2020-10-21T02:31:38Z
+
+0.0.2 2020-10-20T05:30:12Z
+    - Support Office365
+
 0.0.1 2019-08-21T05:49:56Z
 
     - original version

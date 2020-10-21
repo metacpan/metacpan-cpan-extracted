@@ -1,5 +1,5 @@
 package WebService::Blogger::Blog;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 use warnings;
 use strict;
 
@@ -347,4 +347,3 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-

@@ -5,8 +5,10 @@ package A;
 use strict;
 
 use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '0.01';
+
+BEGIN
+{
+    $VERSION = '0.01';
 }
 
 sub dummy { 1 }

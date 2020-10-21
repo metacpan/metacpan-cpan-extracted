@@ -17,14 +17,14 @@ leak_free_ok(
         @e  = indexes { !($_ & 1) } (10 .. 15);
     }
 );
-$lr and is_deeply(\@s, [2 .. 5], "indexes/leak: some");
-$lr and is_deeply(\@n, [],       "indexes/leak: none");
+$lr and is_deeply(\@s, [2 .. 5],  "indexes/leak: some");
+$lr and is_deeply(\@n, [],        "indexes/leak: none");
 $lr and is_deeply(\@o, [1, 3, 5], "indexes/leak: odd");
 $lr and is_deeply(\@e, [0, 2, 4], "indexes/leak: even");
 
 @n = map { $_ + 1 } @o = (0 .. 9);
 @x = indexes { ++$_ > 7 } @o;
-is_deeply(\@o, \@n, "indexes behaves like grep on modified \$_");
+is_deeply(\@o, \@n,      "indexes behaves like grep on modified \$_");
 is_deeply(\@x, [7 .. 9], "indexes/modify");
 
 not_dying(
@@ -48,8 +48,8 @@ leak_free_ok(
     },
 );
 
-$lr and is_deeply(\@s, [2 .. 5], "indexes/leak: some");
-$lr and is_deeply(\@n, [],       "indexes/leak: none");
+$lr and is_deeply(\@s, [2 .. 5],  "indexes/leak: some");
+$lr and is_deeply(\@n, [],        "indexes/leak: none");
 $lr and is_deeply(\@o, [1, 3, 5], "indexes/leak: odd");
 $lr and is_deeply(\@e, [0, 2, 4], "indexes/leak: even");
 

@@ -1,10 +1,9 @@
 ############################################################
 #
-#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
-#   Copyright 2009           Jens Rehsack
+#   Copyright 2009-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -28,14 +27,14 @@ use 5.008001;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA);
+use vars qw($VERSION);
+use parent qw(Sys::Filesystem::Unix);
 
 use Carp qw(croak);
 use Data::Dumper;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.406';
-@ISA     = qw(Sys::Filesystem::Unix);
+$VERSION = '1.408';
 
 sub version()
 {
@@ -60,29 +59,30 @@ my %special_fs = (
     cachefs => 1,
 );
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
-    ref( my $class = shift ) && croak 'Class name required';
+    ref(my $class = shift) && croak 'Class name required';
     my %args = @_;
-    my $self = bless( {}, $class );
+    my $self = bless({}, $class);
     $args{canondev} and $self->{canondev} = 1;
 
     $args{fstab} ||= '/etc/vfstab';
     $args{mtab}  ||= '/etc/mnttab';
 
-    unless ( $self->readFsTab( $args{fstab}, \@fstab_keys, [ 0, 2, 3 ], \%special_fs ) )
+    unless ($self->readFsTab($args{fstab}, \@fstab_keys, [0, 2, 3], \%special_fs))
     {
         croak "Unable to open fstab file ($args{fstab})\n";
     }
 
-    unless ( $self->readMntTab( $args{mtab}, \@mtab_keys, [ 0, 1, 2 ], \%special_fs ) )
+    unless ($self->readMntTab($args{mtab}, \@mtab_keys, [0, 1, 2], \%special_fs))
     {
         croak "Unable to open mtab file ($args{mtab})\n";
     }
 
     delete $self->{canondev};
 
-    $self;
+    return $self;
 }
 
 1;
@@ -159,10 +159,6 @@ The time at which the file system was mounted.
 
 L<Solaris::DeviceTree>
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
@@ -172,11 +168,11 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
-Copyright 2009-2014 Jens Rehsack.
+
+Copyright 2009-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

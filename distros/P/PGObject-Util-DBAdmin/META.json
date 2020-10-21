@@ -4,7 +4,7 @@
       "Chris Travers <chris@efficito.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -57,6 +57,6 @@
          "web" : "https://github.com/ledgersmb/PGObject-Util-DBAdmin"
       }
    },
-   "version" : "v1.1.0",
+   "version" : "v1.2.1",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

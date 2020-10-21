@@ -1,5 +1,5 @@
 package Term::ProgressSpinner; 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use 5.006; use strict; use warnings;
 use IO::Handle; use Term::ANSIColor; use Time::HiRes qw//;
 use Term::Size::Any qw/chars/;
@@ -456,6 +456,7 @@ sub new {
 	my ($pkg, %args) = (shift, ref $_[0] ? %{$_[0]} : @_);
 	$args{$_} and ($VALIDATE{colours}{$args{$_}} or die "Invalid color for $_")
 		for qw/text_color total_color counter_color percent_color percentage_color percentages_color percents_color spinner_color progress_color elapsed_color last_elapsed_color estimate_color last_advance_epoch_color start_epoch_color epoch_color/;
+	$args{precision} ||= 3;
 	return bless {
 		text_color => 'white',
 		total_color => 'white',
@@ -602,11 +603,11 @@ sub advance {
 sub time_advance_elapsed {
 	my ($self) = @_;
 	my %time = ();
-	$time{epoch} = Time::HiRes::time;
-	$time{start_epoch} = $self->start_epoch;
-	$time{last_advance_epoch} = $self->last_advance_epoch || $time{start_epoch};
-	$time{last_elapsed} = $time{epoch} - $time{last_advance_epoch};
-	$time{elapsed} = $time{epoch} - $time{start_epoch};
+	$time{epoch} = sprintf($self->precision, Time::HiRes::time);
+	$time{start_epoch} = sprintf($self->precision, $self->start_epoch);
+	$time{last_advance_epoch} = $self->last_advance_epoch || $time{start_epoch};	
+	$time{last_elapsed} = sprintf($self->precision, $time{epoch} - $time{last_advance_epoch}) + 0;
+	$time{elapsed} = sprintf($self->precision, $time{epoch} - $time{start_epoch}) + 0;
 	for (qw/epoch start_epoch last_advance_epoch last_elapsed elapsed/) {
 		$time{"${_}_second"} = int($time{$_});
 	}
@@ -629,10 +630,10 @@ sub draw {
 		$options{spinner} .= color($ps->text_color);
 		$options{percent} = int( ( $options{counter} / $options{total} ) * 100 );
 		$options{percentage} = ($available / 100) * $options{percent};
-		$options{estimate} = $options{percent} ? (($options{elapsed} / $options{percent}) * 100) - $options{elapsed} : 0; 
+		$options{estimate} = $options{percent} ? sprintf($self->precision, (($options{elapsed} / $options{percent}) * 100) - $options{elapsed}) + 0 : 0; 
 		$options{estimate_second} = int($options{estimate} + 0.5);
 		$options{per_second} = $options{elapsed_seconds} ? 
-			$options{counter} / int($options{elapsed_second})
+			int(($options{counter} / int($options{elapsed_second})) + 0.5)
 			: 0;
 		$options{progress} = sprintf("%s%s%s%s%s",
 			color($ps->progress_color),
@@ -786,6 +787,18 @@ sub last_advance_epoch {
 		$self->{last_advance_epoch} = $val;
 	}
 	return $self->{last_advance_epoch};
+}
+
+sub precision {
+	my ($self, $val) = @_;
+	if (defined $val) {
+		if ($val !~ m/\d+/) {
+			die "last_advance_epoch should be a epoch";
+		}
+		$self->{precision} = $val;
+	}
+	$val = $self->{precision};
+	return "%.${val}f";
 }
 
 sub text_color {
@@ -1000,7 +1013,7 @@ Term::ProgressSpinner - Terminal Progress bars!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -1063,6 +1076,7 @@ Instantiate a new Term::ProgressSpinner Object.
 		output => \*STDERR,
 		progress_spinner_index => 0,
 		progress_spinners => [],
+		precision => 3,
 		message => "{progress} {spinner} processed {percents} of {counter}/{total} {elapsed}/{estimate}",
 		terminal_height => 0,
 		terminal_line => 0,
@@ -1354,6 +1368,10 @@ Specify The height of the current terminal, if not set then Term::Size::Any is u
 
 Specify the line number to render the progress spinner, if not set then the code attempts to detect the current terminal line number.
 
+=head3 precision
+
+Specifiy the precision to render times and durations. The default is 3 decimal places.
+
 =head3 text_color
 
 Specify the colour of the message text. See the COLORS section for valid options.
@@ -1447,6 +1465,12 @@ End the progress spinner.
 Get or Set whether the progress spinner has been drawn already.
 
 	$ps->drawn
+
+=head2 precision
+
+Get or Set the precision of time/duration fields.
+
+	$ps->precision(3); # sets precision to three decimal places
 
 =head2 progress_spinner_index
 

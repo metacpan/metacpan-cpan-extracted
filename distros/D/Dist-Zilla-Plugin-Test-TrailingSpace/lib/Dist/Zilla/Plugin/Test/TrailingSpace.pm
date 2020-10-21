@@ -1,7 +1,5 @@
 package Dist::Zilla::Plugin::Test::TrailingSpace;
 
-our $VERSION = '0.2.0';
-
 use 5.012;
 
 use Moose;
@@ -11,20 +9,22 @@ with qw/Dist::Zilla::Role::TextTemplate Dist::Zilla::Role::PrereqSource/;
 use namespace::autoclean;
 
 has filename_regex => (
-    is => 'ro',
-    isa => 'Str',
-    default => q/(?:\.(?:t|pm|pl|xs|c|h|txt|pod|PL)|README|Changes|TODO|LICENSE)\z/,
+    is      => 'ro',
+    isa     => 'Str',
+    default =>
+        q/(?:\.(?:t|pm|pl|xs|c|h|txt|pod|PL)|README|Changes|TODO|LICENSE)\z/,
 );
 
 around add_file => sub {
-    my ($orig, $self, $file) = @_;
+    my ( $orig, $self, $file ) = @_;
 
     return $self->$orig(
         Dist::Zilla::File::InMemory->new(
-            name => $file->name,
-            content => $self->fill_in_string($file->content,
+            name    => $file->name,
+            content => $self->fill_in_string(
+                $file->content,
                 {
-                    dist => \($self->zilla),
+                    dist           => \( $self->zilla ),
                     filename_regex => $self->filename_regex,
                 }
             )
@@ -34,7 +34,8 @@ around add_file => sub {
 
 # Register the release test prereq as a "develop requires"
 # so it will be listed in "dzil listdeps --author"
-sub register_prereqs {
+sub register_prereqs
+{
     my ($self) = @_;
 
     $self->zilla->register_prereqs(
@@ -42,7 +43,7 @@ sub register_prereqs {
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::TrailingSpace'     => '0.0203',
+        'Test::TrailingSpace' => '0.0203',
     );
 
     return;
@@ -63,7 +64,7 @@ in files.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -115,37 +116,9 @@ for.
 
 =back
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2013 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Test-TrailingSpa
-ce or by email to bug-dist-zilla-plugin-test-trailingspace@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Dist::Zilla::Plugin::Test::TrailingSpace
 
 =head2 Websites
 
@@ -160,15 +133,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-TrailingSpace>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Dist-Zilla-Plugin-Test-TrailingSpace>
+L<https://metacpan.org/release/Dist-Zilla-Plugin-Test-TrailingSpace>
 
 =item *
 
@@ -176,31 +141,7 @@ RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Test-TrailingSpace>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Dist-Zilla-Plugin-Test-TrailingSpace>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-Test-TrailingSpace>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Dist-Zilla-Plugin-Test-TrailingSpace>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-TrailingSpace>
 
 =item *
 
@@ -208,13 +149,13 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/Dist-Zilla-Plugin-Test-TrailingSpace>
+L<http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-Test-TrailingSpace>
 
 =item *
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-Test-TrailingSpace>
 
@@ -239,7 +180,7 @@ L<http://deps.cpantesters.org/?module=Dist::Zilla::Plugin::Test::TrailingSpace>
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-dist-zilla-plugin-test-trailingspace at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-Zilla-Plugin-Test-TrailingSpace>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Dist-Zilla-Plugin-Test-TrailingSpace>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -251,6 +192,29 @@ from your repository :)
 L<http://bitbucket.org/shlomif/perl-Dist-Zilla-Plugin-Test-TrailingSpace>
 
   hg clone ssh://hg@bitbucket.org/shlomif/perl-Dist-Zilla-Plugin-Test-TrailingSpace
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Test-TrailingSpace>
+or by email to
+L<bug-dist-zilla-plugin-test-trailingspace@rt.cpan.org|mailto:bug-dist-zilla-plugin-test-trailingspace@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
 

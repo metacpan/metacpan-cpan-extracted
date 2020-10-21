@@ -59,7 +59,7 @@ my %CONFLICTS = (
 WriteMakefile1(
     MIN_PERL_VERSION => '5.008',
     META_MERGE       => {
-        'meta-spec' => { version => 2 },
+        'meta-spec' => {version => 2},
         resources   => {
             homepage      => 'https://metacpan.org/release/SQL-Statement',
             x_IRC         => "irc://irc.perl.org/#dbi",
@@ -123,26 +123,26 @@ WriteMakefile1(
     TEST_REQUIRES  => \%TEST_DEPS,
     LICENSE        => 'perl',
     AUTHOR         => 'Jeff Zucker <jeff@vpservices.com>, Jens Rehsack <rehsack@cpan.org>',
-    test           => { TESTS => 't/*.t xt/*.t' },
+    test           => {TESTS => 't/*.t xt/*.t'},
 );
 
 sub CheckConflicts
 {
     my %params    = @_;
-    my %conflicts = %{ $params{CONFLICTS} };
+    my %conflicts = %{$params{CONFLICTS}};
     my $found     = 0;
 
-    while ( my ( $module, $version ) = each(%conflicts) )
+    while (my ($module, $version) = each(%conflicts))
     {
         undef $@;
         eval "require $module";
         next if $@;
         my $installed = eval "\$" . $module . "::VERSION";
-        if ( $installed le $version )
+        if ($installed le $version)
         {
             ++$found;
-            my $msg = $module eq $params{NAME} ? $selfConflictMsg : $conflictMsg;
-            my $warning = sprintf( $msg, $module, $installed );
+            my $msg     = $module eq $params{NAME} ? $selfConflictMsg : $conflictMsg;
+            my $warning = sprintf($msg, $module, $installed);
             warn $warning;
         }
     }
@@ -151,41 +151,44 @@ sub CheckConflicts
 }
 
 sub WriteMakefile1
-{    #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
+{    # originally written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
     my %params       = @_;
     my $eumm_version = $ExtUtils::MakeMaker::VERSION;
     $eumm_version = eval $eumm_version;
-    die "EXTRA_META is deprecated" if ( exists( $params{EXTRA_META} ) );
-    die "License not specified"    if ( !exists( $params{LICENSE} ) );
+    die "EXTRA_META is deprecated" if (exists($params{EXTRA_META}));
+    die "License not specified"    if (!exists($params{LICENSE}));
     $params{TEST_REQUIRES}
       and $eumm_version < 6.6303
-      and $params{BUILD_REQUIRES} = { %{ $params{BUILD_REQUIRES} || {} }, %{ delete $params{TEST_REQUIRES} } };
+      and $params{BUILD_REQUIRES} = {%{$params{BUILD_REQUIRES} || {}}, %{delete $params{TEST_REQUIRES}}};
     #EUMM 6.5502 has problems with BUILD_REQUIRES
     $params{BUILD_REQUIRES}
       and $eumm_version < 6.5503
-      and $params{PREREQ_PM} = { %{ $params{PREREQ_PM} || {} }, %{ delete $params{BUILD_REQUIRES} } };
+      and $params{PREREQ_PM} = {%{$params{PREREQ_PM} || {}}, %{delete $params{BUILD_REQUIRES}}};
     ref $params{AUTHOR}
       and "ARRAY" eq ref $params{AUTHOR}
       and $eumm_version < 6.5702
-      and $params{AUTHOR} = join( ", ", @{ $params{AUTHOR} } );
-    delete $params{CONFIGURE_REQUIRES}    if ( $eumm_version < 6.52 );
-    delete $params{MIN_PERL_VERSION}      if ( $eumm_version < 6.48 );
-    delete $params{META_MERGE}            if ( $eumm_version < 6.46 );
-    delete $params{META_ADD}{prereqs}     if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}{'meta-spec'} if ( $eumm_version < 6.58 );
-    delete $params{META_ADD}              if ( $eumm_version < 6.46 );
-    delete $params{LICENSE}               if ( $eumm_version < 6.31 );
-    delete $params{AUTHOR}                if ( $] < 5.005 );
-    delete $params{ABSTRACT_FROM}         if ( $] < 5.005 );
-    delete $params{BINARY_LOCATION}       if ( $] < 5.005 );
+      and $params{AUTHOR} = join(", ", @{$params{AUTHOR}});
+    delete $params{CONFIGURE_REQUIRES}    if ($eumm_version < 6.52);
+    delete $params{MIN_PERL_VERSION}      if ($eumm_version < 6.48);
+    delete $params{META_MERGE}            if ($eumm_version < 6.46);
+    delete $params{META_ADD}{prereqs}     if ($eumm_version < 6.58);
+    delete $params{META_ADD}{'meta-spec'} if ($eumm_version < 6.58);
+    delete $params{META_ADD}              if ($eumm_version < 6.46);
+    delete $params{LICENSE}               if ($eumm_version < 6.31);
+    delete $params{AUTHOR}                if ($] < 5.005);
+    delete $params{ABSTRACT_FROM}         if ($] < 5.005);
+    delete $params{BINARY_LOCATION}       if ($] < 5.005);
 
     # more or less taken from Moose' Makefile.PL
-    if ( $params{CONFLICTS} )
+    if ($params{CONFLICTS})
     {
         my $ok = CheckConflicts(%params);
-        exit(0) if ( $params{PREREQ_FATAL} and not $ok );
-        my $cpan_smoker = grep { $_ =~ m/(?:CR_SMOKER|CPAN_REPORTER|AUTOMATED_TESTING)/ } keys %ENV;
-        unless ( $cpan_smoker || $ENV{PERL_MM_USE_DEFAULT} || $ENV{SQL_STATEMENT_WARN_UPDATE} )
+        exit(0) if ($params{PREREQ_FATAL} and not $ok);
+        my $cpan_smoker = grep { $_ =~ m/(?:CR_SMOKER|CPAN_REPORTER|AUTOMATED_TESTING)/ }
+          keys %ENV;
+        unless ($cpan_smoker
+            || $ENV{PERL_MM_USE_DEFAULT}
+            || $ENV{SQL_STATEMENT_WARN_UPDATE})
         {
             sleep 4 unless ($ok);
         }

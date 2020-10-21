@@ -44,19 +44,19 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.014'
+    version: '0.015'
   JSON::Schema::Draft201909::Annotation:
     file: lib/JSON/Schema/Draft201909/Annotation.pm
-    version: '0.014'
+    version: '0.015'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.014'
+    version: '0.015'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.014'
+    version: '0.015'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Carp: '0'
   File::ShareDir: '0'
@@ -87,7 +87,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.014'
+version: '0.015'
 x_Dist_Zilla:
   perl:
     version: '5.033002'
@@ -798,7 +798,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.014
+          tag: v0.015
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

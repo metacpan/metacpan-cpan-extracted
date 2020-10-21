@@ -1,9 +1,12 @@
-use Test;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN { plan tests => 7; }
 
-use XML::LibXML;
-use XML::LibXML::Iterator;
+use XML::LibXML           ();
+use XML::LibXML::Iterator ();
 
 my $xmlstr = "<A><B/>T<B/><C><D/></C></A>";
 my $libversion;
@@ -38,6 +41,7 @@ sub t01_tree_first_element
     return 1;
 }
 
+# TEST
 ok( t01_tree_first_element() );
 
 sub t06_set_first
@@ -69,6 +73,8 @@ sub t06_set_first
 
     return 1;
 }
+
+# TEST
 ok( t06_set_first() );
 
 sub t07_set_last
@@ -101,6 +107,7 @@ sub t07_set_last
     return 1;
 }
 
+# TEST
 ok( t07_set_last() );
 
 sub t02_loop_forward
@@ -157,6 +164,8 @@ sub t02_loop_forward
 
     return 1;
 }
+
+# TEST
 ok( t02_loop_forward() );
 
 sub t03_loop_backward
@@ -187,6 +196,8 @@ sub t03_loop_backward
 
     return 1;
 }
+
+# TEST
 ok( t03_loop_backward() );
 
 sub t04_loop_forward_backward
@@ -233,6 +244,8 @@ sub t04_loop_forward_backward
 
     return 1;
 }
+
+# TEST
 ok( t04_loop_forward_backward() );
 
 sub t05_run_iterate
@@ -258,4 +271,6 @@ sub t05_run_iterate
 
     return 1;
 }
+
+# TEST
 ok( t05_run_iterate() );

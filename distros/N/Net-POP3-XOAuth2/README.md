@@ -1,6 +1,6 @@
 # NAME
 
-Net::POP3::XOAuth2 - It enables to use XOAUTH2 authentication with [Net::POP3](https://metacpan.org/pod/Net::POP3)
+Net::POP3::XOAuth2 - It enables to use XOAUTH2 authentication with [Net::POP3](https://metacpan.org/pod/Net%3A%3APOP3)
 
 # SYNOPSIS
 
@@ -13,9 +13,12 @@ Net::POP3::XOAuth2 - It enables to use XOAUTH2 authentication with [Net::POP3](h
     my $pop = Net::POP3->new('pop.gmail.com', Port => 995, Timeout => 30, SSL => 1, Debug => 1);
     $pop->xoauth2($user, $token);
 
+    # or if you use office365
+    $pop->xoauth2($user, $token, 1);
+
 # DESCRIPTION
 
-Net::POP3::XOAuth2 is an extension for [Net::POP3](https://metacpan.org/pod/Net::POP3). This allows you to use SASL XOAUTH2.
+Net::POP3::XOAuth2 is an extension for [Net::POP3](https://metacpan.org/pod/Net%3A%3APOP3). This allows you to use SASL XOAUTH2.
 
 # METHODS
 

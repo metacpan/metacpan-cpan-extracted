@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/lib";
 use parent (
     'TestHTTPBase',
     'TestHTTPUAPIMixin',
+    'TestHTTPWHM1Mixin',
 );
 
 use Test::More;

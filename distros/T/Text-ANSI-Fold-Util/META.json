@@ -1,5 +1,5 @@
 {
-   "abstract" : "Text::ANSI::Fold utilities",
+   "abstract" : "Text::ANSI::Fold utilities (width, substr, expand)",
    "author" : [
       "Kazumasa Utashiro."
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "1.08",
+            "Text::ANSI::Fold" : "2.01",
             "perl" : "v5.14.0"
          }
       },
@@ -56,7 +56,7 @@
    "provides" : {
       "Text::ANSI::Fold::Util" : {
          "file" : "lib/Text/ANSI/Fold/Util.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -9,7 +9,7 @@ Test::Run::CmdLine::Plugin::ColorSummary - Color the summary in Test::Run::CmdLi
 
 =cut
 
-our $VERSION = '0.0202';
+our $VERSION = '0.0203';
 
 =head2 $self->private_backend_plugins()
 
@@ -35,8 +35,7 @@ environment variables.
 sub private_direct_backend_env_mapping
 {
     my $self = shift;
-    return
-    [
+    return [
         {
             'env' => "HARNESS_SUMMARY_COLOR_SUCCESS",
             'arg' => "summary_color_success",
@@ -90,14 +89,6 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::CmdLine::Plugin::ColorSummary>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test::Run::CmdLine::Plugin::ColorSummary>
-
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test::Run::CmdLine::Plugin::ColorSummary>
@@ -131,4 +122,3 @@ This program is released under the following license: MIT X11.
 =cut
 
 1;
-

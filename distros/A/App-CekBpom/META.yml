@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom
   homepage: https://metacpan.org/release/App-CekBpom
   repository: git://github.com/perlancar/perl-App-CekBpom.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

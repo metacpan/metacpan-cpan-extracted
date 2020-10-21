@@ -1,219 +1,51 @@
 package JSON::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
-use JSON; use Clone qw/clone/;
+use 5.006; use strict; use warnings; our $VERSION = '0.04';
+use JSON; use base 'Struct::Conditional';
 
 our $JSON;
 
 BEGIN {
-	$JSON = JSON->new->allow_blessed->convert_blessed;
-}
-
-sub new {
-	bless ($_[1] || {}), $_[0];
+	$JSON = JSON->new->pretty(1)->allow_blessed->convert_blessed;
 }
 
 sub encode {
+	if ($_[2]) {
+		$_[0]->encode_file($_[1], $_[2]);
+	}
 	$JSON->encode($_[1]);
 }
 
+sub encode_file {
+	open my $file, '>', $_[2] or die "cannot open file $!";
+	print $file $_[0]->encode($_[1]);
+	close $file;
+	return $file;
+}
+
 sub decode {
+	if ( $_[1] !~ m/\n/ && -f $_[1]) {
+		$_[0]->decode_file($_[1]);
+	} 
 	$JSON->decode($_[1]);
 }
 
+sub decode_file {
+	open my $file, '<', $_[1] or die "cannot open file $!";
+	my $content = do { local $/; <$file> };
+	close $file;
+	return $_[0]->decode($content);
+}
+
 sub compile {
-	my ($self, $json, $params, $return_struct) = @_;
-	$json = $JSON->decode($json) unless ref $json;
-	$json = $self->itterate($json, $params);
-	die "failed to compile conditional json"
-		if (defined $json && ! ref $json && $json eq 'compiled_null');
-	return $return_struct ? $json : $JSON->encode($json);
+	my ($self, $json, $params, $return_struct, $out_file) = @_;
+	$json = $self->decode($json) 
+	unless ref $json;
+	$params = $self->decode($params) unless ref $params;
+	$json = $self->SUPER::compile($json, $params);
+	return $return_struct 
+		? $json 
+		: $self->encode($json, $out_file);
 }
-
-sub itterate {
-	my ($self, $json, $params) = @_;
-	my $ref = ref $json;
-	if ($ref eq 'HASH') {
-		$json = $self->loops(
-			$self->conditionals($json, $params),
-			$params
-		);
-		for my $key ( keys %{$json} ) {
-			my $value = $self->itterate($json->{$key}, $params);
-			$value && $value eq 'compiled_null'
-				? delete $json->{$key}
-				: do {
-					$json->{$key} = $value;
-				};
-		}
-		return keys %{$json} ? $json : 'compiled_null';
-	} elsif ($ref eq 'ARRAY') {
-		my $i = 0;
-		for my $item (@{ $json }) {
-			my $value = $self->itterate($item, $params);
-			$value && $value eq 'compiled_null'
-				? do {
-					splice @{$json}, $i, 1;
-				}
-				: $i++;
-		}
-	}
-	return $self->make_replacement($json, $params);
-}
-
-sub loops {
-	my ($self, $json, $params) = @_;
-	my %loops = map {
-		($_ => delete $json->{$_})
-	} qw/for/;
-	if ($loops{for}) {
-		my $key = delete $loops{for}{key};
-		die "no key defined for loop" unless defined $key;
-		if ($loops{for}{each}) {
-			my @each = ();
-			my $map = delete $loops{for}{each};
-			die "param $key must be an arrayref"
-				unless (ref($params->{$key}) || "") eq 'ARRAY';
-			for (@{$params->{$key}}) {
-				my $jsn = $self->conditionals(clone($loops{for}), $_);
-				push @each, $self->make_replacement($jsn, $_) if scalar keys %{$jsn};
-			}
-			$json->{$map} = \@each if scalar @each;
-		}
-		if ($loops{for}{keys}) {
-			my %keys = ();
-			my $map = delete $loops{for}{keys};
-			die "param $key muse be an hashref"
-				unless (ref($params->{$key}) || "") eq 'HASH';
-			for my $k (keys %{$params->{$key}}) {
-				my $jsn = $self->conditionals(
-					clone($loops{for}),
-					$params->{$key}->{$k}
-				);
-				$keys{$k} = $self->make_replacement($jsn, $params->{$key}->{$k}) if scalar keys %{$jsn};
-			}
-			if (scalar %keys) {
-				$map =~ m/^1$/ ? do {
-					for my $k (keys %keys) {
-						$json->{$k} = $keys{$k};
-					}
-				} : do {
-					$json->{$map} = \%keys;
-				}
-			}
-		}
-	}
-	return $json;
-}
-
-sub conditionals {
-	my ($self, $json, $params) = @_;
-	my %keywords = map {
-		($_ => delete $json->{$_})
-	} qw/if elsif else given/;
-	my $expression;
-	if ($keywords{if}) {
-		($expression) = $self->expressions($keywords{if}, $params);
-		unless ($expression) {
-			if ($keywords{elsif}) {
-				($expression) = $self->expressions($keywords{elsif}, $params);
-			}
-			unless ($expression) {
-				if ($keywords{else}) {
-					($expression) = $keywords{else}->{then};
-				}
-			}
-		}
-		if ($expression) {
-			$json->{$_} = $expression->{$_} for ( keys %{$expression} );
-		}
-	}
-	if ($keywords{given}) {
-		die "no key provided for given" if ! $keywords{given}{key};
-		die "no when provided for given" if ! ref $keywords{given}{when};
-		my $default = delete $keywords{given}{default};
-		my $ref = ref $keywords{given}{when};
-		if ($ref eq 'ARRAY') {
-			for (@{ $keywords{given}{when} }) {
-				$_->{key} ||= $keywords{given}{key};
-				($expression) = $self->expressions($_, $params);
-				last if $expression;
-			}
-		} elsif ($ref eq 'HASH') {
-			$default ||= delete $keywords{given}{when}{default};
-			for my $k (keys %{ $keywords{given}{when} }) {
-				($expression) = $self->expressions(
-					{
-						key => $keywords{given}{key},
-						m => $k,
-						then => $keywords{given}{when}{$k}
-					},
-					$params
-				);
-				last if $expression;
-			}
-		} else {
-			die "given cannot handle ref $ref";
-		}
-		$expression = $default if ! $expression;
-		if ($expression) {
-			$json->{$_} = $expression->{$_} for ( keys %{$expression} );
-		}
-	}
-	return $json;
-}
-
-sub expressions {
-	my ($self, $keyword, $params) = @_;
-	my $success = 0;
-	$success = exists $params->{$keyword->{key}}
-		if defined $keyword->{exists};
-	my $key = $params->{$keyword->{key}};
-	if (defined $key) {
-		$success = $key =~ m/\Q$keyword->{m}\E/
-			if !$success && defined $keyword->{m};
-		$success = $key !~ m/\Q$keyword->{nm}\E/
-			if !$success && defined $keyword->{nm};
-		$success = $key eq $keyword->{eq}
-			if !$success && defined $keyword->{eq};
-		$success = $key ne $keyword->{ne}
-			if !$success && defined $keyword->{ne};
-		$success = $key > $keyword->{gt}
-			if !$success && defined $keyword->{gt};
-		$success = $key < $keyword->{lt}
-			if !$success && defined $keyword->{lt}
-	}
-	if ($keyword->{or} && !$success) {
-		$keyword->{or}->{then} = $keyword->{then};
-		($success, $keyword) = $self->expressions($keyword->{or}, $params)
-	}
-	if ($keyword->{and} && $success) {
-		$keyword->{and}->{then} = $keyword->{then};
-		($success, $keyword) = $self->expressions($keyword->{and}, $params)
-	}
-	if ($keyword->{elsif} && !$success) {
-		$keyword = $keyword->{elsif};
-		($success, $keyword) = $self->expressions($keyword, $params);
-	}
-	($success, $keyword) = ($keyword->{else}->{then}, $keyword->{else})
-		if ($keyword->{else} && !$success);
-	return (($success ? $keyword->{then} : 0), $keyword);
-}
-
-sub make_replacement {
-	my ($self, $then, $params, $params_reg) = @_;
-	$params_reg ||= join "|", keys %{$params};
-	my $ref = ref $then || "";
-	if ($ref eq 'HASH') {
-		$then->{$_} = $self->make_replacement($then->{$_}, $params, $params_reg)
-			for keys %{$then};
-	} elsif ($ref eq 'ARRAY') {
-		$then = [map { $self->make_replacement($_, $params, $params_reg) } @{ $then }];
-	} elsif (defined $then && $then =~ m/\{($params_reg)\}/) {
-		$then = $params->{$1};
-	}
-	return $then;
-}
-
 
 1;
 
@@ -221,11 +53,11 @@ __END__
 
 =head1 NAME
 
-JSON::Conditional - The great new JSON::Conditional!
+JSON::Conditional - A conditional language within a JSON struct
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -271,27 +103,27 @@ Quick summary of what the module does.
 			{ country => "Japan" },
 			{ country => "Cambodia" },
 		]
-	}, 1);
+	});
 
 	...
 
 	{
-		countries => [
+		"countries": [
 			{
-				rank => 1,
-				country => "Thailand"
+				"rank": 1,
+				"country": "Thailand"
 			},
 			{
-				rank => 2,
-				country => 'Indonesia'
+				"rank": 2,
+				"country": "Indonesia"
 			},
 			{
-				rank => undef
-				country => 'Japan',
+				"rank": null,
+				"country": "Japan"
 			},
 			{
-				rank => undef,
-				country => 'Cambodia'
+				"rank": null,
+				"country": "Cambodia"
 			}
 		]
 	};
@@ -308,23 +140,35 @@ Instantiate a new JSON::Conditional object. Currently this expects no arguments.
 
 Encode a perl struct into JSON.
 
+	$c->encode($struct);
+
+=head2 encode_file
+
+Encode a perl struct into JSON file.
+
+	$c->encode_file($struct, $out_file);
+
 =head2 decode
 
 Decode a JSON string into a perl struct.
 
+	$c->decode($json);
+
+=head2 decode_file
+
+Decode a JSON file into a perl struct.
+
+	$c->decode_file($json_file);
+
 =head2 compile
 
-Compile a json string containing valid JSON::Conditional markup into either a json string or perl struct based upon the passed params.
+Compile a json string or file containing valid JSON::Conditional markup into either a json string, json file or perl struct based upon the passed params.
 
 	$c->compile($json, $params); # json string
 
 	$c->compile($json, $params, 1); # perl struct
 
-=head2 itterate
-
-Itterate a perl struct that contains valid JSON::Conditional markup and return a perl struct based upon the passed params.
-
-	$c->itterate($perl_struct, $params);
+	$c->compile($json, $params, 0, $out_file); # json file
 
 =head1 Markup or Markdown
 
@@ -429,7 +273,7 @@ Given conditionals are logical blocks used within JSON::Conditional. They are co
 				}
 			]
 		},
-		country => "{country}"
+		"country": "{country}"
 	}';
 
 	my $compiled = $c->compile($json, {
@@ -460,7 +304,7 @@ You can also write this like the following:
 				}
 			}
 		},
-		country => "{country}"
+		"country": "{country}"
 	}';
 
 	my $compiled = $c->compile($json, {
@@ -523,11 +367,10 @@ The 'and' keyword allows you to chain expression checks, where only all expressi
 			},
 			"and": {
 				"key": "season",
-				"m": "Summer",
+				"m": "Summer"
 			}
 		}
 	}';
-
 
 	my $compiled = $c->compile($json, {
 		country => 'Thailand',
@@ -549,8 +392,18 @@ The 'and' keyword allows you to chain expression checks, where only all expressi
 Does the params key value match the provided regex value.
 
 	{
-		"key": $param_key
+		"key": $param_key,
 		"m": $regex,
+		"then": \%then
+	}
+
+=head3 im
+
+Does the params key value match the provided regex value case insensative.
+
+	{
+		"key": $param_key,
+		"im": $regex,
 		"then": \%then
 	}
 
@@ -559,8 +412,18 @@ Does the params key value match the provided regex value.
 Does the params key value not match the provided regex value.
 
 	{
-		"key": $param_key
+		"key": $param_key,
 		"nm": $regex,
+		"then": \%then
+	}
+
+=head3 inm
+
+Does the params key value not match the provided regex value case insensative.
+
+	{
+		"key": $param_key,
+		"inm": $regex,
 		"then": \%then
 	}
 
@@ -569,7 +432,7 @@ Does the params key value not match the provided regex value.
 Does the params key value equal the provided value.
 
 	{
-		"key": $param_key
+		"key": $param_key,
 		"eq": $equals,
 		"then": \%then
 	}
@@ -579,7 +442,7 @@ Does the params key value equal the provided value.
 Does the params key value not equal the provided value.
 
 	{
-		"key": $param_key
+		"key": $param_key,
 		"ne": $equals,
 		"then": \%then
 	}
@@ -589,7 +452,7 @@ Does the params key value not equal the provided value.
 Is the params key value greater than the provided value.
 
 	{
-		"key": $param_key
+		"key": $param_key,
 		"gt": $greater_than,
 		"then": \%then
 	}
@@ -599,7 +462,7 @@ Is the params key value greater than the provided value.
 Is the params key value less than the provided value.
 
 	{
-		"key": $param_key
+		"key": $param_key,
 		"lt": $greater_than,
 		"then": \%then
 	}
@@ -645,13 +508,13 @@ Expects key to reference a array in the passed params. It will then itterate eac
 				country => "Thailand"
 			},
 			{
-				country => 'Indonesia'
+				country => "Indonesia"
 			},
 			{
-				country => 'Japan',
+				country => "Japan",
 			},
 			{
-				country => 'Cambodia'
+				country => "Cambodia"
 			}
 		]
 	};

@@ -21,14 +21,14 @@ no_index:
 provides:
   Term::ProgressSpinner:
     file: lib/Term/ProgressSpinner.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   IO::Handle: '0'
-  Term::ANSIColor: '0'
-  Term::Size::Any: '0'
+  Term::ANSIColor: '5.01'
+  Term::Size::Any: '0.002'
   Time::HiRes: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Term-ProgressSpinner.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

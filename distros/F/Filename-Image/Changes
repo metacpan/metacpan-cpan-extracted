@@ -1,3 +1,20 @@
+0.005   2020-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add webp & xcf (RT#133566).
+
+
+0.004   2020-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Rinci metadata, move tests to function metadata's examples.
+
+
+0.003   2020-05-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Filename::Ebook.
+
+
 0.002   2020-04-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Provide $STR_RE.

@@ -34,7 +34,7 @@ requires:
   Perinci::Sub::ConvertArgs::Array: '0'
   Perinci::Sub::GetArgs::Argv: '0.845'
   Perinci::Sub::Normalize: '0.19'
-  Perinci::Sub::Util: '0.46'
+  Perinci::Sub::Util: '0.470'
   Perinci::Sub::Util::Sort: '0'
   Sort::ByExample: '0'
   String::PodQuote: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-To-Doc
   homepage: https://metacpan.org/release/Perinci-To-Doc
   repository: git://github.com/perlancar/perl-Perinci-To-Doc.git
-version: '0.873'
+version: '0.874'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

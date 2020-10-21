@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Util-Config
   homepage: https://metacpan.org/release/Perinci-CmdLine-Util-Config
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Util-Config.git
-version: '1.723'
+version: '1.724'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

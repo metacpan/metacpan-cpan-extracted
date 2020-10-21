@@ -18,8 +18,8 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Term::Size::Any' => '0',
-        'Term::ANSIColor' => '0',
+        'Term::Size::Any' => '0.002',
+        'Term::ANSIColor' => '5.01',
         'IO::Handle' => '0',
 	'Time::HiRes' => '0'
     },

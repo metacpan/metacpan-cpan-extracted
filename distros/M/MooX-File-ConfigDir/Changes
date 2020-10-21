@@ -1,5 +1,9 @@
 Revision history for Perl module MooX::File::ConfigDir
 
+0.008	2020-10-21
+    - update tooling / infrastructure using
+    - fix MANIFEST.SKIP to distribute .perltidyrc
+
 0.007	2018-04-30
     - Spelling fixes triggered by Mohammed Anwar's PR for
       File::ConfigDir

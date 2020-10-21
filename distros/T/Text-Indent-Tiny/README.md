@@ -4,7 +4,7 @@ Text::Indent::Tiny - tiny and flexible indentation across modules
 
 # VERSION
 
-This module version is 0.1.0.
+This module version is 0.1.2.
 
 # SYNOPSIS
 

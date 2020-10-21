@@ -1,5 +1,5 @@
 package Data::Crumbr::Util;
-$Data::Crumbr::Util::VERSION = '0.1.1';
+$Data::Crumbr::Util::VERSION = '0.1.2';
 # ABSTRACT: utility functions for Data::Crumbr
 use strict;
 use Carp;
@@ -110,7 +110,7 @@ Data::Crumbr::Util - utility functions for Data::Crumbr
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 DESCRIPTION
 

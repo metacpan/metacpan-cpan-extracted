@@ -3,9 +3,9 @@ NAME
     files
 
 VERSION
-    This document describes version 1.723 of Perinci::CmdLine::Util::Config
+    This document describes version 1.724 of Perinci::CmdLine::Util::Config
     (from Perl distribution Perinci-CmdLine-Util-Config), released on
-    2020-10-16.
+    2020-10-21.
 
 FUNCTIONS
   get_args_from_config
@@ -13,11 +13,45 @@ FUNCTIONS
 
      get_args_from_config(%args) -> [status, msg, payload, meta]
 
+    "config" is a HoH (hashes of hashrefs) produced by reading an INI (IOD)
+    configuration file using modules like Config::IOD::Reader.
+
+    Hashref argument "args" will be set by parameters in "config", while
+    "plugins" will be set by parameters in "[plugin=...]" sections in
+    "config". For example, with this configuration:
+
+     arg1=val1
+     arg2=val2
+     -special_arg1=val3
+     -special_arg2=val4
+ 
+     [plugin=DumpArgs]
+     -event=before_validation
+ 
+     [plugin=Foo]
+     arg1=val1
+
+    "args" will become:
+
+     {
+       arg1=>"val1",
+       arg2=>"val2",
+       -special_arg1=>"val3",
+       -special_arg2=>"val4",
+     }
+
+    and "plugins" will become:
+
+     [
+       'DumpArgs@before_validation' => {},
+       Foo => {arg1=>val},
+     ]
+
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
-    *   args => *any*
+    *   args => *hash*
 
     *   common_opts => *any*
 
@@ -28,6 +62,8 @@ FUNCTIONS
     *   meta => *any*
 
     *   meta_is_normalized => *any*
+
+    *   plugins => *array*
 
     *   r => *any*
 

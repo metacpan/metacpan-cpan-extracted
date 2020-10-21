@@ -4,7 +4,7 @@ package SQL::Statement::Functions;
 #
 # This module is copyright (c), 2001,2005 by Jeff Zucker.
 # This module is copyright (c), 2011,2012 by Brendan Byrd.
-# This module is copyright (c), 2009-2017 by Jens Rehsack.
+# This module is copyright (c), 2009-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -235,7 +235,7 @@ ODBC 3.0 functions that are implemented with differences include:
 =cut
 
 use vars qw($VERSION);
-$VERSION = '1.412';
+$VERSION = '1.414';
 
 =pod
 
@@ -1297,7 +1297,7 @@ Brendan Byrd added in the Numeric/Trig/System functions and filled in the SQL92/
 =head1 AUTHOR & COPYRIGHT
 
 Copyright (c) 2005 by Jeff Zucker: jzuckerATcpan.org
-Copyright (c) 2009-2017 by Jens Rehsack: rehsackATcpan.org
+Copyright (c) 2009-2020 by Jens Rehsack: rehsackATcpan.org
 
 All rights reserved.
 

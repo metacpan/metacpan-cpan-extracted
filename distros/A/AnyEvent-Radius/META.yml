@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,6 @@ requires:
   AnyEvent::Handle::UDP: '0'
   Class::Accessor::Fast: '0'
   Data::Radius: v1.2.3
-  perl: v5.10.0
-version: v1.1.2
+  perl: '5.010000'
+version: v1.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

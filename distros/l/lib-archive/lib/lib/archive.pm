@@ -9,11 +9,12 @@ use Carp qw(croak);
 use Archive::Tar;
 use File::Spec::Functions qw(file_name_is_absolute rel2abs);
 use File::Basename qw(dirname fileparse);
+use File::Path qw(make_path);
 use MIME::Base64 qw(decode_base64);
 use IO::Uncompress::Gunzip;
 use HTTP::Tiny;
 
-our $VERSION = "0.8";
+our $VERSION = "0.9";
 
 =pod
 
@@ -57,8 +58,11 @@ calling script or module resides in. So don't do a chdir() before using
 lib::archive when you call your script with a relative path B<and> use releative
 paths for lib::archive.
 
-B<The module will not create any files, not even temporary.
-Everything is extracted on the fly>.
+B<In standard mode the module will not create any files, not even temporary.
+Everything is extracted on the fly>. When the environment variable
+PERL_LIB_ARCHIVE_EXTRACT is set to a directory name the directories and
+files will be extracted to that path. An attempt will be made to create
+the directory should it not already exist.
 
 You can use every file format Archive::Tar supports.
 
@@ -110,7 +114,6 @@ my $cpan   = $ENV{CPAN_MIRROR} || 'https://www.cpan.org';
 my $rx_url = qr!^(?:CPAN|https?)://!;
 my $tar    = Archive::Tar->new();
 
-
 sub import {
     my ( $class, @entries ) = @_;
     my %cache;
@@ -146,8 +149,9 @@ sub import {
     unshift @INC, sub {
         my ( $cref, $rel ) = @_;
         return unless my $rec = $cache{$rel};
-        $INC{$rel} = $rec->{path} unless defined($DB::single);    ## no critic (RequireLocalizedPunctuationVars)
-        open( my $pfh, '<', $rec->{content} ) or croak $!;        ## no critic (RequireBriefOpen)
+        $INC{$rel} = _expand( $rel, $rec->{content} ) if $ENV{PERL_LIB_ARCHIVE_EXTRACT};
+        $INC{$rel} //= $rec->{path} unless defined($DB::single);
+        open( my $pfh, '<', $rec->{content} ) or croak $!;    ## no critic (RequireBriefOpen)
         return $pfh;
     };
 
@@ -203,7 +207,7 @@ sub _get_data {
 
     for my $d (@data) {
         my $content = decode_base64($d);
-        my $z = eval { IO::Uncompress::Gunzip->new( \$content ) };
+        my $z       = eval { IO::Uncompress::Gunzip->new( \$content ) };
         if ($z) {
             push @tars, [ $z, '' ];
             next;
@@ -212,6 +216,17 @@ sub _get_data {
         push @tars, [ $cfh, '' ];
     }
     return \@tars;
+}
+
+
+sub _expand {
+    my ( $rel, $cref ) = @_;
+    my $fn = "$ENV{PERL_LIB_ARCHIVE_EXTRACT}/$rel";
+    make_path( dirname($fn) );
+    open( my $fh, '>', $fn ) or die "couldn't save $fn, $!\n";
+    print $fh $$cref;
+    close($fh);
+    return $fn;
 }
 
 

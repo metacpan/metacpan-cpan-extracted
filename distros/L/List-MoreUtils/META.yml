@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +24,10 @@ no_index:
     - inc
 requires:
   Exporter::Tiny: '0.038'
-  List::MoreUtils::XS: '0.426'
+  List::MoreUtils::XS: '0.430'
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils
   homepage: https://metacpan.org/release/List-MoreUtils
   repository: https://github.com/perl5-utils/List-MoreUtils.git
-version: '0.428'
+version: '0.430'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

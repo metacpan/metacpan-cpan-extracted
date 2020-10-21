@@ -367,3 +367,7 @@ CODE:
     XSRETURN_UNDEF;
 }
 
+void
+_XScompiled ()
+    CODE:
+       XSRETURN_YES;

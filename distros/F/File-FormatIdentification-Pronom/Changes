@@ -1,3 +1,8 @@
+0.04      2020-10-21 18:03:09+02:00 Europe/Berlin
+v0.03:
+ - fixed build problems in dzil, should fix #133055
+ - minor speed improvements
+ - checked successfully with DROID_SignatureFile_V97.xml
 v0.02:
  - CPANization
 v0.01:

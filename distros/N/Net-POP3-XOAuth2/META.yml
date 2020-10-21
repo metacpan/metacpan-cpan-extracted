@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Net::POP3::XOAuth2:
     file: lib/Net/POP3/XOAuth2.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   MIME::Base64: '0'
   Net::POP3: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/kizashi1122/Net-POP3-XOAuth2/issues
   homepage: https://github.com/kizashi1122/Net-POP3-XOAuth2
   repository: git://github.com/kizashi1122/Net-POP3-XOAuth2.git
-version: 0.0.1
+version: 0.0.2
 x_contributors:
   - 'Kizashi Nagata <kizashi1122@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,5 @@
+seq:
+    - seq:
+        - t/04_fail.t
+        - t/06_old.t
+    - par: **

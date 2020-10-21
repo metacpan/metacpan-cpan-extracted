@@ -9,6 +9,8 @@ use App::SimpleBackuper::_BlocksInfo;
 sub StorageCheck {
 	my($options, $state, $fix) = @_;
 	
+	my %fails;
+	
 	print "Fetching files listing from storage...\t";
 	my $listing = $state->{storage}->listing();
 	print keys(%$listing)." files done\n";
@@ -17,7 +19,7 @@ sub StorageCheck {
 		if($fix) {
 			App::SimpleBackuper::BackupDB($options, $state);
 		} else {
-			push @{ $state->{fails}->{'Storage lost file'} }, grep {! exists $listing->{ $_ }} qw(db db.key);
+			push @{ $fails{'Storage lost file'} }, grep {! exists $listing->{ $_ }} qw(db db.key);
 		}
 	}
 	delete @$listing{qw(db db.key)};
@@ -31,14 +33,14 @@ sub StorageCheck {
 			if($fix) {
 				$blocks2delete{ $part->{block_id} } = 1;
 			} else {
-				push @{ $state->{fails}->{'Storage lost file'} }, $name;
+				push @{ $fails{'Storage lost file'} }, $name;
 			}
 		}
 		elsif($part->{size} != $listing->{ $name }) {
 			if($fix) {
 				$blocks2delete{ $part->{block_id} } = 1;
 			} else {
-				push @{ $state->{fails}->{'Storage corrupted'} }, "$name weights $listing->{ $name } instead of $part->{size}";
+				push @{ $fails{'Storage corrupted'} }, "$name weights $listing->{ $name } instead of $part->{size}";
 			}
 		}
 		delete $listing->{ $name };
@@ -64,13 +66,13 @@ sub StorageCheck {
 				print "done.\n";
 			}
 		} else {
-			$state->{fails}->{'Storage has unknown extra file'} = [ keys %$listing ];
+			$fails{'Storage has unknown extra file'} = [ keys %$listing ];
 		}
 	}
 
-	if($state->{fails}) {
+	if(%fails) {
 		print "Storage data was corrupted:\n";
-		while(my($error, $list) = each %{ $state->{fails} }) {
+		while(my($error, $list) = each %fails) {
 			print "\t$error (".@$list."):\n";
 			print "\t\t$_\n" foreach @$list;
 		}

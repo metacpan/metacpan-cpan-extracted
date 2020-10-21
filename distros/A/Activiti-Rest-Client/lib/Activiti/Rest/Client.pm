@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.1255";
+our $VERSION = "0.1256";
 
 #see: http://www.activiti.org/userguide
 

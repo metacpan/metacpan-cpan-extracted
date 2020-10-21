@@ -1,5 +1,5 @@
 ---
-abstract: "Interface to Google's Blogger service"
+abstract: "(DEPRECATED) Interface to Google's Blogger service"
 author:
   - 'Kedar Warriner <kedar at cpan.org>'
 build_requires:
@@ -32,4 +32,5 @@ requires:
   XML::Simple: '0'
   strict: '0'
   warnings: '0'
-version: '0.22'
+version: '0.23'
+x_deprecated: 1

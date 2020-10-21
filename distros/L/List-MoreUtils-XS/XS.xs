@@ -87,6 +87,10 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
 #  define slu_sv_value(sv) (SvIOK(sv)) ? (NV)(SvIVX(sv)) : (SvNV(sv))
 #endif
 
+#ifndef SvTEMP_off
+#  define SvTEMP_off(a) (a)
+#endif
+
 /*
  * Perl < 5.18 had some kind of different SvIV_please_nomg
  */
@@ -286,6 +290,10 @@ in_pad (pTHX_ SV *code)
     return 0;
 }
 
+#define ASSERT_PL_defgv \
+    if(UNLIKELY(!GvSV(PL_defgv))) \
+        croak("panic: *_ disappeared");
+
 #define WARN_OFF \
     SV *oldwarn = PL_curcop->cop_warnings; \
     PL_curcop->cop_warnings = pWARN_NONE;
@@ -309,7 +317,7 @@ in_pad (pTHX_ SV *code)
                                                                                         \
         for (i = 0; i < items; i++) {                                                   \
             if(UNLIKELY(!arraylike(ST(i))))                                             \
-               croak_xs_usage(cv,  "\\@;\\@\\@...");                                    \
+               croak_xs_usage(cv, "\\@;\\@\\@...");                                     \
             args->avs[i] = (AV*)SvRV(ST(i));                                            \
             SvREFCNT_inc(args->avs[i]);                                                 \
         }                                                                               \
@@ -320,32 +328,33 @@ in_pad (pTHX_ SV *code)
         /* in order to allow proper cleanup in DESTROY-handler */                       \
         sv_bless(RETVAL, stash)
 
-#define LMUFECPY(a) (a)
 #define dMULTICALLSVCV                          \
         HV *stash;                              \
         GV *gv;                                 \
         I32 gimme = G_SCALAR;                   \
         CV *mc_cv = sv_2cv(code, &stash, &gv, 0)
 
-
-#define FOR_EACH(on_item)                       \
-    if(!codelike(code))                         \
-       croak_xs_usage(cv,  "code, ...");        \
-                                                \
-    if (items > 1) {                            \
-        dMULTICALL;                             \
-        dMULTICALLSVCV;                         \
-        int i;                                  \
-        SV **args = &PL_stack_base[ax];         \
-        PUSH_MULTICALL(mc_cv);                  \
-        SAVESPTR(GvSV(PL_defgv));               \
-                                                \
-        for(i = 1 ; i < items ; ++i) {          \
-            GvSV(PL_defgv) = LMUFECPY(args[i]); \
-            MULTICALL;                          \
-            on_item;                            \
-        }                                       \
-        POP_MULTICALL;                          \
+#define FOR_EACH(on_item)                         \
+    if(!codelike(code))                           \
+       croak_xs_usage(cv, "code, ...");           \
+                                                  \
+    if (items > 1) {                              \
+        dMULTICALL;                               \
+        dMULTICALLSVCV;                           \
+        int i;                                    \
+        SV **args = &PL_stack_base[ax];           \
+        PUSH_MULTICALL(mc_cv);                    \
+        SAVESPTR(GvSV(PL_defgv));                 \
+                                                  \
+        for(i = 1 ; i < items ; ++i) {            \
+            SV *def_sv;                           \
+            ASSERT_PL_defgv                       \
+            def_sv = GvSV(PL_defgv) = args[i];    \
+            SvTEMP_off(def_sv);                   \
+            MULTICALL;                            \
+            on_item;                              \
+        }                                         \
+        POP_MULTICALL;                            \
     }
 
 #define TRUE_JUNCTION                             \
@@ -356,24 +365,27 @@ in_pad (pTHX_ SV *code)
     FOR_EACH(if (!SvTRUE(*PL_stack_sp)) ON_FALSE) \
     else ON_EMPTY;
 
-#define ROF_EACH(on_item)                       \
-    if(!codelike(code))                         \
-       croak_xs_usage(cv,  "code, ...");        \
-                                                \
-    if (items > 1) {                            \
-        dMULTICALL;                             \
-        dMULTICALLSVCV;                         \
-        int i;                                  \
-        SV **args = &PL_stack_base[ax];         \
-        PUSH_MULTICALL(mc_cv);                  \
-        SAVESPTR(GvSV(PL_defgv));               \
-                                                \
-        for(i = items-1; i > 0; --i) {          \
-            GvSV(PL_defgv) = LMUFECPY(args[i]); \
-            MULTICALL;                          \
-            on_item;                            \
-        }                                       \
-        POP_MULTICALL;                          \
+#define ROF_EACH(on_item)                         \
+    if(!codelike(code))                           \
+       croak_xs_usage(cv, "code, ...");           \
+                                                  \
+    if (items > 1) {                              \
+        dMULTICALL;                               \
+        dMULTICALLSVCV;                           \
+        int i;                                    \
+        SV **args = &PL_stack_base[ax];           \
+        PUSH_MULTICALL(mc_cv);                    \
+        SAVESPTR(GvSV(PL_defgv));                 \
+                                                  \
+        for(i = items-1; i > 0; --i) {            \
+            SV *def_sv;                           \
+            ASSERT_PL_defgv                       \
+            def_sv = GvSV(PL_defgv) = args[i];    \
+            SvTEMP_off(def_sv);                   \
+            MULTICALL;                            \
+            on_item;                              \
+        }                                         \
+        POP_MULTICALL;                            \
     }
 
 #define REDUCE_WITH(init)                            \
@@ -383,7 +395,7 @@ in_pad (pTHX_ SV *code)
     IV i;                                            \
                                                      \
     if(!codelike(code))                              \
-       croak_xs_usage(cv,  "code, list, list");      \
+       croak_xs_usage(cv, "code, list, list");       \
                                                      \
     if (in_pad(aTHX_ code)) {                        \
         croak("Can't use lexical $a or $b in pairwise code block"); \
@@ -497,14 +509,15 @@ typedef struct
     int curidx;     /* the current index of the iterator */
 } arrayeach_args;
 
-/* used for natatime */
+/* used for natatime and slideatatime_args */
 typedef struct
 {
     SV **svs;
     int nsvs;
     int curidx;
-    int natatime;
-} natatime_args;
+    int window;
+    int move;
+} slideatatime_args;
 
 static void
 insert_after (pTHX_ int idx, SV *what, AV *av)
@@ -662,16 +675,29 @@ swapfunc(SV **a, SV **b, size_t n)
 
 #if HAVE_FEATURE_STATEMENT_EXPRESSION
 # define CMP(x, y) ({ \
-        GvSV(PL_firstgv) = *(x); \
-        GvSV(PL_secondgv) = *(y); \
-        MULTICALL; \
-        SvIV(*PL_stack_sp); \
+        SV *olda, *oldb;                             \
+        olda = GvSV(PL_firstgv);                     \
+        oldb = GvSV(PL_secondgv);                    \
+        GvSV(PL_firstgv) = SvREFCNT_inc_simple_NN(*(x)); \
+        GvSV(PL_secondgv) = SvREFCNT_inc_simple_NN(*(y)); \
+        SvREFCNT_dec(olda);                          \
+        SvREFCNT_dec(oldb);                          \
+                                                     \
+        MULTICALL;                                   \
+        SvIV(*PL_stack_sp);                          \
     })
 #else
 static inline int _cmpsvs(pTHX_ SV *x, SV *y, OP *multicall_cop )
 {
-    GvSV(PL_firstgv) = x;
-    GvSV(PL_secondgv) = y;
+    SV *olda, *oldb;
+
+    olda = GvSV(PL_firstgv);
+    oldb = GvSV(PL_secondgv);
+    GvSV(PL_firstgv) = SvREFCNT_inc_simple_NN(x);
+    GvSV(PL_secondgv) = SvREFCNT_inc_simple_NN(y);
+    SvREFCNT_dec(olda);
+    SvREFCNT_dec(oldb);
+
     MULTICALL;
     return SvIV(*PL_stack_sp);
 }
@@ -805,57 +831,60 @@ loop:
 }
 
 /* lower_bound algorithm from STL - see http://en.cppreference.com/w/cpp/algorithm/lower_bound */
-#define LOWER_BOUND(at)               \
-    while (count > 0) {               \
-        ssize_t step = count / 2;     \
-        ssize_t it = first + step;    \
-                                      \
-        GvSV(PL_defgv) = at;          \
-        MULTICALL;                    \
-        cmprc = SvIV(*PL_stack_sp);   \
-        if (cmprc < 0) {              \
-            first = ++it;             \
-            count -= step + 1;        \
-        }                             \
-        else                          \
-            count = step;             \
+#define LOWER_BOUND(at)                   \
+    while (count > 0) {                   \
+        ssize_t step = count / 2;         \
+        ssize_t it = first + step;        \
+                                          \
+        ASSERT_PL_defgv                   \
+        GvSV(PL_defgv) = at;     \
+        MULTICALL;                        \
+        cmprc = SvIV(*PL_stack_sp);       \
+        if (cmprc < 0) {                  \
+            first = ++it;                 \
+            count -= step + 1;            \
+        }                                 \
+        else                              \
+            count = step;                 \
     }
 
-#define LOWER_BOUND_QUICK(at)         \
-    while (count > 0) {               \
-        ssize_t step = count / 2;     \
-        ssize_t it = first + step;    \
-                                      \
-        GvSV(PL_defgv) = at;          \
-        MULTICALL;                    \
-        cmprc = SvIV(*PL_stack_sp);   \
-        if(UNLIKELY(0 == cmprc)) {    \
-            first = it;               \
-            break;                    \
-        }                             \
-        if (cmprc < 0) {              \
-            first = ++it;             \
-            count -= step + 1;        \
-        }                             \
-        else                          \
-            count = step;             \
+#define LOWER_BOUND_QUICK(at)             \
+    while (count > 0) {                   \
+        ssize_t step = count / 2;         \
+        ssize_t it = first + step;        \
+                                          \
+        ASSERT_PL_defgv                   \
+        GvSV(PL_defgv) = at;     \
+        MULTICALL;                        \
+        cmprc = SvIV(*PL_stack_sp);       \
+        if(UNLIKELY(0 == cmprc)) {        \
+            first = it;                   \
+            break;                        \
+        }                                 \
+        if (cmprc < 0) {                  \
+            first = ++it;                 \
+            count -= step + 1;            \
+        }                                 \
+        else                              \
+            count = step;                 \
     }
 
 /* upper_bound algorithm from STL - see http://en.cppreference.com/w/cpp/algorithm/upper_bound */
-#define UPPER_BOUND(at)                 \
-    while (count > 0) {                 \
-        ssize_t step = count / 2;       \
-        ssize_t it = first + step;      \
-                                        \
-        GvSV(PL_defgv) = at;            \
-        MULTICALL;                      \
-        cmprc = SvIV(*PL_stack_sp); \
-        if (cmprc <= 0) {               \
-            first = ++it;               \
-            count -= step + 1;          \
-        }                               \
-        else                            \
-            count = step;               \
+#define UPPER_BOUND(at)                   \
+    while (count > 0) {                   \
+        ssize_t step = count / 2;         \
+        ssize_t it = first + step;        \
+                                          \
+        ASSERT_PL_defgv                   \
+        GvSV(PL_defgv) = at;     \
+        MULTICALL;                        \
+        cmprc = SvIV(*PL_stack_sp);       \
+        if (cmprc <= 0) {                 \
+            first = ++it;                 \
+            count -= step + 1;            \
+        }                                 \
+        else                              \
+            count = step;                 \
     }
 
 
@@ -880,8 +909,7 @@ CODE:
     }
 }
 
-
-MODULE = List::MoreUtils::XS_na             PACKAGE = List::MoreUtils::XS_na
+MODULE = List::MoreUtils::XS_sa             PACKAGE = List::MoreUtils::XS_sa
 
 void
 DESTROY(sv)
@@ -890,7 +918,7 @@ CODE:
 {
     int i;
     CV *code = (CV*)SvRV(sv);
-    natatime_args *args = (natatime_args *)(CvXSUBANY(code).any_ptr);
+    slideatatime_args *args = (slideatatime_args *)(CvXSUBANY(code).any_ptr);
     if (args)
     {
         for (i = 0; i < args->nsvs; ++i)
@@ -1079,6 +1107,136 @@ CODE:
     REDUCE_WITH(newSViv(1));
 }
 
+void
+slide(code, ...)
+    SV *code;
+PROTOTYPE: &@
+CODE:
+{
+    if ((items <= 2) || (!codelike(code)))
+       croak_xs_usage(cv,  "code, item1, item2, ...");
+    else {
+        /* keep original stack a bit smaller ... */
+        dMULTICALL;
+        dMULTICALLSVCV;
+        ssize_t i;
+        SV **args = &PL_stack_base[ax];
+        AV *rc = newAV();
+
+        sv_2mortal(newRV_noinc((SV*)rc));
+        av_extend(rc, items-2);
+
+        PUSH_MULTICALL(mc_cv);
+
+        SAVEGENERICSV(PL_firstgv);
+        SAVEGENERICSV(PL_secondgv);
+        PL_firstgv = MUTABLE_GV(SvREFCNT_inc(
+            gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV)
+        ));
+        PL_secondgv = MUTABLE_GV(SvREFCNT_inc(
+            gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV)
+        ));
+        /* make sure the GP isn't removed out from under us for
+         * the SAVESPTR() */
+        save_gp(PL_firstgv, 0);
+        save_gp(PL_secondgv, 0);
+        /* we don't want modifications localized */
+        GvINTRO_off(PL_firstgv);
+        GvINTRO_off(PL_secondgv);
+        SAVEGENERICSV(GvSV(PL_firstgv));
+        SvREFCNT_inc(GvSV(PL_firstgv));
+        SAVEGENERICSV(GvSV(PL_secondgv));
+        SvREFCNT_inc(GvSV(PL_secondgv));
+
+        for(i = 1 ; i < items - 1; ++i) {
+            SV *olda, *oldb;
+
+            olda = GvSV(PL_firstgv);
+            oldb = GvSV(PL_secondgv);
+            GvSV(PL_firstgv) = SvREFCNT_inc_simple_NN(args[i]);
+            GvSV(PL_secondgv) = SvREFCNT_inc_simple_NN(args[i+1]);
+            SvREFCNT_dec(olda);
+            SvREFCNT_dec(oldb);
+            MULTICALL;
+            av_push(rc, newSVsv(*PL_stack_sp));
+        }
+        POP_MULTICALL;
+
+        for(i = av_len(rc); i >= 0; --i)
+        {
+            ST(i) = sv_2mortal(AvARRAY(rc)[i]);
+            AvARRAY(rc)[i] = NULL;
+        }
+
+        AvFILLp(rc) = -1;
+    }
+
+    XSRETURN(items-2);
+}
+
+void
+_slideatatime_iterator ()
+PROTOTYPE:
+CODE:
+{
+    int i;
+
+    /* 'cv' is the hidden argument with which XS_List__MoreUtils__XS__slideatatime_iterator (this XSUB)
+     * is called. The closure_arg struct is stored in this CV. */
+
+    slideatatime_args *args = (slideatatime_args*)CvXSUBANY(cv).any_ptr;
+
+    EXTEND(SP, args->window);
+
+    for (i = 0; i < args->window; i++)
+        if ((args->curidx + i) < args->nsvs)
+            ST(i) = sv_2mortal(newSVsv(args->svs[args->curidx + i]));
+        else
+            break;
+
+    args->curidx += args->move;
+
+    XSRETURN(i);
+}
+
+SV *
+slideatatime (move, window, ...)
+int move;
+int window;
+PROTOTYPE: $@
+CODE:
+{
+    int i;
+    slideatatime_args *args;
+    HV *stash = gv_stashpv("List::MoreUtils::XS_sa", TRUE);
+
+    CV *closure = newXS(NULL, XS_List__MoreUtils__XS__slideatatime_iterator, __FILE__);
+
+    /* must NOT set prototype on iterator:
+     * otherwise one cannot write: &$it */
+    /* !! sv_setpv((SV*)closure, ""); !! */
+
+    New(0, args, 1, slideatatime_args);
+    New(0, args->svs, items-2, SV*);
+    args->nsvs   = items-2;
+    args->curidx = 0;
+    args->move   = move;
+    args->window = window;
+
+    for (i = 2; i < items; i++)
+        SvREFCNT_inc(args->svs[i-2] = ST(i));
+
+    CvXSUBANY(closure).any_ptr = args;
+    RETVAL = newRV_noinc((SV*)closure);
+
+    /* in order to allow proper cleanup in DESTROY-handler */
+    sv_bless(RETVAL, stash);
+}
+OUTPUT:
+    RETVAL
+
+
+
 int
 true (code, ...)
     SV *code;
@@ -1231,9 +1389,9 @@ CODE:
     AV *av;
 
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, val, \\@area_of_operation");
+       croak_xs_usage(cv, "code, val, \\@area_of_operation");
     if(!arraylike(avref))
-       croak_xs_usage(cv,  "code, val, \\@area_of_operation");
+       croak_xs_usage(cv, "code, val, \\@area_of_operation");
 
     av = (AV*)SvRV(avref);
     len = av_len(av);
@@ -1244,6 +1402,7 @@ CODE:
 
     for (i = 0; i <= len ; ++i)
     {
+        ASSERT_PL_defgv
         GvSV(PL_defgv) = *av_fetch(av, i, FALSE);
         MULTICALL;
         if (SvTRUE(*PL_stack_sp))
@@ -1277,7 +1436,7 @@ CODE:
     RETVAL = 0;
 
     if(!arraylike(avref))
-       croak_xs_usage(cv,  "string, val, \\@area_of_operation");
+       croak_xs_usage(cv, "string, val, \\@area_of_operation");
 
     av = (AV*)SvRV(avref);
     len = av_len(av);
@@ -1308,7 +1467,7 @@ PROTOTYPE: &@
 CODE:
 {
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items > 1) {
         dMULTICALL;
@@ -1402,7 +1561,7 @@ PROTOTYPE: &@
 CODE:
 {
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items > 1) {
         dMULTICALL;
@@ -1517,7 +1676,7 @@ PPCODE:
     sv_2mortal(newRV_noinc((SV*)rc));
 
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, list, list");
+       croak_xs_usage(cv, "code, list, list");
 
     if (in_pad(aTHX_ code)) {
         croak("Can't use lexical $a or $b in pairwise code block");
@@ -1531,21 +1690,38 @@ PPCODE:
     gimme = G_ARRAY;
     PUSH_MULTICALL(mc_cv);
 
-    if (!PL_firstgv || !PL_secondgv)
-    {
-        SAVESPTR(PL_firstgv);
-        SAVESPTR(PL_secondgv);
-        PL_firstgv = gv_fetchpv("a", TRUE, SVt_PV);
-        PL_secondgv = gv_fetchpv("b", TRUE, SVt_PV);
-    }
+    SAVEGENERICSV(PL_firstgv);
+    SAVEGENERICSV(PL_secondgv);
+    PL_firstgv = MUTABLE_GV(SvREFCNT_inc(
+        gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV)
+    ));
+    PL_secondgv = MUTABLE_GV(SvREFCNT_inc(
+        gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV)
+    ));
+    /* make sure the GP isn't removed out from under us for
+     * the SAVESPTR() */
+    save_gp(PL_firstgv, 0);
+    save_gp(PL_secondgv, 0);
+    /* we don't want modifications localized */
+    GvINTRO_off(PL_firstgv);
+    GvINTRO_off(PL_secondgv);
+    SAVEGENERICSV(GvSV(PL_firstgv));
+    SvREFCNT_inc(GvSV(PL_firstgv));
+    SAVEGENERICSV(GvSV(PL_secondgv));
+    SvREFCNT_inc(GvSV(PL_secondgv));
 
     for (i = 0; i < maxitems; ++i)
     {
         SV **j;
+        SV *olda = GvSV(PL_firstgv), *oldb = GvSV(PL_secondgv);
+
         SV **svp = av_fetch(list1, i, FALSE);
-        GvSV(PL_firstgv) = svp ? *svp : &PL_sv_undef;
+        GvSV(PL_firstgv) = SvREFCNT_inc_simple_NN(svp ? *svp : &PL_sv_undef);
         svp = av_fetch(list2, i, FALSE);
-        GvSV(PL_secondgv) = svp ? *svp : &PL_sv_undef;
+        GvSV(PL_secondgv) = SvREFCNT_inc_simple_NN(svp ? *svp : &PL_sv_undef);
+        SvREFCNT_dec(olda);
+        SvREFCNT_dec(oldb);
+
         MULTICALL;
 
         for (j = PL_stack_base+1; j <= PL_stack_sp; ++j)
@@ -1569,30 +1745,6 @@ PPCODE:
     XSRETURN(i);
 }
 
-void
-_natatime_iterator ()
-PROTOTYPE:
-CODE:
-{
-    int i, nret;
-
-    /* 'cv' is the hidden argument with which XS_List__MoreUtils__array_iterator (this XSUB)
-     * is called. The closure_arg struct is stored in this CV. */
-
-    natatime_args *args = (natatime_args*)CvXSUBANY(cv).any_ptr;
-    nret = args->natatime;
-
-    EXTEND(SP, nret);
-
-    for (i = 0; i < args->natatime; i++)
-        if (args->curidx < args->nsvs)
-            ST(i) = sv_2mortal(newSVsv(args->svs[args->curidx++]));
-        else
-            XSRETURN(i);
-
-    XSRETURN(nret);
-}
-
 SV *
 natatime (n, ...)
 int n;
@@ -1600,20 +1752,21 @@ PROTOTYPE: $@
 CODE:
 {
     int i;
-    natatime_args *args;
-    HV *stash = gv_stashpv("List::MoreUtils::XS_na", TRUE);
+    slideatatime_args *args;
+    HV *stash = gv_stashpv("List::MoreUtils::XS_sa", TRUE);
 
-    CV *closure = newXS(NULL, XS_List__MoreUtils__XS__natatime_iterator, __FILE__);
+    CV *closure = newXS(NULL, XS_List__MoreUtils__XS__slideatatime_iterator, __FILE__);
 
     /* must NOT set prototype on iterator:
      * otherwise one cannot write: &$it */
     /* !! sv_setpv((SV*)closure, ""); !! */
 
-    New(0, args, 1, natatime_args);
+    New(0, args, 1, slideatatime_args);
     New(0, args->svs, items-1, SV*);
     args->nsvs = items-1;
     args->curidx = 0;
-    args->natatime = n;
+    args->move   = n;
+    args->window = n;
 
     for (i = 1; i < items; i++)
         SvREFCNT_inc(args->svs[i-1] = ST(i));
@@ -1665,7 +1818,7 @@ CODE:
     for (i = 0; i < items; i++)
     {
         if(!arraylike(ST(i)))
-           croak_xs_usage(cv,  "\\@\\@;\\@...");
+           croak_xs_usage(cv, "\\@\\@;\\@...");
 
         avs[i] = (AV*)SvRV(ST(i));
         if (av_len(avs[i]) > maxidx)
@@ -1696,7 +1849,7 @@ CODE:
     for (i = 0; i < items; i++)
     {
         if(!arraylike(ST(i)))
-           croak_xs_usage(cv,  "\\@\\@;\\@...");
+           croak_xs_usage(cv, "\\@\\@;\\@...");
 
         src[i] = (AV*)SvRV(ST(i));
         if (av_len(src[i]) > maxidx)
@@ -1738,7 +1891,7 @@ CODE:
         I32 j;
 
         if(!arraylike(ST(i)))
-           croak_xs_usage(cv,  "\\@\\@;\\@...");
+           croak_xs_usage(cv, "\\@\\@;\\@...");
         av = (AV*)SvRV(ST(i));
 
         hv_clear(distinct);
@@ -1777,25 +1930,33 @@ CODE:
     }
 
     i = HvUSEDKEYS(rc);
-    EXTEND(SP, i * 2);
-
-    i = 0;
-    hv_iterinit(rc);
-    for(;;)
+    if (GIMME_V == G_SCALAR)
     {
-        HE *he = hv_iternext(rc);
-        SV *key, *val;
-        if(NULL == he)
-            break;
-
-        if(UNLIKELY(( NULL == (key = HeSVKEY_force(he)) ) || ( NULL == (val = HeVAL(he)) )))
-            continue;
-
-        ST(i++) = key;
-        ST(i++) = val;
+        ST(0) = sv_2mortal(newSVuv(i));
+        XSRETURN(1);
     }
+    else
+    {
+        EXTEND(SP, i * 2);
 
-    XSRETURN(i);
+        i = 0;
+        hv_iterinit(rc);
+        for(;;)
+        {
+            HE *he = hv_iternext(rc);
+            SV *key, *val;
+            if(NULL == he)
+                break;
+
+            if(UNLIKELY(( NULL == (key = HeSVKEY_force(he)) ) || ( NULL == (val = HeVAL(he)) )))
+                continue;
+
+            ST(i++) = key;
+            ST(i++) = val;
+        }
+
+        XSRETURN(i);
+    }
 }
 
 void
@@ -2308,7 +2469,7 @@ CODE:
     sv_2mortal(newRV_noinc((SV*)tmp));
 
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items == 1)
         XSRETURN_EMPTY;
@@ -2322,6 +2483,7 @@ CODE:
         SV **inner;
         AV *av;
 
+        ASSERT_PL_defgv
         GvSV(PL_defgv) = args[i];
         MULTICALL;
         idx = SvIV(*PL_stack_sp);
@@ -2365,7 +2527,7 @@ CODE:
 {
     I32 ret_gimme = GIMME_V;
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items > 1)
     {
@@ -2382,6 +2544,7 @@ CODE:
 
         if(cmprc < 0 && first < items)
         {
+            ASSERT_PL_defgv
             GvSV(PL_defgv) = args[first];
             MULTICALL;
             cmprc = SvIV(*PL_stack_sp);
@@ -2411,7 +2574,7 @@ CODE:
 {
     I32 ret_gimme = GIMME_V;
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     RETVAL = -1;
     if (items > 1)
@@ -2429,6 +2592,7 @@ CODE:
 
         if(cmprc < 0 && first < items)
         {
+            ASSERT_PL_defgv
             GvSV(PL_defgv) = args[first];
             MULTICALL;
             cmprc = SvIV(*PL_stack_sp);
@@ -2450,7 +2614,7 @@ PROTOTYPE: &@
 CODE:
 {
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items > 1)
     {
@@ -2482,7 +2646,7 @@ PROTOTYPE: &@
 CODE:
 {
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items > 1)
     {
@@ -2514,7 +2678,7 @@ PROTOTYPE: &@
 CODE:
 {
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (items > 1)
     {
@@ -2554,7 +2718,7 @@ PROTOTYPE: &$\@
 CODE:
 {
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, val, list");
+       croak_xs_usage(cv, "code, val, list");
 
     RETVAL = -1;
 
@@ -2594,7 +2758,7 @@ CODE:
 {
     I32 ret_gimme = GIMME_V;
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (AvFILLp(list) >= 0)
     {
@@ -2611,6 +2775,7 @@ CODE:
 
         if(cmprc < 0 && first < items)
         {
+            ASSERT_PL_defgv
             GvSV(PL_defgv) = btree[first];
             MULTICALL;
             cmprc = SvIV(*PL_stack_sp);
@@ -2666,7 +2831,7 @@ CODE:
     dMULTICALL;
 
     if(!codelike(code))
-       croak_xs_usage(cv,  "code, ...");
+       croak_xs_usage(cv, "code, ...");
 
     if (in_pad(aTHX_ code))
         croak("Can't use lexical $a or $b in qsort's cmp code block");
@@ -2694,8 +2859,10 @@ CODE:
         /* we don't want modifications localized */
         GvINTRO_off(PL_firstgv);
         GvINTRO_off(PL_secondgv);
-        SAVESPTR(GvSV(PL_firstgv));
-        SAVESPTR(GvSV(PL_secondgv));
+        SAVEGENERICSV(GvSV(PL_firstgv));
+        SvREFCNT_inc(GvSV(PL_firstgv));
+        SAVEGENERICSV(GvSV(PL_secondgv));
+        SvREFCNT_inc(GvSV(PL_secondgv));
 
         bsd_qsort_r(aTHX_ AvARRAY(list), av_len(list) + 1, multicall_cop);
         POP_MULTICALL;

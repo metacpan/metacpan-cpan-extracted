@@ -6,9 +6,11 @@ use strict;
 
 use A ();
 use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '0.01';
-	@ISA     = 'A';
+
+BEGIN
+{
+    $VERSION = '0.01';
+    @ISA     = 'A';
 }
 
 sub dummy { 1 }

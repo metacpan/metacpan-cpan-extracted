@@ -1,5 +1,5 @@
 package Util::Medley::Exec;
-$Util::Medley::Exec::VERSION = '0.047';
+$Util::Medley::Exec::VERSION = '0.051';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -23,7 +23,7 @@ Util::Medley::Exec - proxy for cmdline to libs
 
 =head1 VERSION
 
-version 0.047
+version 0.051
 
 =cut
 
@@ -116,6 +116,12 @@ method decryptStr (Str :$str!,
 
 	my $crypt = Util::Medley::Crypt->new;
 	say $crypt->decryptStr(%a);
+}
+
+method fileType (Str :$file!) {
+
+    my $util = Util::Medley::File->new;	
+    say $util->fileType($file);
 }
 
 method yamlBeautifyFile (Str :$file!,

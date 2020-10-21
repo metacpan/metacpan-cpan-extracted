@@ -1,3 +1,4 @@
+.perltidyrc
 ARTISTIC-1.0
 Changes
 GPL-1
@@ -11,8 +12,10 @@ lib/List/MoreUtils/Contributing.pod
 lib/List/MoreUtils/PP.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
+t/.perltidyrc
 t/inline/after.pm
 t/inline/after_incl.pm
 t/inline/all.pm
@@ -67,6 +70,8 @@ t/inline/reduce_1.pm
 t/inline/reduce_u.pm
 t/inline/samples.pm
 t/inline/singleton.pm
+t/inline/slide.pm
+t/inline/slideatatime.pm
 t/inline/true.pm
 t/inline/uniq.pm
 t/inline/upper_bound.pm
@@ -128,6 +133,8 @@ t/pureperl/reduce_1.t
 t/pureperl/reduce_u.t
 t/pureperl/samples.t
 t/pureperl/singleton.t
+t/pureperl/slide.t
+t/pureperl/slideatatime.t
 t/pureperl/true.t
 t/pureperl/uniq.t
 t/pureperl/upper_bound.t
@@ -187,6 +194,8 @@ t/xs/reduce_1.t
 t/xs/reduce_u.t
 t/xs/samples.t
 t/xs/singleton.t
+t/xs/slide.t
+t/xs/slideatatime.t
 t/xs/true.t
 t/xs/uniq.t
 t/xs/upper_bound.t

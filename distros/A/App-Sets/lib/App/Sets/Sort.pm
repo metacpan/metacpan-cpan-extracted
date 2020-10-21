@@ -1,5 +1,5 @@
 package App::Sets::Sort;
-$App::Sets::Sort::VERSION = '0.976';
+$App::Sets::Sort::VERSION = '0.978';
 
 
 use strict;
@@ -166,7 +166,7 @@ App::Sets::Sort - sort handling
 
 =head1 VERSION
 
-version 0.976
+version 0.978
 
 =head1 AUTHOR
 

@@ -24,7 +24,7 @@ eval {
 };
 like($@, qr/^Modification of non-creatable array value attempted, subscript -1/);
 
-$i = 0;
+$i    = 0;
 @part = part { $i++ == 0 ? 0 : -1 } @list;
 is_deeply($part[0], [1 .. 12], "part with negative indices");
 
@@ -72,7 +72,7 @@ leak_free_ok(
 leak_free_ok(
     'part with exception' => sub {
         my @long_list = int rand(1000) for 0 .. 1E7;
-        my @part = part { $_ == 1E7 and die "Too much!"; ($_ % 10) * 2 } @long_list;
+        my @part      = part { $_ == 1E7 and die "Too much!"; ($_ % 10) * 2 } @long_list;
     }
 );
 

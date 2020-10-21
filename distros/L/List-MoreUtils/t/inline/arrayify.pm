@@ -5,14 +5,14 @@ use Tie::Array ();
 
 SCOPE:
 {
-    my @in = (1 .. 4, [5 .. 7], 8 .. 11, [[12 .. 17]], 18);
+    my @in  = (1 .. 4, [5 .. 7], 8 .. 11, [[12 .. 17]], 18);
     my @out = arrayify @in;
     is_deeply(\@out, [1 .. 18], "linear flattened int mix i");
 }
 
 SCOPE:
 {
-    my @in = (1 .. 4, [[5 .. 11]], 12, [[13 .. 17]]);
+    my @in  = (1 .. 4, [[5 .. 11]], 12, [[13 .. 17]]);
     my @out = arrayify @in;
     is_deeply(\@out, [1 .. 17], "linear flattened int mix ii");
 }
@@ -56,7 +56,7 @@ SCOPE:
 
 SCOPE:
 {
-    my @in = (qw(av_make av_undef av_clear), [qw(av_push av_pop)], qw(av_fetch av_store), [['av_shift'], ['av_unshift']]);
+    my @in  = (qw(av_make av_undef av_clear), [qw(av_push av_pop)], qw(av_fetch av_store), [['av_shift'], ['av_unshift']]);
     my @out = arrayify @in;
     is_deeply(
         \@out,
@@ -67,7 +67,7 @@ SCOPE:
 
 leak_free_ok(
     arrayify => sub {
-        my @in = (1 .. 4, [5 .. 7], 8 .. 11, [[12 .. 17]]);
+        my @in  = (1 .. 4, [5 .. 7], 8 .. 11, [[12 .. 17]]);
         my @out = arrayify @in;
     },
     'arrayify magic' => sub {

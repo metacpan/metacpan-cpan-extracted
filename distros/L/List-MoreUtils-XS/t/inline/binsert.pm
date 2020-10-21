@@ -43,7 +43,7 @@ foreach my $v (reverse @even)
 }
 is_deeply(\@in, \@expected, "binsert even elements reversely into odd list succeeded");
 
-@in = @even;
+@in       = @even;
 @expected = map { $_, $_ } @in;
 foreach my $v (@even)
 {
@@ -51,7 +51,7 @@ foreach my $v (@even)
 }
 is_deeply(\@in, \@expected, "binsert existing even elements into even list succeeded");
 
-@in = @even;
+@in       = @even;
 @expected = map { $_, $_ } @in;
 foreach my $v (reverse @even)
 {

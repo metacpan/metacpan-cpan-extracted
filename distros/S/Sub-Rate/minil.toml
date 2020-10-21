@@ -1,0 +1,7 @@
+name = "Sub-Rate"
+# badges = ["travis-ci.com"]
+authority="cpan:FUJIWARA"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

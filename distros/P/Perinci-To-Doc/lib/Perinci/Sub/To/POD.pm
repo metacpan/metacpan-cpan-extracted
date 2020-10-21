@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2020-10-07'; # DATE
-our $VERSION = '0.873'; # VERSION
+our $DATE = '2020-10-20'; # DATE
+our $VERSION = '0.874'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -155,23 +155,21 @@ sub after_gen_doc {
             last unless $eg->{'x.doc.show_result'} // 1;
             log_trace("result_naked: %s", $meta->{result_naked});
             log_trace("orig_result_naked: %s", $orig_result_naked);
-            my $res;
+            my $envres;
             my $tff;
             if (exists $eg->{result}) {
-                $res = $eg->{result};
+                $envres = $orig_result_naked ? [200, "OK (envelope generated)", $eg->{result}] : $eg->{result};
                 unless ($orig_result_naked) {
-                    $tff = $res->[3]{'table.fields'};
+                    $tff = $envres->[3]{'table.fields'};
                 }
             } elsif (exists $eg->{naked_result}) {
-                $res = $orig_result_naked ? $eg->{naked_result} : [200, "OK (envelope generated)", $eg->{naked_result}];
+                $envres = [200, "OK (envelope generated)", $eg->{naked_result}];
             } elsif (exists $eg->{env_result}) {
-                $res = $orig_result_naked ? $eg->{env_result}[2] : $eg->{env_result};
-                unless ($orig_result_naked) {
-                    $tff = $res->[3]{'table.fields'};
-                }
+                $envres = $eg->{env_result};
+                $tff = $envres->[3]{'table.fields'};
             } else {
-                # XXX since we retrieve the result by calling through Riap,
-                # the result will be json-cleaned.
+                # NOTE: since we retrieve the result by calling through Riap,
+                # the result will enveloped and be json-cleaned.
                 my %extra;
                 if ($eg->{argv}) {
                     $extra{argv} = $eg->{argv};
@@ -181,18 +179,18 @@ sub after_gen_doc {
                     log_debug("Example does not provide args/argv, skipped trying to get result from calling function");
                     last GET_RESULT;
                 }
+                say "D2";
                 my $url;
                 if ($self->{url} =~ /\A\w+\z/) {
                     $url = $self->parent->name . $self->{url};
                 } else {
                     $url = $self->{url};
                 }
-                $res = $self->{_pa}->request(call => $url, \%extra);
+                $envres = $self->{_pa}->request(call => $url, \%extra);
                 unless ($orig_result_naked) {
-                    $tff = $res->[3]{'table.fields'};
+                    $tff = $envres->[3]{'table.fields'};
                 }
             }
-            $res = $res->[2] if $orig_result_naked;
             local $Data::Dump::SortKeys::SORT_KEYS = do {
                 if ($tff) {
                     require Sort::ByExample;
@@ -202,7 +200,7 @@ sub after_gen_doc {
                     undef;
                 }
             };
-            $resdump = Data::Dump::SortKeys::dump($res);
+            $resdump = Data::Dump::SortKeys::dump($orig_result_naked ? $envres->[2] : $envres);
         }
 
         my $status = $eg->{status} // 200;
@@ -447,7 +445,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.873 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-10-07.
+This document describes version 0.874 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-10-20.
 
 =head1 SYNOPSIS
 

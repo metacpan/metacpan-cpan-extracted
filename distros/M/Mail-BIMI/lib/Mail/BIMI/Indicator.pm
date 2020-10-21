@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '2.20201019.2'; # VERSION
+our $VERSION = '2.20201020.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -204,7 +204,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 2.20201019.2
+version 2.20201020.2
 
 =head1 DESCRIPTION
 

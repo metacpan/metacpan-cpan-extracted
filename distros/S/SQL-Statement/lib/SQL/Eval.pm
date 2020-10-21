@@ -3,7 +3,7 @@ package SQL::Eval;
 #########################################################################
 #
 # This module is copyright (c), 2001,2005 by Jeff Zucker.
-# This module is copyright (c), 2007-2017 by Jens Rehsack.
+# This module is copyright (c), 2007-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -16,7 +16,7 @@ use strict;
 use warnings FATAL => "all";
 use vars qw($VERSION);
 
-$VERSION = '1.412';
+$VERSION = '1.414';
 
 use Carp qw(croak);
 
@@ -278,7 +278,7 @@ Hash reference containing additional capabilities.
 =item _gen_access_fastpath
 
 Return a subroutine reference for fast accessing columns for read-only
-access. When the instantiated object doesn't provide own methods for
+access. When the instantiated object does not provide own methods for
 C<column> and C<column_num> a subroutine reference is returned which
 directly access the internal data structures. For all other cases a
 subroutine directly calling C<< $self->column($_[0]) >> is returned.
@@ -512,7 +512,7 @@ indexes.
 =head1 MULTITHREADING
 
 All methods are working with instance-local data only, thus the module
-is reentrant and thread safe, if you either don't share handles between
+is reentrant and thread safe, if you either do not share handles between
 threads or grant serialized use.
 
 =head1 BUGS

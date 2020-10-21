@@ -1,9 +1,9 @@
 ############################################################
 #
-#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
+#   Copyright 2008-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,15 +27,14 @@ use 5.008001;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA);
+use vars qw($VERSION);
+use parent qw(Sys::Filesystem::Unix);
 
 use Carp qw(croak);
 use Cwd 'abs_path';
-use IO::File              ();
-use Sys::Filesystem::Unix ();
+use IO::File ();
 
-$VERSION = '1.406';
-@ISA     = qw(Sys::Filesystem::Unix);
+$VERSION = '1.408';
 
 sub version()
 {
@@ -61,36 +60,37 @@ my %special_fs = (
     udev                    => 1,
 );
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
-    ref( my $class = shift ) && croak 'Class name required';
+    ref(my $class = shift) && croak 'Class name required';
     my %args = @_;
-    my $self = bless( {}, $class );
+    my $self = bless({}, $class);
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
-    $args{mtab} ||= -r '/proc/mounts' ? '/proc/mounts' : '/etc/mtab';
+    $args{mtab}  ||= -r '/proc/mounts' ? '/proc/mounts' : '/etc/mtab';
     #$args{xtab}  ||= '/etc/lib/nfs/xtab';
     $args{canondev} and $self->{canondev} = 1;
 
     local $/ = "\n";
 
     # Read the fstab
-    if ( my $fstab = IO::File->new( $args{fstab}, 'r' ) )
+    if (my $fstab = IO::File->new($args{fstab}, 'r'))
     {
         while (<$fstab>)
         {
-            next if ( /^\s*#/ || /^\s*$/ );
-            my @vals = split( ' ', $_ );
+            next if (/^\s*#/ || /^\s*$/);
+            my @vals = split(' ', $_);
             $vals[0] =~ /^\s*LABEL=(.+)\s*$/
-              and $self->{ $vals[1] }->{label} = $1;
-            $args{canondev} and -l $vals[0] and $vals[0] = abs_path( $vals[0] );
-            $self->{ $vals[1] }->{mount_point} = $vals[1];
-            $self->{ $vals[1] }->{device}      = $vals[0];
-            $self->{ $vals[1] }->{unmounted}   = 1;
-            defined $special_fs{ $vals[2] }
-              and $self->{ $vals[1] }->{special} = 1;
-            @{ $self->{ $vals[1] } }{@keys} = @vals;
+              and $self->{$vals[1]}->{label} = $1;
+            $args{canondev} and -l $vals[0] and $vals[0] = abs_path($vals[0]);
+            $self->{$vals[1]}->{mount_point}             = $vals[1];
+            $self->{$vals[1]}->{device}                  = $vals[0];
+            $self->{$vals[1]}->{unmounted}               = 1;
+            defined $special_fs{$vals[2]}
+              and $self->{$vals[1]}->{special} = 1;
+            @{$self->{$vals[1]}}{@keys} = @vals;
         }
         $fstab->close();
     }
@@ -100,14 +100,14 @@ sub new
     }
 
     # Read the mtab
-    unless ( $self->readMntTab( $args{mtab}, \@keys, [ 0, 1, 2 ], \%special_fs ) )
+    unless ($self->readMntTab($args{mtab}, \@keys, [0, 1, 2], \%special_fs))
     {
         croak "Unable to open fstab file ($args{mtab})\n";
     }
 
     delete $self->{canondev};
 
-    $self;
+    return $self;
 }
 
 1;
@@ -220,10 +220,6 @@ be checked.
 
 L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
@@ -234,11 +230,10 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2009-2014 Jens Rehsack.
+Copyright 2009-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

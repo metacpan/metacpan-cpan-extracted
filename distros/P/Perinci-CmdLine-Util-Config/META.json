@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Util-Config"
       }
    },
-   "version" : "1.723",
+   "version" : "1.724",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -1,3 +1,8 @@
+0.874   2020-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix the naked/enveloped result bug once and for all (I hope).
+
+
 0.873   2020-10-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe env_result & naked_result function example specification.

@@ -6,7 +6,6 @@ use open ':std', ':encoding(UTF-8)';
 use Encode qw(decode);
 use File::Find;
 use File::Spec;
-use File::stat;
 use Digest::MD5;
 use Class::Load qw(load_class);
 use Carp;
@@ -14,11 +13,9 @@ use POSIX qw(strftime);
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.067'; # VERSION
+our $VERSION = '0.069'; # VERSION
 
 # ABSTRACT: The common base for Archive::BagIt. This is the module for experts. ;)
-
-use Sub::Quote;
 
 
 
@@ -36,23 +33,6 @@ around 'BUILDARGS' , sub {
 sub BUILD {
     my ($self, $args) = @_;
     return $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5", "Archive::BagIt::Plugin::Manifest::SHA512"));
-}
-
-###############################################
-
-
-has 'parallel' => ( # used for parallel verify, only usefull if bagits with many files expected!
-    is        => 'rw',
-    lazy      => 1,
-);
-
-sub has_parallel {
-    my $self = shift;
-    if ((exists $self->{parallel}) && ($self->{parallel})) {
-        return 1
-    } else {
-        return;
-    }
 }
 
 ###############################################
@@ -545,20 +525,22 @@ sub __file_find { # own implementation, because File::Find has problems with UTF
         $excludedir = File::Spec->rel2abs( $excludedir);
     }
     my @file_paths;
+    my $rx_portable = qr/^[a-zA-Z0-9._-]+$/;
     my $finder;
     $finder = sub {
-        my $current_dir = shift; #absolute path
+        my ($current_dir) = @_; #absolute path
         my @todo;
         my @tmp_file_paths;
         opendir( my $dh, $current_dir);
-        while ( my $local_entry = readdir($dh) ) {
-            next if $local_entry =~ m/^\.{1,2}$/;
-            my $is_portable = $local_entry =~ m/^[a-zA-Z0-9._-]+$/;
+        my @paths = File::Spec->no_upwards ( readdir $dh );
+        closedir $dh;
+        foreach my $local_entry (@paths) {
+            my $is_portable = $local_entry =~ m/$rx_portable/;
             if (! $is_portable) {
                 my $local_entry_utf8 = decode("UTF-8", $local_entry);
                 if ((!$self->has_force_utf8)) {
                     my $hexdump = "0x" . unpack('H*', $local_entry);
-                    $local_entry =~m/[^a-zA-Z0-9._-]/;
+                    $local_entry =~m/[^a-zA-Z0-9._-]/; # to find PREMATCH, needed nextline
 
                     carp "possible non portable pathname detected in $dir,\n",
                         "got path (hexdump)='$hexdump'(hex),\n",
@@ -577,7 +559,6 @@ sub __file_find { # own implementation, because File::Find has problems with UTF
                 croak "not a file nor a dir found '$path_entry'";
             }
         }
-        closedir($dh);
         push @file_paths, sort @tmp_file_paths;
         foreach my $subdir (sort @todo) {
             &$finder($subdir);
@@ -687,9 +668,9 @@ sub _parse_bag_info { # parses a bag-info textblob
 
         if ($textblob =~ s/(.+?)(?=^\S)//ms) {
             # value if rest string starts with chars not \r and/or \n until a non-whitespace after \r\n
-            $value = $self->chomp_portable($1);
+            $value = chomp_portable($1);
         } elsif ($textblob =~ s/(.*)//s) {
-            $value = $self->chomp_portable($1);
+            $value = chomp_portable($1);
         }
         if (defined $label) {
             push @labels, { "$label" => "$value" };
@@ -835,8 +816,11 @@ sub calc_payload_oxum {
     my $streamcount = scalar @payload;
     foreach my $local_name (@payload) {# local_name is relative to bagit base
         my $file = File::Spec->catfile($self->bag_path(), $local_name);
-        my $sb = File::stat::stat($file) or croak "file $file error, $!";
-        $octets += $sb->size;
+        if (-e $file) {
+            my $filesize = 0;
+            $filesize = -s $file or carp "empty file $file detected";
+            $octets += $filesize;
+        } else { croak "file $file does not exist, $!"; }
     }
     return ($octets, $streamcount);
 }
@@ -953,7 +937,7 @@ Archive::BagIt::Base - The common base for Archive::BagIt. This is the module fo
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 NAME
 
@@ -1026,19 +1010,15 @@ Similar for tagmanifests
 
 It depends. On my system with SSD and a 38MB bag with 48 payload files the results for C<verify_bag()> are:
 
-                  Rate BaseParallel FastParallel         Base         Fast
-   BaseParallel 2.46/s           --          -2%         -52%         -57%
-   FastParallel 2.52/s           2%           --         -51%         -56%
-   Base         5.10/s         107%         102%           --         -10%
-   Fast         5.69/s         131%         125%          11%           --
+                  Rate        Base         Fast
+   Base         102%           --         -10%
+   Fast         125%           11%           --
 
 On network filesystem (CIFS, 1Gb) with same Bag:
 
-                  Rate FastParallel         Fast BaseParallel         Base
-   FastParallel 1.97/s           --         -10%         -15%         -20%
-   Fast         2.20/s          12%           --          -6%         -11%
-   BaseParallel 2.33/s          18%           6%           --          -6%
-   Base         2.48/s          26%          13%           6%           --
+                  Rate         Fast         Base
+   Fast         2.20/s          --          -11%
+   Base         2.48/s          13%         --
 
 But you should measure which variant is best for you. In general the default C<Archive::BagIt::Base> is fast enough.
 
@@ -1122,7 +1102,6 @@ or use hashreferences
     my $bag_dir = "/path/to/bag";
     my $bag = Archive::BagIt::Base->new(
         bag_path => $bag_dir,
-        parallel => 1
     );
 
 The arguments are:
@@ -1131,9 +1110,6 @@ The arguments are:
 
 =item C<bag_path> - path to bag-directory
 
-=item C<parallel> - if set and Parallel::Iterator available, it verifies files in parallel.
-      Hint: use it only for very large bagits, because overhead for parallelization
-
 =item C<force_utf8> - if set the warnings about non portable filenames are disabled (default: enabled)
 
 =back
@@ -1141,10 +1117,6 @@ The arguments are:
 The bag object will use $bag_dir, BUT an existing $bag_dir is not read. If you use C<store()> an existing bag will be overwritten!
 
 See C<load()> if you want to parse/modify an existing bag.
-
-=head2 has_parallel()
-
-to check if parallelization is possible.
 
 =head2 has_force_utf8()
 

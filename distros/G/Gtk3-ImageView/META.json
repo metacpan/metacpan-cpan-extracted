@@ -1,0 +1,55 @@
+{
+   "abstract" : "Gtk3 port of the Gtk2::ImageView image viewer widget",
+   "author" : [
+      "Jeffrey Ratcliffe <jffry@posteo.net>",
+      "Alexey Sokolov <sokolov@google.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk3-ImageView",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Glib" : "1.21",
+            "Gtk3" : "0",
+            "Readonly" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp::Always" : "0",
+            "Image::Magick" : "0",
+            "Test::Differences" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

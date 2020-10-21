@@ -10,7 +10,7 @@ my @list = (1 .. 10000);
 is(4999, (firstidx { $_ >= 5000 } @list),  "firstidx");
 is(-1,   (firstidx { not defined } @list), "invalid firstidx");
 is(0,    (firstidx { defined } @list),     "real firstidx");
-is(-1, (firstidx {}), "empty firstidx");
+is(-1,   (firstidx {}),                    "empty firstidx");
 
 SKIP:
 {
@@ -18,7 +18,7 @@ SKIP:
     is(4999, first_index { $_ >= 5000 } @list);
     is(-1,   first_index { not defined } @list);
     is(0,    first_index { defined } @list);
-    is(-1, first_index {});
+    is(-1,   first_index {});
 }
 
 leak_free_ok(

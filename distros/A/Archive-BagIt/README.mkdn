@@ -4,7 +4,7 @@ Archive::BagIt - An interface to make and verify bags according to the BagIt sta
 
 # VERSION
 
-version 0.067
+version 0.069
 
 # WARNING
 

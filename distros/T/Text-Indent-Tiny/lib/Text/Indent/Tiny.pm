@@ -4,7 +4,7 @@ Text::Indent::Tiny - tiny and flexible indentation across modules
 
 =head1 VERSION
 
-This module version is 0.1.0.
+This module version is 0.1.2.
 
 =head1 SYNOPSIS
 
@@ -257,7 +257,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "0.1.0";
+our $VERSION = "0.1.2";
 
 # Default indent settings: 4 spaces per one indent
 
@@ -288,7 +288,7 @@ sub lclamp {
 
 sub set_indent {
 	my $self = shift;
-	my $v = shift // 0;
+	my $v = shift || 0;
 
 	if ( defined wantarray ) {
 		$self = bless { %{ $self } }, ref $self;
@@ -309,8 +309,8 @@ sub new {
 	my $t = $DefaultSpace;
 	my $s = $DefaultSize;
 
-	$p{text} //= $p{tab} ? "\t" : $t x lclamp(1, $p{size} // $s);
-	$p{level} = lclamp(0, $p{level} // 0);
+	$p{text} ||= $p{tab} ? "\t" : $t x lclamp(1, $p{size} || $s);
+	$p{level} = lclamp(0, $p{level} || 0);
 
 	my $self = bless {
 		text	=> $p{text},
@@ -327,7 +327,7 @@ sub new {
 # =========================================================================
 
 sub instance {
-	$indent //= new(@_);
+	$indent = defined $indent ? $indent : new(@_);
 }
 
 # =========================================================================
@@ -372,13 +372,13 @@ sub cut {
 sub over {
 	my ( $self, $v ) = @_;
 	$v = $v->{level} if ref $v eq __PACKAGE__;
-	$self->set_indent(+abs($v // 1));
+	$self->set_indent(+abs($v || 1));
 }
 
 sub back {
 	my ( $self, $v ) = @_;
 	$v = $v->{level} if ref $v eq __PACKAGE__;
-	$self->set_indent(-abs($v // 1));
+	$self->set_indent(-abs($v || 1));
 }
 
 1;

@@ -60,11 +60,11 @@ SCOPE:
 
 SCOPE:
 {
-    my @foo = ('a', 'b', '', undef, 'b', 'c', '');
+    my @foo  = ('a', 'b',   '', undef, 'b', 'c', '');
     my @sfoo = ('a', undef, 'c');
     is_deeply([singleton @foo], \@sfoo, 'one undef is supported correctly by singleton');
-    @foo = ('a', 'b', '', undef, 'b', 'c', undef);
-    @sfoo = ('a', '', 'c');
+    @foo  = ('a', 'b', '', undef, 'b', 'c', undef);
+    @sfoo = ('a', '',  'c');
     is_deeply([singleton @foo], \@sfoo, 'twice undef is supported correctly by singleton');
     is((scalar singleton @foo), scalar @sfoo, 'scalar twice undef is supported correctly by singleton');
 }
@@ -85,11 +85,11 @@ leak_free_ok(
     sub {
         eval {
             my $obj = DieOnStringify->new;
-            my @u = singleton $obj, $obj;
+            my @u   = singleton $obj, $obj;
         };
         eval {
             my $obj = DieOnStringify->new;
-            my $u = singleton $obj, $obj;
+            my $u   = singleton $obj, $obj;
         };
     }
 );

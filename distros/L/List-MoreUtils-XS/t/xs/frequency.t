@@ -44,9 +44,9 @@ SCOPE:
 # Test mixing strings and numbers
 SCOPE:
 {
-    my @s = (1001 .. 1200, "AA" .. "ZZ");
-    my @d = (1 .. 1000,    "aa" .. "zz");
-    my @a = (@d, @s, @d);
+    my @s  = (1001 .. 1200, "AA" .. "ZZ");
+    my @d  = (1 .. 1000,    "aa" .. "zz");
+    my @a  = (@d, @s, @d);
     my %e  = ((map { $_ => 2 } @d), map { $_ => 1 } @s);
     my $fa = freeze(\@a);
     my %f  = frequency @a;
@@ -77,7 +77,7 @@ SCOPE:
 SCOPE:
 {
     my @foo = ('a', 'b', '', undef, 'b', 'c', '', undef);
-    my %e = (
+    my %e   = (
         a  => 1,
         b  => 2,
         '' => 2,
@@ -116,7 +116,7 @@ leak_free_ok(
         };
         eval {
             my $obj = DieOnStringify->new;
-            my $f = frequency 'a', 'b', '', undef, $obj, 'b', 'c', '', undef, $obj;
+            my $f   = frequency 'a', 'b', '', undef, $obj, 'b', 'c', '', undef, $obj;
         };
     }
 );

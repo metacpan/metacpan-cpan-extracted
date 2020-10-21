@@ -1,5 +1,19 @@
 Revision history for Perl extension File-ShareDir
 
+1.118	2020-10-21
+    - Releasing 1.117_001 without further changes
+
+1.117_001	2020-09-25
+    - fix failing test of dependencies after in 1.116 (from 1.112),
+      thanks to Dirk Stöcker for reporting via RT#127376 and
+      Mohammad S Anwar (@manwar) for providing the fix via Github
+      PR#14
+    - Fix RT#133368 (PR#15): Fix running tests in parallel submitted
+      by Kent Fredric (KENTNL) and fix provided by Tom Hukins (@tomhukins)
+    - Fix RT#125907: spelling error in manpage - thanks to Lucas Kanashiro
+      for reporting and Graham Knop (@haarg) for kicking me by submitting
+      PR#17
+
 1.116	2018-06-24
     - fix fail-test which incorrectly read without permission
       ==> introduce new CI test proving this (Thanks to Ville

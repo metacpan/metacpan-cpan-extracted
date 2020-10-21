@@ -1,8 +1,9 @@
 package Mail::BIMI::Role::Cacheable;
 # ABSTRACT: Cache handling
-our $VERSION = '2.20201019.2'; # VERSION
+our $VERSION = '2.20201020.2'; # VERSION
 use 5.20.0;
 use Moose::Role;
+use Mail::BIMI;
 use Mail::BIMI::Prelude;
 use Mail::BIMI::Trait::Cacheable;
 use Mail::BIMI::Trait::CacheKey;
@@ -75,6 +76,12 @@ around new => sub{
     warn 'Cache is invalid';
     return $self;
   }
+  my $version = $Mail::BIMI::VERSION;
+  $version //= 'dev';
+  if ($data->{cache_version} ne $version){
+    warn 'Cache is invalid';
+    return $self;
+  }
   if ($data->{timestamp}+$self->cache_valid_for < $self->bimi_object->time) {
     $self->cache_backend->delete_cache;
     return $self;
@@ -103,8 +110,11 @@ sub _write_cache($self) {
   $self->_do_not_cache(1);
   my $meta = $self->meta;
   my $time = $self->bimi_object->time;
+  my $version = $Mail::BIMI::VERSION;
+  $version //= 'dev';
   my $data = {
     cache_key => $self->_cache_key,
+    cache_version => $version,
     timestamp => $self->_cache_read_timestamp // $time,
     data => {},
   };
@@ -139,7 +149,7 @@ Mail::BIMI::Role::Cacheable - Cache handling
 
 =head1 VERSION
 
-version 2.20201019.2
+version 2.20201020.2
 
 =head1 DESCRIPTION
 
@@ -154,6 +164,8 @@ Do not cache this object
 =head1 REQUIRES
 
 =over 4
+
+=item * L<Mail::BIMI|Mail::BIMI>
 
 =item * L<Mail::BIMI::CacheBackend::FastMmap|Mail::BIMI::CacheBackend::FastMmap>
 

@@ -1,5 +1,5 @@
 package App::Sets::Parser;
-$App::Sets::Parser::VERSION = '0.976';
+$App::Sets::Parser::VERSION = '0.978';
 
 
 use strict;
@@ -239,7 +239,7 @@ App::Sets::Parser - parse input expressions of operations on sets
 
 =head1 VERSION
 
-version 0.976
+version 0.978
 
 =begin grammar
 

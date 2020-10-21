@@ -1,5 +1,5 @@
 {
-   "abstract" : "Interface to Google's Blogger service",
+   "abstract" : "(DEPRECATED) Interface to Google's Blogger service",
    "author" : [
       "Kedar Warriner <kedar at cpan.org>"
    ],
@@ -50,5 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.22"
+   "version" : "0.23",
+   "x_deprecated": 1
 }

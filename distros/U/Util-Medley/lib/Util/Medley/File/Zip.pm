@@ -1,5 +1,5 @@
 package Util::Medley::File::Zip;
-$Util::Medley::File::Zip::VERSION = '0.047';
+$Util::Medley::File::Zip::VERSION = '0.051';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -14,7 +14,7 @@ Util::Medley::File::Zip - utility methods for working with zipfiles.
 
 =head1 VERSION
 
-version 0.047
+version 0.051
 
 =cut
 

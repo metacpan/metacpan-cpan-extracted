@@ -27,7 +27,7 @@ sub check_statement_expression
     my $cache_name = $self->_cache_name(qw(feature statement expression));
     my $check_sub  = sub {
         my $prologue = defined $options->{prologue} ? $options->{prologue} : "";
-        my $decl = "#define STMT_EXPR ({ 1; })";
+        my $decl     = "#define STMT_EXPR ({ 1; })";
 
         my $have_stmt_expr = $self->compile_if_else(
             $self->lang_build_bool_test($prologue, "STMT_EXPR", $decl),

@@ -26,10 +26,12 @@ _Inline/.*
 ~$
 .*\.planner
 \bxt
-^MYMETA\.json$
-^MYMETA\..*$
+^MYMETA\.
 bugsql
 nytprof*
 .*\.csv
-^\..*
+\.aspell\.local\.pws
+.*\.lock
+\.travis\.yml
 SQL-Statement-.*
+cover_db/

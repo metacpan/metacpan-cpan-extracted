@@ -1,3 +1,10 @@
+0.2.8 2020-10-22
+	- Minor POD fix.
+0.2.7 2020-10-21
+	- Fix case with ignoring some dirs to backup.
+	- Minor storage integrity report fix.
+	- Minor verbosity output fix.
+	- Minor POD improvement.
 0.2.6 2020-10-18
 	- POD minor change.
 0.2.5 2020-10-18

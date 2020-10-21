@@ -1,5 +1,5 @@
 package Data::Crumbr::Default::URI;
-$Data::Crumbr::Default::URI::VERSION = '0.1.1';
+$Data::Crumbr::Default::URI::VERSION = '0.1.2';
 # ABSTRACT: "JSON" profile for Data::Crumbr::Default
 use Data::Crumbr::Util;
 
@@ -40,7 +40,7 @@ Data::Crumbr::Default::URI - "JSON" profile for Data::Crumbr::Default
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Parqus;
-$Parqus::VERSION = '0.02';
+$Parqus::VERSION = '0.03';
 use Moo;
 use namespace::autoclean;
 use Regexp::Grammars;
@@ -35,6 +35,15 @@ has value_regex => (
     default => sub { qr![\w-]+!xms },
 );
 
+has string_delimiters => (
+    is  => 'lazy',
+    isa => sub {
+        die "$_[0] is not a ArrayRef!"
+          if ref $_[0] ne 'ARRAY';
+    },
+    default => sub { [qw/'"/] }
+);
+
 has parser => (
     is       => 'lazy',
     init_arg => undef,
@@ -47,8 +56,9 @@ has parser => (
 sub _build_parser {
     my ($self) = @_;
 
-    my %keywords    = %{ $self->keywords };
-    my $value_regex = $self->value_regex;
+    my %keywords          = %{ $self->keywords };
+    my $value_regex       = $self->value_regex;
+    my @string_delimiters = @{ $self->string_delimiters };
     return eval q{qr/
                     <timeout: 2>
                     ^
@@ -65,7 +75,7 @@ sub _build_parser {
                     <rule: key>
                         <%keywords>
                     <rule: delim>
-                        ['"]
+                        [@string_delimiters]
                     <rule: value>
                         <MATCH= ($value_regex)>|<ldelim=delim><MATCH= (.*?)><rdelim=\_ldelim>
                  /xms};
@@ -123,7 +133,7 @@ Parqus - parse a search query string
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -184,6 +194,10 @@ the list of keywords you want to recognise.
 
 regular expression to capture words. (default: C<[qr![\w-]+!xms]>)
 
+=head2 string_delimiters
+
+array of characters used to delimit strings. (default: C<['"]>)
+
 =head1 SEE ALSO
 
 L<Regexp::Grammars>,
@@ -196,7 +210,7 @@ David Schmidt <davewood@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by David Schmidt.
+This software is copyright (c) 2020 by David Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,10 +7,12 @@ use Test::More;
 
 # Prereqs-testing for File::ShareDir
 
-TODO:
+BEGIN
 {
-    local $TODO = "Just diagnostics ...";
-    use_ok("CPAN::Meta") or plan skip_all => "Need CPAN::Meta for this test";
+    if (!eval { require CPAN::Meta; 1 })
+    {
+        plan skip_all => "Need CPAN::Meta for this test";
+    }
 }
 
 my $meta = CPAN::Meta->load_file(-d "xt" ? "MYMETA.json" : "META.json");
@@ -28,7 +30,7 @@ foreach my $phase (qw/configure build runtime test/, (-d "xt" ? "develop" : ()))
 {
     foreach my $severity (qw/requires recommends suggests/)
     {
-        my $reqs = $prereqs->requirements_for($phase, $severity);
+        my $reqs    = $prereqs->requirements_for($phase, $severity);
         my @modules = sort $reqs->required_modules;
         @modules or next;
 
@@ -49,9 +51,18 @@ foreach my $phase (qw/configure build runtime test/, (-d "xt" ? "develop" : ()))
             if (eval { require_ok($module) unless $module eq 'perl'; 1 })
             {
                 my $version = $module eq 'perl' ? $] : $module->VERSION;
-                $len{have} < length($version) and $len{have} = length($version);
-                my $ok = ok($reqs->accepts_module($module, $version), "$module matches required $version");
-                my $status = $ok ? "ok" : "not ok";
+                my $status;
+                if (defined $version)
+                {
+                    $len{have} < length($version) and $len{have} = length($version);
+                    my $ok = ok($reqs->accepts_module($module, $version), "$module matches required $version");
+                    $status = $ok ? "ok" : "not ok";
+                }
+                else
+                {
+                    $status  = "not ok";
+                    $version = "n/a";
+                }
                 $report{$phase}{$severity}{$module} = {
                     want   => $want,
                     have   => $version,

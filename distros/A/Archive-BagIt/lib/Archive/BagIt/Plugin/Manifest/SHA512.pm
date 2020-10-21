@@ -3,7 +3,6 @@ package Archive::BagIt::Plugin::Manifest::SHA512;
 use strict;
 use warnings;
 use Digest::SHA;
-use Sub::Quote;
 use Moo;
 with 'Archive::BagIt::Role::Manifest';
 
@@ -56,7 +55,7 @@ Archive::BagIt::Plugin::Manifest::SHA512 - The role to load the sha512 plugin (d
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 AVAILABILITY
 

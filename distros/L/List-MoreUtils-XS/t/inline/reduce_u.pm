@@ -20,7 +20,7 @@ leak_free_ok(
         my $wa           = reduce_u { defined $a ? $a + $_ * $b / $pupil : 0 } @exam_results;
     },
     'reduce_u X' => sub {
-        my @w = map { int(rand(5)) + 1; } 1 .. 100;
+        my @w  = map { int(rand(5)) + 1; } 1 .. 100;
         my $c1 = reduce_u { ($a || 0) + $w[$_] * $b } 1 .. 100;
     }
 );

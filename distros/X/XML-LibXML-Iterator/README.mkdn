@@ -1,0 +1,301 @@
+# NAME
+
+XML::LibXML::Iterator - XML::LibXML's Tree Iteration Class
+
+# VERSION
+
+version 1.06
+
+# SYNOPSIS
+
+    use XML::LibXML;
+    use XML::LibXML::Iterator;
+
+    my $doc = XML::LibXML->new->parse_string( $somedata );
+    my $iter= XML::LibXML::Iterator->new( $doc );
+
+    $iter->iterator_function( \&iterator_function );
+
+    # more control on the flow
+    while ( $iter->nextNode ) {
+        # do something
+    }
+
+    # operate on the entire tree
+    $iter->iterate( \&callback_function );
+
+# DESCRIPTION
+
+XML::LibXML::Iterator is an iterator class for XML::LibXML parsed
+documents. This class allows one to iterate the document tree as it were a
+linear data structure. It is possible to step back and forth between
+the nodes of the tree and do certain operations on that
+nodes. Different to XPath the nodes are not prefetched but will be
+calculated for each step. Therefore an iterator is sensible towards
+the current state of a document tree on each step, while XPath is only
+per query executed.
+
+## What is an iterator?
+
+XML::LibXML offers by default a W3C DOM interface on the parsed XML
+documents. This tree has per definition four directions to be
+traversed: Up, down, foreward and backward. Therefore a tree can be
+considered two dimensional. Although a tree is still one more simple
+datastructure it is way to complex for some operations. So the
+XML::LibXML::Iterator class breaks the for operations down to only
+two: backward and forward. For some people this easier to understand
+than DOM or SAX as this follows more the way one actually reads an XML
+document.
+
+Therefore an iterator has three basic functions:
+
+- nextNode()
+- current()
+- previousNode()
+
+That's it. With an iterator one does not have to decide when to dive
+into a subtree or find a parent. It is not even required to care about
+the boundaries of a certain level. The iterator will get the next node
+for you until there is no node left to handle.
+
+In short: An iterator will answer the question about what to do next.
+
+## How to use XML::LibXML::Iterator?
+
+XML::LibXML::Iterator requires a parsed document or at least a node to
+operate on. This node is passed to the iterator class and will be used
+as the **first** node of the iteration. One can always reset the
+iterator to the first node by using the first()-function.
+
+Once XML::LibXML::Iterator is initialized the tree can be traversed by
+using either next() or previous(). Both function will return a
+XML::LibXML::Node object if there is such object available.
+
+Since the current object hold by the iterator class is always
+available via the current() function.
+
+The following example may clarify this:
+
+    # get the document from wherever you like
+    my $doc = XML::LibXML->new->parse_stream( *SOMEINPUT );
+
+    # get the iterator for the document root.
+    my $iter = XML::LibXML::Iterator->new( $doc->documentElement );
+
+    # walk through the document
+    while ( $iter->nextNode() ) {
+       my $curnode = $iter->current();
+       print $curnode->nodeType();
+    }
+
+    # now get back to the beginning
+    $iter->first();
+    my $curnode = $iter->current();
+    print $curnode->nodeType();
+
+Actually the functions nextNode(), previousNode(), first(), last() and
+current() do return the node which is current after the
+operation. E.g. nextNode() moves to the next node if possible and then
+returns the node. Thus the while-loop in the example can be written
+as
+
+    while ( $iter->nextNode() ) {
+       print $_->nodeType();
+    }
+
+Note, that just relieing on the return value of next() and previous()
+is somewhat dangerous, because both functions return **undef** in case
+of reaching the iteration boundaries. That means it is not possible
+to iterate past the last element or before the first one.
+
+## Node Filters
+
+XML::LibXML::Iterator accepts XML::NodeFilters to limit the nodes made
+available to the caller. Any nodefilter applied to
+XML::LibXML::Iterator will test if a node returned by the iteration
+function is visible to the caller.
+
+Different to the DOM Traversal Specification, XML::LibXML::Iterator
+allows filter stacks. This means it is possible to apply more than a
+single node filter to your node iterator.
+
+## Complex Iterations
+
+By default XML::LibXML::Iterator will access all nodes of a given DOM
+tree. An interation based on the default iterator will access each
+single node in the given subtree once. The order how the nodes will be
+accessed is given by the following order:
+
+    node -> node's childnodes -> node's next sibling
+
+In combination with XML::Nodefilter this is best for a wide range of
+scripts and applications. Nevertheless this is still to restrictive
+for some applications. XML::LibXML::Iterator allows one to change that
+behaviour. This is done by resetting XML::LibXML::Iterator's iterator
+function. By using the method iterator\_function() to override the
+default iterator function, it is possible to implement iterations
+based on any iteration rule imaginable.
+
+A valid iterator function has to take two parameters: As the first
+parameter it will receive the iterator object itself, as second the
+direction of the iteration will be passed. The direction is either 1
+(for next()) or -1 (for previous()). As the iterator-function is
+called by next() and previous() the interator-function has to be aware
+about the iteration boundaries. In case the iteration would pass the
+boundary for that operation, the function has to return
+undefined. Also the iterator function has to return the new current node,
+instead of setting it itself.
+
+\*DEVELOPER NOTE\* In order a single stepping is rather limited, the
+direction is given by the sign of the passed integer value. The value
+of the passed parameter will be used as an indication how many steps
+should be done.  Therefor the interation direction should be tested
+relative to '0' and not as a equation. A basic template for a iterator
+function therefore will look like this:
+
+    sub iterator_func_templ {
+       my $iter = shift;
+       my $step = shift;
+       my $node = undef;
+       my $current = $iter->current();
+
+       if ( $step > 0 ) {
+           # move forward
+       }
+       else {
+           # move backward
+           $step *= -1; # remove the sign
+       }
+
+       return $node;
+    }
+
+## Repeated Operation
+
+Another feature of XML::LibXML::Iterator is the ability to repeat a
+single operation on all nodes in scope. Instead of writing a loop one
+can specify the operation as a function, that it applied on each node
+found. The function that does the trick, is named iterate().
+
+iterate() takes again two parameter: First the iterator object, second
+the node to operate on. iterate() will iterate through the entire
+document starting with the first node. If one has already started an
+iteration, the internal position will be reset to the first node.
+
+The following example will show how this works:
+
+    $iter->iterate( sub {my ($iter,$node)=@_; map {$iter->setNodeName( lc $iter->nodeName ) if $iter->nodeType != NAMESPACE_DECLARATION } ($node, $node->attributes);  } );
+
+This extra long line lowercases all tagnames and the names of the
+attributes in a given subtree.
+
+# METHODS
+
+- new($first\_node)
+- default\_iterator
+- first()
+- next()
+- nextNode()
+- previous()
+- previousNode()
+- last()
+- current()
+- index()
+- iterator\_function($funcion\_ref)
+- set\_filter(@filter\_list)
+- add\_filter(@filter\_list)
+- iterate($function\_ref)
+
+# SEE ALSO
+
+[XML::LibXML::Node](https://metacpan.org/pod/XML%3A%3ALibXML%3A%3ANode), [XML::NodeFilter](https://metacpan.org/pod/XML%3A%3ANodeFilter)
+
+# AUTHOR
+
+Christian Glahn, <phish@cpan.org>
+
+# COPYRIGHT
+
+(c) 2002-2007, Christian Glahn. All rights reserved.
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [https://metacpan.org/release/XML-LibXML-Iterator](https://metacpan.org/release/XML-LibXML-Iterator)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=XML-LibXML-Iterator](https://rt.cpan.org/Public/Dist/Display.html?Name=XML-LibXML-Iterator)
+
+- CPANTS
+
+    The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+    [http://cpants.cpanauthors.org/dist/XML-LibXML-Iterator](http://cpants.cpanauthors.org/dist/XML-LibXML-Iterator)
+
+- CPAN Testers
+
+    The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+    [http://www.cpantesters.org/distro/X/XML-LibXML-Iterator](http://www.cpantesters.org/distro/X/XML-LibXML-Iterator)
+
+- CPAN Testers Matrix
+
+    The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+    [http://matrix.cpantesters.org/?dist=XML-LibXML-Iterator](http://matrix.cpantesters.org/?dist=XML-LibXML-Iterator)
+
+- CPAN Testers Dependencies
+
+    The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+    [http://deps.cpantesters.org/?module=XML::LibXML::Iterator](http://deps.cpantesters.org/?module=XML::LibXML::Iterator)
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to `bug-xml-libxml-iterator at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-LibXML-Iterator](https://rt.cpan.org/Public/Bug/Report.html?Queue=XML-LibXML-Iterator). You will be automatically notified of any
+progress on the request by the system.
+
+## Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+[https://github.com/shlomif/xml-libxml-iterator](https://github.com/shlomif/xml-libxml-iterator)
+
+    git clone git://github.com/shlomif/xml-libxml-iterator.git
+
+# AUTHOR
+
+unknown
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+[https://github.com/shlomif/xml-libxml-iterator/issues](https://github.com/shlomif/xml-libxml-iterator/issues)
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by unknown.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

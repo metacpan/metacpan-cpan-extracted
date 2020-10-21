@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+0.02 2020-10-21T02:47:08Z
+
+    - Introduce ansi_expand() function.
+
 0.01 2020-07-13T08:18:02Z
 
     - Initial release.

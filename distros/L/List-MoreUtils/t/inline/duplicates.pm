@@ -35,8 +35,8 @@ SCOPE:
 # Test mixing strings and numbers
 SCOPE:
 {
-    my @s = (1001 .. 1200, "AA" .. "ZZ");
-    my @d = (1 .. 1000,    "aa" .. "zz");
+    my @s  = (1001 .. 1200, "AA" .. "ZZ");
+    my @d  = (1 .. 1000,    "aa" .. "zz");
     my $fd = freeze(\@d);
     my @a  = (@d, @s, @d);
     my $fa = freeze(\@a);
@@ -62,7 +62,7 @@ SCOPE:
     my @u  = duplicates @a;
     is_deeply(\@u, [@d], "duplicates of tied array of numbers/strings mixture");
     is($fa, freeze(\@a), "duplicates:G_ARRAY leaves mixture untouched");
-    @a = (@u, @d);
+    @a  = (@u, @d);
     $fa = freeze(\@a);
     my $u = duplicates @a;
     is($fa,       freeze(\@a), "duplicates:G_SCALAR leaves mixture untouched");
@@ -71,10 +71,10 @@ SCOPE:
 
 SCOPE:
 {
-    my @foo = ('a', 'b', '', undef, 'b', 'c', '', undef);
-    my @dfoo = ('b', '', undef);
+    my @foo  = ('a', 'b', '', undef, 'b', 'c', '', undef);
+    my @dfoo = ('b', '',  undef);
     is_deeply([duplicates @foo], \@dfoo, "two undef's are supported correctly by duplicates");
-    @foo = ('a', undef, 'b', '', 'b', 'c', '');
+    @foo  = ('a', undef, 'b', '', 'b', 'c', '');
     @dfoo = ('b', '');
     is_deeply([duplicates @foo], \@dfoo, 'one undef is ignored correctly by duplicates');
     is((scalar duplicates @foo), scalar @dfoo, 'scalar one undef is ignored correctly by duplicates');
@@ -101,7 +101,7 @@ leak_free_ok(
         };
         eval {
             my $obj = DieOnStringify->new;
-            my $u = duplicates 'a', 'b', '', undef, $obj, 'b', 'c', '', undef, $obj;
+            my $u   = duplicates 'a', 'b', '', undef, $obj, 'b', 'c', '', undef, $obj;
         };
     }
 );

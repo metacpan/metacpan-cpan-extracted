@@ -1,5 +1,9 @@
 Revision history for FSM-Basic
 
+0.22    Wed 21 Oct 17:14:05 2020 +0200
+            add tag "caseinsensitive" and "swapregex"
+            update test files
+
 0.21    Sat Oct 17 18:05:35 2020 +0200
             fix 01-exec.t test (typo)
 

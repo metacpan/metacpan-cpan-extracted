@@ -11,7 +11,8 @@ use List::MoreUtils (":all");
 use Test::More;
 use Test::LMU;
 
-SCOPE: {
+SCOPE:
+{
     my @list = ();
     is(0, (binsert { $_ cmp "Hello" } "Hello", @list), "Inserting into empty list");
     is(1, (binsert { $_ cmp "world" } "world", @list), "Inserting into one-item list");
@@ -51,7 +52,7 @@ foreach my $v (reverse @even)
 }
 is_deeply(\@in, \@expected, "binsert even elements reversely into odd list succeeded");
 
-@in = @even;
+@in       = @even;
 @expected = map { $_, $_ } @in;
 foreach my $v (@even)
 {
@@ -59,7 +60,7 @@ foreach my $v (@even)
 }
 is_deeply(\@in, \@expected, "binsert existing even elements into even list succeeded");
 
-@in = @even;
+@in       = @even;
 @expected = map { $_, $_ } @in;
 foreach my $v (reverse @even)
 {

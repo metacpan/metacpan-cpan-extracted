@@ -1,4 +1,9 @@
 Revision history for Code-TidyAll-Plugin-TestCount
 
+0.0.2       2020-10-20
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 0.0.1       2019-01-26
     - First version, released on an unsuspecting world

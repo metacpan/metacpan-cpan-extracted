@@ -1,3 +1,14 @@
+0.021   2020-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix generated examples.
+
+
+0.020   2020-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- In generated 'CONFIGURATION FILE' POD section, mention about
+	  loading and configuring plugins.
+
+
 0.019   2020-05-30  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.018 & 0.018.1.

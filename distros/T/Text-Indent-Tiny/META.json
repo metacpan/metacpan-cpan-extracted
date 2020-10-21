@@ -4,7 +4,7 @@
       "Ildar Shaimordanov <ildar.shaimordanov@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -43,6 +43,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.0",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ildar-shaimordanov/indent-pm/issues"
+      },
+      "homepage" : "https://github.com/ildar-shaimordanov/indent-pm",
+      "license" : [
+         "https://github.com/ildar-shaimordanov/indent-pm/blob/master/LICENSE"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ildar-shaimordanov/indent-pm.git"
+      }
+   },
+   "version" : "v0.1.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

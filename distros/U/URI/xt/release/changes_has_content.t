@@ -1,8 +1,14 @@
 use Test::More tests => 2;
 
+if (($ENV{TRAVIS_PULL_REQUEST} || '') eq 'false') {
+    chomp(my $branch_name = ($ENV{TRAVIS_BRANCH} || `git rev-parse --abbrev-ref HEAD`));
+    $TODO = 'Changes need not have content for this release yet if this is only the master branch'
+    if ($branch_name || '') eq 'master';
+}
+
 note 'Checking Changes';
 my $changes_file = 'Changes';
-my $newver = '1.76';
+my $newver = '5.05';
 my $trial_token = '-TRIAL';
 my $encoding = 'UTF-8';
 

@@ -2,7 +2,7 @@ package SQL::Statement::Function;
 
 ######################################################################
 #
-# This module is copyright (c), 2009-2017 by Jens Rehsack.
+# This module is copyright (c), 2009-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -17,7 +17,7 @@ use vars qw(@ISA $VERSION);
 use SQL::Statement::Term ();
 @ISA = qw(SQL::Statement::Term);
 
-$VERSION = '1.412';
+$VERSION = '1.414';
 
 =pod
 
@@ -27,7 +27,7 @@ SQL::Statement::Function - abstract base class for all function executing terms
 
 =head1 SYNOPSIS
 
-  # this class doesn't have a common constructor, because all derived classes
+  # this class does not have a common constructor, because all derived classes
   # have their special requirements
 
 =head1 DESCRIPTION
@@ -287,7 +287,7 @@ The character to trim - defaults to C<' '>
 
 =item I<\@params>
 
-Expected to be an array with exact 1 element (more aren't evaluated).
+Expected to be an array with exact 1 element (more are not evaluated).
 
 =back
 
@@ -381,7 +381,7 @@ If omitted, everything to the end of the string is returned.
 
 =item I<\@params>
 
-Expected to be an array with exact 1 element (more aren't evaluated).
+Expected to be an array with exact 1 element (more are not evaluated).
 
 =back
 
@@ -479,7 +479,7 @@ sub value($)
 
 =head1 AUTHOR AND COPYRIGHT
 
-Copyright (c) 2009-2017 by Jens Rehsack: rehsackATcpan.org
+Copyright (c) 2009-2020 by Jens Rehsack: rehsackATcpan.org
 
 All rights reserved.
 

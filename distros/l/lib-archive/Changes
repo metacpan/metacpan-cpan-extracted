@@ -1,3 +1,7 @@
+0.9 2020-10-19
+  - add env var PERL_LIB_ARCHIVE_EXTRACT to extract the
+    modules to the filesystem (for testing and debugging)
+
 0.8 2020-10-03
   - add loading from DATA section
   - fix running under debugger

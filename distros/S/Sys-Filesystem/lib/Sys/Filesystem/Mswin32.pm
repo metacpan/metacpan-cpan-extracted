@@ -1,9 +1,9 @@
 ############################################################
 #
-#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
+#   Copyright 2008-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -33,19 +33,20 @@ use Params::Util qw(_STRING);
 use Win32::DriveInfo;
 use Carp qw(croak);
 
-$VERSION = '1.406';
+$VERSION = '1.408';
 
 sub version()
 {
     return $VERSION;
 }
 
-my @volInfoAttrs = ( 'n/a', 'preserve case', 'case sensitive', 'unicode', 'acl', 'file compression', 'compressed volume' );
-my @typeExplain = ( 'unable to determine', 'no root directory', 'removeable', 'fixed', 'network', 'cdrom', 'ram disk' );
+my @volInfoAttrs = ('n/a', 'preserve case', 'case sensitive', 'unicode', 'acl', 'file compression', 'compressed volume');
+my @typeExplain  = ('unable to determine', 'no root directory', 'removeable', 'fixed', 'network', 'cdrom', 'ram disk');
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
-    ref( my $class = shift ) && croak 'Class name required';
+    ref(my $class = shift) && croak 'Class name required';
     my %args = @_;
     my $self = {};
 
@@ -54,32 +55,32 @@ sub new
     for my $drvletter (@drives)
     {
         my $type = Win32::DriveInfo::DriveType($drvletter);
-        my ( $VolumeName, $VolumeSerialNumber, $MaximumComponentLength, $FileSystemName, @attr ) =
+        my ($VolumeName, $VolumeSerialNumber, $MaximumComponentLength, $FileSystemName, @attr) =
           Win32::DriveInfo::VolumeInfo($drvletter);
 
         my $drvRoot = $drvletter . ":/";
-        defined( _STRING($VolumeName) ) and $VolumeName =~ s/\\/\//g;
-        defined( _STRING($VolumeName) ) or $VolumeName = $drvRoot;
+        defined(_STRING($VolumeName)) and $VolumeName =~ s/\\/\//g;
+        defined(_STRING($VolumeName)) or $VolumeName = $drvRoot;
         $VolumeName = ucfirst($VolumeName);
 
-        $FileSystemName ||= 'CDFS' if ( $type == 5 );
+        $FileSystemName ||= 'CDFS' if ($type == 5);
 
         # XXX Win32::DriveInfo gives no details here ...
         $self->{$drvRoot}->{mount_point} = $drvRoot;
         $self->{$drvRoot}->{device}      = $VolumeName;
         # XXX Win32::DriveInfo gives sometime wrong information here
-        $self->{$drvRoot}->{format} = $FileSystemName;
-        $self->{$drvRoot}->{options} = join( ',', map { $volInfoAttrs[$_] } @attr );
-        my $mntstate = ( ( defined $FileSystemName ) and $type > 1 );
+        $self->{$drvRoot}->{format}  = $FileSystemName;
+        $self->{$drvRoot}->{options} = join(',', map { $volInfoAttrs[$_] } @attr);
+        my $mntstate = ((defined $FileSystemName) and $type > 1);
         $mntstate
           and 2 == $type
           and $mntstate = Win32::DriveInfo::IsReady($drvletter);
-        $mntstate = $mntstate ? "mounted" : "unmounted";
-        $self->{$drvRoot}->{$mntstate} = 1;
+        $mntstate                               = $mntstate ? "mounted" : "unmounted";
+        $self->{$drvRoot}->{$mntstate}          = 1;
         $type > 0 and $self->{$drvRoot}->{type} = $typeExplain[$type];
     }
 
-    bless( $self, $class );
+    bless($self, $class);
     return $self;
 }
 
@@ -128,10 +129,6 @@ True when mounted.
 
 =back
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
@@ -147,11 +144,10 @@ drives are recognized, no UNC names neither file systems mounted to a path.
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2009-2014 Jens Rehsack.
+Copyright 2009-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

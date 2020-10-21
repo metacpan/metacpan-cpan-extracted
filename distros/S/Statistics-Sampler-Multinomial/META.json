@@ -62,6 +62,6 @@
          "web" : "https://github.com/shawnlaffan/perl-statistics-sampler-multinomial"
       }
    },
-   "version" : "0.84",
+   "version" : "0.85",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

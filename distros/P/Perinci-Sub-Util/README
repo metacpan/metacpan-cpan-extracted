@@ -1,18 +1,24 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::Util - Helper when writing functions
 
+VERSION
+    This document describes version 0.470 of Perinci::Sub::Util (from Perl
+    distribution Perinci-Sub-Util), released on 2020-10-20.
+
+SYNOPSIS
     Example for err() and caller():
 
      use Perinci::Sub::Util qw(err caller);
-    
+
      sub foo {
          my %args = @_;
          my $res;
-    
+
          my $caller = caller();
-    
+
          $res = bar(...);
          return err($err, 500, "Can't foo") if $res->[0] != 200;
-    
+
          [200, "OK"];
      }
 
@@ -25,7 +31,7 @@ SYNOPSIS
     Example for gen_modified_sub():
 
      use Perinci::Sub::Util qw(gen_modified_sub);
-    
+
      $SPEC{list_users} = {
          v => 1.1,
          args => {
@@ -34,7 +40,7 @@ SYNOPSIS
          },
      };
      sub list_users { ... }
-    
+
      gen_modified_sub(
          output_name => 'list_suspended_users',
          base_name   => 'list_users',
@@ -47,7 +53,7 @@ SYNOPSIS
     Example for gen_curried_sub():
 
      use Perinci::Sub::Util qw(gen_curried_sub);
-    
+
      $SPEC{list_users} = {
          v => 1.1,
          args => {
@@ -56,20 +62,182 @@ SYNOPSIS
          },
      };
      sub list_users { ... }
-    
+
      # simpler/shorter than gen_modified_sub, but can be used for currying only
      gen_curried_sub('list_users', {is_suspended=>1}, 'list_suspended_users');
 
-append:FUNCTIONS
+FUNCTIONS
+  gen_curried_sub
+    Usage:
 
- caller([ $n ])
+     gen_curried_sub( [ \%optional_named_args ] , $base_name, $output_name) -> any
 
+    Generate curried subroutine (and its metadata).
+
+    This is a more convenient helper than "gen_modified_sub" if you want to
+    create a new subroutine that has some of its arguments preset (so they
+    no longer need to be present in the new metadata).
+
+    For more general needs of modifying a subroutine (e.g. add some
+    arguments, modify some arguments, etc) use "gen_modified_sub".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $base_name* => *str*
+
+        Subroutine name (either qualified or not).
+
+        If not qualified with package name, will be searched in the caller's
+        package. Rinci metadata will be searched in %SPEC package variable.
+
+    *   $output_name* => *str*
+
+        Where to install the modified sub.
+
+        Subroutine will be put in the specified name. If the name is not
+        qualified with package name, will use caller's package.
+
+    *   set_args => *hash*
+
+        Arguments to set.
+
+    Return value: (any)
+
+  gen_modified_sub
+    Usage:
+
+     gen_modified_sub(%args) -> [status, msg, payload, meta]
+
+    Generate modified metadata (and subroutine) based on another.
+
+    Often you'll want to create another sub (and its metadata) based on
+    another, but with some modifications, e.g. add/remove/rename some
+    arguments, change summary, add/remove some properties, and so on.
+
+    Instead of cloning the Rinci metadata and modify it manually yourself,
+    this routine provides some shortcuts.
+
+    You can specify base sub/metadata using "base_name" (string, subroutine
+    name, either qualified or not) or "base_code" (coderef) + "base_meta"
+    (hash).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_args => *hash*
+
+        Arguments to add.
+
+    *   base_code => *code*
+
+        Base subroutine code.
+
+        If you specify this, you'll also need to specify "base_meta".
+
+        Alternatively, you can specify "base_name" instead, to let this
+        routine search the base subroutine from existing Perl package.
+
+    *   base_meta => *hash*
+
+        Base Rinci metadata.
+
+    *   base_name => *str*
+
+        Subroutine name (either qualified or not).
+
+        If not qualified with package name, will be searched in the caller's
+        package. Rinci metadata will be searched in %SPEC package variable.
+
+        Alternatively, you can also specify "base_code" and "base_meta".
+
+    *   description => *str*
+
+        Description for the mod subroutine.
+
+    *   install_sub => *bool* (default: 1)
+
+    *   modify_args => *hash*
+
+        Arguments to modify.
+
+        For each argument you can specify a coderef. The coderef will
+        receive the argument ($arg_spec) and is expected to modify the
+        argument specification.
+
+    *   modify_meta => *code*
+
+        Specify code to modify metadata.
+
+        Code will be called with arguments ($meta) where $meta is the cloned
+        Rinci metadata.
+
+    *   output_code => *code*
+
+        Code for the modified sub.
+
+        Alternatively you can use "wrap_code". If both are not specified,
+        will use "base_code" (which will then be required) as the modified
+        subroutine's code.
+
+    *   output_name => *str*
+
+        Where to install the modified sub.
+
+        Subroutine will be put in the specified name. If the name is not
+        qualified with package name, will use caller's package. If no
+        "output_code" is specified, the base subroutine reference will be
+        assigned here.
+
+        Note that this argument is optional.
+
+    *   remove_args => *array*
+
+        List of arguments to remove.
+
+    *   rename_args => *hash*
+
+        Arguments to rename.
+
+    *   replace_args => *hash*
+
+        Arguments to add.
+
+    *   summary => *str*
+
+        Summary for the mod subroutine.
+
+    *   wrap_code => *code*
+
+        Wrapper to generate the modified sub.
+
+        The modified sub will become:
+
+         sub { wrap_code->(base_code, @_) }
+
+        Alternatively you can use "output_code". If both are not specified,
+        will use "base_code" (which will then be required) as the modified
+        subroutine's code.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (hash)
+
+  caller([ $n ])
     Just like Perl's builtin caller(), except that this one will ignore
     wrapper code in the call stack. You should use this if your code is
     potentially wrapped. See Perinci::Sub::Wrapper for more details.
 
- err(...) => ARRAY
-
+  err(...) => ARRAY
     Experimental.
 
     Generate an enveloped error response (see Rinci::function). Can accept
@@ -78,7 +246,7 @@ append:FUNCTIONS
     hashes, and previous error responses are arrays. Error responses also
     seldom contain actual result. Status code defaults to 500, status
     message will default to "FUNC failed". This function will also fill the
-    information in the logs result metadata.
+    information in the "logs" result metadata.
 
     Examples:
 
@@ -89,33 +257,53 @@ append:FUNCTIONS
      err([404, "Prev error"]); # => [500, "FUNC failed", undef,
                                #     {logs=>[...], prev=>[404, "Prev error"]}]
 
-    Will put stack_trace in logs only if Carp::Always module is loaded.
+    Will put "stack_trace" in logs only if "Carp::Always" module is loaded.
 
- warn_err(...)
-
+  warn_err(...)
     This is a shortcut for:
 
      $res = err(...);
      warn "ERROR $res->[0]: $res->[1]";
 
- die_err(...)
-
+  die_err(...)
     This is a shortcut for:
 
      $res = err(...);
      die "ERROR $res->[0]: $res->[1]";
 
 FAQ
-
- What if I want to put result ($res->[2]) into my result with err()?
-
+  What if I want to put result ($res->[2]) into my result with err()?
     You can do something like this:
 
      my $err = err(...) if ERROR_CONDITION;
      $err->[2] = SOME_RESULT;
      return $err;
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-Util>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

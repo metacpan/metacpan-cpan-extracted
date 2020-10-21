@@ -145,7 +145,7 @@ our @EXPORT_OK = qw{
 our %EXPORT_TAGS = (
     ALL => [@EXPORT_OK],
 );
-our $VERSION = '1.116';
+our $VERSION = '1.118';
 
 #####################################################################
 # Interface Functions
@@ -251,7 +251,7 @@ sub _module_dir_old
     my $long   = Class::Inspector->loaded_filename($module);
     $short =~ tr{/}{:}   if IS_MACOS;
     $short =~ tr{\\} {/} if IS_WIN32;
-    $long =~ tr{\\} {/}  if IS_WIN32;
+    $long  =~ tr{\\} {/} if IS_WIN32;
     substr($short, -3, 3, '');
     $long =~ m/^(.*)\Q$short\E\.pm\z/s or Carp::croak("Failed to find base dir");
     my $dir = File::Spec->catdir("$1", 'auto', $short);
@@ -573,7 +573,7 @@ to use the development copy without needing to install them first.
 
   use Foo::Module;
 
-  # interal calls in Foo::Module to module_file('Foo::Module','bar') now resolves to
+  # internal calls in Foo::Module to module_file('Foo::Module','bar') now resolves to
   # the source trees share/ directory instead of something in @INC
 
 =head1 SUPPORT

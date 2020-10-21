@@ -1,7 +1,8 @@
 === ChangeLog discontinued ===
 
 	With the move to git, we stop maintaining a separate ChangeLog and
-	rely on proper commit messages instead.
+	rely on proper commit messages instead.  Web view of changes:
+	<http://git.gnome.org/browse/perl-Gtk2-MozEmbed/>.
 
 2008-11-20  Torsten Schoenfeld  <kaffeetisch@gmx.de>
 

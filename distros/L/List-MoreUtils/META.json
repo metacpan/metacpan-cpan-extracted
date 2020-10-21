@@ -6,7 +6,7 @@
       "Jens Rehsack <rehsack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -42,6 +42,8 @@
             "Test::CPAN::Changes" : "0",
             "Test::CheckManifest" : "0",
             "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
@@ -53,7 +55,7 @@
       "runtime" : {
          "requires" : {
             "Exporter::Tiny" : "0.038",
-            "List::MoreUtils::XS" : "0.426"
+            "List::MoreUtils::XS" : "0.430"
          }
       },
       "test" : {
@@ -77,6 +79,6 @@
          "web" : "https://github.com/perl5-utils/List-MoreUtils"
       }
    },
-   "version" : "0.428",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.430",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

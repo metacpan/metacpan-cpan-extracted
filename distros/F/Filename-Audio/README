@@ -2,8 +2,8 @@ NAME
     Filename::Audio - Check whether filename indicates being an audio file
 
 VERSION
-    This document describes version 0.003 of Filename::Audio (from Perl
-    distribution Filename-Audio), released on 2020-05-30.
+    This document describes version 0.004 of Filename::Audio (from Perl
+    distribution Filename-Audio), released on 2020-10-21.
 
 SYNOPSIS
      use Filename::Audio qw(check_audio_filename);
@@ -17,6 +17,41 @@ SYNOPSIS
 DESCRIPTION
 FUNCTIONS
   check_audio_filename
+    Usage:
+
+     check_audio_filename(%args) -> bool|hash
+
+    Check whether filename indicates being an audio file.
+
+    Examples:
+
+    *   Example #1:
+
+         check_audio_filename(filename => "foo.txt"); # -> 0
+
+    *   Example #2:
+
+         check_audio_filename(filename => "foo.mp4"); # -> 0
+
+    *   Example #3:
+
+         check_audio_filename(filename => "foo.wav"); # -> {}
+
+    *   Example #4:
+
+         check_audio_filename(filename => "foo.MP3"); # -> {}
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Filename-Audio>.
@@ -40,6 +75,8 @@ SEE ALSO
     Filename::Ebook
 
     Filename::Media
+
+    Other Filename::*
 
 AUTHOR
     perlancar <perlancar@cpan.org>

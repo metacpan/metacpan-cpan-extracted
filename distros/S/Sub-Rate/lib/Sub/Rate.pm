@@ -1,10 +1,10 @@
 package Sub::Rate;
 use strict;
 use warnings;
-use Any::Moose;
+use Moo;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has max_rate => (
     is      => 'rw',
@@ -32,7 +32,7 @@ has _default_func => (
     is => 'rw',
 );
 
-no Any::Moose;
+no Moo;
 
 sub add {
     my ($self, $rate, $func) = @_;
@@ -49,7 +49,7 @@ sub add {
                 $total_rate + $rate, $self->max_rate;
         }
 
-        push @{ $self->_func }, [ $rate, $func ];
+        push @{ $self->_func }, [$rate, $func];
     }
 }
 
@@ -57,7 +57,7 @@ sub generate {
     my ($self) = @_;
 
     my @sorted_funcs = @{ $self->_func };
-    @sorted_funcs = sort { $a->[0] <=> $b->[0] } @sorted_funcs if $self->sort;
+    @sorted_funcs = CORE::sort { $a->[0] <=> $b->[0] } @sorted_funcs if $self->sort;
 
     my $rand         = $self->rand_func;
     my $max_rate     = $self->max_rate;
@@ -66,7 +66,7 @@ sub generate {
     sub {
         my @args = @_;
 
-        my $index  = $rand->( $max_rate );
+        my $index  = $rand->($max_rate);
         my $cursor = 0;
 
         for my $f (@sorted_funcs) {
@@ -148,6 +148,8 @@ Random calculate function. Default is:
 You can change random function to your own implementation by this option.
 C<max_rate> is passed as C<$_[0]> to this function.
 
+=item * sort => 'Bool'
+
 =back
 
 =head2 METHODS
@@ -190,4 +192,3 @@ The full text of the license can be found in the
 LICENSE file included with this module.
 
 =cut
-

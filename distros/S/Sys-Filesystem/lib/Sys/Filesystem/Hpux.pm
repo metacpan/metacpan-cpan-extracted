@@ -1,8 +1,9 @@
+############################################################
+#
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
-#   $Id$
 #
 #   Copyright (c) 2009 H.Merijn Brand,  All rights reserved.
-#   Copyright (c) 2009 Jens Rehsack,  All rights reserved.
+#   Copyright (c) 2009-2020 Jens Rehsack,  All rights reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,14 +25,12 @@ use 5.008001;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA);
-
-require Sys::Filesystem::Unix;
+use vars qw($VERSION);
+use parent qw(Sys::Filesystem::Unix);
 
 use Carp qw(croak);
 
-$VERSION = '1.406';
-@ISA     = qw(Sys::Filesystem::Unix);
+$VERSION = '1.408';
 
 sub version()
 {
@@ -46,31 +45,32 @@ my %special_fs = (
     proc => 1
 );
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
     my $proto = shift;
     my $class = ref($proto) || $proto or croak 'Class name required';
     my %args  = @_;
-    my $self  = bless( {}, $class );
+    my $self  = bless({}, $class);
     $args{canondev} and $self->{canondev} = 1;
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
     $args{mtab}  ||= '/etc/mnttab';
 
-    unless ( $self->readFsTab( $args{fstab}, \@fstabkeys, [ 0, 1, 2 ], \%special_fs ) )
+    unless ($self->readFsTab($args{fstab}, \@fstabkeys, [0, 1, 2], \%special_fs))
     {
         croak "Unable to open fstab file ($args{fstab})\n";
     }
 
-    unless ( $self->readMntTab( $args{mtab}, \@mnttabkeys, [ 0, 1, 2 ], \%special_fs ) )
+    unless ($self->readMntTab($args{mtab}, \@mnttabkeys, [0, 1, 2], \%special_fs))
     {
         croak "Unable to open fstab file ($args{mtab})\n";
     }
 
     delete $self->{canondev};
 
-    $self;
+    return $self;
 }
 
 1;
@@ -101,10 +101,6 @@ Return the version of the (sub)module.
 
 =back
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 H.Merijn Brand, PROCURA B.V.
@@ -113,11 +109,10 @@ H.Merijn Brand, PROCURA B.V.
 
 Copyright 2009 H.Merijn Brand PROCURA B.V.
 
-Copyright 2009-2014 Jens Rehsack.
+Copyright 2009-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

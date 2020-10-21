@@ -1,0 +1,9 @@
+0.02      2020-10-20 11:55:21 EDT
+
+  - Specify Perl v5.20 so Signatures will work. 
+  - dist.ini: Switch to @Starter::Git, per IRC Grinnz et al
+
+0.01      2020-10-19 16:17:47-04:00 America/New_York
+
+Initial release.
+

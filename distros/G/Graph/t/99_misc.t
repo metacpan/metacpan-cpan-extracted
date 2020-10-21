@@ -1,6 +1,6 @@
-use strict;
+use strict; use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -64,6 +64,8 @@ is($ub2, "a=b,a=c,b=d,b=e");
 is($ub3, "a=b,a=c,b=d,b=e,c=f,c=g");
 
 my $g2 = Graph->new;
+is_deeply [ $g2->clustering_coefficient ], [],
+  'clustering_coefficient with no vertices = empty list';
 
 for my $p (qw(zero
 	      one
@@ -95,3 +97,12 @@ ok(abs($betweenness{e} - 60.3333333333333) <= $eps);
 ok(abs($betweenness{t} - 17.1666666666667) <= $eps);
 is($betweenness{x}, 0.0);
 is($betweenness{u}, 3.0);
+
+{
+my $w = '';
+local $SIG{__WARN__} = sub { $w = shift };
+my $g3 = Graph->new;
+$g3->add_edge(0,1);
+my @dummy = $g3->SP_Dijkstra(1,0);
+is $w, '';
+}

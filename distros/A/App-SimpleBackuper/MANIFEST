@@ -1,3 +1,4 @@
+App-SimpleBackuper-0.2.7.tar
 bin/simple-backuper
 Changes
 lib/App/SimpleBackuper.pm
@@ -33,5 +34,6 @@ t/DB/BackupsTable.t
 t/DB/BaseTable.t
 t/DB/FilesTable.t
 t/RegularFile.t
+upsert
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

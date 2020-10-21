@@ -1,12 +1,12 @@
 package MediaWiki::CleanupHTML;
-$MediaWiki::CleanupHTML::VERSION = '0.0.5';
+$MediaWiki::CleanupHTML::VERSION = '0.0.6';
 use 5.008;
 
 use strict;
 use warnings;
 
-use HTML::TreeBuilder::XPath;
-use Scalar::Util (qw(blessed));
+use HTML::TreeBuilder::XPath ();
+use Scalar::Util             (qw(blessed));
 
 
 
@@ -155,8 +155,11 @@ sub destroy_resources
 {
     my $self = shift;
 
-    $self->_tree->delete();
-    $self->_tree( undef() );
+    if ( defined( $self->_tree() ) )
+    {
+        $self->_tree->delete();
+        $self->_tree( undef() );
+    }
 
     return;
 }
@@ -186,7 +189,7 @@ embellishments.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 SYNOPSIS
 
@@ -230,40 +233,6 @@ be called before destruction.
 =head1 AUTHOR
 
 Shlomi Fish, L<http://www.shlomifish.org/> .
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-mediawiki-cleanuphtml at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MediaWiki-CleanupHTML>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc MediaWiki::CleanupHTML
-
-You can also look for information at:
-
-=over 4
-
-=item * MetaCPAN
-
-L<http://metacpan.org/release/MediaWiki-CleanupHTML>
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MediaWiki-CleanupHTML>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MediaWiki-CleanupHTML>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MediaWiki-CleanupHTML>
-
-=back
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -319,27 +288,11 @@ L<https://metacpan.org/release/MediaWiki-CleanupHTML>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/MediaWiki-CleanupHTML>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=MediaWiki-CleanupHTML>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/MediaWiki-CleanupHTML>
 
 =item *
 

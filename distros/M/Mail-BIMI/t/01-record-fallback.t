@@ -32,8 +32,8 @@ subtest 'with selector' => sub{
 
   my $record = $bimi->record;
   $record->record_hashref;
-  is_deeply( $record->domain, 'recordfallback.com', 'Fallback domain' );
-  is_deeply( $record->selector, 'selector', 'Fallback selector' );
+  is_deeply( $record->retrieved_domain, 'recordfallback.com', 'Fallback domain' );
+  is_deeply( $record->retrieved_selector, 'selector', 'Fallback selector' );
 };
 
 subtest 'default selector' => sub{
@@ -51,8 +51,8 @@ subtest 'default selector' => sub{
   my $record = $bimi->record;
   $record->record_hashref;
 
-  is_deeply( $record->domain, 'recordfallback.com', 'Fallback domain' );
-  is_deeply( $record->selector, 'default', 'Fallback selector' );
+  is_deeply( $record->retrieved_domain, 'recordfallback.com', 'Fallback domain' );
+  is_deeply( $record->retrieved_selector, 'default', 'Fallback selector' );
 };
 
 done_testing;

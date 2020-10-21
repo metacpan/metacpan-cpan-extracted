@@ -10,7 +10,12 @@ use File::Slurper qw(read_text write_text);
 my $path = "$Bin/../lib/Filename/Image.pm";
 my $content = read_text($path);
 
-my %exts;
+my %exts = (
+    # extra extensions that might not be in mime type registry
+    webp => 1,
+    xcf => 1,
+);
+
 open my $fh, "<", "/etc/mime.types" or die "Can't open /etc/mime.types: $!";
 while (<$fh>) {
     next if /#/;

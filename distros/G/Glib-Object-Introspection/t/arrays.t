@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-plan tests => 88;
+plan tests => 92;
 
 ok (Regress::test_strv_in ([ '1', '2', '3' ]));
 
@@ -226,4 +226,31 @@ __PDF__
       }
     }
   }
+}
+
+# -----------------------------------------------------------------------------
+
+SKIP: {
+  my $have_gio = eval {
+    Glib::Object::Introspection->setup (
+      basename    => 'Gio',
+      version     => '2.0',
+      package     => 'Glib::IO');
+    1;
+  };
+  skip 'string special case using Gio', 4
+    unless $have_gio;
+
+  my $msg1 = Glib::IO::DBusMessage->new_signal ('/asdf/ghjk', 'de.asdf', 'ghjk');
+  my $caps = [];
+  my $blob1 = $msg1->to_blob ($caps);
+
+  my $msg2 = Glib::IO::DBusMessage->new_from_blob ($blob1, $caps);
+  is ($msg2->get_interface (), $msg1->get_interface ());
+  is_deeply ($msg2->to_blob ($caps), $blob1);
+
+  my $blob1_as_string = pack "C*", @$blob1;
+  my $msg3 = Glib::IO::DBusMessage->new_from_blob ($blob1_as_string, $caps);
+  is ($msg3->get_interface (), $msg1->get_interface ());
+  is_deeply ($msg3->to_blob ($caps), $blob1);
 }

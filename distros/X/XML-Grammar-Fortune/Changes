@@ -1,3 +1,7 @@
+0.0802  2020-10-20
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0801  2020-04-28
     - Convert weaver.ini to @SHLOMIF .
     - Remove the failing libxml version tests.

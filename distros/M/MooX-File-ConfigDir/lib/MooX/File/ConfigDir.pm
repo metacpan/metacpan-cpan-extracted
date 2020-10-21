@@ -3,7 +3,7 @@ package MooX::File::ConfigDir;
 use strict;
 use warnings;
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 
 use Carp qw/croak/;
 use Scalar::Util qw(blessed);
@@ -223,7 +223,7 @@ L<http://search.cpan.org/dist/MooX-File-ConfigDir/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2018 Jens Rehsack.
+Copyright 2013-2020 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -4,13 +4,13 @@
       "Jeff Zucker <jeff@vpservices.com>, Jens Rehsack <rehsack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SQL-Statement",
    "no_index" : {
@@ -97,6 +97,6 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org'"
    },
-   "version" : "1.412",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.414",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

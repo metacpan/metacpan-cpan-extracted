@@ -1,3 +1,9 @@
+0.009   2020-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Tweak regex to remove leading blanks in brand (merk),
+	  packaging (kemasan), date of issue (tanggal terbit).
+
+
 0.008   2020-10-16  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

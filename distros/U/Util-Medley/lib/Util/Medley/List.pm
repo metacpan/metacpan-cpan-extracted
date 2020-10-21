@@ -1,5 +1,5 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.047';
+$Util::Medley::List::VERSION = '0.051';
 #########################################################################################
 
 use v5.16;
@@ -18,7 +18,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.047
+version 0.051
 
 =cut
 
@@ -48,6 +48,95 @@ version 0.047
 #########################################################################################
 
 =head1 METHODS
+
+=head2 contains
+
+Search for pattern in a list.
+
+Returns bool
+
+=over
+
+=item usage:
+
+  $bool = $util->contains(\@list, 'mystring');
+  $bool = $util->contains(\@list, undef);
+  $bool = $util->contains(\@list, qr/myregex/);
+
+  $bool = $util->contains(list => \@list, match => 'mystring');
+  $bool = $util->contains(list => \@list, match => undef);
+  $bool = $util->contains(list => \@list, match => qr/myregex/);;
+   
+=item args:
+
+=over
+
+=item list [ArrayRef] 
+
+An array of values.
+
+=item match [Str|Regexp|Undef]
+
+Pattern to search for.  This can be a string, regex, or undef.
+
+=back
+
+=back
+ 
+=cut
+
+multi method contains (ArrayRef            :$list!, 
+                       Str|RegexpRef|Undef :$match) {
+
+    my $matchUndef = 0;
+    my $matchString = 0;
+    my $matchRegexp = 0;
+  
+    my $refType = ref($match);
+    if (!$refType) {
+        if (defined $match) {
+           $matchString = 1;    
+        }
+        else {
+           $matchUndef = 1; 
+        }
+    }
+    else {
+        $matchRegexp = 1;
+    }
+     
+    foreach my $item (@$list) {
+     
+        if ($matchUndef) {
+            if (!defined $item) {
+               return 1;    
+            }  
+        }
+        elsif ($matchString) {
+            if (defined $item) {
+               if ($item eq $match) {
+                   return 1;    
+               }    
+            }
+        }
+        else {
+            if (defined $item) {
+               if ($item =~ $match) {
+                   return 1;    
+               }    
+            }
+        }
+    }   
+    
+    return 0;
+}
+
+
+multi method contains (ArrayRef            $list!, 
+                       Str|RegexpRef|Undef $match!) {
+
+    return $self->contains(list => $list, match => $match);                         
+}
 
 =head2 diff
 

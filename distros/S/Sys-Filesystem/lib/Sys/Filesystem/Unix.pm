@@ -4,7 +4,7 @@
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
-#   Copyright 2009           Jens Rehsack
+#   Copyright 2008-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ use Cwd 'abs_path';
 use Fcntl qw(:flock);
 use IO::File;
 
-$VERSION = '1.406';
+$VERSION = '1.408';
 
 sub version()
 {
@@ -49,168 +49,171 @@ my %special_fs = (
     proc => 1
 );
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
-    ref( my $class = shift ) && croak 'Class name required';
+    ref(my $class = shift) && croak 'Class name required';
     my %args = @_;
-    my $self = bless( {}, $class );
+    my $self = bless({}, $class);
     $args{canondev} and $self->{canondev} = 1;
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
     $args{mtab}  ||= '/etc/mtab';
 
-    $self->readFsTab( $args{fstab}, \@keys, [ 0, 1, 2 ], \%special_fs );
-    $self->readMntTab( $args{mtab}, \@keys, [ 0, 1, 2 ], \%special_fs );
+    $self->readFsTab($args{fstab}, \@keys, [0, 1, 2], \%special_fs);
+    $self->readMntTab($args{mtab}, \@keys, [0, 1, 2], \%special_fs);
 
     delete $self->{canondev};
 
-    $self;
+    return $self;
 }
 
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 sub readFsTab($\@\@\%)
 {
-    my ( $self, $fstabPath, $fstabKeys, $pridx, $special_fs ) = @_;
+    my ($self, $fstabPath, $fstabKeys, $pridx, $special_fs) = @_;
 
     # Read the fstab
     local $/ = "\n";
-    if ( my $fstab = IO::File->new( $fstabPath, 'r' ) )
+    if (my $fstab = IO::File->new($fstabPath, 'r'))
     {
         while (<$fstab>)
         {
-            next if ( /^\s*#/ || /^\s*$/ );
+            next if (/^\s*#/ || /^\s*$/);
 
             # $_ =~ s/#.*$//;
             # next if( /^\s*$/ );
 
-            my @vals = split( ' ', $_ );
-            $self->{canondev} and -l $vals[ $pridx->[0] ] and $vals[ $pridx->[0] ] = abs_path( $vals[ $pridx->[0] ] );
-            $self->{ $vals[ $pridx->[1] ] }->{mount_point} = $vals[ $pridx->[1] ];
-            $self->{ $vals[ $pridx->[1] ] }->{device}      = $vals[ $pridx->[0] ];
-            $self->{ $vals[ $pridx->[1] ] }->{unmounted}   = 1
-              unless ( defined( $self->{ $vals[ $pridx->[1] ] }->{mounted} ) );
+            my @vals = split(' ', $_);
+            $self->{canondev} and -l $vals[$pridx->[0]] and $vals[$pridx->[0]] = abs_path($vals[$pridx->[0]]);
+            $self->{$vals[$pridx->[1]]}->{mount_point}                         = $vals[$pridx->[1]];
+            $self->{$vals[$pridx->[1]]}->{device}                              = $vals[$pridx->[0]];
+            $self->{$vals[$pridx->[1]]}->{unmounted}                           = 1
+              unless (defined($self->{$vals[$pridx->[1]]}->{mounted}));
 
-            if ( defined( $pridx->[2] ) )
+            if (defined($pridx->[2]))
             {
-                my $vfs_type = $self->{ $vals[ $pridx->[1] ] }->{fs_vfstype} = $vals[ $pridx->[2] ];
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 1
-                  if ( defined( $special_fs->{$vfs_type} ) );
+                my $vfs_type = $self->{$vals[$pridx->[1]]}->{fs_vfstype} = $vals[$pridx->[2]];
+                $self->{$vals[$pridx->[1]]}->{special} = 1
+                  if (defined($special_fs->{$vfs_type}));
             }
             else
             {
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 0
-                  unless ( defined( $self->{ $vals[ $pridx->[1] ] }->{special} ) );
+                $self->{$vals[$pridx->[1]]}->{special} = 0
+                  unless (defined($self->{$vals[$pridx->[1]]}->{special}));
             }
 
-            for ( my $i = 0; $i < @{$fstabKeys}; ++$i )
+            for (my $i = 0; $i < @{$fstabKeys}; ++$i)
             {
-                $self->{ $vals[ $pridx->[1] ] }->{ $fstabKeys->[$i] } =
-                  defined( $vals[$i] ) ? $vals[$i] : '';
+                $self->{$vals[$pridx->[1]]}->{$fstabKeys->[$i]} =
+                  defined($vals[$i]) ? $vals[$i] : '';
             }
         }
+
         $fstab->close();
-        1;
+
+        return 1;
     }
-    else
-    {
-        0;
-    }
+
+    return 0;
 }
 
 sub readMntTab($\@\@\%)
 {
-    my ( $self, $mnttabPath, $mnttabKeys, $pridx, $special_fs ) = @_;
+    my ($self, $mnttabPath, $mnttabKeys, $pridx, $special_fs) = @_;
 
     # Read the mtab
     local $/ = "\n";
     my $mtab;
-    if ( ( $mtab = IO::File->new( $mnttabPath, 'r' ) ) && flock( $mtab, LOCK_SH | LOCK_NB ) )
+    if (($mtab = IO::File->new($mnttabPath, 'r')) && flock($mtab, LOCK_SH | LOCK_NB))
     {
         while (<$mtab>)
         {
-            next if ( /^\s*#/ || /^\s*$/ );
+            next if (/^\s*#/ || /^\s*$/);
 
             # $_ =~ s/#.*$//;
             # next if( /^\s*$/ );
 
-            my @vals = split( /\s+/, $_ );
-            $self->{canondev} and -l $vals[ $pridx->[0] ] and $vals[ $pridx->[0] ] = abs_path( $vals[ $pridx->[0] ] );
-            delete $self->{ $vals[ $pridx->[1] ] }->{unmounted}
-              if ( exists( $self->{ $vals[ $pridx->[1] ] }->{unmounted} ) );
-            $self->{ $vals[ $pridx->[1] ] }->{mounted}     = 1;
-            $self->{ $vals[ $pridx->[1] ] }->{mount_point} = $vals[ $pridx->[1] ];
-            $self->{ $vals[ $pridx->[1] ] }->{device}      = $vals[ $pridx->[0] ];
+            my @vals = split(/\s+/, $_);
+            $self->{canondev} and -l $vals[$pridx->[0]] and $vals[$pridx->[0]] = abs_path($vals[$pridx->[0]]);
+            delete $self->{$vals[$pridx->[1]]}->{unmounted}
+              if (exists($self->{$vals[$pridx->[1]]}->{unmounted}));
+            $self->{$vals[$pridx->[1]]}->{mounted}     = 1;
+            $self->{$vals[$pridx->[1]]}->{mount_point} = $vals[$pridx->[1]];
+            $self->{$vals[$pridx->[1]]}->{device}      = $vals[$pridx->[0]];
 
-            if ( defined( $pridx->[2] ) )
+            if (defined($pridx->[2]))
             {
-                my $vfs_type = $self->{ $vals[ $pridx->[1] ] }->{fs_vfstype} = $vals[ $pridx->[2] ];
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 1
-                  if ( defined( $special_fs->{$vfs_type} ) );
+                my $vfs_type = $self->{$vals[$pridx->[1]]}->{fs_vfstype} = $vals[$pridx->[2]];
+                $self->{$vals[$pridx->[1]]}->{special} = 1
+                  if (defined($special_fs->{$vfs_type}));
             }
             else
             {
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 0
-                  unless ( defined( $self->{ $vals[ $pridx->[1] ] }->{special} ) );
+                $self->{$vals[$pridx->[1]]}->{special} = 0
+                  unless (defined($self->{$vals[$pridx->[1]]}->{special}));
             }
 
-            for ( my $i = 0; $i < @{$mnttabKeys}; ++$i )
+            for (my $i = 0; $i < @{$mnttabKeys}; ++$i)
             {
-                $self->{ $vals[ $pridx->[1] ] }->{ $mnttabKeys->[$i] } =
-                  defined( $vals[$i] ) ? $vals[$i] : '';
+                $self->{$vals[$pridx->[1]]}->{$mnttabKeys->[$i]} =
+                  defined($vals[$i]) ? $vals[$i] : '';
             }
         }
+
         $mtab->close();
-        1;
+
+        return 1;
     }
-    else
-    {
-        0;
-    }
+
+    return 0;
 }
 
+## no critic (Subroutines::ProhibitManyArgs)
 sub readMounts
 {
-    my ( $self, $mount_rx, $pridx, $keys, $special, @lines ) = @_;
+    my ($self, $mount_rx, $pridx, $keys, $special, @lines) = @_;
 
     foreach my $line (@lines)
     {
-        if ( my @vals = $line =~ $mount_rx )
+        if (my @vals = $line =~ $mount_rx)
         {
-            $self->{canondev} and -l $vals[ $pridx->[0] ] and $vals[ $pridx->[0] ] = abs_path( $vals[ $pridx->[0] ] );
-            $self->{ $vals[ $pridx->[1] ] }->{mount_point} = $vals[ $pridx->[1] ];
-            $self->{ $vals[ $pridx->[1] ] }->{device}      = $vals[ $pridx->[0] ];
-            $self->{ $vals[ $pridx->[1] ] }->{mounted}     = 1;
-            delete $self->{ $vals[ $pridx->[1] ] }->{unmounted}
-              if ( exists( $self->{ $vals[ $pridx->[1] ] }->{unmounted} ) );
+            $self->{canondev} and -l $vals[$pridx->[0]] and $vals[$pridx->[0]] = abs_path($vals[$pridx->[0]]);
+            $self->{$vals[$pridx->[1]]}->{mount_point}                         = $vals[$pridx->[1]];
+            $self->{$vals[$pridx->[1]]}->{device}                              = $vals[$pridx->[0]];
+            $self->{$vals[$pridx->[1]]}->{mounted}                             = 1;
+            delete $self->{$vals[$pridx->[1]]}->{unmounted}
+              if (exists($self->{$vals[$pridx->[1]]}->{unmounted}));
 
-            if ( defined( $pridx->[2] ) )
+            if (defined($pridx->[2]))
             {
-                my $vfs_type = $self->{ $vals[ $pridx->[1] ] }->{fs_vfstype} = $vals[ $pridx->[2] ];
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 1
-                  if ( defined( $special->{$vfs_type} ) );
+                my $vfs_type = $self->{$vals[$pridx->[1]]}->{fs_vfstype} = $vals[$pridx->[2]];
+                $self->{$vals[$pridx->[1]]}->{special} = 1
+                  if (defined($special->{$vfs_type}));
             }
-            elsif ( !defined( $self->{ $vals[ $pridx->[1] ] }->{special} ) )
+            elsif (!defined($self->{$vals[$pridx->[1]]}->{special}))
             {
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 0;
+                $self->{$vals[$pridx->[1]]}->{special} = 0;
             }
 
-            for ( my $i = 0; $i < @{$keys}; ++$i )
+            for (my $i = 0; $i < @{$keys}; ++$i)
             {
-                $self->{ $vals[ $pridx->[1] ] }->{ $keys->[$i] } =
-                  defined( $vals[$i] ) ? $vals[$i] : '';
+                $self->{$vals[$pridx->[1]]}->{$keys->[$i]} =
+                  defined($vals[$i]) ? $vals[$i] : '';
             }
         }
     }
 
-    $self;
+    return $self;
 }
 
 sub readSwap
 {
-    my ( $self, $swap_rx, @lines ) = @_;
+    my ($self, $swap_rx, @lines) = @_;
     foreach my $line (@lines)
     {
-        if ( my ($dev) = $line =~ $swap_rx )
+        if (my ($dev) = $line =~ $swap_rx)
         {
             $self->{canondev} and -l $dev and $dev = abs_path($dev);
             $self->{none}->{mount_point} ||= 'none';
@@ -221,7 +224,8 @@ sub readSwap
             delete $self->{none}->{unmounted};
         }
     }
-    $self;
+
+    return $self;
 }
 
 1;
@@ -354,10 +358,6 @@ Array containing the lines to parse.
 
 =back
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
@@ -367,11 +367,11 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
-Copyright 2008-2014 Jens Rehsack.
+
+Copyright 2008-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

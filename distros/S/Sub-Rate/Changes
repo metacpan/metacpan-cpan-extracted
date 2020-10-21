@@ -1,5 +1,8 @@
 Revision history for Perl extension Sub::Rate
 
+0.06 2020-10-20T14:53:29Z
+     - Switch to Moo from Any::Moose #4
+
 0.05 2012-12-06T14:50:11+09:00
      - fixed a bug that NoMaxRate does not support bigger max_rate than 100 (koba04)
 

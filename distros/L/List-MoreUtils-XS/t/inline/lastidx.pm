@@ -10,13 +10,13 @@ my @list = (1 .. 10000);
 is(9999, lastidx { $_ >= 5000 } @list);
 is(-1,   lastidx { not defined } @list);
 is(9999, lastidx { defined } @list);
-is(-1, lastidx {});
+is(-1,   lastidx {});
 
 # Test aliases
 is(9999, last_index { $_ >= 5000 } @list);
 is(-1,   last_index { not defined } @list);
 is(9999, last_index { defined } @list);
-is(-1, last_index {});
+is(-1,   last_index {});
 
 leak_free_ok(
     lastidx => sub {

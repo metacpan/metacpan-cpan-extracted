@@ -1,7 +1,12 @@
 use strict;
 use warnings;
+use Cwd ();
 use Test::More;
-use lib qw(../lib);
+use File::Basename;
+use lib (
+	File::Basename::dirname(Cwd::abs_path(__FILE__)) . '/../lib',	# in build dir
+	File::Basename::dirname(Cwd::abs_path(__FILE__)) . '/../..'		# in project dir with t subdir in same dir as .pm file
+);
 
 my @methods = qw(
 	new

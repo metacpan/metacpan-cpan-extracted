@@ -1,9 +1,9 @@
 This archive contains the distribution Parqus,
-version 0.02:
+version 0.03:
 
   parse a search query string
 
-This software is copyright (c) 2015 by David Schmidt.
+This software is copyright (c) 2020 by David Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

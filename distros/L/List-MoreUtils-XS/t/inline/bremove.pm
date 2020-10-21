@@ -65,17 +65,17 @@ leak_free_ok(
 leak_free_ok(
     'bremove first with stack-growing' => sub {
         my @list = mesh @odd, @even;
-        my $v = $list[0];
+        my $v    = $list[0];
         bremove { grow_stack(); $_ <=> $v } @list;
     },
     'bremove last with stack-growing' => sub {
         my @list = mesh @odd, @even;
-        my $v = $list[-1];
+        my $v    = $list[-1];
         bremove { grow_stack(); $_ <=> $v } @list;
     },
     'bremove middle with stack-growing' => sub {
         my @list = mesh @odd, @even;
-        my $v = $list[int($#list / 2)];
+        my $v    = $list[int($#list / 2)];
         bremove { grow_stack(); $_ <=> $v } @list;
     },
 );
@@ -83,21 +83,21 @@ leak_free_ok(
 leak_free_ok(
     'bremove first with stack-growing and exception' => sub {
         my @list = mesh @odd, @even;
-        my $v = $list[0];
+        my $v    = $list[0];
         eval {
             bremove { grow_stack(); $_ <=> $v or die "Goal!"; $_ <=> $v } @list;
         };
     },
     'bremove last with stack-growing and exception' => sub {
         my @list = mesh @odd, @even;
-        my $v = $list[-1];
+        my $v    = $list[-1];
         eval {
             bremove { grow_stack(); $_ <=> $v or die "Goal!"; $_ <=> $v } @list;
         };
     },
     'bremove middle with stack-growing and exception' => sub {
         my @list = mesh @odd, @even;
-        my $v = $list[int($#list / 2)];
+        my $v    = $list[int($#list / 2)];
         eval {
             bremove { grow_stack(); $_ <=> $v or die "Goal!"; $_ <=> $v } @list;
         };

@@ -1,5 +1,19 @@
 Changes log for Perl extension SQL::Statement
 
+1.414	2020-10-21
+    * re-release 1.413_001 without further changes
+
+1.413_001	2020-09-28
+    * Spell check
+    * Be specific in which files to skip from the distribution
+    * Author fixes
+    * Makefile.PL: port WriteMakefile1 from Hash::Merge
+    * .travis.yml: update for Xenial VMs
+    * cleanup MANIFEST.SKIP
+    * bump copyright year
+    * SQL::Parser correctly parse VALUES and SET clauses containing function invocations with several arguments
+      patch provided by Edgar J. Holleis
+
 1.412	2017-04-06
     * Release 1.411_001 without further changes as 1.412
 

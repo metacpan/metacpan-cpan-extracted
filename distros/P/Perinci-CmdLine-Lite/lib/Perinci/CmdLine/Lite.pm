@@ -1,7 +1,9 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2020-05-26'; # DATE
-our $VERSION = '1.829'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-21'; # DATE
+our $DIST = 'Perinci-CmdLine-Lite'; # DIST
+our $VERSION = '1.900'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -24,6 +26,9 @@ has default_prompt_template => (
 has validate_args => (
     is=>'rw',
     default => 1,
+);
+has plugins => (
+    is => 'rw',
 );
 
 my $formats = [qw/text text-simple text-pretty json json-pretty csv html html+datatables perl/];
@@ -99,6 +104,10 @@ sub BUILD {
     $self->{formats} //= $formats;
 
     $self->{per_arg_json} //= 1;
+
+    Perinci::CmdLine::Base::__plugin_activate_plugins_in_env();
+    Perinci::CmdLine::Base::__plugin_activate_plugins(@{ $self->{plugins} })
+          if $self->{plugins};
 }
 
 my $setup_progress;
@@ -229,11 +238,7 @@ sub hook_before_action {
 
     my ($self, $r) = @_;
 
-    # validate arguments using schema from metadata
-  VALIDATE_ARGS:
-    {
-        no strict 'refs';
-
+  VALIDATE_ARGS: {
         last unless $self->validate_args;
 
         # unless we're feeding the arguments to function, don't bother
@@ -243,7 +248,7 @@ sub hook_before_action {
         my $meta = $r->{meta};
 
         # function is probably already wrapped
-        last if $meta->{'x.perinci.sub.wrapper.logs'} &&
+        return if $meta->{'x.perinci.sub.wrapper.logs'} &&
             (grep { $_->{validate_args} }
              @{ $meta->{'x.perinci.sub.wrapper.logs'} });
 
@@ -251,100 +256,110 @@ sub hook_before_action {
         # it
         last if $meta->{features} && $meta->{features}{validate_vars};
 
-        # to be cheap, we simply use "$ref" as key as cache key. to be proper,
-        # it should be hash of serialized content.
-        my %validators_by_arg; # key = argname
+        Perinci::CmdLine::Base::__plugin_run_event(
+            name => 'validate_args',
+            r => $r,
+            on_success => sub {
+                no strict 'refs';
 
-      USE_VALIDATORS_FROM_SCHEMA_V: {
-            my $url = $r->{subcommand_data}{url};
-            $url =~ m!\A/(.+)/(\w+)\z! or last;
-            my $func = $2;
-            (my $mod = $1) =~ s!/!::!g;
-            my $schemav_mod = "Sah::SchemaV::$mod";
-            (my $schemav_mod_pm = "$schemav_mod.pm") =~ s!::!/!g;
-            eval { require $schemav_mod_pm };
-            last if $@;
+                # to be cheap, we simply use "$ref" as key as cache key. to be
+                # proper, it should be hash of serialized content.
+                my %validators_by_arg; # key = argname
 
-            #say "D:we have pre-compiled validator codes";
+              USE_VALIDATORS_FROM_SCHEMA_V: {
+                    my $url = $r->{subcommand_data}{url};
+                    $url =~ m!\A/(.+)/(\w+)\z! or last;
+                    my $func = $2;
+                    (my $mod = $1) =~ s!/!::!g;
+                    my $schemav_mod = "Sah::SchemaV::$mod";
+                    (my $schemav_mod_pm = "$schemav_mod.pm") =~ s!::!/!g;
+                    eval { require $schemav_mod_pm };
+                    last if $@;
 
-            for my $arg (sort keys %{ $meta->{args} // {} }) {
-                next unless exists($r->{args}{$arg});
+                    #say "D:we have pre-compiled validator codes";
 
-                # we don't support validation of input stream because this must
-                # be done after each 'get item' (but periswrap does)
-                next if $meta->{args}{$arg}{stream};
+                    for my $arg (sort keys %{ $meta->{args} // {} }) {
+                        next unless exists($r->{args}{$arg});
 
-                my $v = ${"$schemav_mod\::Args_Validators"}{$func}{$arg}
-                    or next;
-                #say "D:using precompiled validator for arg $arg";
-                $validators_by_arg{$arg} = $v;
-            }
-        }
+                        # we don't support validation of input stream because
+                        # this must be done after each 'get item' (but periswrap
+                        # does)
+                        next if $meta->{args}{$arg}{stream};
 
-      GEN_VALIDATORS: {
-            my %validators_by_schema; # key = "$schema"
-            require Data::Sah;
-            for my $arg (sort keys %{ $meta->{args} // {} }) {
-                next unless exists($r->{args}{$arg});
+                        my $v = ${"$schemav_mod\::Args_Validators"}{$func}{$arg}
+                            or next;
+                        #say "D:using precompiled validator for arg $arg";
+                        $validators_by_arg{$arg} = $v;
+                    }
+                }
 
-                # we don't support validation of input stream because this must
-                # be done after each 'get item' (but periswrap does)
-                next if $meta->{args}{$arg}{stream};
+              GEN_VALIDATORS: {
+                    my %validators_by_schema; # key = "$schema"
+                    require Data::Sah;
+                    for my $arg (sort keys %{ $meta->{args} // {} }) {
+                        next unless exists($r->{args}{$arg});
 
-                my $schema = $meta->{args}{$arg}{schema};
-                next unless $schema;
+                        # we don't support validation of input stream because
+                        # this must be done after each 'get item' (but periswrap
+                        # does)
+                        next if $meta->{args}{$arg}{stream};
 
-                unless ($validators_by_schema{"$schema"}) {
+                        my $schema = $meta->{args}{$arg}{schema};
+                        next unless $schema;
+
+                        unless ($validators_by_schema{"$schema"}) {
+                            my $v = Data::Sah::gen_validator($schema, {
+                                return_type => 'str+val',
+                                schema_is_normalized => 1,
+                            });
+                            $validators_by_schema{"$schema"} = $v;
+                            $validators_by_arg{$arg} = $v;
+                        }
+                    }
+                }
+
+              DO_VALIDATE: {
+                    for my $arg (sort keys %{ $meta->{args} // {} }) {
+                        my $v = $validators_by_arg{$arg} or next;
+                        my $res = $v->($r->{args}{$arg});
+                        if ($res->[0]) {
+                            die [400, "Argument '$arg' fails validation: $res->[0]"];
+                        }
+                        my $val0 = $r->{args}{$arg};
+                        my $coerced_val = $res->[1];
+                        $r->{args}{$arg} = $coerced_val;
+                        $r->{args}{"-orig_$arg"} = $val0
+                            unless equal2($val0, $coerced_val);
+                    }
+                } # DO_VALIDATE
+
+              DO_VALIDATE_ARGS_RELS: {
+                    last unless $meta->{args_rels};
+
+                    # we haven't precompiled validator for args_rels yet
+                    require Data::Sah;
+
+                    my $schema = [hash => $meta->{args_rels}];
+                    my $sah = Data::Sah->new;
+                    my $hc  = $sah->get_compiler("human");
+                    my $cd  = $hc->init_cd;
+                    $cd->{args}{lang} //= $cd->{default_lang};
                     my $v = Data::Sah::gen_validator($schema, {
-                        return_type => 'str+val',
-                        schema_is_normalized => 1,
+                        return_type => 'str',
+                        human_hash_values => {
+                            field  => $hc->_xlt($cd, "argument"),
+                            fields => $hc->_xlt($cd, "arguments"),
+                        },
                     });
-                    $validators_by_schema{"$schema"} = $v;
-                    $validators_by_arg{$arg} = $v;
-                }
-            }
-        }
+                    my $res = $v->($r->{args});
+                    if ($res) {
+                        die [400, $res];
+                    }
+                } # DO_VALIDATE_ARGS_RELS
 
-      DO_VALIDATE: {
-            for my $arg (sort keys %{ $meta->{args} // {} }) {
-                my $v = $validators_by_arg{$arg} or next;
-                my $res = $v->($r->{args}{$arg});
-                if ($res->[0]) {
-                    die [400, "Argument '$arg' fails validation: $res->[0]"];
-                }
-                my $val0 = $r->{args}{$arg};
-                my $coerced_val = $res->[1];
-                $r->{args}{$arg} = $coerced_val;
-                $r->{args}{"-orig_$arg"} = $val0
-                    unless equal2($val0, $coerced_val);
-            }
-        } # DO_VALIDATE
-
-      DO_VALIDATE_ARGS_RELS: {
-            last unless $meta->{args_rels};
-
-            # we haven't precompiled validator for args_rels yet
-            require Data::Sah;
-
-            my $schema = [hash => $meta->{args_rels}];
-            my $sah = Data::Sah->new;
-            my $hc  = $sah->get_compiler("human");
-            my $cd  = $hc->init_cd;
-            $cd->{args}{lang} //= $cd->{default_lang};
-            my $v = Data::Sah::gen_validator($schema, {
-                return_type => 'str',
-                human_hash_values => {
-                    field  => $hc->_xlt($cd, "argument"),
-                    fields => $hc->_xlt($cd, "arguments"),
-                },
-            });
-            my $res = $v->($r->{args});
-            if ($res) {
-                die [400, $res];
-            }
-        } # DO_VALIDATE_ARGS_RELS
-
-    }
+            },
+        );
+    } # VALIDATE_ARGS
 }
 
 sub hook_format_result {
@@ -630,7 +645,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.829 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-05-26.
+This document describes version 1.900 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-10-21.
 
 =head1 SYNOPSIS
 

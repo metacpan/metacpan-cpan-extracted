@@ -1,9 +1,12 @@
-use Test;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN { plan tests => 9; }
 
-use XML::LibXML;
-use XML::LibXML::NodeList::Iterator;
+use XML::LibXML                     ();
+use XML::LibXML::NodeList::Iterator ();
 
 my $xmlstr = "<A><B/><B/>T<C><D/></C></A>";
 
@@ -37,6 +40,7 @@ sub t01_list_first_element
     return 1;
 }
 
+# TEST
 ok( t01_list_first_element() );
 
 sub t06_set_first
@@ -69,6 +73,8 @@ sub t06_set_first
 
     return 1;
 }
+
+# TEST
 ok( t06_set_first() );
 
 sub t07_set_last
@@ -102,6 +108,7 @@ sub t07_set_last
     return 1;
 }
 
+# TEST
 ok( t07_set_last() );
 
 sub t02_loop_forward
@@ -171,6 +178,8 @@ sub t02_loop_forward
 
     return 1;
 }
+
+# TEST
 ok( t02_loop_forward() );
 
 sub t03_loop_backward
@@ -214,6 +223,8 @@ sub t03_loop_backward
     }
     return 1;
 }
+
+# TEST
 ok( t03_loop_backward() );
 
 sub t04_loop_forward_backward
@@ -261,6 +272,8 @@ sub t04_loop_forward_backward
 
     return 1;
 }
+
+# TEST
 ok( t04_loop_forward_backward() );
 
 sub t05_run_iterate
@@ -287,14 +300,15 @@ sub t05_run_iterate
 
     return 1;
 }
+
+# TEST
 ok( t05_run_iterate() );
 
 # RT#28688
 package MyFilter;
 
-use base qw(XML::NodeFilter);
+use parent qw(XML::NodeFilter);
 use XML::NodeFilter qw(:results);
-use UNIVERSAL;
 
 sub accept_node
 {
@@ -340,6 +354,8 @@ sub t08_last_with_filter
 
     return 1;
 }
+
+# TEST
 ok( t08_last_with_filter() );
 
 # END RT#28688
@@ -380,6 +396,7 @@ sub t09_pass_nodes
     return 1;
 }
 
+# TEST
 ok( t09_pass_nodes() );
 
 # END RT#29262

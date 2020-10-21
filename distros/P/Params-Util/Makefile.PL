@@ -1,233 +1,215 @@
+#!perl
+
 use strict;
-BEGIN {
-	require 5.00503;
+use warnings;
+
+use 5.008;
+
+BEGIN
+{
+    unless (grep { $_ eq "." } @INC)
+    {
+        use lib ".";
+    }
 }
-use Config;
-use ExtUtils::MakeMaker ();
+
+use inc::latest 'Capture::Tiny';
+use inc::latest 'Config::AutoConf';
+
+unless (-f "META.yml")
+{
+    if (inc::latest->can("write"))
+    {
+        inc::latest->write("inc");
+        for my $mod (inc::latest->loaded_modules)
+        {
+            inc::latest->bundle_module($mod, "inc");
+        }
+    }
+    eval <<EOEC;
+use Devel::PPPort;
+Devel::PPPort::WriteFile("ppport.h");
+EOEC
+}
+
+use ExtUtils::MakeMaker;
+
+use lib 'inc';
+use Config::AutoConf::ParamsUtil ();
+
+Config::AutoConf::ParamsUtil->_set_argv(@ARGV);    # XXX hack because we cannot construct for global use
+my $loadable_xs = Config::AutoConf::ParamsUtil->check_paramsutil_prerequisites();
 
 # Should we build the XS version?
-my $make_xs = undef;
-foreach ( @ARGV ) {
-	/^-pm/ and $make_xs = 0;
-	/^-xs/ and $make_xs = 1;
-}
-unless ( defined $make_xs ) {
-	$make_xs = can_xs();
-}
-if ( $^O eq 'cygwin' and $make_xs == 1 and not /^-xs/ ) {
-	# Cygwin goes bonkers breaking `` if using Params::Util XS version
-	# for no apparent reason.
-	$make_xs = 0;
-}
-
-# Generate the non-XS tests if we are making the XS version
-my @tests = qw{
-	t/01_compile.t
-	t/02_main.t
-	t/03_all.t
-	t/04_codelike.t
-	t/05_typelike.t
-	t/06_invocant.t
-	t/07_handle.t
-	t/08_driver.t
-	t/09_insideout.t
-};
-if ( $make_xs ) {
-	foreach my $file ( @tests ) {
-		# Load the original
-		local *FILE;
-		local $/ = undef;
-		open( FILE, "<$file" ) or die("Failed to open '$file'");
-		my $buffer = <FILE>;
-		close( FILE ) or die("Failed to close '$file'");
-
-		# Convert it to a pure perl version
-		$file   =~ s/0/1/;
-		$buffer =~ s/0;/1;/;
-
-		# Write the pure perl version
-		open( FILE, ">$file" ) or die("Failed to open '$file'");
-		print FILE $buffer;
-		close( FILE ) or die("Failed to close '$file'");
-	}
-}
-
-my @clean = (
-	# 'test.c',
-	'*.old'
+my %RUN_DEPS = (
+    'Scalar::Util' => $loadable_xs ? '1.18' : '1.10',
+    'XSLoader'     => "0.22",
 );
-if ( $make_xs ) {
-	push @clean, @tests;
-}
+my %BUNDLE_CONFIGURE_DEPS = (
+    'inc::latest'      => '0.500',
+    'Config::AutoConf' => '0.315',
+);
+my %CONFIGURE_DEPS = (
+    'Carp'                => 0,
+    'ExtUtils::MakeMaker' => 0,
+    'File::Basename'      => 0,
+    'File::Copy'          => 0,
+    'File::Path'          => 0,
+    'File::Spec'          => 0,
+    'IPC::Cmd'            => 0,
+    'parent'              => 0,
+);
+my %BUILD_DEPS = ();
 
-WriteMakefile(
-	# We created our own META.yml
-	# NO_META            => 1,
-	NAME               => 'Params::Util',
-	ABSTRACT           => 'Simple, compact and correct param-checking functions',
-	VERSION_FROM       => 'lib/Params/Util.pm',
-	AUTHOR             => 'Adam Kennedy <adamk@cpan.org>',
-	LICENSE            => 'perl',
-	DEFINE             => '-DPERL_EXT',
-	MIN_PERL_VERSION   => '5.00503',
-	CONFIGURE_REQUIRES => {
-		'ExtUtils::MakeMaker' => '6.52',
-		'ExtUtils::CBuilder'  => '0.27',
-	},
-	PREREQ_PM => {
-		'Scalar::Util' => $make_xs ? '1.18' : '1.10',
-	},
-	BUILD_REQUIRES => {
-		'ExtUtils::MakeMaker' => '6.52',
-		'Test::More'          => '0.42',
-		'File::Spec'          => '0.80',
-	},
+my %TEST_DEPS = (
+    'Storable'   => 0,
+    'Test::More' => 0.96,
+);
+my @XS_FILES = qw(Util.xs);
 
-	# Special stuff
-	CONFIGURE     => sub {
-		my $hash = $_[1];
-		unless ( $make_xs ) {
-			$hash->{XS} = {};
-			$hash->{C}  = [];
-		}
-		return $hash;
-	},
-	clean => {
-		FILES => join( ' ', @clean ),
-	},
+WriteMakefile1(
+    META_MERGE => {
+        'meta-spec' => {version => 2},
+        resources   => {
+            homepage   => 'https://metacpan.org/release/Params-Util',
+            repository => {
+                url  => 'https://github.com/perl5-utils/Params-Util.git',
+                web  => 'https://github.com/perl5-utils/Params-Util',
+                type => 'git',
+            },
+            bugtracker => {
+                web    => 'https://rt.cpan.org/Dist/Display.html?Name=Params-Util',
+                mailto => 'bug-Params-Util@rt.cpan.org',
+            },
+            license => 'apache_2_0',
+        },
+        prereqs => {
+            develop => {
+                requires => {
+                    %BUNDLE_CONFIGURE_DEPS,
+                    'Test::CPAN::Changes'                 => 0,
+                    'Test::CheckManifest'                 => 0,
+                    'Module::CPANTS::Analyse'             => '0.96',
+                    'Test::Kwalitee'                      => 0,
+                    'Test::Perl::Critic'                  => 0,
+                    'Test::PerlTidy'                      => 0,
+                    'Test::Pod'                           => 0,
+                    'Test::Pod::Coverage'                 => 0,
+                    'Test::Pod::Spelling::CommonMistakes' => 0,
+                    'Test::Spelling'                      => 0,
+                },
+            },
+            configure => {
+                requires   => {%CONFIGURE_DEPS},
+                recommends => {'Config::AutoConf' => '0.315'}
+            },
+            test => {
+                requires => {%TEST_DEPS},
+                requires => {'Test::LeakTrace' => 0}
+            },
+            runtime => {requires => {%RUN_DEPS}},
+        },
+    },
+    NAME               => 'Params::Util',
+    ABSTRACT           => 'Simple, compact and correct param-checking functions',
+    VERSION_FROM       => 'lib/Params/Util.pm',
+    AUTHOR             => ['Adam Kennedy <adamk@cpan.org>', 'Jens Rehsack <rehsack@cpan.org>'],
+    LICENSE            => 'perl',
+    CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
+    PREREQ_PM          => \%RUN_DEPS,
+    TEST_REQUIRES      => \%TEST_DEPS,
+    XS                 => {map { (my $tgt = $_) =~ s/\.xs$/\.c/; $_ => $tgt; } @XS_FILES},
+    MAGICXS            => 1,
+    depend             => {'$(FIRST_MAKEFILE)' => '$(VERSION_FROM)'},
+    test               => {TESTS               => join(' ', 't/pp/*.t', ($loadable_xs ? 't/xs/*.t' : ()), 'xt/*.t')},
+    # Otherwise 'cxinc' isn't defined
+    ($] < 5.012 ? (DEFINE => '-DPERL_EXT') : (),),
 );
 
+sub WriteMakefile1
+{    # originally written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
+    my %params       = @_;
+    my $eumm_version = $ExtUtils::MakeMaker::VERSION;
+    $eumm_version = eval $eumm_version;
+    die "EXTRA_META is deprecated" if (exists($params{EXTRA_META}));
+    die "License not specified"    if (!exists($params{LICENSE}));
+    $params{TEST_REQUIRES}
+      and $eumm_version < 6.6303
+      and $params{BUILD_REQUIRES} = {%{$params{BUILD_REQUIRES} || {}}, %{delete $params{TEST_REQUIRES}}};
+    #EUMM 6.5502 has problems with BUILD_REQUIRES
+    $params{BUILD_REQUIRES}
+      and $eumm_version < 6.5503
+      and $params{PREREQ_PM} = {%{$params{PREREQ_PM} || {}}, %{delete $params{BUILD_REQUIRES}}};
+    ref $params{AUTHOR}
+      and "ARRAY" eq ref $params{AUTHOR}
+      and $eumm_version < 6.5702
+      and $params{AUTHOR} = join(", ", @{$params{AUTHOR}});
+    delete $params{CONFIGURE_REQUIRES}    if ($eumm_version < 6.52);
+    delete $params{MIN_PERL_VERSION}      if ($eumm_version < 6.48);
+    delete $params{META_MERGE}            if ($eumm_version < 6.46);
+    delete $params{META_ADD}{prereqs}     if ($eumm_version < 6.58);
+    delete $params{META_ADD}{'meta-spec'} if ($eumm_version < 6.58);
+    delete $params{META_ADD}              if ($eumm_version < 6.46);
+    delete $params{LICENSE}               if ($eumm_version < 6.31);
+    delete $params{AUTHOR}                if ($] < 5.005);
+    delete $params{ABSTRACT_FROM}         if ($] < 5.005);
+    delete $params{BINARY_LOCATION}       if ($] < 5.005);
 
+    # more or less taken from SQL::Statement's Makefile.PL
+    if ($params{CONFLICTS})
+    {
+        my $ok          = 1;
+        my $cpan_smoker = grep { $_ =~ m/(?:CR_SMOKER|CPAN_REPORTER|AUTOMATED_TESTING)/ } keys %ENV;
+        unless ($cpan_smoker || $ENV{PERL_MM_USE_DEFAULT})
+        {
+            sleep 4 unless ($ok);
+        }
+        delete $params{CONFLICTS};
+    }
 
-
-
-#####################################################################
-# Support Functions (adapted from Module::Install)
-
-# Modified from eumm-upgrade by Alexandr Ciornii.
-sub WriteMakefile {
-	my %params=@_;
-	my $eumm_version=$ExtUtils::MakeMaker::VERSION;
-	$eumm_version=eval $eumm_version;
-	die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
-	die "License not specified" unless exists $params{LICENSE};
-	if ( $params{BUILD_REQUIRES} and $eumm_version < 6.5503 ) {
-		#EUMM 6.5502 has problems with BUILD_REQUIRES
-		$params{PREREQ_PM} = {
-			%{$params{PREREQ_PM} || {}},
-			%{$params{BUILD_REQUIRES}},
-		};
-		delete $params{BUILD_REQUIRES};
-	}
-	delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
-	delete $params{MIN_PERL_VERSION}   if $eumm_version < 6.48;
-	delete $params{META_MERGE}         if $eumm_version < 6.46;
-	delete $params{META_ADD}           if $eumm_version < 6.46;
-	delete $params{LICENSE}            if $eumm_version < 6.31;
-	delete $params{AUTHOR}             if $] < 5.005;
-	delete $params{ABSTRACT_FROM}      if $] < 5.005;
-	delete $params{BINARY_LOCATION}    if $] < 5.005;
-	ExtUtils::MakeMaker::WriteMakefile(%params);
+    WriteMakefile(%params);
 }
-
-# Secondary compile testing via ExtUtils::CBuilder
-sub can_xs {
-	# Do we have the configure_requires checker?
-	local $@;
-	eval "require ExtUtils::CBuilder;";
-	if ( $@ ) {
-		# They don't obey configure_requires, so it is
-		# someone old and delicate. Try to avoid hurting
-		# them by falling back to an older simpler test.
-		return can_cc();
-	}
-
-	# Do a simple compile that consumes the headers we need
-	my @libs    = ();
-	my $object  = undef;
-	my $builder = ExtUtils::CBuilder->new( quiet => 1 );
-	unless ( $builder->have_compiler ) {
-		# Lack of a compiler at all
-		return 0;
-	}
-
-
-	# Write a C file representative of what XS becomes
-	require File::Temp;
-	my ( $FH, $tmpfile ) = File::Temp::tempfile(
-		"sanexs-XXXXX",
-		SUFFIX => '.c',
-	);
-	binmode $FH;
-	print $FH <<'END_C';
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-
-int main(int argc, char **argv) {
-    return 0;
-}
-
-int boot_sanexs() {
-    return 1;
-}
-
-END_C
-	close $FH;
-
-	eval {
-		$object = $builder->compile(
-			source => $tmpfile,
-		);
-		@libs = $builder->link(
-			objects     => $object,
-			module_name => 'sanexs',
-		);
-	};
-	my $broken = !! $@;
-	foreach ( $tmpfile, $object, @libs ) {
-		next unless defined $_;
-		1 while unlink $_;
-	}
-
-	if ( $broken ) {
-		### NOTE: Don't do this in a production release.
-		# Compiler is officially screwed, you don't deserve
-		# to do any of our downstream depedencies as you'll
-		# probably end up choking on them as well.
-		# Trigger an NA for their own protection.
-		print "Unresolvable broken external dependency.\n";
-		print "This package requires a C compiler with full perl headers.\n";
-		print "Trivial test code using them failed to compile.\n";
-		print STDERR "NA: Unable to build distribution on this platform.\n";
-		exit(0);
-	}
-
-	return 1;
-}
-
-sub can_cc {
-	my @chunks = split(/ /, $Config::Config{cc}) or return;
-
-	# $Config{cc} may contain args; try to find out the program part
-	while ( @chunks ) {
-		return can_run("@chunks") || (pop(@chunks), next);
-	}
-
-	return;
-}
-
-sub can_run {
-	my ($cmd) = @_;
-
-	my $_cmd = $cmd;
-	return $_cmd if (-x $_cmd or $_cmd = MM->maybe_command($_cmd));
-
-	for my $dir ((split /$Config::Config{path_sep}/, $ENV{PATH}), '.') {
-		next if $dir eq '';
-		my $abs = File::Spec->catfile($dir, $cmd);
-		return $abs if (-x $abs or $abs = MM->maybe_command($abs));
-	}
-
-	return;
-}
+# my @clean = (
+# 	# 'test.c',
+# 	'*.old'
+# );
+# if ( $make_xs ) {
+# 	push @clean, @tests;
+# }
+#
+# WriteMakefile(
+# 	# We created our own META.yml
+# 	# NO_META            => 1,
+# 	NAME               => 'Params::Util',
+# 	ABSTRACT           => 'Simple, compact and correct param-checking functions',
+# 	VERSION_FROM       => 'lib/Params/Util.pm',
+# 	AUTHOR             => 'Adam Kennedy <adamk@cpan.org>',
+# 	LICENSE            => 'perl',
+# 	DEFINE             => '-DPERL_EXT',
+# 	MIN_PERL_VERSION   => '5.00503',
+# 	CONFIGURE_REQUIRES => {
+# 		'ExtUtils::MakeMaker' => '6.52',
+# 		'ExtUtils::CBuilder'  => '0.27',
+# 	},
+# 	PREREQ_PM => {
+# 		'Scalar::Util' => $make_xs ? '1.18' : '1.10',
+# 	},
+# 	BUILD_REQUIRES => {
+# 		'ExtUtils::MakeMaker' => '6.52',
+# 		'Test::More'          => '0.42',
+# 		'File::Spec'          => '0.80',
+# 	},
+#
+# 	# Special stuff
+# 	CONFIGURE     => sub {
+# 		my $hash = $_[1];
+# 		unless ( $make_xs ) {
+# 			$hash->{XS} = {};
+# 			$hash->{C}  = [];
+# 		}
+# 		return $hash;
+# 	},
+# 	clean => {
+# 		FILES => join( ' ', @clean ),
+# 	},
+# );

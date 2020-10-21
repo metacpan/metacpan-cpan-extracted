@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/CmdLine/Base.pm','lib/Perinci/CmdLine/Lite.pm'];
+my $filenames = ['lib/Perinci/CmdLine/Base.pm','lib/Perinci/CmdLine/Lite.pm','lib/Perinci/CmdLine/Plugin/DisablePlugin.pm','lib/Perinci/CmdLine/Plugin/DumpArgs.pm','lib/Perinci/CmdLine/Plugin/DumpR.pm','lib/Perinci/CmdLine/Plugin/DumpRes.pm','lib/Perinci/CmdLine/PluginBase.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

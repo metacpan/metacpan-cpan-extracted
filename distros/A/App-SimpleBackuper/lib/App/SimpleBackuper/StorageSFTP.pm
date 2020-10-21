@@ -2,6 +2,7 @@ package App::SimpleBackuper::StorageSFTP;
 
 use strict;
 use warnings;
+use Try::Tiny;
 use Net::SFTP::Foreign;
 use Net::SFTP::Foreign::Constants qw(SSH2_FX_CONNECTION_LOST);
 
@@ -33,7 +34,11 @@ sub _do {
 		if($self->{sftp}->status == SSH2_FX_CONNECTION_LOST and $attempts_left--) {
 			print " (".$self->{sftp}->error.", reconnecting)";
 			sleep 30;
-			$self->_connect();
+			try {
+				$self->_connect()
+			} catch {
+				print " (attempt to reconnect failed: $_)";
+			};
 		} else {
 			$self->{sftp}->die_on_error("Can't $method (status=".$self->{sftp}->status.")");
 		}

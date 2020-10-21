@@ -1,5 +1,7 @@
 Revision history for WebService-Blogger
 
+0.23    21 Oct 2020 Deprecate the module
+
 0.22    04 Sept 2015 Change ownership to Kedar Warriner
 
 0.21    16 June 2015 Deprecate the module due to changes in Blogger's authentication mechanism
@@ -52,4 +54,3 @@ Revision history for WebService-Blogger
 
 0.01    15 Aug 2010
         First working version.
-

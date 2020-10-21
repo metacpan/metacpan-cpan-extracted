@@ -29,7 +29,12 @@ my %WriteMakefileArgs = (
     "XML::LibXML" => 0,
     "YAML::XS" => 0
   },
-  "VERSION" => "0.002",
+  "TEST_REQUIRES" => {
+    "Path::Tiny" => 0,
+    "Test::Exception" => 0,
+    "Test::File" => 0
+  },
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/File/FormatIdentification/*.t"
   }
@@ -38,9 +43,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Moose" => 0,
+  "Path::Tiny" => 0,
   "Regexp::Assemble" => 0,
   "Regexp::Optimizer" => 0,
   "String::LCSS" => 0,
+  "Test::Exception" => 0,
+  "Test::File" => 0,
   "XML::LibXML" => 0,
   "YAML::XS" => 0
 );

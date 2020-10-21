@@ -6,7 +6,7 @@
       "Jens Rehsack <rehsack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -83,6 +83,6 @@
          "web" : "https://github.com/perl5-utils/List-MoreUtils-XS"
       }
    },
-   "version" : "0.428",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "0.430",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

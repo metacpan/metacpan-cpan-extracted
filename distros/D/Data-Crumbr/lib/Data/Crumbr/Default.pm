@@ -1,5 +1,5 @@
 package Data::Crumbr::Default;
-$Data::Crumbr::Default::VERSION = '0.1.1';
+$Data::Crumbr::Default::VERSION = '0.1.2';
 # ABSTRACT: Default renderer for Data::Crumbr
 
 use Mo qw< default coerce >;
@@ -165,7 +165,7 @@ Data::Crumbr::Default - Default renderer for Data::Crumbr
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 DESCRIPTION
 

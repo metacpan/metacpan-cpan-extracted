@@ -66,7 +66,7 @@ dies(
 
 remove_tree($testautolib);
 
-dies(sub { my $dist_dir = dist_dir('ShareDir-TestClass'); }, qr/Failed to find share dir for dist/, "No module directory");
+dies(sub { my $dist_dir   = dist_dir('ShareDir-TestClass'); },    qr/Failed to find share dir for dist/, "No module directory");
 dies(sub { my $module_dir = module_dir('ShareDir::TestClass'); }, qr/No such directory/, "Old module directory but file");
 
 make_path(dirname($testsharedirold), {mode => 0700});
@@ -101,7 +101,7 @@ open($fh, ">", $testsharedirold);
 close($fh);
 
 dies(sub { my $module_dir = module_dir('ShareDir::TestClass'); }, qr/No such directory/, "Old module directory but file");
-dies(sub { my $dist_dir = dist_dir('ShareDir-TestClass'); }, qr/Failed to find share dir for dist/,
+dies(sub { my $dist_dir   = dist_dir('ShareDir-TestClass'); }, qr/Failed to find share dir for dist/,
     "Old dist directory but file");
 dies(
     sub { my $dist_file = dist_file('ShareDir-TestClass', 'noread.txt'); },

@@ -1,5 +1,5 @@
 package AI::Pathfinding::OptimizeMultiple::PostProcessor;
-$AI::Pathfinding::OptimizeMultiple::PostProcessor::VERSION = '0.0.15';
+$AI::Pathfinding::OptimizeMultiple::PostProcessor::VERSION = '0.0.16';
 use strict;
 use warnings;
 
@@ -7,21 +7,23 @@ use 5.012;
 
 use MooX qw/late/;
 
-has _should_do_rle => (isa => 'Bool', is => 'ro', init_arg => 'do_rle', required => 1);
-has _offset_quotas => (isa => 'Bool', is => 'ro', init_arg => 'offset_quotas', required => 1);
+has _should_do_rle =>
+    ( isa => 'Bool', is => 'ro', init_arg => 'do_rle', required => 1 );
+has _offset_quotas =>
+    ( isa => 'Bool', is => 'ro', init_arg => 'offset_quotas', required => 1 );
 
 sub scans_rle
 {
     my $self = shift;
 
-    my @scans_list = @{shift()};
+    my @scans_list = @{ shift() };
 
     my $scan = shift(@scans_list);
 
     my (@a);
-    while (my $next_scan = shift(@scans_list))
+    while ( my $next_scan = shift(@scans_list) )
     {
-        if ($next_scan->scan_idx() == $scan->scan_idx())
+        if ( $next_scan->scan_idx() == $scan->scan_idx() )
         {
             $scan->iters( $scan->iters() + $next_scan->iters() );
         }
@@ -35,7 +37,6 @@ sub scans_rle
     return \@a;
 }
 
-
 sub process
 {
     my $self = shift;
@@ -43,25 +44,26 @@ sub process
     my $scans_orig = shift;
 
     # clone the scans.
-    my $scans = [ map { $_->clone(); } @{$scans_orig}];
+    my $scans = [ map { $_->clone(); } @{$scans_orig} ];
 
-    if ($self->_offset_quotas)
+    if ( $self->_offset_quotas )
     {
-        $scans =
-        [
-            map { my $ret = $_->clone(); $ret->iters($ret->iters()+1); $ret; }
-            @$scans
+        $scans = [
+            map {
+                my $ret = $_->clone();
+                $ret->iters( $ret->iters() + 1 );
+                $ret;
+            } @$scans
         ];
     }
 
-    if ($self->_should_do_rle)
+    if ( $self->_should_do_rle )
     {
         $scans = $self->scans_rle($scans);
     }
 
     return $scans;
 }
-
 
 1;
 
@@ -77,11 +79,7 @@ AI::Pathfinding::OptimizeMultiple::PostProcessor - post-processor.
 
 =head1 VERSION
 
-version 0.0.15
-
-=head1 VERSION
-
-version 0.0.15
+version 0.0.16
 
 =head1 SUBROUTINES/METHODS
 
@@ -93,36 +91,9 @@ For internal use.
 
 For internal use.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2012 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc AI::Pathfinding::OptimizeMultiple
 
 =head2 Websites
 
@@ -137,15 +108,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/AI-Pathfinding-OptimizeMultiple>
+L<https://metacpan.org/release/AI-Pathfinding-OptimizeMultiple>
 
 =item *
 
@@ -154,30 +117,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/AI-Pathfinding-OptimizeMultiple>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/AI-Pathfinding-OptimizeMultiple>
 
 =item *
 
@@ -191,7 +130,7 @@ L<http://cpants.cpanauthors.org/dist/AI-Pathfinding-OptimizeMultiple>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/AI-Pathfinding-OptimizeMultiple>
 
@@ -228,5 +167,26 @@ from your repository :)
 L<http://github.com/shlomif/fc-solve>
 
   git clone ssh://git@github.com/shlomif/fc-solve.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

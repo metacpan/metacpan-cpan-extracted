@@ -3,7 +3,7 @@ package SQL::Parser;
 ######################################################################
 #
 # This module is copyright (c), 2001,2005 by Jeff Zucker.
-# This module is copyright (c), 2007-2017 by Jens Rehsack.
+# This module is copyright (c), 2007-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -20,9 +20,9 @@ use constant BAREWORD_FUNCTIONS =>
 use Carp qw(carp croak);
 use Params::Util qw(_ARRAY0 _ARRAY _HASH);
 use Scalar::Util qw(looks_like_number);
-use Text::Balanced qw(extract_bracketed);
+use Text::Balanced qw(extract_bracketed extract_multiple);
 
-$VERSION = '1.412';
+$VERSION = '1.414';
 
 BEGIN
 {
@@ -1181,7 +1181,10 @@ sub CREATE
 sub SET_CLAUSE_LIST
 {
     my ( $self, $set_string ) = @_;
-    my @sets = split( /,/, $set_string );
+    my @sets = extract_multiple($set_string, [ 
+        sub { my ($m, $r, $p) = extract_bracketed($_[0], "()", qr/[^,(]*/); (($p||'').($m||''), $r, ''); },
+        qr/([^,(]+)/,
+      ], undef, 1);
     my ( @cols, @vals );
     for my $set (@sets)
     {
@@ -1878,7 +1881,10 @@ sub nongroup_numeric
 sub LITERAL_LIST
 {
     my ( $self, $str ) = @_;
-    my @tokens = split /,/, $str;
+    my @tokens = extract_multiple($str, [ 
+        sub { my ($m, $r, $p) = extract_bracketed($_[0], "()", qr/[^,(]*/); (($p||'').($m||''), $r, ''); },
+        qr/([^,(]+)/,
+      ], undef, 1);
     my @values;
     for my $tok (@tokens)
     {
@@ -3435,7 +3441,7 @@ package.
  This module is
 
  copyright (c) 2001,2005 by Jeff Zucker and
- copyright (c) 2007-2017 by Jens Rehsack.
+ copyright (c) 2007-2020 by Jens Rehsack.
 
  All rights reserved.
 

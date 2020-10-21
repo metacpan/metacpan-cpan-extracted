@@ -1,7 +1,7 @@
 package Perinci::Sub::Util::Args;
 
-our $DATE = '2017-01-31'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2020-10-20'; # DATE
+our $VERSION = '0.470'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -42,7 +42,7 @@ sub argnames_by_tag {
 
     my @res;
     my $args_prop = $meta->{args} or return ();
-    my $neg = 1 if $tag =~ s/\A!//;
+    my $neg; $neg = 1 if $tag =~ s/\A!//;
     for my $argname (keys %$args_prop) {
         my $argspec = $args_prop->{$argname};
         if ($neg) {
@@ -126,7 +126,7 @@ Perinci::Sub::Util::Args - Utility routines related to Rinci arguments
 
 =head1 VERSION
 
-This document describes version 0.46 of Perinci::Sub::Util::Args (from Perl distribution Perinci-Sub-Util), released on 2017-01-31.
+This document describes version 0.470 of Perinci::Sub::Util::Args (from Perl distribution Perinci-Sub-Util), released on 2020-10-20.
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Util>.
 
 =head1 BUGS
 
@@ -246,7 +246,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

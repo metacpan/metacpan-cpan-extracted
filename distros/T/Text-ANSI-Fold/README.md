@@ -2,6 +2,10 @@
 
 Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.
 
+# VERSION
+
+Version 2.01
+
 # SYNOPSIS
 
     use Text::ANSI::Fold qw(ansi_fold);
@@ -209,6 +213,12 @@ function as well as **new** and **configure** method.
 
     Option **runin** and **runout** is used to set maximum width of moving
     characters.  Default values are both 2.
+
+- **expand** => _bool_
+- **tabstop** => _n_
+
+    Enable tab character expansion.  Default tabstop is 8 and can be set
+    by **tabstop** option.
 
 # EXAMPLE
 

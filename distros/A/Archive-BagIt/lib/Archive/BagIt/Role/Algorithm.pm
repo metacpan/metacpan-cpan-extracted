@@ -10,6 +10,17 @@ has 'name' => (
     is => 'ro',
 );
 
+sub get_optimal_bufsize {
+    my ($self, $fh) = @_;
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks)
+        = stat $fh;
+    # Windows systems return "" for $blksize
+    if ((defined $blksize ) && ($blksize ne "") && ($blksize >= 512)) {
+        return $blksize;
+    }
+    return 8192;
+}
 
 sub get_hash_string {
     my ($self, $fh) = @_;
@@ -44,7 +55,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 AVAILABILITY
 

@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.10";
+our $VERSION = "2.01";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -89,6 +89,8 @@ sub new {
 	linebreak => $DEFAULT_LINEBREAK,
 	runin     => $DEFAULT_RUNIN_WIDTH,
 	runout    => $DEFAULT_RUNOUT_WIDTH,
+	expand    => 0,
+	tabstop   => 8,
     }, $class;
 
     $obj->configure(@_) if @_;
@@ -163,6 +165,8 @@ sub fold {
     my $linebreak = $opt{linebreak} // $obj->{linebreak};
     my $runin     = $opt{runin}     // $obj->{runin};
     my $runout    = $opt{runout}    // $obj->{runout};
+    my $expand    = $opt{expand}    // $obj->{expand};
+    my $tabstop   = $opt{tabstop}   // $obj->{tabstop};
 
     if ($width < 0) {
 	$width = ~0 >> 1; # INT_MAX
@@ -183,7 +187,7 @@ sub fold {
     my $eol = '';
     my $room = $width;
     @color_stack = @reset = ();
-
+    my $yield_re = $expand ? qr/[^\e\n\f\r\t]/ : qr/[^\e\n\f\r]/;
     while (length) {
 
 	if (s/\A(\r*\n)//) {
@@ -218,7 +222,13 @@ sub fold {
 	    next;
 	}
 
-	if (s/\A(\e*[^\e\n\f\r]+)//) {
+	if ($expand and s/\A(\t+)//) {
+	    my $space = $tabstop * length($1) - ($width - $room) % $tabstop;
+	    $_ = ' ' x $space . $_;
+	    next;
+	}
+
+	if (s/\A(\e*${yield_re}+)//) {
 	    my $s = $1;
 	    if ((my $w = vwidth($s)) <= $room) {
 		$folded .= $s;
@@ -391,6 +401,10 @@ __END__
 =head1 NAME
 
 Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.
+
+=head1 VERSION
+
+Version 2.01
 
 =head1 SYNOPSIS
 
@@ -603,6 +617,13 @@ Import-tag B<:constants> can be used to access these constants.
 
 Option B<runin> and B<runout> is used to set maximum width of moving
 characters.  Default values are both 2.
+
+=item B<expand> => I<bool>
+
+=item B<tabstop> => I<n>
+
+Enable tab character expansion.  Default tabstop is 8 and can be set
+by B<tabstop> option.
 
 =back
 

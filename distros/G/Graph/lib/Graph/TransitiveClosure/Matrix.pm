@@ -112,36 +112,8 @@ sub _new {
 			$aiaiv |= $aiaiu;
 		    }
 		} else {
-		    if ($want_reflexive) {
-			$aiaiv |= $aiaiu;
-			vec($aiaiv, $aiu, 1) = 1;
-			# See XXX above.
-			# for my $w (@V) {
-			#     my $aiw = $ai{$w};
-			#     if (
-			# 	# $am->get($u, $w)
-			#	vec($aiaiu, $aiw, 1)
-			#	|| ($u eq $w)) {
-			#	# $am->set($v, $w)
-			#	vec($aiaiv, $aiw, 1) = 1
-			#	    ;
-			#     }
-			# }
-		    } else {
-			$aiaiv |= $aiaiu;
-			# See XXX above.
-			# for my $w (@V) {
-			#    my $aiw = $ai{$w};
-			#    if (
-			#	# $am->get($u, $w)
-			#	vec($aiaiu, $aiw, 1)
-			#       ) {
-			#	# $am->set($v, $w)
-			#	vec($aiaiv, $aiw, 1) = 1
-			#	    ;
-			#     }
-			# }
-		    }
+		    $aiaiv |= $aiaiu;
+		    vec($aiaiv, $aiu, 1) = 1 if $want_reflexive;
 		}
 		if ($aiaiv ne $aivivo) {
 		    $ai[$aiv] = $aiaiv;
@@ -168,8 +140,11 @@ sub _new {
 			# $d1a = $dm->get($v, $u) || 1;
 			# $d1b = $dm->get($u, $w) || 1;
 			$d0  = $didiv->[$diw];
-			$d1a = $didiv->[$diu] || 1;
-			$d1b = $didiu->[$diw] || 1;
+			# no override sum-zero paths which can happen with negative weights
+			$d1a = $didiv->[$diu];
+			$d1a = 1 unless defined $d1a;
+			$d1b = $didiu->[$diw];
+			$d1b = 1 unless defined $d1b;
 		    } else {
 			$d1a = 1;
 			$d1b = 1;

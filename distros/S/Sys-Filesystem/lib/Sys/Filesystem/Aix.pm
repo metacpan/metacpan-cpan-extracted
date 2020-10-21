@@ -1,10 +1,9 @@
 ############################################################
 #
-#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
-#   Copyright 2008,2009      Jens Rehsack
+#   Copyright 2008-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -34,7 +33,7 @@ use Carp qw(croak);
 use Cwd 'abs_path';
 use IO::File;
 
-$VERSION = '1.406';
+$VERSION = '1.408';
 
 sub version()
 {
@@ -54,90 +53,91 @@ my %special_fs = (
 # see AIX commands at
 # http://publib.boulder.ibm.com/infocenter/pseries/v5r3/topic/com.ibm.aix.doc/doc/base/alphabeticallistofcommands.htm
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
-    ref( my $class = shift ) && croak 'Class name required';
+    ref(my $class = shift) && croak 'Class name required';
     my %args = @_;
-    my $self = bless( {}, $class );
+    my $self = bless({}, $class);
 
     $args{fstab} ||= '/etc/filesystems';
     local $/ = "\n";
 
     my %curr_mountz = map {
         my $path = $_ =~ m/^\s/ ? (split)[1] : (split)[2];
-        ( $path => 1 );
+        ($path => 1);
     } qx( /usr/sbin/mount );
 
     my %fs_info = map {
-        my ( $path, $device, $vfs, $nodename, $type, $size, $options, $mount, $account ) =
-          split( m/:/, $_ );
+        my ($path, $device, $vfs, $nodename, $type, $size, $options, $mount, $account) =
+          split(m/:/, $_);
 
-        ( $path => [ $device, $vfs, $nodename, $type, $size, $options, $mount, $account ] )
+        ($path => [$device, $vfs, $nodename, $type, $size, $options, $mount, $account])
       }
       grep { m/^[^#]/ } qx( /usr/sbin/lsfs -c );
 
-    foreach my $current_filesystem ( keys %fs_info )
+    foreach my $current_filesystem (keys %fs_info)
     {
         $self->{$current_filesystem}->{filesystem} = $current_filesystem;
 
-        my ( $device, $vfs, $nodename, $type, $size, $options, $mount, $account ) =
-          @{ $fs_info{$current_filesystem} };
+        my ($device, $vfs, $nodename, $type, $size, $options, $mount, $account) =
+          @{$fs_info{$current_filesystem}};
 
         $args{canondev} and -l $device and $device = abs_path($device);
-        $self->{$current_filesystem}->{dev}      = $device;
-        $self->{$current_filesystem}->{vfs}      = $vfs;
-        $self->{$current_filesystem}->{options}  = $options;
-        $self->{$current_filesystem}->{nodename} = $nodename;
-        $self->{$current_filesystem}->{type}     = $type;
-        $self->{$current_filesystem}->{size}     = $size;
-        $self->{$current_filesystem}->{mount}    = $mount;
-        $self->{$current_filesystem}->{account}  = $account;
-        $self->{$current_filesystem}->{special}  = 1
-          if ( defined($vfs) && defined( $special_fs{$vfs} ) );
+        $self->{$current_filesystem}->{dev}        = $device;
+        $self->{$current_filesystem}->{vfs}        = $vfs;
+        $self->{$current_filesystem}->{options}    = $options;
+        $self->{$current_filesystem}->{nodename}   = $nodename;
+        $self->{$current_filesystem}->{type}       = $type;
+        $self->{$current_filesystem}->{size}       = $size;
+        $self->{$current_filesystem}->{mount}      = $mount;
+        $self->{$current_filesystem}->{account}    = $account;
+        $self->{$current_filesystem}->{special}    = 1
+          if (defined($vfs) && defined($special_fs{$vfs}));
 
         # the filesystem is either currently mounted or is not,
         # this does not need to be checked for each individual
         # attribute.
-        my $state = defined( $curr_mountz{$current_filesystem} ) ? 'mounted' : 'unmounted';
+        my $state = defined($curr_mountz{$current_filesystem}) ? 'mounted' : 'unmounted';
         $self->{$current_filesystem}->{$state} = 1;
     }
 
     my @active_vgs = qx(/usr/sbin/lsvg -Lo);
     scalar @active_vgs
       and %fs_info = map {
-        my ( $lvname, $type, $lps, $pps, $pvs, $lvstate, $path ) = split( m/\s+/, $_ );
+        my ($lvname, $type, $lps, $pps, $pvs, $lvstate, $path) = split(m/\s+/, $_);
 
-        ( $path => [ $lvname, $type, $lps, $pps, $pvs, $lvstate ] )
+        ($path => [$lvname, $type, $lps, $pps, $pvs, $lvstate])
       }
       grep { $_ !~ m/^\w+:$/ }
       grep { $_ !~ m/^LV\sNAME\s+/ }
       grep { $_ !~ m(N/A$) } qx( /usr/sbin/lsvg -Ll `/usr/sbin/lsvg -Lo` );
 
-    foreach my $current_filesystem ( keys %fs_info )
+    foreach my $current_filesystem (keys %fs_info)
     {
         $self->{$current_filesystem}->{filesystem} = $current_filesystem;
 
-        my ( $lvname, $type, $lps, $pps, $pvs, $lvstate ) = @{ $fs_info{$current_filesystem} };
+        my ($lvname, $type, $lps, $pps, $pvs, $lvstate) = @{$fs_info{$current_filesystem}};
 
         $args{canondev} and -l $lvname and $lvname = abs_path($lvname);
-        $self->{$current_filesystem}->{dev}     = $lvname;
-        $self->{$current_filesystem}->{vfs}     = $type;
-        $self->{$current_filesystem}->{LPs}     = $lps;
-        $self->{$current_filesystem}->{PPs}     = $pps;
-        $self->{$current_filesystem}->{PVs}     = $pvs;
-        $self->{$current_filesystem}->{lvstate} = $lvstate;
-        $self->{$current_filesystem}->{special} = 1
-          if ( defined($type) && defined( $special_fs{$type} ) );
+        $self->{$current_filesystem}->{dev}        = $lvname;
+        $self->{$current_filesystem}->{vfs}        = $type;
+        $self->{$current_filesystem}->{LPs}        = $lps;
+        $self->{$current_filesystem}->{PPs}        = $pps;
+        $self->{$current_filesystem}->{PVs}        = $pvs;
+        $self->{$current_filesystem}->{lvstate}    = $lvstate;
+        $self->{$current_filesystem}->{special}    = 1
+          if (defined($type) && defined($special_fs{$type}));
 
         # the filesystem is either currently mounted or is not,
         # this does not need to be checked for each individual
         # attribute.
-        my $state = defined( $curr_mountz{$current_filesystem} ) ? 'mounted' : 'unmounted';
+        my $state = defined($curr_mountz{$current_filesystem}) ? 'mounted' : 'unmounted';
         $self->{$current_filesystem}->{$state} = 1;
     }
 
     # Read the fstab
-    if ( my $fstab = IO::File->new( $args{fstab}, 'r' ) )
+    if (my $fstab = IO::File->new($args{fstab}, 'r'))
     {
         my $current_filesystem = '*UNDEFINED*';
         while (<$fstab>)
@@ -154,12 +154,12 @@ sub new
                 # the filesystem is either currently mounted or is not,
                 # this does not need to be checked for each individual
                 # attribute.
-                my $state = defined( $curr_mountz{$current_filesystem} ) ? 'mounted' : 'unmounted';
+                my $state = defined($curr_mountz{$current_filesystem}) ? 'mounted' : 'unmounted';
                 $self->{$current_filesystem}{$state} = 1;
 
                 # This matches a filesystem attribute
             }
-            elsif ( my ( $key, $value ) = $_ =~ /^\s*([a-z]{3,8})\s+=\s+"?(.+)"?\s*$/ )
+            elsif (my ($key, $value) = $_ =~ /^\s*([a-z]{3,8})\s+=\s+"?(.+)"?\s*$/)
             {
                 # do not overwrite already known data
                 defined $self->{$current_filesystem}->{$key} and next;
@@ -167,7 +167,7 @@ sub new
                 $key eq "dev" and $args{canondev} and -l $value and $value = abs_path($value);
 
                 $self->{$current_filesystem}->{$key} = $value;
-                if ( ( $key eq 'vfs' ) && defined( $special_fs{$value} ) )
+                if (($key eq 'vfs') && defined($special_fs{$value}))
                 {
                     $self->{$current_filesystem}->{special} = 1;
                 }
@@ -180,7 +180,7 @@ sub new
         croak "Unable to open fstab file ($args{fstab})\n";
     }
 
-    $self;
+    return $self;
 }
 
 1;
@@ -338,10 +338,6 @@ L<Sys::Filesystem>
 Manpage includes all known options, describes the format
 and comment char's.
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
@@ -352,11 +348,10 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008-2014 Jens Rehsack.
+Copyright 2008-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

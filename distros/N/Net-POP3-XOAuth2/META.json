@@ -4,7 +4,7 @@
       "@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -56,7 +56,7 @@
    "provides" : {
       "Net::POP3::XOAuth2" : {
          "file" : "lib/Net/POP3/XOAuth2.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/kizashi1122/Net-POP3-XOAuth2"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.2",
    "x_contributors" : [
       "Kizashi Nagata <kizashi1122@gmail.com>"
    ],

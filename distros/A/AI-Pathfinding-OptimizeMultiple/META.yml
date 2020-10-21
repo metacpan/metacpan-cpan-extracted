@@ -9,11 +9,10 @@ build_requires:
   Module::Build: '0.28'
   Test::Differences: '0'
   Test::More: '0.88'
-  blib: '1.01'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,35 +21,34 @@ name: AI-Pathfinding-OptimizeMultiple
 provides:
   AI::Pathfinding::OptimizeMultiple:
     file: lib/AI/Pathfinding/OptimizeMultiple.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::App::CmdLine:
     file: lib/AI/Pathfinding/OptimizeMultiple/App/CmdLine.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::DataInputObj:
     file: lib/AI/Pathfinding/OptimizeMultiple/DataInputObj.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::IterState:
     file: lib/AI/Pathfinding/OptimizeMultiple/IterState.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::PostProcessor:
     file: lib/AI/Pathfinding/OptimizeMultiple/PostProcessor.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::Scan:
     file: lib/AI/Pathfinding/OptimizeMultiple/Scan.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::ScanRun:
     file: lib/AI/Pathfinding/OptimizeMultiple/ScanRun.pm
-    version: v0.0.15
+    version: v0.0.16
   AI::Pathfinding::OptimizeMultiple::SimulationResults:
     file: lib/AI/Pathfinding/OptimizeMultiple/SimulationResults.pm
-    version: v0.0.15
+    version: v0.0.16
 requires:
   Carp: '0'
   Exception::Class: '0'
   File::Path: '0'
   Getopt::Long: '0'
   IO::File: '0'
-  IO::Handle: '0'
   MooX: '0'
   MooX::Types::MooseLike::Base: '0'
   MooX::late: '0.007'
@@ -66,10 +64,10 @@ resources:
   bugtracker: https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues
   homepage: http://metacpan.org/release/AI-Pathfinding-OptimizeMultiple
   repository: ssh://git@github.com/shlomif/fc-solve.git
-version: 0.0.15
+version: 0.0.16
 x_Dist_Zilla:
   perl:
-    version: '5.022003'
+    version: '5.032000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -78,15 +76,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@Filter/TestMoreDoneTesting'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Filter/AutoPrereqs'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -99,58 +97,58 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/GatherDir'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '9'
       name: '@Filter/RunExtraTests'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Filter/CheckChangesHasContent'
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -159,41 +157,41 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '5.047'
+              version: '6.015'
+          include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.001011'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Filter/MetaProvides::Package'
-      version: '2.003002'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Filter/MetaResources'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ModuleBuild
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '9'
       name: '@Filter/ModuleBuild'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Filter/PodCoverageTests'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '5.047'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@Filter/PodVersion'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -209,24 +207,28 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@Filter/Test::Compile'
-      version: '2.054'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
       name: '@Filter/Test::CPAN::Changes'
-      version: '0.009'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
-          trailing_whitespace: '1'
+          trailing_whitespace: 1
       name: '@Filter/Test::EOL'
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -239,17 +241,13 @@ x_Dist_Zilla:
       name: '@Filter/Test::NoTabs'
       version: '0.15'
     -
-      class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
-      name: '@Filter/Test::Kwalitee::Extra'
-      version: v0.2.1
-    -
       class: Dist::Zilla::Plugin::Test::TrailingSpace
       name: '@Filter/Test::TrailingSpace'
       version: 0.2.0
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -259,83 +257,115 @@ x_Dist_Zilla:
             - ':ExecFiles'
           plugins:
             -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@SHLOMIF/SingleEncoding'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::WikiDoc
+              name: '@SHLOMIF/WikiDoc'
+              version: '0.093004'
+            -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.013'
-            -
-              class: Pod::Weaver::Plugin::SingleEncoding
-              name: -SingleEncoding
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: NAME
-              version: '4.013'
+              name: '@SHLOMIF/Name'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
-              name: Version
-              version: '4.013'
+              name: '@SHLOMIF/Version'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: prelude
-              version: '4.013'
+              name: '@SHLOMIF/Prelude'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: SYNOPSIS
-              version: '4.013'
+              name: '@SHLOMIF/Synopsis'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: DESCRIPTION
-              version: '4.013'
+              name: '@SHLOMIF/Description'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: OVERVIEW
-              version: '4.013'
+              name: '@SHLOMIF/Usage'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Overview'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Stability'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
-              name: ATTRIBUTES
-              version: '4.013'
+              name: Requirements
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
-              name: METHODS
-              version: '4.013'
+              name: Attributes
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Constructors
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Methods
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Functions
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
-              name: Leftovers
-              version: '4.013'
+              name: '@SHLOMIF/Leftovers'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: postlude
-              version: '4.013'
-            -
-              class: Pod::Weaver::Section::Authors
-              name: Authors
-              version: '4.013'
-            -
-              class: Pod::Weaver::Section::Legal
-              name: Legal
-              version: '4.013'
-            -
-              class: Pod::Weaver::Section::Bugs
-              name: Bugs
-              version: '4.013'
+              name: '@SHLOMIF/postlude'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Support
-              name: Support
-              version: '1.007'
+              name: '@SHLOMIF/Support'
+              version: '1.013'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@SHLOMIF/Authors'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Bugs
+              name: '@SHLOMIF/Bugs'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@SHLOMIF/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@SHLOMIF/Legal'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@SHLOMIF/List'
+              version: '4.015'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -343,68 +373,71 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: PruneFiles
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '9'
       name: RunExtraTests
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.047'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '5.047'
+      version: '6.015'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.047'
+    version: '6.015'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

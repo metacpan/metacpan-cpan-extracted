@@ -1,6 +1,6 @@
 package Mail::BIMI::Result;
 # ABSTRACT: Class to model a BIMI result
-our $VERSION = '2.20201019.2'; # VERSION
+our $VERSION = '2.20201020.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -47,12 +47,17 @@ sub get_authentication_results_object($self) {
     $header->add_child( Mail::AuthenticationResults::Header::Comment->new()->safe_set_value( $self->comment ) );
   }
   if ( $self->result eq 'pass' ) {
-    $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'header.d' )->safe_set_value( $self->bimi_object->record->domain ) );
-    $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'header.selector' )->safe_set_value( $self->bimi_object->record->selector ) );
+    $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'header.d' )->safe_set_value( $self->bimi_object->record->retrieved_domain ) );
+    $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'header.selector' )->safe_set_value( $self->bimi_object->record->retrieved_selector ) );
   }
   if ( $self->bimi_object->record->authority->is_relevant ) {
     my $vmc = $self->bimi_object->record->authority->vmc;
-    $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.authority' )->safe_set_value( $vmc->is_valid ? 'pass' : 'fail' ) );
+    if ( $vmc ) {
+      $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.authority' )->safe_set_value( $vmc->is_valid ? 'pass' : 'fail' ) );
+    }
+    else {
+      $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.authority' )->safe_set_value( 'fail' ) );
+    }
     $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.authority-uri' )->safe_set_value( $self->bimi_object->record->authority->uri ) );
   }
 
@@ -78,7 +83,7 @@ Mail::BIMI::Result - Class to model a BIMI result
 
 =head1 VERSION
 
-version 2.20201019.2
+version 2.20201020.2
 
 =head1 DESCRIPTION
 

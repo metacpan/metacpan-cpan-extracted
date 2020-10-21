@@ -22,7 +22,7 @@ may help us to design SQL::Statement 2.xx much better.
 =head3 CREATE and DROP of FUNCTION, KEYWORD, OPERATOR, TYPE
 
 SQL::Statement is missing some functions, types, operators etc. It's
-supported to add missing functionality - but the implementation wasn't
+supported to add missing functionality - but the implementation was not
 picked up during the modernizing of column evaluation. See RT#52397
 for some more information.
 

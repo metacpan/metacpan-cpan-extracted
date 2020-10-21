@@ -1,5 +1,5 @@
 package App::Sets;
-$App::Sets::VERSION = '0.976';
+$App::Sets::VERSION = '0.978';
 
 
 use strict;
@@ -201,7 +201,7 @@ App::Sets - set operations in Perl
 
 =head1 VERSION
 
-version 0.976
+version 0.978
 
 =head1 AUTHOR
 

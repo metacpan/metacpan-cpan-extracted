@@ -20,7 +20,7 @@ $list[0] = 17;
 
 # Floating-point comparison cunningly avoided
 is(sprintf("%.2f", $min), "-3.33");
-is($max, 10000);
+is($max,                  10000);
 
 # Test with a single negative list value
 my $input = -1;

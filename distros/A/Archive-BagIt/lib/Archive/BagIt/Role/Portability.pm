@@ -8,10 +8,37 @@ use Moo::Role;
 
 
 sub chomp_portable {
-    my $self = shift;
-    my $line = shift;
+    my ($line) = @_;
     $line =~ s#\x{0d}?\x{0a}?\Z##s; # replace CR|CRNL with empty
     return $line;
+}
+
+sub normalize_payload_filepath {
+    my ($filename) = @_;
+    $filename =~ s#[\\](?![/])#/#g; # normalize Windows Backslashes, but only if they are no escape sequences
+    $filename =~ s#%#%25#g; # normalize percent
+    $filename =~ s#\x{0a}#%0A#g; #normalize NEWLINE
+    $filename =~ s#\x{0d}#%0D#g; #normalize CARRIAGE RETURN
+    $filename =~ s# #%20#g; # space
+    $filename =~ s#"##g; # quotes
+    return $filename;
+}
+
+sub check_if_payload_filepath_violates{
+    my ($local_name) = @_;
+    # HINT: there is no guarantuee *not* to escape!
+    return
+        ($local_name =~ m/^~/) # Unix Home
+            || ($local_name =~ m#\./#) # Unix, parent dir escape
+            || ($local_name =~ m#^[A-Z]:[\\/]#) # Windows Drive
+            || ($local_name =~ m#^/#) # Unix absolute path
+            || ($local_name =~ m#^$#) # Unix Env
+            || ($local_name =~ m#^\\#) # Windows absolute path
+            || ($local_name =~ m#^%[^%]*%#) # Windows ENV
+            || ($local_name =~ m#^\*#) # Artifact of md5sum-Tool, where ' *' is allowed to separate checksum and file in fixity line
+            || ($local_name =~ m#[<>:"?|]#) # Windows reserved chars
+            || ($local_name =~ m#(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])#) # Windows reserved filenames
+    ;
 }
 
 no Moo::Role;
@@ -29,7 +56,7 @@ Archive::BagIt::Role::Portability
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 AVAILABILITY
 

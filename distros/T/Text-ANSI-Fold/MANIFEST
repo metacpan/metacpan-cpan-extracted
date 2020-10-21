@@ -15,6 +15,7 @@ t/03_chops.t
 t/04_linebreak.t
 t/05_margin.t
 t/06_color.t
+t/07_expand.t
 tool/fix-w3c.pl
 META.yml
 MANIFEST

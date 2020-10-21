@@ -8,7 +8,7 @@ WriteMakefile(
     ],
     LICENSE      => "artistic_2",
     VERSION_FROM => 'lib/AnyEvent/Radius.pm',
-    MIN_PERL_VERSION => "v5.10",
+    MIN_PERL_VERSION => "v5.10.0",
     PREREQ_PM    => {
         'Data::Radius' => '1.2.3',
         'AnyEvent' => 0,

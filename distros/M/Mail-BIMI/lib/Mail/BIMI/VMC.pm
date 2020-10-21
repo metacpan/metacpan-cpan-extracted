@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '2.20201019.2'; # VERSION
+our $VERSION = '2.20201020.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -54,7 +54,7 @@ sub _build_data($self) {
   }
 
   if ( !( $self->uri =~ /\.pem\?/ || $self->uri =~ /\.pem$/ )) {
-    $self->add_error('VMC_FETCH_ERROR','VMC MUST have .pem extension');
+    $self->add_error('INVALID_EXTENSION_A','VMC MUST have .pem extension');
     return '';
   }
 
@@ -219,6 +219,11 @@ sub _build_indicator($self) {
 
 sub _build_is_valid($self) {
 
+  if ($self->data eq '' && $self->errors->@*) {
+    # We already have a fetch error, do not validate further
+    return 0;
+  }
+
   $self->add_error('VMC_VALIDATION_ERROR','Expired') if $self->is_expired;
   $self->add_error('VMC_VALIDATION_ERROR','Missing usage flag') if !$self->has_valid_usage;
   $self->add_error('VMC_VALIDATION_ERROR','Invalid alt name') if !$self->is_valid_alt_name;
@@ -286,7 +291,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 2.20201019.2
+version 2.20201020.2
 
 =head1 DESCRIPTION
 

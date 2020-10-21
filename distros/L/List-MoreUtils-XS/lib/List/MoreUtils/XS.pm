@@ -7,7 +7,7 @@ use base ('Exporter');
 
 use vars qw{$VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS};
 
-$VERSION = '0.428';
+$VERSION = '0.430';
 
 @EXPORT    = ();
 @EXPORT_OK = qw(any all none notall one
@@ -15,14 +15,14 @@ $VERSION = '0.428';
   reduce_u reduce_0 reduce_1
   true false
   insert_after insert_after_string
-  apply indexes
+  apply indexes slide
   after after_incl before before_incl
   firstidx lastidx onlyidx
   firstval lastval onlyval
   firstres lastres onlyres
   singleton duplicates frequency occurrences mode
   each_array each_arrayref
-  pairwise natatime
+  pairwise natatime slideatatime
   arrayify mesh zip6 uniq listcmp
   samples minmax minmaxstr part
   bsearch bsearchidx binsert bremove lower_bound upper_bound equal_range
@@ -47,8 +47,8 @@ List::MoreUtils::XS - Provide compiled List::MoreUtils functions
 
 =head1 SYNOPSIS
 
-  use List::Moreutils::XS ();
-  use List::MoreUtils ':all';
+  use List::MoreUtils::XS (); # doesn't export anything
+  use List::MoreUtils ':all'; # required to import functions
 
   my @procs = get_process_stats->fetchall_array;
   # sort by ppid, then pid

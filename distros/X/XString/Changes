@@ -1,5 +1,17 @@
 Revision history for XString
 
+0.005     2020-10-20 11:56:46-06:00 America/Denver
+
+Add compatibility with Perl 5.8
+
+0.004     2020-10-20 10:56:52-06:00 America/Denver
+
+Remove unneeded module deps.
+
+0.003     2020-10-20 09:30:01-06:00 America/Denver
+
+Fix cstring for Perl 5.32
+
 0.002     2019-08-13 11:44:34-06:00 America/Denver
 
 Update git repo & bug tracker URLs

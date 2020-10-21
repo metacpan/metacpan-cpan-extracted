@@ -3,7 +3,7 @@ package SQL::Statement::GetInfo;
 ######################################################################
 #
 # This module is copyright (c), 2001,2005 by Jeff Zucker.
-# This module is copyright (c), 2007-2017 by Jens Rehsack.
+# This module is copyright (c), 2007-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -15,7 +15,7 @@ use strict;
 use warnings FATAL => "all";
 
 use vars qw($VERSION %info);
-$VERSION = '1.412';
+$VERSION = '1.414';
 
 use SQL::Statement();
 
@@ -580,7 +580,7 @@ Returns the list of keywords
  This module is
 
  copyright (c) 2001,2005 by Jeff Zucker and
- copyright (c) 2007-2017 by Jens Rehsack.
+ copyright (c) 2007-2020 by Jens Rehsack.
 
  All rights reserved.
 

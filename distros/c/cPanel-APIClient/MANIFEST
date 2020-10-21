@@ -49,10 +49,12 @@ t/http_sync.t
 t/http_sync_tls_verify_by_default.t
 t/lib/MockCpsrvd.pm
 t/lib/MockCpsrvd/cpanel.pm
+t/lib/MockCpsrvd/whm.pm
 t/lib/TestBase.pm
 t/lib/TestHTTPBase.pm
 t/lib/TestHTTPTinyMixin.pm
 t/lib/TestHTTPUAPIMixin.pm
+t/lib/TestHTTPWHM1Mixin.pm
 t/local.t
 t/mojouseragent.t
 t/net_curl_promiser__anyevent.t

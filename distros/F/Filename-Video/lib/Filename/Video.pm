@@ -1,9 +1,9 @@
 package Filename::Video;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-30'; # DATE
 our $DIST = 'Filename-Video'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ Filename::Video - Check whether filename indicates being a video file
 
 =head1 VERSION
 
-This document describes version 0.002 of Filename::Video (from Perl distribution Filename-Video), released on 2020-04-01.
+This document describes version 0.003 of Filename::Video (from Perl distribution Filename-Video), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,8 @@ feature.
 L<Filename::Audio>
 
 L<Filename::Image>
+
+L<Filename::Ebook>
 
 L<Filename::Media>
 

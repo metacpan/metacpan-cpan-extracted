@@ -4,13 +4,13 @@
       "Jarkko Hietaniemi <jhi@iki.fi>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Graph",
    "no_index" : {
@@ -19,13 +19,45 @@
          "inc"
       ]
    },
-   "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/neilbowers/Graph.git",
-         "web" : "https://github.com/neilbowers/Graph"
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Heap" : "0.80",
+            "List::Util" : "0",
+            "Safe" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "2.05",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::Complex" : "0",
+            "Test::More" : "0"
+         }
       }
    },
-   "version" : "0.9704"
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/neilb/Graph/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/neilb/Graph.git",
+         "web" : "https://github.com/neilb/Graph"
+      }
+   },
+   "version" : "0.9706",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

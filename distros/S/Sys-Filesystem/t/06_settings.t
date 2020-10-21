@@ -8,7 +8,7 @@ use Sys::Filesystem;
 
 delete @ENV{qw(CANONDEV FSTAB MTAB)};
 
-my ( $fs, @filesystems );
+my ($fs, @filesystems);
 eval { $fs = Sys::Filesystem->new(); };
 
 $@ and plan skip_all => "Cannot initialize Sys::Filesystem: $@";
@@ -21,13 +21,13 @@ for my $filesystem (@filesystems)
     -l $device and $devsymlinks{$filesystem} = $device;
 }
 
-$fs = Sys::Filesystem->new( canondev => 1 );
+$fs          = Sys::Filesystem->new(canondev => 1);
 @filesystems = $fs->filesystems;
 
 for my $filesystem (@filesystems)
 {
     my $device = $fs->device($filesystem);
-    ok( !-l $device, "$device is not a symlink (canondev => 1)" );
+    ok(!-l $device, "$device is not a symlink (canondev => 1)");
 }
 
 SCOPE:
@@ -41,7 +41,7 @@ SCOPE:
         my $device = $fs->device($filesystem);
         -l $device and $symdevs{$filesystem} = $device;
     }
-    is_deeply( \%symdevs, \%devsymlinks, "\$S::F::CANONDEV = 0 works as expected" );
+    is_deeply(\%symdevs, \%devsymlinks, "\$S::F::CANONDEV = 0 works as expected");
 }
 
 SCOPE:
@@ -52,7 +52,7 @@ SCOPE:
     for my $filesystem (@filesystems)
     {
         my $device = $fs->device($filesystem);
-        ok( !-l $device, "$device is not a symlink (\$S::F::CANONDEV = 1)" );
+        ok(!-l $device, "$device is not a symlink (\$S::F::CANONDEV = 1)");
     }
 }
 

@@ -3,7 +3,7 @@ use strict;
 use Carp qw(carp croak);
 use Text::CSV ();
 use Tie::IxHash ();
-our $VERSION = 1.11;
+our $VERSION = 1.12;
 
 =head1 NAME
 
@@ -121,7 +121,7 @@ sub new {
 	};
 	tie(%{$self->{'field_cols'}}, 'Tie::IxHash');
 
-	unless(defined($file) && length($file)) {
+	unless (defined($file) && length($file)) {
 		croak('Missing $file argument');
 	}
 	if (ref($file)) {
@@ -147,6 +147,7 @@ sub new {
 	my %opt_field_aliases;
 	my $opt_field_normalizer;
 	my %opt_include_fields;
+	my %text_csv_options;	# undocumented experimental feature; text_csv_*: avoid if possible; options with this prefix are passed as is (but without prefix) to the internal Text::CSV object.
 	if (%options) {
 		foreach my $key (keys %options) {
 			my $value = $options{$key};
@@ -198,13 +199,16 @@ sub new {
 				}
 				$self->{$key} = $value;
 			}
+			elsif ($key =~ /^(?:Text(?::|_)CSV|text_csv)[\._:](.+)$/) {
+				$text_csv_options{$1} = $value;
+			}
 			else {
 				croak("Unknown option '$key'");
 			}
 		}
 	}
 
-	my $text_csv = $self->{'text_csv'} = Text::CSV->new({
+	my $text_csv = $self->{'text_csv'} = $proto->_new_text_csv_object({
 		'auto_diag'			=> 1,
 		'binary'			=> 1,
 		'blank_is_undef'	=> 1,
@@ -212,10 +216,11 @@ sub new {
 		'sep_char'			=> $self->{'delimiter'},
 		'escape_char'		=> $self->{'escape'},
 		'quote_char'		=> $self->{'enclosure'},
-	});
+		%text_csv_options,	# undocumented experimental feature; consider overriding _new_text_csv_object() instead.
+	}) || die('Method _new_text_csv_object() did not return a Text::CSV object as expected');
 
 	# Emulate the original Text::CSV error message format but without the LF and with the caller script/module.
-	if (0) {
+	if (0 && $text_csv->can('callbacks')) {	# exists since Text::CSV_XS version 1.06
 		$text_csv->callbacks(
 			'error' => sub {
 				my ($err, $msg, $pos, $recno, $fldno) = @_;	# This is dumb because the object itself is not given.
@@ -295,8 +300,6 @@ sub new {
 		}
 	}
 
-
-
 	bless($self, ref($proto) || $proto);
 	return $self;
 }
@@ -317,6 +320,32 @@ sub DESTROY {
 	}
 }
 
+
+
+
+
+=head1 PROTECTED STATIC METHODS
+
+=head2 _new_text_csv_object($args_hashref)
+
+Creates and returns a new Text::CSV object using the given arguments.
+Child classes may override this method in order to tweak the arguments
+and/or customize the creation of the internal Text::CSV object.
+
+=cut
+
+sub _new_text_csv_object {
+	my $proto = shift;
+	my $args = shift;	# hashref
+	my $result = Text::CSV->new($args);
+	unless ($result) {
+		# handle the bad practice of constructors that return undef instead of dieing.
+		my $epitaph = 'Failed to create a Text::CSV object';
+		require Data::Dumper; local $Data::Dumper::Terse = 1; $epitaph .= ' using args ' . Data::Dumper::Dumper($args);
+		die($epitaph);
+	}
+	return $result;
+}
 
 
 

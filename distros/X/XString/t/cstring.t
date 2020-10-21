@@ -10,7 +10,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 276;
+use Test::More;
 
 use XString ();
 
@@ -29,14 +29,19 @@ my @strings = (
     map { chr } 0..128
 );
 
-note "testing cstring";
-foreach my $str ( @strings ) {
-    is B::cstring( $str ), XString::cstring( $str );
+{
+    #note "testing cstring";
+    foreach my $str ( @strings ) {
+        is B::cstring( $str ), XString::cstring( $str );
+    }
 }
 
-note "testing perlstring";
-foreach my $str ( @strings ) {
-    is B::perlstring( $str ), XString::perlstring( $str );
+{
+    #note "testing perlstring";
+    foreach my $str ( @strings ) {
+        is B::perlstring( $str ), XString::perlstring( $str );
+    }    
 }
 
-done_testing;
+
+done_testing();

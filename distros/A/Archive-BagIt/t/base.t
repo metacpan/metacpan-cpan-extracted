@@ -42,7 +42,6 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   note ("bag path:", explain $bag->bag_path);
   note ("metadata path: ", explain $bag->metadata_path);
   note explain $bag->tagmanifest_files;
-  isnt($bag->parallel, 1, "parallel not set");
   my $result = $bag->verify_bag;
   ok($result,     "Bag verifies");
 }
@@ -63,12 +62,11 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   like (
     $warning ,
     qr/no payload path/,
-    'Got expexted warning from make_bag()',
+    'Got expected warning from make_bag()',
   ) or diag 'got unexpected warnings:' , explain($warning);
 
   ok ($bag,       "Object created");
   isa_ok ($bag,   $Class);
-  isnt($bag->parallel, 1, "parallel not set");
   ok ($bag->load(), "Bag loaded");
 
   my $result = $bag->verify_bag();

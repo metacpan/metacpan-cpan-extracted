@@ -1,3 +1,6 @@
+0.03 2020-10-21T23:27:25+02:00
+ - Update to Tags::HTML::Page::Begin 0.10.
+
 0.02 2020-09-22T00:10:45+02:00
  - Add constructor parameters to doc.
  - Add missing $VERSION variable.

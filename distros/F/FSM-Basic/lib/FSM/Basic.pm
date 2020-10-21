@@ -10,11 +10,11 @@ FSM::Basic - Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -90,9 +90,12 @@ User> '
 The keys are the states name.
 "expect" contain a sub HASH where the keys are word or REGEX expected as input
 
+
 =over 1
 
 =item In this hash, you have :
+
+=back 
 
 =over 2
 
@@ -120,9 +123,13 @@ e.g. 'catWRAND' => './t/test_cat.txt:1 ./t/test_cat1.txt:50',   in this case the
 
 =back
 
-=over 2
+=over 3
 
-It is possible to use a regex to allow generics commands
+It is possible to use a regex to allow optional commands
+
+=back
+
+=over 4
 
 e.g.
 "h(elp)?|\\?": {
@@ -156,6 +163,61 @@ Other example:
       }
       
 If you call with "cat /tmp/test/a1 the cat read the file /tmp/test/1" (without the 'a' because the group 3 is matching a single digit after a single character    
+
+=back
+
+=over 3 
+
+If you need to match all possible partial match for a word ( like "h, "he", "hel", "help" to match the "help" state)
+Use the extra tag "swapregex": "1"
+
+=over 4 
+
+This reverse the REGEX test 
+
+In normal case (no "swapregex" )
+The state is check with 
+
+  $in =~ /^$key$/
+
+Where $in is the input from the run() function
+and $key is the state defined in the HASH  
+
+In case of "swapregex": "1" we use this
+
+  $key =~ /^$in/  
+  
+e.g.
+        
+        'expect' => {
+            'not_matching' => 'prompt',
+            'help'       => {
+                'swapregex' => 1,
+                'output'  => 'in enable',
+                'final'     => 0
+            }
+        }
+
+In this example me match "h, "he", "hel", "help"
+
+
+=back
+
+=over 3
+
+It is possible to do a case insensitive matching with the special tag  "caseinsensitive": "1"
+
+=over 4
+
+e.g.
+
+            'other' => {
+                'output'          => 'in other',
+                'caseinsensitive' => 1,
+                'final'           => 0
+            }
+            
+in this example "other", "OTHER", "Other", "otheR" (and all other case alternate set) match the state "other"
 
 =back
 
@@ -229,7 +291,7 @@ sub new {
 
 =back
 
-=head2 run
+B<run>
 
 my ( $final, $out ) = $fsm->run( $in );
 
@@ -240,7 +302,13 @@ Run the FSM with the input and return the expected output and an extra flag
 
 sub run {
     my ($self, $in) = @_;
-
+    my $in_lc = lc($in);
+    my $rev;
+    foreach my $IN (grep { /$in/i } keys %{ $self->{states_list}{ $self->{state} }{expect} }) {
+        if (defined $self->{states_list}{ $self->{state} }{expect}{$IN}{swapregex}) {
+            $rev //= $IN;
+        }
+    }
     my $output = '';
     if (exists $self->{states_list}) {
         if (   exists $self->{states_list}{ $self->{state} }
@@ -257,8 +325,7 @@ sub run {
         }
         if (exists $self->{states_list}{ $self->{state} }{expect}) {
             if (exists $self->{states_list}{ $self->{state} }{info}) {
-                $output =
-                  $self->{states_list}{ $self->{state} }{info} . $output;
+                $output = $self->{states_list}{ $self->{state} }{info} . $output;
             }
             if (exists $self->{states_list}{ $self->{state} }{info_once}) {
                 $output = delete($self->{states_list}{ $self->{state} }{info_once}) . $output;
@@ -270,14 +337,33 @@ sub run {
             {
                 $in = $1;
             }
-            if (exists $self->{states_list}{ $self->{state} }{expect}{$in}) {
+            if (defined $rev) {
+                my $key = $rev;
+                my $r   = $in;
+                $r = '(?i:' . $r . ')' if defined $self->{states_list}{ $self->{state} }{expect}{$rev}{caseinsensitive};
+                if ($key =~ /^$r/) {
+                    if (@+) {
+                        for my $nbr (1 .. (scalar(@+) - 1)) {
+                            if (defined $-[$nbr]) {
+                                my $match = substr($key, $-[$nbr], $+[$nbr] - $-[$nbr]);
+                                if (defined($+[$nbr])) {
+                                    $self->{cmd_regex}{$nbr} = substr($key, $-[$nbr], $+[$nbr] - $-[$nbr]);
+                                }
+                            }
+                        }
+                    }
+                    $state = $self->{states_list}{ $self->{state} }{expect}{$key};
+                }
+            } elsif (exists $self->{states_list}{ $self->{state} }{expect}{$in_lc} && defined $self->{states_list}{ $self->{state} }{expect}{$in_lc}{caseinsensitive}) {
+                $state = $self->{states_list}{ $self->{state} }{expect}{$in_lc};
+            } elsif (exists $self->{states_list}{ $self->{state} }{expect}{$in}) {
                 $state = $self->{states_list}{ $self->{state} }{expect}{$in};
             } else {
                 foreach my $key (keys %{ $self->{states_list}{ $self->{state} }{expect} }) {
-                    if ($in =~ /$key/) {
+                    if ($in =~ /^$key$/) {
                         if (@+) {
-                            for my $nbr (1 .. (scalar(@+)-1)) {
-                                if ( defined $-[$nbr] ) {
+                            for my $nbr (1 .. (scalar(@+) - 1)) {
+                                if (defined $-[$nbr]) {
                                     my $match = substr($in, $-[$nbr], $+[$nbr] - $-[$nbr]);
                                     if (defined($+[$nbr])) {
                                         $self->{cmd_regex}{$nbr} = substr($in, $-[$nbr], $+[$nbr] - $-[$nbr]);
@@ -308,9 +394,9 @@ sub run {
                 if (exists $state->{exec}) {
                     my $old_exec = $state->{exec};
                     $state->{exec} =~ s/__IN__/$in/g;
-                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                    foreach my $k (keys %{ $self->{cmd_regex} }) {
                         my $v = $self->{cmd_regex}{$k};
-                        my $K = '__'.$k.'__';
+                        my $K = '__' . $k . '__';
                         $state->{exec} =~ s/$K/$v/g;
                     }
                     my $string = `$state->{exec}`;
@@ -320,20 +406,20 @@ sub run {
                 if (exists $state->{do}) {
                     my $old_do = $state->{do};
                     $state->{do} =~ s/__IN__/$in/g;
-                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                    foreach my $k (keys %{ $self->{cmd_regex} }) {
                         my $v = $self->{cmd_regex}{$k};
-                        my $K = '__'.$k.'__';
+                        my $K = '__' . $k . '__';
                         $state->{do} =~ s/$K/$v/g;
                     }
-                    $output = (eval $state->{do}) . $output;
+                    $output = (eval { $state->{do} }) . $output;
                     $state->{do} = $old_do;
                 }
                 if (exists $state->{cat}) {
                     my $old_cat = $state->{cat};
                     $state->{cat} =~ s/__IN__/$in/g;
-                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                    foreach my $k (keys %{ $self->{cmd_regex} }) {
                         my $v = $self->{cmd_regex}{$k};
-                        my $K = '__'.$k.'__';
+                        my $K = '__' . $k . '__';
                         $state->{cat} =~ s/$K/$v/g;
                     }
                     my $string = do { local (@ARGV, $/) = $state->{cat}; <> };
@@ -343,9 +429,9 @@ sub run {
                 if (exists $state->{catRAND}) {
                     my $old_cat = $state->{catRAND};
                     $state->{catRAND} =~ s/__IN__/$in/g;
-                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                    foreach my $k (keys %{ $self->{cmd_regex} }) {
                         my $v = $self->{cmd_regex}{$k};
-                        my $K = '__'.$k.'__';
+                        my $K = '__' . $k . '__';
                         $state->{catRAND} =~ s/$K/$v/g;
                     }
                     my @files  = split /\s+/, $state->{catRAND};
@@ -357,9 +443,9 @@ sub run {
                 if (exists $state->{catWRAND}) {
                     my $old_cat = $state->{catWRAND};
                     $state->{catWRAND} =~ s/__IN__/$in/g;
-                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                    foreach my $k (keys %{ $self->{cmd_regex} }) {
                         my $v = $self->{cmd_regex}{$k};
-                        my $K = '__'.$k.'__';
+                        my $K = '__' . $k . '__';
                         $state->{catWRAND} =~ s/$K/$v/g;
                     }
                     my %files = map { split /:/ } split /\s+/, $state->{catWRAND};
@@ -385,9 +471,9 @@ sub run {
 
                     }
                     $state->{catSEQ} =~ s/__IN__/$in/g;
-                    foreach my $k ( keys %{$self->{cmd_regex}} ) {
+                    foreach my $k (keys %{ $self->{cmd_regex} }) {
                         my $v = $self->{cmd_regex}{$k};
-                        my $K = '__'.$k.'__';
+                        my $K = '__' . $k . '__';
                         $state->{catSEQ} =~ s/$K/$v/g;
                     }
                     my @files = split /\s+/, $state->{catSEQ};
@@ -440,7 +526,9 @@ sub FETCH { ${ $_[0] }[0] }
 sub STORE { ${ $_[0] }[0] = $_[1] % ${ $_[0] }[1] }
 1;
 
-=head1 EXAMPLE
+=back
+
+B<EXAMPLE>
 
 
     use strict;
@@ -521,30 +609,30 @@ sub STORE { ${ $_[0] }[0] = $_[1] % ${ $_[0] }[1] }
 More sample code in the examples folder.
 
 
-=head1 TODO
+TODO
 
 add "edit" to allow on the fly modification of the states definition
 
 add "verify_states" to check all states are reachable from a original state
 
-=head1 SEE ALSO
+B<SEE ALSO>
 
 FSA::Rules
 
 https://metacpan.org/pod/FSA::Rules
 
 
-=head1 AUTHOR
+B<AUTHOR>
 
 DULAUNOY Fabrice, C<< <fabrice at dulaunoy.com> >>
 
-=head1 BUGS
+B<BUGS>
 
 Please report any bugs or feature requests to C<bug-FSM-basic at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FSM-Basic>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-=head1 SUPPORT
+B<SUPPORT>
 
 You can find documentation for this module with the perldoc command.
 
@@ -574,10 +662,10 @@ L<http://search.cpan.org/dist/FSM-Basic/>
 =back
 
 
-=head1 ACKNOWLEDGEMENTS
+B<ACKNOWLEDGEMENTS>
 
 
-=head1 LICENSE AND COPYRIGHT
+B<LICENSE AND COPYRIGHT>
 
 Copyright 2008 - 2020 DULAUNOY Fabrice.
 

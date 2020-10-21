@@ -1,5 +1,14 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.2.1   2020-10-22
+      * Fix 'Odd number of elements in hash assignment' bug
+
+1.2.0   2020-10-21
+      * Deprecate attributes 'username', 'password' and 'dbname'
+      * Introduce new 'connect_data' attribute which can hold all
+        the attributes supported by PostgreSQL as documented on
+        https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+
 1.1.0   2020-09-21
       * Add optional parameter to 'list_dbs' and 'server_version'
 

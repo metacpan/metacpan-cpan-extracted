@@ -19,11 +19,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.1
 
 =cut
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.2.1';
 
 
 =head1 SYNOPSIS
@@ -32,11 +32,13 @@ This module provides an interface to the basic Postgres db manipulation
 utilities.
 
  my $db = PGObject::Util::DBAdmin->new(
-    username => 'postgres',
-    password => 'mypassword',
-    host     => 'localhost',
-    port     => '5432',
-    dbname   => 'mydb'
+    connect_data => {
+       user     => 'postgres',
+       password => 'mypassword',
+       host     => 'localhost',
+       port     => '5432',
+       dbname   => 'mydb'
+    }
  );
 
  my @dbnames = $db->list_dbs(); # like psql -l
@@ -48,9 +50,102 @@ utilities.
 
  my $db2 = PGObject::Util::DBAdmin->new($db->export, (dbname => 'otherdb'));
 
+ my $db3 = PGObject::Util::DBAdmin->new(
+    connect_data => {
+       service     => 'zephyr',
+       sslmode     => 'require',
+       sslkey      => "$HOME/.postgresql/postgresql.key",
+       sslcert     => "$HOME/.postgresql/postgresql.crt",
+       sslpassword => 'your-sslpassword',
+    }
+ );
+
+
 =head1 PROPERTIES
 
-=head2 username
+=head2 connect_data
+
+Contains a hash with connection parameters; see L<the PostgreSQL
+documentation|https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS>
+for supported parameters.
+
+The usual parameters are:
+
+=over
+
+=item * user
+
+=item * password
+
+=item * dbname
+
+=item * host
+
+=item * port
+
+=back
+
+Please note that the key C<requiressl> is deprecated in favor of
+C<sslmode> and isn't supported.
+
+=cut
+
+# Not supported
+#  PGSERVICEFILE: (because no connect string equiv)
+#  PGREQUIRESSL: deprecated
+my %connkey_env = qw(
+    host                     PGHOST
+    hostaddr                 PGHOSTADDR
+    dbname                   PGDATABASE
+    user                     PGUSER
+    password                 PGPASSWORD
+    passfile                 PGPASSFILE
+    channel_binding          PGCHANNELBINDING
+    service                  PGSERVICE
+    options                  PGOPTIONS
+    sslmode                  PGSSLMODE
+    sslcompression           PGSSLCOMPRESSION
+    sslcert                  PGSSLCERT
+    sslkey                   PGSSLKEY
+    sslrootcert              PGSSLROOTCERT
+    sslcrl                   PGSSLCRL
+    requirepeer              PGREQUIREPEER
+    ssl_min_protocol_version PGSSLMINPROTOCOLVERSION
+    ssl_max_protocol_version PGSSLMAXPROTOCOLVERSION
+    gssencmode               PGGSSENCMODE
+    krbsrvname               PGKRBSRVNAME
+    gsslib                   PGGSSLIB
+    connect_timeout          PGCONNECT_TIMEOUT
+    client_encoding          PGCLIENTENCODING
+    target_session_attrs     PGTARGETSESSIONATTRS
+    );
+my @connstr_keys = ((grep { not ($_ eq 'user' or $_ eq 'password') }
+                     keys %connkey_env),
+                    qw(application_name fallback_application_name
+                    keepalives keepalives_idle keepalives_interval
+                    keepalives_count tcp_user_timeout replication sslpassword),
+    );
+
+sub _connect_data_env {
+    my ($connect_data) = @_;
+    my @keys = grep { exists $connkey_env{$_}
+                      and defined $connect_data->{$_} } keys %$connect_data;
+    return map { $connkey_env{$_} => $connect_data->{$_} } @keys;
+}
+
+sub _connect_data_str {
+    my ($connect_data) = @_;
+    my @keys = grep { defined $connect_data->{$_} } @connstr_keys;
+    return join(';', map {
+        my $val = $connect_data->{$_};
+        $val =~ s/\\/\\\\/g;
+        $val =~ s/'/\\'/g;
+        "$_='$val'"; } @keys );
+}
+
+has connect_data => (is => 'ro');
+
+=head2 username (deprecated)
 
 The username used to authenticate with the PostgreSQL server.
 
@@ -58,7 +153,7 @@ The username used to authenticate with the PostgreSQL server.
 
 has username => (is => 'ro');
 
-=head2 password
+=head2 password (deprecated)
 
 The password used to authenticate with the PostgreSQL server.
 
@@ -66,7 +161,7 @@ The password used to authenticate with the PostgreSQL server.
 
 has password => (is => 'ro');
 
-=head2 host
+=head2 host (deprecated)
 
 In PostgreSQL, this can refer to the hostname or the absolute path to the
 directory where the UNIX sockets are set up.
@@ -75,7 +170,7 @@ directory where the UNIX sockets are set up.
 
 has host => (is => 'ro');
 
-=head2 port
+=head2 port (deprecated)
 
 Default '5432'
 
@@ -83,7 +178,7 @@ Default '5432'
 
 has port => (is => 'ro');
 
-=head2 dbname
+=head2 dbname (deprecated)
 
 The database name to create or connect to.
 
@@ -171,34 +266,21 @@ sub _run_with_env {
 
 sub _run_command {
     my ($self, %args) = @_;
-    my %env;
     my $exit_code;
+    my %env = (
+        # lowest priority: existing environment variables
+        (map { $ENV{$_} ? ($_ => $ENV{$_})  : () }
+         qw(PGUSER PGPASSWORD PGHOST PGPORT PGDATABASE PGSERVICE)),
+        # overruled by middle priority: object connection parameters
+        _connect_data_env($self->connect_data),
+        # overruled by highest priority: specified environment
+        ($args{env}   ? %{$args{env}} : ()),
+        );
 
-    %env = %{$args{env}} if $args{env};
     # Any files created should be accessible only by the current user
     my $original_umask = umask 0077;
 
     ($self->{stdout}, $self->{stderr}, $exit_code) = capture {
-
-        if ($self->username or exists $ENV{PGUSER}) {
-            $env{PGUSER} //= $self->username // $ENV{PGUSER};
-        }
-        if ($self->password or exists $ENV{PGPASSWORD}) {
-            $env{PGPASSWORD} //= $self->password // $ENV{PGPASSWORD};
-        }
-        if ($self->host or exists $ENV{PGHOST}) {
-            $env{PGHOST} //= $self->host // $ENV{PGHOST};
-        }
-        if ($self->port or exists $ENV{PGPORT}) {
-            $env{PGPORT} //= $self->port // $ENV{PGPORT};
-        }
-        if ($self->dbname or exists $ENV{PGDATABASE}) {
-            $env{PGDATABASE} //= $self->dbname // $ENV{PGDATABASE};
-        }
-        if (exists $ENV{PGSERVICE}) {
-            $env{PGSERVICE} //= $ENV{PGSERVICE};
-        }
-
         _run_with_env(%args, env => \%env);
     };
 
@@ -285,6 +367,11 @@ sub _append_to_file {
 
 Creates a new db admin object for manipulating databases.
 
+=head2 BUILDARGS
+
+Compensates for the legacy invocation with the C<username>, C<password>,
+C<host>, C<port> and C<dbname> parameters.
+
 =head2 verify_helpers( [ helpers => [...]], [operations => [...]])
 
 Verifies ability to execute (external) helper applications by
@@ -311,6 +398,40 @@ Note: C<verify_helpers> is a class method, meaning it wants to be called
 as C<PGObject::Util::DBAdmin->verify_helpers()>.
 
 =cut
+
+around 'BUILDARGS' => sub {
+    my ($orig, $class, %args) = @_;
+
+    # deprecated field support code block
+    if (exists $args{connect_data}) {
+        # Work-around for 'export' creating the expectation that
+        # parameters may be overridable; I've observed the pattern
+        #  ...->new($db->export, (dbname => 'newdb'))
+        # which we "solve" by hacking the dbname arg into the connect_data
+        # Don't overwrite connect_data, because it may be used elsewhere...
+        $args{connect_data} = {
+            %{$args{connect_data}},
+            dbname => $args{dbname}
+        };
+
+        # Now for legacy purposes hack the connection parameters into
+        # connect_data
+        $args{username} = $args{connect_data}->{user};
+        $args{$_}       = $args{connect_data}->{$_} for (qw(password dbname
+                                                         host port));
+    }
+    else {
+        $args{connect_data}             = {};
+        $args{connect_data}->{user}     = $args{username};
+        $args{connect_data}->{password} = $args{password};
+        $args{connect_data}->{dbname}   = $args{dbname};
+        $args{connect_data}->{host}     = $args{host};
+        $args{connect_data}->{port}     = $args{port};
+    }
+    return $class->$orig(%args);
+};
+
+
 
 
 sub _run_capturing_output {
@@ -341,14 +462,14 @@ sub verify_helpers {
 
 =head2 export
 
-Exports the database parameters in a hash so it can be used to create another
+Exports the database parameters as a list so it can be used to create another
 object.
 
 =cut
 
 sub export {
     my $self = shift;
-    return map {$_ => $self->$_() } qw(username password host port dbname)
+    return ( connect_data => $self->connect_data );
 }
 
 =head2 connect($options)
@@ -362,20 +483,13 @@ Connection options may be specified in the $options hashref.
 sub connect {
     my ($self, $options) = @_;
 
-    my $connect = 'dbname="' . $self->dbname . '"';
-
-    $connect .= ';host=' . $self->host
-        if defined $self->host;
-
-    $connect .= ';port=' . $self->port
-        if defined $self->port;
-
-    my $dbh = DBI->connect(
+    my $connect = _connect_data_str($self->connect_data);
+    my $dbh     = DBI->connect(
         'dbi:Pg:' . $connect,
-        $self->username,
-        $self->password,
+        $self->connect_data->{user} // '',    # suppress use of DBI_USER
+        $self->connect_data->{password} // '',# suppress use of DBI_PASS
         $options
-    ) or croak 'Could not connect to database!';
+    ) or croak 'Could not connect to database: ' . $DBI::errstr;
 
     return $dbh;
 }
@@ -451,7 +565,8 @@ sub create {
 
     my @command = ($helper_paths{createdb});
     defined $args{copy_of}  and push(@command, '-T', $args{copy_of});
-    defined $self->dbname   and push(@command, $self->dbname);
+    # No need to pass the database name PGDATABASE will be set
+    #  if a 'dbname' connection parameter was provided
 
     $self->_run_command(command => [@command])
         or croak 'error running command';
@@ -665,7 +780,8 @@ sub restore {
     # Build command options
     my @command = ($helper_paths{pg_restore}, '--verbose', '--exit-on-error');
     defined $args{format}   and push(@command, "-F$args{format}");
-    defined $self->dbname   and push(@command, '-d', $self->dbname);
+    defined $self->connect_data->{dbname}   and
+        push(@command, '-d', $self->connect_data->{dbname});
     push(@command, $args{file});
 
     $self->_run_command(command => [@command])
@@ -688,7 +804,7 @@ sub drop {
     croak 'No db name of this object' unless $self->dbname;
 
     my @command = ($helper_paths{dropdb});
-    push(@command, $self->dbname);
+    push(@command, $self->connect_data->{dbname});
 
     $self->_run_command(command => [@command])
         or croak 'error running command';

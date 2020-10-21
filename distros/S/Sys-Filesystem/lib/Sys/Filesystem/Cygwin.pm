@@ -1,9 +1,9 @@
 ############################################################
 #
-#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
+#   Copyright 2008-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,13 +27,12 @@ use 5.008001;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA);
+use vars qw($VERSION);
+use parent qw(Sys::Filesystem::Unix);
 
 use Carp qw(croak);
-require Sys::Filesystem::Unix;
 
-$VERSION = '1.406';
-@ISA     = qw(Sys::Filesystem::Unix);
+$VERSION = '1.408';
 
 sub version()
 {
@@ -47,22 +46,23 @@ my %special_fs = (
     devpts => 1,
     tmpfs  => 1,
 );
-my $mount_rx = qr/^\s*(.+?)\s+on\s+(\/.+?)\s+type\s+(\S+)\s+\((\S+)\)\s*$/;
+my $mount_rx = qr/^\s*(.+?)\s+on\s+(\/.*)\s+type\s+(\S+)\s+\((\S+)\)\s*$/;
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
-    ref( my $class = shift ) && croak 'Class name required';
+    ref(my $class = shift) && croak 'Class name required';
     my %args = @_;
-    my $self = bless( {}, $class );
+    my $self = bless({}, $class);
     $args{canondev} and $self->{canondev} = 1;
 
     local $/ = "\n";
     my @mounts = qx( mount );
-    $self->readMounts( $mount_rx, [ 0, 1, 2 ], \@keys, \%special_fs, @mounts );
+    $self->readMounts($mount_rx, [0, 1, 2], \@keys, \%special_fs, @mounts);
 
     delete $self->{canondev};
 
-    $self;
+    return $self;
 }
 
 1;
@@ -136,10 +136,6 @@ Mount options.
 
 L<http://cygwin.com/cygwin-ug-net/using.html>
 
-=head1 VERSION
-
-$Id$
-
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
@@ -150,11 +146,10 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008-2014 Jens Rehsack.
+Copyright 2008-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

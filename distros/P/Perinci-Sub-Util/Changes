@@ -1,27 +1,32 @@
-0.46    2017-01-31 (PERLANCAR)
+0.470   2020-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- gen_modified_sub: Add wrap_code argument.
+
+
+0.46    2017-01-31  Released-By: PERLANCAR
 
 	- Add module: Perinci::Sub::Util::Args with routines: args_by_tags,
 	  argnames_by_tag, func_args_by_tag, func_argnames_by_tag,
 	  call_with_its_args.
 
 
-0.45    2016-02-21 (PERLANCAR)
+0.45    2016-02-21  Released-By: PERLANCAR
 
 	- Add function: gen_curried_sub().
 
 
-0.44    2015-12-31 (PERLANCAR)
+0.44    2015-12-31  Released-By: PERLANCAR
 
 	- Split Perinci::Sub::Util::PropertyModule to its own dist to
 	  resolve circular dep problem [RT#110777].
 
 
-0.43    2015-12-25 (PERLANCAR)
+0.43    2015-12-25  Released-By: PERLANCAR
 
         - Add module: Perinci::Sub::Util::PropertyModule.
 
 
-0.42    2015-09-04 (PERLANCAR)
+0.42    2015-09-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -30,22 +35,22 @@
 	  requirement.
 
 
-0.41    2015-01-04 (PERLANCAR)
+0.41    2015-01-04  Released-By: PERLANCAR
 
 	- [Bugfix] Fix metadata: forgot to specify 'output_code' argument.
 
 
-0.40    2014-10-15 (PERLANCAR)
+0.40    2014-10-15  Released-By: PERLANCAR
 
 	- Add module Perinci::Sub::Util::Sort.
 
 
-0.39     2014-09-25 (PERLANCAR)
+0.39     2014-09-25  Released-By: PERLANCAR
 
          - Add functions: warn_err() and die_err().
 
 
-0.38     2014-06-27 (SHARYANTO)
+0.38     2014-06-27  Released-By: SHARYANTO
 
          - First release. Split from Perinci-Util dist.
 

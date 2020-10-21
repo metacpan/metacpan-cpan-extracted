@@ -1,5 +1,9 @@
 package File::FormatIdentification::Regex;
-# helper module to combine and optimize regexes
+
+our $VERSION = '0.04'; # VERSION
+
+# ABSTRACT helper module to combine and optimize regexes
+
 use feature qw(say);
 use strict;
 use warnings;
@@ -14,7 +18,7 @@ our @EXPORT =
   ;                       # symbols to export on request
 our @EXPORT_OK = qw( hex_replace_from_bracket hex_replace_to_bracket );
 
-our $VERSION = '0.02';
+
 
 
 sub and_combine (@) {
@@ -54,22 +58,10 @@ sub or_combine (@) {
 sub simplify_two_or_combined_regex($$) {
     my $rx1    = $_[0];
     my $rx2    = $_[1];
-    my $common = "";
-    my $rx = qr#\(([A-Za-z0-9]*)\)#;
-    if (
-        #        ($rx1 =~ m#\(([A-Za-z0-9]*)|(\\x[0-9A-F]{2})*\)#) &&
-        #       ($rx2 =~ m#\(([A-Za-z0-9]*)|(\\x[0-9A-F]{2})*\)#)
-        ( $rx1 =~ m/$rx/ ) and ( $rx2 =~ m/$rx/ )
-      )
-    {
-        # only left simplify supported yet
-        $common = String::LCSS::lcss( $rx1, $rx2 );
-
-        #say "";
-        #say "Found common='$common' of rx1='$rx1' rx2='$rx2'";
-        #say "";
-    }
-    return $common;
+    my $rx = qr#\([A-Za-z0-9]*\)#;
+    return "" if (($rx1 !~ m/$rx/) || ($rx2 !~ m/$rx/));
+    # only left simplify supported yet
+    return String::LCSS::lcss( $rx1, $rx2 );
 }
 
 sub hex_replace_to_bracket {
@@ -104,9 +96,10 @@ sub peep_hole_optimizer ($) {
     ##### optimize common subsequences
     ##### part1, combine bar|baz -> ba(r|z)
     #say "BEFORE: regex=$regex";
-    while ($regex =~ m#\(($subrg*)\)\|\(($subrg*)\)#
-        || $regex =~ m#($subrg*)\|($subrg*)# )
-    {
+    while (
+        $regex =~ m#\(($subrg*)\)\|\(($subrg*)\)# ||
+        $regex =~ m#($subrg*)\|($subrg*)#
+    ) {
         my $rx1 = $1;
         my $rx2 = $2;
 
@@ -259,7 +252,7 @@ File::FormatIdentification::Regex
 
 =head1 VERSION
 
-version 0.002
+version 0.04
 
 =head1 AUTHOR
 

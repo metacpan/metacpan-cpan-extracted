@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.013-22-gebb56d9
+package JSON::Schema::Draft201909; # git description: v0.014-7-gff049fa
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -472,7 +472,7 @@ sub _eval_keyword_multipleOf {
   abort($state, 'multipleOf value is not a positive number') if $schema->{multipleOf} <= 0;
 
   my $quotient = $data / $schema->{multipleOf};
-  return 1 if int($quotient) == $quotient and $quotient !~ /(?:NaN|Inf)/;
+  return 1 if int($quotient) == $quotient and $quotient !~ /^-?Inf$/i;
   return E($state, 'value is not a multiple of %g', $schema->{multipleOf});
 }
 
@@ -633,6 +633,8 @@ sub _eval_keyword_dependentRequired {
   abort($state, '"dependentRequired" property is not an array')
     if any { !$self->_is_type('array', $schema->{dependentRequired}{$_}) }
       keys %{$schema->{dependentRequired}};
+  abort($state, '"dependentRequired" property element is not a string')
+    if any { !$self->_is_type('string', $_) } map @$_, values %{$schema->{dependentRequired}};
   abort($state, '"dependentRequired" property elements are not unique')
     if any { !$self->_is_elements_unique($schema->{dependentRequired}{$_}) }
       keys %{$schema->{dependentRequired}};
@@ -1376,12 +1378,17 @@ sub _eval_keyword_examples {
 }
 
 sub _eval_keyword_definitions {
-  carp 'no-longer-supported "definitions" keyword present: this should be rewritten as "$defs"';
+  my ($self, $schema, $state) = @_;
+  carp 'no-longer-supported "definitions" keyword present (at '
+    .canonical_schema_uri($state).'): this should be rewritten as "$defs"';
   return 1;
 }
 
 sub _eval_keyword_dependencies {
-  carp 'no-longer-supported "dependencies" keyword present: this should be rewritten as "dependentSchemas" or "dependentRequired"';
+  my ($self, $schema, $state) = @_;
+  carp 'no-longer-supported "dependencies" keyword present (at'
+    .canonical_schema_uri($state)
+    .'): this should be rewritten as "dependentSchemas" or "dependentRequired"';
   return 1;
 }
 
@@ -1735,7 +1742,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -2043,6 +2050,11 @@ additional output formats beyond C<flag>, C<basic> and C<terse> (L<https://json-
 examination of the C<$schema> keyword for deviation from the standard metaschema, including changes to vocabulary behaviour
 
 =back
+
+Additionally, some small errors in the specification (which have been fixed in the next draft
+specification version) are fixed here rather than implementing the precise but unintended behaviour,
+most notably in the use of json pointers rather than fragment-only URIs in C<instanceLocation> and
+C<keywordLocation> in annotations and errors.
 
 =head1 SECURITY CONSIDERATIONS
 

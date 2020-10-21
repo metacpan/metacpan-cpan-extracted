@@ -2,9 +2,14 @@
 abstract: unknown
 author:
   - 'Jarkko Hietaniemi <jhi@iki.fi>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Math::Complex: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141520'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,6 +19,15 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Heap: '0.80'
+  List::Util: '0'
+  Safe: '0'
+  Scalar::Util: '0'
+  Storable: '2.05'
+  perl: '5.006'
 resources:
-  repository: git://github.com/neilbowers/Graph.git
-version: '0.9704'
+  bugtracker: https://github.com/neilb/Graph/issues
+  repository: git://github.com/neilb/Graph.git
+version: '0.9706'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

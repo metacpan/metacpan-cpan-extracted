@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
 # ABSTRACT: Class to model a BIMI record
-our $VERSION = '2.20201019.2'; # VERSION
+our $VERSION = '2.20201020.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -15,9 +15,13 @@ with(
   'Mail::BIMI::Role::Cacheable',
 );
 has domain => ( is => 'rw', isa => 'Str', required => 1, traits => ['CacheKey'],
-  documentation => 'inputs: Domain the for the record; will become fallback domain if used', );
+  documentation => 'inputs: Domain the for the record', );
+has retrieved_domain => ( is => 'rw', isa => 'Str', traits => ['Cacheable'],
+  documentation => 'Domain the record was retrieved from', );
 has retrieved_record => ( is => 'rw', traits => ['Cacheable'],
   documentation => 'Record as retrieved' );
+has retrieved_selector => ( is => 'rw', isa => 'Str', traits => ['Cacheable'],
+  documentation => 'Selector the record was retrieved from', );
 has selector => ( is => 'rw', isa => 'Str', traits => ['CacheKey'],
   documentation => 'inputs: Selector used to retrieve the record; will become default if fallback was used', );
 has version => ( is => 'rw', isa => 'Maybe[Str]', lazy => 1, builder => '_build_version', traits => ['Cacheable'],
@@ -179,9 +183,9 @@ sub _build_record_hashref($self) {
     }
     else {
       # We have one record, let's use that.
-      $self->domain($fallback_domain);
-      $self->selector($fallback_selector);
       $self->retrieved_record($records[0]);
+      $self->retrieved_domain($fallback_domain);
+      $self->retrieved_selector($fallback_selector);
       return $self->_parse_record($records[0]);
     }
   }
@@ -192,6 +196,8 @@ sub _build_record_hashref($self) {
   else {
     # We have one record, let's use that.
     $self->retrieved_record($records[0]);
+    $self->retrieved_domain($domain);
+    $self->retrieved_selector($selector);
     return $self->_parse_record($records[0]);
   }
 }
@@ -242,12 +248,12 @@ sub finish($self) {
 
 sub app_validate($self) {
   say 'Record Returned: '.($self->is_valid ? GREEN."\x{2713}" : BRIGHT_RED."\x{26A0}").RESET;
-  $self->is_valid; # To set retrieved record and actual domain/selector
+  $self->is_valid; # To set retrieved record and retrieved domain/selector
   say YELLOW.'  Record    : '.($self->retrieved_record//'-none-').RESET;
   if ($self->retrieved_record){
     say YELLOW.'  Version   '.WHITE.': '.CYAN.($self->version//'-none-').RESET;
-    say YELLOW.'  Domain    '.WHITE.': '.CYAN.($self->domain//'-none-').RESET;
-    say YELLOW.'  Selector  '.WHITE.': '.CYAN.($self->selector//'-none-').RESET;
+    say YELLOW.'  Domain    '.WHITE.': '.CYAN.($self->retrieved_domain//'-none-').RESET;
+    say YELLOW.'  Selector  '.WHITE.': '.CYAN.($self->retrieved_selector//'-none-').RESET;
     say YELLOW.'  Authority '.WHITE.': '.CYAN.($self->authority->uri//'-none-').RESET if $self->authority;
     say YELLOW.'  Location  '.WHITE.': '.CYAN.($self->location->uri//'-none-').RESET if $self->location_is_relevant && $self->location;
     say YELLOW.'  Is Valid  '.WHITE.': '.($self->is_valid?GREEN.'Yes':BRIGHT_RED.'No').RESET;
@@ -279,7 +285,7 @@ Mail::BIMI::Record - Class to model a BIMI record
 
 =head1 VERSION
 
-version 2.20201019.2
+version 2.20201020.2
 
 =head1 DESCRIPTION
 
@@ -293,7 +299,7 @@ These values are used as inputs for lookups and verifications, they are typicall
 
 is=rw required
 
-Domain the for the record; will become fallback domain if used
+Domain the for the record
 
 =head2 selector
 
@@ -337,11 +343,23 @@ is=rw
 
 Hashref of record values
 
+=head2 retrieved_domain
+
+is=rw
+
+Domain the record was retrieved from
+
 =head2 retrieved_record
 
 is=rw
 
 Record as retrieved
+
+=head2 retrieved_selector
+
+is=rw
+
+Selector the record was retrieved from
 
 =head2 version
 

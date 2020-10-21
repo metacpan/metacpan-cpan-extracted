@@ -64,7 +64,7 @@ SCOPE:
 
 SCOPE:
 {
-    my @foo = ('a', 'b', '', undef, 'b', 'c', '');
+    my @foo  = ('a', 'b', '', undef, 'b', 'c', '');
     my @ufoo = ('a', 'b', '', undef, 'c');
     is_deeply([uniq @foo], \@ufoo, 'undef is supported correctly');
 }
@@ -83,7 +83,7 @@ leak_free_ok(
     sub {
         eval {
             my $obj = DieOnStringify->new;
-            my @u = uniq "foo", $obj, "bar", $obj;
+            my @u   = uniq "foo", $obj, "bar", $obj;
         };
     }
 );

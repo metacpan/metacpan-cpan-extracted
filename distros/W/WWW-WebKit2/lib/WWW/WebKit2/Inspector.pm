@@ -106,20 +106,20 @@ sub get_body_text {
 sub get_html_source {
     my ($self) = @_;
 
-    my $html_source;
     my $resource = $self->view->get_main_resource();
-    my $done = 0;
 
     return '' unless $resource;
 
-    $resource->get_data(undef, sub {
-        my ($resource, $result, $user_data) = @_;
+    my $result;
 
-        $html_source = $resource->get_data_finish($result);
-        $done = 1;
+    $resource->get_data(undef, sub {
+        $result = $_[1]; #store GAsyncResult, used for the _finish call later
     }, undef);
 
-    Gtk3::main_iteration while Gtk3::events_pending or not $done;
+    #wait for the callback to fire
+    Gtk3::main_iteration while Gtk3::events_pending or not defined $result;
+
+    my $html_source = $resource->get_data_finish($result);
 
     # get_data_finish returns a byte-array, turn it into a human readable string
     my $html_string = decode_utf8(join('', map chr, @$html_source));

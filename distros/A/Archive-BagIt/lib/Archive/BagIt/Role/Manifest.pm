@@ -83,7 +83,7 @@ sub __build_xxxmanifest_entries {
     open(my $XXMANIFEST, "<:encoding(UTF-8)", $xxmanifest_file) or croak("Cannot open $xxmanifest_file: $!");
     my $algorithm = $self->algorithm()->name;
     while (my $line = <$XXMANIFEST>) {
-        $line = $self->chomp_portable($line);
+        $line = chomp_portable($line);
         my ($digest, $file) = split(/\s+/, $line, 2);
         next unless ((defined $digest) && (defined $file)); # empty lines!
         $xxmanifest_entries->{$algorithm}->{$file} = $digest;
@@ -110,33 +110,7 @@ sub _build_manifest_entries {
     return;
 }
 
-sub normalize_payload_filepath {
-    my $filename = shift;
-    $filename =~ s#[\\](?![/])#/#g; # normalize Windows Backslashes, but only if they are no escape sequences
-    $filename =~ s#%#%25#g; # normalize percent
-    $filename =~ s#\x{0a}#%0A#g; #normalize NEWLINE
-    $filename =~ s#\x{0d}#%0D#g; #normlize CARRIAGE RETURN
-    $filename =~ s# #%20#g; # space
-    $filename =~ s#"##g; # quotes
-    return $filename;
-}
 
-sub check_if_payload_filepath_violates{
-    my $local_name = shift;
-    # HINT: there is no guarantuee *not* to escape!
-    return
-        ($local_name =~ m/^~/) # Unix Home
-            || ($local_name =~ m#\./#) # Unix, parent dir escape
-            || ($local_name =~ m#^[A-Z]:[\\/]#) # Windows Drive
-            || ($local_name =~ m#^/#) # Unix absolute path
-            || ($local_name =~ m#^$#) # Unix Env
-            || ($local_name =~ m#^\\#) # Windows absolute path
-            || ($local_name =~ m#^%[^%]*%#) # Windows ENV
-            || ($local_name =~ m#^\*#) # Artifact of md5sum-Tool, where ' *' is allowed to separate checksum and file in fixity line
-            || ($local_name =~ m#[<>:"?|]#) # Windows reserved chars
-            || ($local_name =~ m#(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])#) # Windows reserved filenames
-    ;
-}
 
 sub _fill_digest_hashref {
     my ($self, $bagit, $digestobj, $localname) = @_;
@@ -158,34 +132,9 @@ sub _fill_digest_hashref {
 # $tmp->{filename} = $filename;
 sub calc_digests {
     my ($self, $bagit, $digestobj, $filenames_ref) = @_;
-    my @digest_hashes;
-    # check if we could use parallel
-    my $is_parallelizeable;
-    if (($self->bagit->has_parallel()) && (defined $self->bagit->parallel)) {
-        my $err;
-        ($is_parallelizeable, $err) = Class::Load::try_load_class("Parallel::Iterator");
-        if (!$is_parallelizeable) {
-            carp "Class 'Parallel::Iterator' could not be loaded…, $err\n";
-            $self->{parallel} = undef;
-        }
-    }
-    if ($is_parallelizeable) {
-        my $class = Class::Load::load_class("Parallel::Iterator");
-        $class->import( qw(iterate));
-        my $worker = sub {
-            my ($idx, $localname) = @_;
-            return $self->_fill_digest_hashref($bagit, $digestobj, $localname);
-        };
-        my $iter = iterate( { adaptive=>2 }, $worker, $filenames_ref);
-        while ( my ($index, $value) = $iter->() ) {
-            $digest_hashes[$index] = $value;
-        }
-    }
-    else { # fallback to serial processing
-        @digest_hashes = map {
+    my @digest_hashes = map {
             $self->_fill_digest_hashref($bagit, $digestobj, $_);
         } @{$filenames_ref};
-    }
     return \@digest_hashes;
 }
 
@@ -365,13 +314,11 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head2 calc_digests($bagit, $digestobj, $filenames_ref, $opts)
 
 Method to calculate and return all digests for a a list of files using a Digest-object. This method will be overwritten by C<Archive::BagIt::Fast>.
-
-If object ist build with option C<parallel>, the digests will be build in parallel.
 
 =head2 verify_manifest($payload_files, $return_all_errors)
 

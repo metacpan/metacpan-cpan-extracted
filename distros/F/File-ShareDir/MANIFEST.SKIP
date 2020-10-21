@@ -10,6 +10,7 @@
 ^Makefile$
 ^Build$
 ^Build\.bat$
+cover_db/
 \.Inline/.*
 _Inline/.*
 \.bak$
@@ -28,8 +29,8 @@ nytprof.out
 ^_build/.*
 ~$
 .*\.planner
-^\..*
+.*\.lock
+\.travis\.yml
 ^File-ShareDir-.*
 \bxt
-^MYMETA\.json$
-^MYMETA\..*$
+^MYMETA.*

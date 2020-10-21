@@ -11,6 +11,17 @@ my $list = Util::Medley::List->new;
 ok($list);
 
 #####################################
+# contains
+#####################################
+
+my @list = qw(a b c d);
+push @list, undef;
+
+ok($list->contains(\@list, 'd'));
+ok($list->contains(\@list, qr/^d$/));
+ok($list->contains(\@list, undef));
+
+#####################################
 # listToMap
 #####################################
 
@@ -32,7 +43,7 @@ ok( $min == 4 );
 # nsort
 #####################################
 
-my @list = qw(0 01 1 1_foobar 1_foobar_1 1foobar);
+@list = qw(0 01 1 1_foobar 1_foobar_1 1foobar);
 push @list, qw(10_foobar 10foobar Bizbaz bizbaz Foobar foobar foobar_10);
 my @sorted = $list->nsort( $list->shuffle(@list) );
 ok( "@sorted" eq "@list" );

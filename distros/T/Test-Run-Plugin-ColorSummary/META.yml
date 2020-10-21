@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +17,10 @@ name: Test-Run-Plugin-ColorSummary
 provides:
   Test::Run::CmdLine::Plugin::ColorSummary:
     file: lib/Test/Run/CmdLine/Plugin/ColorSummary.pm
-    version: '0.0202'
+    version: '0.0203'
   Test::Run::Plugin::ColorSummary:
     file: lib/Test/Run/Plugin/ColorSummary.pm
-    version: '0.0202'
+    version: '0.0203'
 requires:
   Scalar::Util: '0'
   Term::ANSIColor: '0'
@@ -33,5 +33,5 @@ resources:
   homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://bitbucket.org/shlomif/perl-test-run
-version: '0.0202'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.0203'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

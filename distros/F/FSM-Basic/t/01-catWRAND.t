@@ -58,7 +58,7 @@ my $out;
 ok( $out eq "Switch> " );
 my %tot = ( 'Hello World' => 0, 'Hello Universe' => 0 );
 for ( 1 .. 20000 ) {
-    ( $final, $out ) = $fsm->run('catWRAND');
+    ( $final, $out ) = $fsm->run('cat');
     $out =~ s/\nSwitch.*//m;
     $tot{$out}++;
 }

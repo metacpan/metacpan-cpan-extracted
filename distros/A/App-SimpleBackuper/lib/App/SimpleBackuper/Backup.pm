@@ -88,8 +88,7 @@ sub Backup {
 	
 	_print_progress($state) if $options->{verbose};
 	
-	
-	my %files_queues_by_priority;
+	my(%files_queues_by_priority, %dirs2upd);
 	while(my($mask, $priority) = each %{ $options->{files} }) {
 		next if ! $priority;
 		foreach my $path (glob $mask) {
@@ -117,24 +116,25 @@ sub Backup {
 						parent_id	=> $file_id,
 						id			=> ++$state->{last_file_id},
 						name		=> $path_node,
-						versions	=> [ { backup_id_min	=> $state->{last_backup_id} } ],
-					};
-						
-					my @stat = lstat(join('/', @cur_path) || '/');
-					my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
-					$file->{versions}->[-1] = {
-						%{ $file->{versions}->[-1] },
-						backup_id_max	=> $state->{last_backup_id},
-						uid				=> $uid,
-						gid				=> $gid,
-						size			=> $stat[7],
-						mode			=> $stat[2],
-						mtime			=> $stat[9],
-						block_id		=> 0,
-						symlink_to		=> undef,
-						parts			=> [],
+						versions	=> [ {
+							backup_id_min	=> $state->{last_backup_id},
+							backup_id_max	=> 0,
+							uid				=> 0,
+							gid				=> 0,
+							size			=> 0,
+							mode			=> 0,
+							mtime			=> 0,
+							block_id		=> 0,
+							symlink_to		=> undef,
+							parts			=> [],
+						} ],
 					};
 					
+					$dirs2upd{join('/', @cur_path) || '/'} = {
+						parent_id	=> $file_id,
+						filename	=> $path_node,
+					};
+						
 					$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
 					
 					$file_id = $file->{id};
@@ -152,6 +152,28 @@ sub Backup {
 		delete $files_queues_by_priority{$priority} if ! @{ $files_queues_by_priority{$priority} };
 		my @next = _file_proc( $task, $options, $state );
 		unshift @{ $files_queues_by_priority{ $_->[1] } }, $_ foreach reverse @next;
+	}
+	
+	
+	while(my($full_path, $dir2upd) = each %dirs2upd) {
+		print "Updating dir $full_path..." if $options->{verbose};
+		my $file = $files->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
+		my @stat = lstat($full_path);
+		my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
+		$file->{versions}->[-1] = {
+			%{ $file->{versions}->[-1] },
+			backup_id_max	=> $state->{last_backup_id},
+			uid				=> $uid,
+			gid				=> $gid,
+			size			=> $stat[7],
+			mode			=> $stat[2],
+			mtime			=> $stat[9],
+			block_id		=> 0,
+			symlink_to		=> undef,
+			parts			=> [],
+		};
+		$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
+		print "OK\n" if $options->{verbose};
 	}
 	
 	App::SimpleBackuper::BackupDB($options, $state);
@@ -228,7 +250,7 @@ sub _file_proc {
 		if($file) {
 			print ", is old file #$file->{id}" if $options->{verbose};
 			if($file->{versions}->[-1]->{backup_id_max} == $state->{last_backup_id}) {
-				print ", is already backuped.\n";
+				print ", is already backuped.\n" if $options->{verbose};
 				return;
 			}
 		} else {
@@ -324,6 +346,9 @@ sub _file_proc {
 		
 		if(@{ $file->{versions} } and $file->{versions}->[-1]->{mtime} == $version{mtime}) {
 			$version{parts} = $file->{versions}->[-1]->{parts}; # If mtime not changed then file not changed
+			
+			$blocks->debug($file->{versions}->[-1]->{block_id} => file => $file->{id} => 'version'); 
+			
 			$version{block_id} = $file->{versions}->[-1]->{block_id};
 			
 			my $block = $blocks->find_row({ id => $version{block_id} });
@@ -373,7 +398,9 @@ sub _file_proc {
 				
 				# Search for part with this hash
 				if(my $part = $parts->find_row({ hash => $part{hash} })) {
-					$block_ids{ $part->{block_id} }++ if $part->{block_id};
+					if($part->{block_id}) {
+						$block_ids{ $part->{block_id} }++;
+					}
 					$part{size} = $part->{size};
 					$part{aes_key} = $part->{aes_key};
 					$part{aes_iv} = $part->{aes_iv};
@@ -436,7 +463,7 @@ sub _file_proc {
 			my $block;
 			if(1 == %block_ids) {
 				$block = $blocks->find_row({ id => keys %block_ids });
-				die "Block #".join(', ', keys %block_ids)." wasn't found" if ! $block;
+				die "Block #".join(', ', keys %block_ids)." wasn't found. debug: ".$blocks->debug(keys %block_ids) if ! $block;
 			}
 			elsif(%block_ids) {
 				# Search for block with highest parts count
@@ -457,6 +484,7 @@ sub _file_proc {
 						my $block_file = $files->unpack( $files->[ $block_file_index ] );
 						foreach my $version ( @{ $block_file->{versions} } ) {
 							next if $version->{block_id} != $bi;
+							$blocks->debug($block->{id} => file => $file->{id} => 'new version');
 							$version->{block_id} = $block->{id};
 							$block->{parts_cnt} += @{ $version->{parts} };
 						}
@@ -481,6 +509,7 @@ sub _file_proc {
 			$block->{last_backup_id} = $state->{last_backup_id};
 			$blocks->upsert({ id => $block->{id} }, $block);
 			
+			$blocks->debug($block->{id} => file => $file->{id} => 'new version');
 			$version{block_id} = $block->{id};
 		}
 	}
@@ -523,12 +552,14 @@ sub _file_proc {
 		splice @{ $state->{longest_files} }, 5;
 	}
 	
-	$state->{heaviweightest_files} ||= [];
-	if(@{ $state->{heaviweightest_files} } < 5 or $state->{heaviweightest_files}->[-1]->{weight} < $file_weight_spent) {
-		@{ $state->{heaviweightest_files} } = sort {$b->{weight} <=> $a->{weight}} (@{ $state->{heaviweightest_files} }, {weight => $file_weight_spent, path => $task->[0]});
-		splice @{ $state->{heaviweightest_files} }, 5;
+	if($file_weight_spent) {
+		$state->{heaviweightest_files} ||= [];
+		if(@{ $state->{heaviweightest_files} } < 5 or $state->{heaviweightest_files}->[-1]->{weight} < $file_weight_spent) {
+			@{ $state->{heaviweightest_files} } = sort {$b->{weight} <=> $a->{weight}}
+				(@{ $state->{heaviweightest_files} }, {weight => $file_weight_spent, path => $task->[0]});
+			splice @{ $state->{heaviweightest_files} }, 5;
+		}
 	}
-
 	
 	return @next;
 }

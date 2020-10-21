@@ -1,5 +1,16 @@
 Revision history for Perl extension List-MoreUtils
 
+0.430	2020-10-21
+    - bump List::MoreUtils::XS requirement to 0.430
+    - release 0.429_001 without any further changes
+
+0.429_001	2020-10-05
+    - fix failing installation in parallel make (Issue#38)
+    - infrastructure improvements and tooling updates,
+      lot's of author tests with according fixes added
+    - added slide and slideatatime functions wished by SCHWERN
+    - documentation fixes (PR#21, PR#33, PR#34, RT#126029, RT#132043, RT#132940)
+
 0.428	2017-12-11
     - release 0.427_001 without further changes
 

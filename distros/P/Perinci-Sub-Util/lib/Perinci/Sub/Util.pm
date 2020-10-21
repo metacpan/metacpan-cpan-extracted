@@ -1,7 +1,9 @@
 package Perinci::Sub::Util;
 
-our $DATE = '2017-01-31'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-20'; # DATE
+our $DIST = 'Perinci-Sub-Util'; # DIST
+our $VERSION = '0.470'; # VERSION
 
 use 5.010001;
 use strict;
@@ -203,7 +205,22 @@ _
             schema  => 'code*',
             description => <<'_',
 
-If not specified will use `base_code` (which will then be required).
+Alternatively you can use `wrap_code`. If both are not specified, will use
+`base_code` (which will then be required) as the modified subroutine's code.
+
+_
+        },
+        wrap_code => {
+            summary => 'Wrapper to generate the modified sub',
+            schema  => 'code*',
+            description => <<'_',
+
+The modified sub will become:
+
+    sub { wrap_code->(base_code, @_) }
+
+Alternatively you can use `output_code`. If both are not specified, will use
+`base_code` (which will then be required) as the modified subroutine's code.
 
 _
         },
@@ -293,7 +310,8 @@ sub gen_modified_sub {
     }
 
     my $output_meta = Function::Fallback::CoreOrPP::clone($base_meta);
-    my $output_code = $args{output_code} // $base_code;
+    my $output_code = ($args{wrap_code} ? sub { $args{wrap_code}->($base_code, @_) } : undef) //
+        $args{output_code} // $base_code;
 
     # modify metadata
     for (qw/summary description/) {
@@ -457,7 +475,7 @@ Perinci::Sub::Util - Helper when writing functions
 
 =head1 VERSION
 
-This document describes version 0.46 of Perinci::Sub::Util (from Perl distribution Perinci-Sub-Util), released on 2017-01-31.
+This document describes version 0.470 of Perinci::Sub::Util (from Perl distribution Perinci-Sub-Util), released on 2020-10-20.
 
 =head1 SYNOPSIS
 
@@ -524,7 +542,11 @@ Example for gen_curried_sub():
 =head1 FUNCTIONS
 
 
-=head2 gen_curried_sub($base_name, $output_name, $set_args) -> any
+=head2 gen_curried_sub
+
+Usage:
+
+ gen_curried_sub( [ \%optional_named_args ] , $base_name, $output_name) -> any
 
 Generate curried subroutine (and its metadata).
 
@@ -555,16 +577,22 @@ Where to install the modified sub.
 Subroutine will be put in the specified name. If the name is not qualified with
 package name, will use caller's package.
 
-=item * B<$set_args> => I<hash>
+=item * B<set_args> => I<hash>
 
 Arguments to set.
+
 
 =back
 
 Return value:  (any)
 
 
-=head2 gen_modified_sub(%args) -> [status, msg, result, meta]
+
+=head2 gen_modified_sub
+
+Usage:
+
+ gen_modified_sub(%args) -> [status, msg, payload, meta]
 
 Generate modified metadata (and subroutine) based on another.
 
@@ -634,7 +662,8 @@ metadata.
 
 Code for the modified sub.
 
-If not specified will use C<base_code> (which will then be required).
+Alternatively you can use C<wrap_code>. If both are not specified, will use
+C<base_code> (which will then be required) as the modified subroutine's code.
 
 =item * B<output_name> => I<str>
 
@@ -662,6 +691,18 @@ Arguments to add.
 
 Summary for the mod subroutine.
 
+=item * B<wrap_code> => I<code>
+
+Wrapper to generate the modified sub.
+
+The modified sub will become:
+
+ sub { wrap_code->(base_code, @_) }
+
+Alternatively you can use C<output_code>. If both are not specified, will use
+C<base_code> (which will then be required) as the modified subroutine's code.
+
+
 =back
 
 Returns an enveloped result (an array).
@@ -669,11 +710,12 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (hash)
+
 
 =head2 caller([ $n ])
 
@@ -733,7 +775,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Util>.
 
 =head1 BUGS
 
@@ -753,7 +795,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ package SQL::Statement::Operation;
 
 ######################################################################
 #
-# This module is copyright (c), 2009-2017 by Jens Rehsack.
+# This module is copyright (c), 2009-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -18,7 +18,7 @@ use Carp ();
 
 use SQL::Statement::Term ();
 
-our $VERSION = '1.412';
+our $VERSION = '1.414';
 
 @ISA = qw(SQL::Statement::Term);
 
@@ -1057,7 +1057,7 @@ sub regexp($)
 
 =head1 AUTHOR AND COPYRIGHT
 
-Copyright (c) 2009,2017 by Jens Rehsack: rehsackATcpan.org
+Copyright (c) 2009-2020 by Jens Rehsack: rehsackATcpan.org
 
 All rights reserved.
 

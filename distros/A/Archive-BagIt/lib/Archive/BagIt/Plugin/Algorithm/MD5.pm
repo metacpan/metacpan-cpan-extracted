@@ -2,10 +2,9 @@
 package Archive::BagIt::Plugin::Algorithm::MD5;
 use strict;
 use warnings;
-use Moo;
 use Carp;
+use Moo;
 use namespace::autoclean;
-
 with 'Archive::BagIt::Role::Algorithm';
 
 has '+plugin_name' => (
@@ -28,24 +27,18 @@ has '_digest' => (
 
 sub _build_digest_md5 {
     my ($self) = @_;
-    my $digest_md5 = Digest::MD5->new();
-    return $digest_md5;
+    my $digest = Digest::MD5->new();
+    return $digest;
 }
 
 sub get_hash_string {
     my ($self, $fh) = @_;
-    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-        $atime,$mtime,$ctime,$blksize,$blocks)
-        = stat $fh;
-    if ((!defined $blksize) || (length($blksize) < 1) || ($blksize <1)) {
-        $blksize = 8192;
-    }
+    my $blksize = $self->get_optimal_bufsize($fh);
     my $buffer;
     while (read($fh, $buffer, $blksize)) {
         $self->_digest->add($buffer);
     }
     return $self->_digest->hexdigest;
-
 }
 
 sub verify_file {
@@ -71,7 +64,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The MD5 algorithm plugin (default for v
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 AVAILABILITY
 

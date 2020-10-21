@@ -12,7 +12,8 @@ my @PROGRESS = sort grep { $_ ne 'default' } keys %Term::ProgressSpinner::PROGRE
 
 my $ps = Term::ProgressSpinner->new(
 	text_color => 'black on_bright_black',
-	terminal_height => 40
+	terminal_height => 40,
+	precision => 2,
 );
 
 $ps->output->print("\e[${line};1f\e[2J");

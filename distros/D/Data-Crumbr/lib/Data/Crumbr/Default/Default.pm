@@ -1,5 +1,5 @@
 package Data::Crumbr::Default::Default;
-$Data::Crumbr::Default::Default::VERSION = '0.1.1';
+$Data::Crumbr::Default::Default::VERSION = '0.1.2';
 # ABSTRACT: "Default" profile for Data::Crumbr::Default
 
 # Default is default... nothing is set here!
@@ -19,7 +19,7 @@ Data::Crumbr::Default::Default - "Default" profile for Data::Crumbr::Default
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 DESCRIPTION
 

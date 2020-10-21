@@ -4,8 +4,8 @@ use Test::LMU;
 
 # Normal cases
 my @list = (1 .. 10000);
-is_true(notall_u  { !defined } @list);
-is_true(notall_u  { $_ < 10000 } @list);
+is_true(notall_u { !defined } @list);
+is_true(notall_u { $_ < 10000 } @list);
 is_false(notall_u { $_ <= 10000 } @list);
 is_undef(notall_u {});
 

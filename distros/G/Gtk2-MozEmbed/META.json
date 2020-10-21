@@ -1,0 +1,50 @@
+{
+   "abstract" : "Perl interface to the Mozilla embedding widget",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-MozEmbed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "xs/GtkMozEmbed.xs"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.20",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1.03",
+            "Gtk2" : "1.081"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.20",
+            "ExtUtils::PkgConfig" : "1.03",
+            "Gtk2" : "1.081"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10",
+   "x_deprecated" : 1
+}

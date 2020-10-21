@@ -1,5 +1,11 @@
 Revision history for Text-Indent-Tiny
 
+0.1.2	2020/10/21
+	set correct version in READMEs
+
+0.1.1	2020/10/21
+	Fix issues reported during tests
+
 0.1.0	2020/10/19
 	First release
 

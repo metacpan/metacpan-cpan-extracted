@@ -11,7 +11,9 @@ use YAML::XS;
 use File::FormatIdentification::Regex;
 use Moose;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04'; # VERSION
+
+# ABSTRACT Perl extension for parsing PRONOM-Signatures using DROID-Signature file
 
 # Preloaded methods go here.
 # flattens a regex-structure to a regex-string, expects a signature-pattern and a list of regex-structures
@@ -948,6 +950,8 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -958,7 +962,7 @@ File::FormatIdentification::Pronom
 
 =head1 VERSION
 
-version 0.002
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -1075,8 +1079,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-# Below is stub documentation for your module. You'd better edit it!
-
-

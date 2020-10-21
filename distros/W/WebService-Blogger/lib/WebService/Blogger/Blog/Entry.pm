@@ -1,5 +1,5 @@
 package WebService::Blogger::Blog::Entry;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 use warnings;
 use strict;
 
@@ -95,7 +95,7 @@ sub add_xml_ns {
     my %xml_ns = (
         ''     => 'http://www.w3.org/2005/Atom',
         ':thr' => 'http://purl.org/rss/1.0/modules/threading/',
-        ':gd'  => 'http://schemas.google.com/g/2005', 
+        ':gd'  => 'http://schemas.google.com/g/2005',
     );
     while (my ($postfix, $url) = each %xml_ns) {
         $dest->{"xmlns$postfix"} = $url;
@@ -324,4 +324,3 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-

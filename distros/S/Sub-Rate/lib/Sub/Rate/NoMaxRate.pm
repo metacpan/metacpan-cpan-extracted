@@ -1,7 +1,7 @@
 package Sub::Rate::NoMaxRate;
 use strict;
 use warnings;
-use Any::Moose;
+use Moo;
 
 use List::Util 'sum';
 
@@ -113,4 +113,3 @@ The full text of the license can be found in the
 LICENSE file included with this module.
 
 =cut
-

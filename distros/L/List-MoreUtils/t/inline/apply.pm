@@ -10,11 +10,11 @@ my @null_list = apply {};
 is_deeply(\@null_list, [], 'apply(null) returns null list');
 
 # Normal cases
-my @list = (0 .. 9);
+my @list  = (0 .. 9);
 my @list1 = apply { $_++ } @list;
 is_deeply(\@list,  [0 .. 9],  "original numbers untouched");
 is_deeply(\@list1, [1 .. 10], "returned numbers increased");
-@list = (" foo ", " bar ", "     ", "foobar");
+@list  = (" foo ", " bar ", "     ", "foobar");
 @list1 = apply { s/^\s+|\s+$//g } @list;
 is_deeply(\@list,  [" foo ", " bar ", "     ", "foobar"], "original strings untouched");
 is_deeply(\@list1, ["foo",   "bar",   "",      "foobar"], "returned strings stripped");
@@ -34,7 +34,7 @@ SKIP:
 SCOPE:
 {
     # wrong results from apply() [XS]
-    @list = (1 .. 4);
+    @list  = (1 .. 4);
     @list1 = apply { grow_stack(); $_ = 5; } @list;
     is_deeply(\@list,  [1 .. 4]);
     is_deeply(\@list1, [(5) x 4]);

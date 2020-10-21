@@ -3,10 +3,10 @@ use Test::More;
 use Test::LMU;
 
 my @list = (1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 11, 13, 13, 13, 17);
-is(0,  (lower_bound { $_ <=> 0 } @list), "lower bound 0");
-is(0,  (lower_bound { $_ <=> 1 } @list), "lower bound 1");
-is(2,  (lower_bound { $_ <=> 2 } @list), "lower bound 2");
-is(10, (lower_bound { $_ <=> 4 } @list), "lower bound 4");
+is(0,            (lower_bound { $_ <=> 0 } @list),  "lower bound 0");
+is(0,            (lower_bound { $_ <=> 1 } @list),  "lower bound 1");
+is(2,            (lower_bound { $_ <=> 2 } @list),  "lower bound 2");
+is(10,           (lower_bound { $_ <=> 4 } @list),  "lower bound 4");
 is(scalar @list, (lower_bound { $_ <=> 19 } @list), "lower bound 19");
 
 my @in = @list = 1 .. 100;

@@ -263,12 +263,7 @@ sv_to_array (GITransfer transfer,
 	if (!gperl_sv_is_defined (sv))
 		return NULL;
 
-	if (!gperl_sv_is_array_ref (sv))
-		ccroak ("need an array ref to convert to GArray");
-
 	array_type = g_type_info_get_array_type (type_info);
-
-	av = (AV *) SvRV (sv);
 
 	item_transfer = transfer == GI_TRANSFER_CONTAINER
 		      ? GI_TRANSFER_NOTHING
@@ -287,6 +282,22 @@ sv_to_array (GITransfer transfer,
 		_need_struct_value_semantics (array_type, param_info, param_tag);
 	is_zero_terminated = g_type_info_is_zero_terminated (type_info);
 	item_size = size_of_type_info (param_info);
+
+	if (!gperl_sv_is_array_ref (sv)) {
+		// special-case const guchar* with transfer=none
+		if (SvPOK (sv) && param_tag == GI_TYPE_TAG_UINT8 && transfer == GI_TRANSFER_NOTHING) {
+			STRLEN string_length = 0;
+			char* string = SvPV (sv, string_length);
+			if (length_pos >= 0) {
+				array_info->length = is_zero_terminated ? string_length : string_length - 1;
+			}
+			return string;
+		} else {
+			ccroak ("need an array ref to convert to GArray");
+		}
+	}
+
+	av = (AV *) SvRV (sv);
 	length = (gsize) (av_len (av) + 1); /* av_len always returns at least -1 */
 
 	switch (array_type) {

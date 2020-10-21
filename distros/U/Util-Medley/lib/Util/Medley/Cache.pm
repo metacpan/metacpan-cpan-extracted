@@ -1,5 +1,5 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.047';
+$Util::Medley::Cache::VERSION = '0.051';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ Util::Medley::Cache - Simple caching mechanism.
 
 =head1 VERSION
 
-version 0.047
+version 0.051
 
 =cut
 

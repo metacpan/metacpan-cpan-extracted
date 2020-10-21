@@ -11,7 +11,7 @@ use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub call {
 	my ($self, $env) = @_;
@@ -292,6 +292,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

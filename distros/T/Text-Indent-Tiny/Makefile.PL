@@ -19,6 +19,14 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Carp' => '0',
     },
+    META_MERGE => {
+        resources => {
+            license    => 'https://github.com/ildar-shaimordanov/indent-pm/blob/master/LICENSE',
+            homepage   => 'https://github.com/ildar-shaimordanov/indent-pm',
+            bugtracker => 'https://github.com/ildar-shaimordanov/indent-pm/issues',
+            repository => 'https://github.com/ildar-shaimordanov/indent-pm.git',
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Text-Indent-Tiny-*' },
 );

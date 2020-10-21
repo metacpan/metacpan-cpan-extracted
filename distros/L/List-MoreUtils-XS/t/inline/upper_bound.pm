@@ -3,17 +3,17 @@ use Test::More;
 use Test::LMU;
 
 my @list = (1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 11, 13, 13, 13, 17);
-is(0,  (upper_bound { $_ <=> 0 } @list), "upper bound 0");
-is(2,  (upper_bound { $_ <=> 1 } @list), "upper bound 1");
-is(4,  (upper_bound { $_ <=> 2 } @list), "upper bound 2");
-is(14, (upper_bound { $_ <=> 4 } @list), "upper bound 4");
+is(0,            (upper_bound { $_ <=> 0 } @list),  "upper bound 0");
+is(2,            (upper_bound { $_ <=> 1 } @list),  "upper bound 1");
+is(4,            (upper_bound { $_ <=> 2 } @list),  "upper bound 2");
+is(14,           (upper_bound { $_ <=> 4 } @list),  "upper bound 4");
 is(scalar @list, (upper_bound { $_ <=> 19 } @list), "upper bound 19");
 
 my @in = @list = 1 .. 100;
 for my $i (0 .. $#in)
 {
     my $j = $in[$i] - 1;
-    is($i, (upper_bound { $_ - $j } @list), "placed $j");
+    is($i,     (upper_bound { $_ - $j } @list),      "placed $j");
     is($i + 1, (upper_bound { $_ - $in[$i] } @list), "found $in[$i]");
 }
 my @lout = ($in[0] - 11 .. $in[0] - 1);

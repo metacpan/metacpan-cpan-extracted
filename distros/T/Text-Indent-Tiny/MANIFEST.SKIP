@@ -2,8 +2,8 @@
 pod2*.tmp$
 .git
 .tar.gz$
-MYMETA.yml
-MYMETA.json
+MYMETA.*
+META.*
 Makefile
 
 etc/

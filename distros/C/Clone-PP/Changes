@@ -1,5 +1,9 @@
 Revision history for Perl module Clone::PP
 
+1.08 2020-10-20 NEILB
+    - Changed "sub main'dump" to "sub main::dump" in t/dump.pl, as that
+      meant this distribution wouldn't build under cperl. RT#125171
+
 1.07 2017-04-10 NEILB
     - Update tests to cope with '.' not being in @INC, part of Perl 5.26.
       Thanks to Jim Keenan for the PR which fixed this.

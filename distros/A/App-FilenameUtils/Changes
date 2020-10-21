@@ -1,0 +1,9 @@
+0.002   2020-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq versions with those that have Rinci function metadata
+	  (RT#133571).
+
+
+0.001   2020-10-20  Released-By: PERLANCAR
+
+        - First release.

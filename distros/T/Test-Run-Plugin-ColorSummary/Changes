@@ -1,5 +1,8 @@
 Revision history for Test-Run-Plugin-ColorSummary
 
+0.0203  2020-10-21
+    * Remove stale links from the POD.
+
 0.0202  2015-12-31
     * Update old E-mail addresses.
 

@@ -15,7 +15,7 @@ my $test = Plack::Test->create($app);
 my $res = $test->request(HTTP::Request->new(GET => '/'));
 my $right_ret = <<'END';
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta charset="UTF-8" /><meta name="generator" content="Login" /><title>Login page</title><style type="text/css">.outer{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);}.login{text-align:center;background-color:blue;padding:1em;}.login a{text-decoration:none;color:white;font-size:3em;}
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="generator" content="Login" /><title>Login page</title><style type="text/css">.outer{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);}.login{text-align:center;background-color:blue;padding:1em;}.login a{text-decoration:none;color:white;font-size:3em;}
 </style></head><body class="outer"><div class="login"><a href="login">LOGIN</a></div></body></html>
 END
 chomp $right_ret;
@@ -34,10 +34,9 @@ $test = Plack::Test->create($app);
 $res = $test->request(HTTP::Request->new(GET => '/'));
 $right_ret = <<'END';
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta charset="UTF-8" />
     <meta name="generator" content="Login" />
     <title>
       Login page
@@ -90,10 +89,9 @@ $test = Plack::Test->create($app);
 $res = $test->request(HTTP::Request->new(GET => '/'));
 $right_ret = <<'END';
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta charset="UTF-8" />
     <meta name="generator" content="Foo" />
     <title>
       Foo

@@ -1,3 +1,4 @@
+.perltidyrc
 ARTISTIC-1.0
 Changes
 GPL-1
@@ -10,7 +11,8 @@ lib/List/MoreUtils/XS.pm
 LICENSE
 MAINTAINER.md
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
+MANIFEST.SKIP
 multicall.h
 ppport.h
 README.md
@@ -69,6 +71,8 @@ t/inline/reduce_1.pm
 t/inline/reduce_u.pm
 t/inline/samples.pm
 t/inline/singleton.pm
+t/inline/slide.pm
+t/inline/slideatatime.pm
 t/inline/true.pm
 t/inline/uniq.pm
 t/inline/upper_bound.pm
@@ -130,6 +134,8 @@ t/xs/reduce_1.t
 t/xs/reduce_u.t
 t/xs/samples.t
 t/xs/singleton.t
+t/xs/slide.t
+t/xs/slideatatime.t
 t/xs/true.t
 t/xs/uniq.t
 t/xs/upper_bound.t

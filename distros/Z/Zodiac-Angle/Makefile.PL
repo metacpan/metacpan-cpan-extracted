@@ -19,17 +19,20 @@ perl_version 5.006002;
 readme_from 'Angle.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
+requires 'Error::Pure' => 0;
+requires 'List::MoreUtils' => 0;
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Zodiac-Angle';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Zodiac-Angle/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Zodiac-Angle';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Zodiac-Angle';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.02';
+version '0.04';
 
 # Run.
 WriteAll();

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.01 2020-10-20T11:36:15Z
+
+    - Implement tab expansion.
+
 1.10 2020-09-19T04:56:59Z
 
     - Add prefix/postfix characters to prohibition rule.

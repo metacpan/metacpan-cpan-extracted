@@ -1,9 +1,9 @@
 package App::CekBpom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-16'; # DATE
+our $DATE = '2020-10-20'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -164,8 +164,8 @@ sub cek_bpom {
 
                 while ($ct =~ m!
                                    <tr\stitle.+?\surldetil="/(?P<reg_id>[^"]+)">
-                                   <td[^>]*>(?P<nomor_registrasi>[^<]+)(?:<div>Terbit: (?P<tanggal_terbit>[^<]+))?</div></td>
-                                   <td[^>]*>(?P<nama>[^<]+)<div>Merk: (?P<merk>[^<]+)<br>Kemasan: (?P<kemasan>[^<]+)</div></td>
+                                   <td[^>]*>(?P<nomor_registrasi>[^<]+)(?:<div>Terbit:\s*(?P<tanggal_terbit>[^<]+))?</div></td>
+                                   <td[^>]*>(?P<nama>[^<]+)<div>Merk:\s*(?P<merk>[^<]+)<br>Kemasan:\s*(?P<kemasan>[^<]+)</div></td>
                                    <td[^>]*>(?P<pendaftar>[^<]+)<div>(?P<kota_pendaftar>[^<]+)</div></td>
                                !sgx) {
                     my $row = {%+};
@@ -219,7 +219,7 @@ App::CekBpom - Check BPOM products via the command-line (CLI interface for cekbp
 
 =head1 VERSION
 
-This document describes version 0.008 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-10-16.
+This document describes version 0.009 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-10-20.
 
 =head1 DESCRIPTION
 

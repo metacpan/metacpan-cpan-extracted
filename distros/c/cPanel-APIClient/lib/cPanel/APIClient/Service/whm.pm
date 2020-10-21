@@ -47,6 +47,9 @@ C<cPanel::APIClient->create()> do it for you.
 
 use parent qw( cPanel::APIClient::Service );
 
+# overridden in tests
+our $_PORT = 2087;
+
 #----------------------------------------------------------------------
 
 =head1 METHODS
@@ -74,7 +77,7 @@ sub call_api1 {
 
 # left undocumented since unneeded
 sub get_https_port {
-    return 2087;
+    return $_PORT;
 }
 
 =head1 LICENSE

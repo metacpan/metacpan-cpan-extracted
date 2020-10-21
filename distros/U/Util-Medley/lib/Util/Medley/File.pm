@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.047';
+$Util::Medley::File::VERSION = '0.051';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -24,7 +24,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.047
+version 0.051
 
 =cut
 
@@ -296,7 +296,7 @@ multi method fileType (Str :$path!) {
 
 multi method fileType (Str $path) {
 
-	if ( $self->String->is_blank($path) ) {
+	if ( $self->String->isBlank($path) ) {
 		confess "path is empty";
 	}
 

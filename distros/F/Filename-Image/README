@@ -1,9 +1,9 @@
 NAME
-    Filename::Image - Check whether filename indicates being an image file
+    Filename::Image - Check whether filename indicates being an image
 
 VERSION
-    This document describes version 0.002 of Filename::Image (from Perl
-    distribution Filename-Image), released on 2020-04-01.
+    This document describes version 0.005 of Filename::Image (from Perl
+    distribution Filename-Image), released on 2020-10-20.
 
 SYNOPSIS
      use Filename::Image qw(check_image_filename);
@@ -17,6 +17,41 @@ SYNOPSIS
 DESCRIPTION
 FUNCTIONS
   check_image_filename
+    Usage:
+
+     check_image_filename(%args) -> bool|hash
+
+    Check whether filename indicates being an image.
+
+    Examples:
+
+    *   Example #1:
+
+         check_image_filename(filename => "foo.txt"); # -> 0
+
+    *   Example #2:
+
+         check_image_filename(filename => "foo.mp4"); # -> 0
+
+    *   Example #3:
+
+         check_image_filename(filename => "foo.jpg"); # -> {}
+
+    *   Example #4:
+
+         check_image_filename(filename => "foo.PNG"); # -> {}
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *filename*
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Filename-Image>.
@@ -36,6 +71,8 @@ SEE ALSO
     Filename::Audio
 
     Filename::Video
+
+    Filename::Ebook
 
     Filename::Media
 

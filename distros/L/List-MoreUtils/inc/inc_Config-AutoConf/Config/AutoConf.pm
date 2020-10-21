@@ -47,8 +47,8 @@ sub looks_like_number {
 }
 EOP
 
-eval "use File::Slurp::Tiny qw/read_file/;";
-__PACKAGE__->can("read_file") or eval <<'EOP';
+eval "use File::Slurper qw/read_binary/;";
+__PACKAGE__->can("read_binary") or eval <<'EOP';
 =begin private
 
 =head2 read_file
@@ -57,7 +57,7 @@ __PACKAGE__->can("read_file") or eval <<'EOP';
 
 =cut
 
-sub read_file {
+sub read_binary {
   my $fn = shift;
   local $@ = "";
   open( my $fh, "<", $fn ) or croak "Error opening $fn: $!";
@@ -92,7 +92,7 @@ Config::AutoConf - A module to implement some of AutoConf macros in pure perl.
 
 =cut
 
-our $VERSION = '0.315';
+our $VERSION = '0.319';
 $VERSION = eval $VERSION;
 
 =head1 ABSTRACT
@@ -142,7 +142,7 @@ my $glob_instance;
 
 =head2 new
 
-This function instantiates a new instance of Config::AutoConf, eg. to
+This function instantiates a new instance of Config::AutoConf, e.g. to
 configure child components. The constructor adds also values set via
 environment variable C<PERL5_AUTOCONF_OPTS>.
 
@@ -228,11 +228,14 @@ sub check_files
     1;
 }
 
-sub _sanitize_prog
+sub _quote_shell_arg { scalar Text::ParseWords::shellwords($_[0]) > 1 ? QUOTE . $_[0] . QUOTE : $_[0] }
+
+sub _sanitize_prog { shift; _quote_shell_arg shift }
+
+sub _append_prog_args
 {
-    my ($self, $prog) = @_;
-    (scalar Text::ParseWords::shellwords $prog) > 1 and $prog = QUOTE . $prog . QUOTE;
-    $prog;
+    shift;
+    join " ", map { _quote_shell_arg $_ } @_;
 }
 
 my @exe_exts = ($^O eq "MSWin32" ? qw(.exe .com .bat .cmd) : (""));
@@ -268,12 +271,13 @@ sub check_prog
     {
         for my $e (@exe_exts)
         {
-            my $cmd = $self->_sanitize_prog(File::Spec->catfile($p, $ac_prog . $e));
-            -x $cmd
+            my $cmd           = $self->_sanitize_prog(File::Spec->catfile($p, $ac_prog . $e));
+            my $is_executable = -x $cmd and -f $cmd;
+                  $is_executable
               and $options->{action_on_true}
               and ref $options->{action_on_true} eq "CODE"
               and $options->{action_on_true}->();
-            -x $cmd and return $cmd;
+            $is_executable and return $cmd;
         }
     }
 
@@ -331,16 +335,9 @@ sub check_progs
     return;
 }
 
-sub _append_prog_args
-{
-    my $self = shift->_get_instance();
-    my $prog = shift;
-    join(" ", $self->_sanitize_prog($prog), @_);
-}
-
 =head2 check_prog_yacc
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   If `bison' is found, set [...] `bison -y'.
   Otherwise, if `byacc' is found, set [...] `byacc'. 
@@ -374,7 +371,7 @@ sub check_prog_yacc
 
 =head2 check_prog_awk
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   Check for `gawk', `mawk', `nawk', and `awk', in that order, and
   set output [...] to the first one that is found.  It tries
@@ -388,14 +385,14 @@ Note that it returns the full path, if found.
 
 sub check_prog_awk
 {
-    my $self = shift->_get_instance();
+    my $self       = shift->_get_instance();
     my $cache_name = $self->_cache_name("prog", "AWK");
     $self->check_cached($cache_name, "for awk", sub { $ENV{AWK} || $self->check_progs(qw/gawk mawk nawk awk/) });
 }
 
 =head2 check_prog_egrep
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   Check for `grep -E' and `egrep', in that order, and [...] output
   [...] the first one that is found.  The result can be overridden by
@@ -432,7 +429,7 @@ sub check_prog_egrep
 
 =head2 check_prog_lex
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   If flex is found, set output [...] to ‘flex’ and [...] to -lfl, if that
   library is in a standard place. Otherwise set output [...] to ‘lex’ and
@@ -503,7 +500,7 @@ EOLEX
         );
         defined $self->{lex}->{root} or $self->{lex}->{root} = $lex_root_var;
 
-        my $conftest = read_file($lex_root_var . ".c");
+        my $conftest = read_binary($lex_root_var . ".c");
         unlink $lex_root_var . ".c";
 
         $cache_name = $self->_cache_name("lib", "lex");
@@ -541,7 +538,7 @@ EOLEX
 
 =head2 check_prog_sed
 
-From the autoconf documentation,
+From the L<GNU Autoconf|https://www.gnu.org/software/autoconf/autoconf.html> documentation,
 
   Set output variable [...] to a Sed implementation that conforms to Posix
   and does not have arbitrary length limits. Report an error if no
@@ -557,7 +554,7 @@ Note that it returns the full path, if found.
 
 sub check_prog_sed
 {
-    my $self = shift->_get_instance();
+    my $self       = shift->_get_instance();
     my $cache_name = $self->_cache_name("prog", "SED");
     $self->check_cached($cache_name, "for sed", sub { $ENV{SED} || $self->check_progs(qw/gsed sed/) });
 }
@@ -570,7 +567,7 @@ Checks for C<pkg-config> program. No additional tests are made for it ...
 
 sub check_prog_pkg_config
 {
-    my $self = shift->_get_instance();
+    my $self       = shift->_get_instance();
     my $cache_name = $self->_cache_name("prog", "PKG_CONFIG");
     $self->check_cached($cache_name, "for pkg-config", sub { $self->check_prog("pkg-config") });
 }
@@ -583,7 +580,7 @@ Determine a C compiler to use. Currently the probe is delegated to L<ExtUtils::C
 
 sub check_prog_cc
 {
-    my $self = shift->_get_instance();
+    my $self       = shift->_get_instance();
     my $cache_name = $self->_cache_name("prog", "CC");
 
     $self->check_cached(
@@ -1377,7 +1374,7 @@ variable.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1401,7 +1398,7 @@ sub check_decl
     $sym_call =~ s/,/) 0, (/g;
 
     my $cache_name = $self->_cache_name("decl", $self->{lang}, $symbol);
-    my $check_sub = sub {
+    my $check_sub  = sub {
 
         my $body = <<ACEOF;
 #ifndef $sym_plain
@@ -1437,13 +1434,13 @@ ACEOF
 For each of the symbols (with optional function argument types for C++
 overloads), run L<check_decl>.
 
-Contrary to GNU autoconf, this method does not declare HAVE_DECL_symbol
+Contrary to B<GNU Autoconf>, this method does not declare C<HAVE_DECL_symbol>
 macros for the resulting C<confdefs.h>, because it differs as C<check_decl>
 between compiling languages.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1731,7 +1728,7 @@ This method caches its result in the C<ac_cv_type_>type variable.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1750,7 +1747,7 @@ sub check_type
     ref($type) eq "" or return croak("No type to check for");
 
     my $cache_name = $self->_cache_type_name("type", $type);
-    my $check_sub = sub {
+    my $check_sub  = sub {
 
         my $body = <<ACEOF;
   if( sizeof ($type) )
@@ -1797,7 +1794,7 @@ for type and return the accumulated result (accumulation op is binary and).
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1933,7 +1930,7 @@ the default includes are used.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -1958,7 +1955,7 @@ sub compute_int
     $self = $self->_get_instance();
 
     my $cache_name = $self->_cache_type_name("compute_int", $self->{lang}, $expr);
-    my $check_sub = sub {
+    my $check_sub  = sub {
         my $val = $self->_compute_int_compile($expr, $options->{prologue}, @decls);
 
         defined $val
@@ -2005,7 +2002,7 @@ Checks for the size of the specified type by compiling and define
 C<SIZEOF_type> using the determined size.
 
 In opposition to GNU AutoConf, this method can determine size of structure
-members, eg.
+members, e.g.
 
   $ac->check_sizeof_type( "SV.sv_refcnt", { prologue => $include_perl } );
   # or
@@ -2015,7 +2012,7 @@ This method caches its result in the C<ac_cv_sizeof_E<lt>set langE<gt>>_type var
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2042,7 +2039,7 @@ sub check_sizeof_type
     ref($type) eq "" or return croak("No type to check for");
 
     my $cache_name = $self->_cache_type_name("sizeof", $self->{lang}, $type);
-    my $check_sub = sub {
+    my $check_sub  = sub {
         my @decls;
         if ($type =~ m/^([^.]+)\.([^.]+)$/)
         {
@@ -2102,7 +2099,7 @@ is executed when one size of the types could not determined.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2182,7 +2179,7 @@ variable name mapped to underscores.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2200,12 +2197,12 @@ sub check_alignof_type
     ref($type) eq "" or return croak("No type to check for");
 
     my $cache_name = $self->_cache_type_name("alignof", $self->{lang}, $type);
-    my $check_sub = sub {
+    my $check_sub  = sub {
         my @decls = (
             "#ifndef offsetof",
             "# ifdef __ICC",
             "#  define offsetof(type,memb) ((size_t)(((char *)(&((type*)0)->memb)) - ((char *)0)))",
-            "# else", "#  define offsetof(type,memb) ((size_t)&((type*)0)->memb)",
+            "# else",  "#  define offsetof(type,memb) ((size_t)&((type*)0)->memb)",
             "# endif", "#endif"
         );
 
@@ -2272,7 +2269,7 @@ is executed when one align of the types could not determined.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2364,7 +2361,7 @@ This macro caches its result in the C<ac_cv_>aggr_member variable.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2393,7 +2390,7 @@ sub check_member
   if( check_aggr.$member )
     return 0;
 ACEOF
-        my $conftest = $self->lang_build_program($options->{prologue}, $body);
+        my $conftest    = $self->lang_build_program($options->{prologue}, $body);
         my $have_member = $self->compile_if_else($conftest);
 
         unless ($have_member)
@@ -2403,7 +2400,7 @@ ACEOF
   if( sizeof check_aggr.$member )
     return 0;
 ACEOF
-            $conftest = $self->lang_build_program($options->{prologue}, $body);
+            $conftest    = $self->lang_build_program($options->{prologue}, $body);
             $have_member = $self->compile_if_else($conftest);
         }
 
@@ -2453,7 +2450,7 @@ This function will return a true value (1) if at least one member is found.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
-When a I<prologue> exists in the optional hash at end, it will be favoured
+When a I<prologue> exists in the optional hash at end, it will be favored
 over C<default includes> (represented by L</_default_includes>). If any of
 I<action_on_cache_true>, I<action_on_cache_false> is defined, both callbacks
 are passed to L</check_cached> as I<action_on_true> or I<action_on_false> to
@@ -2714,7 +2711,7 @@ sub check_stdc_headers
 
     # XXX for C++ the map should look like "c${_}" ...
     my @c_ansi_c_headers = map { "${_}.h" } @ansi_c_headers;
-    my $rc = $self->check_all_headers(@c_ansi_c_headers, $options);
+    my $rc               = $self->check_all_headers(@c_ansi_c_headers, $options);
     $rc and $self->define_var("STDC_HEADERS", 1, "Define to 1 if you have the ANSI C header files.");
     $rc;
 }
@@ -2814,7 +2811,7 @@ sub check_dirent_header
         if ($self->check_header($header))
         {
             my $cache_name = $self->_cache_name("dirent", $header);
-            my $check_sub = sub {
+            my $check_sub  = sub {
                 my $have_dirent;
                 $have_dirent = $self->_check_header(
                     $header,
@@ -3007,7 +3004,7 @@ sub _check_link_perlapi
     $libperl =~ s/\.[^\.]*$//;
 
     push @{$self->{extra_link_flags}}, "-L" . File::Spec->catdir($Config{installarchlib}, "CORE");
-    push @{$self->{extra_libs}}, "$libperl";
+    push @{$self->{extra_libs}},       "$libperl";
     if ($Config{perllibs})
     {
         foreach my $perllib (split(" ", $Config{perllibs}))
@@ -3098,7 +3095,7 @@ sub check_lib
       and @other_libs = @{$other_libs[0]};
 
     my $cache_name = $self->_cache_name("lib", $lib, $func);
-    my $check_sub = sub {
+    my $check_sub  = sub {
         my $conftest = $self->lang_call("", $func);
 
         my @save_libs = @{$self->{extra_libs}};
@@ -3141,7 +3138,15 @@ sub check_lib
     );
 }
 
-=head2 search_libs( function, search-libs, @other-libs?, \%options? )
+=head2 search_libs( function, search-libs, @other-libs?, @extra_link_flags?, \%options? )
+
+    Config::AutoConf->search_libs("gethostent", "nsl", [qw(socket net)], {
+        action_on_true => sub { ... }
+    });
+    Config::AutoConf->search_libs("log4cplus_initialize", ["log4cplus"],
+        [[qw(stdc++)], [qw(stdc++ unwind)]],
+        [qw(-pthread -thread)]
+    );
 
 Search for a library defining function if it's not already available.
 This equates to calling
@@ -3157,9 +3162,10 @@ Prepend -llibrary to LIBS for the first library found to contain function.
 
 If linking with library results in unresolved symbols that would be
 resolved by linking with additional libraries, give those libraries as
-the I<other-libraries> argument: e.g., C<[qw(Xt X11)]>. Otherwise, this
-method fails to detect that function is present, because linking the
-test program always fails with unresolved symbols.
+the I<other-libraries> argument: e.g., C<[qw(Xt X11)]> or C<[qw(intl),
+qw(intl iconv)]>. Otherwise, this method fails to detect that function
+is present, because linking the test program always fails with unresolved
+symbols.
 
 The result of this test is cached in the ac_cv_search_function variable
 as "none required" if function is already available, as C<0> if no
@@ -3182,7 +3188,7 @@ sub search_libs
     my $options = {};
     scalar @_ > 1 and ref $_[-1] eq "HASH" and $options = pop @_;
     my $self = shift->_get_instance();
-    my ($func, $libs, @other_libs) = @_;
+    my ($func, $libs, @other_libs, @other_link_flags) = @_;
 
     (defined($libs) and "ARRAY" eq ref($libs) and scalar(@{$libs}) > 0)
       or return 0;    # XXX would prefer croak
@@ -3192,35 +3198,60 @@ sub search_libs
       and ref($other_libs[0]) eq "ARRAY"
       and @other_libs = @{$other_libs[0]};
 
+    scalar(@other_link_flags) == 1
+      and ref($other_link_flags[0]) eq "ARRAY"
+      and @other_link_flags = @{$other_link_flags[0]};
+
     my $cache_name = $self->_cache_name("search", $func);
-    my $check_sub = sub {
+    my $check_sub  = sub {
         my $conftest = $self->lang_call("", $func);
 
-        my @save_libs = @{$self->{extra_libs}};
-        my $have_lib  = 0;
-        foreach my $libstest (undef, @$libs)
-        {
-            # XXX would local work on array refs? can we omit @save_libs?
-            $self->{extra_libs} = [@save_libs];
-            defined($libstest) and unshift(@{$self->{extra_libs}}, $libstest, @other_libs);
+        my @save_libs  = @{$self->{extra_libs}};
+        my @save_extra = @{$self->{extra_link_flags}};
+        my $have_lib   = 0;
+
+        my $if_else_sub = sub {
+            my ($libstest, @other) = @_;
+            defined($libstest) and unshift(@{$self->{extra_libs}}, $libstest, @other);
             $self->link_if_else(
                 $conftest,
                 {
                     (
                         $options->{action_on_lib_true} && "CODE" eq ref $options->{action_on_lib_true}
-                        ? (action_on_true => sub { $options->{action_on_lib_true}->($libstest, @other_libs, @_) })
+                        ? (action_on_true => sub { $options->{action_on_lib_true}->($libstest, @other, @_) })
                         : ()
                     ),
                     (
                         $options->{action_on_lib_false} && "CODE" eq ref $options->{action_on_lib_false}
-                        ? (action_on_false => sub { $options->{action_on_lib_false}->($libstest, @other_libs, @_) })
+                        ? (action_on_false => sub { $options->{action_on_lib_false}->($libstest, @other, @_) })
                         : ()
                     ),
                 }
-              )
-              and ($have_lib = defined($libstest) ? $libstest : "none required")
-              and last;
+            ) and ($have_lib = defined($libstest) ? $libstest : "none required");
+        };
+
+      LIBTEST:
+        foreach my $libstest (undef, @$libs)
+        {
+            foreach my $linkextra (undef, @other_link_flags)
+            {
+                # XXX would local work on array refs? can we omit @save_libs?
+                $self->{extra_libs}       = [@save_libs];
+                $self->{extra_link_flags} = [@save_extra];
+                if (defined $libstest and scalar(@other_libs) > 1 and ref($other_libs[0]) eq "ARRAY")
+                {
+                    foreach my $ol (@other_libs)
+                    {
+                        $if_else_sub->($libstest, @{$ol}) and last LIBTEST;
+                    }
+                }
+                else
+                {
+                    $if_else_sub->($libstest, @other_libs) and last LIBTEST;
+                }
+            }
         }
+
         $self->{extra_libs} = [@save_libs];
 
               $have_lib
@@ -3353,12 +3384,42 @@ sub check_lm
 
 =head2 pkg_config_package_flags($package, \%options?)
 
-Search for pkg-config flags for package as specified. The flags which are
-extracted are C<--cflags> and C<--libs>. The extracted flags are appended
-to the global C<extra_compile_flags> and C<extra_link_flags>, respectively.
+  use Config::AutoConf
+  
+  my $c = Config::AutoConf->new;
+  $c->pkg_config_package_flags('log4cplus');
+  WriteMakefile(
+    ...
+    INC  => $c->_get_extra_compiler_flags,
+    LIBS => $c->_get_extra_linker_flags,
+  );
 
-Call it with the package you're looking for and optional callback whether
-found or not.
+Search for C<pkg-config> flags for package as specified. The flags which are
+extracted are C<--cflags> and C<--libs>. The extracted flags are appended
+to the global C<extra_preprocess_flags>, C<extra_link_flags> or C<extra_libs>,
+respectively. Distinguishing between C<extra_link_flags> and C<extra_libs>
+is essential to avoid conflicts with L<search_libs function|/search_libs>
+and family.  In case, no I<package configuration> matching given criteria
+could be found, return a C<false> value (C<0>).
+
+The C<pkg-config> flags are taken from I<environment variables>
+C<< ${package}_CFLAGS >> or C<< ${package}_LIBS >> when defined, respectively.
+It will be a nice touch to document the particular environment variables
+for your build procedure - as for above example it should be
+
+  $ env log4cplus_CFLAGS="-I/opt/coolapp/include" \
+        log4cplus_LIBS="-L/opt/coolapp/lib -Wl,-R/opt/coolapp/lib -llog4cplus" \
+    perl Makefile.PL
+
+Call C<pkg_config_package_flags> with the package you're looking for and
+optional callback whether found or not.
+
+To support stage compiling properly (C<rpath> vs. library file location),
+the internal representation is a moving target. Do not use the result
+directly - the getters L<_get_extra_compiler_flags|/_get_extra_compiler_flags>
+and L<_get_extra_linker_flags|/_get_extra_linker_flags> are strongly
+encouraged. In case this is not possible, please open a ticket to get
+informed on invasive changes.
 
 If the very last parameter contains a hash reference, C<CODE> references
 to I<action_on_true> or I<action_on_false> are executed, respectively.
@@ -3378,7 +3439,7 @@ sub _pkg_config_flag
       capture { system($_pkg_config_prog, @pkg_config_args); };
     chomp $stdout;
     0 == $exit and return $stdout;
-    return;
+    return $exit;
 }
 
 sub pkg_config_package_flags
@@ -3391,30 +3452,41 @@ sub pkg_config_package_flags
     (my $pkgpfx = $package) =~ s/^(\w+).*?$/$1/;
     my $cache_name = $self->_cache_name("pkg", $pkgpfx);
 
+    defined $_pkg_config_prog or $_pkg_config_prog = $self->{cache}->{$self->_cache_name("prog", "PKG_CONFIG")};
     defined $_pkg_config_prog or $_pkg_config_prog = $self->check_prog_pkg_config;
     my $check_sub = sub {
         my (@pkg_cflags, @pkg_libs);
 
         (my $ENV_CFLAGS = $package) =~ s/^(\w+).*?$/$1_CFLAGS/;
+        (my $ENV_LIBS   = $package) =~ s/^(\w+).*?$/$1_LIBS/;
+
+        my $pkg_exists = 0 + (
+                 defined $ENV{$ENV_CFLAGS}
+              or defined $ENV{$ENV_LIBS}
+              or _pkg_config_flag($package, "--exists") eq ""
+        );
+        looks_like_number($pkg_exists) and $pkg_exists == 0 and return 0;
+
         my $CFLAGS =
           defined $ENV{$ENV_CFLAGS}
           ? $ENV{$ENV_CFLAGS}
           : _pkg_config_flag($package, "--cflags");
-        $CFLAGS and @pkg_cflags = (
+        $CFLAGS and not looks_like_number($CFLAGS) and @pkg_cflags = (
             map { $_ =~ s/^\s+//; $_ =~ s/\s+$//; Text::ParseWords::shellwords $_; }
               split(m/\n/, $CFLAGS)
         ) and push @{$self->{extra_preprocess_flags}}, @pkg_cflags;
 
-        (my $ENV_LIBS = $package) =~ s/^(\w+).*?$/$1_LIBS/;
         # do not separate between libs and extra (for now) - they come with -l prepended
         my $LIBS =
           defined $ENV{$ENV_LIBS}
           ? $ENV{$ENV_LIBS}
           : _pkg_config_flag($package, "--libs");
-        $LIBS and @pkg_libs = (
+        $LIBS and not looks_like_number($LIBS) and @pkg_libs = (
             map { $_ =~ s/^\s+//; $_ =~ s/\s+$//; Text::ParseWords::shellwords $_; }
               split(m/\n/, $LIBS)
-        ) and push @{$self->{extra_link_flags}}, @pkg_libs;
+        );
+        @pkg_libs and push @{$self->{extra_link_flags}}, grep { $_ !~ m/^-l/ } @pkg_libs;
+        @pkg_libs and push @{$self->{extra_libs}}, map { (my $l = $_) =~ s/^-l//; $l } grep { $_ =~ m/^-l/ } @pkg_libs;
 
         my $pkg_config_flags = join(" ", @pkg_cflags, @pkg_libs);
 
@@ -3559,7 +3631,7 @@ sub check_produce_xs_build
     $self->check_pureperl_required() and return _on_return_callback_helper(0, $options, "action_on_false");
     eval { $self->check_valid_compilers($_[0] || [qw(C)]) }
       or return _on_return_callback_helper(0, $options, "action_on_false");
-    # XXX necessary check for $Config{useshrlib}? (need to dicuss with eg. TuX, 99% likely return 0)
+    # XXX necessary check for $Config{useshrlib}? (need to dicuss with e.g. TuX, 99% likely return 0)
     $self->check_compile_perlapi_or_die();
 
     $options->{action_on_true}
@@ -3704,7 +3776,7 @@ sub _fill_defines
 =head2 _default_includes
 
 returns a string containing default includes for program prologue taken
-from autoconf/headers.m4:
+from C<autoconf/headers.m4>:
 
   #include <stdio.h>
   #ifdef HAVE_SYS_TYPES_H
@@ -3874,7 +3946,7 @@ sub _add_log_lines
 
 =head2 add_log_fh
 
-Push new file handles at end of log-handles to allow tee-ing log-output
+Push new file handles at end of log-handles to allow tee'ing log-output
 
 =cut
 
@@ -3925,13 +3997,25 @@ sub _cache_type_name
     $self->_cache_name(map { $_ =~ tr/*/p/; $_ } @names);
 }
 
+=head2 _get_extra_compiler_flags
+
+Returns the determined flags required to run the compile stage as string
+
+=cut
+
 sub _get_extra_compiler_flags
 {
     my $self    = shift->_get_instance();
     my @ppflags = @{$self->{extra_preprocess_flags}};
     my @cflags  = @{$self->{extra_compile_flags}->{$self->{lang}}};
-    join(" ", @ppflags, @cflags);
+    join(" ", map { _quote_shell_arg $_ } (@ppflags, @cflags));
 }
+
+=head2 _get_extra_linker_flags
+
+Returns the determined flags required to run the link stage as string
+
+=cut
 
 sub _get_extra_linker_flags
 {
@@ -3939,7 +4023,7 @@ sub _get_extra_linker_flags
     my @libs     = @{$self->{extra_libs}};
     my @lib_dirs = @{$self->{extra_lib_dirs}};
     my @ldflags  = @{$self->{extra_link_flags}};
-    join(" ", @ldflags, map('-L' . $self->_sanitize_prog($_), @lib_dirs), map("-l$_", @libs));
+    join(" ", map { _quote_shell_arg $_ } (@ldflags, map("-L" . $self->_sanitize_prog($_), @lib_dirs), map("-l$_", @libs)));
 }
 
 =head1 AUTHOR
@@ -4012,7 +4096,7 @@ Peter Rabbitson for help on refactoring and making the API more Perl'ish
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2004-2017 by the Authors
+Copyright 2004-2020 by the Authors
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

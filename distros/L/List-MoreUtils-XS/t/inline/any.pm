@@ -4,11 +4,11 @@ use Test::LMU;
 
 # Normal cases
 my @list = (1 .. 10000);
-is_true(any  { $_ == 5000 } @list);
-is_true(any  { $_ == 5000 } 1 .. 10000);
-is_true(any  { defined } @list);
+is_true(any { $_ == 5000 } @list);
+is_true(any { $_ == 5000 } 1 .. 10000);
+is_true(any { defined } @list);
 is_false(any { not defined } @list);
-is_true(any  { not defined } undef);
+is_true(any { not defined } undef);
 is_false(any {});
 
 leak_free_ok(

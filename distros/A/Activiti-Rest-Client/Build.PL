@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Franck C<< <nicolas.franck at ugent.be> >>"
   ],
   "dist_name" => "Activiti-Rest-Client",
-  "dist_version" => "0.1255",
+  "dist_version" => "0.1256",
   "license" => "perl",
   "module_name" => "Activiti::Rest::Client",
   "recursive_test_files" => 1,

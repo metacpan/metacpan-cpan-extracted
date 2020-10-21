@@ -3,27 +3,44 @@ abstract: 'Rate based sub dispatcher generator'
 author:
   - 'Daisuke Murase <typester@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Test::More: 0.96
+  ExtUtils::MakeMaker: '6.34'
+  Test::More: '0.96'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Sub-Rate
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Sub::Rate:
+    file: lib/Sub/Rate.pm
+    version: '0.06'
+  Sub::Rate::NoMaxRate:
+    file: lib/Sub/Rate/NoMaxRate.pm
 requires:
-  Any::Moose: 0.18
-  perl: 5.008001
+  Moo: '0'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/typester/Sub-Rate/issues
+  homepage: https://github.com/typester/Sub-Rate
   repository: git://github.com/typester/Sub-Rate.git
-version: 0.05
+version: '0.06'
+x_authority: cpan:FUJIWARA
+x_contributors:
+  - 'Daisuke Murase <typester@gmail.com>'
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'Toru, Kobayashi <koba0004@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

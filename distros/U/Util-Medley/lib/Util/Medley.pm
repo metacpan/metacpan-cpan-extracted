@@ -1,19 +1,22 @@
 package Util::Medley;
-$Util::Medley::VERSION = '0.047';
+$Util::Medley::VERSION = '0.051';
 use Modern::Perl;
 use Moose;
 
-with 'Util::Medley::Roles::Attributes::Cache';
-with 'Util::Medley::Roles::Attributes::Crypt';
-with 'Util::Medley::Roles::Attributes::DateTime';
-with 'Util::Medley::Roles::Attributes::File';
-with 'Util::Medley::Roles::Attributes::File::Zip';
-with 'Util::Medley::Roles::Attributes::Hostname';
-with 'Util::Medley::Roles::Attributes::List';
-with 'Util::Medley::Roles::Attributes::Logger';
-with 'Util::Medley::Roles::Attributes::Spawn';
-with 'Util::Medley::Roles::Attributes::String';
-with 'Util::Medley::Roles::Attributes::XML';
+with
+  'Util::Medley::Roles::Attributes::Cache',
+  'Util::Medley::Roles::Attributes::Crypt',
+  'Util::Medley::Roles::Attributes::DateTime',
+  'Util::Medley::Roles::Attributes::File',
+  'Util::Medley::Roles::Attributes::File::Zip',
+  'Util::Medley::Roles::Attributes::Hostname',
+  'Util::Medley::Roles::Attributes::List',
+  'Util::Medley::Roles::Attributes::Logger',
+  'Util::Medley::Roles::Attributes::PkgManager::RPM',
+  'Util::Medley::Roles::Attributes::PkgManager::YUM',
+  'Util::Medley::Roles::Attributes::Spawn',
+  'Util::Medley::Roles::Attributes::String',
+  'Util::Medley::Roles::Attributes::XML';
 
 =head1 NAME
 
@@ -21,7 +24,7 @@ Util::Medley - A collection of commonly used utilities.
 
 =head1 VERSION
 
-version 0.047
+version 0.051
 
 =head1 SYNOPSIS
 
@@ -77,6 +80,5 @@ interface to commonly used modules all under one roof.
 =back
 
 =cut
-
 
 1;

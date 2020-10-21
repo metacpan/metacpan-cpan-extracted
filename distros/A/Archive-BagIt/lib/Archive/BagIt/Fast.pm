@@ -7,7 +7,7 @@ use Time::HiRes qw(time);
 use Moo;
 extends "Archive::BagIt::Base";
 
-our $VERSION = '0.067'; # VERSION
+our $VERSION = '0.069'; # VERSION
 
 
 has 'digest_callback' => (
@@ -20,22 +20,23 @@ has 'digest_callback' => (
             my $filename =shift;
             my $opts = shift;
             my $MMAP_MIN = $opts->{mmap_min} || 8000000;
+            my $filesize = -s $filename;
             open(my $fh, "<:raw", "$filename") or croak ("Cannot open $filename, $!");
-            stat $fh;
-            $self->{stats}->{files}->{"$filename"}->{size}= -s _;
-            $self->{stats}->{size} += -s _;
+            $self->{stats}->{files}->{"$filename"}->{size}= $filesize;
+            $self->{stats}->{size} += $filesize;
             my $start_time = time();
             my $digest;
-            if (-s _ < $MMAP_MIN ) {
-                sysread $fh, my $data, -s _;
+            my $data;
+            if ($filesize < $MMAP_MIN ) {
+                sysread $fh, $data, $filesize;
                 $digest = $digestobj->_digest->add($data)->hexdigest;
             }
-            elsif ( -s _ < 1500000000) {
-                IO::AIO::mmap my $data, -s _, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh or croak "mmap: $!";
+            elsif ( $filesize < 1500000000) {
+                IO::AIO::mmap $data, $filesize, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh or croak "mmap: $!";
                 $digest = $digestobj->_digest->add($data)->hexdigest;
             }
             else {
-                $digest = $digestobj->_digest->addfile($fh)->hexdigest;
+                $digest = $digestobj->get_hash_string($fh);
             }
             my $finish_time = time();
             $self->{stats}->{files}->{"$filename"}->{verify_time}= ($finish_time - $start_time);
@@ -61,7 +62,7 @@ Archive::BagIt::Fast
 
 =head1 VERSION
 
-version 0.067
+version 0.069
 
 =head1 NAME
 

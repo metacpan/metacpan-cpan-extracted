@@ -1,5 +1,5 @@
 package Data::Crumbr;
-$Data::Crumbr::VERSION = '0.1.1';
+$Data::Crumbr::VERSION = '0.1.2';
 # ABSTRACT: Render data structures for easy searching and parsing
 
 # Inlined Mo
@@ -137,7 +137,7 @@ Data::Crumbr - Render data structures for easy searching and parsing
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+1.724   2020-10-21  Released-By: PERLANCAR; Urgency: medium
+
+	- get_args_from_config(): Accept argument 'plugins' which will be set
+	  from config sections [plugin=...].
+
+
 1.723   2020-10-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Use Data::Sah::Resolve instead of just

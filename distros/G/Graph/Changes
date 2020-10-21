@@ -1,4 +1,19 @@
-Revision history for Perl module Graph
+0.9706 2020-10-20
+- metadata list test-deps as not runtime
+
+0.9705 2020-10-20
+- document clustering_coefficient return empty list on no vertices - RT#114094
+- apply lazy-load patch from Stephen Loyd - RT#123236
+- depend on Heap 0.80 instead of local fork. Heap::Elem is really an interface not superclass.
+- fix uninitialised value warning in SP_Dijkstra - RT#118539
+- fix complement losing vertices on unconnected graphs - RT#115366
+- fix average_path_length when two vertices given - RT#120611
+- switch to GitHub issues rather than RT
+- fix all_successors with non-truthy names - fix #5
+- add Graph::Matrix->stringify to help debug
+- fix APSP_Floyd_Warshall logic error when subpaths totalled 0 - fix #3
+- typo fix - thanks @jkeenan (#6)
+- Added "use strict; use warnings;", etc - thanks @manwar (closes #2)
 
 0.9704 2015-10-07  Jarkko Hietaniemi  <jhi@iki.fi>
     - rt.cpan.org 107567: edges() missing on undirected multiedged graph:

@@ -1,7 +1,7 @@
 package Perinci::Sub::Util::Sort;
 
-our $DATE = '2017-01-31'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2020-10-20'; # DATE
+our $VERSION = '0.470'; # VERSION
 
 use 5.010;
 use strict;
@@ -38,7 +38,7 @@ Perinci::Sub::Util::Sort - Sort routines
 
 =head1 VERSION
 
-This document describes version 0.46 of Perinci::Sub::Util::Sort (from Perl distribution Perinci-Sub-Util), released on 2017-01-31.
+This document describes version 0.470 of Perinci::Sub::Util::Sort (from Perl distribution Perinci-Sub-Util), released on 2020-10-20.
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Util>.
 
 =head1 BUGS
 
@@ -83,7 +83,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

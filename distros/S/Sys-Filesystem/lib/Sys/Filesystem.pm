@@ -1,10 +1,9 @@
 ############################################################
 #
-#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
-#   Copyright 2008,2009 Jens Rehsack
+#   Copyright 2008-2020 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,16 +25,17 @@ package Sys::Filesystem;
 
 use 5.008001;
 
-my @query_order;
-
 use strict;
 use warnings;
 use vars qw($VERSION $AUTOLOAD $CANONDEV $FSTAB $MTAB);
-use Carp qw(croak cluck confess);
+use Carp qw(carp croak cluck confess);
+
+my @query_order;
+
 use Module::Pluggable
-  require => 1,
-  only  => [ @query_order = map { __PACKAGE__ . '::' . $_ } ( ucfirst( lc $^O ), $^O =~ m/Win32/i ? 'Win32' : 'Unix', 'Dummy' ) ],
-  inner => 0,
+  require     => 1,
+  only        => [@query_order = map { __PACKAGE__ . '::' . $_ } (ucfirst(lc $^O), $^O =~ m/Win32/i ? 'Win32' : 'Unix', 'Dummy')],
+  inner       => 0,
   search_path => ['Sys::Filesystem'],
   sub_name    => '_plugins';
 use Params::Util qw(_INSTANCE);
@@ -43,19 +43,20 @@ use Scalar::Util qw(blessed);
 use List::Util qw(first);
 
 use constant DEBUG   => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
-use constant SPECIAL => ( 'darwin' eq $^O )        ? 0 : undef;
+use constant SPECIAL => ('darwin' eq $^O)          ? 0 : undef;
 
-$VERSION = '1.406';
+$VERSION = '1.408';
 
-my ( $FsPlugin, $Supported );
+my ($FsPlugin, $Supported);
 
 BEGIN
 {
+    ## no critic (Subroutines::ProtectPrivateSubs)
     Sys::Filesystem->_plugins();
 
     foreach my $qo (@query_order)
     {
-        next unless ( UNIVERSAL::isa( $qo, $qo ) );
+        next unless (eval { $qo->isa($qo) });
         $FsPlugin = $qo;
         last;
     }
@@ -63,25 +64,26 @@ BEGIN
     $Supported = $FsPlugin ne 'Sys::Filesystem::Unix' and $FsPlugin ne 'Sys::Filesystem::Dummy';
 }
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub new
 {
     # Check we're being called correctly with a class name
-    ref( my $class = shift ) and croak 'Class name required';
+    ref(my $class = shift) and croak 'Class name required';
 
     # Check we've got something sane passed
-    croak 'Odd number of elements passed when even number was expected' if ( @_ % 2 );
+    croak 'Odd number of elements passed when even number was expected' if (@_ % 2);
     my %args = @_;
 
     exists $args{xtab} and carp("Using xtab is depreciated") and delete $args{xtab};
-    defined $FSTAB    and not exists $args{fstab}    and $args{fstab}    = $FSTAB;
-    defined $MTAB     and not exists $args{mtab}     and $args{mtab}     = $MTAB;
-    defined $CANONDEV and not exists $args{canondev} and $args{canondev} = $CANONDEV;
+    defined $FSTAB     and not exists $args{fstab}    and $args{fstab}    = $FSTAB;
+    defined $MTAB      and not exists $args{mtab}     and $args{mtab}     = $MTAB;
+    defined $CANONDEV  and not exists $args{canondev} and $args{canondev} = $CANONDEV;
 
     # Double check the key pairs for stuff we recognise
     my @sane_keys = qw(aliases canondev fstab mtab);
     my %sane_args;
     @sane_args{@sane_keys} = delete @args{@sane_keys};
-    scalar keys %args and croak( "Unrecognised parameter(s) '" . join( "', '", sort keys %args ) . "' passed to module $class" );
+    scalar keys %args and croak("Unrecognised parameter(s) '" . join("', '", sort keys %args) . "' passed to module $class");
 
     my $self = {%sane_args};
 
@@ -102,24 +104,24 @@ sub new
       };
 
     # Debug
-    DUMP( '$self', $self ) if (DEBUG);
+    DUMP('$self', $self) if (DEBUG);
 
     $self->{filesystems} = $FsPlugin->new(%sane_args);
 
     # Maybe upchuck a little
-    croak "Unable to create object for OS type '$self->{osname}'" unless ( $self->{filesystems} );
+    croak "Unable to create object for OS type '$self->{osname}'" unless ($self->{filesystems});
 
     # Bless and return
-    bless( $self, $class );
+    bless($self, $class);
     return $self;
 }
 
 sub filesystems
 {
     my $self = shift;
-    unless ( defined( _INSTANCE( $self, __PACKAGE__ ) ) )
+    unless (defined(_INSTANCE($self, __PACKAGE__)))
     {
-        unshift @_, $self unless ( 0 == ( scalar(@_) % 2 ) );
+        unshift @_, $self unless (0 == (scalar(@_) % 2));
         $self = __PACKAGE__->new();
     }
 
@@ -127,17 +129,17 @@ sub filesystems
     @_ % 2 and croak 'Odd number of elements passed when even number was expected';
 
     my $params = {@_};
-    for my $param ( keys %{$params} )
+    for my $param (keys %{$params})
     {
         croak "Illegal paramater '$param' passed to filesystems() method"
-          unless grep( m/^$param$/, qw(mounted unmounted special device regular) );
+          unless grep { m/^$param$/ } qw(mounted unmounted special device regular);
     }
 
     # Invert logic for regular
-    if ( exists $params->{regular} )
+    if (exists $params->{regular})
     {
         delete $params->{regular};
-        exists( $params->{special} )
+        exists($params->{special})
           and carp("Mutual exclusive parameters 'special' and 'regular' specified together");
         $params->{special} = SPECIAL;
     }
@@ -145,26 +147,27 @@ sub filesystems
     my @filesystems = ();
 
     # Return list of all filesystems
-    keys %{$params} or return sort( keys( %{ $self->{filesystems} } ) );
+    ## no critic (Subroutines::ProhibitReturnSort)
+    keys %{$params} or return sort(keys(%{$self->{filesystems}}));
 
-    for my $fsname ( sort( keys( %{ $self->{filesystems} } ) ) )
+    for my $fsname (sort(keys(%{$self->{filesystems}})))
     {
-        for my $requirement ( keys( %{$params} ) )
+        for my $requirement (keys(%{$params}))
         {
             my $fs = $self->{filesystems}->{$fsname};
             my $fsreqname =
-              ( !exists $fs->{$requirement} and exists $self->{aliases}->{$requirement} )
-              ? first { exists $fs->{$_} } @{ $self->{aliases}->{$requirement} }
+              (not exists $fs->{$requirement} and exists $self->{aliases}->{$requirement})
+              ? first { exists $fs->{$_} } @{$self->{aliases}->{$requirement}}
               : $requirement;
 
             defined $params->{$requirement}
               and exists $fs->{$fsreqname}
               and $fs->{$fsreqname} eq $params->{$requirement}
-              and push( @filesystems, $fsname )
+              and push(@filesystems, $fsname)
               and last;
-            push( @filesystems, $fsname ) and last
-              unless defined( $params->{$requirement} )
-              or exists( $fs->{$fsreqname} );
+            push(@filesystems, $fsname) and last
+              unless defined($params->{$requirement})
+              or exists($fs->{$fsreqname});
         }
     }
 
@@ -179,34 +182,35 @@ sub supported
 
 sub mounted_filesystems
 {
-    return $_[0]->filesystems( mounted => 1 );
+    return $_[0]->filesystems(mounted => 1);
 }
 
 sub unmounted_filesystems
 {
-    return $_[0]->filesystems( unmounted => 1 );
+    return $_[0]->filesystems(unmounted => 1);
 }
 
 sub special_filesystems
 {
-    return $_[0]->filesystems( special => 1 );
+    return $_[0]->filesystems(special => 1);
 }
 
 sub regular_filesystems
 {
-    return $_[0]->filesystems( special => SPECIAL );
+    return $_[0]->filesystems(special => SPECIAL);
 }
 
 sub DESTROY { }
 
+## no critic (ClassHierarchies::ProhibitAutoloading)
 sub AUTOLOAD
 {
-    my ( $self, $fsname ) = @_;
+    my ($self, $fsname) = @_;
 
-    croak "$self is not an object" unless ( blessed($self) );
+    croak "$self is not an object"              unless (blessed($self));
     croak "No filesystem passed where expected" unless ($fsname);
 
-    ( my $name = $AUTOLOAD ) =~ s/.*://;
+    (my $name = $AUTOLOAD) =~ s/.*://;
 
     # No such filesystem
     exists $self->{filesystems}->{$fsname} or croak "No such filesystem";
@@ -218,24 +222,26 @@ sub AUTOLOAD
 
     # Didn't find the property, but check any aliases
     exists $self->{aliases}->{$name}
-      and $name = first { exists $fs->{$_} } @{ $self->{aliases}->{$name} }
+      and $name = first { exists $fs->{$_} } @{$self->{aliases}->{$name}}
       and return $fs->{$name};
 
     return;
 }
 
+## no critic (Subroutines::RequireFinalReturn)
 sub TRACE
 {
     return unless DEBUG;
-    warn( $_[0] );
+    carp($_[0]);
 }
 
 sub DUMP
 {
     return unless DEBUG;
+    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     eval {
         require Data::Dumper;
-        warn( shift() . ': ' . Data::Dumper::Dumper( shift() ) );
+        carp(shift() . ': ' . Data::Dumper::Dumper(shift()));
     };
 }
 
@@ -329,12 +335,12 @@ C<$Sys::Filesystem::MTAB> is used when no key C<mtab> is passed.
 =item xtab
 
 B<DEPRECIATED> Specify the full path and filename of the mounted NFS
-filesystem table (or xtab for short). This is usually only pertinant
+filesystem table (or xtab for short). This is usually only pertinent
 to Unix bases systems.  Not all helper modules will query NFS mounts
 as a separate exercise, and therefore this option may be ignored on
 some systems.
 
-B<None> of the OS plugins use that tunable (anymore?), so it now a warning
+B<None> of the OS plugins use that tunable (anymore?), so now a warning
 is raised when it's used. The entire support will be removed not before
 2015. Once that happened, using C<xtab> will raise an exception.
 
@@ -350,7 +356,7 @@ helper module(s).
 
 Returns true if the operating system is supported by Sys::Filesystem.
 Unsupported operating systems may get less information, e.g. the mount
-state couldn't determined or which file system type is special ins't
+state couldn't determined or which file system type is special isn't
 known.
 
 =back
@@ -597,11 +603,7 @@ L<http://search.cpan.org/dist/Sys-Filesystem/>
 
 =head1 SEE ALSO
 
-L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
-
-=head1 VERSION
-
-$Id$
+L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>, L<Sys::Filesystem::MountPoint>
 
 =head1 AUTHOR
 
@@ -617,11 +619,10 @@ See CREDITS in the distribution tarball.
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008-2014 Jens Rehsack.
+Copyright 2008-2020 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-

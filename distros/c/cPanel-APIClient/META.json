@@ -65,6 +65,6 @@
          "web" : "https://github.com/cpanel/p5-cPanel-APIClient"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

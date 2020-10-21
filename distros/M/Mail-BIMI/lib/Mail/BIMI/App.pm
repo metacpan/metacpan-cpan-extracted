@@ -1,6 +1,6 @@
 package Mail::BIMI::App;
 # ABSTRACT: App::Cmd base class
-our $VERSION = '2.20201019.2'; # VERSION
+our $VERSION = '2.20201020.2'; # VERSION
 use 5.20.0;
 use Mail::BIMI::Prelude;
 use App::Cmd::Setup -app;
@@ -20,7 +20,7 @@ Mail::BIMI::App - App::Cmd base class
 
 =head1 VERSION
 
-version 2.20201019.2
+version 2.20201020.2
 
 =head1 DESCRIPTION
 

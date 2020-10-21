@@ -1,0 +1,71 @@
+NAME
+    Pod::Definitions -- extract main sections and contained definitions from
+    Pod
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        my $pod_file = Pod::Definitions->new();
+        $pod_file->parse_file($file_name);
+
+DESCRIPTION
+    This class uses Pod::Headings to parse a Pod file and extract the
+    top-level (head1) headings, and the names of the functions, methods,
+    events, or such as documented therein.
+
+    Heading names, presumed to be written in the English language, are
+    simplifed for indexing purposes. (See Pod::Headings::Heuristic for
+    details.) For example:
+
+        What is the Q function?               -> Q function
+        How can I blip the blop?              -> Blip the blop
+        Why doesn't my socket have a packet?  -> Socket have a packet
+        Where are the pockets on the port?    -> Pockets on the port
+        I need to reap the zombie             -> Reap the zombie
+        What does the error "Disk full" mean? -> Disk full
+        What about backwards compatibility?   -> Backwards compatibility
+        Reaping the zombie from proctab       -> Zombie, reaping from proctab
+        $c = Mojo::Path->new()                -> new
+
+    Currently, captialization (other than rewrites of type type shown above)
+    is mostly left for the caller to handle.
+
+METHODS
+  new
+    Creates a new object of type Pod::Definitions
+
+  parse_file ($filename)
+    Parse a podfile, or Perl source file. Returns the Pod::Headings object,
+    which, as a subclass of Pod::Simple, may give various useful information
+    about the parsed document (e.g., the line_count() or pod_para_count()
+    methods, or the source_dead() method which will be true if the
+    Pod::Simple parser successfully read, and came to the end of, a
+    document).
+
+  file
+    Local path to file as passed to parse_file
+
+  manpage
+    Full name of manpage (e.g., 'Mojo::Path').
+
+  module
+    Module leaf name (e.g., 'Path')
+
+  sections
+    Hash (with the key being the toplevel section, e.g., "FUNCTIONS") of
+    arrays of section names, or undef if no sections (other than the
+    standard NAME and SEE ALSO) were given in the Pod file
+
+SEE ALSO
+    Pod::Simple, Pod::Headings
+
+SUPPORT
+    This module is managed in an open GitHub repository,
+    <https://github.com/lindleyw/Pod-Definitions>. Feel free to fork and
+    contribute, or to clone and send patches.
+
+AUTHOR
+    This module was written and is maintained by William Lindley
+    <wlindley@cpan.org>.
+

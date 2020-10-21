@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Interface to Google's Blogger service",
+  "ABSTRACT" => "(DEPRECATED) Interface to Google's Blogger service",
   "AUTHOR" => "Kedar Warriner <kedar at cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0

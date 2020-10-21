@@ -283,7 +283,7 @@ Delimited identifiers (table and column names *with* quotes around them) are
 case SENSITIVE so column "foo", "fOo", "FOO" each refer to different columns.
 
 A delimited identifier is *never* equal to a regular identifier (so "foo" and
-foo are two different columns).  But don't do that :-).
+foo are two different columns).  But do not do that :-).
 
 Remember thought that, in L<DBD::CSV> if table names are used directly as file
 names, the case sensitivity depends on the OS e.g. on Windows files named foo,
@@ -373,7 +373,7 @@ are exactly the same:
  my $sth = $dbh->prepare(" SELECT * FROM RUN( 'query.sql' ) ");
 
 If the file contains a statement with placeholders, the values for the
-placehoders can be passed in the call to $sth->execute() as normal. If the
+placeholders can be passed in the call to $sth->execute() as normal. If the
 query.sql file contains "SELECT id,name FROM x WHERE id=?", then these
 two are the same:
 
@@ -402,7 +402,7 @@ Syntax obvious
 
 Surrounded by either single quotes; some characters need to
 be escaped with a backslash, in particular the backslash itself (\\),
-the NUL byte (\0), Line feeds (\n), Carriage return (\r), and the
+the NULL byte (\0), Line feeds (\n), Carriage return (\r), and the
 quotes (\').
 
 B<Note:> Quoting "Strings" using double quotes are recognized as
@@ -461,7 +461,7 @@ the parser, especially keywords like FROM and WHERE that are central to
 parsing the statement.
 
 In the reverse situation, suppose you want to parse some SQL that defines a
-column as type BIG_BLOB.  Since 'BIG_BLOB' isn't a recognized ANSI data type,
+column as type BIG_BLOB.  Since 'BIG_BLOB' is not a recognized ANSI data type,
 an error will be produced by default.  To make the parser treat it as a valid
 data type, you do this:
 
@@ -532,7 +532,7 @@ See L<SQL::Parser> for details.
 =head1 AUTHOR & COPYRIGHT
 
 Copyright (c) 2005, Jeff Zucker <jzuckerATcpan.org>, all rights reserved.
-Copyright (c) 2009, Jens Rehsack <rehsackATcpan.org>, all rights reserved.
+Copyright (c) 2009-2020, Jens Rehsack <rehsackATcpan.org>, all rights reserved.
 
 This document may be freely modified and distributed under the same
 terms as Perl itself.

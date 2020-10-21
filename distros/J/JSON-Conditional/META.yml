@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new JSON::Conditional!'
+abstract: 'A conditional language within a JSON struct'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -19,8 +19,8 @@ no_index:
     - t
     - inc
 requires:
-  Clone: '0'
   JSON: '0'
+  Struct::Conditional: '0'
   perl: '5.006'
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

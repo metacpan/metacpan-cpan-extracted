@@ -3,6 +3,9 @@ abstract: 'Perl extension for parsing PRONOM-Signatures using DROID-Signature fi
 author:
   - 'Andreas Romeyke <pause@andreas-romeyke.de>'
 build_requires:
+  Path::Tiny: '0'
+  Test::Exception: '0'
+  Test::File: '0'
   perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -14,13 +17,6 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: File-FormatIdentification-Pronom
-provides:
-  File::FormatIdentification::Pronom:
-    file: lib/File/FormatIdentification/Pronom.pm
-    version: '0.002'
-  File::FormatIdentification::Regex:
-    file: lib/File/FormatIdentification/Regex.pm
-    version: '0.002'
 requires:
   Moose: '0'
   Regexp::Assemble: '0'
@@ -29,7 +25,11 @@ requires:
   XML::LibXML: '0'
   YAML::XS: '0'
   perl: '5.014'
-version: '0.002'
+resources:
+  repository: https://art1pirat.spdns.org/art1/File-FormatIdentification-Pronom.git
+version: '0.04'
+x_contributors:
+  - 'Andreas Romeyke <art1@andreas-romeyke.de>'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

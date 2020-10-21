@@ -24,7 +24,7 @@ SCOPE:
     # Do I segfault? I shouldn't.
     $it->();
 
-    is_deeply(\@r, [7, 'a', 3, 2, 'a', -1, undef, 'x', 'r', undef]);
+    is_deeply(\@r,   [7, 'a', 3, 2, 'a', -1, undef, 'x', 'r', undef]);
     is_deeply(\@idx, [0 .. 4]);
 
     # Testing two iterators on the same arrays in parallel
@@ -85,7 +85,7 @@ SCOPE:
     # Do I segfault? I shouldn't.
     $it->();
 
-    is_deeply(\@r, [7, 'a', 3, 2, 'a', -1, undef, 'x', 'r', undef]);
+    is_deeply(\@r,   [7, 'a', 3, 2, 'a', -1, undef, 'x', 'r', undef]);
     is_deeply(\@idx, [0 .. 4]);
 
     # Testing two iterators on the same arrays in parallel
@@ -128,7 +128,7 @@ leak_free_ok(
         }
     }
 );
-is_dying('each_array without sub' => sub { &each_array(42, 4711); });
+is_dying('each_array without sub'    => sub { &each_array(42, 4711); });
 is_dying('each_arrayref without sub' => sub { &each_arrayref(42, 4711); });
 
 done_testing;

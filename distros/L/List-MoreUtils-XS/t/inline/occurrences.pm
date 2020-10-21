@@ -54,11 +54,11 @@ SCOPE:
 leak_free_ok(
     occurrences => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4);
-        my @o = occurrences @probes;
+        my @o      = occurrences @probes;
     },
     'scalar occurrences' => sub {
         my @probes = ((1) x 3, (2) x 4, (3) x 2, (4) x 7, (5) x 2, (6) x 4);
-        my $o = occurrences @probes;
+        my $o      = occurrences @probes;
     }
 );
 

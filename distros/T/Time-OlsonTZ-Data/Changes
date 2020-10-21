@@ -1,3 +1,7 @@
+version 0.202004; 2020-10-21
+
+  * Olson database version 2020d: 388 canonical zones, 206 links
+
 version 0.202003; 2020-10-16
 
   * Olson database version 2020c: 388 canonical zones, 206 links

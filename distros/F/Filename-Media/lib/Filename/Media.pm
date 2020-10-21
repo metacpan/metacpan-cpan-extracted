@@ -1,7 +1,9 @@
 package Filename::Media;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-30'; # DATE
+our $DIST = 'Filename-Media'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +12,8 @@ use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(check_media_filename);
 
-our $RE = qr(\.(?:movie|mpega|aifc|aiff|djvu|flac|jpeg|jpg2|midi|mpeg|mpga|opus|svgz|tiff|wbmp|webm|3gp|aif|amr|art|asf|asx|avi|awb|axa|axv|bmp|cdr|cdt|cpt|cr2|crw|csd|dif|djv|erf|fli|flv|gif|gsm|ico|ief|jng|jp2|jpe|jpf|jpg|jpm|jpx|kar|lsf|lsx|m3u|m4a|mid|mkv|mng|mov|mp2|mp3|mp4|mpe|mpg|mpv|mxu|nef|oga|ogg|ogv|orc|orf|pat|pbm|pcx|pgm|pls|png|pnm|ppm|psd|ram|ras|rgb|sco|sd2|sid|snd|spx|svg|tif|wav|wax|wma|wmv|wmx|wvx|xbm|xpm|xwd|au|dl|dv|gl|qt|ra|rm|ts|wm)\z)i; # RE
+our $STR_RE = "movie|mpega|aifc|aiff|djvu|flac|jpeg|jpg2|midi|mpeg|mpga|opus|svgz|tiff|wbmp|webm|3gp|aif|amr|art|asf|asx|avi|awb|axa|axv|bmp|cdr|cdt|cpt|cr2|crw|csd|dif|djv|erf|fli|flv|gif|gsm|ico|ief|jng|jp2|jpe|jpf|jpg|jpm|jpx|kar|lsf|lsx|m3u|m4a|mid|mkv|mng|mov|mp2|mp3|mp4|mpe|mpg|mpv|mxu|nef|oga|ogg|ogv|orc|orf|pat|pbm|pcx|pgm|pls|png|pnm|ppm|psd|ram|ras|rgb|sco|sd2|sid|snd|spx|svg|tif|wav|wax|wma|wmv|wmx|wvx|xbm|xpm|xwd|au|dl|dv|gl|qt|ra|rm|ts|wm"; # STR_RE
+our $RE = qr(\.(?:$STR_RE)\z)i;
 
 sub check_media_filename {
     my %args = @_;
@@ -33,7 +36,7 @@ Filename::Media - Check whether filename indicates being a media (audio/video/im
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::Media (from Perl distribution Filename-Media), released on 2017-08-12.
+This document describes version 0.002 of Filename::Media (from Perl distribution Filename-Media), released on 2020-05-30.
 
 =head1 SYNOPSIS
 
@@ -69,6 +72,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<Filename::Ebook>. Ebook currently is not included.
+
 L<Filename::Audio>
 
 L<Filename::Video>
@@ -81,7 +86,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

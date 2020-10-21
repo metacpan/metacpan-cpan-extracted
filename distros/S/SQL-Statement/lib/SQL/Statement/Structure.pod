@@ -305,7 +305,7 @@ C<where_clause>, if any.
 =head2 execute
 
 When called from a DBD or other subclass of SQL::Statement, the execute()
-method will be executed against whatever datasource (persistent storage) is
+method will be executed against whatever data-source (persistent storage) is
 supplied by the DBD or the subclass (e.g. CSV files for L<DBD::CSV>, or
 BerkeleyDB for L<DBD::DBM>). If you are using L<SQL::Statement> directly
 rather than as a subclass, you can call the execute() method and the
@@ -361,7 +361,7 @@ data as an arrayref. Use a loop to fetch all rows:
 =head1 AUTHOR & COPYRIGHT
 
 Copyright (c) 2005, Jeff Zucker <jzuckerATcpan.org>, all rights reserved.
-Copyright (c) 2009, Jens Rehsack <rehsackATcpan.org>, all rights reserved.
+Copyright (c) 2009-2020, Jens Rehsack <rehsackATcpan.org>, all rights reserved.
 
 This document may be freely modified and distributed under the same terms
 as Perl itself.

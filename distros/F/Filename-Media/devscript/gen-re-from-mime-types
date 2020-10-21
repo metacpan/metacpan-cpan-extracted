@@ -20,11 +20,10 @@ while (<$fh>) {
     while ($exts =~ /(\w+)/g) { $exts{$1}++ }
 }
 
-my $re = join("|", map { quotemeta $_ }
+my $str_re = join("|", map { quotemeta $_ }
                   sort { length($b) <=> length($a) || $a cmp $b } keys %exts);
-$re = qr/\.(?:$re)\z/i;
 
-$content =~ s/^.+(# RE)/"our \$RE = ".dmp($re)."; $1"/em
-    or die "Can't replace # RE line";
+$content =~ s/^.+(# STR_RE)/"our \$STR_RE = ".dmp($str_re)."; $1"/em
+    or die "Can't replace # STR_RE line";
 
 write_text($path, $content);

@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(freeze is_true is_false is_defined is_undef is_dying not_dyi
 my $CLASS = __PACKAGE__;
 
 eval "use Storable qw();";
-$@ or Storable->import(qw(freeze));
+$@                         or Storable->import(qw(freeze));
 __PACKAGE__->can("freeze") or eval <<'EOFR';
 use inc::latest 'JSON::PP';
 use JSON::PP qw();
@@ -113,7 +113,7 @@ sub leak_free_ok
 
     package DieOnStringify;
     use overload '""' => \&stringify;
-    sub new { bless {}, shift }
+    sub new       { bless {}, shift }
     sub stringify { die 'DieOnStringify exception' }
 }
 

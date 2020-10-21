@@ -1,3 +1,4 @@
+.perltidyrc
 Changes
 foo/test_file.txt
 inc/inc_File-ShareDir-Install/File/ShareDir/Install.pm
@@ -6,7 +7,7 @@ inc/latest/private.pm
 lib/File/ShareDir.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 share/sample.txt
@@ -19,5 +20,6 @@ t/04_fail.t
 t/05_class.t
 t/06_old.t
 t/lib/ShareDir/TestClass.pm
+testrules.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

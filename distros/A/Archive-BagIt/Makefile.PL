@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Archive-BagIt",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Archive::BagIt",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -25,14 +25,12 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "File::Find" => 0,
     "File::Spec" => 0,
-    "File::stat" => 0,
     "IO::AIO" => 0,
     "List::Util" => "1.450",
     "Moo" => 0,
     "Moo::Role" => 0,
     "POSIX" => 0,
     "String::CRC32" => 0,
-    "Sub::Quote" => 0,
     "Time::HiRes" => 0,
     "namespace::autoclean" => 0,
     "open" => 0,
@@ -55,7 +53,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.067",
+  "VERSION" => "0.069",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,7 +74,6 @@ my %FallbackPrereqs = (
   "File::Slurp" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
-  "File::stat" => 0,
   "IO::AIO" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
@@ -85,7 +82,6 @@ my %FallbackPrereqs = (
   "Moo::Role" => 0,
   "POSIX" => 0,
   "String::CRC32" => 0,
-  "Sub::Quote" => 0,
   "Test::Exception" => 0,
   "Test::File" => 0,
   "Test::More" => 0,

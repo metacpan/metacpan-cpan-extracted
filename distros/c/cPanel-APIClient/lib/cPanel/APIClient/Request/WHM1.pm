@@ -15,6 +15,8 @@ use parent qw( cPanel::APIClient::Request::HTTPBase );
 use cPanel::APIClient::Utils::JSON    ();
 use cPanel::APIClient::Response::WHM1 ();
 
+sub HTTP_RESPONSE_CLASS { return 'cPanel::APIClient::Response::WHM1' }
+
 sub new {
     my ( $class, $func, $args_hr, $metaargs_hr ) = @_;
 

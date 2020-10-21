@@ -53,13 +53,6 @@ WriteMakefile(
         'Test::MockModule' => '0.170',
 
         'Promise::ES6' => 0.23,
-
-        $ENV{'AUTOMATED_TESTING'} ? (
-            'AnyEvent' => 0,
-            'IO::Async::Loop' => 0,
-            'Net::Curl::Promiser' => 0.14,
-            'IO::Socket::SSL' => 0,
-        ) : (),
     },
 );
 

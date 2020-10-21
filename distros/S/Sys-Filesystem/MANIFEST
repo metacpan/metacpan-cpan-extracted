@@ -1,3 +1,4 @@
+.perltidyrc
 Changes
 CREDITS
 INSTALL
@@ -15,7 +16,7 @@ lib/Sys/Filesystem/Solaris.pm
 lib/Sys/Filesystem/Unix.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 NOTICE
 README

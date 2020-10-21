@@ -233,5 +233,42 @@ sub test_draw_n_samples_with_mask {
     
 }
 
+sub test_update_values {
+    my $probs = [
+        1, 5, 2, 6, 3, 5, 10
+    ];
+    
+    my $prng   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object = Statistics::Sampler::Multinomial->new (
+        prng => $prng,
+        data => $probs,
+    );
+
+    my $update_count
+      = $object->update_values (
+        1 => 10,
+        5 => 0,
+    );
+      
+    is $update_count, 2, 'got correct update count';
+
+    my $expected = [@$probs];
+    @{$expected}[1,5] = (10, 0);
+
+    my $exp_sum = 0;
+    $exp_sum += $_ foreach @$probs;
+    $exp_sum -= ($probs->[1] + $probs->[5]);
+    $exp_sum += 10;
+
+    my $data = $object->get_data;
+
+    is_deeply
+      $data,
+      $expected,
+      'got expected data after modifying values';
+
+    is $object->get_sum, $exp_sum, 'got expected sum';
+}
+
 
 1;

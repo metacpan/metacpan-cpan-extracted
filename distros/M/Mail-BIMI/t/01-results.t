@@ -29,6 +29,8 @@ sub process_bimi {
 
   my $record = Mail::BIMI::Record->new( bimi_object => $bimi, domain => $domain, selector => $selector );
   $record->record_hashref( $record->_parse_record( $entry ) );
+  $record->retrieved_domain($domain);
+  $record->retrieved_selector($selector);
   $bimi->record($record);
   $bimi->dmarc_object( get_dmarc_result( $dmarc_result, $dmarc_disposition ) );
 

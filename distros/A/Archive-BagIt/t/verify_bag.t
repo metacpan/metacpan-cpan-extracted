@@ -125,7 +125,7 @@ foreach my $prefix (@prefix_manifestfiles) {
 {
     my @should_fail_bags_097 = (
         [ qw(../bagit_conformance_suite/v0.97/invalid/baginfo-missing-encoding), qr{Encoding line missed} ],
-        [ qw(../bagit_conformance_suite/v0.97/invalid/bom-in-bagit.txt), qr{Version string '<BOM>BagIt-Version: 0\.97'.* is incorrect} ],
+        [ qw(../bagit_conformance_suite/v0.97/invalid/bom-in-bagit.txt), qr{Version string '.+BagIt-Version: 0\.97'.* is incorrect} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/corrupt-data-file), qr{file '.*' \(normalized='data/bare-filename'\) invalid, digest \(md5\).*} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/corrupt-tag-file), qr{file 'bag-info\.txt' \(normalized='.*'\) invalid, digest \(md5\).*} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/extra-file-in-bag), qr{file '.*' \(normalized='data/bar'\) found, which is not in 'manifest-md5\.txt'} ],

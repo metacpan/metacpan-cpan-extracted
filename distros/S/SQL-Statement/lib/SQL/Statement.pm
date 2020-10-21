@@ -3,7 +3,7 @@ package SQL::Statement;
 #########################################################################
 #
 # This module is copyright (c), 2001,2005 by Jeff Zucker.
-# This module is copyright (c), 2007-2017 by Jens Rehsack.
+# This module is copyright (c), 2007-2020 by Jens Rehsack.
 # All rights reserved.
 #
 # It may be freely distributed under the same terms as Perl itself.
@@ -32,7 +32,7 @@ use Params::Util qw(_INSTANCE _STRING _ARRAY _ARRAY0 _HASH0 _HASH);
 
 #use locale;
 
-$VERSION = '1.412';
+$VERSION = '1.414';
 
 sub new
 {
@@ -1537,7 +1537,7 @@ sub verify_columns
         }
 
         # the following should be probably conditioned on an option,
-        # but I don't know which --BW
+        # but I do not know which --BW
         elsif ( 'USING' eq $join->{clause} )
         {
             my @keys = @{ $join->{keycols} };
@@ -2750,11 +2750,13 @@ portions in perl and began extending the SQL support. Since 2008, Jens
 Rehsack is the maintainer.
 
 Copyright (c) 2001,2005 by Jeff Zucker: jzuckerATcpan.org
-Copyright (c) 2007-2017 by Jens Rehsack: rehsackATcpan.org
+Copyright (c) 2007-2020 by Jens Rehsack: rehsackATcpan.org
 
 Portions Copyright (C) 1998 by Jochen Wiedmann: jwiedATcpan.org
 
 All rights reserved.
+
+=head1 LICENSE
 
 You may distribute this module under the terms of either the GNU
 General Public License or the Artistic License, as specified in

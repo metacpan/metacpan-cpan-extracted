@@ -21,7 +21,6 @@ use constant _CP_REQUIRE => (
     [ 'HTTP::Message' => 6.07 ],
     'HTTP::Request',
     'HTTP::Response',
-    'MockCpsrvd::cpanel',
     sub {
         die 'Need real fork!' if !$Config::Config{'d_fork'};
     },
@@ -43,25 +42,19 @@ sub runtests {
     require cPanel::APIClient::Service::cpanel;
     local $cPanel::APIClient::Service::cpanel::_PORT;
 
-    local $self->{'_cpanel'};
+    require cPanel::APIClient::Service::whm;
+    local $cPanel::APIClient::Service::whm::_PORT;
+
+    local $self->{'_servers'};
 
     return $self->SUPER::runtests();
-}
-
-sub _set_up_servers : Tests(startup) {
-    my ($self) = @_;
-
-    $self->{'_cpanel'} = MockCpsrvd::cpanel->new();
-    $cPanel::APIClient::Service::cpanel::_PORT = $self->{'_cpanel'}->get_port();
-
-    return;
 }
 
 sub _teardown_servers : Tests(shutdown) {
     my ($self) = shift;
 
-    for ( delete @{$self}{'_cpanel'} ) {
-        diag sprintf( 'Tearing down server on port %d …', $_->get_port() );
+    for ( splice @{$self->{'_servers'}} ) {
+        diag sprintf( 'Tearing down server (%s) on port %d …', ref, $_->get_port() );
         $_->terminate();
     }
 

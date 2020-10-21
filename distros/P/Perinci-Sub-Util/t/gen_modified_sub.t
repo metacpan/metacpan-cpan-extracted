@@ -3,8 +3,8 @@
 use 5.010;
 use strict;
 use warnings;
-
 use Test::More 0.98;
+
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 package Foo;
@@ -22,7 +22,7 @@ $SPEC{bar} = {
         e => {_e=>1},
     },
 };
-sub bar {}
+sub bar { [200,"OK","bar"] }
 
 package main;
 
@@ -53,6 +53,28 @@ is_deeply($meta, {
     },
     _mod => 1,
 }) or diag explain $meta;
+
+subtest "arg:output_code" => sub {
+    my $res = gen_modified_sub(
+        base_name    => 'Foo::bar',
+        output_code  => sub { [200, "OK", "bar mod"] },
+    );
+    is($res->[0], 200);
+    my $code = $res->[2]{code};
+    my $meta = $res->[2]{meta};
+    is_deeply($code->(), [200, "OK", "bar mod"]);
+};
+
+subtest "arg:wrap_code" => sub {
+    my $res = gen_modified_sub(
+        base_name    => 'Foo::bar',
+        wrap_code  => sub { my $orig = shift; my $res = $orig->(); $res->[2] .= " mod " . $_[0]; $res },
+    );
+    is($res->[0], 200);
+    my $code = $res->[2]{code};
+    my $meta = $res->[2]{meta};
+    is_deeply($code->("a"), [200, "OK", "bar mod a"]);
+};
 
 # XXX test install (output_name)
 # XXX test using caller in base_name
