@@ -29,7 +29,7 @@ override 'as_string' => sub {
     push @lines, 'ALTID=' . $self->altID() if $self->can('altID') and $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->can('pid') and $self->pid();
 
-    push my @types, map { uc $_ } grep { length $_ } @{ $self->types() };
+    my @types = map {uc} grep {length} @{ $self->types() };
     push @types, 'PREF' if $self->preferred();
     my $types = 'TYPE="' . join( ',', @types ) . '"' if @types;
     push @lines, $types if $types;

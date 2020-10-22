@@ -1,6 +1,6 @@
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use 5.12.5;
 
@@ -113,8 +113,8 @@ use Text::vCard::Precisely::V3::Node::Image;
 use Text::vCard::Precisely::V3::Node::URL;
 use Text::vCard::Precisely::V3::Node::SocialProfile;
 
-has encoding_in  => ( is => 'rw', isa => 'Str', default => 'UTF-8', );
-has encoding_out => ( is => 'rw', isa => 'Str', default => 'UTF-8', );
+has encoding_in  => ( is => 'rw', isa => 'Str', default => 'UTF-8' );
+has encoding_out => ( is => 'rw', isa => 'Str', default => 'UTF-8' );
 
 =head1 Constructors
 
@@ -673,6 +673,9 @@ coerce 'Nodes', from 'Str', via {
             }
         )
     ]
+}, from 'ArrayRef[Str]', via {
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
+    return \map { Text::vCard::Precisely::V3::Node->new( { name => $name, content => $_ } ) } @$_
 }, from 'ArrayRef[HashRef]', via {
     my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
@@ -813,7 +816,7 @@ sub timezone {
 
 1;
 
-=head1 aroud UTF-8
+=head1 around UTF-8
 
 if you want to send precisely the vCard3.0 with UTF-8 characters to the 
 B<Android4.4.x or before>, you have to set Charset param for each values like below:

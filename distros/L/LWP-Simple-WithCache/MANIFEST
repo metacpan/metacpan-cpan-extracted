@@ -1,5 +1,6 @@
 Changes
 MANIFEST
+META.yml
 Makefile.PL
 README
 lib/LWP/Simple/WithCache.pm
@@ -7,4 +8,4 @@ t/00-load.t
 t/01-ref.t
 t/02-default_expires_in.t
 t/03-cache.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

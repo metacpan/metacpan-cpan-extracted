@@ -1,5 +1,5 @@
 package Text::ANSI::Fold::Util;
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use v5.14;
 use utf8;
@@ -21,7 +21,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr, expand)
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -101,6 +101,7 @@ sub substr {
     }
 }
 
+
 =item B<expand>(I<text>, ...)
 
 =item B<ansi_expand>(I<text>, ...)
@@ -116,20 +117,18 @@ BEGIN { push @EXPORT_OK, qw(&ansi_expand $tabstop) }
 sub ansi_expand { goto &expand }
 
 our $tabstop = 8;
+our $spacechar = ' ';
 
 sub expand {
     my @l = map {
-	join('',
-	     map {
-		 !/\t/ ? $_ :
-		     (ansi_fold($_, -1, expand => 1, tabstop => $tabstop))[0];
-	     }
-	     split(/^/m, $_, -1));
+	s{^(\t+)}{ $spacechar x ($tabstop * length($1)) }mge;
+	s{^(.*\t)}{
+	    (ansi_fold($1, -1, expand => 1, tabstop => $tabstop))[0];
+	}mge;
+	$_;
     } @_;
-    return @l if wantarray;
-    return $l[0];
+    wantarray ? @l : $l[0];
 }
-
 
 =back
 

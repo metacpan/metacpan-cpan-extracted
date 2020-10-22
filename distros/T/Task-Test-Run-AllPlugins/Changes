@@ -1,4 +1,8 @@
-Revision history for Task-Latemp:
+Revision history for Task-Test-Run-AllPlugins
+
+0.0106  2020-10-22
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
 
 0.0105  2015-12-13
     - Update an old E-mail address.

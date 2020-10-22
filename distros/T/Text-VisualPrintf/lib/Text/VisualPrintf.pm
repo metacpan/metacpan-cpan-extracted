@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "3.07";
+our $VERSION = "3.08";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(&vprintf &vsprintf);
@@ -13,16 +13,16 @@ our @EXPORT_OK = qw(&vprintf &vsprintf);
 sub vprintf  { &printf (@_) }
 sub vsprintf { &sprintf(@_) }
 
-our $IS_TARGET = sub { $_[0] =~ /[\e\P{ASCII}]/ };
+our $IS_TARGET = qr/[\e\P{ASCII}]/;
 
 sub sprintf {
     my($format, @args) = @_;
     my $uniqstr = _sub_uniqstr($format, @args)
 	or return CORE::sprintf $format, @args;
     my @replace;
-    for my $arg (@args) {
-	next if not defined $arg;
-	next if not $IS_TARGET->($arg);
+    for my $arg (grep { defined } @args) {
+	next unless ( ( ref $IS_TARGET eq 'Regexp' and $arg =~ $IS_TARGET ) or
+		      ( ref $IS_TARGET eq 'CODE'   and $IS_TARGET->($arg) ) );
 	my($replace, $regex, $len) = $uniqstr->($arg) or next;
 	push @replace, [ $regex, $arg, $len ];
 	$arg = $replace;
@@ -45,11 +45,17 @@ sub _replace {
     my($matched, $orig, $len) = @_;
     my $width = length $matched;
     if ($width == $len) {
-	return $orig;
+	$orig;
+    } else {
+	_trim($orig, $width);
     }
+}
+
+sub _trim {
+    my($str, $width) = @_;
     use Text::ANSI::Fold;
     state $f = Text::ANSI::Fold->new(padding => 1);
-    my($folded, $rest, $w) = $f->fold($orig, width => $width);
+    my($folded, $rest, $w) = $f->fold($str, width => $width);
     if ($w <= $width) {
 	$folded;
     } elsif ($width == 1) {
@@ -104,7 +110,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 =head1 VERSION
 
-Version 3.07
+Version 3.08
 
 =head1 DESCRIPTION
 

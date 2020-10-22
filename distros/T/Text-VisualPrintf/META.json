@@ -56,7 +56,7 @@
    "provides" : {
       "Text::VisualPrintf" : {
          "file" : "lib/Text/VisualPrintf.pm",
-         "version" : "3.07"
+         "version" : "3.08"
       },
       "Text::VisualPrintf::IO" : {
          "file" : "lib/Text/VisualPrintf/IO.pm"
@@ -73,7 +73,7 @@
          "web" : "https://github.com/kaz-utashiro/Text-VisualPrintf"
       }
    },
-   "version" : "3.07",
+   "version" : "3.08",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

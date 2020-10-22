@@ -1,0 +1,72 @@
+ 33.77	10771	10771	U	0	unclassified
+ 66.23	21126	0	R	1	root
+ 66.23	21126	6	R1	131567	  cellular organisms
+ 66.21	21120	45	D	2	    Bacteria
+ 66.07	21074	19	D1	1783272	      Terrabacteria group
+ 66.01	21055	0	D2	1798711	        Cyanobacteria/Melainabacteria group
+ 66.01	21055	109	P	1117	          Cyanobacteria
+ 65.65	20941	1339	O	1161	            Nostocales
+ 60.81	19398	371	F	1162	              Nostocaceae
+ 59.57	19000	10924	G	1177	                Nostoc
+ 21.70	6923	2221	G1	2593658	                  unclassified Nostoc
+ 12.67	4042	4042	S	1618022	                    Nostoc sp. 'Lobaria pulmonaria (5183) cyanobiont'
+  1.29	412	412	S	1261031	                    Nostoc sp. 'Peltigera membranacea cyanobiont' N6
+  0.72	231	231	S	76335	                    Nostoc sp. ATCC 53789
+  0.03	8	8	S	1973475	                    Nostoc sp. NIES-2111
+  0.01	4	4	S	317936	                    Nostoc sp. PCC 7107
+  0.01	3	3	S	2005458	                    Nostoc sp. NIES-4103
+  0.01	2	2	S	1869241	                    Nostoc sp. CENA543
+  1.73	552	250	S	446679	                  Nostoc sphaeroides
+  0.95	302	302	S1	2653204	                    Nostoc sphaeroides CCNUC1
+  1.09	347	0	S	272131	                  Nostoc punctiforme
+  1.09	347	347	S1	63737	                    Nostoc punctiforme PCC 73102
+  0.62	199	0	S	1306274	                  Nostoc flagelliforme
+  0.62	199	199	S1	2038116	                    Nostoc flagelliforme CCNUN1
+  0.14	45	0	S	92942	                  Nostoc linckia
+  0.14	45	45	S1	1091006	                    Nostoc linckia NIES-25
+  0.03	10	0	S	374162	                  Nostoc carneum
+  0.03	10	10	S1	1973483	                    Nostoc carneum NIES-2107
+  0.08	25	0	G	56106	                Cylindrospermum
+  0.08	25	0	S	142864	                  Cylindrospermum stagnale
+  0.08	25	25	S1	56107	                    Cylindrospermum stagnale PCC 7417
+  0.00	1	0	G	1163	                Anabaena
+  0.00	1	0	S	1165	                  Anabaena cylindrica
+  0.00	1	1	S1	272123	                    Anabaena cylindrica PCC 7122
+  0.00	1	0	G	264688	                Trichormus
+  0.00	1	0	S	264691	                  Trichormus variabilis
+  0.00	1	1	S1	1973479	                    Trichormus variabilis NIES-23
+  0.42	135	0	F	2661849	              Calotrichaceae
+  0.42	135	3	G	1186	                Calothrix
+  0.40	128	17	G1	2619626	                  unclassified Calothrix
+  0.21	66	66	S	99598	                    Calothrix sp. PCC 7507
+  0.13	43	43	S	1954172	                    Calothrix sp. NIES-2100
+  0.01	2	2	S	1954171	                    Calothrix sp. NIES-2098
+  0.01	3	0	S	938406	                  Calothrix brevissima
+  0.01	3	3	S1	1973478	                    Calothrix brevissima NIES-22
+  0.00	1	0	S	32054	                  Calothrix parietina
+  0.00	1	1	S1	1170562	                    Calothrix sp. PCC 6303
+  0.16	51	0	F	1892259	              Aphanizomenonaceae
+  0.16	51	0	G	110103	                Anabaenopsis
+  0.16	51	0	S	109266	                  Anabaenopsis circularis
+  0.16	51	51	S1	1085406	                    Anabaenopsis circularis NIES-21
+  0.04	14	0	F	1182	              Scytonemataceae
+  0.04	14	0	G	1203	                Scytonema
+  0.04	14	2	G1	2618749	                  unclassified Scytonema
+  0.03	8	8	S	1137095	                    Scytonema sp. HK-05
+  0.01	4	4	S	2005464	                    Scytonema sp. NIES-4073
+  0.01	4	0	F	1892263	              Hapalosiphonaceae
+  0.01	4	0	G	1190	                Fischerella
+  0.01	4	0	G1	494603	                  unclassified Fischerella
+  0.01	3	3	S	2005456	                    Fischerella sp. NIES-4106
+  0.00	1	1	S	1752063	                    Fischerella sp. NIES-3754
+  0.02	5	0	P1	1301283	            Oscillatoriophycideae
+  0.02	5	0	O	1150	              Oscillatoriales
+  0.01	4	0	F	1892255	                Gomontiellaceae
+  0.01	4	0	G	241421	                  Crinalium
+  0.01	4	0	S	241425	                    Crinalium epipsammum
+  0.01	4	4	S1	1173022	                      Crinalium epipsammum PCC 9333
+  0.00	1	0	F	1892254	                Oscillatoriaceae
+  0.00	1	0	G	1158	                  Oscillatoria
+  0.00	1	0	S	482564	                    Oscillatoria nigro-viridis
+  0.00	1	1	S1	179408	                      Oscillatoria nigro-viridis PCC 7112
+  0.00	1	1	P	1224	      Proteobacteria

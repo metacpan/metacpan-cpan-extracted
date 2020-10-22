@@ -42,7 +42,7 @@ $vc->org( [ { content => 'Bubba Gump Shrimp Co.' } ] );
 $vc->title( [ { content => 'Shrimp Man' } ] );
 $vc->role( [ { content => 'Section 9' } ] );
 $vc->categories( ['fisher'] );
-$vc->note( [ { content => "It's a note!" } ] );
+$vc->note( [ { content => "It's a note!\nthis is anoter note!" } ] );
 $vc->geo( [ { content => '39.95;-75.1667' } ] );
 $vc->label(    # DEPRECATED in vCard4.0
     [   {   types   => ['home'],

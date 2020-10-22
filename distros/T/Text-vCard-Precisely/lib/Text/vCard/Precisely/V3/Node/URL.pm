@@ -20,8 +20,8 @@ override 'as_string' => sub {
     my @lines;
     push @lines, $self->name() || croak "Empty name";
     push @lines, 'ALTID=' . $self->altID() if $self->can('altID') and $self->altID();
-    push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->can('pid') and $self->pid();
-    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types() } )
+    push @lines, 'PID=' . join ',',  @{ $self->pid() } if $self->can('pid') and $self->pid();
+    push @lines, 'TYPE=' . join ',', map {uc} @{ $self->types() }
         if ref $self->types() eq 'ARRAY' and $self->types()->[0];
 
     my $string = join( ';', @lines ) . ':' . $self->content();

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-VisualPrintf
 
+3.08 2020-10-22T02:05:15Z
+
+    - Make interface more generic.
+
 3.07 2020-09-29T13:54:44Z
 
     - More robust logic for 0-width result with many args.

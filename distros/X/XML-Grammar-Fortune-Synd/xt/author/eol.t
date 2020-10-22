@@ -11,7 +11,6 @@ my @files = (
     'lib/XML/Grammar/Fortune/Synd/App.pm',
     'lib/XML/Grammar/Fortune/Synd/Heap/Elem.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/01-run.t',
     't/02-eliminate-old-ids.t',
     't/boilerplate.t',

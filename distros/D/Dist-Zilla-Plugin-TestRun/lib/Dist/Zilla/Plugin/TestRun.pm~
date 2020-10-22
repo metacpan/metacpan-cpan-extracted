@@ -1,10 +1,8 @@
 package Dist::Zilla::Plugin::TestRun;
 
-use 5.012;
+use 5.014;
 
 use Moose;
-
-our $VERSION = '0.0.1';
 
 with
 (
@@ -50,10 +48,6 @@ Dist::Zilla::Plugin::TestRun - run ./Build runtest on the build distribution
 
 Will run using "./Build runtest" as well.
 
-=head1 VERSION
-
-version 0.0.1
-
 =head1 SUBROUTINES/METHODS
 
 =head2 test()
@@ -64,4 +58,3 @@ Needed by L<Dist::Zilla> .
 
 Thanks to rwstauner and cjm on #distzilla on irc.perl.org for providing
 some help and insights.
-

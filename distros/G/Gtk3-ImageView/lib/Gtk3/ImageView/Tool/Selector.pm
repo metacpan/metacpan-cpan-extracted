@@ -10,7 +10,7 @@ use Readonly;
 Readonly my $CURSOR_PIXELS => 5;
 Readonly my $RIGHT_BUTTON  => 3;
 
-our $VERSION = 1;
+our $VERSION = 2;
 
 my %cursorhash = (
     left => {

@@ -1,0 +1,124 @@
+NAME
+    Date::Format::ISO8601 - Format date (Unix timestamp/epoch) as ISO8601
+    date/time string
+
+VERSION
+    This document describes version 0.010 of Date::Format::ISO8601 (from
+    Perl distribution Date-Format-ISO8601), released on 2020-10-22.
+
+SYNOPSIS
+     use Date::Format::ISO8601 qw(
+         gmtime_to_iso8601_date
+         gmtime_to_iso8601_time
+         gmtime_to_iso8601_datetime
+
+         localtime_to_iso8601_date
+         localtime_to_iso8601_time
+         localtime_to_iso8601_datetime
+     );
+
+     my $timestamp      = 1529780523    ; # Sat Jun 23 19:02:03 2018 GMT
+     my $timestamp_frac = 1529780523.456; # Sat Jun 23 19:02:03 2018 GMT
+
+    Assuming local timezone is UTC+7.
+
+    Formatting dates:
+
+     say gmtime_to_iso8601_date   ($timestamp);   # => 2018-06-23
+     say localtime_to_iso8601_date($timestamp);   # => 2018-06-24
+
+    Formatting times:
+
+     say gmtime_to_iso8601_time   ($timestamp);            # => 19:02:03Z
+     say gmtime_to_iso8601_time   ({tz=>''}, $timestamp);  # => 19:02:03
+     say gmtime_to_iso8601_time   ({second_precision=>3}, $timestamp_frac);
+                                                           # => 19:02:03.456Z
+     say localtime_to_iso8601_time($timestamp);            # => 00:02:03
+     say localtime_to_iso8601_time({tz=>'+07:00'}, $timestamp);
+                                                           # => 00:02:03+07:00
+
+    Formatting date+time:
+
+     say gmtime_to_iso8601_datetime   ($timestamp);        # => 2018-06-23T19:02:03Z
+     say gmtime_to_iso8601_datetime   ({tz=>''}, $timestamp);
+                                                           # => 2018-06-23T19:02:03
+     say gmtime_to_iso8601_datetime   ({second_precision=>3}, $timestamp_frac);
+                                                           # => 2018-06-23T19:02:03.456Z
+     say localtime_to_iso8601_datetime($timestamp);        # => 2018-06-24T00:02:03
+     say localtime_to_iso8601_datetime({tz=>'+07:00'}, $timestamp);
+                                                           # => 2018-06-24T00:02:03+07:00
+
+DESCRIPTION
+    This module formats Unix timestamps (epochs) as ISO8601 date/time
+    strings. It is a lightweight alternative to
+    DateTime::Format::ISO8601::Format and DateTime::Format::ISO8601.
+
+FUNCTIONS
+  gmtime_to_iso8601_date
+    Usage:
+
+     my $str = gmtime_to_iso8601_date([ \%opts, ] $timestamp);
+
+    Options:
+
+    *   tz
+
+        String. Will be appended after the time portion.
+
+    *   date_sep
+
+        String. Default is colon ("-").
+
+    *   time_sep
+
+        String. Default is colon (":").
+
+    *   second_precision
+
+        Integer. Number of digits for fractional second. Default is undef
+        (precision as needed).
+
+  gmtime_to_iso8601_time
+    See Synopsis and "gmtime_to_iso8601_date" for syntax and options.
+
+  gmtime_to_iso8601_datetime
+    See Synopsis and "gmtime_to_iso8601_date" for syntax and options.
+
+  localtime_to_iso8601_date
+    See Synopsis and "gmtime_to_iso8601_date" for syntax and options.
+
+  localtime_to_iso8601_time
+    See Synopsis and "gmtime_to_iso8601_date" for syntax and options.
+
+  localtime_to_iso8601_datetime
+    See Synopsis and "gmtime_to_iso8601_date" for syntax and options.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Date-Format-ISO8601>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Date-Format-ISO8601>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Format-ISO8601>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DateTime::Format::ISO8601::Format
+
+    DateTime::Format::ISO8601
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -48,7 +48,7 @@ void RIPEMD160_update(RIPEMD160 ripemd160, byte *strptr, dword len)
 	/* byte i goes into word X[i div 4] at pos.  8*(i mod 4)  */
 	ripemd160->X[i>>2] |= (dword) *ptr++ << (8 * (i&3));
       }
-      compress(ripemd160->MDbuf, ripemd160->X);
+      rmd160_compress(ripemd160->MDbuf, ripemd160->X);
     } else {
       return;
     }
@@ -60,7 +60,7 @@ void RIPEMD160_update(RIPEMD160 ripemd160, byte *strptr, dword len)
       ripemd160->X[i>>2] |= (dword) *strptr++ << (8 * (i&3));
     }
     len -= RIPEMD160_BLOCKSIZE;
-    compress(ripemd160->MDbuf, ripemd160->X);
+    rmd160_compress(ripemd160->MDbuf, ripemd160->X);
   }
   memcpy(ripemd160->data, strptr, len);
   ripemd160->local = len;

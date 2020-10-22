@@ -1,9 +1,9 @@
 package App::AlgorithmBackoffUtils;
 
-# AUTHOR
-our $DATE = '2019-11-29'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-20'; # DATE
 our $DIST = 'App-AlgorithmBackoffUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -400,7 +400,7 @@ App::AlgorithmBackoffUtils - Utilities related to Algorithm::Backoff
 
 =head1 VERSION
 
-This document describes version 0.004 of App::AlgorithmBackoffUtils (from Perl distribution App-AlgorithmBackoffUtils), released on 2019-11-29.
+This document describes version 0.005 of App::AlgorithmBackoffUtils (from Perl distribution App-AlgorithmBackoffUtils), released on 2020-10-20.
 
 =head1 DESCRIPTION
 
@@ -565,6 +565,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -573,7 +574,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -690,6 +691,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -698,7 +700,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -817,6 +819,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -825,7 +828,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -946,6 +949,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -954,7 +958,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1075,6 +1079,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -1083,7 +1088,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1204,6 +1209,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -1212,7 +1218,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1333,6 +1339,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -1341,7 +1348,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1462,6 +1469,7 @@ Comma-separated list of exit codes that mean success.
 
 By default, only exit code 0 means success.
 
+
 =back
 
 Special arguments:
@@ -1470,7 +1478,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1616,6 +1624,7 @@ Maximum delay time, in seconds.
 
 Maximum delay time, in seconds.
 
+
 =back
 
 Special arguments:
@@ -1624,7 +1633,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1658,19 +1667,19 @@ feature.
 =head1 SEE ALSO
 
 
-L<Algorithm::Backoff::MIMD>.
+L<Algorithm::Backoff::Exponential>.
+
+L<Algorithm::Backoff::LIMD>.
 
 L<Algorithm::Backoff::Constant>.
 
-L<Algorithm::Backoff::Exponential>.
+L<Algorithm::Backoff::MILD>.
 
 L<Algorithm::Backoff::Fibonacci>.
 
-L<Algorithm::Backoff::MILD>.
-
 L<Algorithm::Backoff::LILD>.
 
-L<Algorithm::Backoff::LIMD>.
+L<Algorithm::Backoff::MIMD>.
 
 L<Algorithm::Backoff>
 
@@ -1680,7 +1689,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

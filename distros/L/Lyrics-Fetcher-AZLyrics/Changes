@@ -1,5 +1,8 @@
 Revision history for Perl extension Lyrics::Fetcher::AZLyrics.
 
+0.06 - 2020-10-22
+    Changes from RT 133592, thanks to Jim Turner
+
 0.05 - 2010-04-15
     Handle changes to AZLyrics site
     Improve test script.

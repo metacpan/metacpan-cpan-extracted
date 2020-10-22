@@ -10,7 +10,7 @@ Plugins
 
 =cut
 
-our $VERSION = '0.0105';
+our $VERSION = '0.0106';
 
 =head1 DESCRIPTION
 
@@ -50,19 +50,11 @@ hesitate to contact me: L<http://www.shlomifish.org/me/contact-me/> .
 
 Shlomi Fish, L<http://www.shlomifish.org/> .
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-task-latemp at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-Latemp>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Task::Latemp
+    perldoc Task::Test::Run::AllPlugins
 
 You can also look for information at:
 
@@ -72,26 +64,13 @@ You can also look for information at:
 
 ( L<http://web-cpan.shlomifish.org/modules/Test-Run/> )
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Task-Latemp>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Task-Latemp>
-
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Latemp>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Task-Test-Run-AllPlugins>
 
 =item * MetaCPAN
 
 L<http://metacpan.org/release/Task-Test-Run-AllPlugins>
-
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Task-Test-Run-AllPlugins>
 
 =back
 
@@ -107,7 +86,7 @@ The documentation of the appropriate plugins.
 
 Copyright 2006 Shlomi Fish, all rights reserved.
 
-This program is released under the following license: bsd
+This program is released under the following license: MIT.
 
 =cut
 

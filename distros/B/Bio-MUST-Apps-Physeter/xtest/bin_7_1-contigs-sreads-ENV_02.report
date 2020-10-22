@@ -1,0 +1,43 @@
+ 97.08	9612	9612	U	0	unclassified
+  2.92	289	253	R	1	root
+  0.36	36	7	R1	131567	  cellular organisms
+  0.29	29	19	D	2759	    Eukaryota
+  0.09	9	1	D1	33154	      Opisthokonta
+  0.06	6	0	K	33208	        Metazoa
+  0.06	6	0	K1	6072	          Eumetazoa
+  0.06	6	2	K2	33213	            Bilateria
+  0.04	4	1	K3	33317	              Protostomia
+  0.03	3	0	K4	2697495	                Spiralia
+  0.03	3	0	K5	2697496	                  Gnathifera
+  0.03	3	0	P	10190	                    Rotifera
+  0.03	3	1	C	44578	                      Bdelloidea
+  0.02	2	0	C1	317009	                        unclassified Bdelloidea
+  0.02	2	0	C2	333507	                          environmental samples
+  0.02	2	2	S	317506	                            Bdelloidea environmental sample
+  0.02	2	0	K	4751	        Fungi
+  0.02	2	0	K1	451864	          Dikarya
+  0.02	2	0	P	4890	            Ascomycota
+  0.02	2	0	P1	716545	              saccharomyceta
+  0.02	2	0	P2	147538	                Pezizomycotina
+  0.02	2	1	P3	716546	                  leotiomyceta
+  0.01	1	0	C	147547	                    Lecanoromycetes
+  0.01	1	0	C1	1520881	                      OSLEUM clade
+  0.01	1	0	C2	388435	                        Lecanoromycetidae
+  0.01	1	0	O	388450	                          Peltigerales
+  0.01	1	0	O1	157824	                            Peltigerineae
+  0.01	1	0	F	48860	                              Peltigeraceae
+  0.01	1	0	G	48861	                                Peltigera
+  0.01	1	1	S	161997	                                  Peltigera membranacea
+  0.01	1	0	K	33090	      Viridiplantae
+  0.01	1	0	P	35493	        Streptophyta
+  0.01	1	0	P1	131221	          Streptophytina
+  0.01	1	0	P2	3193	            Embryophyta
+  0.01	1	0	P3	58023	              Tracheophyta
+  0.01	1	0	P4	78536	                Euphyllophyta
+  0.01	1	0	P5	58024	                  Spermatophyta
+  0.01	1	0	C	3398	                    Magnoliopsida
+  0.01	1	0	C1	1437183	                      Mesangiospermae
+  0.01	1	0	C2	71240	                        eudicotyledons
+  0.01	1	0	C3	91827	                          Gunneridae
+  0.01	1	0	C4	1437201	                            Pentapetalae
+  0.01	1	1	C5	71275	                              rosids

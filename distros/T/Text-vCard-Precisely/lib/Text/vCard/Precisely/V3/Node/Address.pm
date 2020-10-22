@@ -15,16 +15,13 @@ override 'as_string' => sub {
     my ($self) = @_;
     my @lines;
     push @lines, $self->name() || croak "Empty name";
-    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types() } )
+    push @lines, 'TYPE=' . join( ',', map {uc} @{ $self->types() } )
         if ref $self->types() eq 'ARRAY' and $self->types()->[0];
     push @lines, 'PREF=' . $self->pref()         if $self->pref();
     push @lines, 'LANGUAGE=' . $self->language() if $self->language();
 
-    my @values = ();
-    map { push @values, $self->_escape( $self->$_ ) } @order;
-    my $string = join( ';', @lines ) . ':' . join ';', @values;
+    my $string = join( ';', @lines ) . ':' . join ';', map { $self->_escape( $self->$_ ) } @order;
     return $self->fold($string);
-
 };
 
 __PACKAGE__->meta->make_immutable;

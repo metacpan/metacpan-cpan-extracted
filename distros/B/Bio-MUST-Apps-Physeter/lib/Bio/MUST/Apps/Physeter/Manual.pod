@@ -1,0 +1,304 @@
+# PODNAME: Physeter::Manual
+# ABSTRACT: User Guide for Physeter
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+# CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
+# CONTRIBUTOR: Luc CORNET <luc.cornet@uliege.be>
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Physeter::Manual - User Guide for Physeter
+
+=head1 VERSION
+
+version 0.202960
+
+=encoding UTF-8
+
+=head1 Background
+
+The aim of C<physeter.pl> is to assess the level of contamination of any
+prokaryotic genome based on a BLASTX (Basic Local Alignment Search Tool) report
+and a taxonomic labeler (expressed in terms of I<NCBI Taxonomy>).
+
+=head1 Usage
+
+=head2 Installation and dependencies
+
+C<physeter.pl> is written in I<Modern Perl> but it relies on I<DIAMOND>. See the
+link below to download and install it for your system.
+
+=over
+
+=item L<http://www.diamondsearch.org/index.php>
+
+=back
+
+Most other dependencies can be handled automatically by using C<cpanm> in a
+I<Perlbrew> environment (L<https://perlbrew.pl/>). Below are a set of commands
+to setup such an environment on I<Ubuntu>.
+
+    # install development tools
+    $ sudo apt-get update
+    $ sudo apt-get install build-essential
+
+    # download the perlbrew installer...
+    $ wget -O - http://install.perlbrew.pl | bash
+
+    # initialize perlbrew
+    $ source ~/perl5/perlbrew/etc/bashrc
+    $ perlbrew init
+
+    # search for a recent stable version of the perl interpreter
+    $ perlbrew available
+    # install the last even version (e.g., 5.24.x, 5.26.x, 5.28.x)
+    # (this will take a while)
+    $ perlbrew install perl-5.26.2
+    # install cpanm (for Perl dependencies)
+    $ perlbrew install-cpanm
+
+    # enable the just-installed version
+    $ perlbrew list
+    $ perlbrew switch perl-5.26.2
+
+    # make perlbrew always available
+    # if using bash (be sure to use double >> to append)
+    $ echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc
+    # if using zsh  (only the destination file changes)
+    $ echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.zshrc
+
+Major C<physeter.pl> dependencies are the C<Bio::MUST> series of modules.
+Install them as follows.
+
+    $ cpanm Bio::FastParsers
+    $ cpanm Bio::MUST::Core
+    $ cpanm Bio::MUST::Drivers
+
+If errors occur during installation, use C<--force> and/or C<--notest> options
+of C<cpanm>.
+
+    $ cpanm --force Bio::MUST::Drivers
+
+Install C<physeter.pl>.
+
+    $ cpanm Bio::MUST::Apps::Physeter
+
+Finally install a local mirror of the I<NCBI Taxonomy>. It will be used by
+C<physeter.pl> to taxonomically affiliate the main organism and the possible
+contaminant organisms.
+
+    $ setup-taxdir.pl --taxdir=taxdump/
+
+=head2 Input files
+
+=head3 Building the DIAMOND database
+
+In order to generate BLASTX report file needed by C<physeter.pl>, you have to
+set up a C<DIAMOND> database. First, download prokaryotic protein files from
+I<NCBI RefSeq>. As of October 2020, it requires at least 220 GB of storage.
+
+    $ rsync -avz --files-from=genome.idl \
+    	--no-R rsync://ftp.ncbi.nlm.nih.gov/genomes/all/ database/
+    $ gunzip database/*.faa.gz
+
+Then, you have to rename sequence identifiers to hold NCBI GCA/GCF accessions
+followed by a separator (C<|>) and by a protein accession number (e.g.,
+C<GCF_000003135.1|WP_001260374.1>). This can be done using C<inst-abbr-ids.pl>
+from the L<Bio::MUST::Core> distribution.
+
+    $ ls -U database/*.faa | perl -nle 'm/(GCF\_\d{9}\.\d+)/; print "$_\t$1"' \
+    	> abbr.idm
+
+Your C<abbr.idm> should look like this:
+
+    $ head -n5 file.idm
+    
+    GCF_003144445.1_ASM314444v1_protein.faa	GCF_003144445.1
+    GCF_900129705.1_IMG-taxon_2695420922_annotated_assembly_protein.faa	GCF_900129705.1
+    GCF_002037065.1_ASM203706v1_protein.faa	GCF_002037065.1
+    GCF_001941425.1_ASM194142v1_protein.faa	GCF_001941425.1
+    GCF_900468105.1_AFS031577_protein.faa	GCF_900468105.1
+    
+    $ inst-abbr-ids.pl *.faa --id-regex=:DEF --id-prefix-mapper=abbr.idm \
+    	--outdir=./renamed-db
+
+=for todo TODO: add --indir option
+	TODO: add --greedy-taxa, --kfold-seed and --auto-detect options
+
+Finally, build the C<DIAMOND> database.
+
+    $ cat renamed-db/*.faa > database.faa
+    $ diamond makedb --in database.faa -d database
+
+=head3 Running DIAMOND BLASTX
+
+Before running C<DIAMOND>, you have to transform the prokaryotic genome files
+you want to assess into pseudo-read C<FASTA> files. Use C<inst-split-fas.pl>
+from the L<Bio::MUST::Core> distribution to do so. In the example below, the
+genome will be split into 250-base long pseudo-read sequences without overlap.
+If your genome has a NCBI GCA/GCF accession, name your C<outfile>
+C<assembly_accession.fasta> (e.g., C<GCF_000006605.1.fasta>).
+
+    $ inst-split-fas.pl genome.fasta --outfile=split-genome.fasta \
+    	--chunk=250 --step=250
+
+Then run C<DIAMOND> as follows. Like the C<FASTA> file, name your C<BLASTX>
+report as C<assembly_accession.blastx> (e.g., C<GCF_000006605.1.blastx>). If
+your genome file does not have a NCBI GCA/GCF accession, both the C<FASTA> file
+and the C<BLASTX> report must have the same basename. The C<-f tab> option of
+DIAMOND will generate a tab-separated file corresponding to the C<-outfmt 6> of
+regular I<NBCI-BLAST+>. You can adapt the C<-p 10> option (number of CPU
+threads) to suit your system.
+
+    $ diamond blastx -d database -q split-genome.fasta -o split-genome.blastx \
+    	-t ./temp -k 50 -e 1e-10 -f tab -p 10
+
+=head3 Taxonomic labeler
+
+A taxonomic labeler is used by C<physeter.pl> to determine at which taxonomic
+level you consider a pseudo-read sequence as a contaminant. See examples below: 
+
+    $ head phylum-taxa.idl
+    
+    unclassified Bacteria
+    unclassified Archaea
+    Abditibacteriota
+    Acidithiobacillia
+    Acidobacteria
+    Actinobacteria
+    Alphaproteobacteria
+    Aquificae
+    Armatimonadetes
+    Bacteroidetes
+
+In this example, taxonomic levels are I<phyla> and therefore C<physeter.pl> will
+be able to detect inter-phylum contaminations.
+
+=head2 Command-line options of physeter.pl
+
+=head3 Classic mode
+
+Once all input files are correctly prepared, you can simply run C<physeter.pl>
+like this:
+
+    $ physeter.pl *.blastx --outfile=contam.report --taxdir=taxdump/ \
+    	--taxon-list=phylum-taxa.idl
+
+The standard output file of C<physeter.pl> is a tab-separated file containing
+the following sections: (1) organism accession or file name, (2) assigned taxon,
+(3) % self sequences, (4) % contaminated sequences, (5) % unknown taxon
+sequences, (6) % unclassified sequences, (7) detail of contaminants, (8) mean
+number of hits used to classify the pseudo-read sequences.
+
+In addition to the Physeter output file, you can generate for each assayed
+genome a Kraken-like file, an Anvio-like file, a Krona-compatible file or a LCA
+(Last Common Ancestor) file, the latter providing the taxonomic affiliation of
+each pseudo-read.
+
+    $ physeter.pl *.blastx --outfile=contam.report --taxdir=taxdump/ \
+    	--taxon-list=phylum-taxa.idl --kraken --anvio --krona --lca
+
+When your pseudo-read FASTA files are not in the working directory, you can
+specify their localization using the C<--fasta-dir> option.
+
+    $ physeter.pl *.blastx --outfile=contam.report --fasta-dir=split-fasta/ \
+    	--taxdir=taxdump/ --taxon-list=phylum-taxa.idl
+
+If your organism does not have a NCBI GCA/GCF accession but you know
+approximately its taxonomy, you can specify it with the C<--exp-tax> option.
+Note that the specified taxon must be listed in the file provided through the
+C<--taxon-list> option.
+
+    $ physeter.pl organism.blastx --exp-tax=Firmicutes --outfile=contam.report \
+    	--taxdir=taxdump/ --taxon-list=phylum-taxa.idl
+
+Otherwise, use the C<--auto-detect> option.
+
+    $ physeter.pl organism.blastx --auto-detect --outfile=contam.report \
+    	--taxdir=taxdump/ --taxon-list=phylum-taxa.idl
+
+In the basic configuration, C<physeter.pl> will assess the contamination status
+of a pseudo-read sequence using only 1 hit (i.e., I<best-hit mode>). If you want
+to use more than 1 hit (i.e., I<MEGAN-like mode>), you can use the
+C<--tax-min-hits> and C<--tax-max-hits> options. In the I<MEGAN-like mode>, a
+LCA will be inferred for each pseudo-read sequence.
+
+    $ physeter.pl *.blastx --outfile=contam.report --taxdir=taxdump/ \
+    	--taxon-list=phylum-taxa.idl --tax-min-hits=2 --tax-max-hits=50
+
+You can use C<--tax-score-mul> and C<--tax-min-lca-freq> options to fine tune
+LCA inference.
+
+    $ physeter.pl *.blastx --outfile=contam.report --taxdir=taxdump/ \
+    	--taxon-list=phylum-taxa.idl --tax-min-hits=2 --tax-max-hits=50 \
+    	--tax-score-mul=0.7 --tax-min-lca-freq=0.85
+
+Other options can be applied to filter the BLASTX hits used for contamination
+assessment. Those are C<--tax-min-ident>, C<--tax-min-len> and
+C<--tax-min-score>.
+
+=head3 k-fold mode
+
+The last functionality of C<physeter.pl> is the I<k-fold mode>. In this mode,
+the C<DIAMOND> database is randomly split into 10 subsets. Then, C<physeter.pl>
+runs 10 times and, for each run, hits from one of the subsets are ignored. The
+results of the 10 analyses are written in the standard output file. None of the
+Kraken-like file, Anvio-like file, Krona-coompatible file and LCA file are
+available when running in I<k-fold mode>.
+
+    $ physeter.pl *.blastx --outfile=contam.report --taxdir=taxdump/ \
+    	--taxon-list=phylum-taxa.idl --tax-min-hits=2 --tax-max-hits=50 \
+    	--k-fold=database.gca
+
+The C<database.gca> file is the list of all NCBI GCA/GCF accessions of the
+genomes used to build the C<DIAMOND> database.
+
+    $ cut -f2 abbr.idm > database.gca
+    $ head database.gca
+    
+    GCF_003144445.1
+    GCF_900129705.1
+    GCF_002037065.1
+    GCF_001941425.1
+    GCF_900468105.1
+    GCF_005886055.1
+    GCF_002043285.1
+    GCF_004011355.1
+    GCF_000267825.2
+    GCF_001661025.1
+
+=head1 AUTHOR
+
+Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Valerian LUPO Mick VAN VLIERBERGHE Luc CORNET
+
+=over 4
+
+=item *
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
+
+=item *
+
+Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
+
+=item *
+
+Luc CORNET <luc.cornet@uliege.be>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by University of Liege / Unit of Eukaryotic Phylogenomics / Denis BAURAIN.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

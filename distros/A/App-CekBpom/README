@@ -3,8 +3,8 @@ NAME
     for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.009 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2020-10-20.
+    This document describes version 0.010 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2020-10-22.
 
 DESCRIPTION
     See included script cek-bpom.
@@ -31,7 +31,52 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   note => *str*
+
+        Add note.
+
+        This will not be sent as queries, but will be added to the log file
+        if log file is specified, as well as added to the result dump file
+        name, in encoded form.
+
     *   queries* => *array[str]*
+
+    *   query_log_file => *filename*
+
+        Log queries to log file.
+
+        If specified, each invocation of this utility will be logged into a
+        line in the specified file path, in TSV format. Tab character in the
+        query will be converted into 4 spaces, to avoid clash with the use
+        of Tab as field separator.
+
+        For example, this invocation:
+
+         % cek-bpom "minuman susu fermentasi" yakult --query-log-file /some/path.txt
+
+        Sample log line:
+
+         time:2020-10-22T01:02:03.000Z    queries:minuman susu fermentasi,yakult    search_types:merk,nama_produk    num_results:51    duration:3.402
+
+    *   result_dump_dir => *dirname*
+
+        Dump result to directory.
+
+        If specified, will dump full enveloped result to a file in specified
+        directory path, in JSON format. The JSON formatting makes it easy to
+        grep each row. The file will be named
+        "cek-bpom-result.<encoded-timestamp>.<search-types-encoded>.<queries
+        -encoded>(.<note-encoded>)?.json". The encoded timestamp is ISO 8601
+        format with colon replaced by underscore. The encoded query will
+        replace all every group of "unsafe" characters in query with a
+        single dash. The same goes with encoded note, which comes from the
+        "note" argument. For example, this invocation:
+
+         % cek-bpom "minuman susu fermentasi" yakult --note "some note"
+
+        will result in a result dump file name like:
+        "cek-bpom-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-s
+        usu-fermentasi-yakult.some-note.json".
 
     *   search_types => *array[str]*
 

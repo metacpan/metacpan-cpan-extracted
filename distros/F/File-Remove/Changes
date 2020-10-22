@@ -1,5 +1,12 @@
 Revision history for Perl extension File-Remove
 
+1.60    2020-10-22 - Shlomi Fish
+    - Add .tidyallrc + related changes
+    - Fix mismatched $VERSION.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=133562
+        - https://github.com/shlomif/File-Remove/pull/3/files
+        - Thanks to William Storey, PMPERRY, and @briang for the report
+
 1.59    2020-10-16 - Shlomi Fish
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

@@ -1,16 +1,16 @@
 {
-   "abstract" : "Rendering template with Perl code and CGI.pm funcs/subs for tags emits.",
+   "abstract" : "Rendering Mojoliciuos template by CGI.pm subs as tags.",
    "author" : [
       "ÐÐ¸ÑÐ°Ð¸Ð» Ð§Ðµ <mche@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-RenderCGI",
    "no_index" : {
@@ -46,6 +46,6 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-RenderCGI"
       }
    },
-   "version" : "0.101",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.102",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

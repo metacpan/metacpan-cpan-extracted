@@ -131,6 +131,7 @@ t/Legacy/Regression/6_cmp_ok.t
 t/Legacy/Regression/736_use_ok.t
 t/Legacy/Regression/789-read-only.t
 t/Legacy/Regression/870-experimental-warnings.t
+t/Legacy/Regression/is_capture.t
 t/Legacy/Simple/load.t
 t/Legacy/Test2/Subtest.t
 t/Legacy/Tester/tbt_01basic.t

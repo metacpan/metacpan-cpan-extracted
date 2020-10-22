@@ -42,7 +42,7 @@ sub as_string {
     push @lines, $self->name() || croak "Empty name";
     push @lines, 'ALTID=' . $self->altID() if $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->pid();
-    push @lines, 'TYPE="' . join( ',', map { uc $_ } @{ $self->types() } ) . '"'
+    push @lines, 'TYPE="' . join( ',', map {uc} @{ $self->types() } ) . '"'
         if ref $self->types() eq 'ARRAY' and $self->types()->[0];
     push @lines, 'PREF=' . $self->pref()            if $self->pref();
     push @lines, 'MEDIATYPE=' . $self->media_type() if $self->media_type();

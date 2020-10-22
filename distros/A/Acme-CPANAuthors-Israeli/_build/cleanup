@@ -1,7 +1,0 @@
-do{ my $x = {
-       'blib' => 1,
-       'Acme-CPANAuthors-Israeli-*' => 1,
-       'Acme-CPANAuthors-Israeli-0.0200' => 1,
-       'Acme-CPANAuthors-Israeli-0.0201' => 1
-     };
-$x; }

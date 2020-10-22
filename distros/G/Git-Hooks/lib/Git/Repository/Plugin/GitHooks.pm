@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.12.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.13.0';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -1599,7 +1599,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.12.0
+version 2.13.0
 
 =head1 SYNOPSIS
 
@@ -2357,7 +2357,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2020 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

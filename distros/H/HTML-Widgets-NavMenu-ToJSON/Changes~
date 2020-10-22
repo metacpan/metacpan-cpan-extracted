@@ -1,7 +1,11 @@
 Revision history for HTML-Widgets-NavMenu-ToJSON
 
+0.0.8   2020-10-22
+        
+
 0.0.7   2015-05-30
         - Convert the build system to Dist-Zilla
+            - Some improvements such as links to VCS repositories.
 
 0.0.6   2014-10-23
         - Add a minimal dependency on JSON::MaybeXS-1.002002.

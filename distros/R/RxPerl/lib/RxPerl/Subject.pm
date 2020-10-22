@@ -4,9 +4,7 @@ use warnings;
 
 use base 'RxPerl::Observable';
 
-use RxPerl::Utils 'get_subscription_from_subscriber';
-
-our $VERSION = "v6.0.1";
+our $VERSION = "v6.0.2";
 
 sub new {
     my ($class) = @_;

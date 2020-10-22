@@ -6,13 +6,11 @@ use Scalar::Util 'weaken';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    get_subscription_from_subscriber immortalize decapitate
+    immortalize decapitate
     get_timer_subs get_interval_subs
 /;
 
-our $VERSION = "v6.0.1";
-
-sub get_subscription_from_subscriber { $_[0]->{_subscription} }
+our $VERSION = "v6.0.2";
 
 my %KEEP_ALIVE;
 

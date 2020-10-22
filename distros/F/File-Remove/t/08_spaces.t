@@ -4,7 +4,10 @@
 # spaces in the path to delete.
 
 use strict;
-BEGIN {
+use warnings;
+
+BEGIN
+{
     $|  = 1;
     $^W = 1;
 }
@@ -14,51 +17,54 @@ use File::Spec::Functions ':ALL';
 use File::Copy   ();
 use File::Remove ();
 
-
-
-
-
 #####################################################################
 # Set up for the test
 
 my $t  = catdir( curdir(), 't' );
-my $s  = catdir(  $t, 'spaced path' );
-my $f1 = catfile( $s, 'foo1.txt'    );
-my $f2 = catfile( $s, 'foo2.txt'    );
-my $f3 = catfile( $s, 'bar.txt'     );
+my $s  = catdir( $t,       'spaced path' );
+my $f1 = catfile( $s, 'foo1.txt' );
+my $f2 = catfile( $s, 'foo2.txt' );
+my $f3 = catfile( $s, 'bar.txt' );
 
-sub create_directory {
-    mkdir($s,0777) or die "Failed to create $s";
+sub create_directory
+{
+    mkdir( $s, 0777 ) or die "Failed to create $s";
     ok( -d $s, "Created $s ok" );
     ok( -r $s, "Created $s -r" );
     ok( -w $s, "Created $s -w" );
-    open( FILE, ">$f1" ) or die "Failed to create $f1";
-    print FILE "Test\n";
-    close FILE;
-    open( FILE, ">$f2" ) or die "Failed to create $f2";
-    print FILE "Test\n";
-    close FILE;
-    open( FILE, ">$f3" ) or die "Failed to create $f3";
-    print FILE "Test\n";
-    close FILE;
+    my $spew = sub {
+        my $fn = shift;
+        open( my $fh, ">", $fn ) or die "Failed to create $fn";
+        print {$fh} "Test\n";
+        close $fh;
+        return;
+    };
+    $spew->($f1);
+    $spew->($f2);
+    $spew->($f3);
 }
 
-sub clear_directory {
-    if ( -e $f1 ) {
-        unlink( $f1 )      or die "unlink: $f1 failed";
-        ! -e $f1           or die "unlink didn't work";
+sub clear_directory
+{
+    if ( -e $f1 )
+    {
+        unlink($f1) or die "unlink: $f1 failed";
+        !-e $f1     or die "unlink didn't work";
     }
-    if ( -e $f2 ) {
-        unlink( $f2 )      or die "unlink: $f2 failed";
-        ! -e $f2           or die "unlink didn't work";
+    if ( -e $f2 )
+    {
+        unlink($f2) or die "unlink: $f2 failed";
+        !-e $f2     or die "unlink didn't work";
     }
-    if ( -e $f3 ) {
-        unlink( $f3 )      or die "unlink: $f3 failed";
-        ! -e $f3           or die "unlink didn't work";
+    if ( -e $f3 )
+    {
+        unlink($f3) or die "unlink: $f3 failed";
+        !-e $f3     or die "unlink didn't work";
     }
-    if ( -e $s ) {
-        rmdir( $s )       or die "rmdir: $s failed";
-        ! -e $s           or die "rmdir didn't work";
+    if ( -e $s )
+    {
+        rmdir($s) or die "rmdir: $s failed";
+        !-e $s    or die "rmdir didn't work";
     }
 }
 
@@ -69,13 +75,10 @@ clear_directory();
 create_directory();
 
 # Schedule cleanup
-END {
+END
+{
     clear_directory();
 }
-
-
-
-
 
 #####################################################################
 # Main Testing

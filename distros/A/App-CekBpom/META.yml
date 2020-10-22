@@ -19,12 +19,19 @@ name: App-CekBpom
 requires:
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
+  Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
+  Date::Format::ISO8601: '0'
   Exporter: '5.57'
   HTTP::CookieJar::LWP: '0'
+  JSON::Encode::TableData: '0'
   LWP::UserAgent::Plugin: '0.004'
   Log::ger: '0.037'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
+  Sah::Schema::dirname: '0'
+  Sah::Schema::filename: '0'
+  Time::HiRes: '0'
   URI::Escape: '0'
   perl: '5.010001'
   strict: '0'
@@ -33,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom
   homepage: https://metacpan.org/release/App-CekBpom
   repository: git://github.com/perlancar/perl-App-CekBpom.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

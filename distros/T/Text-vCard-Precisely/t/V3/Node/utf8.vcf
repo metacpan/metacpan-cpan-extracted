@@ -8,6 +8,6 @@ ORG:Bubba Gump Shrimp Co.
 TITLE:Shrimp Man
 ROLE:Section 9
 CATEGORIES:fisher
-NOTE:It's a note!
+NOTE:It's a note!\nthis is anoter note!
 KEY;TYPE=PGP:http://example.com/key.pgp
 END:VCARD

@@ -2,8 +2,8 @@
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
   }
 }
 
@@ -28,7 +28,7 @@ else
 my $finder = Test::TrailingSpace->new(
    {
        root => '.',
-       filename_regex => qr/(?:\.(?:t|pm|pl|xs|c|h|txt|pod|PL)|README|Changes|TODO|LICENSE)\z/,
+       filename_regex => qr#(?:\.(?:t|pm|pl|xs|c|h|txt|pod|PL)|README|Changes|TODO|LICENSE)\z#,
    },
 );
 

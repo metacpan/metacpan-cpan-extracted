@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+0.03 2020-10-22T02:02:12Z
+
+    - Update ansi_expand() to optimize line-head tabs.
+
 0.02 2020-10-21T02:47:08Z
 
     - Introduce ansi_expand() function.

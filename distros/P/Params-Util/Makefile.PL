@@ -81,7 +81,7 @@ WriteMakefile1(
                 web    => 'https://rt.cpan.org/Dist/Display.html?Name=Params-Util',
                 mailto => 'bug-Params-Util@rt.cpan.org',
             },
-            license => 'apache_2_0',
+            license => 'perl',
         },
         prereqs => {
             develop => {

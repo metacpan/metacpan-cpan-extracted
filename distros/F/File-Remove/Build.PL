@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "File-Remove",
-  "dist_version" => "1.59",
+  "dist_version" => "1.60",
   "license" => "perl",
   "module_name" => "File::Remove",
   "recursive_test_files" => 1,
@@ -29,7 +29,7 @@ my %module_build_args = (
     "File::Path" => 0,
     "File::Spec" => "3.29",
     "constant" => 0,
-    "perl" => "5.006",
+    "perl" => "5.008",
     "strict" => 0,
     "vars" => 0,
     "warnings" => 0
@@ -40,8 +40,7 @@ my %module_build_args = (
     "File::Spec::Functions" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.88",
-    "perl" => "5.006"
+    "Test::More" => "0.88"
   }
 );
 
@@ -53,8 +52,7 @@ my %fallback_build_requires = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
-  "Test::More" => "0.88",
-  "perl" => "5.006"
+  "Test::More" => "0.88"
 );
 
 

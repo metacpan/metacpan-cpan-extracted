@@ -12,8 +12,8 @@ WriteMakefile(
     'DISTNAME'     => 'Crypt-RIPEMD160',
     'NAME'                => 'Crypt::RIPEMD160',
     'AUTHOR'              => 'Christian H. Geuer-Pollmann',
-    'VERSION_FROM'  => 'RIPEMD160.pm',
-    'ABSTRACT_FROM' => 'RIPEMD160.pm',
+    'VERSION_FROM'  => 'lib/Crypt/RIPEMD160.pm',
+    'ABSTRACT_FROM' => 'lib/Crypt/RIPEMD160.pm',
     'PL_FILES'            => {},
     ($ExtUtils::MakeMaker::VERSION >= 6.3002 ? ('LICENSE'        => 'perl', ) : ()),
     PREREQ_PM => {
@@ -36,9 +36,9 @@ WriteMakefile(
         },
         resources => {
             license => 'http://dev.perl.org/licenses/',
-            homepage => 'http://wiki.github.com/toddr/Crypt-RIPEMD160',
-#            bugtracker => 'http://code.google.com/p/Crypt-RIPEMD160/issues/list',
-            repository => 'http://github.com/toddr/Crypt-RIPEMD160/tree/master',
+            homepage   => 'http://wiki.github.com/toddr/Crypt-RIPEMD160',
+            bugtracker => 'https://github.com/toddr/Crypt-RIPEMD160/issues',
+            repository => 'https://github.com/toddr/Crypt-RIPEMD160/tree/master',
 #            MailingList => 'http://groups.google.com/group/Crypt-RIPEMD160',
         },
     },

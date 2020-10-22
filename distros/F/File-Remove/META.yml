@@ -10,7 +10,6 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0.88'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
@@ -24,14 +23,14 @@ name: File-Remove
 provides:
   File::Remove:
     file: lib/File/Remove.pm
-    version: '1.59'
+    version: '1.60'
 requires:
   Cwd: '3.29'
   File::Glob: '0'
   File::Path: '0'
   File::Spec: '3.29'
   constant: '0'
-  perl: '5.006'
+  perl: '5.008'
   strict: '0'
   vars: '0'
   warnings: '0'
@@ -39,7 +38,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Remove
   homepage: http://metacpan.org/release/File-Remove
   repository: git://github.com/shlomif/File-Remove.git
-version: '1.59'
+version: '1.60'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -221,7 +220,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::TrailingSpace
       name: '@Filter/Test::TrailingSpace'
-      version: 0.2.0
+      version: ~
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
@@ -340,6 +339,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
       version: '6.015'
+    -
+      class: Dist::Zilla::Plugin::Test::TidyAll
+      name: Test::TidyAll
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

@@ -1,6 +1,6 @@
 package Text::vCard::Precisely::V4;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -237,7 +237,7 @@ The format is SAME as 3.0
 
 subtype 'v4Photos' => as 'ArrayRef[Text::vCard::Precisely::V4::Node::Image]';
 coerce 'v4Photos', from 'HashRef', via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
         Text::vCard::Precisely::V4::Node::Image->new(
             {   name       => $name,
@@ -257,7 +257,7 @@ coerce 'v4Photos', from 'HashRef', via {
     ]
 }, from 'Str',    # when parse BASE64 encoded strings
     via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
         Text::vCard::Precisely::V4::Node::Image->new(
             {   name    => $name,
@@ -267,7 +267,7 @@ coerce 'v4Photos', from 'HashRef', via {
     ]
     }, from 'ArrayRef[Str]',    # when parse BASE64 encoded strings
     via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
         map { Text::vCard::Precisely::V4::Node::Image->new( { name => $name, content => $_, } ) }
             @$_ ]
@@ -313,10 +313,10 @@ The format is SAME as 3.0
 
 subtype 'v4Nodes' => as 'ArrayRef[Text::vCard::Precisely::V4::Node]';
 coerce 'v4Nodes', from 'Str', via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [ Text::vCard::Precisely::V4::Node->new( { name => $name, content => $_ } ) ]
 }, from 'HashRef', via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
         Text::vCard::Precisely::V4::Node->new(
             {   name    => $_->{'name'}  || $name,
@@ -327,7 +327,7 @@ coerce 'v4Nodes', from 'Str', via {
         )
     ]
 }, from 'ArrayRef[Str]', via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
         map {
             Text::vCard::Precisely::V4::Node->new(
@@ -335,7 +335,7 @@ coerce 'v4Nodes', from 'Str', via {
         } @$_
     ]
 }, from 'ArrayRef[HashRef]', via {
-    my $name = uc [ split( /::/, [ caller(2) ]->[3] ) ]->[-1];
+    my $name = uc [ split /::/, ( caller(2) )[3] ]->[-1];
     return [
         map {
             Text::vCard::Precisely::V4::Node->new(

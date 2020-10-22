@@ -1,5 +1,10 @@
 Revision history for Acme-CPANAuthors-Israeli
 
+0.0400  2020-10-22
+        -
+0.0310  2015-06-19
+        - Actual release number due to a misrelease.
+
 0.0300  2015-06-19
         - Convert to dzil and update some old URLs/addresses.
 

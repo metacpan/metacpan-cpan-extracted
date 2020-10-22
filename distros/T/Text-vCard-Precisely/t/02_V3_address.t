@@ -35,13 +35,13 @@ $vc->adr(
             post_code => 'post_code',
             country   => 'country',
         },
-        {   pobox     => 'another pobox',
-            extended  => 'extended',
-            street    => 'another street',
-            city      => 'city',
-            region    => 'region',
-            post_code => 'post_code',
-            country   => 'country',
+        {   pobox     => "another\npobox",
+            extended  => "something\nextended",
+            street    => "another\nstreet",
+            city      => "another city",
+            region    => "another region",
+            post_code => "another post_code",
+            country   => "another country",
         }
     ]
 );

@@ -4,13 +4,13 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run-Plugin-CollectStats",
    "prereqs" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Test::Run::Plugin::CollectStats" : {
          "file" : "lib/Test/Run/Plugin/CollectStats.pm",
-         "version" : "0.0103"
+         "version" : "0.0104"
       },
       "Test::Run::Plugin::CollectStats::TestFileData" : {
          "file" : "lib/Test/Run/Plugin/CollectStats/TestFileData.pm"
@@ -51,5 +51,6 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "0.0103"
+   "version" : "0.0104",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

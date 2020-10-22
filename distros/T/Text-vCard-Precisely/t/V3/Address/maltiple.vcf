@@ -1,5 +1,6 @@
 BEGIN:VCARD
 VERSION:3.0
 ADR:pobox;extended;street;city;region;post_code;country
-ADR:another pobox;extended;another street;city;region;post_code;country
+ADR:another\npobox;something\nextended;another\nstreet;another city;another
+  region;another post_code;another country
 END:VCARD

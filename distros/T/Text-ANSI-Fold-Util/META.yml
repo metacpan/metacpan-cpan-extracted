@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::ANSI::Fold::Util:
     file: lib/Text/ANSI/Fold/Util.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   List::Util: '1.45'
   Text::ANSI::Fold: '2.01'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Fold-Util/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Fold-Util
   repository: git://github.com/kaz-utashiro/Text-ANSI-Fold-Util.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

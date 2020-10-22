@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v6.0.2 2020-10-22T08:28:16Z
+
+    - minor bugfix
+
 v6.0.1 2020-09-28T06:03:10Z
 
     - added rx_repeat, rx_retry and rx_skip

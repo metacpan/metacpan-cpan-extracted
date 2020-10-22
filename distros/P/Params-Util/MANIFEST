@@ -1,5 +1,7 @@
 .perltidyrc
+ARTISTIC-1.0
 Changes
+GPL-1
 inc/Config/AutoConf/ParamsUtil.pm
 inc/inc_Capture-Tiny/Capture/Tiny.pm
 inc/inc_Config-AutoConf/Config/AutoConf.pm
@@ -7,6 +9,7 @@ inc/latest.pm
 inc/latest/private.pm
 lib/Params/Util.pm
 lib/Params/Util/PP.pm
+LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP

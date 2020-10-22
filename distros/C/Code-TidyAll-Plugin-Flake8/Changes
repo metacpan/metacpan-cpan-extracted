@@ -1,5 +1,9 @@
 Revision history for Code-TidyAll-Plugin-Flake8
 
+0.2.1       2020-10-22
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.2.0       2019-02-19
     - Use Inline::Python if possible for speeding up by avoiding fork()+exec()
 

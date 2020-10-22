@@ -3,7 +3,7 @@ package LWP::Simple::WithCache;
 use strict;
 use LWP::Simple;
 use LWP::UserAgent::WithCache;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 $LWP::Simple::ua = new LWP::UserAgent::WithCache;
 $LWP::Simple::ua->agent("LWP::Simple::WithCache/$VERSION");
@@ -22,7 +22,7 @@ LWP::Simple::WithCache - LWP::Simple with cache
   use LWP::Simple;
   use LWP::Simple::WithCache;
 
-  print get('http://www.leeym.com/');
+  print get('http://www.example.com/');
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,13 @@
+[@Default]
+
+; [Generic / DESCRIPTION]
+; required = 1
+
+; [Generic / BUGS]
+
+; [Generic / Section::Bugs]
+; [Generic / Section::License]
+;
+[Bugs]
+[Support]
+all_modules = 1

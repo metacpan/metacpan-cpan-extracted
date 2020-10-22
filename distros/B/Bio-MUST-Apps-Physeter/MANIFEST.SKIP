@@ -1,0 +1,6 @@
+\btest\/my_.*
+dist\.ini
+weaver\.ini
+nytprof*
+tags
+.DS_Store

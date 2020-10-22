@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Message;
 # ABSTRACT: A Git commit message
-$Git::Message::VERSION = '2.12.0';
+$Git::Message::VERSION = '2.13.0';
 use 5.010;
 use utf8;
 use Carp;
@@ -195,7 +195,7 @@ Git::Message - A Git commit message
 
 =head1 VERSION
 
-version 2.12.0
+version 2.13.0
 
 =head1 SYNOPSIS
 
@@ -400,7 +400,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2020 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

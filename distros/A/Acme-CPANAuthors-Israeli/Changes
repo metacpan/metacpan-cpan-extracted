@@ -1,5 +1,10 @@
 Revision history for Acme-CPANAuthors-Israeli
 
+0.0400  2020-10-22
+        - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+            - Move to @SHLOMIF
+            - Inspired by Lady_Aleena.
+
 0.0310  2015-06-19
         - Actual release number due to a misrelease.
 

@@ -3,51 +3,51 @@ abstract: 'Plack-compatible, instant ExtJS file browser'
 author:
   - 'Henry Van Styn <vanstyn@cpan.org>'
 build_requires:
-  RapidApp::Test: '0'
-  Test::More: '0'
+  RapidApp::Test: 0
+  Test::More: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0.06'
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Rapi-Fs
 requires:
-  DateTime: '0'
-  Encode::Guess: '0'
-  File::MimeInfo::Magic: '0'
-  File::ShareDir: '0'
-  FindBin: '0'
-  Getopt::Long: '0'
-  HTML::Entities: '0'
-  Module::Runtime: '0'
-  Moo: '0'
-  Moo::Role: '0'
-  Moose: '0'
-  Moose::Role: '0'
-  Number::Bytes::Human: '0'
-  Path::Class: '0'
-  Plack::Runner: '0'
-  Pod::Usage: '0'
-  RapidApp: '1.04'
-  RapidApp::Builder: '0'
-  RapidApp::Module::NavTree: '0'
-  RapidApp::Util: '0'
-  Scalar::Util: '0'
-  Types::Standard: '0'
-  URI: '0'
-  URI::Escape: '0'
-  experimental: '0'
-  if: '0'
-  lib: '0'
-  strict: '0'
-  warnings: '0'
+  DateTime: 0
+  Encode::Guess: 0
+  File::MimeInfo::Magic: 0
+  File::ShareDir: 0
+  FindBin: 0
+  Getopt::Long: 0
+  HTML::Entities: 0
+  Module::Runtime: 0
+  Moo: 0
+  Moo::Role: 0
+  Moose: 0
+  Moose::Role: 0
+  Number::Bytes::Human: 0
+  Path::Class: 0
+  Plack::Runner: 0
+  Pod::Usage: 0
+  RapidApp: 1.04
+  RapidApp::Builder: 0
+  RapidApp::Module::NavTree: 0
+  RapidApp::Util: 0
+  Scalar::Util: 0
+  Types::Standard: 0
+  URI: 0
+  URI::Escape: 0
+  experimental: 0
+  if: 0
+  lib: 0
+  strict: 0
+  warnings: 0
 resources:
   IRC: irc://irc.perl.org/#rapidapp
   bugtracker: https://github.com/vanstyn/Rapi-Fs/issues
   homepage: http://rapi.io/fs
   repository: https://github.com/vanstyn/Rapi-Fs.git
-version: '1.104'
+version: 1.105

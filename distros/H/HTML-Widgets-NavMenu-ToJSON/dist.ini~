@@ -1,29 +1,13 @@
-name    = HTML-Widgets-NavMenu-ToJSON
-author  = Shlomi Fish <shlomif@cpan.org>
-license = MIT
+name = HTML-Widgets-NavMenu-ToJSON
+author = Shlomi Fish <shlomif@cpan.org>
+license = Artistic_2_0
 copyright_holder = Shlomi Fish
-copyright_year   = 2012
+copyright_year = 2012
+version = 0.0.8
 
 [@Filter]
--bundle = @Basic
+-bundle = @SHLOMIF
 -remove = MakeMaker
-[AutoPrereqs]
-[MetaProvides::Package]
-[ModuleBuild]
-mb_class = Test::Run::Builder
-testing_command = runtest
-[PodSyntaxTests]
-[PodCoverageTests]
-[Test::Compile]
-fake_home = 1
-[PruneCruft]
-[VersionFromModule]
-[MetaResources]
-bugtracker.web = http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Widgets-NavMenu-ToJSON
-bugtracker.mailto = bug-xml-grammar-vered@rt.cpan.org
-repository.url = ssh://hg@bitbucket.org/shlomif/perl-html-widgets-navmenu
-repository.web = http://bitbucket.org/shlomif/perl-html-widgets-navmenu
-repository.type = hg
+dist = HTML-Widgets-NavMenu-ToJSON
+github_name = perl-HTML-Widgets-NavMenu
 [PodWeaver]
-[Test::CPAN::Changes]
-[Test::TrailingSpace]

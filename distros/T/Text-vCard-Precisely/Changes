@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.28 2020-10-22T14:12:40Z
+  - started to accept newlines in some nodes like addresses
+
 0.27 2020-10-16T12:55:18Z
   - correct spec for RFC2426 again
   - so categories and nikname can have multiple values separated by comma

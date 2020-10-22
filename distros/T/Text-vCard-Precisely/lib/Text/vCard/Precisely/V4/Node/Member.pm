@@ -22,13 +22,12 @@ override 'as_string' => sub {
     push @lines, $self->name() || croak "Empty name";
     push @lines, 'ALTID=' . $self->altID() if $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->pid();
-    push @lines, 'TYPE="' . join( ',', map { uc $_ } @{ $self->types() } ) . '"'
+    push @lines, 'TYPE="' . join( ',', map {uc} @{ $self->types() } ) . '"'
         if ref $self->types() eq 'ARRAY' and $self->types()->[0];
     push @lines, 'PREF=' . $self->pref() if $self->pref();
 
     my $string = join( ';', @lines ) . ':' . $self->_escape( $self->content() );
     return $self->fold($string);
-
 };
 
 __PACKAGE__->meta->make_immutable;

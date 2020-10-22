@@ -29,6 +29,7 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
             "Test::EOL" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
@@ -44,7 +45,7 @@
             "File::Path" : "0",
             "File::Spec" : "3.29",
             "constant" : "0",
-            "perl" : "5.006",
+            "perl" : "5.008",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -57,15 +58,14 @@
             "File::Spec::Functions" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.88",
-            "perl" : "5.006"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "File::Remove" : {
          "file" : "lib/File/Remove.pm",
-         "version" : "1.59"
+         "version" : "1.60"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/shlomif/File-Remove"
       }
    },
-   "version" : "1.59",
+   "version" : "1.60",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -318,7 +318,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::TrailingSpace",
             "name" : "@Filter/Test::TrailingSpace",
-            "version" : "0.2.0"
+            "version" : null
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
@@ -469,6 +469,11 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
             "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
+            "name" : "Test::TidyAll",
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

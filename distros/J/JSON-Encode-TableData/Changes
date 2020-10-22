@@ -1,0 +1,8 @@
+0.002   2020-10-22  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Forgot to restore original data after formatting.
+
+
+0.001   2020-10-22  Released-By: PERLANCAR; Released: no
+
+        - First release.

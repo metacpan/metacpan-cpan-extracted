@@ -6,15 +6,14 @@ use 5.008000;
 use strict;
 use warnings;
 use LWP::UserAgent;
+use HTTP::Request;
 use HTML::Strip;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # the HTTP User-Agent we'll send:
-our $AGENT = "Perl/Lyrics::Fetcher::AZLyrics $VERSION";
-
-    
+our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
 
 sub fetch {
     
@@ -33,18 +32,39 @@ sub fetch {
     $artist =~ s/[^a-z0-9]//gi;
     $song   =~ s/[^a-z0-9]//gi;
     
-    my $url = 'http://www.azlyrics.com/lyrics/';
+    my $url = 'https://www.azlyrics.com/lyrics/';
     $url .= join('/', lc $artist, lc $song) . '.html';
     
-    my $ua = new LWP::UserAgent;
-    $ua->timeout(6);
+    my $ua = LWP::UserAgent->new(
+		ssl_opts => {	verify_hostname => 0, }
+	);
+	$ua->timeout(10);
     $ua->agent($AGENT);
-    my $res = $ua->get($url);
+	$ua->protocols_allowed(['https']);
+	$ua->cookie_jar( {} );
+	push @{ $ua->requests_redirectable }, 'GET';
+	(my $referer = $url) =~ s#^(\w+)\:\/\/##;
+	my $protocol = $1;
+	$referer =~ s#\/.+$#\/#;
+	my $host = $referer;
+	$host =~ s#\/$##;
+	$referer = $protocol . '://' . $referer;
+	my $req = new HTTP::Request 'GET' => $url;
+	$req->header(
+	    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+	    'Accept-Language' => 'en-US,en;q=0.5',
+	    'Accept-Encoding' => 'gzip, deflate',
+	    'Connection'      => 'keep-alive',
+	    'Upgrade-insecure-requests' => 1,
+	    'Host' => $host,
+	);
+
+	my $res = $ua->request($req);
+
     if ( $res->is_success ) {
-        my $lyrics = _parse($res->content);
+        my $lyrics = _parse($res->decoded_content);
         return $lyrics;
     } else {
-    
         if ($res->status_line =~ /^404/) {
             $Lyrics::Fetcher::Error = 
                 'Lyrics not found';
@@ -62,25 +82,16 @@ sub fetch {
 
 sub _parse {
     my $html = shift;
-    my $hs = HTML::Strip->new();
 
     # Nasty - look for everything in between the two ringtones links:
     if (my ($goodbit) = $html =~
-        m{<\!-- END OF RINGTONE 1 -->(.+)<\!-- RINGTONE 2 -->}msi)
+        m{our licensing agreement. Sorry about that. \-\-\>(.+)\<\/div\>}msi)
+        #m{\<div\s+class\=\"lyrics\"\>(.+)\<\!\-\-\/sse\-\-\>}msi)
     {
+		my $hs = HTML::Strip->new();
         my $text = $hs->parse($goodbit);
 
-        # Remove mentions of ringtones:
-        $text =~ s/^ .+ ringtone .+ $//xmgi;
-
-        # Scoop out any credits for these lyrics:
-        my @credits;
-        @Lyrics::Fetcher::azcredits = ();
-        while ($text =~ s{\[ Thanks \s to \s (.+) \]}{}xgi) {
-            push @Lyrics::Fetcher::azcredits, $1;
-        }
-
-        $text =~ s/\s*\[.+at \s www.AZLyrics.com\s+\]\s*//xmgi;
+        $text =~ s/\s+$//xmgi;
 
         # finally, clear up excess blank lines:
         $text =~ s/(\r?\n){2,}/\n\n/gs;
@@ -94,9 +105,8 @@ sub _parse {
 
 } # end of sub parse
 
-
-
 1;
+
 __END__
 
 =head1 NAME
@@ -150,11 +160,15 @@ the same terms as Perl itself.
 
 David Precious E<lt>davidp@preshweb.co.ukE<gt>
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Jim Turner for submitting a patch in RT 133592 to accomodate changes
+to the AZLyrics site to make this work again
 
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-08 by David Precious
+Copyright (C) 2007-20 by David Precious
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.7 or,

@@ -1,5 +1,10 @@
 Revision history for Test-Run-Plugin-CollectStats
 
+0.0104  2020-10-22
+
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0103  2014-01-31
         - Add a prereq on Moose.
         - Add minimum version of perl - 5.8.

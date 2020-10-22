@@ -20,4 +20,6 @@ sub complete {
     $self->{complete}->() if defined $self->{complete};
 }
 
+sub subscription { $_[0]->{_subscription} }
+
 1;

@@ -4,7 +4,7 @@ use warnings;
 
 use RxPerl::Observable;
 use RxPerl::Subscription;
-use RxPerl::Utils 'get_subscription_from_subscriber', 'get_timer_subs', 'get_interval_subs';
+use RxPerl::Utils 'get_timer_subs', 'get_interval_subs';
 use RxPerl::Subject;
 
 use Carp 'croak';
@@ -34,7 +34,7 @@ sub rx_combine_latest {
         my @latest_values;
         my $num_active = @$sources;
 
-        get_subscription_from_subscriber($subscriber)->add_dependents(
+        $subscriber->subscription->add_dependents(
             \%own_subscriptions, sub { undef @$sources },
         );
 
@@ -101,7 +101,7 @@ sub rx_concat {
         my @sources = @sources;
 
         my @active;
-        get_subscription_from_subscriber($subscriber)->add_dependents(
+        $subscriber->subscription->add_dependents(
             \@active, sub { undef @sources },
         );
 
@@ -158,7 +158,7 @@ sub rx_fork_join {
         my @keys = keys %$sources;
         @keys = sort {$a <=> $b} @keys if $arg_is_array;
 
-        get_subscription_from_subscriber($subscriber)->add_dependents(
+        $subscriber->subscription->add_dependents(
             \%own_subscriptions, sub { undef @keys },
         );
 
@@ -259,7 +259,7 @@ sub rx_from_event {
             $subscriber->{next}->(splice @args, 0, 1) if defined $subscriber->{next};
         };
 
-        get_subscription_from_subscriber($subscriber)->add_dependents(sub {
+        $subscriber->subscription->add_dependents(sub {
             $object->unsubscribe($cb) if defined $object;
         });
 
@@ -284,7 +284,7 @@ sub rx_from_event_array {
             $subscriber->{next}->([@args]) if defined $subscriber->{next};
         };
 
-        get_subscription_from_subscriber($subscriber)->add_dependents(sub {
+        $subscriber->subscription->add_dependents(sub {
             $object->unsubscribe($cb) if defined $object;
         });
 
@@ -322,7 +322,7 @@ sub rx_merge {
         my @sources = @sources;
 
         my %own_subscriptions;
-        get_subscription_from_subscriber($subscriber)->add_dependents(
+        $subscriber->subscription->add_dependents(
             \%own_subscriptions,
             sub { @sources = () },
         );
@@ -389,7 +389,7 @@ sub rx_race {
         my @sources = @sources;
 
         my @own_subscriptions;
-        get_subscription_from_subscriber($subscriber)->add_dependents(\@own_subscriptions);
+        $subscriber->subscription->add_dependents(\@own_subscriptions);
 
         for (my $i = 0; $i < @sources; $i++) {
             my $source = $sources[$i];

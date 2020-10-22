@@ -1,3 +1,13 @@
+0.000138  2020-10-21 19:46:07-07:00 America/Los_Angeles
+
+    - Merge doc fix from PR
+    - Merge strict fix for test
+
+0.000137  2020-10-21 18:22:07-07:00 America/Los_Angeles
+
+    - Test new syntax `use Test2::Plugin::SRand seed => $seed;`
+    - Update GitHub workflow with deprecated add-path
+
 0.000136  2020-10-05 22:05:24-07:00 America/Los_Angeles
 
     - Fix typo Test2::Builder -> Test::Builder

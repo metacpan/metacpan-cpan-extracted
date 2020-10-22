@@ -1,31 +1,28 @@
 package XML::Grammar::Fortune::Synd::Heap::Elem;
-$XML::Grammar::Fortune::Synd::Heap::Elem::VERSION = '0.0214';
+$XML::Grammar::Fortune::Synd::Heap::Elem::VERSION = '0.0215';
 use strict;
 use warnings;
 
 
 use parent 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(
-    date
-    id
-    idx
-    file
-    ));
+__PACKAGE__->mk_accessors(
+    qw(
+        date
+        id
+        idx
+        file
+        )
+);
 
 # "All problems in computer science can be solved by
 # adding another level of indirection;"
 # -- http://en.wikipedia.org/wiki/Abstraction_layer
 sub cmp
 {
-    my ($self, $other) = @_;
-    return
-    (
-        ($self->date()->compare($other->date()))
-            ||
-        ($self->idx() <=> $other->idx())
-    )
-    ;
+    my ( $self, $other ) = @_;
+    return (   ( $self->date()->compare( $other->date() ) )
+            || ( $self->idx() <=> $other->idx() ) );
 }
 
 1;
@@ -43,7 +40,7 @@ XML::Grammar::Fortune::Synd. For internal use.
 
 =head1 VERSION
 
-version 0.0214
+version 0.0215
 
 =head1 SYNOPSIS
 
@@ -59,80 +56,17 @@ Internal use.
 
 Shlomi Fish, C<< <shlomif at cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-xml-grammar-fortune-synd at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-Grammar-Fortune-Synd>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc XML::Grammar::Fortune::Synd
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fortune-Synd>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/XML-Grammar-Fortune-Synd>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/XML-Grammar-Fortune-Synd>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/XML-Grammar-Fortune-Synd>
-
-=back
-
-=head1 ACKNOWLEDGEMENTS
-
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2008 Shlomi Fish, all rights reserved.
 
-This program is released under the following license: MIT/X11 License
+This program is released under the following license: MIT/Expat License
 
 L<http://www.opensource.org/licenses/mit-license.php>
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2019 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/fortune-xml/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc XML::Grammar::Fortune::Synd::Heap::Elem
 
 =head2 Websites
 
@@ -151,35 +85,11 @@ L<https://metacpan.org/release/XML-Grammar-Fortune-Synd>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/XML-Grammar-Fortune-Synd>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Grammar-Fortune-Synd>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/XML-Grammar-Fortune-Synd>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/XML-Grammar-Fortune-Synd>
 
 =item *
 
@@ -230,5 +140,26 @@ from your repository :)
 L<https://github.com/shlomif/fortune-xml>
 
   git clone git://github.com/shlomif/fortune-xml.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/fortune-xml/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

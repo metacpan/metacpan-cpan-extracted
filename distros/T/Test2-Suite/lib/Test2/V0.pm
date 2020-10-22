@@ -4,7 +4,7 @@ use warnings;
 
 use Importer;
 
-our $VERSION = '0.000136';
+our $VERSION = '0.000138';
 
 use Carp qw/croak/;
 
@@ -339,9 +339,15 @@ See L<Test2::Tools::Basic>.
 
 =item ok($bool, $name)
 
+=item ok($bool, $name, @diag)
+
 =item pass($name)
 
+=item pass($name, @diag)
+
 =item fail($name)
+
+=item fail($name, @diag)
 
 =item diag($message)
 

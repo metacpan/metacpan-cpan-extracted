@@ -1,23 +1,25 @@
---- #YAML:1.0
-name:               Lyrics-Fetcher-LyricWiki
-version:            0.10
-abstract:           Get song lyrics from www.LyricWiki.org
+---
+abstract: 'DEPRECATED now LyricWiki is dead'
 author:
-    - David Precious <davidp@preshweb.co.uk>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'David Precious <davidp@preshweb.co.uk>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    LWP::UserAgent:  0
-    Test::More:      0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lyrics-Fetcher-LyricWiki
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: '0'
+  Test::More: '0'
+  URI::Escape: '0'
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

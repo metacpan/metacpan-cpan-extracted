@@ -1,6 +1,14 @@
+0.010   2020-10-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: --query-log-file, --result-dump-dir, --note.
+
+	- [bugfix] Tweak regex again to strip all trailing/leading blanks from
+	  result fields.
+
+
 0.009   2020-10-20  Released-By: PERLANCAR; Urgency: medium
 
-	- [bugfix] Tweak regex to remove leading blanks in brand (merk),
+	- [bugfix] Tweak regex to remove leading blank in brand (merk),
 	  packaging (kemasan), date of issue (tanggal terbit).
 
 

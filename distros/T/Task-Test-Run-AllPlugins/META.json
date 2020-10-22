@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@shlomifish.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "back-end",
       "harness",
@@ -25,7 +25,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-Test-Run-AllPlugins",
    "prereqs" : {
@@ -60,7 +60,7 @@
    "provides" : {
       "Task::Test::Run::AllPlugins" : {
          "file" : "lib/Task/Test/Run/AllPlugins.pm",
-         "version" : "0.0105"
+         "version" : "0.0106"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "url" : "http://bitbucket.org/shlomif/perl-test-run"
       }
    },
-   "version" : "0.0105",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.0106",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

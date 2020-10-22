@@ -9,3 +9,4 @@ t/3-pod-coverage.t
 eg/example.pl
 eg/example-direct.pl
 lib/Lyrics/Fetcher/LyricWiki.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

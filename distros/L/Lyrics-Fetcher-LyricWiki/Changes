@@ -1,5 +1,8 @@
 Revision history for Perl extension Lyrics::Fetcher::LyricWiki
 
+0.20  2020/10/22
+    - Deprecation stub release now LyricWiki has been shut down.
+
 0.10  2011/01/17
     - Handle changes in LyricWiki.org site (they now HTML-encode only the start
       of the <lyrics>...</lyrics> tag, e.g. "&gt;lyrics>")

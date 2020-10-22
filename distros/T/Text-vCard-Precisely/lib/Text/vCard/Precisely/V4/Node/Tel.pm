@@ -21,7 +21,7 @@ override 'as_string' => sub {
     push @lines, 'VALUE=uri';
     push @lines, 'ALTID=' . $self->altID() if $self->altID();
     push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->pid();
-    push @lines, 'TYPE="' . join( ',', map { uc $_ } grep { length $_ } @{ $self->types() } ) . '"'
+    push @lines, 'TYPE="' . join( ',', map {uc} grep {length} @{ $self->types() } ) . '"'
         if ref $self->types() eq 'ARRAY' and $self->types()->[0];
 
     #( my $content = $self->content() ) =~ s/^\s+//s;    # remove top space

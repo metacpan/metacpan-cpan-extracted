@@ -4,7 +4,7 @@ use warnings;
 
 use RxPerl::Operators::Creation qw/ rx_observable rx_subject rx_concat rx_of rx_interval /;
 use RxPerl::ConnectableObservable;
-use RxPerl::Utils qw/ get_subscription_from_subscriber get_timer_subs /;
+use RxPerl::Utils qw/ get_timer_subs /;
 use RxPerl::Subscription;
 
 use Carp 'croak';
@@ -35,7 +35,7 @@ sub op_audit_time {
             my $in_audit = 0;
             my @last_value;
 
-            get_subscription_from_subscriber($subscriber)->add_dependents(
+            $subscriber->subscription->add_dependents(
                 sub { $cancel_timer_sub->($id) },
             );
 
@@ -95,7 +95,7 @@ sub op_catch_error {
             my ($subscriber) = @_;
 
             my $dependents = [];
-            get_subscription_from_subscriber($subscriber)->add_dependents($dependents);
+            $subscriber->subscription->add_dependents($dependents);
 
             _op_catch_error_helper(
                 $source, $selector, $subscriber, $dependents,
@@ -519,7 +519,7 @@ sub op_merge_map {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $subscription = get_subscription_from_subscriber($subscriber);
+            my $subscription = $subscriber->subscription;
 
             my %these_subscriptions;
             my $own_subscription = RxPerl::Subscription->new;
@@ -675,12 +675,12 @@ sub op_ref_count {
             if ($count_was == 0) {
                 $connection_subscription = RxPerl::Subscription->new;
 
-                get_subscription_from_subscriber($subscriber)->add_dependents($typical_unsubscription_fn);
+                $subscriber->subscription->add_dependents($typical_unsubscription_fn);
                 $source->subscribe($subscriber);
 
                 $connection_subscription = $source->connect;
             } else {
-                get_subscription_from_subscriber($subscriber)->add_dependents($typical_unsubscription_fn);
+                $subscriber->subscription->add_dependents($typical_unsubscription_fn);
                 $source->subscribe($subscriber);
             }
 
@@ -732,7 +732,7 @@ sub op_repeat {
             my $own_subscription;
             my $own_subscription_ref = \$own_subscription;
 
-            get_subscription_from_subscriber($subscriber)->add_dependents(
+            $subscriber->subscription->add_dependents(
                 $own_subscription_ref,
             );
 
@@ -784,7 +784,7 @@ sub op_retry {
             my $own_subscription;
             my $own_subscription_ref = \$own_subscription;
 
-            get_subscription_from_subscriber($subscriber)->add_dependents(
+            $subscriber->subscription->add_dependents(
                 $own_subscription_ref,
             );
 
@@ -816,7 +816,7 @@ sub op_sample_time {
                 }
             });
 
-            get_subscription_from_subscriber($subscriber)->add_dependents($n_s);
+            $subscriber->subscription->add_dependents($n_s);
 
             $source->subscribe({
                 %$subscriber,
@@ -932,7 +932,7 @@ sub op_switch_map {
             my $this_own_subscription;
             my $own_subscription = RxPerl::Subscription->new;
 
-            get_subscription_from_subscriber($subscriber)->add_dependents(
+            $subscriber->subscription->add_dependents(
                 \$this_own_subscription, $own_subscription,
             );
 
@@ -1076,7 +1076,7 @@ sub op_tap {
             my ($subscriber) = @_;
 
             my @args = @args;
-            my $tap_subscriber = $args[0] if (reftype($args[0]) // '') eq 'HASH';
+            my $tap_subscriber; $tap_subscriber = $args[0] if (reftype($args[0]) // '') eq 'HASH';
             $tap_subscriber //= {
                 map {($_, shift @args)} qw/ next error complete /
             };
@@ -1115,7 +1115,7 @@ sub op_throttle_time {
             my $silent_mode = 0;
             my $silence_timer_id;
 
-            get_subscription_from_subscriber($subscriber)->add_dependents(
+            $subscriber->subscription->add_dependents(
                 sub { $cancel_timer_sub->($silence_timer_id) if defined $silence_timer_id }
             );
 
@@ -1158,7 +1158,7 @@ sub op_with_latest_from {
             my @latest_values;
             my %other_subscriptions;
 
-            get_subscription_from_subscriber($subscriber)->add_dependents(
+            $subscriber->subscription->add_dependents(
                 \%other_subscriptions, sub { undef @other_observables },
             );
 

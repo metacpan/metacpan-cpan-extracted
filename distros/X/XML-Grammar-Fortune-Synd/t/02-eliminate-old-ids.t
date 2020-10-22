@@ -22,7 +22,7 @@ $temp_dir = tempdir( CLEANUP => 1 );
 
 sub _my_copy
 {
-    my ($src, $dest) = @_;
+    my ( $src, $dest ) = @_;
 
     open my $out_fh, '>', $dest;
     print {$out_fh} _slurp($src);
@@ -35,7 +35,8 @@ sub _my_copy
 # read-only status on some versions of Windows, which makes the file
 # unwritable later on, which prevents it from being updated and causes
 # the tests to fail.
-_my_copy(cur_fn("t/data/fortune-synd-eliminate-old-ids-1/fort.yaml"), yaml_fn());
+_my_copy( cur_fn("t/data/fortune-synd-eliminate-old-ids-1/fort.yaml"),
+    yaml_fn() );
 
 my @cmd_line = (
     $^X,
@@ -43,29 +44,29 @@ my @cmd_line = (
     "-e",
     "run()",
     "--",
-    "--dir" => dir( "t/data/fortune-synd-eliminate-old-ids-1"),
+    "--dir" => dir("t/data/fortune-synd-eliminate-old-ids-1"),
     qw(
         --xml-file irc-conversation-4-several-convos.xml
         --xml-file screenplay-fort-sample-1.xml
-    ),
-    @{common_fns()},
+        ),
+    @{ common_fns() },
     "--master-url" => "http://www.fortunes.tld/My-Fortunes/",
-    "--title" => "My Fortune Feeds",
-    "--tagline" => "My Fortune Feeds",
-    "--author" => "shlomif\@iglu.org.il (Shlomi Fish)",
+    "--title"      => "My Fortune Feeds",
+    "--tagline"    => "My Fortune Feeds",
+    "--author"     => "shlomif\@iglu.org.il (Shlomi Fish)",
 );
 
 sub print_cmd_line
 {
     open my $out_fh, ">", "file.bash";
-    print {$out_fh} join(" ", map { qq{"$_"} } @cmd_line);
+    print {$out_fh} join( " ", map { qq{"$_"} } @cmd_line );
     close($out_fh);
 }
 
 # print_cmd_line();
 
 # TEST
-ok (!system(@cmd_line));
+ok( !system(@cmd_line) );
 
 sub _slurp
 {
@@ -84,10 +85,10 @@ sub _slurp
 
 # TODO : use a YAML parser etc., but I'm lazy.
 {
-    my $content = _slurp(yaml_fn());
+    my $content = _slurp( yaml_fn() );
 
-    my @matches = ($content =~ m{let-me-wikipedia-it}g);
+    my @matches = ( $content =~ m{let-me-wikipedia-it}g );
 
     # TEST
-    is (scalar(@matches), 1, "ID exists only in one place.");
+    is( scalar(@matches), 1, "ID exists only in one place." );
 }

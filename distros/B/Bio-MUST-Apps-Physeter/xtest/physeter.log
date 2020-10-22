@@ -1,0 +1,4 @@
+Getopt::Euclid: Invalid .type constraint: max.type: 0+integer, max >= min
+(Bareword "min" not allowed while "strict subs" in use at (eval 43) line 1.
+) at ./physeter.pl line 11.
+BEGIN failed--compilation aborted at ./physeter.pl line 11.

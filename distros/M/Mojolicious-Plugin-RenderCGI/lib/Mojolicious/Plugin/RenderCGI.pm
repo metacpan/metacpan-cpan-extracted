@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::RenderCGI::Template;
 use Mojo::Util qw(encode md5_sum);
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 my $pkg = __PACKAGE__;
 
 has qw(app);
@@ -51,10 +51,10 @@ sub handler {
     unless $stash;
   $stash ||= $c->stash($pkg);
   my $last_template = $stash->{stack}[-1];
-  if ($last_template && $last_template eq $name) {
-    $$output = $plugin->error("Stop looping template [$name]!", $c);
-    return;
-  }
+  #~ if ($last_template && $last_template eq $name) {
+    #~ $$output = $plugin->error("Stop looping template [$name]!", $c);
+    #~ return;
+  #~ }
   push @{$stash->{stack}}, $name;
   
   $$output = '';
@@ -134,13 +134,9 @@ sub error {# харе
 
 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
 
-=head1 VERSION
-
-0.101
-
 =head1 NAME
 
-Mojolicious::Plugin::RenderCGI - Rendering template with Perl code and CGI.pm funcs/subs for tags emits.
+Mojolicious::Plugin::RenderCGI - Rendering Mojoliciuos template by CGI.pm subs as tags.
 
 =head1 SYNOPSIS
 
@@ -150,7 +146,7 @@ Mojolicious::Plugin::RenderCGI - Rendering template with Perl code and CGI.pm fu
 
 Template is a Perl code that generate content as list of statements. Similar to C<do BLOCK>. Template file name like "templates/foo/bar.html.cgi.pl"
 
-  # Predefined variables:
+  # There are predefined variables:
   # $self  is a     Mojolicious::Plugin::RenderCGI::Template object
   # $c     is a     current controller object
   # $cgi   is a     CGI object
@@ -163,7 +159,11 @@ Template is a Perl code that generate content as list of statements. Similar to 
   #======= content comma list! ===========
   #=======================================
   
-  h1({}, "Welcome"),# but this template handlered cgi!
+  h1({}, "Welcome"),# but this template handlered CGI
+  div({-class=>"container"},
+    span('Okay here'),
+    p(['blah', 'blaz']),
+  ),
   
   $c->include('foo', handler=>'cgi.pl'),# change handler against layout
   $c->include('bar'); # handler still "ep" unless template "foo" (and its includes) didn`t changes it by $c->stash('handler'=>...)
@@ -262,7 +262,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

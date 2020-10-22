@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util 'blessed', 'reftype', 'weaken';
 
-our $VERSION = "v6.0.1";
+our $VERSION = "v6.0.2";
 
 sub new {
     my ($class) = @_;
@@ -47,7 +47,7 @@ sub _execute_item {
     }
 }
 
-sub add_to_subscribers {
+sub _add_to_subscribers {
     my ($self, $subscriber) = @_;
 
     push @{ $self->{subscribers} }, $subscriber;

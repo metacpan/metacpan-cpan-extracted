@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use IO::All;
+use Path::Tiny qw/ path /;
 
 my ($version) =
-    ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-        io->file('lib/XML/Grammar/Fortune/Synd.pm')->getlines() );
+    ( map { m{\Aversion * = *(\S+)} ? ($1) : () }
+        path("./dist.ini")->lines_utf8() );
 
 if ( !defined($version) )
 {
@@ -22,4 +22,3 @@ my @cmd = (
 
 print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);
-

@@ -1,14 +1,18 @@
-MANIFEST
-Makefile.PL
+Changes
 CHGEUER.asc
-README
-RIPEMD160.pm
-RIPEMD160.xs
-RIPEMD160/MAC.pm
+lib/Crypt/RIPEMD160.pm
+lib/Crypt/RIPEMD160/MAC.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.json			Module meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
 misc/rfc2104.txt
 misc/rfc2286.txt
 misc/ripemd160_driver.pl
 misc/speedtest.pl
+README
+RIPEMD160.xs
 rmd160.c
 rmd160.h
 rmd160/doc/README
@@ -27,5 +31,3 @@ t/01test.t
 typemap
 wrap_160.c
 wrap_160.h
-META.yml                                 Module meta-data (added by MakeMaker)
-META.json                                Module meta-data (added by MakeMaker)

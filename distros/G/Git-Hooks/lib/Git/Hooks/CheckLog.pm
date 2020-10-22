@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '2.12.0';
+$Git::Hooks::CheckLog::VERSION = '2.13.0';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -430,7 +430,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 2.12.0
+version 2.13.0
 
 =head1 SYNOPSIS
 
@@ -522,7 +522,7 @@ the format of commit log messages. The REFERENCES section below lists
 some of the most important.
 
 This plugin allows one to enforce most of the established policies. The
-default configuration already enforces the most common one.
+default configuration already enforces the most common ones.
 
 To enable it you should add it to the githooks.plugin configuration
 option:
@@ -539,7 +539,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options under the
-C<githooks.checkacls> subsection.
+C<githooks.checklog> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
@@ -764,7 +764,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2020 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension LWP::Simple::WithCache.
 
+0.04  Wed Oct 21 20:17:22 PDT 2020
+	- update t/03-cache.t so it will not fail
+
 0.03  Thu Dec 18 08:49:09 2008
 	- update t/02-default_expires_in.t so it will not fail
 

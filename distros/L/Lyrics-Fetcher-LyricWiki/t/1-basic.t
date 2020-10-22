@@ -26,65 +26,12 @@ use Lyrics::Fetcher::LyricWiki;
 #   fail    => 1  (optional - if true, then this request should fail)
 #   error   => '....'  - if fail is used, then eror gives the error
 #               message that we expect to see upon failure
-my @tests = (
-
-    {
-        title   => 'Cast No Shadow',
-        artist  => 'Oasis',
-        lookfor => qr/As he faced the sun he cast no shadow/,
-    },
-    {
-        title   => 'Heavy Fuel',
-        artist  => 'Dire Straits',
-        lookfor => qr/Last time I was sober, man I felt bad/i,
-    },
-    {
-        title   => 'Turn Up The Sun',
-        artist  => 'Oasis',
-        lookfor => qr/Come on,? turn up the sun/i,
-    },
-    # This one gets redirected (REM -> R.E.M.)
-    {
-        title   => 'High Speed Train',
-        artist  => 'REM',
-        lookfor => qr/jump on a high(?:\s|-)speed train/i,
-    },
-    {
-        title   => 'This Song Does Not Exist',
-        artist  => 'Nobody In Particular',
-        fail    => 1,
-        error   => 'Lyrics not found',
-    },
-);
 
 # For each test fetch, we perform two tests and skip two tests, depending upon
 # whether it's a test which should fail or not.
-plan tests => scalar @tests * 4;
+plan tests => 1;
 
-
-TEST: for my $test (@tests) {
     
-    my $lyrics = Lyrics::Fetcher::LyricWiki->fetch(@$test{ qw(artist title) })
-        || ''; # save errors trying to match regexes against uninitalised value
-    my $title = $test->{title};
-    SKIP: {
-        skip "We expect this to work, so skip the failure checks", 2
-            unless $test->{fail};
-        # We want to see a failure attempting to fetch lyrics for this one; if
-        # we get something, we're accidentally interpreting failure as success
-        ok(!$lyrics, "Got no lyrics for $title");
-        is($Lyrics::Fetcher::Error, $test->{error},
-            "Got expected error message");
-    }
+my $lyrics = Lyrics::Fetcher::LyricWiki->fetch('Spice Girls', 'Goodbye');
+is($Lyrics::Fetcher::Error, 'LyricsWiki no longer exists');
 
-    SKIP: {
-        skip "We expect this to fail, so skip success checks", 2
-            if $test->{fail};
-        # This is a test that ought to succeed:
-        like($lyrics, $test->{lookfor}, 
-            "Lyrics look acceptable for $test->{title} by $test->{artist}");
-        is($Lyrics::Fetcher::Error, 'OK',
-            '$Lyrics::Fetcher::Error is \'OK\'');
-    }
-   
-}

@@ -2,9 +2,9 @@ NAME
     App::AlgorithmBackoffUtils - Utilities related to Algorithm::Backoff
 
 VERSION
-    This document describes version 0.004 of App::AlgorithmBackoffUtils
+    This document describes version 0.005 of App::AlgorithmBackoffUtils
     (from Perl distribution App-AlgorithmBackoffUtils), released on
-    2019-11-29.
+    2020-10-20.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -1211,19 +1211,19 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Algorithm::Backoff::MIMD.
+    Algorithm::Backoff::Exponential.
+
+    Algorithm::Backoff::LIMD.
 
     Algorithm::Backoff::Constant.
 
-    Algorithm::Backoff::Exponential.
+    Algorithm::Backoff::MILD.
 
     Algorithm::Backoff::Fibonacci.
 
-    Algorithm::Backoff::MILD.
-
     Algorithm::Backoff::LILD.
 
-    Algorithm::Backoff::LIMD.
+    Algorithm::Backoff::MIMD.
 
     Algorithm::Backoff
 
@@ -1231,7 +1231,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

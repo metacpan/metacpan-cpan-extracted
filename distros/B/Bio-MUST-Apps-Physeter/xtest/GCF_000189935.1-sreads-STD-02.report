@@ -1,0 +1,21 @@
+ 48.96	3919	3919	U	0	unclassified
+ 51.04	4085	0	R	1	root
+ 51.04	4085	44	R1	131567	  cellular organisms
+ 50.36	4031	2	D	2157	    Archaea
+ 50.34	4029	1	P	28890	      Euryarchaeota
+ 50.32	4028	3	P1	2283794	        Methanomada group
+ 50.29	4025	0	C	183925	          Methanobacteria
+ 50.29	4025	0	O	2158	            Methanobacteriales
+ 50.29	4025	13	F	2159	              Methanobacteriaceae
+ 50.12	4012	129	G	2172	                Methanobrevibacter
+ 48.50	3882	3210	S	2173	                  Methanobrevibacter smithii
+  8.40	672	672	S1	420247	                    Methanobrevibacter smithii ATCC 35061
+  0.01	1	0	G1	2638681	                  unclassified Methanobrevibacter
+  0.01	1	1	S	1609968	                    Methanobrevibacter sp. YE315
+  0.12	10	0	D	2	    Bacteria
+  0.12	10	0	D1	1783272	      Terrabacteria group
+  0.12	10	0	P	1239	        Firmicutes
+  0.12	10	1	C	91061	          Bacilli
+  0.11	9	5	O	186826	            Lactobacillales
+  0.05	4	1	F	81852	              Enterococcaceae
+  0.04	3	3	G	1350	                Enterococcus

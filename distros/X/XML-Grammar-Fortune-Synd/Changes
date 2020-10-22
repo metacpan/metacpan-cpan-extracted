@@ -1,5 +1,10 @@
 Revision history for XML-Grammar-Fortune-Synd
 
+0.0215  2020-10-22
+    - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
+        - Move to @SHLOMIF
+        - Inspired by Lady_Aleena.
+
 0.0214  2019-08-23
         - Move repo to github.
 
