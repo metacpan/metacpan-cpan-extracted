@@ -1,6 +1,9 @@
-# $Id: 05-ZONEMD.t 1771 2020-02-25 14:23:23Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-ZONEMD.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 20;
 use Net::DNS;
 
@@ -16,20 +19,20 @@ my $wire = join '', qw( 00003039 01 01 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -43,9 +46,9 @@ my $wire = join '', qw( 00003039 01 01 2BB183AF5F22588179A53B0A98631FAD1A292118 
 	}
 
 
-	my $empty   = new Net::DNS::RR("$name $type");
+	my $empty   = Net::DNS::RR->new("$name $type");
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $decoded->encode;
 	my $hex2    = uc unpack 'H*', $encoded;
 	my $hex3    = uc unpack 'H*', substr( $encoded, length $empty->encode );
@@ -55,7 +58,7 @@ my $wire = join '', qw( 00003039 01 01 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 	foreach ( @attr, @also, 'rdstring' ) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
@@ -63,7 +66,7 @@ my $wire = join '', qw( 00003039 01 01 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 
 {
-	my $rr = new Net::DNS::RR( type => $type, scheme => 1 );
+	my $rr = Net::DNS::RR->new( type => $type, scheme => 1 );
 	ok( $rr->string, 'string method with default values' );
 	is( $rr->string, Net::DNS::RR->new( $rr->string )->string, 'parse $rr->string' );
 	$rr->digestbin('');
@@ -72,7 +75,7 @@ my $wire = join '', qw( 00003039 01 01 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 
 {
-	my $rr = new Net::DNS::RR( type => $type );
+	my $rr = Net::DNS::RR->new( type => $type );
 	eval { $rr->digest('123456789XBCDEF'); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "corrupt hexadecimal\t[$exception]" );

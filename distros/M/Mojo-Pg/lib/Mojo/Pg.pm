@@ -22,7 +22,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.20';
+our $VERSION = '4.21';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -60,6 +60,8 @@ sub from_string {
 
 sub new { @_ > 1 ? shift->SUPER::new->from_string(@_) : shift->SUPER::new }
 
+sub reset { ($_[0]->{queue} = []) and return $_[0] }
+
 sub _dequeue {
   my $self = shift;
 
@@ -73,7 +75,7 @@ sub _dequeue {
   # Search path
   if (my $path = $self->search_path) {
     my $search_path = join ', ', map { $dbh->quote_identifier($_) } @$path;
-    $dbh->do("set search_path to $search_path");
+    $dbh->do("SET search_path TO $search_path");
   }
 
   $self->emit(connection => $dbh);
@@ -117,14 +119,14 @@ Mojo::Pg - Mojolicious ♥ PostgreSQL
   my $pg = Mojo::Pg->new('postgresql://postgres@/test');
 
   # Select the server version
-  say $pg->db->query('select version() as version')->hash->{version};
+  say $pg->db->query('SELECT VERSION() AS version')->hash->{version};
 
   # Use migrations to create a table
   $pg->migrations->name('my_names_app')->from_string(<<EOF)->migrate;
   -- 1 up
-  create table names (id serial primary key, name text);
+  CREATE TABLE names (id SERIAL PRIMARY KEY, name TEXT);
   -- 1 down
-  drop table names;
+  DROP TABLE names;
   EOF
 
   # Use migrations to drop and recreate the table
@@ -142,8 +144,8 @@ Mojo::Pg - Mojolicious ♥ PostgreSQL
   # Insert a few rows in a transaction with SQL and placeholders
   eval {
     my $tx = $db->begin;
-    $db->query('insert into names (name) values (?)', 'Sara');
-    $db->query('insert into names (name) values (?)', 'Stefan');
+    $db->query('INSERT INTO names (name) VALUES (?)', 'Sara');
+    $db->query('INSERT INTO names (name) VALUES (?)', 'Stefan');
     $tx->commit;
   };
   say $@ if $@;
@@ -152,7 +154,7 @@ Mojo::Pg - Mojolicious ♥ PostgreSQL
   say $db->insert('names', {name => 'Daniel'}, {returning => 'id'})->hash->{id};
 
   # JSON roundtrip
-  say $db->query('select ?::json as foo', {json => {bar => 'baz'}})
+  say $db->query('SELECT ?::JSON AS foo', {json => {bar => 'baz'}})
     ->expand->hash->{foo}{bar};
 
   # Select all rows blocking with SQL::Abstract
@@ -167,8 +169,8 @@ Mojo::Pg - Mojolicious ♥ PostgreSQL
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
   # Concurrent non-blocking queries (synchronized with promises)
-  my $now   = $pg->db->query_p('select now() as now');
-  my $names = $pg->db->query_p('select * from names');
+  my $now   = $pg->db->query_p('SELECT NOW() AS now');
+  my $names = $pg->db->query_p('SELECT * FROM names');
   Mojo::Promise->all($now, $names)->then(sub {
     my ($now, $names) = @_;
     say $now->[0]->hash->{now};
@@ -212,7 +214,7 @@ can handle connection timeouts gracefully by holding on to them only for short a
   get '/' => sub {
     my $c  = shift;
     my $db = $c->pg->db;
-    $c->render(json => $db->query('select now() as now')->hash);
+    $c->render(json => $db->query('SELECT NOW() AS now')->hash);
   };
 
   app->start;
@@ -231,8 +233,8 @@ Every database connection can only handle one active query at a time, this inclu
 multiple queries concurrently, you have to use multiple connections.
 
   # Performed concurrently (5 seconds)
-  $pg->db->query('select pg_sleep(5)' => sub {...});
-  $pg->db->query('select pg_sleep(5)' => sub {...});
+  $pg->db->query('SELECT PG_SLEEP(5)' => sub {...});
+  $pg->db->query('SELECT PG_SLEEP(5)' => sub {...});
 
 All cached database handles will be reset automatically if a new process has been forked, this allows multiple
 processes to share the same L<Mojo::Pg> object safely.
@@ -246,7 +248,7 @@ And as your application grows, you can move queries into model classes.
 
   has 'pg';
 
-  sub now { shift->pg->db->query('select now() as now')->hash }
+  sub now { shift->pg->db->query('SELECT NOW() AS now')->hash }
 
   1;
 
@@ -290,7 +292,7 @@ Emitted when a new database connection has been established.
 
   $pg->on(connection => sub {
     my ($pg, $dbh) = @_;
-    $dbh->do('set search_path to my_schema');
+    $dbh->do('SET search_path TO my_schema');
   });
 
 =head1 ATTRIBUTES
@@ -398,10 +400,10 @@ Schema search path assigned to all new connections.
 
   # Isolate tests and avoid race conditions when running them in parallel
   my $pg = Mojo::Pg->new('postgresql:///test')->search_path(['test_one']);
-  $pg->db->query('drop schema if exists test_one cascade');
-  $pg->db->query('create schema test_one');
+  $pg->db->query('DROP SCHEMA IF EXISTS test_one CASCADE');
+  $pg->db->query('CREATE SCHEMA test_one');
   ...
-  $pg->db->query('drop schema test_one cascade');
+  $pg->db->query('DROP SCHEMA test_one CASCADE');
 
 =head2 username
 
@@ -424,8 +426,7 @@ destroyed, so you can handle problems like connection timeouts gracefully by hol
 time.
 
   # Add up all the money
-  say $pg->db->select('accounts')
-    ->hashes->reduce(sub { $a->{money} + $b->{money} });
+  say $pg->db->select('accounts')->hashes->reduce(sub { $a->{money} + $b->{money} });
 
 =head2 from_string
 
@@ -468,6 +469,12 @@ Construct a new L<Mojo::Pg> object and parse connection string with L</"from_str
 
   # Customize configuration further
   my $pg = Mojo::Pg->new->dsn('dbi:Pg:service=foo');
+
+=head2 reset
+
+  $pg = $pg->reset;
+
+Reset connection cache.
 
 =head1 DEBUGGING
 

@@ -1,5 +1,21 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.4.0   2020-10-25
+      * Add (debug) logging through Log::Any; each instance has a
+        logger through the new `logger` attribute
+
+1.3.0   2020-10-24
+      * Restore umask using Scope::Guard for maximum reliability
+      * More meaningful error messages
+
+1.2.3   2020-10-24
+      * Restore pre-1.2.0 compatibility by allowing a reference
+        to be passed into the constructor/BUILDARGS
+
+1.2.2   2020-10-23
+      * Fall back to dbname in 'connect_data' init_arg when
+        no explicit 'dbname' init_arg is supplied.
+
 1.2.1   2020-10-22
       * Fix 'Odd number of elements in hash assignment' bug
 

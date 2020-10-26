@@ -1,21 +1,17 @@
 package Net::DNS::RR::AFSDB;
 
-#
-# $Id: AFSDB.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: AFSDB.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::AFSDB - DNS AFSDB resource record
 
 =cut
-
 
 use integer;
 
@@ -26,8 +22,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset, @opaque ) = @_;
 
-	$self->{subtype} = unpack "\@$offset n", $$data;
-	$self->{hostname} = decode Net::DNS::DomainName2535( $data, $offset + 2, @opaque );
+	$self->{subtype}  = unpack "\@$offset n", $$data;
+	$self->{hostname} = Net::DNS::DomainName2535->decode( $data, $offset + 2, @opaque );
+	return;
 }
 
 
@@ -36,7 +33,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my ( $offset, @opaque ) = @_;
 
 	my $hostname = $self->{hostname};
-	pack 'n a*', $self->subtype, $hostname->encode( $offset + 2, @opaque );
+	return pack 'n a*', $self->subtype, $hostname->encode( $offset + 2, @opaque );
 }
 
 
@@ -44,7 +41,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $hostname = $self->{hostname};
-	join ' ', $self->subtype, $hostname->string;
+	return join ' ', $self->subtype, $hostname->string;
 }
 
 
@@ -53,6 +50,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->subtype(shift);
 	$self->hostname(shift);
+	return;
 }
 
 
@@ -60,15 +58,15 @@ sub subtype {
 	my $self = shift;
 
 	$self->{subtype} = 0 + shift if scalar @_;
-	$self->{subtype} || 0;
+	return $self->{subtype} || 0;
 }
 
 
 sub hostname {
 	my $self = shift;
 
-	$self->{hostname} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{hostname}->name if $self->{hostname};
+	$self->{hostname} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{hostname} ? $self->{hostname}->name : undef;
 }
 
 
@@ -79,7 +77,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name AFSDB subtype hostname');
+    $rr = Net::DNS::RR->new('name AFSDB subtype hostname');
 
 =head1 DESCRIPTION
 

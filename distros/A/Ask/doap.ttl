@@ -1,0 +1,335 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Ask/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [ doap-deps:on "System::Command"^^doap-deps:CpanId ], [ doap-deps:on "Gtk2"^^doap-deps:CpanId ], [ doap-deps:on "Tk"^^doap-deps:CpanId ], [ doap-deps:on "Caroline"^^doap-deps:CpanId ], [ doap-deps:on "Term::ANSIColor"^^doap-deps:CpanId ], [ doap-deps:on "Term::Clui"^^doap-deps:CpanId ], [ doap-deps:on "File::Which"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.000006"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "Type::Utils"^^doap-deps:CpanId ], [
+		doap-deps:on "Lingua::Boolean::Tiny 0.003"^^doap-deps:CpanId;
+	], [ doap-deps:on "Module::Pluggable"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "Wx"^^doap-deps:CpanId ], [ doap-deps:on "Prima"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.98"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Ask>;
+	doap:created         "2012-11-28"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Ask>;
+	doap:homepage        <https://metacpan.org/release/Ask>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Ask";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Ask/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Ask/v_0-012>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-ask>;
+	];
+	doap:shortdesc       "ask your users about stuff".
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Developer preview";
+	dc:identifier        "Ask-0.000_01"^^xsd:string;
+	dc:issued            "2012-12-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Developer preview II";
+	dc:identifier        "Ask-0.000_02"^^xsd:string;
+	dc:issued            "2012-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Tk";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix repo link.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Ask-0.001"^^xsd:string;
+	dc:issued            "2012-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document Ask::Tk.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document Ask::Callback.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Respect PERL_ASK_BACKEND environment variable.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Allow functions to be exported via Sub::Exporter::Progressive.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.002"^^xsd:string;
+	dc:issued            "2012-12-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require at least version 0.006 of namespace::sweep.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.003"^^xsd:string;
+	dc:issued            "2013-01-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Gtk";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.004"^^xsd:string;
+	dc:issued            "2013-01-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "New API method: multiple_choice";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Correctly destroy no longer used Tk::MainWindow objects created in info, warning, question and file_selection methods.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Wx - does not yet support multi file selection dialog.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "New API method: single_choice";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.005"^^xsd:string;
+	dc:issued            "2013-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "New (internal) API method: quality";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "New (internal) API method: is_usable";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Saner implementation of Ask->detect, using Module::Pluggable.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Fallback backend, which kicks in if $ENV{AUTOMATED_TESTING} or $ENV{PERL_MM_USE_DEFAULT}.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.006"^^xsd:string;
+	dc:issued            "2013-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "XML address book example script.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Corrections in Ask::Wx pod.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.007"^^xsd:string;
+	dc:issued            "2013-06-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "AskX::AutoLang.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use POSIX.pm to switch off terminal echo instead of Term::ReadKey.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/haarg>;
+		], [
+			a doap-changeset:Bugfix, doap-changeset:Update;
+			rdfs:label "Bumped Moo version requirement to 1.000006.";
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-ask/issues/1>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jberger>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Add a 'lang' option; use Lingua::Boolean::Tiny to process it.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/daxim>;
+			rdfs:comment "The beginning of the long i18n journey.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=82925>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.008"^^xsd:string;
+	dc:issued            "2020-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Replace Sub::Exporter::Progressive with Exporter::Tiny.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Replace namespace::sweep with namespace::autoclean.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Ask::Gtk, Ask::Wx, Ask::Tk, and Ask::Zenity now check DISPLAY environment variable to see if they will be usable.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Better skipping of backends which cannot be loaded.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.009"^^xsd:string;
+	dc:issued            "2020-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Remove Perl-5.10-specific syntax and backport to Perl 5.8.8+.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.010"^^xsd:string;
+	dc:issued            "2020-10-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix syntax error in Ask::Wx introduced in version 0.009.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add Module::Pluggable to the dependency list.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.011"^^xsd:string;
+	dc:issued            "2020-10-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Question.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Minor issues with Ask::Functions fixed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Ask/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "Ask-0.012"^^xsd:string;
+	dc:issued            "2020-10-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Clui.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Caroline.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Ask::Prima.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Ask->backends method.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "file_selection now returns Path::Tiny objects instead of strings.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Ask-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/daxim>
+	a                    foaf:Person;
+	foaf:name            "Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯";
+	foaf:nick            "DAXIM";
+	foaf:page            <https://metacpan.org/author/DAXIM>.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
+
+<http://purl.org/NET/cpan-uri/person/jberger>
+	a                    foaf:Person;
+	foaf:name            "Joel Berger";
+	foaf:nick            "JBERGER";
+	foaf:page            <https://metacpan.org/author/JBERGER>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

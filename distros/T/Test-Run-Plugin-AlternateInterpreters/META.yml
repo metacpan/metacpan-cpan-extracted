@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ name: Test-Run-Plugin-AlternateInterpreters
 provides:
   Test::Run::CmdLine::Plugin::AlternateInterpreters:
     file: lib/Test/Run/CmdLine/Plugin/AlternateInterpreters.pm
-    version: '0.0124'
+    version: '0.0125'
   Test::Run::Plugin::AlternateInterpreters:
     file: lib/Test/Run/Plugin/AlternateInterpreters.pm
-    version: '0.0124'
+    version: '0.0125'
   Test::Run::Plugin::AlternateInterpreters::Straps::AltIntrPlugin:
     file: lib/Test/Run/Plugin/AlternateInterpreters/Straps/AltIntrPlugin.pm
 requires:
@@ -34,5 +34,6 @@ requires:
 resources:
   homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
   license: http://www.opensource.org/licenses/mit-license.php
-  repository: https://bitbucket.org/shlomif/perl-test-run
-version: '0.0124'
+  repository: https://github.com/shlomif/perl-test-run
+version: '0.0125'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

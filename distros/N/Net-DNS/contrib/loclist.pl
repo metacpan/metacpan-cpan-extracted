@@ -11,15 +11,18 @@
 #    perl -pe 's/^.*host=//; s/([a-zA-Z0-9.-]+).*/$1/' |
 #    sort -u | ~/loclist.pl > loc.sites
 
+use strict;
+use warnings;
+
 use Net::DNS '0.08';
 use Getopt::Std;
 
 getopts('vnrd');
 
-$res = new Net::DNS::Resolver;
+$res = Net::DNS::Resolver->new();
 
 line:
-    foreach $_ (<>) {
+    while (<>) {
       chomp;
       $foundloc = $namefound = 0;
 
@@ -33,7 +36,7 @@ line:
 	  $query = $res->query($_);
 	  
 	  if (defined ($query)) {
-	    foreach $ans ($query->answer) {
+	    foreach my $ans ($query->answer) {
 	      if ($ans->type eq "PTR") {
 		$_ = $ans->ptrdname;
 		$namefound++;
@@ -47,7 +50,7 @@ line:
       $query = $res->query($_,"LOC");
 
       if (defined ($query)) {	# then we got an answer of some sort
-	foreach $ans ($query->answer) {
+	foreach my $ans ($query->answer) {
 	  if ($ans->type eq "LOC") {
 	    print "$_ YES ",$ans->rdatastr,"\n";
 	    $foundloc++;
@@ -58,7 +61,7 @@ line:
 	@addrs = @netnames = ();
 	$query = $res->query($_,"A");
 	if (defined ($query)) {
-	  foreach $ans ($query->answer) {
+	  foreach my $ans ($query->answer) {
 	    if ($ans->type eq "A") {
 	      push(@addrs,$ans->address);
 	    }
@@ -66,7 +69,7 @@ line:
 	}
 	if (@addrs) {
 	checkaddrs:
-	  foreach $ipstr (@addrs) {
+	  foreach my $ipstr (@addrs) {
 	    $ipnum = unpack("N",pack("CCCC",split(/\./,$ipstr,4)));
 	    ($ip1) = split(/\./,$ipstr);
 	    if ($ip1 >= 224) { # class D/E, treat as host addr
@@ -86,7 +89,7 @@ line:
 		      . ".in-addr.arpa";
 	      $query = $res->query($querystr,"PTR");
 	      if (defined ($query)) {
-		foreach $ans ($query->answer) {
+		foreach my $ans ($query->answer) {
 		  if ($ans->type eq "PTR") {
 		    # we want the list in LIFO order
 		    unshift(@netnames,$ans->ptrdname);
@@ -94,7 +97,7 @@ line:
 		}
 		$query = $res->query($querystr,"A");
 		if (defined ($query)) {
-		  foreach $ans ($query->answer) {
+		  foreach my $ans ($query->answer) {
 		    if ($ans->type eq "A") {
 		      $mask = unpack("L",pack("CCCC",
 					      split(/\./,$ans->address,4)));
@@ -104,10 +107,10 @@ line:
 	      }
 	    }
 	    if (@netnames) {
-	      foreach $network (@netnames) {
+	      foreach my $network (@netnames) {
 		$query = $res->query($network,"LOC");
 		if (defined ($query)) {
-		  foreach $ans ($query->answer) {
+		  foreach my $ans ($query->answer) {
 		    if ($ans->type eq "LOC") {
 		      print "$_ YES ",$ans->rdatastr,"\n";
 		      $foundloc++;

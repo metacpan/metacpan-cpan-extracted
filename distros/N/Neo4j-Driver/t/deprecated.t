@@ -18,12 +18,56 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 1 + 4;
+use Test::More 0.96 tests => 7 + 3;
 use Test::Exception;
 use Test::Warnings qw(warning warnings);
+my $transaction = $driver->session->begin_transaction;
+$transaction->{return_stats} = 0;  # optimise sim
 
 
 my ($d, $w, $r);
+
+
+# query from types.t
+my $q = <<END;
+CREATE (n1:Test {test: 'node1'}), (n2:Test {test: 'node2'})
+CREATE p1=(n1)-[e1:TEST]->(n2)<-[e2:TEST]-(n1)
+CREATE (n3:Test {_node: -1, _labels: 'special'})
+CREATE p2=(n3)-[e3:TEST {_relationship: 'yes', _test: 1}]->(n4)
+SET e1.test = 'rel1', e2.test = 'rel2'
+RETURN n1, n2, e1, e2, id(n1), id(e1), p1, n3, n4, e3
+END
+lives_ok { $r = 0; $r = $transaction->run($q)->single; } 'run query (structural types)';
+
+
+subtest 'direct node/rel/path access' => sub {
+	plan skip_all => '(query failed)' if ! $r;
+	plan tests => 12;
+	ok my $n = $r->get('n4'), 'get node';
+	lives_ok { $w = ''; $w = warning { $n->{answer} = 42; }; } 'set node prop';
+	(like $w, qr/\bdeprecate/, 'node access deprecated') or diag 'got warning(s): ', explain($w);
+	is $n->get('answer'), 42, 'get node prop';
+	ok my $e = $r->get('e2'), 'get relationship';
+	lives_ok { $w = ''; $w = warning { $e->{prime} = 43; }; } 'set rel prop';
+	(like $w, qr/\bdeprecate/, 'rel access deprecated') or diag 'got warning(s): ', explain($w);
+	is $e->get('prime'), 43, 'get rel prop';
+	ok my $p = $r->get('p1'), 'get path';
+	lives_ok { $w = ''; $w = warning { $p->[2] = 'foo'; }; } 'modify path';
+	(like $w, qr/\bdeprecate/, 'path access deprecated') or diag 'got warning(s): ', explain($w);
+	is $n = ($p->nodes)[1], 'foo', 'get modified path';
+};
+
+
+subtest 'path()' => sub {
+	plan skip_all => '(query failed)' if ! $r;
+	plan tests => 5;
+	ok my $p = $r->get('p1'), 'get path';
+	ok my @all = $p->elements, 'get elements';
+	my $path;
+	lives_ok { $w = ''; $w = warning { $path = $p->path; }; } 'path method';
+	(like $w, qr/\bdeprecate/, 'path method deprecated') or diag 'got warning(s): ', explain($w);
+	is_deeply $path, \@all, 'path method matches elements';
+};
 
 
 subtest 'close()' => sub {
@@ -87,6 +131,26 @@ subtest 'stats' => sub {
 	lives_and { warnings { is ref $r->single->stats, 'HASH' } } 'no single stats: type';
 	lives_and { warnings { is scalar keys %{$r->single->stats}, 0 } } 'no single stats: none';
 };
+
+
+subtest 'support for get_person in LOMS plugin' => sub {
+	plan tests => 6;
+	$r = $s->run('RETURN 1 AS one, 2 AS two')->single;
+	lives_and { warnings { is $r->{column_keys}->count, 2 } } 'ResultColumns count 2';
+	lives_and { warnings { is $r->{column_keys}->add('three'), 2 } } 'ResultColumns add';
+	lives_and { warnings { is $r->{column_keys}->count, 3 } } 'ResultColumns count 3';
+	$r->{row}->[2] = 'Three!';
+	lives_and { is $r->get(2), 'Three!' } 'ResultColumns get col by index';
+	lives_and { is $r->get('three'), 'Three!' } 'ResultColumns get col by name';
+	throws_ok {
+		$s->run('')->_column_keys;
+	} qr/missing columns/i, 'result missing columns';
+};
+
+
+CLEANUP: {
+	lives_ok { $transaction->rollback } 'rollback';
+}
 
 
 done_testing;

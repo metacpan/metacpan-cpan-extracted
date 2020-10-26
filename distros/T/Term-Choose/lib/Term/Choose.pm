@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.711';
+our $VERSION = '1.712';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -64,7 +64,7 @@ sub _defaults {
         color               => 0,
         #default            => undef,
         empty               => '<empty>',
-        #footer_string       => undef,  # experimental
+        #footer             => undef,
         hide_cursor         => 1,
         include_highlighted => 0,
         index               => 0,
@@ -97,28 +97,27 @@ sub _valid_options {
         codepage_mapping    => '[ 0 1 ]',
         hide_cursor         => '[ 0 1 ]',
         index               => '[ 0 1 ]',
+        mouse               => '[ 0 1 ]',
         order               => '[ 0 1 ]',
         page                => '[ 0 1 ]',
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
-        justify             => '[ 0 1 2 ]',         # 05.09.2019    # after transition -> remove
         include_highlighted => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
-        mouse               => '[ 0 1 2 3 4 ]',     # 05.09.2019    # after transition -> '[ 0 1 ]',
         keep                => '[ 1-9 ][ 0-9 ]*',
         ll                  => '[ 1-9 ][ 0-9 ]*',
         max_height          => '[ 1-9 ][ 0-9 ]*',
         max_width           => '[ 1-9 ][ 0-9 ]*',
         default             => '[ 0-9 ]+',
         pad                 => '[ 0-9 ]+',
-        lf                  => 'Array_Int',     # 21.11.2019    # after transition -> remove
         mark                => 'Array_Int',
         meta_items          => 'Array_Int',
         no_spacebar         => 'Array_Int',
         tabs_info           => 'Array_Int',
         tabs_prompt         => 'Array_Int',
         empty               => 'Str',
-        footer_string       => 'Str',   # experimental
+        footer              => 'Str',
+        footer_string       => 'Str',   # for Term:TablePrint versions 0.120 - 0.122     22.10.2020
         info                => 'Str',
         prompt              => 'Str',
         undef               => 'Str',
@@ -239,16 +238,9 @@ sub __choose {
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
 
-        ##### 05.09.2019
-        if ( ! defined $opt->{alignment} && defined $opt->{justify} ) {
-            $opt->{alignment} = $opt->{justify};
-        }
-        #####
-
-        ##### 21.11.2019
-        if ( ! defined $opt->{tabs_prompt} && ! defined $opt->{tabs_info} && defined $opt->{lf} ) {
-            $opt->{tabs_prompt} = $opt->{lf};
-            $opt->{tabs_info} = $opt->{lf};
+        ##### 22.10.2020
+        if ( ! defined $opt->{footer} && defined $opt->{footer_string} ) {
+            $opt->{footer} = $opt->{footer_string};
         }
         #####
 
@@ -688,11 +680,11 @@ sub __prepare_promptline {
 
 sub __prepare_page_number {
     my ( $self ) = @_;
-    if ( ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) || defined $self->{footer_string} ) {
+    if ( ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) || defined $self->{footer} ) {
         my $pp_total = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
         my $pp_total_w = length $pp_total;
-        if ( defined $self->{footer_string} ) {
-            $self->{footer_fmt} = '%0' . $pp_total_w . 'd/' . $pp_total . ' ' . $self->{footer_string};
+        if ( defined $self->{footer} ) {
+            $self->{footer_fmt} = '%0' . $pp_total_w . 'd/' . $pp_total . ' ' . $self->{footer};
         }
         else {
             $self->{footer_fmt} = '--- Page %0' . $pp_total_w . 'd/' . $pp_total . ' ---';
@@ -749,7 +741,7 @@ sub __write_first_screen {
         $self->{avail_width} = 1;
     }
     $self->__prepare_promptline();
-    $self->{pp_row} = $self->{page} || $self->{footer_string} ? 1 : 0;
+    $self->{pp_row} = $self->{page} || $self->{footer} ? 1 : 0;
     $self->{avail_height} -= $self->{count_prompt_lines} + $self->{pp_row};
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
@@ -1196,7 +1188,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.711
+Version 1.712
 
 =cut
 
@@ -1476,6 +1468,12 @@ Sets the string displayed on the screen instead an empty string.
 
 (default: "<empty>")
 
+=head3 footer
+
+Add a string in the bottom line.
+
+(default: undefined)
+
 =head3 hide_cursor
 
 0 - keep the terminals highlighting of the cursor position
@@ -1494,11 +1492,6 @@ Expects as its value a string. The info text is printed above the prompt string.
 
 1 - return the index of the chosen element instead of the chosen element respective the indices of the chosen elements
 instead of the chosen elements.
-
-
-=head3 justify
-
-The option I<justify> is now called I<alignment>. Use I<alignment> instead of I<justify>. I<justify> will be removed.
 
 =head3 keep
 
@@ -1571,10 +1564,6 @@ From broad to narrow: 0 > 1 > 2 > 3
  '----------------------'   '----------------------'   '----------------------'   '----------------------'
 
 =back
-
-=head3 lf DEPRECATED
-
-The option I<lf> is deprecated and will be removed. Use I<tabs_prompt> and I<tabs_info> instead.
 
 =head3 ll
 

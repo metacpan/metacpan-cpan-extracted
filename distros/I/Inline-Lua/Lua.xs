@@ -407,11 +407,15 @@ add_pair (lua_State *L, SV **any, int *isary) {
  * FALSE reference subsequently. */
 SV*
 bool_ref (lua_State *L, int b) {
+    SV *sv;
+
     if (b) {
-        return eval_pv("Inline::Lua::Boolean::TRUE", 1);
+        sv = eval_pv("Inline::Lua::Boolean::TRUE", 1);
     } else {
-        return eval_pv("Inline::Lua::Boolean::FALSE", 1);
+        sv = eval_pv("Inline::Lua::Boolean::FALSE", 1);
     }
+
+    return SvREFCNT_inc(sv);
 }
 
 /* The Lua table being in the stack at 'idx' is turned into a

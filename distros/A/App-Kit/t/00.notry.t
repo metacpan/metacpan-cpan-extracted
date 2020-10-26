@@ -16,7 +16,7 @@ like( $@, qr/Global symbol "\$x" requires explicit package name/, 'strict enable
         $warn = join( '', @_ );
     };
     eval 'my $foo=1;42/99;$foo=2;';
-    like( $warn, qr/Useless use of a constant \(.*\) in void context/i, 'warnings enabled still under -no-try' );
+    like( $warn, qr/Useless use of a constant/i, 'warnings enabled still under -no-try' );
 }
 
 done_testing;

@@ -1,9 +1,9 @@
 package Net::DNS::Nameserver;
 
-#
-# $Id: Nameserver.pm 1781 2020-05-13 08:58:25Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Nameserver.pm 1813 2020-10-08 21:58:40Z willem $)[2];
 
 
 =head1 NAME
@@ -14,14 +14,14 @@ Net::DNS::Nameserver - DNS server class
 
     use Net::DNS::Nameserver;
 
-    my $nameserver = new Net::DNS::Nameserver(
+    my $nameserver = Net::DNS::Nameserver->new(
 	LocalAddr	=> ['::1' , '127.0.0.1'],
 	ZoneFile	=> "filename"
 	);
 
-    my $nameserver = new Net::DNS::Nameserver(
+    my $nameserver = Net::DNS::Nameserver->new(
 	LocalAddr	=> '10.1.2.3',
-	LocalPort	=> 5353,
+	LocalPort	=> 53,
 	ReplyHandler	=> \&reply_handler
     );
 
@@ -39,10 +39,9 @@ See L</EXAMPLE> for an example.
 
 =cut
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;'; ## no critic
+require IO::Socket::INET unless USE_SOCKET_IP;
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 use Net::DNS;
@@ -54,7 +53,7 @@ use IO::Select;
 use constant FORCE_IPv4 => 0;
 
 use constant DEFAULT_ADDR => qw(::1 127.0.0.1);
-use constant DEFAULT_PORT => 53;
+use constant DEFAULT_PORT => 5353;
 
 use constant STATE_ACCEPTED   => 1;
 use constant STATE_GOT_LENGTH => 2;
@@ -81,7 +80,7 @@ sub new {
 
 	# local server addresses must also be accepted by a resolver
 	my $LocalAddr = $self{LocalAddr} || [DEFAULT_ADDR];
-	my $resolver = new Net::DNS::Resolver( nameservers => $LocalAddr );
+	my $resolver = Net::DNS::Resolver->new( nameservers => $LocalAddr );
 	$resolver->force_v4(1) unless USE_SOCKET_IP;
 	$resolver->force_v4(1) if FORCE_IPv4;
 	my @localaddresses = $resolver->nameservers;
@@ -144,12 +143,12 @@ sub new {
 	# Create the Select object.
 	#--------------------------------------------------------------------------
 
-	my $select = $self{select} = new IO::Select;
+	my $select = $self{select} = IO::Select->new;
 
 	$select->add(@sock_tcp);
 	$select->add(@sock_udp);
 
-	return undef unless $select->count;
+	return unless $select->count;
 
 	#--------------------------------------------------------------------------
 	# Return the object.
@@ -165,7 +164,7 @@ sub new {
 
 sub ReadZoneFile {
 	my ( $self, $file ) = @_;
-	my $zonefile = new Net::DNS::ZoneFile($file);
+	my $zonefile = Net::DNS::ZoneFile->new($file);
 
 	my $RRhash = $self->{RRhash} = {};
 	my $RRlist = [];
@@ -177,6 +176,7 @@ sub ReadZoneFile {
 		if ( $rr->type eq 'SOA' ) { $RRlist = $rr->{RRlist} = [] }
 		else			  { push @$RRlist, $rr }
 	}
+	return;
 }
 
 
@@ -194,10 +194,10 @@ sub ReplyHandler {
 	my ( $leaf, @tail ) = split /\./, $lcase;
 	my $RRhash = $self->{RRhash};
 	my $RRlist = $RRhash->{$leaf} || [];			# hash, then linear search
-	my @match  = grep lc( $_->owner ) eq $lcase, @$RRlist;
+	my @match  = grep { lc( $_->owner ) eq $lcase } @$RRlist;
 
 	if ( $qtype eq 'AXFR' ) {
-		my ($soa) = grep $_->type eq 'SOA', @match;
+		my ($soa) = grep { $_->type eq 'SOA' } @match;
 		if ($soa) { push @ans, $soa, @{$soa->{RRlist}}, $soa }
 		else	  { $rcode = 'NOTAUTH' }
 
@@ -205,14 +205,14 @@ sub ReplyHandler {
 		unless ( scalar(@match) ) {
 			my $wildcard = join '.', '*', @tail;
 			my $wildlist = $RRhash->{'*'} || [];
-			foreach ( grep lc( $_->owner ) eq $wildcard, @$wildlist ) {
+			foreach ( grep { lc( $_->owner ) eq $wildcard } @$wildlist ) {
 				my $clone = bless {%$_}, ref($_);
 				$clone->owner($qname);
 				push @match, $clone;
 			}
 			$rcode = 'NXDOMAIN' unless @match;
 		}
-		@ans = grep $_->type eq $qtype, @match;
+		@ans = grep { $_->type eq $qtype } @match;
 	}
 
 	return ( $rcode, \@ans, [], [], {aa => 1}, {} );
@@ -224,8 +224,7 @@ sub ReplyHandler {
 #------------------------------------------------------------------------------
 
 sub inet_new {
-	return new IO::Socket::IP(@_) if USE_SOCKET_IP;
-	return new IO::Socket::INET(@_) unless USE_SOCKET_IP;
+	return USE_SOCKET_IP ? IO::Socket::IP->new(@_) : IO::Socket::INET->new(@_);
 }
 
 #------------------------------------------------------------------------------
@@ -237,7 +236,7 @@ sub make_reply {
 
 	unless ($query) {
 		print "ERROR: invalid packet\n" if $self->{Verbose};
-		my $empty = new Net::DNS::Packet();		# create empty reply packet
+		my $empty = Net::DNS::Packet->new();		# create empty reply packet
 		my $reply = $empty->reply();
 		$reply->header->rcode("FORMERR");
 		return $reply;
@@ -302,7 +301,7 @@ sub make_reply {
 
 		if ( !defined($rcode) ) {
 			print "remaining silent\n" if $self->{Verbose};
-			return undef;
+			return;
 		}
 
 		$header->rcode($rcode);
@@ -402,7 +401,7 @@ sub tcp_connection {
 
 			my $qbuf = substr( $self->{_tcp}{$sock}{inbuffer}, 0, $self->{_tcp}{$sock}{querylength} );
 			substr( $self->{_tcp}{$sock}{inbuffer}, 0, $self->{_tcp}{$sock}{querylength} ) = "";
-			my $query = new Net::DNS::Packet( \$qbuf );
+			my $query = Net::DNS::Packet->new( \$qbuf );
 			if ( my $err = $@ ) {
 				print "Error decoding query packet: $err\n" if $self->{Verbose};
 				undef $query;			# force FORMERR reply
@@ -433,6 +432,7 @@ sub tcp_connection {
 			$self->{_tcp}{$sock}{state} = STATE_SENDING;
 		}
 	}
+	return;
 }
 
 #------------------------------------------------------------------------------
@@ -455,7 +455,7 @@ sub udp_connection {
 
 	print "UDP connection from $peerhost:$peerport to $sockhost\n" if $self->{Verbose};
 
-	my $query = new Net::DNS::Packet( \$buf );
+	my $query = Net::DNS::Packet->new( \$buf );
 	if ( my $err = $@ ) {
 		print "Error decoding query packet: $err\n" if $self->{Verbose};
 		undef $query;					# force FORMERR reply
@@ -478,6 +478,7 @@ sub udp_connection {
 	} else {
 		$sock->send( $reply->data($max_len) );
 	}
+	return;
 }
 
 
@@ -584,6 +585,7 @@ sub loop_once {
 			}
 		}
 	}
+	return;
 }
 
 #------------------------------------------------------------------------------
@@ -599,6 +601,7 @@ sub main_loop {
 		# You really need an argument otherwise you'll be burning CPU.
 		$self->loop_once(10);
 	}
+	return;
 }
 
 
@@ -610,12 +613,12 @@ __END__
 
 =head2 new
 
-    $nameserver = new Net::DNS::Nameserver(
+    $nameserver = Net::DNS::Nameserver->new(
 	LocalAddr	=> ['::1' , '127.0.0.1'],
 	ZoneFile	=> "filename"
 	);
 
-    $nameserver = new Net::DNS::Nameserver(
+    $nameserver = Net::DNS::Nameserver->new(
 	LocalAddr	=> '10.1.2.3',
 	LocalPort	=> 5353,
 	ReplyHandler	=> \&reply_handler,
@@ -765,7 +768,7 @@ additional filtering on its basis may be applied.
 
 	if ( $qtype eq "A" && $qname eq "foo.example.com" ) {
 		my ( $ttl, $rdata ) = ( 3600, "10.1.2.3" );
-		my $rr = new Net::DNS::RR("$qname $ttl $qclass $qtype $rdata");
+		my $rr = Net::DNS::RR->new("$qname $ttl $qclass $qtype $rdata");
 		push @ans, $rr;
 		$rcode = "NOERROR";
 	} elsif ( $qname eq "foo.example.com" ) {
@@ -785,7 +788,7 @@ additional filtering on its basis may be applied.
     }
 
 
-    my $ns = new Net::DNS::Nameserver(
+    my $ns = Net::DNS::Nameserver->new(
 	LocalPort    => 5353,
 	ReplyHandler => \&reply_handler,
 	Verbose	     => 1

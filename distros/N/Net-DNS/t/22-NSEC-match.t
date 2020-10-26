@@ -1,7 +1,9 @@
-# $Id: 22-NSEC-match.t 1740 2019-04-04 14:45:31Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 22-NSEC-match.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -10,7 +12,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1;";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -24,7 +26,7 @@ my @typelist = qw(TYPE1 TYPE2 TYPE3);
 
 my @args = ( $nxtdname, @typelist );
 
-my $nsec = new Net::DNS::RR("$owner NSEC @args");
+my $nsec = Net::DNS::RR->new("$owner NSEC @args");
 
 
 my @match = qw(

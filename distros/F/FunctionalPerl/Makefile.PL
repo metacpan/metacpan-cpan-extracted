@@ -18,6 +18,9 @@ BEGIN {
     eval "use $MIN_PERL_VERSION; 1" || die $@;
 }
 use ExtUtils::MakeMaker;
+
+my $on_unix_like = $^O =~ /dragonfly|bsd|linux|darwin/i;
+
 WriteMakefile (
     NAME              => 'FunctionalPerl',
     VERSION_FROM      => 'lib/FunctionalPerl.pm',
@@ -41,11 +44,8 @@ WriteMakefile (
 
         # could be optional (tests should skip if not available):
         "autobox"=> 0,
-
-
-        # XXX is TEST_REQUIRES not working? Just move all dependencies
-        # required for testing here, for now:
-
+    },
+    TEST_REQUIRES => {
         "Test::Requires"=> 0,
         # Now required; otherwise would have to make it optional in
         # FP::Show, but then tests looking at show output would
@@ -53,8 +53,16 @@ WriteMakefile (
         "Capture::Tiny"=> 0,
         # Now required, too, to ensure test outputs match:
         "Sub::Util"=> 0,
-    },
-    TEST_REQUIRES => {
+
+        # for *some* tests:
+        ($on_unix_like ? (
+             "BSD::Resource"=> 0,
+         ) : ()),
+        "DBI"=> 0,
+        "DBD::CSV"=> 0,
+        "Text::CSV"=> 0,
+        "Test::Pod::Snippets"=> 0,
+        "URI"=> 0,
     },
     META_MERGE => {
         'meta-spec'=> {
@@ -77,14 +85,6 @@ WriteMakefile (
                     #"Sub::Call::Tail"=> 0, currently broken
                     "Method::Signatures"=> 0,
                     "Function::Parameters"=> 0,
-
-                        # for some tests:
-                    "BSD::Resource"=> 0,
-                    "DBI"=> 0,
-                    "DBD::CSV"=> 0,
-                    "Text::CSV"=> 0,
-                    "Test::Pod::Snippets"=> 0,
-                    "URI"=> 0,
 
                         # for running htmlgen
                     "Encode"=> 0,

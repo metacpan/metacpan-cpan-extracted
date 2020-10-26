@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 
 my %WriteMakefileArgs = (
     NAME             => 'JSON::Schema::Generate',
@@ -15,17 +16,31 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
-    	'JSON::Schema' => '0',
+    	'JSON::Schema' => '0'
     },
     PREREQ_PM => {
-	'JSON' => 0,
-	'Compiled::Params::OO' => 0.04,
-	'Type::Tiny' => 1.010001,
-    	'Tie::IxHash' => 1.23,
-	'Blessed::Merge' => 0.11
+	'JSON' => '0',
+	'Compiled::Params::OO' => '0.04',
+	'Type::Tiny' => '1.010001',
+    	'Tie::IxHash' => '1.23',
+	'Blessed::Merge' => '1.00'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'JSON-Schema-Generate-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/JSON-Schema-Generate.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/JSON-Schema-Generate',
+            },
+        },
+    },
+    META_ADD => {
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+    }
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

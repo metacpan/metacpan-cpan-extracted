@@ -1,9 +1,9 @@
 package Net::DNS::Question;
 
-#
-# $Id: Question.pm 1726 2018-12-15 12:59:56Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Question.pm 1812 2020-10-07 18:09:53Z willem $)[2];
 
 
 =head1 NAME
@@ -14,7 +14,7 @@ Net::DNS::Question - DNS question record
 
     use Net::DNS::Question;
 
-    $question = new Net::DNS::Question('example.com', 'AAAA', 'IN');
+    $question = Net::DNS::Question->new('example.com', 'AAAA', 'IN');
 
 =head1 DESCRIPTION
 
@@ -24,12 +24,10 @@ section of a DNS packet.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(%classbyname %typebyname :class :type);
 use Net::DNS::Domain;
 use Net::DNS::DomainName;
 
@@ -38,12 +36,12 @@ use Net::DNS::DomainName;
 
 =head2 new
 
-    $question = new Net::DNS::Question('example.com', 'AAAA', 'IN');
-    $question = new Net::DNS::Question('example.com', 'A', 'IN');
-    $question = new Net::DNS::Question('example.com');
+    $question = Net::DNS::Question->new('example.com', 'AAAA', 'IN');
+    $question = Net::DNS::Question->new('example.com', 'A', 'IN');
+    $question = Net::DNS::Question->new('example.com');
 
-    $question = new Net::DNS::Question('2001::DB8::dead:beef', 'PTR', 'IN');
-    $question = new Net::DNS::Question('2001::DB8::dead:beef');
+    $question = Net::DNS::Question->new('2001::DB8::dead:beef', 'PTR', 'IN');
+    $question = Net::DNS::Question->new('2001::DB8::dead:beef');
 
 Creates a question object from the domain, type, and class passed as
 arguments. One or both type and class arguments may be omitted and
@@ -78,8 +76,8 @@ sub new {
 		}
 	}
 
-	$self->{qname}	= new Net::DNS::DomainName1035($qname);
-	$self->{qtype}	= typebyname( $qtype || 'A' );
+	$self->{qname}	= Net::DNS::DomainName1035->new($qname);
+	$self->{qtype}	= typebyname( $qtype   || 'A' );
 	$self->{qclass} = classbyname( $qclass || 'IN' );
 
 	return $self;
@@ -88,9 +86,9 @@ sub new {
 
 =head2 decode
 
-    $question = decode Net::DNS::Question(\$data, $offset);
+    $question = Net::DNS::Question->decode(\$data, $offset);
 
-    ($question, $offset) = decode Net::DNS::Question(\$data, $offset);
+    ($question, $offset) = Net::DNS::Question->decode(\$data, $offset);
 
 Decodes the question record at the specified location within a DNS
 wire-format packet.  The first argument is a reference to the buffer
@@ -111,13 +109,13 @@ sub decode {
 	my $self = bless {}, shift;
 	my ( $data, $offset ) = @_;
 
-	( $self->{qname}, $offset ) = decode Net::DNS::DomainName1035(@_);
+	( $self->{qname}, $offset ) = Net::DNS::DomainName1035->decode(@_);
 
 	my $next = $offset + QFIXEDSZ;
 	die 'corrupt wire-format data' if length $$data < $next;
 	@{$self}{qw(qtype qclass)} = unpack "\@$offset n2", $$data;
 
-	wantarray ? ( $self, $next ) : $self;
+	return wantarray ? ( $self, $next ) : $self;
 }
 
 
@@ -137,21 +135,7 @@ table used to index compressed names within the packet.
 sub encode {
 	my $self = shift;
 
-	pack 'a* n2', $self->{qname}->encode(@_), @{$self}{qw(qtype qclass)};
-}
-
-
-=head2 print
-
-    $object->print;
-
-Prints the record to the standard output.  Calls the string() method
-to get the string representation.
-
-=cut
-
-sub print {
-	print shift->string, "\n";
+	return pack 'a* n2', $self->{qname}->encode(@_), @{$self}{qw(qtype qclass)};
 }
 
 
@@ -166,7 +150,22 @@ Returns a string representation of the question record.
 sub string {
 	my $self = shift;
 
-	join "\t", $self->{qname}->string, $self->qclass, $self->qtype;
+	return join "\t", $self->{qname}->string, $self->qclass, $self->qtype;
+}
+
+
+=head2 print
+
+    $object->print;
+
+Prints the record to the standard output.  Calls the string() method
+to get the string representation.
+
+=cut
+
+sub print {
+	print &string, "\n";
+	return;
 }
 
 
@@ -183,7 +182,7 @@ further queries.
 When required to communicate with humans, the 'proper' domain name
 should be extracted from a query or reply packet.
 
-    $query = new Net::DNS::Packet( $example, 'ANY' );
+    $query = Net::DNS::Packet->new( $example, 'SOA' );
     $reply = $resolver->send($query) or die;
     ($question) = $reply->question;
     $name = $question->name;
@@ -194,7 +193,7 @@ sub name {
 	my $self = shift;
 
 	croak 'immutable object: argument invalid' if scalar @_;
-	$self->{qname}->xname;
+	return $self->{qname}->xname;
 }
 
 
@@ -213,10 +212,10 @@ sub qname {
 	my $self = shift;
 
 	croak 'immutable object: argument invalid' if scalar @_;
-	$self->{qname}->name;
+	return $self->{qname}->name;
 }
 
-sub zname { &qname; }
+sub zname { return &qname; }
 
 
 =head2 qtype, ztype, type
@@ -234,11 +233,11 @@ sub type {
 	my $self = shift;
 
 	croak 'immutable object: argument invalid' if scalar @_;
-	typebyval( $self->{qtype} );
+	return typebyval( $self->{qtype} );
 }
 
-sub qtype { &type; }
-sub ztype { &type; }
+sub qtype { return &type; }
+sub ztype { return &type; }
 
 
 =head2 qclass, zclass, class
@@ -256,11 +255,11 @@ sub class {
 	my $self = shift;
 
 	croak 'immutable object: argument invalid' if scalar @_;
-	classbyval( $self->{qclass} );
+	return classbyval( $self->{qclass} );
 }
 
-sub qclass { &class; }
-sub zclass { &class; }
+sub qclass { return &class; }
+sub zclass { return &class; }
 
 
 ########################################
@@ -270,7 +269,7 @@ sub _dns_addr {				## Map IP address into reverse lookup namespace
 
 	# IP address must contain address characters only
 	s/[%].+$//;						# discard RFC4007 scopeid
-	return undef unless m#^[a-fA-F0-9:./]+$#;
+	return unless m#^[a-fA-F0-9:./]+$#;
 
 	my ( $address, $pfxlen ) = split m#/#;
 
@@ -286,7 +285,7 @@ sub _dns_addr {				## Map IP address into reverse lookup namespace
 	return unless m#^[:\w]+:([.\w]*)(/\d+)?$#;
 	my $rhs = $1 || '0';
 	return _dns_addr($rhs) if m#^[:0]*:0*:[fF]{4}:[^:]+$#;	# IPv4
-	$rhs = sprintf '%x%0.2x:%x%0.2x', map $_ || 0, split( /\./, $rhs, 4 ) if /\./;
+	$rhs = sprintf '%x%0.2x:%x%0.2x', map { $_ || 0 } split( /\./, $rhs, 4 ) if /\./;
 	$address =~ s/:[^:]*$/:0$rhs/;
 	my @parse = split /:/, ( reverse "0$address" ), 9;
 	my @xpand = map { /./ ? $_ : ('0') x ( 9 - @parse ) } @parse;	 # expand ::

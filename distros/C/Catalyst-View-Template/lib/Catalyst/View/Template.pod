@@ -1,0 +1,408 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Catalyst::View::Template - Template Toolkit meets Catalyst
+
+=head1 SYNOPSIS
+
+ package MyApp::View::Web;
+ use parent 'Catalyst::View::Template';
+ 1;
+ 
+ package MyApp;
+ __PACKAGE__->config( default_view => 'Web' );
+ 1;
+ 
+ package MyApp::Controller::Root;
+ __PACKAGE__->config( namespace => '' );
+ sub end : ActionClass('RenderView') {}
+ 1;
+
+=head1 DESCRIPTION
+
+This is a L<Catalyst> view class for the L<Template Toolkit|Template>
+with the following design objectives:
+
+=over 2
+
+=item * To be as close as possible to direct use of L<Template Toolkit|Template>
+
+=item * To nevertheless integrate seamlessly with L<Catalyst>
+
+=item * To make all parts of its behaviour easy to augment
+
+Taken together with the other objectives, this should make it easy to repurpose
+for any view class in which you might want to use Template Toolkit templates.
+
+=back
+
+This is a rethink of L<Catalyst::View::TT> whose focus is on
+providing lots of L<Catalyst>-specific features on top of Template Toolkit,
+which ultimately only make templates harder to reuse or test in other contexts.
+
+=head1 DEFAULT OPERATION
+
+As with any Catalyst view, you create a subclass of it for your application,
+something like C<MyApp::View::Web>. Generally you then forward to C<View::Web>
+from the C<end> action of your root controller, which indirectly invokes its
+L</process> method:
+
+ package MyApp::Controller::Root;
+ 
+ __PACKAGE__->config( namespace => '' );
+ 
+ # ...
+ 
+ sub end : Private {
+   my ( $self, $c ) = ( shift, @_ );
+   $c->forward( $c->view( 'Web' ) ) # just $c->view if set as default_view
+     if  $c->req->method ne 'HEAD'
+     and $c->response->status !~ /^20[14]$|^3[0-9][0-9]$/
+     and ( not defined $c->response->body )
+     and ( not @{ $c->error } );
+ }
+ 
+ 1;
+
+This picks an appropriate template to render for the request,
+using the data you put into the C<< $c->stash >> as template variables,
+then sets C<< $c->response->content_type >> and C<< $c->response->body >>.
+
+The name of the template processed
+corresponds to the private path of the dispatched action,
+unless you specify a template explicitly using the C<template> stash key.
+The value of L</template_ext> is appended to the template name
+before calling Template Toolkit to process it,
+which will look in C<INCLUDE_PATH> to find the corresponding file.
+
+So if you consider the C<lobster> action in a controller called C<Essay>:
+
+ package MyApp::Controller::Essay;
+ sub lobster : Local {
+   my ( $self, $c ) = ( shift, @_ );
+   # ...
+ }
+
+This will be invoked when you go to C<http://localhost:5000/essay/lobster>.
+The private path of this action is C<essay/lobster>.
+If L</template_ext> is set to C<.tt2> and C<INCLUDE_PATH> is left unchanged,
+that means the template that will be rendered is C<F<root/essay/lobster.tt2>>.
+
+To set L</template_ext> or other configuratin options you can use
+the usual mechanisms available in Catalyst:
+
+=over 3
+
+=item 1.
+
+Calling the C<config> class method in the view class:
+
+ package MyApp::View::Web;
+ use parent 'Catalyst::View::Template';
+ 
+ __PACKAGE__->config(
+   template_ext => '.tt',
+   PRE_PROCESS  => 'config/main',
+   WRAPPER      => 'site/wrapper',
+ );
+ 
+ 1;
+
+=item 2.
+
+Calling the C<config> class method in the application class
+and passing it a configuration section named after the view class:
+
+ package MyApp;
+ 
+ # ...
+ 
+ __PACKAGE__->config(
+   'View::Web' => {
+     INCLUDE_PATH => [
+       __PACKAGE__->path_to( 'root', 'src' ),
+       __PACKAGE__->path_to( 'root', 'lib' ),
+     ],
+   },
+ );
+ 
+ 1;
+
+=item 3.
+
+Calling the C<config> class method in the application class indirectly,
+through a plugin such as L<Catalyst::Plugin::ConfigLoader>,
+and putting the configuration section into a configuration file.
+
+=back
+
+=head1 CONFIGURATION
+
+By default, L<Catalyst::View::Template> instantiates Template Toolkit as
+follows:
+
+ Template->new( {
+   EVAL_PERL    => 0,
+   ENCODING     => 'UTF-8',
+   INCLUDE_PATH => [ $c->path_to( 'root' ) ],
+ } )
+
+You can override any or all of these settings or add others by passing any of
+L<the Template Toolkit configuration options|Template::Manual::Config>
+through the configuration of your view class.
+You can also override L</new_template>
+for control over the final set of configuration values.
+
+The following non-L<Template> configuration options are also available:
+
+=head2 C<content_type>
+
+The content type which will be set on the response,
+unless one has been set already.
+
+Defaults to C<text/html; charset=utf-8>
+
+=head2 C<template_ext>
+
+A suffix to add to the template name
+just before passing it to L<Template/process>.
+
+Defaults to the empty string.
+
+=head2 C<class_name>
+
+The template class to instantiate. E.g. for easier XSS protection:
+
+ package MyApp::View::Web;
+ use parent 'Catalyst::View::Template';
+ __PACKAGE__->config(
+   class_name  => 'Template::AutoFilter',
+   AUTO_FILTER => 'html',
+ );
+
+Defaults to L<Template>.
+
+=head1 METHODS
+
+This class inherits everything in L<Catalyst::Component>.
+
+Additionally it implements the following methods:
+
+=head2 C<new_template>
+
+ $view->new_template( $c, \%config )
+
+This is called by the constructor to construct the L<Template> instance.
+It gets passed the configuration hash to pass to L<Template/new>
+and is expected to return an instance of L<Template> or something like it.
+It throws an exception on failure.
+
+You might want to override this method in your view class to modify
+the result of merging all static class configuration.
+Most likely you might use this to inject values into the C<INCLUDE_PATH>
+in C<\%config> and then pass through to the super method.
+But you could also construct an instance yourself,
+either to completely bypass all defaults (including L</class_name>),
+or maybe to not throw an exception on error.
+
+=head2 C<process>
+
+ $view->process( $c )
+ $view->process( $c, $template )
+ $view->process( $c, $template, ... )
+
+This decides which template to call L</render> on,
+then calls it with a copy of the C<< $c->stash >>.
+The template name is taken from C<< $c->action->reverse >> by default,
+or from C<< $c->stash->{'template'} >> if that has been set,
+or from the C<$template> passed explicitly if one was.
+
+On success it then calls L</process_output> on the output.
+If template execution fails it calls L</process_error>.
+It returns whatever the called method returns.
+
+Any trailing extra arguments you pass this method will be passed
+to all of L</render>, L</process_output> and L</process_error>.
+
+You might want to override this method in your view class
+if you want additional steps taken when the view is forwarded to,
+but which should not be taken when L</render> is called directly.
+
+=head2 C<render>
+
+ $view->render( $c, $template, \%vars, \$output )
+ $view->render( $c, $template, \%vars, \$output, ... )
+
+This renders the template named by C<$template> and the L</template_ext>
+configuration option into C<$output>, passing it the values from C<\%vars>,
+and returns true on success.
+In other words, the default implementation is a shorthand for this:
+
+ $view->template->process( $template . $view->template_ext, \%vars, \$output )
+
+As usual, you can also forward to this method:
+
+ $c->forward( 'View::Web', 'render', $template, \%vars, \$output )
+
+You might want to override this method in your view class
+if you always want certain additional steps taken before rendering a template.
+E.g. you would use this to add a standard set of variables to the variables
+passed to any template, in which case you will want to modify C<\%vars> and
+then pass through to the super method.
+
+E.g. to mimic the standard L<Catalyst::View::TT> behaviour:
+
+ sub render {
+   my ( $self, $c, $vars ) = ( shift, @_ );
+   my %extra_vars = (
+     c    => $c,
+     base => $c->req->base,
+     name => $c->config->{'name'},
+   );
+   @$vars{ keys %extra_vars } = values %extra_vars;
+   $self->next::method( @_ );
+ }
+
+In other words, overriding this method has much the same uses as overriding
+L<Catalyst::View::TT/template_vars>.
+However, your method remains in the call stack during template execution,
+so you can do things like this:
+
+ sub render {
+   my ( $self, $c, $vars ) = ( shift, @_ );
+   $vars{'helper_might_croak'} = sub { $c->app_method_that_might_croak( @_ ) };
+   local $Carp::Internal{(__PACKAGE__)} = 1;
+   $self->next::method( @_ );
+ }
+
+You could do this more conveniently with L<Catalyst::View::TT/expose_methods>,
+but the L<C<%Carp::Internal>|Carp/%Carp::Internal> line means exceptions caused
+by code in a template will be reported from the call site in the template,
+rather than from where the helper closure was defined in the view class.
+L<Catalyst::View::TT> could be modified to offer this for helpers added
+through C<expose_methods>,
+but your view class will not be able to do this for helpers
+added through an overridden C<template_vars> method.
+
+=head2 C<process_output>
+
+ $view->process_output( $c, $template_name, \%vars, \$output )
+ $view->process_output( $c, $template_name, \%vars, \$output, ... )
+
+This sets C<< $c->response->body >> to C<$output>
+and C<< $c->response->content_type >> to C<< $view->content_type >>
+(unless a content type has already been set),
+then it returns true.
+
+You might want to override this method in your view class in order
+to send the output somewhere other than the HTTP response, e.g. e-mail.
+
+=head2 C<process_error>
+
+ $view->process_error( $c, $template_name, \%vars )
+ $view->process_error( $c, $template_name, \%vars, ... )
+
+This logs C<< $view->template->error >> at the C<error> level
+and sets it as a C<< $c->error >>,
+then it returns false.
+
+You are unlikely to want to override this method in your view class
+except maybe in some kind of ancillary view (or something of the sort)
+where setting C<< $c->error >> might be too drastic.
+
+=head1 DIFFERENCES FROM L<Catalyst::View::TT>
+
+=over 2
+
+=item *
+
+The biggest difference is probably
+that C<template_ext> is appended to the template name in the L</render> method
+rather than just one branch in L</process>, which means it is not only appended
+to the default template name derived from C<< $c->action->reverse >>,
+but also to C<< $c->stash->{'template'} >> and even to template names passed
+to L</render> directly. Effectively you always use action paths to refer to
+templates rather than hardcoding your preferred extension for templates all
+over the code.
+
+=item *
+
+The L</render> method works exactly like L<Template/process>: it takes
+a scalar reference for storing the output and returns a boolean success value.
+
+This is very much unlike the original design of L<Catalyst::View::TT/render>,
+which returns either the output or a Template Toolkit error object and leaves
+you to examine the value to figure out which case you are dealing with.
+This mistake was fixed by L<Catalyst::View::TT/render_die>,
+at the the cost of guarding every C<render> call with an C<eval>.
+
+=item *
+
+There are no standard variables passed to templates by default.
+Most particularly there is no automatically passed C<c> variable
+(nor any other name for the C<$c> context object)
+because it only encourages unhealthy chumminess of the templates
+with the request object and especially the model.
+Catalyst is certainly not suited for the kind of quick and dirty small project
+where one might even conceivably get away with that sort of misbehaviour.
+
+=item *
+
+There is no equivalent to L<Catalyst::View::TT/expose_methods>.
+This feature offers syntactic sugar for something already trivially simple
+but which should nevertheless not be done lightly.
+
+=item *
+
+There is no equivalent to L<Catalyst::View::TT/additional_template_paths>.
+This seems too specialised a feature to support by default.
+If you need it you can implement it in your view class without too much code:
+
+ use Template::Provider ();
+ 
+ {
+   my $dynamic_path = bless {}, do {
+     package MyApp::Template::DynamicPath;
+     sub paths { $_[0]{'paths'} || [] }
+     __PACKAGE__
+   };
+ 
+   sub dynamic_path { $dynamic_path }
+ }
+ 
+ sub new_template {
+   my ( $self, $c, $config ) = ( shift, @_ );
+   $config->{'INCLUDE_PATH'} = Template::Provider->new( $config )->include_path;
+   unshift @{ $config->{'INCLUDE_PATH'} }, $self->dynamic_path;
+   $self->next::method( @_ );
+ }
+ 
+ sub render {
+   my ( $self, $c ) = ( shift, @_ );
+   local $self->dynamic_path->{'paths'} = $c->stash->{'additional_template_paths'};
+   $self->next::method( @_ );
+ }
+
+See L<Template::Manual::Config/INCLUDE_PATH> for details.
+
+=back
+
+=head1 SEE ALSO
+
+L<Catalyst::Manual>, L<Template::Manual>
+
+=head1 AUTHOR
+
+Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

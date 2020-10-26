@@ -10,7 +10,7 @@
 use strict;
 use warnings;
 
-
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "bin/storage2dot"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "StorageDisplay",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -60,7 +61,7 @@ my %WriteMakefileArgs = (
     "Test::Script" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.0.5",
+  "VERSION" => "1.0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

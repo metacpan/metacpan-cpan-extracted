@@ -1,21 +1,17 @@
 package Net::DNS::RR::LP;
 
-#
-# $Id: LP.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: LP.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::LP - DNS LP resource record
 
 =cut
-
 
 use integer;
 
@@ -25,7 +21,8 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	$self->{preference} = unpack( "\@$offset n", $$data );
-	$self->{target} = decode Net::DNS::DomainName( $data, $offset + 2 );
+	$self->{target}	    = Net::DNS::DomainName->decode( $data, $offset + 2 );
+	return;
 }
 
 
@@ -33,7 +30,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $target = $self->{target};
-	pack 'n a*', $self->preference, $target->encode();
+	return pack 'n a*', $self->preference, $target->encode();
 }
 
 
@@ -41,7 +38,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $target = $self->{target};
-	join ' ', $self->preference, $target->string;
+	return join ' ', $self->preference, $target->string;
 }
 
 
@@ -50,6 +47,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->preference(shift);
 	$self->target(shift);
+	return;
 }
 
 
@@ -57,24 +55,24 @@ sub preference {
 	my $self = shift;
 
 	$self->{preference} = 0 + shift if scalar @_;
-	$self->{preference} || 0;
+	return $self->{preference} || 0;
 }
 
 
 sub target {
 	my $self = shift;
 
-	$self->{target} = new Net::DNS::DomainName(shift) if scalar @_;
-	$self->{target}->name if $self->{target};
+	$self->{target} = Net::DNS::DomainName->new(shift) if scalar @_;
+	return $self->{target} ? $self->{target}->name : undef;
 }
 
 
-sub FQDN { shift->{target}->fqdn; }
-sub fqdn { shift->{target}->fqdn; }
+sub FQDN { return shift->{target}->fqdn; }
+sub fqdn { return shift->{target}->fqdn; }
 
 
 my $function = sub {			## sort RRs in numerically ascending order.
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+	return $Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
 };
 
 __PACKAGE__->set_rrsort_func( 'preference', $function );
@@ -89,9 +87,9 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IN LP preference FQDN');
+    $rr = Net::DNS::RR->new('name IN LP preference FQDN');
 
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	name	   => 'example.com',
 	type	   => 'LP',
 	preference => 10,

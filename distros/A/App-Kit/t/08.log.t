@@ -22,8 +22,8 @@ my $msg = qr/\A#   \xe3\x8f\x92\xc2\xa0. \d{4}-\d{2}-\d{2}\xc2\xa0\d{2}:\d{2}:\d
 like( $info, qr/$msg Your information here.\n\z/, 'msg format is correct' );
 is( $info =~ m/\xc2\xa0(.)/ ? "$1" : undef, "N", "sanity: test does match" );
 
-is( $app->log->debug("debug level 0"), undef, 'default debug() is not active' );
-is( $app->log->info("debug level 1"),  undef, 'default info() is not active' );
+is( $app->log->is_debug("debug level 0"), 0, 'default debug() is not active' );
+is( $app->log->is_info("debug level 1"),  0, 'default info() is not active' );
 
 my %levels = (
     debug     => { level => 0, short => "D" },
@@ -46,11 +46,13 @@ for my $level ( sort { $levels{$a}->{level} <=> $levels{$b}->{level} } keys %lev
     my $ret;
     my $out = Capture::Tiny::capture_merged(
         sub {
-            $ret = $app->log->$level("$level(), level $levels{$level}->{level}");
+            my $is_meth = "is_$level";
+            $ret = $app->log->$is_meth("$level(), level $levels{$level}->{level}");
+            $app->log->$level("$level(), level $levels{$level}->{level}");
         }
     );
 
-    is( $ret, '', "default $level() is on" );
+    is( $ret, 1, "default $level() is on" );
     like( $out, qr/$msg $level\(\), level $levels{$level}->{level}\n\z/, 'msg format is correct' );
     is( $out =~ m/\xc2\xa0(.)/ ? "$1" : undef, $levels{$level}->{short}, "$level() type tag is $levels{$level}->{short}" );
 }
@@ -61,11 +63,13 @@ for my $level ( 'debug', 'info' ) {
     my $ret;
     my $out = Capture::Tiny::capture_merged(
         sub {
-            $ret = $app->log->$level("$level(), level $levels{$level}->{level}");
+            my $is_meth = "is_$level";
+            $ret = $app->log->$is_meth("$level(), level $levels{$level}->{level}");
+            $app->log->$level("$level(), level $levels{$level}->{level}");
         }
     );
 
-    is( $ret, '', 'default $level() is on' );
+    is( $ret, 1, "default $level() is on" );
     like( $out, qr/$msg $level\(\), level $levels{$level}->{level}\n\z/, 'msg format is correct' );
     is( $out =~ m/\xc2\xa0(.)/ ? "$1" : undef, $levels{$level}->{short}, "$level() type tag is $levels{$level}->{short}" );
 }

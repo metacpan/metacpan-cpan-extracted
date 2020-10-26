@@ -15,7 +15,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 # VERSION
 
-Version 3.08
+Version 3.09
 
 # DESCRIPTION
 

@@ -2,7 +2,7 @@ package String::Mask;
 use 5.006; use strict; use warnings;
 use base 'Import::Export';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our %EX = (
 	mask => [qw/all/]
 );
@@ -16,6 +16,8 @@ sub mask {
 	} elsif ($pos eq 'middle') {
 		my $half = int((length($string) - $length) / 2);
 		$string =~ s/(.{$half})(.{$length})(.*)/_mask($1, $mask_char).$2._mask($3, $mask_char)/e;
+	} elsif ($pos eq 'email') {
+		$string =~ s/(.*)(.{$length}\@.*)$/$1._mask($2, $mask_char)/e;
 	} else {
 		$string =~ s/(\w{$length})(.*)/$1._mask($2, $mask_char)/e;
 	}
@@ -35,11 +37,11 @@ __END__
 
 =head1 NAME
 
-String::Mask - The great new String::Mask!
+String::Mask - mask sensitive data
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -49,10 +51,27 @@ Quick summary of what the module does.
 
 	use String::Mask qw/mask/;
 
-	mask('thisusedtobeanemail@gmail.com'); # 'thisusedtobean*****@*****.***'
+	mask('thisusedtobeanemail@gmail.com'); # thisusedtobean*****@*****.***
+	mask('thisusedtobeanemail@gmail.com', 'start', 5); # 'thisu**************@*****.***'
 	mask('thisusedtobeanemail@gmail.com', 'end'); # '***************mail@gmail.com'
+	mask('thisusedtobeanemail@gmail.com', 'end', 5); # '*******************@****l.com'
+	mask('thisusedtobeanemail@gmail.com', 'middle'); # '*******dtobeanemail@g****.***'
+	mask('thisusedtobeanemail@gmail.com', 'middle', 5); # '************anema**@*****.***'
+	mask('thisusedtobeanemail@gmail.com', 'email'); # 'thisu**************@*****.***'
+	mask('thisusedtobeanemail@gmail.com', 'email', 2); # 'thisusedtobeanema**@*****.***'
+
+	mask('9991234567'); # '99912*****'
+	mask('9991234567', 'start', 3); # '999*******'
+	mask('9991234567', 'end'); # '*****34567'
+	mask('9991234567', 'end', 3); # '*******567'
+	mask('9991234567', 'middle'); # '**91234***'
+	mask('9991234567', 'middle', 4); # '***1234***'
+
 	mask('9991234567', 'middle', 4, '_'); # '___1234___'
 
+=head1 Description
+
+Data masking or data obfuscation is the process of hiding original data with modified content (characters or other data). The main reason for applying masking to a string is to protect data that is classified as personally identifiable information, sensitive personal data, or commercially sensitive data. However, the data must remain usable for the purposes of undertaking valid test cycles. It must also look real and appear consistent. 
 
 =head1 EXPORT
 
@@ -70,7 +89,7 @@ The text that you like to mask.
 
 =item position
 
-The position you would like to be visible. Currently you have three options start, middle or end. The default is start.
+The position you would like to be visible. Currently you have four options start, middle, end or email. The default is start.
 
 =item length
 

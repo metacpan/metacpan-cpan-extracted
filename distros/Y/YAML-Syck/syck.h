@@ -1,10 +1,4 @@
 #include "config.h"
-#ifdef I_STDLIB
-#define HAVE_STDLIB_H
-#endif
-#ifdef I_STRING
-#define HAVE_STRING_H
-#endif
 
 /*
  * syck.h
@@ -24,15 +18,9 @@
 #define SYCK_VERSION    "0.61"
 #define YAML_DOMAIN     "yaml.org,2002"
 
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+/* Unconditionally added as part of perl's headers anyway: */
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef HAVE_INTRINSICS_H
 # include <intrinsics.h>

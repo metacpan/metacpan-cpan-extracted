@@ -1,6 +1,10 @@
-# $Id: 72-TSIG-verify.t 1748 2019-07-15 07:57:00Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 72-TSIG-verify.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
+use IO::File;
 use Test::More;
 use Net::DNS;
 
@@ -12,8 +16,8 @@ my %prerequisite = (
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep $_, $prerequisite{$package};
-	next if eval "use $package @revision; 1;";
+	my @revision = grep {$_} $prerequisite{$package};
+	next if eval "use $package @revision; 1;";		## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
@@ -21,34 +25,34 @@ foreach my $package ( sort keys %prerequisite ) {
 plan tests => 28;
 
 
-my $tsig = new Net::DNS::RR( type => 'TSIG' );
+my $tsig  = Net::DNS::RR->new( type => 'TSIG' );
 my $class = ref($tsig);
 
 
 my $privatekey = 'Khmac-sha1.example.+161+39562.private';
 END { unlink($privatekey) if defined $privatekey; }
 
-open( KEY, ">$privatekey" ) or die "$privatekey $!";
-print KEY <<'END';
+my $fh_private = IO::File->new( $privatekey, '>' ) || die "$privatekey $!";
+print $fh_private <<'END';
 Private-key-format: v1.2
 Algorithm: 161 (HMAC_SHA1)
 Key: xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
 END
-close KEY;
+close($fh_private);
 
 
 my $publickey = 'Khmac-md5.example.+157+53335.key';
 END { unlink($publickey) if defined $publickey; }
 
-open( KEY, ">$publickey" ) or die "$publickey $!";
-print KEY <<'END';
+my $fh_public = IO::File->new( $publickey, '>' ) || die "$publickey $!";
+print $fh_public <<'END';
 HMAC-MD5.example. IN KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=
 END
-close KEY;
+close($fh_public);
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example');
+	my $packet = Net::DNS::Packet->new('query.example');
 	$packet->sign_tsig($privatekey);
 	$packet->data;
 
@@ -60,7 +64,7 @@ close KEY;
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example');
+	my $packet = Net::DNS::Packet->new('query.example');
 	$packet->sign_tsig($privatekey);
 	$packet->data;
 	$packet->push( update => rr_add( type => 'NULL' ) );
@@ -73,7 +77,7 @@ close KEY;
 
 
 {
-	my $query = new Net::DNS::Packet('query.example');
+	my $query = Net::DNS::Packet->new('query.example');
 	$query->sign_tsig($privatekey);
 	$query->data;
 
@@ -88,7 +92,7 @@ close KEY;
 
 
 {
-	my @packet = map { new Net::DNS::Packet($_) } 0 .. 3;
+	my @packet = map { Net::DNS::Packet->new($_) } 0 .. 3;
 	my $signed = $privatekey;
 	foreach my $packet (@packet) {
 		$signed = $packet->sign_tsig($signed);
@@ -115,29 +119,29 @@ close KEY;
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example');
+	my $packet = Net::DNS::Packet->new('query.example');
 	$packet->sign_tsig( $privatekey, fudge => 0 );
 	my $encoded = $packet->data;
 	sleep 2;						# guarantee one complete second delay
 
-	my $query = new Net::DNS::Packet( \$encoded );
+	my $query = Net::DNS::Packet->new( \$encoded );
 	$query->verify();
 	is( $query->verifyerr, 'BADTIME', 'unverifiable query packet: BADTIME' );
 }
 
 
 {
-	my $packet = new Net::DNS::Packet();
+	my $packet = Net::DNS::Packet->new();
 	$packet->sign_tsig($privatekey);
 	$packet->sigrr->error('BADTIME');
 	my $encoded = $packet->data;
-	my $decoded = new Net::DNS::Packet( \$encoded );
+	my $decoded = Net::DNS::Packet->new( \$encoded );
 	ok( $decoded->sigrr->other, 'time appended to BADTIME response' );
 }
 
 
 {
-	my $query = new Net::DNS::Packet('query.example');
+	my $query = Net::DNS::Packet->new('query.example');
 	$query->sign_tsig($privatekey);
 	$query->data;
 
@@ -151,14 +155,14 @@ close KEY;
 
 
 {
-	my $packet0 = new Net::DNS::Packet();
+	my $packet0 = Net::DNS::Packet->new();
 	my $chain   = $packet0->sign_tsig($privatekey);
 	$packet0->data;
-	my $packet1 = new Net::DNS::Packet();
+	my $packet1 = Net::DNS::Packet->new();
 	$packet1->sign_tsig($chain);
 	$packet1->data;
 
-	my $packetx = new Net::DNS::Packet();
+	my $packetx = Net::DNS::Packet->new();
 	$packetx->sign_tsig($publickey);
 	$packetx->data;
 	my $tsig     = $packetx->verify();
@@ -168,7 +172,7 @@ close KEY;
 
 
 {
-	my $packet = new Net::DNS::Packet();
+	my $packet = Net::DNS::Packet->new();
 	$packet->sign_tsig($publickey);
 	$packet->data;
 	$packet->sigrr->macbin( substr $packet->sigrr->macbin, 0, 9 );
@@ -179,7 +183,7 @@ close KEY;
 
 
 {
-	my $packet = new Net::DNS::Packet();
+	my $packet = Net::DNS::Packet->new();
 	$packet->sign_tsig($publickey);
 	$packet->data;
 	my $macbin = $packet->sigrr->macbin;
@@ -191,10 +195,10 @@ close KEY;
 
 
 {
-	my $packet = new Net::DNS::Packet();
+	my $packet = Net::DNS::Packet->new();
 	$packet->sign_tsig($privatekey);
 
-	my $null = new Net::DNS::RR( type => 'NULL' );
+	my $null = Net::DNS::RR->new( type => 'NULL' );
 	eval { $packet->sigrr->verify($null); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "unexpected argument\t[$exception]" );
@@ -202,10 +206,10 @@ close KEY;
 
 
 {
-	my $packet = new Net::DNS::Packet();
+	my $packet = Net::DNS::Packet->new();
 	$packet->sign_tsig($privatekey);
 
-	my $null = new Net::DNS::RR( type => 'NULL' );
+	my $null = Net::DNS::RR->new( type => 'NULL' );
 	eval { $packet->sigrr->verify( $packet, $null ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "unexpected argument\t[$exception]" );

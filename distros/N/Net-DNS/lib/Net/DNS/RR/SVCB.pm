@@ -1,21 +1,17 @@
 package Net::DNS::RR::SVCB;
 
-#
-# $Id: SVCB.pm 1800 2020-08-05 15:47:24Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1800 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: SVCB.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::SVCB - DNS SVCB resource record
 
 =cut
-
 
 use integer;
 
@@ -35,7 +31,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$self->{SvcPriority} = unpack( 'n', $rdata );
 
 	my $index;
-	( $self->{TargetName}, $index ) = decode Net::DNS::DomainName( \$rdata, 2 );
+	( $self->{TargetName}, $index ) = Net::DNS::DomainName->decode( \$rdata, 2 );
 
 	my $params = $self->{SvcParams} = {};
 	my $limit  = length($rdata) - 4;
@@ -46,27 +42,28 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	}
 	die 'corrupt RDATA in ' . $self->type unless $index == $self->{rdlength};
 	$self->_post_parse;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	my ($params) = grep defined, $self->{SvcParams}, {};
+	my ($params) = grep {defined} $self->{SvcParams}, {};
 	my @params;
 	foreach ( sort { $a <=> $b } keys %$params ) {
 		my $value = $params->{$_};
 		next unless defined $value;
 		push @params, pack( 'n2a*', $_, length($value), $value );
 	}
-	pack 'n a* a*', $self->{SvcPriority}, $self->{TargetName}->encode, join '', @params;
+	return pack 'n a* a*', $self->{SvcPriority}, $self->{TargetName}->encode, join '', @params;
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my ($params) = grep defined, $self->{SvcParams}, {};
+	my ($params) = grep {defined} $self->{SvcParams}, {};
 	my @keys = keys %$params;
 	return ( $self->{SvcPriority}, $self->{TargetName}->string ) unless scalar @keys;
 
@@ -74,7 +71,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $target = $self->{TargetName}->encode();
 	my $length = 2 + length $target;
 	my @target = split /(\S{32})/, unpack 'H*', $target;
-	$target[$#target] .= join ' ', "\t;", $self->{TargetName}->string if $length > 3;
+	$target[-1] .= join ' ', "\t;", $self->{TargetName}->string if $length > 3;
 	push @rdata, $length > 18 ? "\n" : (), @target, "\n";
 
 	foreach ( sort { $a <=> $b } @keys ) {
@@ -86,7 +83,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 		push @rdata, "\n";
 		$length += 4 + length $value;
 	}
-	return ( '\\#', $length, @rdata );
+	return ( "\\# $length", @rdata );
 }
 
 
@@ -112,6 +109,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 			$self->$1(@argument);
 		}
 	}
+	return;
 }
 
 
@@ -120,10 +118,13 @@ sub _post_parse {			## parser post processing
 
 	my $params = $self->{SvcParams} || return;
 	my %unique;
-	my @unique = grep !$unique{$_}++, unpack 'n*', $params->{0} || return;
+	my @unique = grep { !$unique{$_}++ } unpack 'n*', ( $params->{0} || return );
 	croak( $self->type . qq(: mandatory "key0" not permitted) ) if $unique{0};
-	map croak( $self->type . qq(: duplicate "key$_" in mandatory list) ), grep --$unique{$_}, @unique;
-	map croak( $self->type . qq(: mandatory "key$_" not defined) ), grep !defined( $params->{$_} ), @unique;
+	foreach (@unique) {
+		croak( $self->type . qq(: duplicate "key$_" in mandatory list) ) if --$unique{$_};
+		croak( $self->type . qq(: mandatory "key$_" not defined) )	 if !defined( $params->{$_} );
+	}
+	return;
 }
 
 
@@ -131,6 +132,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->_parse_rdata(qw(0 .));
+	return;
 }
 
 
@@ -138,14 +140,14 @@ sub svcpriority {
 	my $self = shift;					# uncoverable pod
 
 	$self->{SvcPriority} = 0 + shift if scalar @_;
-	$self->{SvcPriority} || 0;
+	return $self->{SvcPriority} || 0;
 }
 
 
 sub targetname {
 	my $self = shift;					# uncoverable pod
 
-	$self->{TargetName} = new Net::DNS::DomainName(shift) if scalar @_;
+	$self->{TargetName} = Net::DNS::DomainName->new(shift) if scalar @_;
 
 	my $target = $self->{TargetName} ? $self->{TargetName}->name : return;
 	return $target unless $self->{SvcPriority};
@@ -160,7 +162,7 @@ use constant ASCII => chr(65) eq 'A';
 my %escape = do {			## precalculated ASCII escape table
 	my @escape = ( 0 .. 32, 34, 92, 127 .. 255 );		# numerical escape
 
-	my %table = map( ( $_ => $_ ), map pack( 'C', $_ ), ( 0 .. 255 ) );
+	my %table = map { ( chr($_) => chr($_) ) } ( 0 .. 255 );
 
 	foreach my $codepoint (@escape) {
 		my $ddd = sprintf( '%03u', $codepoint );
@@ -171,38 +173,36 @@ my %escape = do {			## precalculated ASCII escape table
 	%table;
 };
 
-
 sub _raw {				## concatenate @_ and escape non-printable
-	return @_ unless scalar @_;
-	for ( join '', map $escape{$_}, map split(//), @_ ) {
+	return () unless scalar @_;
+	local $_ = join '', map { $escape{$_} } map { split( //, $_ ) } @_;
 
-		# partial transliteration for non-ASCII character encodings
-		tr
-		[\040-\176\000-\377]
-		[ !"#$%&'()*+,\-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~?] unless ASCII;
+	# partial transliteration for non-ASCII character encodings
+	tr
+	[\040-\176\000-\377]
+	[ !"#$%&'()*+,\-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~?] unless ASCII;
 
-		return $_;
-	}
+	return $_;
 }
 
 sub _base64 {
-	_raw( map MIME::Base64::decode($_), @_ );
+	return _raw( map { MIME::Base64::decode($_) } @_ );
 }
 
 sub _integer16 {
-	_raw( map pack( 'n', $_ ), @_ );
+	return _raw( map { pack( 'n', $_ ) } @_ );
 }
 
 sub _ipv4 {
-	_raw( map bless( {}, 'Net::DNS::RR::A' )->address($_), @_ );
+	return _raw( map { bless( {}, 'Net::DNS::RR::A' )->address($_) } @_ );
 }
 
 sub _ipv6 {
-	_raw( map bless( {}, 'Net::DNS::RR::AAAA' )->address($_), @_ );
+	return _raw( map { bless( {}, 'Net::DNS::RR::AAAA' )->address($_) } @_ );
 }
 
 sub _string {
-	_raw( map Net::DNS::Text->new($_)->encode(), @_ );
+	return _raw( map { Net::DNS::Text->new($_)->encode() } @_ );
 }
 
 
@@ -218,38 +218,38 @@ my %keybyname = (
 
 
 sub mandatory {				## mandatory=key1,port,...
-	my ( $self, @arg ) = grep defined, @_;
-	my @keys = map $keybyname{lc $_} || ( /^key(\d+)$/ ? $1 : croak qq["$_" unknown] ), @arg;
-	$self->key0( _integer16( sort { $a <=> $b } @keys ) );
+	my ( $self, @arg ) = grep {defined} @_;
+	my @keys = map { $keybyname{lc $_} || ( /^key(\d+)$/i ? $1 : croak qq["$_" unknown] ) } @arg;
+	return $self->key0( _integer16( sort { $a <=> $b } @keys ) );
 }
 
 sub alpn {				## alpn=h3,h2,...
 	my $self = shift;
-	$self->key1( _string(@_) );
+	return $self->key1( _string(@_) );
 }
 
 sub no_default_alpn {			## no-default-alpn
-	shift->key2( map '', @_ );				# uncoverable pod
+	return shift->key2( map {''} @_ );			# uncoverable pod
 }
 
 sub port {				## port=1234
 	my $self = shift;
-	$self->key3( map _integer16($_), @_ );
+	return $self->key3( map { _integer16($_) } @_ );
 }
 
 sub ipv4hint {				## ipv4hint=192.0.2.1,...
 	my $self = shift;
-	$self->key4( _ipv4(@_) );
+	return $self->key4( _ipv4(@_) );
 }
 
 sub echconfig {				## echconfig=base64string
 	my $self = shift;
-	$self->key5( map _base64($_), @_ );
+	return $self->key5( map { _base64($_) } @_ );
 }
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
 	my $self = shift;
-	$self->key6( _ipv6(@_) );
+	return $self->key6( _ipv6(@_) );
 }
 
 
@@ -257,13 +257,14 @@ our $AUTOLOAD;
 
 sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	my $self = shift;
+
 	my ($method) = reverse split /::/, $AUTOLOAD;
 
 	my $default = join '::', 'SUPER', $method;
 	return $self->$default(@_) unless $method =~ /^key(\d+)$/i;
 	my $key = $1;
 
-	my ($params) = grep defined, $self->{SvcParams}, {};
+	my ($params) = grep {defined} $self->{SvcParams}, {};
 
 	if ( scalar @_ ) {
 		my $arg = shift;				# keyNN($value);
@@ -274,7 +275,7 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	}
 
 	my $value = $params->{$key};
-	return defined($value) ? _raw($value) : $value if defined wantarray;
+	return defined($value) ? _raw($value) : $value;
 }
 
 
@@ -285,7 +286,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name HTTPS SvcPriority TargetName alpn=h3,...');
+    $rr = Net::DNS::RR->new('name HTTPS SvcPriority TargetName alpn=h3,...');
 
 =head1 DESCRIPTION
 
@@ -329,7 +330,7 @@ owner name of this record must be used as the effective TargetName.
 
 =head2 mandatory, alpn, no-default-alpn, port, ipv4hint, echconfig, ipv6hint
 
-    $rr = new Net::DNS::RR( 'svc.example. SVCB 1 svc.example. port=1234' );
+    $rr = Net::DNS::RR->new( 'svc.example. SVCB 1 svc.example. port=1234' );
 
     $rr->port(1234);
     $string = $rr->port();	# \004\210

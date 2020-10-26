@@ -1,12 +1,12 @@
 package File::Sticker::Reader;
-$File::Sticker::Reader::VERSION = '0.9301';
+$File::Sticker::Reader::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Reader - read and standardize meta-data from files
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 

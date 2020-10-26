@@ -23,6 +23,9 @@ Sub::Defer::defer_sub __PACKAGE__ . '::conn' => sub {
             # Add UTC via: mysql_tzinfo_to_sql /usr/share/zoneinfo/ | mysql -u root mysql -p
             $dbh->do(q{SET time_zone = 'UTC'});    # or die $dbh->errstr;
         }
+        elsif ( $dbh->{Driver}{Name} eq 'SQLite' ) {
+            $dbh->do('PRAGMA encoding = "UTF-8"');    # probably too late, default anyway. so at worst a no-op; at best we get utf-8
+        }
 
         return $dbh;
     };
@@ -33,7 +36,7 @@ has _app => (
     required => 1,
 );
 
-has dbh_is_still_good_check => (                   # e.g. only ping() every N calls/seconds
+has dbh_is_still_good_check => (                      # e.g. only ping() every N calls/seconds
     is  => 'rw',
     isa => sub { die "'dbh_is_still_good_check' must be undef or a coderef" unless !defined $_[0] || ref $_[0] eq 'CODE' },
     default => sub { undef },

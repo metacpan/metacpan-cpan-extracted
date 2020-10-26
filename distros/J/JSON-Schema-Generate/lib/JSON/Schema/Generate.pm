@@ -1,15 +1,8 @@
 package JSON::Schema::Generate;
+use 5.006; use strict; use warnings; our $VERSION = '0.06';
+use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
+use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
-use 5.006;
-use strict;
-use warnings;
-use Tie::IxHash;
-
-our $VERSION = '0.05';
-use Types::Standard qw/Str HashRef Bool/;
-use Compiled::Params::OO qw/cpo/;
-use JSON;
-use Blessed::Merge;
 our ($validate, $JSON);
 BEGIN {
 	$validate = cpo(
@@ -64,7 +57,7 @@ sub new {
 	my $args = $validate->new->(@_);
 	my $self = bless {}, $class;
 	$self->{schema} = _tie_hash();
-	#$self->{schema}{'$schema'} = $args->schema;
+	$self->{schema}{'$schema'} = $args->schema;
 	$self->{schema}{'$id'} = $args->id;
 	$self->{schema}{title} = $args->title;
 	$self->{schema}{description} = $args->description;
@@ -212,7 +205,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -259,8 +252,8 @@ Version 0.05
 
 	use JSON::Schema::Draft201909;
 
-	my $validator = JSON::Schema::Draft201909->new;
-	my $result = $validator->evaluate_json_string($data, $schema);
+	$js = JSON::Schema::Draft201909->new;
+	$result = $js->evaluate_json_string($data, $schema);
 
 
 =head1 DESCRIPTION

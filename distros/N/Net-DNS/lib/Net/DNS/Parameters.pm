@@ -1,26 +1,24 @@
 package Net::DNS::Parameters;
 
-#
-# $Id: Parameters.pm 1795 2020-07-27 11:00:29Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1795 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Parameters.pm 1812 2020-10-07 18:09:53Z willem $)[2];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2020-06-30)
+##	(last updated 2020-07-20)
 ##
 ################################################
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
 use base qw(Exporter);
-our @EXPORT = qw(
+our @EXPORT_OK = qw(
 		classbyname classbyval %classbyname
 		typebyname typebyval %typebyname
 		opcodebyname opcodebyval
@@ -28,6 +26,14 @@ our @EXPORT = qw(
 		ednsoptionbyname ednsoptionbyval
 		dsotypebyname dsotypebyval
 		);
+our %EXPORT_TAGS = (
+	class	   => [qw(classbyname classbyval)],
+	type	   => [qw(typebyname typebyval)],
+	opcode	   => [qw(opcodebyname opcodebyval)],
+	rcode	   => [qw(rcodebyname rcodebyval)],
+	ednsoption => [qw(ednsoptionbyname ednsoptionbyval)],
+	dsotype	   => [qw(dsotypebyname dsotypebyval)],
+	);
 
 
 # Registry: DNS CLASSes
@@ -39,7 +45,7 @@ my @classbyname = (
 	ANY  => 255,						# RFC1035
 	);
 our %classbyval = reverse( CLASS0 => 0, @classbyname );
-push @classbyname, map /^\d/ ? $_ : lc($_), @classbyname;
+push @classbyname, map { /^\d/ ? $_ : lc($_) } @classbyname;
 our %classbyname = ( '*' => 255, @classbyname );
 
 
@@ -121,7 +127,7 @@ my @typebyname = (
 	EUI48	   => 108,					# RFC7043
 	EUI64	   => 109,					# RFC7043
 	TKEY	   => 249,					# RFC2930
-	TSIG	   => 250,					# RFC2845
+	TSIG	   => 250,					# RFC-ietf-dnsop-rfc2845bis-09
 	IXFR	   => 251,					# RFC1995
 	AXFR	   => 252,					# RFC1035 RFC5936
 	MAILB	   => 253,					# RFC1035
@@ -136,7 +142,7 @@ my @typebyname = (
 	DLV	   => 32769,					# RFC8749 RFC4431
 	);
 our %typebyval = reverse( TYPE0 => 0, @typebyname );
-push @typebyname, map /^\d/ ? $_ : lc($_), @typebyname;
+push @typebyname, map { /^\d/ ? $_ : lc($_) } @typebyname;
 our %typebyname = ( '*' => 255, @typebyname );
 
 
@@ -150,7 +156,7 @@ my @opcodebyname = (
 	DSO    => 6,						# RFC8490
 	);
 our %opcodebyval = reverse @opcodebyname;
-push @opcodebyname, map /^\d/ ? $_ : lc($_), @opcodebyname;
+push @opcodebyname, map { /^\d/ ? $_ : lc($_) } @opcodebyname;
 our %opcodebyname = ( NS_NOTIFY_OP => 4, @opcodebyname );
 
 
@@ -166,21 +172,21 @@ my @rcodebyname = (
 	YXRRSET	  => 7,						# RFC2136
 	NXRRSET	  => 8,						# RFC2136
 	NOTAUTH	  => 9,						# RFC2136
-	NOTAUTH	  => 9,						# RFC2845
+	NOTAUTH	  => 9,						# RFC-ietf-dnsop-rfc2845bis-09
 	NOTZONE	  => 10,					# RFC2136
 	DSOTYPENI => 11,					# RFC8490
 	BADVERS	  => 16,					# RFC6891
-	BADSIG	  => 16,					# RFC2845
-	BADKEY	  => 17,					# RFC2845
-	BADTIME	  => 18,					# RFC2845
+	BADSIG	  => 16,					# RFC-ietf-dnsop-rfc2845bis-09
+	BADKEY	  => 17,					# RFC-ietf-dnsop-rfc2845bis-09
+	BADTIME	  => 18,					# RFC-ietf-dnsop-rfc2845bis-09
 	BADMODE	  => 19,					# RFC2930
 	BADNAME	  => 20,					# RFC2930
 	BADALG	  => 21,					# RFC2930
-	BADTRUNC  => 22,					# RFC4635
+	BADTRUNC  => 22,					# RFC-ietf-dnsop-rfc2845bis-09
 	BADCOOKIE => 23,					# RFC7873
 	);
 our %rcodebyval = reverse( BADSIG => 16, @rcodebyname );
-push @rcodebyname, map /^\d/ ? $_ : lc($_), @rcodebyname;
+push @rcodebyname, map { /^\d/ ? $_ : lc($_) } @rcodebyname;
 our %rcodebyname = @rcodebyname;
 
 
@@ -205,7 +211,7 @@ my @ednsoptionbyname = (
 	DEVICEID	 => 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
 	);
 our %ednsoptionbyval = reverse @ednsoptionbyname;
-push @ednsoptionbyname, map /^\d/ ? $_ : lc($_), @ednsoptionbyname;
+push @ednsoptionbyname, map { /^\d/ ? $_ : lc($_) } @ednsoptionbyname;
 our %ednsoptionbyname = @ednsoptionbyname;
 
 
@@ -218,7 +224,7 @@ my @dnsflagbyname = (
 	AD => 0x0020,						# RFC4035 RFC6840
 	CD => 0x0010,						# RFC4035 RFC6840
 	);
-push @dnsflagbyname, map /^\d/ ? $_ : lc($_), @dnsflagbyname;
+push @dnsflagbyname, map { /^\d/ ? $_ : lc($_) } @dnsflagbyname;
 our %dnsflagbyname = @dnsflagbyname;
 
 
@@ -226,7 +232,7 @@ our %dnsflagbyname = @dnsflagbyname;
 my @ednsflagbyname = (
 	DO => 0x8000,						# RFC4035 RFC3225 RFC6840
 	);
-push @ednsflagbyname, map /^\d/ ? $_ : lc($_), @ednsflagbyname;
+push @ednsflagbyname, map { /^\d/ ? $_ : lc($_) } @ednsflagbyname;
 our %ednsflagbyname = @ednsflagbyname;
 
 
@@ -241,7 +247,7 @@ my @dsotypebyname = (
 	RECONFIRM	  => 0x0043,				# RFC8765
 	);
 our %dsotypebyval = reverse @dsotypebyname;
-push @dsotypebyname, map /^\d/ ? $_ : lc($_), @dsotypebyname;
+push @dsotypebyname, map { /^\d/ ? $_ : lc($_) } @dsotypebyname;
 our %dsotypebyname = @dsotypebyname;
 
 
@@ -252,7 +258,7 @@ our %dsotypebyname = @dsotypebyname;
 sub classbyname {
 	my $name = shift;
 
-	$classbyname{$name} || $classbyname{uc $name} || do {
+	return $classbyname{$name} || $classbyname{uc $name} || return do {
 		croak qq[unknown class "$name"] unless $name =~ m/^(CLASS)?(\d+)/i;
 		my $val = 0 + $2;
 		croak qq[classbyname("$name") out of range] if $val > 0xffff;
@@ -263,7 +269,7 @@ sub classbyname {
 sub classbyval {
 	my $val = shift;
 
-	$classbyval{$val} || do {
+	return $classbyval{$val} || return do {
 		$val += 0;
 		croak qq[classbyval($val) out of range] if $val > 0xffff;
 		return "CLASS$val";
@@ -274,7 +280,7 @@ sub classbyval {
 sub typebyname {
 	my $name = shift;
 
-	$typebyname{$name} || do {
+	return $typebyname{$name} || return do {
 		if ( $name =~ m/^(TYPE)?(\d+)/i ) {
 			my $val = 0 + $2;
 			croak qq[typebyname("$name") out of range] if $val > 0xffff;
@@ -288,7 +294,7 @@ sub typebyname {
 sub typebyval {
 	my $val = shift;
 
-	$typebyval{$val} || do {
+	return $typebyval{$val} || return do {
 		$val += 0;
 		croak qq[typebyval($val) out of range] if $val > 0xffff;
 		$typebyval{$val} = "TYPE$val";
@@ -308,7 +314,7 @@ sub opcodebyname {
 
 sub opcodebyval {
 	my $val = shift;
-	$opcodebyval{$val} || return "$val";
+	return $opcodebyval{$val} || return "$val";
 }
 
 
@@ -322,7 +328,7 @@ sub rcodebyname {
 
 sub rcodebyval {
 	my $val = shift;
-	$rcodebyval{$val} || return "$val";
+	return $rcodebyval{$val} || return "$val";
 }
 
 
@@ -336,7 +342,7 @@ sub ednsoptionbyname {
 
 sub ednsoptionbyval {
 	my $val = shift;
-	$ednsoptionbyval{$val} || return "$val";
+	return $ednsoptionbyval{$val} || return "$val";
 }
 
 
@@ -350,14 +356,14 @@ sub dsotypebyname {
 
 sub dsotypebyval {
 	my $val = shift;
-	$dsotypebyval{$val} || return "$val";
+	return $dsotypebyval{$val} || return "$val";
 }
 
 
 sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
-	my ( $mnemonic, $rrtype ) = map uc($_), @_;		# uncoverable pod
+	my ( $mnemonic, $rrtype ) = @_;				# uncoverable pod
 	$rrtype = rand(255) + 65280 unless $rrtype;
-	croak qq["$mnemonic" is a CLASS identifier] if defined $classbyname{$mnemonic};
+	croak qq["$mnemonic" is a CLASS identifier] if defined $classbyname{$mnemonic = uc($mnemonic)};
 	for ( typebyval( $rrtype = int $rrtype ) ) {
 		return $rrtype if /^$mnemonic$/;		# duplicate registration
 		croak qq["$mnemonic" conflicts with TYPE$rrtype ($_)] unless /^TYPE\d+$/;
@@ -369,32 +375,32 @@ sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
 }
 
 
-use constant EXTLANG => defined eval 'require Net::DNS::Extlang';
+use constant EXTLANG => defined eval { require Net::DNS::Extlang };
 
-our $DNSEXTLANG = EXTLANG ? eval 'Net::DNS::Extlang->new()->domain' : undef;
+our $DNSEXTLANG = EXTLANG ? eval { Net::DNS::Extlang->new()->domain } : undef;
 
 sub _typespec {				## draft-levine-dnsextlang
-	eval <<'END' if EXTLANG && $DNSEXTLANG;
+	eval <<'END' if EXTLANG && $DNSEXTLANG;## no critic
 	my ($node) = @_;
 
 	require Net::DNS::Resolver;
-	my $resolver = new Net::DNS::Resolver() || return;
+	my $resolver = Net::DNS::Resolver->new() || return;
 	my $response = $resolver->send( "$node.$DNSEXTLANG", 'TXT' ) || return;
 
-	foreach my $txt ( grep $_->type eq 'TXT', $response->answer ) {
+	foreach my $txt ( grep { $_->type eq 'TXT' } $response->answer ) {
 		my @stanza = $txt->txtdata;
 		my ( $tag, $identifier, @attribute ) = @stanza;
 		next unless defined($tag) && $tag =~ /^RRTYPE=\d+$/;
 		register( $1, $2 ) if $identifier =~ /^(\w+):(\d+)\W*/;
 		return unless defined wantarray;
 
-		my $extobj = new Net::DNS::Extlang();
+		my $extobj = Net::DNS::Extlang->new();
 		my $recipe = $extobj->xlstorerecord( $identifier, @attribute );
 		my @source = split /\n/, $extobj->compilerr($recipe);
 		return sub { defined( $_ = shift @source ) };
 	}
-	return;
 END
+	return;
 }
 
 

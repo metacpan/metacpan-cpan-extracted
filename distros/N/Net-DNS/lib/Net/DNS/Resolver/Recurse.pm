@@ -1,9 +1,8 @@
 package Net::DNS::Resolver::Recurse;
 
-#
-# $Id: Recurse.pm 1748 2019-07-15 07:57:00Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
+use strict;
+use warnings;
+our $VERSION = (qw$Id: Recurse.pm 1811 2020-10-05 08:24:23Z willem $)[2];
 
 
 =head1 NAME
@@ -30,8 +29,6 @@ This module is a subclass of Net::DNS::Resolver.
 =cut
 
 
-use strict;
-use warnings;
 use base qw(Net::DNS::Resolver);
 
 
@@ -61,6 +58,7 @@ sub hints {
 	return @hints unless scalar @_;
 	$root  = [];
 	@hints = @_;
+	return;
 }
 
 
@@ -82,14 +80,14 @@ and invoke send() indirectly.
 sub send {
 	my $self = shift;
 	my @conf = ( recurse => 0, udppacketsize => 1024 );	   # RFC8109
-	bless( {persistent => {'.' => $root}, %$self, @conf}, ref($self) )->_send(@_);
+	return bless( {persistent => {'.' => $root}, %$self, @conf}, ref($self) )->_send(@_);
 }
 
 
 sub query_dorecursion {			## historical
 	my ($self) = @_;					# uncoverable pod
 	$self->_deprecate('prefer  $resolver->send(...)');
-	&send;
+	return &send;
 }
 
 
@@ -106,7 +104,7 @@ sub _send {
 		$root = $self->{persistent}->{'.'};
 	}
 
-	$self->_recurse( $query, '.' );
+	return $self->_recurse( $query, '.' );
 }
 
 
@@ -121,28 +119,28 @@ sub _recurse {
 	return unless $reply;
 	my $qname = lc( ( $query->question )[0]->qname );
 	my $zone = $self->_referral($reply) || return $reply;
-	return $reply if grep lc( $_->owner ) eq $qname, $reply->answer;
-	$self->_recurse( $query, $zone );
+	return $reply if grep { lc( $_->owner ) eq $qname } $reply->answer;
+	return $self->_recurse( $query, $zone );
 }
 
 
 sub _referral {
 	my ( $self, $packet ) = @_;
 	return unless $packet;
-	my @auth = grep $_->type eq 'NS', $packet->answer, $packet->authority;
+	my @auth = grep { $_->type eq 'NS' } $packet->answer, $packet->authority;
 	return unless scalar(@auth);
 	my $owner = lc( $auth[0]->owner );
 	my $cache = $self->{persistent}->{$owner};
 	return $owner if $cache && scalar(@$cache);
-	my @addr = grep $_->can('address'), $packet->additional;
+	my @addr = grep { $_->can('address') } $packet->additional;
 	my @ip;
-	my @ns = map lc( $_->nsdname ), @auth;
+	my @ns = map { lc( $_->nsdname ) } @auth;
 
 	foreach my $ns (@ns) {
-		push @ip, map $_->address, grep $ns eq lc( $_->owner ), @addr;
+		push @ip, map { $_->address } grep { $ns eq lc( $_->owner ) } @addr;
 	}
 	$self->_diag("resolving glue for $owner") unless scalar(@ip);
-	@ip = $self->nameservers( $ns[0], $ns[$#ns] ) unless scalar(@ip);
+	@ip = $self->nameservers( $ns[0], $ns[-1] ) unless scalar(@ip);
 	$self->_diag("caching nameservers for $owner");
 	$self->{persistent}->{$owner} = \@ip;
 	return $owner;
@@ -173,18 +171,21 @@ for queries for missing glue records.
 sub callback {
 	my $self = shift;
 
-	( $self->{callback} ) = grep ref($_) eq 'CODE', @_;
+	( $self->{callback} ) = grep { ref($_) eq 'CODE' } @_;
+	return;
 }
 
 sub _callback {
 	my $callback = shift->{callback};
 	$callback->(@_) if $callback;
+	return;
 }
 
 sub recursion_callback {		## historical
 	my ($self) = @_;					# uncoverable pod
 	$self->_deprecate('prefer  $resolver->callback(...)');
 	&callback;
+	return;
 }
 
 

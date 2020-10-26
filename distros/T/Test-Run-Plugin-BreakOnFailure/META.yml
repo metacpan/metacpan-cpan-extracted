@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.39'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ name: Test-Run-Plugin-BreakOnFailure
 provides:
   Test::Run::CmdLine::Plugin::BreakOnFailure:
     file: lib/Test/Run/CmdLine/Plugin/BreakOnFailure.pm
-    version: v0.0.5
+    version: v0.0.6
   Test::Run::Plugin::BreakOnFailure:
     file: lib/Test/Run/Plugin/BreakOnFailure.pm
-    version: v0.0.5
+    version: v0.0.6
 requires:
   MRO::Compat: '0'
   Moose: '0'
@@ -33,4 +33,5 @@ resources:
   homepage: http://web-cpan.shlomifish.org/modules/Test-Run/
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://bitbucket.org/shlomif/perl-test-run
-version: v0.0.5
+version: v0.0.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::Dazz;
+
+App::Dazz->run;
+
+=head1 OVERVIEW
+
+For help with App::Dazz, run "dazz help"
+
+=cut
+
+__END__
+
+perl -I lib/ script/dazz
+
+perl -I lib/ script/dazz dazzname t/1_4.anchor.fasta -o stdout
+perl -I lib/ t/03-dazzname.t
+
+perl -I lib/ script/dazz show2ovlp t/1_4.renamed.fasta t/1_4.show.txt -o stdout
+perl -I lib/ script/dazz show2ovlp t/1_4.renamed.fasta t/1_4.show.txt -r t/1_4.replace.tsv -o stdout
+perl -I lib/ t/04-show2ovlp.t
+
+perl -I lib/ script/dazz overlap t/1_4.pac.fasta -o stdout
+perl -I lib/ script/dazz overlap t/1_4.pac.fasta -v -o stdout
+perl -I lib/ script/dazz overlap t/1_4.pac.fasta --idt 0.8 --len 2500 --serial -o stdout
+perl -I lib/ script/dazz overlap t/1_4.pac.fasta --idt 0.8 --len 2500 --all -o stdout
+perl -I lib/ t/07-overlap.t
+
+perl -I lib/ script/dazz orient t/1_4.anchor.fasta t/1_4.pac.fasta -o stdout
+perl -I lib/ script/dazz orient t/1_4.anchor.fasta t/1_4.pac.fasta -r t/1_4.2.restrict.tsv
+perl -I lib/ t/09-orient.t
+
+perl -I lib/ t/10-cover.t
+
+perl -I lib/ t/11-group.t
+
+perl -I lib/ t/90-common.t
+
+perl -I lib/ script/dazz contained t/1_4.anchor.fasta -v -o stdout
+perl -I lib/ t/14-contained.t
+
+perl -I lib/ script/dazz merge t/merge.fasta -v -o stdout
+perl -I lib/ t/15-merge.t
+
+perl -I lib/ t/16-layout.t

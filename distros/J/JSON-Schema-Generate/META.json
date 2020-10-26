@@ -3,7 +3,7 @@
    "author" : [
       "LNATION <email@lnation.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Blessed::Merge" : "0.11",
+            "Blessed::Merge" : "1.00",
             "Compiled::Params::OO" : "0.04",
             "JSON" : "0",
             "Tie::IxHash" : "1.23",
@@ -47,7 +47,20 @@
          }
       }
    },
+   "provides" : {
+      "JSON::Schema::Generate" : {
+         "file" : "lib/JSON/Schema/Generate.pm",
+         "version" : "0.06"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.05",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/JSON-Schema-Generate.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/JSON-Schema-Generate"
+      }
+   },
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

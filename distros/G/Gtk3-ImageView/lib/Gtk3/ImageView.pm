@@ -17,7 +17,7 @@ use Readonly;
 Readonly my $HALF     => 0.5;
 Readonly my $MAX_ZOOM => 100;
 
-our $VERSION = 2;
+our $VERSION = 4;
 
 use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     'zoom-changed' => {
@@ -633,11 +633,11 @@ __END__
 
 =head1 NAME
 
-Gtk3::ImageView - Gtk3 port of the Gtk2::ImageView image viewer widget
+Gtk3::ImageView - Image viewer widget for Gtk3
 
 =head1 VERSION
 
-2
+4
 
 =head1 SYNOPSIS
 
@@ -654,7 +654,11 @@ Gtk3::ImageView - Gtk3 port of the Gtk2::ImageView image viewer widget
 
 =head1 DESCRIPTION
 
-Gtk3 port of the L<Gtk2::ImageView|Gtk2::ImageView> image viewer widget
+The Gtk3::ImageView widget allows the user to zoom, pan and select the specified
+image and provides hooks to allow additional tools, e.g. painter, to be created
+and used.
+
+Gtk3::ImageView is a Gtk3 port of L<Gtk2::ImageView|Gtk2::ImageView>.
 
 To discuss Gtk3::ImageView or gtk3-perl, ask questions and flame/praise the
 authors, join gtk-perl-list@gnome.org at lists.gnome.org.

@@ -1,10 +1,14 @@
 Revision history for Neo4j::Driver
 
-0.17  2020-10-12
+0.18  2020-10-24
 
-REMINDER: Neo4j::Driver 0.13 deprecated the old syntax to access nodes,
-relationships and paths. You need to use the new accessor methods introduced
-in 0.13, or else your code will fail with a future version of this software.
+ - fix handling of index/key collisions in field names
+ - deprecate experimental Record->{column_keys} access
+ - deprecate experimental Record->{meta} access
+ - deprecate experimental Path->path() method
+ - warn when accessing the internals of node/rel/path objects (see issue #8)
+
+0.17  2020-10-12
 
  - the Neo4j 4 default database name is reliably auto-detected (fix issue #6)
  - the option to select a database is no longer experimental
@@ -28,6 +32,10 @@ in 0.13, or else your code will fail with a future version of this software.
  - deprecate experimental mutability of auth credentials after session creation
 
 0.14  2019-12-21
+
+REMINDER: Neo4j::Driver 0.13 deprecated the old syntax to access nodes,
+relationships and paths. You need to use the new accessor methods introduced
+in 0.13, or else your code will fail with a future version of this software.
 
  - make Cypher type system customisable
  - add experimental filter to convert {param} to $param in Cypher queries

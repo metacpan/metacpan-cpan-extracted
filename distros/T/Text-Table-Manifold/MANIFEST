@@ -26,6 +26,7 @@ scripts/utf8.pl
 t/00.versions.t
 t/00.versions.tx
 t/boxed.t
+t/wide-characters.t
 xt/author/changes.t
 xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

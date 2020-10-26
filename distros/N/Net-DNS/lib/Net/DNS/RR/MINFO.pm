@@ -1,21 +1,17 @@
 package Net::DNS::RR::MINFO;
 
-#
-# $Id: MINFO.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: MINFO.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::MINFO - DNS MINFO resource record
 
 =cut
-
 
 use integer;
 
@@ -26,8 +22,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset, @opaque ) = @_;
 
-	( $self->{rmailbx}, $offset ) = decode Net::DNS::Mailbox1035(@_);
-	( $self->{emailbx}, $offset ) = decode Net::DNS::Mailbox1035( $data, $offset, @opaque );
+	( $self->{rmailbx}, $offset ) = Net::DNS::Mailbox1035->decode(@_);
+	( $self->{emailbx}, $offset ) = Net::DNS::Mailbox1035->decode( $data, $offset, @opaque );
+	return;
 }
 
 
@@ -37,6 +34,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 
 	my $rdata = $self->{rmailbx}->encode(@_);
 	$rdata .= $self->{emailbx}->encode( $offset + length $rdata, @opaque );
+	return $rdata;
 }
 
 
@@ -44,6 +42,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @rdata = ( $self->{rmailbx}->string, $self->{emailbx}->string );
+	return @rdata;
 }
 
 
@@ -52,22 +51,23 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->rmailbx(shift);
 	$self->emailbx(shift);
+	return;
 }
 
 
 sub rmailbx {
 	my $self = shift;
 
-	$self->{rmailbx} = new Net::DNS::Mailbox1035(shift) if scalar @_;
-	$self->{rmailbx}->address if $self->{rmailbx};
+	$self->{rmailbx} = Net::DNS::Mailbox1035->new(shift) if scalar @_;
+	return $self->{rmailbx} ? $self->{rmailbx}->address : undef;
 }
 
 
 sub emailbx {
 	my $self = shift;
 
-	$self->{emailbx} = new Net::DNS::Mailbox1035(shift) if scalar @_;
-	$self->{emailbx}->address if $self->{emailbx};
+	$self->{emailbx} = Net::DNS::Mailbox1035->new(shift) if scalar @_;
+	return $self->{emailbx} ? $self->{emailbx}->address : undef;
 }
 
 
@@ -78,7 +78,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name MINFO rmailbx emailbx');
+    $rr = Net::DNS::RR('name MINFO rmailbx emailbx');
 
 =head1 DESCRIPTION
 

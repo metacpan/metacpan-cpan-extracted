@@ -3,7 +3,7 @@ use 5.012005;
 use parent qw(utf8 strict warnings);
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 my $enc;
 sub _get_encoding {$enc}
 
@@ -11,16 +11,24 @@ sub import {
     $_->import for qw( utf8 strict warnings );   # borrowed from https://metacpan.org/pod/Mojo::Base
     require encoding;
     my $cp = encoding::_get_locale_encoding();    # borrowed from https://metacpan.org/pod/open
-    $enc = $cp =~ /^utf-8/ ? 'UTF-8' : $cp;
+    $enc = $cp =~ /^utf-?8/i ? 'UTF-8' : $cp;
+    $enc ||= ( split /\./, $ENV{LANG} )[-1];      # Cannot find encoding in some environment
 
-    $| = 1;                                       # is this irrelevant?
-    binmode \*STDIN  => ":encoding($enc)";
-    binmode \*STDOUT => ":encoding($enc)";
-    binmode \*STDERR => ":encoding($enc)";
+    if ($enc) {
+        $| = 1;
+        binmode \*STDIN  => ":encoding($enc)";
+        binmode \*STDOUT => ":encoding($enc)";
+        binmode \*STDERR => ":encoding($enc)";
+    }
 
     $SIG{__WARN__} = \&_redecode;
     $SIG{__DIE__}  = sub { die _redecode(@_) };
     return;
+}
+
+sub unimport {
+    require Carp;
+    Carp::croak "$_[0] doesn't provide `no` pragma";
 }
 
 sub _redecode {
@@ -80,6 +88,8 @@ And writing like this doesn't work.
 
  no usw;
 
+Since version 0.12, it dies with warning.
+
 =head2 Automatically repairs bugs around file path which is encoded
 
 It replaces C<$SIG{__WARN__}> or/and C<$SIG{__DIE__}>
@@ -107,6 +117,8 @@ Since version 0.08, you don't have to care if the environment is a Windows or no
 =item L<%SIG|https://perldoc.perl.org/variables/%25SIG>
 
 =item L<Win32>
+
+=item L<open>
 
 =back
 

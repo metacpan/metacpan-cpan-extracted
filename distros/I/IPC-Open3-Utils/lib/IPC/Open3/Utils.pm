@@ -3,7 +3,7 @@ package IPC::Open3::Utils;
 use strict;
 use warnings;
 
-$IPC::Open3::Utils::VERSION = '0.91';
+$IPC::Open3::Utils::VERSION = '0.92';
 
 require Exporter;
 @IPC::Open3::Utils::ISA       = qw(Exporter);
@@ -90,7 +90,7 @@ sub run_cmd {
             $! = 22;       # Invalid argument
             $? = 65280;    # system();print $?;
         }
-        elsif ( $@ =~ m{open3: exec of .* failed at} ) {
+        elsif ( $@ =~ m{open3: exec of .* failed\b} ) {
             $? = -1;
         }
 
@@ -239,7 +239,7 @@ sub run_cmd {
                             Carp::carp($cur_line);
                         }
 
-                        if ( $cur_line =~ m{open3: exec of .* failed at} ) {
+                        if ( $cur_line =~ m{open3: exec of .* failed\b} ) {
                             $open3_err_is_exec = 1;
                         }
                     }
@@ -372,7 +372,7 @@ IPC::Open3::Utils - simple API encapsulating the most common open3() logic/uses 
 
 =head1 VERSION
 
-This document describes IPC::Open3::Utils version 0.91
+This document describes IPC::Open3::Utils version 0.92
 
 =head1 DESCRIPTION
 

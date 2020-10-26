@@ -6,16 +6,18 @@ sticker - sticks tags onto files, populates a database with file meta-data
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 
     sticker --help | --manpage | --version | --settings { schema | all | I<name> }
 
-    sticker [--verbose] [--derive] --add I<string>=I<string> file [file ...]
-    sticker [--verbose] --delete I<string> file [file ...]
-    sticker [--verbose] --extract file [file ...]
-    sticker [--verbose] --from_file I<otherfile> file [file ...]
+    sticker [--verbose] [--disable I<module> ] I<other options>
+
+    sticker [--derive] --add I<string>=I<string> file [file ...]
+    sticker --delete I<string> file [file ...]
+    sticker --extract file [file ...]
+    sticker --from_file I<otherfile> file [file ...]
 
     sticker --missing
     sticker --overlooked file ...
@@ -53,6 +55,10 @@ Delete the given field from the given file(s).
 
 Derive the needed value of the given field from other information in the given file.
 At the moment, this only works for deriving a "title" field from the filename.
+
+=item --disable I<module>
+
+Disable the given module for reading and writing. By default, all installed modules are enabled.
 
 =item --extract
 
@@ -199,6 +205,11 @@ only do with numbers, such as add them up, or order them numerically.
 
 =back
 
+=item read_all
+
+Read all possible meta-data, rather than just that in the wanted fields,
+including that which can be derived.
+
 =item field_order I<name>
 
 Defines the order of the fields in the primary database table.
@@ -333,6 +344,8 @@ sub process_args () {
 	       'wanted_fields=s%',
 	       'field_order=s@',
 	       'taggable_fields=s%',
+	       'disable=s@',
+               'read_all!',
                'tagprefix!',
                'query|q',
                'quiet',
@@ -374,7 +387,8 @@ sub print_meta {
     my $filename = $args{filename};
 
     say STDERR "== $filename ==";
-    my $meta = $sticker->read_meta($filename);
+    my $meta = $sticker->read_meta(filename=>$filename,
+        read_all=>$opts->{read_all});
     print STDERR Dump($meta);
 } # print_meta
 
@@ -386,7 +400,8 @@ sub meta_from_file {
     my $filename = $args{filename};
     my $from_file = $args{from_file};
 
-    my $meta = $sticker->read_meta($from_file);
+    my $meta = $sticker->read_meta(filename=>$from_file,
+        read_all=>$opts->{read_all});
 
     $sticker->replace_all_meta(filename=>$filename,meta=>$meta);
 } # meta_from_file
@@ -486,7 +501,8 @@ sub do_stuff {
             }
             elsif ($opts->{file_info})
             {
-                my $file_meta = $sticker->read_meta($file);
+                my $file_meta = $sticker->read_meta(filename=>$file,
+                    read_all=>$opts->{read_all});
                 say "== $file ==";
                 print Dump($file_meta);
             }
@@ -512,6 +528,7 @@ MAIN: {
         wanted_fields=>$opts->{wanted_fields},
         field_order=>$opts->{field_order},
         taggable_fields=>$opts->{taggable_fields},
+        disable=>$opts->{disable},
         primary_table=>$opts->{primary_table},
         derive=>$opts->{derive},
         tagfield=>$opts->{tagfield},

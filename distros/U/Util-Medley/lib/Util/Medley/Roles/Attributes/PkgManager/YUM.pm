@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::PkgManager::YUM;
-$Util::Medley::Roles::Attributes::PkgManager::YUM::VERSION = '0.051';
+$Util::Medley::Roles::Attributes::PkgManager::YUM::VERSION = '0.052';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::PkgManager::YUM;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::PkgManager::YUM
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =cut
 

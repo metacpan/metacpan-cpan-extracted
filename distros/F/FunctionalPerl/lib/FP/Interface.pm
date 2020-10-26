@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2019-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -71,19 +71,28 @@ or on the L<website|http://functional-perl.org/>.
 package FP::Interface;
 @ISA="Exporter"; require Exporter;
 @EXPORT=qw();
-@EXPORT_OK=qw(require_package
-              package_check_possible_interface);
+@EXPORT_OK=qw(
+    package_is_populated
+    require_package
+    package_check_possible_interface);
 %EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
 use Carp 'croak';
 
+sub package_is_populated {
+    my ($package)= @_;
+    my $pr = do {
+        no strict 'refs';
+        *{$package . "::"}
+    };
+    %$pr ? 1 : 0
+}
 
 sub require_package ($) {
     my ($package)=@_;
-    no strict 'refs';
-    if (not keys %{$package."::"}) {
+    if (not package_is_populated $package) {
         $package=~ s|::|/|g;
         $package.=".pm";
         require $package
@@ -110,7 +119,6 @@ sub package_check_possible_interface ($$) {
     }
 }
 
-
 sub implemented_with_caller {
     @_==2 or die "wrong number of arguments";
     my ($caller, $interface)= @_;
@@ -118,8 +126,13 @@ sub implemented_with_caller {
     require_package $interface;
     no strict 'refs';
     push @{"${caller_package}::ISA"}, $interface;
-    package_check_possible_interface($caller_package, $interface)
-        // die "'$interface' does not have a 'FP_Interface__method_names' method hence is not an interface at $caller_file line $caller_line.\n";
+    package_check_possible_interface($caller_package, $interface) // do {
+        my $suggestload = package_is_populated($interface) ? ""
+            : " (perhaps you forgot to load \"$interface\"?)";
+        die "'$interface' does not have a 'FP_Interface__method_names' method hence is not an interface"
+            . $suggestload
+            ." at $caller_file line $caller_line.\n";
+    };
 }
 
 # called fully qualified, i.e. FP::Interface::implemented (to avoid

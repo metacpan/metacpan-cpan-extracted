@@ -1,21 +1,17 @@
 package Net::DNS::RR::LOC;
 
-#
-# $Id: LOC.pm 1802 2020-08-31 13:44:20Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1802 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: LOC.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::LOC - DNS LOC resource record
 
 =cut
-
 
 use integer;
 
@@ -28,27 +24,28 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $version = $self->{version} = unpack "\@$offset C", $$data;
 	@{$self}{qw(size hp vp latitude longitude altitude)} = unpack "\@$offset xC3N3", $$data;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'C4N3', @{$self}{qw(version size hp vp latitude longitude altitude)};
+	return pack 'C4N3', @{$self}{qw(version size hp vp latitude longitude altitude)};
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my ( $altitude, @precision ) = map $self->$_() . 'm', qw(altitude size hp vp);
+	my ( $altitude, @precision ) = map { $self->$_() . 'm' } qw(altitude size hp vp);
 	my $precision = join ' ', @precision;
 	for ($precision) {
 		s/^1m 10000m 10m$//;
 		s/ 10000m 10m$//;
 		s/ 10m$//;
 	}
-	my @rdata = ( $self->latitude, '', $self->longitude, '', $altitude, $precision );
+	return ( $self->latitude, '', $self->longitude, '', $altitude, $precision );
 }
 
 
@@ -75,6 +72,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 		$self->$attr(@_);
 		shift;
 	}
+	return;
 }
 
 
@@ -85,66 +83,65 @@ sub _defaults {				## specify RR attribute default values
 	$self->size(1);
 	$self->hp(10000);
 	$self->vp(10);
+	return;
 }
 
 
 sub latitude {
 	my $self = shift;
-	$self->{latitude} = _encode_lat(@_) if scalar @_;
-	return _decode_lat( $self->{latitude} ) if defined wantarray;
+	$self->{latitude} = _encode_angle(@_) if scalar @_;
+	return _decode_angle( $self->{latitude} || return, 'N', 'S' );
 }
 
 
 sub longitude {
 	my $self = shift;
-	$self->{longitude} = _encode_lat(@_) if scalar @_;
-	return undef unless defined wantarray;
-	return _decode_lat( $self->{longitude} ) unless wantarray;
-	my @long = map { s/N/E/; s/S/W/; $_ } _decode_lat( $self->{longitude} );
+	$self->{longitude} = _encode_angle(@_) if scalar @_;
+	return _decode_angle( $self->{longitude} || return, 'E', 'W' );
 }
 
 
 sub altitude {
 	my $self = shift;
 	$self->{altitude} = _encode_alt(shift) if scalar @_;
-	_decode_alt( $self->{altitude} ) if defined wantarray;
+	return _decode_alt( $self->{altitude} );
 }
 
 
 sub size {
 	my $self = shift;
 	$self->{size} = _encode_prec(shift) if scalar @_;
-	_decode_prec( $self->{size} ) if defined wantarray;
+	return _decode_prec( $self->{size} );
 }
 
 
 sub hp {
 	my $self = shift;
 	$self->{hp} = _encode_prec(shift) if scalar @_;
-	_decode_prec( $self->{hp} ) if defined wantarray;
+	return _decode_prec( $self->{hp} );
 }
 
-sub horiz_pre { &hp; }						# uncoverable pod
+sub horiz_pre { return &hp; }					# uncoverable pod
 
 
 sub vp {
 	my $self = shift;
 	$self->{vp} = _encode_prec(shift) if scalar @_;
-	_decode_prec( $self->{vp} ) if defined wantarray;
+	return _decode_prec( $self->{vp} );
 }
 
-sub vert_pre { &vp; }						# uncoverable pod
+sub vert_pre { return &vp; }					# uncoverable pod
 
 
 sub latlon {
 	my $self = shift;
 	my ( $lat, @lon ) = @_;
-	my @pair = scalar $self->latitude(@_), scalar $self->longitude(@lon);
+	return ( scalar $self->latitude(@_), scalar $self->longitude(@lon) );
 }
 
 
 sub version {
-	shift->{version};
+	return shift->{version};
 }
 
 
@@ -153,28 +150,28 @@ sub version {
 no integer;
 
 use constant ALTITUDE0 => 10000000;
-use constant LATITUDE0 => 0x80000000;
+use constant ORDINATE0 => 0x80000000;
 
-sub _decode_lat {
-	my $msec = shift || LATITUDE0;
-	return int( 0.5 + ( $msec - LATITUDE0 ) / 0.36 ) / 10000000 unless wantarray;
+sub _decode_angle {
+	my ( $msec, $N, $S ) = @_;
+	return int( 0.5 + ( $msec - ORDINATE0 ) / 0.36 ) / 10000000 unless wantarray;
 	use integer;
-	my $abs = abs( $msec - LATITUDE0 );
+	my $abs = abs( $msec - ORDINATE0 );
 	my $deg = int( $abs / 3600000 );
 	my $min = int( $abs / 60000 ) % 60;
 	no integer;
 	my $sec = ( $abs % 60000 ) / 1000;
-	return ( $deg, $min, $sec, ( $msec < LATITUDE0 ? 'S' : 'N' ) );
+	return ( $deg, $min, $sec, ( $msec < ORDINATE0 ? $S : $N ) );
 }
 
 
-sub _encode_lat {
+sub _encode_angle {
 	my @ang = scalar @_ > 1 ? (@_) : ( split /[\s\260'"]+/, shift );
 	my $ang = ( 0 + shift @ang ) * 3600000;
 	my $neg = ( @ang ? pop @ang : '' ) =~ /[SWsw]/;
 	$ang += ( @ang ? shift @ang : 0 ) * 60000;
 	$ang += ( @ang ? shift @ang : 0 ) * 1000;
-	return int( 0.5 + ( $neg ? LATITUDE0 - $ang : LATITUDE0 + $ang ) );
+	return int( 0.5 + ( $neg ? ORDINATE0 - $ang : ORDINATE0 + $ang ) );
 }
 
 
@@ -201,11 +198,10 @@ sub _decode_prec {
 
 sub _encode_prec {
 	( my $argument = shift ) =~ s/[Mm]$//;
-	foreach my $exponent ( 0 .. 9 ) {
-		next unless $argument < $power10[1 + $exponent];
-		my $mantissa = int( 0.5 + $argument / $power10[$exponent] );
-		return ( $mantissa & 0xF ) << 4 | $exponent;
-	}
+	my $exponent = 0;
+	until ( $argument < $power10[1 + $exponent] ) { $exponent++ }
+	my $mantissa = int( 0.5 + $argument / $power10[$exponent] );
+	return ( $mantissa & 0xF ) << 4 | $exponent;
 }
 
 
@@ -216,7 +212,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name LOC latitude longitude altitude size hp vp');
+    $rr = Net::DNS::RR->new('name LOC latitude longitude altitude size hp vp');
 
 =head1 DESCRIPTION
 

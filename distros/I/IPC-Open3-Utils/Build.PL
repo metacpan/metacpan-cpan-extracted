@@ -14,6 +14,20 @@ my $builder = Module::Build->new(
         'IO::Handle' => 0,
     },
     add_to_cleanup => ['IPC-Open3-Utils-*'],
+    meta_add       => {
+        'meta-spec'    => { version => 2 },
+        dynamic_config => 0,
+        resources      => {
+            repository => {
+                url  => 'https://github.com/drmuey/p5-IPC-Open3-Utils.git',
+                web  => 'https://github.com/drmuey/p5-IPC-Open3-Utils',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/drmuey/p5-IPC-Open3-Utils/issues',
+            },
+        },
+    },
 );
 
 $builder->create_build_script();

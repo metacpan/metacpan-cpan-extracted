@@ -1,21 +1,17 @@
 package Net::DNS::RR::IPSECKEY;
 
-#
-# $Id: IPSECKEY.pm 1718 2018-10-22 14:39:29Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1718 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: IPSECKEY.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::IPSECKEY - DNS IPSECKEY resource record
 
 =cut
-
 
 use integer;
 
@@ -50,7 +46,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	} elsif ( $gatetype == 3 ) {
 		my $name;
-		( $name, $offset ) = decode Net::DNS::DomainName( $data, $offset );
+		( $name, $offset ) = Net::DNS::DomainName->decode( $data, $offset );
 		$self->{gateway} = $name;
 
 	} else {
@@ -58,6 +54,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	}
 
 	$self->keybin( substr $$data, $offset, $limit - $offset );
+	return;
 }
 
 
@@ -90,9 +87,10 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my @params = map $self->$_, qw(precedence gatetype algorithm);
+	my @params = map { $self->$_ } qw(precedence gatetype algorithm);
 	my @base64 = split /\s+/, encode_base64( $self->keybin );
-	my @rdata = ( @params, $self->gateway, @base64 );
+	my @rdata  = ( @params, $self->gateway, @base64 );
+	return @rdata;
 }
 
 
@@ -101,6 +99,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	foreach (qw(precedence gatetype algorithm gateway)) { $self->$_(shift) }
 	$self->key(@_);
+	return;
 }
 
 
@@ -108,7 +107,7 @@ sub precedence {
 	my $self = shift;
 
 	$self->{precedence} = 0 + shift if scalar @_;
-	$self->{precedence} || 0;
+	return $self->{precedence} || 0;
 }
 
 
@@ -121,7 +120,7 @@ sub algorithm {
 	my $self = shift;
 
 	$self->{algorithm} = 0 + shift if scalar @_;
-	$self->{algorithm} || 0;
+	return $self->{algorithm} || 0;
 }
 
 
@@ -136,17 +135,17 @@ sub gateway {
 		};
 		/:.*:/ && do {
 			$self->{gatetype} = 2;
-			$self->{gateway} = Net::DNS::RR::AAAA::address( {}, $_ );
+			$self->{gateway}  = Net::DNS::RR::AAAA::address( {}, $_ );
 			last;
 		};
 		/\.\d+$/ && do {
 			$self->{gatetype} = 1;
-			$self->{gateway} = Net::DNS::RR::A::address( {}, $_ );
+			$self->{gateway}  = Net::DNS::RR::A::address( {}, $_ );
 			last;
 		};
 		/\..+/ && do {
 			$self->{gatetype} = 3;
-			$self->{gateway}  = new Net::DNS::DomainName($_);
+			$self->{gateway}  = Net::DNS::DomainName->new($_);
 			last;
 		};
 		croak 'unrecognised gateway type';
@@ -163,13 +162,14 @@ sub gateway {
 			die "unknown gateway type ($gatetype)";
 		}
 	}
+	return;
 }
 
 
 sub key {
 	my $self = shift;
 	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
-	$self->keybin( MIME::Base64::decode( join "", @_ ) );
+	return $self->keybin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -177,15 +177,15 @@ sub keybin {
 	my $self = shift;
 
 	$self->{keybin} = shift if scalar @_;
-	$self->{keybin} || "";
+	return $self->{keybin} || "";
 }
 
 
-sub pubkey { &key; }
+sub pubkey { return &key; }
 
 
 my $function = sub {			## sort RRs in numerically ascending order.
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+	return $Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
 };
 
 __PACKAGE__->set_rrsort_func( 'preference', $function );
@@ -200,7 +200,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IPSECKEY precedence gatetype algorithm gateway key');
+    $rr = Net::DNS::RR->new('name IPSECKEY precedence gatetype algorithm gateway key');
 
 =head1 DESCRIPTION
 

@@ -137,8 +137,8 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		{ "@FS@/" [
-			label="/\nDevice: /dev/vgchu/root+debian\next4\nSize: 29.4 GiB\nFree: 7.78 GiB\nUsed: 20.2 GiB";
-			style=striped;fillcolor="pink;0.735279.2:green"
+			label="/\nDevice: /dev/vgchu/root+debian\next4\nSize: 29.4 GiB\nFree: 7.33 GiB\nUsed: 20.6 GiB";
+			style=striped;fillcolor="pink;0.750761.2:green"
 		]; }
 		label="Mounted FS and swap";
 	}
@@ -204,16 +204,16 @@ digraph "machine"{
 		label="Libvirt Virtual Machines";
 	}
 	// Links from LVM VG: vgchu
-	"LVM@vgchu@PV@sda3" -> "dm-1"
-	"LVM@vgchu@PV@sda3" -> "dm-8"
 	"LVM@vgchu@PV@sda3" -> "dm-6"
-	"LVM@vgchu@PV@sda3" -> "dm-5"
-	"LVM@vgchu@PV@sda3" -> "dm-7"
-	"LVM@vgchu@PV@sda3" -> "dm-9"
-	"LVM@vgchu@PV@sda3" -> "dm-4"
-	"LVM@vgchu@PV@sda3" -> "dm-10"
 	"LVM@vgchu@PV@sda3" -> "dm-11"
+	"LVM@vgchu@PV@sda3" -> "dm-10"
+	"LVM@vgchu@PV@sda3" -> "dm-9"
+	"LVM@vgchu@PV@sda3" -> "dm-1"
+	"LVM@vgchu@PV@sda3" -> "dm-4"
 	"LVM@vgchu@PV@sda3" -> "dm-3"
+	"LVM@vgchu@PV@sda3" -> "dm-7"
+	"LVM@vgchu@PV@sda3" -> "dm-8"
+	"LVM@vgchu@PV@sda3" -> "dm-5"
 	// Links from MegaCli: Controller 0
 	"@LSISASIrcu@0@dev@LSISASIrcu@1:0" -> "1"
 	"@LSISASIrcu@0@dev@LSISASIrcu@1:3" -> "1"

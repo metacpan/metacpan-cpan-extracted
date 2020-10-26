@@ -1,23 +1,29 @@
-# $Id: 01-resolver.t 1748 2019-07-15 07:57:00Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 01-resolver.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 29;
 
 use Net::DNS::Resolver;
 use Net::DNS::Resolver::Recurse;
 
-my @NOIP = qw(:: 0.0.0.0);
+BEGIN {					## sabotage socket code
+					## no critic ProhibitMultiplePackages
 
-{					## sabotage socket code
-	no warnings;
+	package LOCAL::Socket::STUB;
+	sub new {return}		## stub
 
 	package IO::Socket::INET;
-	sub new { }			## stub
+	our @ISA = qw(LOCAL::Socket::STUB);
 
 	package IO::Socket::IP;
-	sub new { }			## stub
+	our @ISA = qw(LOCAL::Socket::STUB);
 }
 
+
+my @NOIP = qw(:: 0.0.0.0);
 
 my $resolver = Net::DNS::Resolver->new( retrans => 0, retry => 0 );
 
@@ -43,8 +49,8 @@ $resolver->ndots(2);
 ok( !$resolver->search(''), '$resolver->search() with ndots > 1' );
 
 
-my $query = new Net::DNS::Packet('.');	## exercise _accept_reply()
-my $reply = new Net::DNS::Packet('.');
+my $query = Net::DNS::Packet->new('.');	## exercise _accept_reply()
+my $reply = Net::DNS::Packet->new('.');
 $reply->header->qr(1);
 
 ok( !$resolver->_accept_reply(undef), '_accept_reply()	no reply' );
@@ -116,9 +122,10 @@ eval { $recursive->query_dorecursion( 'www.net-dns.org', 'A' ) };
 my ($warning6) = split /\n/, "$@\n";
 ok( !$warning6, "deprecated query_dorecursion()\t[$warning6]" );
 
-eval { $recursive->recursion_callback( sub { } );
+my $callback = sub { };
+eval { $recursive->recursion_callback($callback) };
 my ($warning7) = split /\n/, "$@\n";
-ok( !$warning7, "deprecated recursion_callback()\t[$warning7]" ) };
+ok( !$warning7, "deprecated recursion_callback()\t[$warning7]" );
 
 
 exit;

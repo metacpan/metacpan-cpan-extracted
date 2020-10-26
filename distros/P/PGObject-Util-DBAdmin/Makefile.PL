@@ -25,6 +25,8 @@ WriteMakefile(
         'Capture::Tiny' => 0,
         'DBI'           => 0,
         'Moo'           => 0,
+        'Log::Any'      => 0,
+        'Scope::Guard'  => 0,
         'namespace::clean' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -3,7 +3,7 @@ package Test::Run::CmdLine::Plugin::TrimDisplayedFilenames;
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 =head1 NAME
 
@@ -27,16 +27,15 @@ environment variable. A few sample ones are:
 
 =head1 VERSION
 
-Version 0.0125
+Version 0.0126
 
 =cut
 
-our $VERSION = '0.0125';
+our $VERSION = '0.0126';
 
 =head1 METHODS
 
 =cut
-
 
 =head2 $self->private_backend_plugins()
 
@@ -52,7 +51,6 @@ sub private_backend_plugins
     return [qw(TrimDisplayedFilenames)];
 }
 
-
 =head2 $self->private_non_direct_backend_env_mapping()
 
 Returns the non-direct Backend Environment Mappings, that will specify
@@ -64,12 +62,11 @@ sub private_non_direct_backend_env_mapping
 {
     my $self = shift;
 
-    return
-    [
+    return [
         {
             type => "direct",
-            env => "HARNESS_TRIM_FNS",
-            arg => "trim_displayed_filenames_query",
+            env  => "HARNESS_TRIM_FNS",
+            arg  => "trim_displayed_filenames_query",
         },
     ];
 }
@@ -95,10 +92,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::CmdLine::Plugin::TrimDisplayedFilenames>
 
 =item * CPAN Ratings
 

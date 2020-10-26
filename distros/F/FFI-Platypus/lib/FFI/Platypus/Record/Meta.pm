@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 
 {
@@ -63,7 +63,7 @@ our $VERSION = '1.33'; # VERSION
 
   $ffi->attach( ffi_type         => ['meta_t'] => 'ffi_type'   );
   $ffi->attach( size             => ['meta_t'] => 'size_t'     );
-  $ffi->attach( alignment        => ['meta_t'] => 'uint'       );
+  $ffi->attach( alignment        => ['meta_t'] => 'ushort'     );
   $ffi->attach( element_pointers => ['meta_t'] => 'ffi_type[]' );
 
   $ffi->attach( DESTROY          => ['meta_t'] => 'void'       );
@@ -83,7 +83,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 DESCRIPTION
 

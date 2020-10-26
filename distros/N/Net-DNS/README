@@ -73,6 +73,7 @@ time. These are the core packages that need to be available:
 	Digest::SHA  
 	File::Spec      
 	IO::Socket      
+	IO::Socket::IP
 	MIME::Base64     
 	Time::Local
 	Test::More       
@@ -80,7 +81,6 @@ time. These are the core packages that need to be available:
 The availability of these optional packages is tested at runtime:
 
 	Digest::BubbleBabble
-	IO::Socket::IP
 	Net::DNS::SEC
 	Net::LibIDN2
 
@@ -330,5 +330,5 @@ have always developed Net::DNS using open-source systems and I am proud
 to make Net::DNS freely available to the world.
 
 
----- $Id: README 1692 2018-07-06 08:55:39Z willem $
+---- $Id: README 1816 2020-10-16 09:44:21Z willem $
 

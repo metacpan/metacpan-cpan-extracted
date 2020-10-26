@@ -7,7 +7,7 @@ use Capture::Tiny qw( capture );
 use FFI::Probe::Runner::Result;
 
 # ABSTRACT: Probe runner for FFI
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 
 sub new
@@ -85,7 +85,7 @@ FFI::Probe::Runner - Probe runner for FFI
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 SYNOPSIS
 

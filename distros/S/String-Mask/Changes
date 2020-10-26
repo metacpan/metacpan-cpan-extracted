@@ -6,3 +6,6 @@ Revision history for String-Mask
 0.02    2020/10/21
 	- Undeclared dependency Import::Export <SREZIC>
 
+0.03    2020/10/24
+	- Add a new method of masking - email - which will mask data offsetting @
+	- Add meta links to github

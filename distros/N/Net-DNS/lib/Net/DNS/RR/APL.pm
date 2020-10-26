@@ -1,21 +1,17 @@
 package Net::DNS::RR::APL;
 
-#
-# $Id: APL.pm 1741 2019-04-16 13:10:38Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: APL.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::APL - DNS APL resource record
 
 =cut
-
 
 use integer;
 
@@ -39,6 +35,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 		push @$aplist, $item;
 	}
 	croak('corrupt APL data') unless $offset == $limit;	# more or less FUBAR
+	return;
 }
 
 
@@ -53,7 +50,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 		my $xlength = ( $_->{negate} ? 0x80 : 0 ) | length($address);
 		push @rdata, pack 'n C2 a*', @{$_}{qw(family prefix)}, $xlength, $address;
 	}
-	join '', @rdata;
+	return join '', @rdata;
 }
 
 
@@ -61,7 +58,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $aplist = $self->{aplist};
-	my @rdata = map $_->string, @$aplist;
+	my @rdata  = map { $_->string } @$aplist;
+	return @rdata;
 }
 
 
@@ -69,6 +67,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	$self->aplist(@_);
+	return;
 }
 
 
@@ -96,14 +95,15 @@ sub aplist {
 	}
 
 	my @ap = @$aplist;
-	return wantarray ? @ap : join ' ', map $_->string, @ap if defined wantarray;
+	return unless defined wantarray;
+	return wantarray ? @ap : join ' ', map { $_->string } @ap;
 }
 
 
 ########################################
 
 
-package Net::DNS::RR::APL::Item;
+package Net::DNS::RR::APL::Item;	## no critic ProhibitMultiplePackages
 
 use Net::DNS::RR::A;
 use Net::DNS::RR::AAAA;
@@ -112,10 +112,9 @@ my %family = qw(1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
 
 
 sub negate {
-	for ( shift->{negate} ) {
-		$_ = shift if scalar @_;
-		return !( !$_ );
-	}
+	my $self = shift;
+	return $self->{negate} = shift if scalar @_;
+	return $self->{negate};
 }
 
 
@@ -123,7 +122,7 @@ sub family {
 	my $self = shift;
 
 	$self->{family} = 0 + shift if scalar @_;
-	$self->{family} || 0;
+	return $self->{family} || 0;
 }
 
 
@@ -131,7 +130,7 @@ sub prefix {
 	my $self = shift;
 
 	$self->{prefix} = 0 + shift if scalar @_;
-	$self->{prefix} || 0;
+	return $self->{prefix} || 0;
 }
 
 
@@ -143,7 +142,7 @@ sub address {
 
 	my $bitmask = $self->prefix;
 	my $address = bless( {}, $family )->address(shift);
-	$self->{address} = pack "B$bitmask", unpack 'B*', $address;
+	return $self->{address} = pack "B$bitmask", unpack 'B*', $address;
 }
 
 
@@ -163,7 +162,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IN APL aplist');
+    $rr = Net::DNS::RR->new('name IN APL aplist');
 
 =head1 DESCRIPTION
 

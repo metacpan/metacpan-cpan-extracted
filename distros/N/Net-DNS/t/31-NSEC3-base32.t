@@ -1,7 +1,9 @@
-# $Id: 31-NSEC3-base32.t 1681 2018-05-28 12:57:49Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 31-NSEC3-base32.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -10,7 +12,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::Bolt;
 # ABSTRACT: Adapter for Neo4j::Bolt
-$Neo4j::Driver::Transport::Bolt::VERSION = '0.17';
+$Neo4j::Driver::Transport::Bolt::VERSION = '0.18';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -189,9 +189,9 @@ sub _deep_bless {
 	my ($cypher_types, $data) = @_;
 	
 	if (ref $data eq 'Neo4j::Bolt::Node') {  # node
-		my $node = $data->{properties} // {};
+		my $node = \( $data->{properties} // {} );
 		bless $node, $cypher_types->{node};
-		$node->{_meta} = {
+		$$node->{_meta} = {
 			id => $data->{id},
 			labels => $data->{labels},
 		};
@@ -199,9 +199,9 @@ sub _deep_bless {
 		return $node;
 	}
 	if (ref $data eq 'Neo4j::Bolt::Relationship') {  # relationship
-		my $rel = $data->{properties} // {};
+		my $rel = \( $data->{properties} // {} );
 		bless $rel, $cypher_types->{relationship};
-		$rel->{_meta} = {
+		$$rel->{_meta} = {
 			id => $data->{id},
 			start => $data->{start},
 			end => $data->{end},
@@ -213,32 +213,33 @@ sub _deep_bless {
 	
 	# support for Neo4j::Bolt 0.01 data structures (to be phased out)
 	if (ref $data eq 'HASH' && defined $data->{_node}) {  # node
-		bless $data, $cypher_types->{node};
+		my $node = bless \$data, $cypher_types->{node};
 		$data->{_meta} = {
 			id => $data->{_node},
 			labels => $data->{_labels},
 		};
-		$cypher_types->{init}->($data) if $cypher_types->{init};
-		return $data;
+		$cypher_types->{init}->($node) if $cypher_types->{init};
+		return $node;
 	}
 	if (ref $data eq 'HASH' && defined $data->{_relationship}) {  # relationship
-		bless $data, $cypher_types->{relationship};
+		my $rel = bless \$data, $cypher_types->{relationship};
 		$data->{_meta} = {
 			id => $data->{_relationship},
 			start => $data->{_start},
 			end => $data->{_end},
 			type => $data->{_type},
 		};
-		$cypher_types->{init}->($data) if $cypher_types->{init};
-		return $data;
+		$cypher_types->{init}->($rel) if $cypher_types->{init};
+		return $rel;
 	}
 	
 	if (ref $data eq 'Neo4j::Bolt::Path') {  # path
-		bless $data, $cypher_types->{path};
+		my $path = bless { path => $data }, $cypher_types->{path};
 		foreach my $i ( 0 .. $#{$data} ) {
 			$data->[$i] = _deep_bless($cypher_types, $data->[$i]);
 		}
-		return $data;
+		$cypher_types->{init}->($path) if $cypher_types->{init};
+		return $path;
 	}
 	
 	if (ref $data eq 'ARRAY') {  # array
@@ -279,7 +280,7 @@ Neo4j::Driver::Transport::Bolt - Adapter for Neo4j::Bolt
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 

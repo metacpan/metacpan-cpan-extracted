@@ -72,6 +72,11 @@ Sub::Defer::defer_sub __PACKAGE__ . '::cwd' => sub {
 #     return 1;
 # }
 
+sub appdir {
+    my ($self) = @_;
+    return $self->spec->catdir( $self->bindir(), '.' . $self->_app->str->prefix . '.d' );
+}
+
 sub file_lookup {
     my ( $self, @rel_parts ) = @_;
 
@@ -79,8 +84,7 @@ sub file_lookup {
     $call->{'inc'} = [] if !exists $call->{'inc'} || ref $call->{'inc'} ne 'ARRAY';
 
     my @paths;
-    my $name = $self->_app->str->prefix;
-    for my $base ( @{ $call->{'inc'} }, $self->spec->catdir( $self->bindir(), ".$name.d" ), @{ $self->inc } ) {
+    for my $base ( @{ $call->{'inc'} }, $self->appdir, @{ $self->inc } ) {
         next if !$base;
         push @paths, $self->spec->catfile( $base, @rel_parts );
     }
@@ -172,6 +176,14 @@ has bindir => (
 
     # 'isa'     => sub { die "'bindir' must be a directory" unless -d $_[1] },
     'default' => sub {
+
+        # PSGI/Plack $0
+        #   1. starman worker -Ilib … t/test.psgi
+        #   2. 500 error: Cannot find current script 'starman worker -Ilib … t/test.psgi' at …/FindBin.pm line 166.
+        local $0 = $0;
+        if ( $0 =~ m/(\S+\.psgi)/ ) {
+            $0 = $1;
+        }
         require FindBin;
         require Cwd;
         return $FindBin::Bin || FindBin->again() || Cwd::cwd();
@@ -265,6 +277,40 @@ Sub::Defer::defer_sub __PACKAGE__ . '::json_read' => sub {
     };
 };
 
+sub is_safe_part {
+    my ( $fs, $part ) = @_;
+
+    return if !defined($part) || !length($part) || $part eq $fs->spec->updir;
+    return if scalar( $fs->spec->splitdir($part) ) != 1;
+    return if utf8::is_utf8($part);    # a Unicode string, see String::UnicodeUTF8
+    return if $part =~ m/[><|*&]/;     # some common shell meta characters
+
+    my $cleaned = $fs->_app->str->trim( $part, 1 );
+    return if $cleaned ne $part;
+
+    return 1;
+}
+
+sub is_safe_path {
+    my ( $fs, $path, $abs_ok, $trl_ok ) = @_;
+
+    return if !defined($path) || !length($path);
+    return if utf8::is_utf8($path);    # a Unicode string, see String::UnicodeUTF8
+
+    my @parts = $fs->spec->splitdir($path);
+
+    return if !$abs_ok && $parts[0] eq '';
+    return if !$trl_ok && $parts[-1] eq '';
+
+    for my $idx ( 0 .. $#parts ) {
+        next if $idx == 0 && $parts[$idx] eq '';
+        next if $idx == $#parts && $parts[$idx] eq '';
+        return if !$fs->is_safe_part( $parts[$idx] );
+    }
+
+    return 1;
+}
+
 # TODO new FCR
 
 1;
@@ -312,6 +358,8 @@ The applications main directory. Defaults to script’s directory or the current
 
 Lazy loads L<FindBin> and L<Cwd>.
 
+Works with .psgi files being run under Plack/PSGI.
+
 =head3 inc
 
 An array ref of paths for file_lookup() to use. Defaults to [].
@@ -319,6 +367,14 @@ An array ref of paths for file_lookup() to use. Defaults to [].
 =head2 cwd()
 
 Lazy wrapper of L<Cwd>’s cwd().
+
+=head2 appdir()
+
+The directory that belongs to the app.
+
+It is a directory in the object’s base path called .$prefix.d (where $prefix is the _app attributes’s ->str->prefix):
+
+$fs->bindir()/.$str->prefix().d/
 
 =head2 file_lookup()
 
@@ -330,7 +386,7 @@ The final argument can be a config hashref with the inc key whose value is an ar
 
 The arguments are the pieces of the path you are interested in that get put together in a portable way.
 
-    my $conf = $fs->file_lookup('data', 'foo.json'); # e.g. …/my_app_base/.appkit.d/data/foo.json
+    my $conf = $fs->file_lookup('data', 'foo.json'); # e.g. …/my_app_bindir/.appkit.d/data/foo.json
 
 The path is looked for in this order:
 
@@ -338,7 +394,7 @@ The path is looked for in this order:
 
 1. the 'inc' paths in the given argument if any
 
-2. a directory in the object’s base path called .$prefix.d (where $prefix is the _app attributes’s ->str->prefix).
+2. appdir()
 
 3. the objects’s inc attribute
 
@@ -407,6 +463,42 @@ Lazy wrapper to consistently write a data structure as a YAML file.
 =head2 get_iterator()
 
 Lazy wrapper of L<Path::Iter>’s get_iterator().
+
+=head2 is_safe_part()
+
+Takes a bytes string (utf8 if encoding matters in your context) and returns true if it safe to use as part of a path name.
+
+e.g.:
+
+    foo            # safe
+    ..             # not safe
+    f\x00o         # not safe
+    f\x{2665}o     # not safe
+    f\xe2\x99\xa5o # safe
+
+=head2 is_safe_path()
+
+Takes a bytes string (utf8 if encoding matters in your context) and returns true if it is safe to use as a path name.
+
+e.g.:
+
+    foo/bar            # safe
+    foo/../bar         # not safe
+    f\x00o/bar         # not safe
+    f\x{2665}o/bar     # not safe
+    f\xe2\x99\xa5o/bar # safe
+
+2nd arg: boolean (default false) to allow absolute paths.
+
+e.g.:
+
+    /foo/bar # now safe
+
+3rd arg:  boolean (default false) to allow trailing path separator
+
+e.g.:
+
+    foo/bar/ # now safe
 
 =head1 DIAGNOSTICS
 

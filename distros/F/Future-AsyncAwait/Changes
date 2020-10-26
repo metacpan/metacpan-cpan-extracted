@@ -1,5 +1,16 @@
 Revision history for Future-AsyncAwait
 
+0.45    2020-10-22
+        [CHANGES]
+         * Have Test::Future::AsyncAwait::Awaitable check for the suggested
+           new `AWAIT_CHAIN_CANCEL` method
+
+        [BUGFIXES]
+         * Avoid refcounting bug when cancelling a suspended SAVEt_SPTR
+           (RT133564)
+         * Turn on SvPADMY on precancel AV to keep -DDEBUGGING perl happy
+           (RT133517)
+
 0.44    2020-10-09
         [CHANGES]
          * Added initial attempt at `CANCEL` blocks for handling Future

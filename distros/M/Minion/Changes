@@ -1,4 +1,8 @@
 
+10.14  2020-10-24
+  - Changed SQL style to use uppercase keywords.
+  - Fixed a bug where Minion::Worker could inherit timers from Mojolicious applications.
+
 10.13  2020-07-30
   - Added EXPERIMENTAL support for lax dependencies.
   - Added EXPERIMENTAL lax option to enqueue method in Minion, Minion::Backend and Minion::Backend::Pg.

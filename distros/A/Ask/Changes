@@ -4,61 +4,116 @@ Ask
 Created:      2012-11-28
 Home page:    <https://metacpan.org/release/Ask>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Ask>
-Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
-0.007  2013-06-18
+0.012	2020-10-26
 
- - (Addition) AskX::AutoLang.
- - (Bugfix Update) Bumped Moo version requirement to 1.000006.
-   Fixes GH#1
-   ++$JBERGER
+ - Added: Ask->backends method.
+ - Added: Ask::Caroline.
+ - Added: Ask::Clui.
+ - Added: Ask::Prima.
+ - file_selection now returns Path::Tiny objects instead of strings.
+
+0.011	2020-10-24
+
+ [ Bug Fixes ]
+ - Minor issues with Ask::Functions fixed.
+
+ [ Other ]
+ - Added: Ask::Question.
+
+0.010	2020-10-24
+
+ [ Bug Fixes ]
+ - Fix syntax error in Ask::Wx introduced in version 0.009.
+
+ [ Packaging ]
+ - Add Module::Pluggable to the dependency list.
+
+0.009	2020-10-23
+
+ - Remove Perl-5.10-specific syntax and backport to Perl 5.8.8+.
+
+0.008	2020-10-23
+
+ [ Bug Fixes ]
+ - Ask::Gtk, Ask::Wx, Ask::Tk, and Ask::Zenity now check DISPLAY
+   environment variable to see if they will be usable.
+ - Better skipping of backends which cannot be loaded.
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+ [ Other ]
+ - Replace Sub::Exporter::Progressive with Exporter::Tiny.
+ - Replace namespace::sweep with namespace::autoclean.
+
+0.007	2013-06-18
+
+ [ Bug Fixes ]
+ - Bumped Moo version requirement to 1.000006.
+   Joel Berger++
+
+ [ Other ]
  - Add a 'lang' option; use Lingua::Boolean::Tiny to process it.
-   ++$DAXIM
+   Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯++
+   <https://rt.cpan.org/Ticket/Display.html?id=82925>
+ - Added: AskX::AutoLang.
  - Use POSIX.pm to switch off terminal echo instead of Term::ReadKey.
-   ++$HAARG
+   Graham Knop++
 
-0.006  2013-01-16
+0.006	2013-01-16
 
- - (Addition) XML address book example script.
- - (Documentation) Corrections in Ask::Wx pod.
+ [ Documentation ]
+ - Corrections in Ask::Wx pod.
 
-0.005  2013-01-16
+ [ Other ]
+ - Added: XML address book example script.
 
- - (Addition) Ask::Fallback backend, which kicks in if
-   $ENV{AUTOMATED_TESTING} or $ENV{PERL_MM_USE_DEFAULT}.
- - (Addition) New (internal) API method: is_usable
- - (Addition) New (internal) API method: quality
+0.005	2013-01-16
+
+ - Added: Ask::Fallback backend, which kicks in if $ENV{AUTOMATED_TESTING}
+   or $ENV{PERL_MM_USE_DEFAULT}.
+ - Added: New (internal) API method: is_usable
+ - Added: New (internal) API method: quality
  - Saner implementation of Ask->detect, using Module::Pluggable.
 
-0.004  2013-01-14
+0.004	2013-01-14
 
- - (Addition) Ask::Wx - does not yet support multi file selection dialog.
- - (Addition) New API method: multiple_choice
- - (Addition) New API method: single_choice
- - (Bugfix) Correctly destroy no longer used Tk::MainWindow objects created
-   in info, warning, question and file_selection methods.
+ [ Bug Fixes ]
+ - Correctly destroy no longer used Tk::MainWindow objects created in info,
+   warning, question and file_selection methods.
 
-0.003  2013-01-13
+ [ Other ]
+ - Added: Ask::Wx - does not yet support multi file selection dialog.
+ - Added: New API method: multiple_choice
+ - Added: New API method: single_choice
 
- - (Addition) Ask::Gtk
+0.003	2013-01-13
 
-0.002  2012-12-11
+ - Added: Ask::Gtk
 
- - (Packaging) Require at least version 0.006 of namespace::sweep.
+0.002	2012-12-11
 
-0.001  2012-12-03  # Initial release
+ [ Packaging ]
+ - Require at least version 0.006 of namespace::sweep.
 
- - (Addition) Allow functions to be exported via
-   Sub::Exporter::Progressive.
- - (Addition) Respect PERL_ASK_BACKEND environment variable.
- - (Documentation) Document Ask::Callback.
- - (Documentation) Document Ask::Tk.
+0.001	2012-12-03	Initial release
 
-0.000_02  2012-12-03  # Developer preview II
+ [ Documentation ]
+ - Document Ask::Callback.
+ - Document Ask::Tk.
 
- - (Addition) Ask::Tk
- - (Packaging) Fix repo link.
+ [ Other ]
+ - Added: Allow functions to be exported via Sub::Exporter::Progressive.
+ - Added: Respect PERL_ASK_BACKEND environment variable.
 
-0.000_01  2012-12-01  # Developer preview
+0.000_02	2012-12-03	Developer preview II
 
+ [ Packaging ]
+ - Fix repo link.
 
+ [ Other ]
+ - Added: Ask::Tk
+
+0.000_01	2012-12-01	Developer preview

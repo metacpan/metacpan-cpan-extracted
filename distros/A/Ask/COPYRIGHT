@@ -1,30 +1,10 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Ask
-Upstream-Contact: Toby Inkster <tobyink@cpan.org>
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Ask
 
-Files: CONTRIBUTING
- CREDITS
- Changes
- LICENSE
- MANIFEST.SKIP
- META.ttl
- Makefile.PL
- README
- TODO
- articles/ask-introduction.pod
- examples/address-book-app.pl
- examples/extending.pl
- examples/multiple-choice.pl
- examples/synopsis.pl
- meta/changes.pret
- meta/doap.pret
- meta/makefile.pret
- meta/people.pret
-Copyright: Unknown
-License: Unknown
-
-Files: lib/Ask.pm
+Files: README
+ lib/Ask.pm
  lib/Ask/API.pm
  lib/Ask/Callback.pm
  lib/Ask/Fallback.pm
@@ -39,56 +19,53 @@ Files: lib/Ask.pm
  t/02callbacks.t
  t/03extending.t
  t/04i18n.t
-Copyright: This software is copyright (c) 2012-2013 by Toby Inkster.
+Copyright: This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/Module/Install.pm
- inc/Module/Install/Include.pm
- inc/Module/Install/Metadata.pm
-Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ TODO
+ articles/ask-introduction.pod
+ examples/address-book-app.pl
+ examples/extending.pl
+ examples/multiple-choice.pl
+ examples/synopsis.pl
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/05aq.t
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/Module/Install/TrustMetaYml.pm
- inc/Module/Package/Dist/RDF.pm
-Copyright: This software is copyright (c) 2011-2012 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/Package.pm
-Copyright: Copyright (c) 2011. Ingy doet Net.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/Base.pm
-Copyright: Copyright 2003, 2004 by Audrey Tang <autrijus@autrijus.org>.
+Files: lib/Ask/Caroline.pm
+ lib/Ask/Clui.pm
+ lib/Ask/Prima.pm
+ lib/Ask/Question.pm
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
 Copyright: None
 License: public-domain
-Comment: This file! Automatically generated.
-
-Files: inc/YAML/Tiny.pm
-Copyright: Copyright 2006 - 2012 Adam Kennedy.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/Contributors.pm
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/Makefile.pm
-Copyright: Copyright 2002, 2003, 2004 Audrey Tang and Brian Ingerson.
-License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 1, February 1989
-

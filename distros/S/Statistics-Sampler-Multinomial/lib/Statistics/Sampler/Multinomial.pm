@@ -4,7 +4,7 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
@@ -93,6 +93,8 @@ sub get_class_count {
     return scalar @$aref;
 }
 
+#  simplified version of draw_n_samples
+#  as we need a single index result
 sub draw {
     my ($self) = @_;
 
@@ -100,30 +102,22 @@ sub draw {
 
     my $data  = $self->{data}
       // croak 'it appears setup has not been run yet';
-    my $K    = scalar @$data;
+    my $K    = scalar @$data - 1;
     my $norm = $self->{sum} // do {$self->_initialise; $self->{sum}};
 
-    my $n = 1;
-    my ($sum_p, $sum_n) = (0, 0);
-
-    foreach my $kk (0..($K-1)) {
+    foreach my $kk (0..$K) {
         #  avoid repeated derefs below - unbenchmarked micro-optimisation
         my $data_kk = $data->[$kk];
         next if !$data_kk;
 
-        my $prob = $data_kk / ($norm - $sum_p);
-        #  MRMA does not like p>1
-        # so if p>1 then we get 1, otherwise the original value
-        # the int-or approach is ~10% faster than min(1,$prob) when $prob<1
-        my $res = $prng->binomial (
-            int ($prob) || $prob,
-            ($n - $sum_n),
-        );
+        return $kk
+          if   ($data_kk > $norm)  #  MRMA blows up if prob>1, due to rounding errors
+            || $prng->binomial (
+                  $data_kk / $norm,
+                  1,  # constant for single draw 
+               );
 
-        return $kk if $res;
-
-        $sum_p += $data_kk;
-        $sum_n += $res;
+        $norm -= $data_kk;
     }
 
     #  we should not get here
@@ -137,13 +131,12 @@ sub draw_n_samples {
 
     my $data  = $self->{data}
       // croak 'it appears setup has not been run yet';
-    my $K    = scalar @$data;
+    my $K    = scalar @$data - 1;
     my $norm = $self->{sum} // do {$self->_initialise; $self->{sum}};
 
     my @draws;
-    my ($sum_p, $sum_n) = (0, 0);
 
-    foreach my $kk (0..($K-1)) {
+    foreach my $kk (0..$K) {
         #  avoid repeated derefs below - unbenchmarked micro-optimisation
         my $data_kk = $data->[$kk];
         if (!$data_kk) {
@@ -151,17 +144,15 @@ sub draw_n_samples {
             next;
         }
 
-        my $prob = $data_kk / ($norm - $sum_p);
         #  MRMA does not like p>1
-        # so if p>1 then we get 1, otherwise the original value
-        # the int-or approach is ~10% faster than min(1,$prob) when $prob<1
+        my $prob = $data_kk > $norm ? 1 : $data_kk / $norm;
         my $res = $prng->binomial (
-            int ($prob) || $prob,
-            ($n - $sum_n),
+            $prob,
+            $n,
         );
         $draws[$kk] = $res;
-        $sum_p += $data_kk;
-        $sum_n += $res;
+        $norm -= $data_kk;
+        $n    -= $res;
     }
 
     return \@draws;
@@ -350,6 +341,7 @@ regarding non-numeric values under the warnings pragma.
 The same applies for floating point array indices.
 
 =item $object->draw_with_mask ($aref)
+
 =item $object->draw_n_samples_with_mask ($n, $aref)
 
 These locally mask out a subset of classes by setting

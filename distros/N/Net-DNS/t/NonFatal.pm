@@ -1,4 +1,4 @@
-# $Id: NonFatal.pm 1608 2017-12-07 10:10:38Z willem $	-*-perl-*-
+# $Id: NonFatal.pm 1818 2020-10-18 15:24:42Z willem $	-*-perl-*-
 
 # Test::More calls functions from Test::Builder. Those functions all eventually
 # call Test::Builder::ok (on a builder instance) for reporting the status.
@@ -6,9 +6,9 @@
 # ok method that always reports the test to have completed successfully.
 #
 # The functions NonFatalBegin and NonFatalEnd re-bless the builder in use by
-# Test::More (Test::More->builder) to be of type Test::NonFatal and
-# Test::Builder respectively. Tests that are between those functions will thus
-# always appear to succeed. The failure report itself is not suppressed.
+# Test::More (Test::More->builder) to be of type NonFatal and Test::Builder
+# respectively. Tests that are between those functions will thus always appear
+# to succeed. The failure report itself is not suppressed.
 #
 # Note that the builder is only re-blessed when the file 't/online.nonfatal'
 # exists.
@@ -18,46 +18,59 @@
 # NonFatalEnd subroutines may not be nested.
 #
 
-use strict;
-use Test::More;
+package NonFatal;
 
-use constant NONFATAL => eval { -e 't/online.nonfatal' };
+use strict;
+use warnings;
+use base qw(Test::Builder);
 
 my @failed;
+
+sub ok {
+	my ( $self, $test, @name ) = @_;
+
+	return $self->SUPER::ok( 1, @name ) if $test;
+
+	$self->SUPER::ok( 1, "NOT OK (tolerating failure)  @name" );
+
+	push @failed, scalar(@name) ? "@name" : 'undef';
+	return $test;
+}
+
+
+sub diag {
+	my @annotation = @_;
+	return Test::More->builder->diag(@annotation);
+}
+
 
 END {
 	my $n = scalar(@failed);
 	my $s = $n > 1 ? 's' : '';
+	bless Test::More->builder, qw(Test::Builder);
 	diag( join "\n\t", "\tDisregarding $n failed sub-test$s", @failed ) if $n;
+	return;
 }
 
 
-{
-	package Test::NonFatal;
+package main;				## no critic ProhibitMultiplePackages
 
-	use base qw(Test::Builder);
+require Test::More;
 
-	sub ok {
-		my ( $self, $test, $name ) = ( @_, '' );
-
-		return $self->SUPER::ok( 1, $name ) if $test;
-
-		$self->SUPER::ok( 1, "NOT OK, but tolerating failure, $name" );
-
-		push @failed, $name;
-		return $test;
-	}
-}
-
+use constant NONFATAL => eval { -e 't/online.nonfatal' };
 
 sub NonFatalBegin {
-	bless Test::More->builder, qw(Test::NonFatal) if NONFATAL;
+	bless Test::More->builder, qw(NonFatal) if NONFATAL;
+	return;
 }
 
 sub NonFatalEnd {
 	bless Test::More->builder, qw(Test::Builder) if NONFATAL;
+	return;
 }
 
 
 1;
+
+__END__
 

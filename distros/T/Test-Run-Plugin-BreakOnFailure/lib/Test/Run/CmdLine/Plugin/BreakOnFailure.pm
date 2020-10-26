@@ -22,7 +22,7 @@ variable and set the C<HARNESS_BREAK> environment variable to a true value.
 
 =cut
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 =head2 $self->private_backend_plugins()
 
@@ -62,45 +62,9 @@ sub private_direct_backend_env_mapping
 
 Shlomi Fish, C<< <shlomif at cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-test-run-plugin-breakonfailure at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test::Run::Plugin::BreakOnFailure>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Test::Run::CmdLine::Plugin::BreakOnFailure
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::CmdLine::Plugin::BreakOnFailure>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test::Run::Plugin::BreakOnFailure>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test::Run::Plugin::BreakOnFailure>
-
-=item * MetaCPAN
-
-L<https://metacpan.org/release/Test-Run-Plugin-BreakOnFailure>
-
-=back
-
 =head1 ACKNOWLEDGEMENTS
 
-My work for Reask ( L<http://reask.com/> ) which inspired this module.
+My work for Reask which inspired this module.
 
 =head1 SEE ALSO
 
@@ -111,7 +75,7 @@ L<Test::Run::CmdLine>, L<TAP::Parser>
 
 Copyright 2010 Shlomi Fish.
 
-This program is distributed under the MIT (X11) License:
+This program is distributed under the MIT (Expat) License:
 L<http://www.opensource.org/licenses/mit-license.php>
 
 Permission is hereby granted, free of charge, to any person

@@ -1,11 +1,19 @@
 Revision History for File-Sticker
 =================================
 
-v0.9301 2020-07-31
-------------------
+v1.01 2020-10-26
+----------------
 
-* 2020-07-31 16:00:14 +1000
-  need to Ignore File-Sticker
+* 2020-10-26 18:14:12 +1100
+  version bump, major changes
+* 2020-10-26 17:58:02 +1100
+  Add read_all option to read all possible meta-data
+* 2020-10-26 17:00:21 +1100
+  Extending Exif type to include any fields at all.
+* 2020-10-26 13:11:20 +1100
+  Enable MP3 files to store any field.
+* 2020-10-26 11:44:20 +1100
+  disable modules
 
 ===================================
 End of changes in the last 365 days

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultColumns;
 # ABSTRACT: Structure definition of Cypher result values
-$Neo4j::Driver::ResultColumns::VERSION = '0.17';
+$Neo4j::Driver::ResultColumns::VERSION = '0.18';
 
 use Carp qw(croak);
 
@@ -18,7 +18,6 @@ sub new {
 	my $column_keys = {};
 	for (my $f = scalar(@$columns) - 1; $f >= 0; $f--) {
 		$column_keys->{$columns->[$f]} = $f;
-		$column_keys->{$f} = $f;
 	}
 	
 	return bless $column_keys, $class;
@@ -35,15 +34,11 @@ sub key {
 
 sub list {
 	my ($self) = @_;
+	warnings::warnif deprecated => "Neo4j::Driver::Record->{column_keys} is deprecated";
 	
-	# reconstruct the ordered list of keys
-	my @keys = ();
-	foreach my $key ( keys %$self ) {
-		my $i = $self->{$key};
-		next if defined $keys[$i] && $keys[$i] ne "$i" && $key eq "$i";
-		$keys[$i] = $key;
-	}
-	return @keys;
+	# returns the unordered list of keys
+	# (prior to version 0.1701, the list was returned in the original order)
+	return keys %$self;
 }
 
 
@@ -51,7 +46,7 @@ sub add {
 	my ($self, $column) = @_;
 	
 	my $index = $self->count;
-	$self->{$column} = $self->{$index} = $index;
+	$self->{$column} = $index;
 	return $index;
 }
 
@@ -59,8 +54,7 @@ sub add {
 sub count {
 	my ($self) = @_;
 	
-	my $column_count = (scalar keys %$self) >> 1;  # each column has two hash entries (numeric and by name)
-	return $column_count;
+	return scalar $self->list;
 }
 
 
@@ -78,7 +72,7 @@ Neo4j::Driver::ResultColumns - Structure definition of Cypher result values
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,9 @@
-# $Id: 08-IPv6.t 1794 2020-07-03 13:36:51Z willem $ -*-perl-*-
+#!/usr/bin/perl
+# $Id: 08-IPv6.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More;
 
 BEGIN {
@@ -13,7 +16,7 @@ use IO::Select;
 
 my $debug = 0;
 
-my @hints = new Net::DNS::Resolver()->_hints;
+my @hints = Net::DNS::Resolver->new()->_hints;
 
 my $NOIP = qw(::);
 
@@ -31,12 +34,12 @@ exit( plan skip_all => 'IPv6 tests disabled.' ) unless -e 't/IPv6.enabled';
 
 
 eval {
-	my $resolver = new Net::DNS::Resolver( igntc => 1 );
+	my $resolver = Net::DNS::Resolver->new( igntc => 1 );
 	exit plan skip_all => 'No nameservers' unless $resolver->nameservers;
 
 	my $reply = $resolver->send(qw(. NS IN)) || die;
 
-	my @ns = grep $_->type eq 'NS', $reply->answer, $reply->authority;
+	my @ns = grep { $_->type eq 'NS' } $reply->answer, $reply->authority;
 	exit plan skip_all => 'Local nameserver broken' unless scalar @ns;
 
 	1;
@@ -44,14 +47,14 @@ eval {
 
 
 eval {
-	my $resolver = new Net::DNS::Resolver( nameservers => [@hints] );
+	my $resolver = Net::DNS::Resolver->new( nameservers => [@hints] );
 	$resolver->force_v6(1);
 	exit plan skip_all => 'No IPv6 transport' unless $resolver->nameservers;
 
 	my $reply = $resolver->send(qw(. NS IN)) || die;
 	my $from  = $reply->from();
 
-	my @ns = grep $_->type eq 'NS', $reply->answer, $reply->authority;
+	my @ns = grep { $_->type eq 'NS' } $reply->answer, $reply->authority;
 	exit plan skip_all => "Unexpected response from $from" unless scalar @ns;
 
 	exit plan skip_all => "Non-authoritative response from $from" unless $reply->header->aa;
@@ -61,7 +64,7 @@ eval {
 
 
 my $IP = eval {
-	my $resolver = new Net::DNS::Resolver();
+	my $resolver = Net::DNS::Resolver->new();
 	$resolver->nameservers(@nsdname);
 	$resolver->force_v6(1);
 	[$resolver->nameservers()];
@@ -92,7 +95,7 @@ NonFatalBegin();
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 
-	my $packet = new Net::DNS::Packet(qw(net-dns.org SOA IN));
+	my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA IN));
 	ok( $resolver->send($packet), '$resolver->send(...)	UDP' );
 
 	$packet->edns->option( PADDING => ( 'OPTION-LENGTH' => 500 ) );	   # force TCP
@@ -120,7 +123,7 @@ NonFatalBegin();
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->igntc(0);
 
-	my $packet = new Net::DNS::Packet(qw(net-dns.org SOA IN));
+	my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA IN));
 
 	my $udp = $resolver->bgsend($packet);
 	ok( $udp, '$resolver->bgsend(...)	UDP' );
@@ -214,7 +217,7 @@ my $tsig_key = eval {
 	shift @answer;
 };
 
-my $bad_key = new Net::DNS::RR('MD5.example KEY 512 3 157 MD5keyMD5keyMD5keyMD5keyMD5=');
+my $bad_key = Net::DNS::RR->new('MD5.example KEY 512 3 157 MD5keyMD5keyMD5keyMD5keyMD5=');
 
 
 SKIP: {
@@ -278,7 +281,7 @@ SKIP: {
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	my $update   = new Net::DNS::Update(qw(example.com));
+	my $update   = Net::DNS::Update->new(qw(example.com));
 	ok( $resolver->send($update), '$resolver->send($update) UDP' );
 	$resolver->usevc(1);
 	ok( $resolver->send($update), '$resolver->send($update) TCP' );
@@ -291,9 +294,9 @@ SKIP: {
 	my $mx = 'mx2.t.net-dns.org';
 	my @rr = rr( $resolver, $mx, 'MX' );
 
-	is( scalar(@rr), 2, 'Net::DNS::rr() works with specified resolver' );
+	is( scalar(@rr),		       2, 'Net::DNS::rr() works with specified resolver' );
 	is( scalar rr( $resolver, $mx, 'MX' ), 2, 'Net::DNS::rr() works in scalar context' );
-	is( scalar rr( $mx, 'MX' ), 2, 'Net::DNS::rr() works with default resolver' );
+	is( scalar rr( $mx, 'MX' ),	       2, 'Net::DNS::rr() works with default resolver' );
 }
 
 
@@ -375,7 +378,7 @@ SKIP: {
 	eval { $resolver->tsig($tsig_key) };
 	skip( 'TSIG bgsend tests', 2 ) if $@;
 
-	my $query = new Net::DNS::Packet(qw(. SOA IN));
+	my $query = Net::DNS::Packet->new(qw(. SOA IN));
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + automatic TSIG' );
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + existing TSIG' );
 }
@@ -395,16 +398,16 @@ SKIP: {
 	$resolver->tcp_timeout(10);
 
 	{
-		my $select = new IO::Select();
+		my $select = IO::Select->new();
 		eval { $resolver->_axfr_next($select); };
 		my ($exception) = split /\n/, "$@\n";
 		ok( $exception, "TCP time out\t[$exception]" );
 	}
 
 	{
-		my $packet = new Net::DNS::Packet(qw(net-dns.org SOA));
+		my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA));
 		my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
-		my $select = new IO::Select($socket);
+		my $select = IO::Select->new($socket);
 		while ( $resolver->bgbusy($socket) ) { sleep 1 }
 		my $discarded = '';	## [size][id][status]	[qdcount]...
 		$socket->recv( $discarded, 6 ) if $socket;
@@ -419,7 +422,7 @@ SKIP: {
 		my $tsigrr = $packet->sigrr;
 		skip( 'verify fail', 1 ) unless $tsigrr;
 
-		my $select = new IO::Select($socket);
+		my $select = IO::Select->new($socket);
 		eval { $resolver->_axfr_next( $select, $tsigrr ); };
 		my ($exception) = split /\n/, "$@\n";
 		ok( $exception, "verify fail\t[$exception]" );
@@ -429,8 +432,8 @@ SKIP: {
 
 {					## exercise error paths in _send_???()
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, retry => 1 );
-	my $original = new Net::DNS::Packet(qw(net-dns.org SOA));
-	my $mismatch = new Net::DNS::Packet(qw(net-dns.org SOA));
+	my $original = Net::DNS::Packet->new(qw(net-dns.org SOA));
+	my $mismatch = Net::DNS::Packet->new(qw(net-dns.org SOA));
 	ok( !$resolver->_send_tcp( $original, $mismatch->data ), '_send_tcp()	id mismatch' );
 	ok( !$resolver->_send_udp( $original, $mismatch->data ), '_send_udp()	id mismatch' );
 }

@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,16 +6,16 @@ use warnings;
 	package Ask::Zenity;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
+	our $VERSION   = '0.012';
 	
 	use Moo;
 	use File::Which qw(which);
 	use System::Command;
-	use namespace::sweep;
+	use Path::Tiny qw( path );
+	use namespace::autoclean;
 	
 	has zenity_path => (
 		is       => 'ro',
-		isa      => sub { die "$_[0] not executable" unless -x $_[0] },
 		default  => sub { which('zenity') || '/usr/bin/zenity' },
 	);
 	
@@ -25,6 +25,13 @@ use warnings;
 	);
 	
 	with 'Ask::API';
+	
+	sub is_usable {
+		my ($self) = @_;
+		return unless !! $ENV{'DISPLAY'};
+		return unless -x $self->zenity_path;
+		return 1;
+	}
 	
 	sub quality {
 		return 40;
@@ -80,21 +87,22 @@ use warnings;
 		my $self = shift;
 		my $text = readline($self->_zenity(file_selection => @_)->stdout);
 		chomp $text;
-		return split m#[|]#, $text;
+		my @files = map path($_), split m#[|]#, $text;
+		@files == 1 ? $files[0] : @files;
 	}
 	
 	sub single_choice {
 		my ($self, %o) = @_;
-		$o{title} //= 'Single choice';
-		$o{text}  //= 'Choose one.';
+		$o{title} = 'Single choice' unless exists $o{title};
+		$o{text}  = 'Choose one.'   unless exists $o{text};
 		my ($c) = $self->_choice(radiolist => 1, %o);
 		return $c;
 	}
 	
 	sub multiple_choice {
 		my ($self, %o) = @_;
-		$o{title} //= 'Multiple choice';
-		$o{text}  //= '';
+		$o{title} = 'Multiple choice' unless exists $o{title};
+		$o{text}  = ''                unless exists $o{text};
 		return $self->_choice(multiple => 1, checklist => 1, %o);
 	}
 	
@@ -125,7 +133,7 @@ __END__
 
 =head1 NAME
 
-Ask::Zenity - use C<< /usr/bin/zenity >> to interact with a user
+Ask::Zenity - use /usr/bin/zenity to interact with a user
 
 =head1 SYNOPSIS
 
@@ -153,7 +161,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

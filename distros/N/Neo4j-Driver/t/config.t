@@ -16,7 +16,7 @@ BEGIN {
 # The Neo4j::Driver package itself mostly deals with configuration
 # in the form of the server URL, auth credentials and other options.
 
-use Test::More 0.96 tests => 9 + 1;
+use Test::More 0.96 tests => 10 + 1;
 use Test::Exception;
 use Test::Warnings;
 
@@ -181,6 +181,13 @@ subtest 'tls' => sub {
 	throws_ok {
 		Neo4j::Driver->new('http://test/')->config(tls => 1)->session;
 	} qr/\bHTTP does not support encrypted communication\b/i, 'no encrypted http';
+};
+
+
+subtest 'auth' => sub {
+	plan tests => 2;
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://user:pass@test:9999'); } 'auth in full uri lives';
+	lives_and { is $d->{uri}, 'http://user:pass@test:9999'; } 'auth in full uri';
 };
 
 

@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "REST::Client" => 134,
     "Try::Tiny" => 0,
-    "URI" => "1.31"
+    "URI" => "1.31",
+    "overload" => 0
   },
   "TEST_REQUIRES" => {
     "File::Slurp" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +48,8 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Test::Warnings" => 0,
   "Try::Tiny" => 0,
-  "URI" => "1.31"
+  "URI" => "1.31",
+  "overload" => 0
 );
 
 

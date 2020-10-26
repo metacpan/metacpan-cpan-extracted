@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl interface to the Mozilla embedding widget'
+abstract: '(DEPRECATED) Perl interface to the Mozilla embedding widget'
 author:
   - unknown
 build_requires:
@@ -26,5 +26,5 @@ requires:
   ExtUtils::Depends: '0.20'
   ExtUtils::PkgConfig: '1.03'
   Gtk2: '1.081'
-version: '0.10'
+version: '0.11'
 x_deprecated: 1

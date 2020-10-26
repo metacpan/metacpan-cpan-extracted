@@ -1,21 +1,17 @@
 package Net::DNS::RR::EUI48;
 
-#
-# $Id: EUI48.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: EUI48.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::EUI48 - DNS EUI48 resource record
 
 =cut
-
 
 use integer;
 
@@ -25,20 +21,21 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	$self->{address} = unpack "\@$offset a6", $$data;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'a6', $self->{address};
+	return pack 'a6', $self->{address};
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	$self->address;
+	return $self->address;
 }
 
 
@@ -46,13 +43,14 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	$self->address(shift);
+	return;
 }
 
 
 sub address {
 	my ( $self, $address ) = @_;
-	$self->{address} = pack 'C6', map hex($_), split /[:-]/, $address if $address;
-	join '-', unpack 'H2H2H2H2H2H2', $self->{address} if defined wantarray;
+	$self->{address} = pack 'C6', map { hex($_) } split /[:-]/, $address if $address;
+	return defined(wantarray) ? join( '-', unpack 'H2H2H2H2H2H2', $self->{address} ) : undef;
 }
 
 
@@ -63,9 +61,9 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IN EUI48 address');
+    $rr = Net::DNS::RR->new('name IN EUI48 address');
 
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	name	=> 'example.com',
 	type	=> 'EUI48',
 	address => '00-00-5e-00-53-2a'

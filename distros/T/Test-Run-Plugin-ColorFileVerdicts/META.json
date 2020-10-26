@@ -4,13 +4,13 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run-Plugin-ColorFileVerdicts",
    "prereqs" : {
@@ -40,11 +40,11 @@
    "provides" : {
       "Test::Run::CmdLine::Plugin::ColorFileVerdicts" : {
          "file" : "lib/Test/Run/CmdLine/Plugin/ColorFileVerdicts.pm",
-         "version" : "0.0124"
+         "version" : "0.0125"
       },
       "Test::Run::Plugin::ColorFileVerdicts" : {
          "file" : "lib/Test/Run/Plugin/ColorFileVerdicts.pm",
-         "version" : "0.0124"
+         "version" : "0.0125"
       },
       "Test::Run::Plugin::ColorFileVerdicts::CanonFailedObj" : {
          "file" : "lib/Test/Run/Plugin/ColorFileVerdicts/CanonFailedObj.pm"
@@ -60,8 +60,9 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ],
       "repository" : {
-         "url" : "https://bitbucket.org/shlomif/perl-test-run"
+         "url" : "https://github.com/shlomif/perl-test-run"
       }
    },
-   "version" : "0.0124"
+   "version" : "0.0125",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

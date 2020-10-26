@@ -1,8 +1,10 @@
-# $Id: 05-CDS.t 1586 2017-08-15 09:01:57Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-CDS.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 31;
-
 
 use Net::DNS;
 
@@ -18,20 +20,20 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -45,9 +47,9 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 	}
 
 
-	my $empty   = new Net::DNS::RR("$name $type");
+	my $empty   = Net::DNS::RR->new("$name $type");
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $decoded->encode;
 	my $hex2    = uc unpack 'H*', $encoded;
 	my $hex3    = uc unpack 'H*', substr( $encoded, length $empty->encode );
@@ -57,7 +59,7 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 	foreach ( @attr, 'rdstring' ) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
@@ -65,7 +67,7 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 
 	$rr->algorithm(255);
 	is( $rr->algorithm(), 255, 'algorithm number accepted' );
@@ -83,7 +85,7 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 {
 	my @arg = qw(0 0 0 00);					# per RFC8078(4), erratum 5049
-	my $rr	= new Net::DNS::RR("$name. $type @arg");
+	my $rr	= Net::DNS::RR->new("$name. $type @arg");
 	ok( ref($rr), "DS delete: $name. $type @arg" );
 	is( $rr->keytag(),    0, 'DS delete: keytag 0' );
 	is( $rr->algorithm(), 0, 'DS delete: algorithm 0' );
@@ -98,20 +100,20 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 {
 	my @arg = qw(0 0 0 0);					# per RFC8078(4) as published
-	my $rr	= new Net::DNS::RR("$name. $type @arg");
+	my $rr	= Net::DNS::RR->new("$name. $type @arg");
 	is( $rr->rdstring(), '0 0 0 00', 'DS delete: accept old format' );
 }
 
 
 {
 	my @arg = qw(0 0 0 -);					# unexpected empty field
-	my $rr	= new Net::DNS::RR("$name. $type @arg");
+	my $rr	= Net::DNS::RR->new("$name. $type @arg");
 	is( $rr->rdstring(), '0 0 0 -', 'DS delete: represent empty digest' );
 }
 
 
 {
-	my $rr = new Net::DNS::RR("$name $type @data");
+	my $rr = Net::DNS::RR->new("$name $type @data");
 	$rr->print;
 }
 

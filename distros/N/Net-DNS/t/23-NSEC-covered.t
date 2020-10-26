@@ -1,7 +1,9 @@
-# $Id: 23-NSEC-covered.t 1690 2018-07-03 09:02:10Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 23-NSEC-covered.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -10,7 +12,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1;";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -63,7 +65,7 @@ my @nocover = (
 foreach my $vector (@cover) {
 	my ( $owner, $argument, $nxtdname ) = @$vector;
 	my $test = join ' ', pad($owner), 'NSEC (', pad($nxtdname), 'A )';
-	my $nsec = new Net::DNS::RR($test);
+	my $nsec = Net::DNS::RR->new($test);
 	ok( $nsec->covers($argument), "$test\t covers('$argument')" );
 }
 
@@ -71,13 +73,13 @@ foreach my $vector (@cover) {
 foreach my $vector (@nocover) {
 	my ( $owner, $argument, $nxtdname ) = @$vector;
 	my $test = join ' ', pad($owner), 'NSEC (', pad($nxtdname), 'A )';
-	my $nsec = new Net::DNS::RR($test);
+	my $nsec = Net::DNS::RR->new($test);
 	ok( !$nsec->covers($argument), "$test\t!covers('$argument')" );
 }
 
 
 sub pad {
-	sprintf '%20s', shift;
+	return sprintf '%20s', shift;
 }
 
 

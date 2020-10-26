@@ -1,0 +1,7 @@
+Release history for Catalyst-View-Template
+
+1.001 Mon 26 Oct 2020
+	- Correctly cased test suite view class filenames
+
+1.000 Sat 24 Oct 2020
+	- Initial release

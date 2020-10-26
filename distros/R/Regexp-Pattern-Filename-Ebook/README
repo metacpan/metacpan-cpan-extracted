@@ -1,0 +1,75 @@
+NAME
+    Regexp::Pattern::Filename::Ebook - Ebook filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Ebook (from Perl distribution
+    Regexp-Pattern-Filename-Ebook), released on 2020-05-30.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Ebook::filename_ebook");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Ebook.
+
+PATTERNS
+    *   filename_ebook
+
+        Ebook filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+
+        Not an extension.
+
+         "pdf" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+
+         "foo.pdf" =~ re("Filename::Ebook::filename_ebook");  # matches
+
+        Case insensitive.
+
+         "foo bar.RTF" =~ re("Filename::Ebook::filename_ebook");  # matches
+
+        Regex is anchored.
+
+         "foo.doc is the file" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+
+         "foo.jpg" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Ebook>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Ebook>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Ebook>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Filename::Ebook
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

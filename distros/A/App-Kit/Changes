@@ -1,5 +1,19 @@
 Revision history for App-Kit
 
+0.63  2020-10-23 11:03:54
+    - adjust warning test regex to match better (e.g. d5b5d78a-6752-11e3-ace4-6da5dfbfc7aa)
+    - change arbitrary module name in test to avoid "CGI will be removed from the Perl core distribution in the next major release. Please install it from CPAN." breaking TAP (d7e824b8-6752-11e3-ace4-6da5dfbfc7aa)
+    - attempt more universal failure in test (e.g. 75564f20-675a-11e3-bd14-e3bee4621ba3)
+    - make fs->bindir() work w/ PSGI/Plack $0
+    - add str->rand
+    - add fs->appdir
+    - add JSON and YAML methods to str()
+    - add fs->is_safe_part and fs->is_safe_path
+    - add str->trim
+    - add str->sha512
+    - add str->epoch, str->attrs, str->escape_html
+    - fix tets for prl 5.32
+
 0.62  2013-12-17 05:15:32
     - rt 91462: remove dep that caused circular dep
     - add _force_new option to db->dbh

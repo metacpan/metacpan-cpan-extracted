@@ -20,259 +20,259 @@ name: StorageDisplay
 provides:
   StorageDisplay:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Block:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Block::NoSystem:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Block::System:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::BlockTreeElement:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::CMD:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::CMD::Local:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::CMD::LocalBySSH:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::CMD::Proxy::Recorder:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::CMD::Remote:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::CMD::Replay:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::Collector:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::DeviceMapper:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::FS:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::LSI::Megacli:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::LSI::Sas2ircu:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::LUKS:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::LVM:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::Libvirt:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::MD:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::Partitions:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Collect::SystemBlocks:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Elem:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::FS:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::FS::FS:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LUKS:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LUKS::Decrypted:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LUKS::Decrypted::None:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LUKS::Decrypted::Present:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LUKS::Encrypted:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::Elem:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::Group:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::LV:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::LVs:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::OnlyPV:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::OnlyPV::PVs:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::PV:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::PVs:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::PVs::Base:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::LVM::XV:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Libvirt:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Libvirt::VM:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Libvirt::VM::Block:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Moose::Cached:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::GPT:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::MSDOS:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::Table:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::Table::Part:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::Table::Part::Data:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::Table::Part::Free:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Partition::Table::Part::SubTable:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::Device:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::Elem:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::LSI::Megacli:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::LSI::Megacli::BBU::Status:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::LSI::Megacli::RaidDevice:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::LSI::SASIrcu:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::LSI::SASIrcu::MissingRawDevice:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::LSI::SASIrcu::RawDevice:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::MD:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::RaidDevice:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::RawDevice:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::RAID::State:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::HasBlock:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Iterable:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Base:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Base::Elem:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Base::HTML:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::FromBlockState:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Grey:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::IsLabel:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::IsSubGraph:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Label::HTML:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Label::HTML::Table:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::Plain:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::SubInternal:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::WithFree:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::WithSize:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Role::Style::WithUsed:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   StorageDisplay::Root:
     file: lib/StorageDisplay.pm
-    version: v1.0.5
+    version: v1.0.6
   is_collector:
     file: lib/StorageDisplay/Collect.pm
-    version: v1.0.5
+    version: v1.0.6
 requires:
   Carp: '0'
   Data::Compare: '0'
@@ -297,9 +297,10 @@ requires:
   lib: '0'
   namespace::sweep: '0'
   parent: '0'
+  perl: v5.14.0
   strict: '0'
   warnings: '0'
-version: 1.0.5
+version: 1.0.6
 x_generated_by_perl: v5.30.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

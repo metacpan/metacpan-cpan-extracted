@@ -138,21 +138,21 @@ is_deeply(
 );
 
 is_deeply(
-    [ $app->ns->have_mod('CGI') ],        # Perl::DependList-NO_DEP(CGI)
-    [ Module::Want::have_mod('CGI') ],    # Perl::DependList-NO_DEP(CGI)
-    'normalize_ns() returns the same as its lazy under pinning'
+    [ $app->ns->have_mod('Acme::ChuckNorris') ],        # Perl::DependList-NO_DEP(Acme::ChuckNorris)
+    [ Module::Want::have_mod('Acme::ChuckNorris') ],    # Perl::DependList-NO_DEP(Acme::ChuckNorris)
+    'have_mod() returns the same as its lazy under pinning'
 );
 
 is_deeply(
     [ $app->ns->ns2distname('Foo::Bar::Baz') ],
     [ Module::Want::ns2distname('Foo::Bar::Baz') ],
-    'normalize_ns() returns the same as its lazy under pinning'
+    'ns2distname() returns the same as its lazy under pinning'
 );
 
 is_deeply(
     [ $app->ns->distname2ns('Foo-Bar-Baz') ],
     [ Module::Want::distname2ns('Foo-Bar-Baz') ],
-    'normalize_ns() returns the same as its lazy under pinning'
+    'distname2ns() returns the same as its lazy under pinning'
 );
 
 ######################

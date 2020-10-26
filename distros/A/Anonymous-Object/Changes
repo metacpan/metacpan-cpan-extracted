@@ -3,3 +3,6 @@ Revision history for Anonymous-Object
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.05    2020/10/24
+	- Add POD description
+	- Update Makefile with links to github

@@ -44,6 +44,7 @@ WriteMakefile(
         'Log::Dispatch::Config'         => 0,
         'YAML::Syck'                    => 1.27,
         'JSON::Syck'                    => 1.27,
+        'Data::Rand'                    => 0,
 
         #  ex() 'Running::Commentary' too ? seems to occasianlly have trouble installing die to a dep failing
         'Unix::Whereis'     => 0,

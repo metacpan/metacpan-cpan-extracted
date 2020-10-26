@@ -1,16 +1,17 @@
-# $Id: 02-domainname.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 02-domainname.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 51;
 
 
-BEGIN {
-	use_ok('Net::DNS::DomainName');
-}
+use_ok('Net::DNS::DomainName');
 
 
 {
-	my $domain = new Net::DNS::DomainName('');
+	my $domain = Net::DNS::DomainName->new('');
 	is( $domain->name, '.', 'DNS root represented as single dot' );
 
 	my @label = $domain->_wire;
@@ -24,8 +25,8 @@ BEGIN {
 
 {
 	my $ldh	      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-0123456789';
-	my $domain    = new Net::DNS::DomainName($ldh);
-	my $subdomain = new Net::DNS::DomainName("sub.$ldh");
+	my $domain    = Net::DNS::DomainName->new($ldh);
+	my $subdomain = Net::DNS::DomainName->new("sub.$ldh");
 	is( $domain->name, $ldh, '63 octet LDH character label' );
 
 	my @label = $domain->_wire;
@@ -114,7 +115,7 @@ BEGIN {
 		'\000\001\002\003\004\005\006\007\008\009\010\011\012\013\014\015',
 		'\016\017\018\019\020\021\022\023\024\025\026\027\028\029\030\031'
 		) {
-		my $domain = new Net::DNS::DomainName($case);
+		my $domain = Net::DNS::DomainName->new($case);
 		my $binary = $domain->encode;
 		my $result = decode Net::DNS::DomainName( \$binary )->name;
 		is( unpack( 'H*', $result ), unpack( 'H*', $case ), "C0 controls:\t$case" );
@@ -131,7 +132,7 @@ BEGIN {
 		'`abcdefghijklmno',				#  96 ..
 		'pqrstuvwxyz{|}~\127'				# 112 ..
 		) {
-		my $domain = new Net::DNS::DomainName($case);
+		my $domain = Net::DNS::DomainName->new($case);
 		my $binary = $domain->encode;
 		my $result = decode Net::DNS::DomainName( \$binary )->name;
 		is( unpack( 'H*', $result ), unpack( 'H*', $case ), "G0 graphics:\t$case" );
@@ -150,7 +151,7 @@ BEGIN {
 		'\224\225\226\227\228\229\230\231\232\233\234\235\236\237\238\239',
 		'\240\241\242\243\244\245\246\247\248\249\250\251\252\253\254\255'
 		) {
-		my $domain = new Net::DNS::DomainName($case);
+		my $domain = Net::DNS::DomainName->new($case);
 		my $binary = $domain->encode;
 		my $result = decode Net::DNS::DomainName( \$binary )->name;
 		is( unpack( 'H*', $result ), unpack( 'H*', $case ), "8-bit codes:\t$case" );
@@ -159,13 +160,13 @@ BEGIN {
 
 
 {
-	my $domain    = new Net::DNS::DomainName( uc 'EXAMPLE.COM' );
+	my $domain    = Net::DNS::DomainName->new( uc 'EXAMPLE.COM' );
 	my $hash      = {};
-	my $data      = $domain->encode( 0, $hash );
+	my $data      = $domain->encode( 0,	       $hash );
 	my $compress  = $domain->encode( length $data, $hash );
 	my $canonical = $domain->encode( length $data );
 	my $decoded   = decode Net::DNS::DomainName( \$data );
-	my $downcased = new Net::DNS::DomainName( lc $domain->name )->encode( 0, {} );
+	my $downcased = Net::DNS::DomainName->new( lc $domain->name )->encode( 0, {} );
 	ok( $domain->isa('Net::DNS::DomainName'),  'object returned by new() constructor' );
 	ok( $decoded->isa('Net::DNS::DomainName'), 'object returned by decode() constructor' );
 	is( length $compress, length $data, 'Net::DNS::DomainName wire encoding is uncompressed' );
@@ -176,13 +177,13 @@ BEGIN {
 
 
 {
-	my $domain    = new Net::DNS::DomainName1035( uc 'EXAMPLE.COM' );
+	my $domain    = Net::DNS::DomainName1035->new( uc 'EXAMPLE.COM' );
 	my $hash      = {};
-	my $data      = $domain->encode( 0, $hash );
+	my $data      = $domain->encode( 0,	       $hash );
 	my $compress  = $domain->encode( length $data, $hash );
 	my $canonical = $domain->encode( length $data );
-	my $decoded   = decode Net::DNS::DomainName1035( \$data );
-	my $downcased = new Net::DNS::DomainName1035( lc $domain->name )->encode( 0x4000, {} );
+	my $decoded   = Net::DNS::DomainName1035->decode( \$data );
+	my $downcased = Net::DNS::DomainName1035->new( lc $domain->name )->encode( 0x4000, {} );
 	ok( $domain->isa('Net::DNS::DomainName1035'),  'object returned by new() constructor' );
 	ok( $decoded->isa('Net::DNS::DomainName1035'), 'object returned by decode() constructor' );
 	isnt( length $compress, length $data, 'Net::DNS::DomainName1035 wire encoding is compressible' );
@@ -193,13 +194,13 @@ BEGIN {
 
 
 {
-	my $domain    = new Net::DNS::DomainName2535( uc 'EXAMPLE.COM' );
+	my $domain    = Net::DNS::DomainName2535->new( uc 'EXAMPLE.COM' );
 	my $hash      = {};
-	my $data      = $domain->encode( 0, $hash );
+	my $data      = $domain->encode( 0,	       $hash );
 	my $compress  = $domain->encode( length $data, $hash );
 	my $canonical = $domain->encode( length $data );
-	my $decoded   = decode Net::DNS::DomainName2535( \$data );
-	my $downcased = new Net::DNS::DomainName2535( lc $domain->name )->encode( 0, {} );
+	my $decoded   = Net::DNS::DomainName2535->decode( \$data );
+	my $downcased = Net::DNS::DomainName2535->new( lc $domain->name )->encode( 0, {} );
 	ok( $domain->isa('Net::DNS::DomainName2535'),  'object returned by new() constructor' );
 	ok( $decoded->isa('Net::DNS::DomainName2535'), 'object returned by decode() constructor' );
 	is( length $compress, length $data, 'Net::DNS::DomainName2535 wire encoding is uncompressed' );

@@ -20,7 +20,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.13';
+our $VERSION = '10.14';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -1163,7 +1163,7 @@ Hash reference with whatever status information the worker would like to share.
 
 =back
 
-=head1 REFERENCE
+=head1 API
 
 This is the class hierarchy of the L<Minion> distribution.
 
@@ -1184,6 +1184,8 @@ This is the class hierarchy of the L<Minion> distribution.
 =item * L<Minion::Command::minion::job>
 
 =item * L<Minion::Command::minion::worker>
+
+=item * L<Minion::Iterator>
 
 =item * L<Minion::Job>
 

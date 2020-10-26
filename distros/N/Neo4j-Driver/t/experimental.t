@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 12;
+use Test::More 0.96 tests => 11;
 use Test::Exception;
 use Test::Warnings qw(warnings :no_end_test);
 
@@ -29,7 +29,7 @@ my ($q, $r, @a, $a);
 
 
 subtest 'wantarray' => sub {
-	plan tests => 17;
+	plan tests => 5 + 6 + 5 + 2;
 	$q = <<END;
 RETURN 7 AS n UNION RETURN 11 AS n
 END
@@ -60,6 +60,9 @@ CREATE p=(a:Test:Want:Array)-[:TEST]->(c)
 RETURN p, a
 END
 	lives_ok { $r = $tx->run($q)->single; } 'get type objects';
+	throws_ok {
+		 $a = $r->get('p')->elements;
+	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path elements as scalar';
 	throws_ok {
 		 $a = $r->get('p')->nodes;
 	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path nodes as scalar';
@@ -228,21 +231,6 @@ END
 };
 
 
-subtest 'support for get_person in LOMS plugin' => sub {
-	plan tests => 6;
-	$r = $s->run('RETURN 1 AS one, 2 AS two')->single;
-	lives_and { is $r->{column_keys}->count, 2 } 'ResultColumns count 2';
-	lives_and { is $r->{column_keys}->add('three'), 2 } 'ResultColumns add';
-	lives_and { is $r->{column_keys}->count, 3 } 'ResultColumns count 3';
-	$r->{row}->[2] = 'Three!';
-	lives_and { is $r->get(2), 'Three!' } 'ResultColumns get col by index';
-	lives_and { is $r->get('three'), 'Three!' } 'ResultColumns get col by name';
-	throws_ok {
-		$s->run('')->_column_keys;
-	} qr/missing columns/i, 'result missing columns';
-};
-
-
 subtest 'graph queries' => sub {
 	plan tests => 7;
 	TODO: { local $TODO = 'graph response not yet implemented for Bolt' if $Neo4j::Test::bolt;
@@ -273,13 +261,18 @@ END
 
 
 subtest 'custom cypher types' => sub {
-	plan tests => 4;
+	plan tests => 5 + 5;
+	# fully test nodes
 	my $e_exact = exp(1);
 	my $d = Neo4j::Test->driver_maybe;
 	lives_ok {
 		$d->config(cypher_types => {
 			node => 'Local::Node',
-			init => sub { my $self = shift; $self->{e_approx} = $e_exact },
+			init => sub {
+				my $self = shift;
+				no warnings 'deprecated';
+				$self->{e_approx} = $e_exact;
+			},
 		});
 	} 'cypher types config';
 	$r = 0;
@@ -288,9 +281,30 @@ subtest 'custom cypher types' => sub {
 		$r = $t->run('CREATE (a {e_approx:3}) RETURN a')->single->get('a');
 	} 'cypher types query';
 	is ref($r), 'Local::Node', 'cypher type ref';
-	is $r->{e_approx}, $e_exact, 'cypher type init';  # ->{} property access is deprecated
-	# TODO: test coverage for other types
+	is $r->get('e_approx'), $e_exact, 'cypher type init';
+	lives_and { is ref($r->_private->{_meta}), 'HASH' } 'node _private access';
+	# test _private access for other types
+	lives_ok {
+		my $tx = $driver->session->begin_transaction;
+		$tx->{return_stats} = 0;  # optimise sim
+		$q = <<END;
+CREATE p=(a:Test:Want:Array)-[:TEST]->(c)
+RETURN p, a
+END
+		$r = $tx->run($q)->single;
+		$tx->rollback;
+	} 'more types query';
+	ok my $e = ($r->get('p')->relationships)[0], 'get rel';
+	lives_and { is ref($e->_private->{_meta}), 'HASH' } 'rel _private access';
+	lives_ok { $r->get('p')->_private->{__foo} = 42; } 'path _private set';
+	lives_and { is $r->get('p')->_private->{__foo}, 42 } 'path _private get';
+	# TODO: fully test other types
 };
 
 
 done_testing;
+
+
+# for 'custom cypher types' test
+package Local::Node;
+BEGIN { our @ISA = qw(Neo4j::Driver::Type::Node) };

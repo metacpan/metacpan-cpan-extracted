@@ -1,7 +1,7 @@
 use FindBin;
 BEGIN { push @INC, $FindBin::Bin }
 
-use TestYAML tests => 134;
+use TestYAML tests => 135;
 
 ok( YAML::Syck->VERSION, "YAML::Syck has a version and is loaded" );
 
@@ -184,6 +184,18 @@ Zort:\s&(?!\1)(\d+)\s*\n
 }xms;
 
 like( Dump( scalar Load($recurse2) ), $recurse2want, 'recurse 2' );
+
+my $recurse3 = << '.';
+cycle: &cycle
+  a: *cycle
+.
+
+{
+    local $YAML::Syck::LoadBlessed = 0;
+    my $data = Load($recurse3);
+    is("$data->{cycle}", "$data->{cycle}->{a}", 'Circular refs are working correctly');
+}
+
 
 is( Dump( 1, 2, 3 ), "--- 1\n--- 2\n--- 3\n" );
 is( "@{[Load(Dump(1, 2, 3))]}", "1 2 3" );

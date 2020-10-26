@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.17';
+$Neo4j::Driver::VERSION = '0.18';
 
 use Carp qw(croak);
 
@@ -171,7 +171,7 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -296,8 +296,6 @@ Each session connects to a single database, which may be specified
 using the C<database> option. If no defined value is given for this
 option, the driver will select the default database configured
 in F<neo4j.conf>.
-(As of S<L<Neo4j::Driver> 0.16>, selecting the default database
-sometimes doesn't work reliably with Neo4j 4.x (see L</BUGS>).)
 
  $session = $driver->session( database => 'system' );
 
@@ -352,12 +350,13 @@ base type packages that this module provides (S<e. g.> using C<@ISA>):
 =back
 
 Clients may only use the documented API to access the data in the base
-type. Direct data structure access might also work, but is unsupported
+type. As an exception, clients may store private data by calling the
+C<_private()> method, which returns a hashref. Within that hashref,
+clients may make free use of any hash keys that begin with two
+underscores (C<__>). All other hash keys are reserved for use by
+Neo4j::Driver. Reading or modifying their values is unsupported
 and discouraged because it makes your code prone to fail when any
-internals change in the implementation of Neo4j::Driver. For those
-objects that are implemented as blessed hash refs, clients may use any
-hash keys that begin with two underscores (C<__>) to store private
-data. All other hash keys are reserved for use by Neo4j::Driver.
+internals change in the implementation of Neo4j::Driver.
 
 =head1 CONFIGURATION OPTIONS
 
@@ -435,16 +434,6 @@ These warnings may be disabled if desired.
  no warnings 'ambiguous';
 
 =head1 BUGS
-
-There is a known issue
-(L<#6|https://github.com/johannessen/neo4j-driver-perl/issues/6>)
-that may prevent automatic selection of the default database on
-some Neo4j 4.0 installations. In these cases, L<Neo4j::Driver> will
-report C<Network error: 404 Not Found> when you try to run any
-statement. As a workaround, you can select the default database
-(usually named C<neo4j> or C<graph.db>) manually like this:
-
- $session = $driver->session(database => 'neo4j');
 
 See the F<TODO> document and Github for known issues and planned
 improvements. Please report new issues and other feedback on Github.

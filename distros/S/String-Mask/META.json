@@ -1,9 +1,9 @@
 {
-   "abstract" : "The great new String::Mask!",
+   "abstract" : "mask sensitive data",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -42,7 +42,20 @@
          }
       }
    },
+   "provides" : {
+      "String::Mask" : {
+         "file" : "lib/String/Mask.pm",
+         "version" : "0.03"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/String-Mask.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/String-Mask"
+      }
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

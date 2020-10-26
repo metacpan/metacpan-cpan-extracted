@@ -1,8 +1,10 @@
-# $Id: 05-A.t 1028 2012-10-23 20:18:49Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-A.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 12;
-
 
 use Net::DNS;
 
@@ -18,20 +20,20 @@ my $wire = 'c0000201';
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -45,13 +47,13 @@ my $wire = 'c0000201';
 	}
 
 
-	my $null    = new Net::DNS::RR("$name NULL")->encode;
-	my $empty   = new Net::DNS::RR("$name $type")->encode;
-	my $rxbin   = decode Net::DNS::RR( \$empty )->encode;
-	my $txtext  = new Net::DNS::RR("$name $type")->string;
-	my $rxtext  = new Net::DNS::RR($txtext)->encode;
+	my $null    = Net::DNS::RR->new("$name NULL")->encode;
+	my $empty   = Net::DNS::RR->new("$name $type")->encode;
+	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
+	my $txtext  = Net::DNS::RR->new("$name $type")->string;
+	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
 	my $hex3    = unpack 'H*', substr( $encoded, length $null );
@@ -72,7 +74,7 @@ my $wire = 'c0000201';
 
 	foreach my $address ( sort keys %testcase ) {
 		my $expect = $testcase{$address};
-		my $rr = new Net::DNS::RR( name => $name, type => $type, address => $address );
+		my $rr	   = Net::DNS::RR->new( name => $name, type => $type, address => $address );
 		is( $rr->address, $expect, "address completion:\t$address" );
 	}
 }

@@ -1,6 +1,9 @@
-# $Id: 05-OPT.t 1796 2020-07-28 08:22:47Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-OPT.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More;
 
 use Net::DNS;
@@ -21,13 +24,13 @@ my $wire = '0000290500000080000000';
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR( name => '.', type => $type )->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new( name => '.', type => $type )->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
@@ -43,7 +46,7 @@ my $wire = '0000290500000080000000';
 	}
 
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $encoded;
 	my $hex2    = uc unpack 'H*', $decoded->encode;
 	is( $hex1, $hex2, 'encode/decode transparent' );
@@ -55,7 +58,7 @@ my $wire = '0000290500000080000000';
 
 
 {
-	my $rr = new Net::DNS::RR( name => '.', type => $type );
+	my $rr = Net::DNS::RR->new( name => '.', type => $type );
 	foreach (@attr) {
 		my $initial = 0x5A5;
 		my $changed = 0xA5A;
@@ -67,7 +70,7 @@ my $wire = '0000290500000080000000';
 
 
 foreach my $method (qw(class ttl)) {
-	my $rr = new Net::DNS::RR( name => '.', type => $type );
+	my $rr = Net::DNS::RR->new( name => '.', type => $type );
 	local $SIG{__WARN__} = sub { die @_ };
 
 	eval { $rr->$method(512) };
@@ -81,20 +84,20 @@ foreach my $method (qw(class ttl)) {
 
 
 {
-	my $rr = new Net::DNS::RR( type => $type, version => 1, rcode => 16 );
+	my $rr = Net::DNS::RR->new( type => $type, version => 1, rcode => 16 );
 	$rr->{rdlength} = 0;					# inbound OPT RR only
 	like( $rr->string, '/BADVER/', 'opt->rcode(16)' );
 }
 
 
 {
-	my $rr = new Net::DNS::RR( name => '.', type => $type, rcode => 1 );
+	my $rr = Net::DNS::RR->new( name => '.', type => $type, rcode => 1 );
 	like( $rr->string, '/NOERROR/', 'opt->rcode(1)' );
 }
 
 
 {
-	my $edns = new Net::DNS::RR( name => '.', type => $type );
+	my $edns = Net::DNS::RR->new( name => '.', type => $type );
 
 	ok( ref($edns), 'new OPT RR created' );
 
@@ -171,7 +174,7 @@ foreach my $method (qw(class ttl)) {
 
 	my $options = $edns->options;
 	my $encoded = $edns->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my @result  = $decoded->options;
 	is( scalar(@result), $options, 'expected number of options' );
 

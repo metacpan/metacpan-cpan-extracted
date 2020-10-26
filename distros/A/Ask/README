@@ -14,21 +14,28 @@ SYNOPSIS
        }
 
 DESCRIPTION
-    The "Ask" suite is a set of modules for interacting with users;
-    prompting them for information, displaying messages, warnings and
-    errors, etc.
+    The `Ask` suite is a set of modules for interacting with users; prompting
+    them for information, displaying messages, warnings and errors, etc.
 
-    There are already countless CPAN modules for doing this sort of thing,
-    but what sets "Ask" apart from them is that "Ask" will detect how your
-    script is being run (in a terminal, headless, etc) and choose an
-    appropriate way to interact with the user.
+    There are already countless CPAN modules for doing this sort of thing, but
+    what sets `Ask` apart from them is that `Ask` will detect how your script
+    is being run (in a terminal, headless, etc) and choose an appropriate way
+    to interact with the user.
 
-  Class Method
-    "Ask->detect(%arguments)"
+  Class Methods
+    `Ask->detect(%arguments)`
         A constructor, sort of. It inspects the program's environment and
         returns an object that implements the Ask API (see below).
 
-        Note that these objects don't usually inherit from "Ask", so the
+        Backend-specific arguments can be provided:
+
+          my $ask = Ask->detect(
+            %common_args,
+            'Ask::STDIO'  => \%stdio_args,
+            'Ask::Zenity' => \%zenity_args,
+          );
+
+        Note that these objects don't usually inherit from `Ask`, so the
         following will typically be false:
 
            my $ask = Ask->detect(%arguments);
@@ -39,79 +46,97 @@ DESCRIPTION
            my $ask = Ask->detect(%arguments);
            $ask->DOES("Ask::API");
 
+    `Ask->backends`
+        Returns a list of available backends. Each backend is a Perl class
+        name. Some of the backends may be available (i.e. installed and able
+        to be compiled) without being usable under current circumstances (e.g.
+        the Gtk2 backend is available but cannot be used because no X server
+        is running). To check usability, instantiate the class and call
+        `is_usable` on the instance.
+
+        The list is sorted in "quality" order, best to worst, though quality
+        is subjective.
+
+    `Ask->plugins`
+        The same as `Ask->backends`, but doesn't check that each result is a
+        loadable Perl class, and doesn't sort them in any particular order.
+
   The Ask API
-    Objects returned by the "detect" method implement the Ask API. This
+    Objects returned by the `detect` method implement the Ask API. This
     section documents that API.
 
     The following methods are provided by objects implementing the Ask API.
     They are largely modeled on the interface for GNOME Zenity.
 
-    "info(text => $text, %arguments)"
+    `info(text => $text, %arguments)`
         Display a message to the user.
 
-        Setting the argument "no_wrap" to true can be used to *hint* that
-        line wrapping should be avoided.
+        Setting the argument `no_wrap` to true can be used to *hint* that line
+        wrapping should be avoided.
 
-        The "lang" argument can be used to indicate the language of the
-        "text" as an ISO 639-1 code (e.g. "en" for English). Not all objects
-        implementing the Ask API will pay attention to this hint, so don't
-        be too surprised to see text in French with an English "OK" button
+        The `lang` argument can be used to indicate the language of the `text`
+        as an ISO 639-1 code (e.g. "en" for English). Not all objects
+        implementing the Ask API will pay attention to this hint, so don't be
+        too surprised to see text in French with an English "OK" button
         underneath!
 
-    "warning(text => $text, %arguments)"
+    `warning(text => $text, %arguments)`
         Display a warning to the user.
 
-        Supports the same arguments as "info".
+        Supports the same arguments as `info`.
 
-    "error(text => $text, %arguments)"
+    `error(text => $text, %arguments)`
         Display an error message (not necessarily fatal) to the user.
 
-        Supports the same arguments as "info".
+        Supports the same arguments as `info`.
 
-    "entry(%arguments)"
+    `entry(%arguments)`
         Ask the user to enter some text. Returns that text.
 
-        The "text" argument is supported as a way of communicating what
-        you'd like them to enter. The "hide_text" argument can be set to
-        true to *hint* that the text entered should not be displayed on
-        screen (e.g. password input).
+        The `text` argument is supported as a way of communicating what you'd
+        like them to enter. The `hide_text` argument can be set to true to
+        *hint* that the text entered should not be displayed on screen (e.g.
+        password input).
 
-        The "default" argument can be used to supply a default return value
-        if the user cannot be asked for some reason (e.g. running on an
+        The `default` argument can be used to supply a default return value if
+        the user cannot be asked for some reason (e.g. running on an
         unattended terminal).
 
-        The "lang" argument can be used to indicate the language of the
-        "text" as an ISO 639-1 code (e.g. "en" for English).
+        The `lang` argument can be used to indicate the language of the `text`
+        as an ISO 639-1 code (e.g. "en" for English).
 
-    "question(text => $text, %arguments)"
+    `question(text => $text, %arguments)`
         Ask the user to answer an affirmative/negative question (i.e.
         OK/cancel, yes/no) defaulting to affirmative. Returns boolean.
 
-        The "text" argument is the text of the question; the "ok_label"
-        argument can be used to set the label for the affirmative button;
-        the "cancel_label" argument for the negative button.
+        The `text` argument is the text of the question; the `ok_label`
+        argument can be used to set the label for the affirmative button; the
+        `cancel_label` argument for the negative button.
 
-        The "default" argument can be used to supply a default return value
-        if the user cannot be asked for some reason (e.g. running on an
+        The `default` argument can be used to supply a default return value if
+        the user cannot be asked for some reason (e.g. running on an
         unattended terminal).
 
-        The "lang" argument can be used to indicate the language of the
-        "text" as an ISO 639-1 code (e.g. "en" for English).
+        The `lang` argument can be used to indicate the language of the `text`
+        as an ISO 639-1 code (e.g. "en" for English).
 
-    "file_selection(%arguments)"
+    `file_selection(%arguments)`
         Ask the user for a file name. Returns the file name. No checks are
         made to ensure the file exists.
 
-        The "multiple" argument can be used to indicate that multiple files
-        may be selected (they are returned as a list); the "directory"
+        The `multiple` argument can be used to indicate that multiple files
+        may be selected (they are returned as a list); the `directory`
         argument can be used to *hint* that you want a directory.
 
-        The "default" argument can be used to supply a default return value
-        if the user cannot be asked for some reason (e.g. running on an
-        unattended terminal). If "multiple" is true, then this must be an
+        The `default` argument can be used to supply a default return value if
+        the user cannot be asked for some reason (e.g. running on an
+        unattended terminal). If `multiple` is true, then this must be an
         arrayref.
 
-    "single_choice(text => $text, choices => \@choices)"
+        Until version 0.011, returned values are strings. Thereafter, returned
+        values are Path::Tiny objects.
+
+    `single_choice(text => $text, choices => \@choices)`
         Asks the user to select a single option from many choices.
 
         For example:
@@ -127,18 +152,18 @@ DESCRIPTION
               ],
            );
 
-        The choices are "identifier => label" pairs. The identifiers are not
+        The choices are `identifier => label` pairs. The identifiers are not
         necessarily displayed to the user making the choice; the labels are.
         The function returns the identifier for the chosen option.
 
-        The "default" argument can be used to supply a default return value
-        if the user cannot be asked for some reason (e.g. running on an
+        The `default` argument can be used to supply a default return value if
+        the user cannot be asked for some reason (e.g. running on an
         unattended terminal).
 
-        The "lang" argument can be used to indicate the language of the
-        "text" and labels as an ISO 639-1 code (e.g. "en" for English).
+        The `lang` argument can be used to indicate the language of the `text`
+        and labels as an ISO 639-1 code (e.g. "en" for English).
 
-    "multiple_choice(text => $text, choices => \@choices)"
+    `multiple_choice(text => $text, choices => \@choices)`
         Asks the user to select zero or more options from many choices.
 
            my @ingredients = $ask->multiple_choice(
@@ -154,15 +179,15 @@ DESCRIPTION
 
         Returns list of identifiers.
 
-        The "default" argument can be used to supply a default return value
-        if the user cannot be asked for some reason (e.g. running on an
+        The `default` argument can be used to supply a default return value if
+        the user cannot be asked for some reason (e.g. running on an
         unattended terminal). It must be an arrayref.
 
-        The "lang" argument can be used to indicate the language of the
-        "text" and labels as an ISO 639-1 code (e.g. "en" for English).
+        The `lang` argument can be used to indicate the language of the `text`
+        and labels as an ISO 639-1 code (e.g. "en" for English).
 
-    If you wish to create your own implementation of the Ask API, please
-    read Ask::API for more information.
+    If you wish to create your own implementation of the Ask API, please read
+    Ask::API for more information.
 
   Extending Ask
     Implementing Ask::API allows you to extend Ask to other environments.
@@ -196,8 +221,7 @@ DESCRIPTION
           info("Then clap your hands!");
        }
 
-    Ask uses Sub::Exporter::Progressive, so exported functions may be
-    renamed:
+    Ask uses Sub::Exporter::Progressive, so exported functions may be renamed:
 
        use Ask
           question => { -as => 'interrogate' },
@@ -205,45 +229,58 @@ DESCRIPTION
        ;
 
   I18n
-    It is strongly recommended that you pass a "lang" argument with each
+    It is strongly recommended that you pass a `lang` argument with each
     method call. Not all backends yet pay attention to it.
 
-    See also AskX::AutoLang as a way to avoid passing "lang => "fu"" to
-    every single method call!
+    See also AskX::AutoLang as a way to avoid passing `lang => "fu"` to every
+    single method call!
 
 ENVIRONMENT
-    The "PERL_ASK_BACKEND" environment variable can be used to influence the
-    outcome of "Ask->detect". Indeed, it trumps all other factors. If set,
-    it should be a full class name.
+    The `PERL_ASK_BACKEND` environment variable can be used to influence the
+    outcome of `Ask->detect`. Indeed, it trumps all other factors. If set, it
+    should be a full class name.
 
-    If either of the "AUTOMATED_TESTING" or "PERL_MM_USE_DEFAULT"
-    environment variables are set to true, the "Ask::Fallback" backend will
-    automatically be used.
+    If either of the `AUTOMATED_TESTING` or `PERL_MM_USE_DEFAULT` environment
+    variables are set to true, the `Ask::Fallback` backend will automatically
+    be used.
 
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Ask>.
 
 SEE ALSO
-    See Ask::API for documentation of API internals.
+    Terminal backends:
 
-    Bundled Ask API backends:
+    *   Ask::STDIO - very basic usage of STDIN/STDOUT/STDERR
 
-    *   Ask::Callback - implementation for testing; redirects input and
-        output to callback functions.
+    *   Ask::Caroline - uses Caroline and Term::ANSIColor for better
+        interaction
 
-    *   Ask::Fallback - returns default answers; for scripts running
-        unattended.
+    *   Ask::Clui - uses Term::Clui for better interaction
+
+    GUI backends:
 
     *   Ask::Gtk - GUI using Gtk2.
 
-    *   Ask::STDIO - based on STDIN/STDOUT/STDERR
+    *   Ask::Prima - GUI using Prima.
 
     *   Ask::Tk - GUI using Tk.
 
     *   Ask::Wx - GUI using Wx.
 
-    *   Ask::Zenity - GUI using the "/usr/bin/zenity" binary (part of GNOME)
+    *   Ask::Zenity - GUI using the `/usr/bin/zenity` binary (part of GNOME)
+
+    Backends which perform no real user interaction:
+
+    *   Ask::Callback - implementation for testing; redirects input and output
+        to callback functions.
+
+    *   Ask::Fallback - returns default answers; for scripts running
+        unattended.
+
+    See Ask::API for documentation of API internals.
+
+    See Ask::Question for an alternative way of using Ask.
 
     Similar modules: IO::Prompt, IO::Prompt::Tiny and many others.
 
@@ -251,10 +288,10 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2012-2013 by Toby Inkster.
+    This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
 
 DISCLAIMER OF WARRANTIES
     THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED

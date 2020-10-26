@@ -39,6 +39,7 @@ t/04.ns.t
 t/05.locale.t
 t/06.http.t
 t/07.fs.t
+t/07.fs-psgi.t
 t/08.log.t
 t/09.db-2.t
 t/09.db.t

@@ -1,17 +1,31 @@
-0.003   2019-05-25 (PERLANCAR)
+0.005   2020-10-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix parsing regression and add tests.
+
+
+0.004   2020-10-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Make colon optional (e.g. +0100 for +01:00, or 1700-1810 for
+	  17:10-18:10) for input convenience.
+
+        - [ux] Print help message the first time shell starts, for better
+          discoverability.
+
+
+0.003   2019-05-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Update doc.
 
 
-0.002   2019-05-19 (PERLANCAR)
+0.002   2019-05-19  Released-By: PERLANCAR
 
 	- Grok seconds.
 
 	- Fix/tweak typo in regex.
 
 
-0.001   2019-05-19 (PERLANCAR) (unreleased)
+0.001   2019-05-19  Released-By: PERLANCAR; Released: no
 
         - First release.

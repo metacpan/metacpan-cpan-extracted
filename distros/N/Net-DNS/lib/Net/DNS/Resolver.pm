@@ -1,9 +1,10 @@
 package Net::DNS::Resolver;
 
-#
-# $Id: Resolver.pm 1740 2019-04-04 14:45:31Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1740 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Resolver.pm 1818 2020-10-18 15:24:42Z willem $)[2];
+
 
 =head1 NAME
 
@@ -12,10 +13,7 @@ Net::DNS::Resolver - DNS resolver class
 =cut
 
 
-use strict;
-use warnings;
-
-use constant CONFIG => defined eval "require Net::DNS::Resolver::$^O";
+use constant CONFIG => defined eval "require Net::DNS::Resolver::$^O";	  ## no critic
 
 use constant OS_CONF => join '::', __PACKAGE__, CONFIG ? $^O : 'UNIX';
 
@@ -31,7 +29,7 @@ __END__
 
     use Net::DNS;
 
-    $resolver = new Net::DNS::Resolver();
+    $resolver = Net::DNS::Resolver->new();
 
     # Perform a lookup, using the searchlist if appropriate.
     $reply = $resolver->search( 'example.com' );
@@ -43,7 +41,7 @@ __END__
     $reply = $resolver->send( 'example.com', 'MX', 'IN' );
 
     # Send a prebuilt query packet
-    $query = new Net::DNS::Packet( ... );
+    $query = Net::DNS::Packet->new( ... );
     $reply = $resolver->send( $query );
 
 =head1 DESCRIPTION
@@ -58,13 +56,13 @@ recursion is desired, etc.
 =head2 new
 
     # Use the default configuration
-    $resolver = new Net::DNS::Resolver();
+    $resolver = Net::DNS::Resolver->new();
 
     # Use my own configuration file
-    $resolver = new Net::DNS::Resolver( config_file => '/my/dns.conf' );
+    $resolver = Net::DNS::Resolver->new( config_file => '/my/dns.conf' );
 
     # Set options in the constructor
-    $resolver = new Net::DNS::Resolver(
+    $resolver = Net::DNS::Resolver->new(
 	nameservers => [ '2001:DB8::1', 'ns.example.com' ],
 	recurse	    => 0,
 	debug	    => 1
@@ -122,7 +120,7 @@ interfaces may confuse L<Net::DNS>.
 
 
     # Use my own configuration file
-    $resolver = new Net::DNS::Resolver( config_file => '/my/dns.conf' );
+    $resolver = Net::DNS::Resolver->new( config_file => '/my/dns.conf' );
 
 You can include a configuration file of your own when creating a
 resolver object.  This is supported on both Unix and Windows.
@@ -132,7 +130,7 @@ all other configuration files and environment variables are ignored.
 
 
     # Set options in the constructor
-    $resolver = new Net::DNS::Resolver(
+    $resolver = Net::DNS::Resolver->new(
 	nameservers => [ '2001:DB8::1', 'ns.example.com' ],
 	recurse	    => 0
 	);
@@ -151,8 +149,8 @@ Prints the resolver state on the standard output.
 
 =head2 query
 
-    $packet = $resolver->query( 'mailhost' );
-    $packet = $resolver->query( 'mailhost.example.com' );
+    $packet = $resolver->query( 'host' );
+    $packet = $resolver->query( 'host.example.com' );
     $packet = $resolver->query( '2001:DB8::1' );
     $packet = $resolver->query( 'example.com', 'MX' );
     $packet = $resolver->query( 'annotation.example.com', 'TXT', 'IN' );
@@ -173,8 +171,8 @@ any answers or not, use the C<send()> method instead.
 
 =head2 search
 
-    $packet = $resolver->search( 'mailhost' );
-    $packet = $resolver->search( 'mailhost.example.com' );
+    $packet = $resolver->search( 'host' );
+    $packet = $resolver->search( 'host.example.com' );
     $packet = $resolver->search( '2001:DB8::1' );
     $packet = $resolver->search( 'example.com', 'MX' );
     $packet = $resolver->search( 'annotation.example.com', 'TXT', 'IN' );
@@ -203,7 +201,7 @@ any answers or not, use the C<send()> method instead.
 
     $packet = $resolver->send( $query );
 
-    $packet = $resolver->send( 'mailhost.example.com' );
+    $packet = $resolver->send( 'host.example.com' );
     $packet = $resolver->send( '2001:DB8::1' );
     $packet = $resolver->send( 'example.com', 'MX' );
     $packet = $resolver->send( 'annotation.example.com', 'TXT', 'IN' );
@@ -288,7 +286,7 @@ Here is the example above, implemented using an iterator:
 
     $handle = $resolver->bgsend( $packet ) || die $resolver->errorstring;
 
-    $handle = $resolver->bgsend( 'mailhost.example.com' );
+    $handle = $resolver->bgsend( 'host.example.com' );
     $handle = $resolver->bgsend( '2001:DB8::1' );
     $handle = $resolver->bgsend( 'example.com', 'MX' );
     $handle = $resolver->bgsend( 'annotation.example.com', 'TXT', 'IN' );

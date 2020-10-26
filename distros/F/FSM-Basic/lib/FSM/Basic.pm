@@ -10,11 +10,11 @@ FSM::Basic - Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
@@ -125,11 +125,8 @@ e.g. 'catWRAND' => './t/test_cat.txt:1 ./t/test_cat1.txt:50',   in this case the
 
 =over 3
 
-It is possible to use a regex to allow optional commands
+=item * It is possible to use a regex to allow optional commands
 
-=back
-
-=over 4
 
 e.g.
 "h(elp)?|\\?": {
@@ -146,7 +143,8 @@ In the regex, the group capture could be used in the command parameter as a subs
 
 2nd group is substituted by __2__
 
-..
+...
+
 e.g. for a ping
 
 "ping (.*)"      => {"exec" => "ping -c 3 __1__"},
@@ -164,24 +162,10 @@ Other example:
       
 If you call with "cat /tmp/test/a1 the cat read the file /tmp/test/1" (without the 'a' because the group 3 is matching a single digit after a single character    
 
-=back
 
-=over 3 
 
-If you need to match all possible partial match for a word ( like "h, "he", "hel", "help" to match the "help" state)
+=item * If you need to match all possible partial match for a word ( like "h, "he", "hel", "help" to match the "help" state)
 Use the extra tag "swapregex": "1"
-
-=over 4 
-
-This reverse the REGEX test 
-
-In normal case (no "swapregex" )
-The state is check with 
-
-  $in =~ /^$key$/
-
-Where $in is the input from the run() function
-and $key is the state defined in the HASH  
 
 In case of "swapregex": "1" we use this
 
@@ -198,14 +182,50 @@ e.g.
             }
         }
 
-In this example me match "h, "he", "hel", "help"
+    In this example me match "h, "he", "hel", "help"
 
 
-=back
+This reverse the REGEX test
+In normal case (no "swapregex" )
+The state is check with 
 
-=over 3
+  $in =~ /^$key$/
 
-It is possible to do a case insensitive matching with the special tag  "caseinsensitive": "1"
+Where $in is the input from the run() function
+and $key is the state defined in the HASH  
+
+
+
+=item * If you need to match all possible abbreviation starting from a fixed header you use the tag 'alternation'=>1 and the variable part between sqare bracket.
+
+
+e.g.
+
+            'ot[her]'       => {
+                'alternation'     => 1,
+                'output'          => 'in enable',
+                'final'           => 0
+            }
+
+This match 'oth', 'othe' and 'other'
+
+In fact the system create the REGEX /^o(t|th|the|ther)$/
+
+For a more complex example: 
+
+'c[onfiguration] t[erminal]' 
+
+create the REGEX  
+
+/^c(o|on|onf|onfi|onfig|onfigu|onfigur|onfigura|onfigurat|onfigurati|onfiguratio|onfiguration) t(e|er|erm|ermi|ermin|ermina|erminal)$/
+
+
+It is possible to add the tag 'caseinsensitive' => 1, to allow also the case insentitive matching
+
+
+=over 4
+
+=item * It is possible to do a case insensitive matching with the special tag  "caseinsensitive": "1"
 
 =over 4
 
@@ -223,7 +243,7 @@ in this example "other", "OTHER", "Other", "otheR" (and all other case alternate
 
 =over 4
 
-=item "matching"
+"matching"
 to define the state when the input match the "expect" value
 
 =back
@@ -285,6 +305,19 @@ sub new {
     my $self;
     $self->{states_list} = $l;
     $self->{state}       = $s;
+    foreach my $k1 ( keys %{ $self->{states_list} }) {
+        if (  exists  $self->{states_list}{ $k1 }{expect} ) {
+            foreach my $k2 ( keys %{ $self->{states_list}{ $k1 }{expect} }) {
+                if (ref $self->{states_list}{ $k1 }{expect}{$k2} eq 'HASH' && exists  $self->{states_list}{ $k1 }{expect}{$k2}{alternation}) {
+                    if (defined $self->{states_list}{ $k1 }{expect}{$k2}{caseinsensitive} ) {
+                        $self->{states_list}{ $k1 }{expect}{alter($k2,1)} = delete $self->{states_list}{ $k1 }{expect}{$k2};
+                    }else{
+                        $self->{states_list}{ $k1 }{expect}{alter($k2)} = delete $self->{states_list}{ $k1 }{expect}{$k2};
+                    }
+                }
+            }
+        }
+    }
     bless($self, $class);
     return $self;
 }
@@ -304,8 +337,9 @@ sub run {
     my ($self, $in) = @_;
     my $in_lc = lc($in);
     my $rev;
+    my $alternation;
     foreach my $IN (grep { /$in/i } keys %{ $self->{states_list}{ $self->{state} }{expect} }) {
-        if (defined $self->{states_list}{ $self->{state} }{expect}{$IN}{swapregex}) {
+        if (ref $self->{states_list}{ $self->{state} }{expect}{$IN} eq 'HASH' && defined $self->{states_list}{ $self->{state} }{expect}{$IN}{swapregex}) {
             $rev //= $IN;
         }
     }
@@ -360,7 +394,7 @@ sub run {
                 $state = $self->{states_list}{ $self->{state} }{expect}{$in};
             } else {
                 foreach my $key (keys %{ $self->{states_list}{ $self->{state} }{expect} }) {
-                    if ($in =~ /^$key$/) {
+                    if ($in =~ /^$key$/) {                        
                         if (@+) {
                             for my $nbr (1 .. (scalar(@+) - 1)) {
                                 if (defined $-[$nbr]) {
@@ -518,6 +552,24 @@ sub write_file {
     open my $fh, '>', $file or die "Error opening file for write $file: $!\n";
     print $fh $content;
     close $fh or die "Error closing file $file: $!\n";
+}
+
+sub alter {
+    my $r = shift;
+    my $c = shift // 0;
+    $r =~ /([^[]*)\[([^\]]+)\](.*)/;
+    my $pre_r   = $1;
+    my $match_r = $2;
+    my $post_r  = $3;
+    my $out     = $pre_r.'(';
+    for (my $i = 1 ; $i <= length $match_r ; $i++) {
+        $out .=  substr($match_r, 0, $i) . '|';
+    }
+    chop $out;
+    $post_r = alter($post_r) if $post_r=~ /\[([^\]]+)\]/ ;
+    $out = $out. ')' . $post_r;
+    $out = '(?i:' . $out. ')' if $c ;
+    return $out;
 }
 
 package FSM::Basic::Modulo;

@@ -1,14 +1,11 @@
 package Net::DNS::RR::SPF;
 
-#
-# $Id: SPF.pm 1593 2017-09-04 14:23:26Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1593 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: SPF.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR::TXT);
+
 
 =head1 NAME
 
@@ -16,16 +13,15 @@ Net::DNS::RR::SPF - DNS SPF resource record
 
 =cut
 
-
 use integer;
 
 
 sub spfdata {
 	my @spf = shift->char_str_list(@_);
-	wantarray ? @spf : join '', @spf;
+	return wantarray ? @spf : join '', @spf;
 }
 
-sub txtdata { &spfdata; }
+sub txtdata { return &spfdata; }
 
 
 1;
@@ -35,14 +31,14 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name SPF spfdata ...');
+    $rr = Net::DNS::RR->new('name SPF spfdata ...');
 
-    $rr = new Net::DNS::RR( name    => 'name',
+    $rr = Net::DNS::RR->new( name    => 'name',
 			    type    => 'SPF',
 			    spfdata => 'single text string'
 			    );
 
-    $rr = new Net::DNS::RR( name    => 'name',
+    $rr = Net::DNS::RR->new( name    => 'name',
 			    type    => 'SPF',
 			    spfdata => [ 'multiple', 'strings', ... ]
 			    );

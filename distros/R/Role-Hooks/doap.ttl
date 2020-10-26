@@ -1,5 +1,6 @@
 @prefix dc:    <http://purl.org/dc/terms/> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
 @prefix doap-deps: <http://ontologi.es/doap-deps#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
@@ -28,7 +29,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Role-Hooks";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-003>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-role-hooks>;
@@ -44,10 +45,60 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Hooks-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Role-Hooks-0.002"^^xsd:string;
+	dc:issued            "2020-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Died applying a role to a non-Moo* class, with Moose loaded.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/133595>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/dakkar>;
+			rdfs:comment "Fixed by using a variant of Safe::Isa to check metaclasses.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Hooks-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Role-Hooks-0.003"^^xsd:string;
+	dc:issued            "2020-10-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Stop polluting Role::Tiny namespace.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/haarg>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-role-hooks/pull/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Hooks-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/dakkar>
+	a                    foaf:Person;
+	foaf:name            "Gianni Ceccarelli";
+	foaf:nick            "DAKKAR";
+	foaf:page            <https://metacpan.org/author/DAKKAR>.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
+
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:tobyink@cpan.org>;
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/133595>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "133595"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=133595>.
 

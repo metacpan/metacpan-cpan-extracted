@@ -1,9 +1,9 @@
 package Net::DNS::Update;
 
-#
-# $Id: Update.pm 1774 2020-03-18 07:49:22Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1774 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Update.pm 1814 2020-10-14 21:49:16Z willem $)[2];
 
 
 =head1 NAME
@@ -14,10 +14,10 @@ Net::DNS::Update - DNS dynamic update packet
 
     use Net::DNS;
 
-    $update = new Net::DNS::Update( 'example.com', 'IN' );
+    $update = Net::DNS::Update->new( 'example.com', 'IN' );
 
-    $update->push( prereq => nxrrset('foo.example.com. AAAA') );
-    $update->push( update => rr_add('foo.example.com. 86400 AAAA 2001::DB8::1') );
+    $update->push( prereq => nxrrset('host.example.com. AAAA') );
+    $update->push( update => rr_add('host.example.com. 86400 AAAA 2001::DB8::F00') );
 
 =head1 DESCRIPTION
 
@@ -29,8 +29,6 @@ Programmers should refer to RFC2136 for dynamic update semantics.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
@@ -43,9 +41,9 @@ use Net::DNS::Resolver;
 
 =head2 new
 
-    $update = new Net::DNS::Update;
-    $update = new Net::DNS::Update( 'example.com' );
-    $update = new Net::DNS::Update( 'example.com', 'HS' );
+    $update = Net::DNS::Update->new;
+    $update = Net::DNS::Update->new( 'example.com' );
+    $update = Net::DNS::Update->new( 'example.com', 'IN' );
 
 Returns a Net::DNS::Update object suitable for performing a DNS
 dynamic update.	 Specifically, it creates a packet with the header
@@ -62,23 +60,18 @@ resolver configuration and IN respectively.
 =cut
 
 sub new {
-	shift;
-	my ( $zone, @class ) = @_;
+	my ( $class, $zone, @rrclass ) = @_;
 
-	my ($domain) = grep defined && length, $zone, Net::DNS::Resolver->searchlist;
+	my ($domain) = grep { defined && length } ( $zone, Net::DNS::Resolver->searchlist );
 
-	eval {
-		local $SIG{__DIE__};
+	my $self = __PACKAGE__->SUPER::new( $domain, 'SOA', @rrclass );
 
-		my $self = __PACKAGE__->SUPER::new( $domain, 'SOA', @class );
+	my $header = $self->header;
+	$header->opcode('UPDATE');
+	$header->qr(0);
+	$header->rd(0);
 
-		my $header = $self->header;
-		$header->opcode('UPDATE');
-		$header->qr(0);
-		$header->rd(0);
-
-		return $self;
-	} || croak $@;
+	return $self;
 }
 
 
@@ -102,13 +95,13 @@ Section names may be abbreviated to the first three characters.
 sub push {
 	my $self = shift;
 	my $list = $self->_section(shift);
-	my @arg	 = grep ref($_), @_;
+	my @arg	 = grep { ref($_) } @_;
 
 	my ($zone) = $self->zone;
 	my $zclass = $zone->zclass;
-	my @rr = grep $_->class( $_->class =~ /ANY|NONE/ ? () : $zclass ), @arg;
+	my @rr = grep { $_->class( $_->class =~ /ANY|NONE/ ? () : $zclass ) } @arg;
 
-	CORE::push( @$list, @rr );
+	return CORE::push( @$list, @rr );
 }
 
 
@@ -133,15 +126,15 @@ Section names may be abbreviated to the first three characters.
 sub unique_push {
 	my $self = shift;
 	my $list = $self->_section(shift);
-	my @arg	 = grep ref($_), @_;
+	my @arg	 = grep { ref($_) } @_;
 
 	my ($zone) = $self->zone;
 	my $zclass = $zone->zclass;
-	my @rr = grep $_->class( $_->class =~ /ANY|NONE/ ? () : $zclass ), @arg;
+	my @rr = grep { $_->class( $_->class =~ /ANY|NONE/ ? () : $zclass ) } @arg;
 
-	my %unique = map { ( bless( {%$_, ttl => 0}, ref $_ )->canonical => $_ ) } @rr, @$list;
+	my %unique = map { ( bless( {%$_, ttl => 0}, ref $_ )->canonical => $_ ) } ( @rr, @$list );
 
-	scalar( @$list = values %unique );
+	return scalar( @$list = values %unique );
 }
 
 
@@ -165,19 +158,19 @@ the corresponding ( name => value ) form may also be used.
     use Net::DNS;
 
     # Create the update packet.
-    my $update = new Net::DNS::Update('example.com');
+    my $update = Net::DNS::Update->new('example.com');
 
     # Prerequisite is that no address records exist for the name.
-    $update->push( pre => nxrrset('foo.example.com. A') );
-    $update->push( pre => nxrrset('foo.example.com. AAAA') );
+    $update->push( pre => nxrrset('host.example.com. A') );
+    $update->push( pre => nxrrset('host.example.com. AAAA') );
 
     # Add two address records for the name.
-    $update->push( update => rr_add('foo.example.com. 86400 A 192.0.2.1') );
-    $update->push( update => rr_add('foo.example.com. 86400 AAAA 2001:DB8::1') );
+    $update->push( update => rr_add('host.example.com. 86400 A 192.0.2.1') );
+    $update->push( update => rr_add('host.example.com. 86400 AAAA 2001:DB8::1') );
 
-    # Send the update to the zone's primary master.
-    my $resolver = new Net::DNS::Resolver;
-    $resolver->nameservers('primary-master.example.com');
+    # Send the update to the zone's primary nameserver.
+    my $resolver = Net::DNS::Resolver->new();
+    $resolver->nameservers('DNSprimary.example.com');
 
     my $reply = $resolver->send($update);
 
@@ -195,45 +188,47 @@ the corresponding ( name => value ) form may also be used.
 
 =head2 Add an MX record for a name that already exists
 
-    my $update = new Net::DNS::Update('example.com');
+    my $update = Net::DNS::Update->new('example.com');
     $update->push( prereq => yxdomain('example.com') );
     $update->push( update => rr_add('example.com MX 10 mailhost.example.com') );
 
 =head2 Add a TXT record for a name that does not exist
 
-    my $update = new Net::DNS::Update('example.com');
+    my $update = Net::DNS::Update->new('example.com');
     $update->push( prereq => nxdomain('info.example.com') );
     $update->push( update => rr_add('info.example.com TXT "yabba dabba doo"') );
 
 =head2 Delete all A records for a name
 
-    my $update = new Net::DNS::Update('example.com');
-    $update->push( prereq => yxrrset('foo.example.com A') );
-    $update->push( update => rr_del('foo.example.com A') );
+    my $update = Net::DNS::Update->new('example.com');
+    $update->push( prereq => yxrrset('host.example.com A') );
+    $update->push( update => rr_del('host.example.com A') );
 
 =head2 Delete all RRs for a name
 
-    my $update = new Net::DNS::Update('example.com');
+    my $update = Net::DNS::Update->new('example.com');
     $update->push( prereq => yxdomain('byebye.example.com') );
     $update->push( update => rr_del('byebye.example.com') );
 
-=head2 Perform a DNS update signed using a BIND private key file
+=head2 Perform DNS update signed using a key generated by BIND tsig-keygen
 
-    my $update = new Net::DNS::Update('example.com');
-    $update->push( update => rr_add('foo.example.com AAAA 2001:DB8::1') );
-    $update->sign_tsig( "$dir/Khmac-sha512.example.com.+165+01018.private" );
+    my $update = Net::DNS::Update->new('example.com');
+    $update->push( update => rr_add('host.example.com AAAA 2001:DB8::1') );
+    $update->sign_tsig( $key_file );
     my $reply = $resolver->send( $update );
     $reply->verify( $update ) || die $reply->verifyerr;
 
-=head2 Signing the DNS update using a BIND public key file
-
-    $update->sign_tsig( "$dir/Khmac-sha512.example.com.+165+01018.key" );
-
 =head2 Signing the DNS update using a customised TSIG record
 
-    $update->sign_tsig( "$dir/Khmac-sha512.example.com.+165+01018.private",
-			fudge => 60
-			);
+    $update->sign_tsig( $key_file, fudge => 60 );
+
+=head2 Signing the DNS update using private key generated by BIND dnssec-keygen
+
+    $update->sign_tsig( "$dir/Khmac-sha512.example.com.+165+01018.private" );
+
+=head2 Signing the DNS update using public key generated by BIND dnssec-keygen
+
+    $update->sign_tsig( "$dir/Khmac-sha512.example.com.+165+01018.key" );
 
 =head2 Another way to sign a DNS update
 
@@ -242,8 +237,8 @@ the corresponding ( name => value ) form may also be used.
     my $tsig = create Net::DNS::RR::TSIG( $key_file );
     $tsig->fudge(60);
 
-    my $update = new Net::DNS::Update('example.com');
-    $update->push( update     => rr_add('foo.example.com AAAA 2001:DB8::1') );
+    my $update = Net::DNS::Update->new('example.com');
+    $update->push( update     => rr_add('host.example.com AAAA 2001:DB8::1') );
     $update->push( additional => $tsig );
 
 

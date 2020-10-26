@@ -13,7 +13,7 @@ my $builder = Module::Build->new(
         'Test::Mock::Cmd' => 0,    # for testing, I know I know: Test::XT
 
         'Module::Want'        => 0.6,
-        'String::UnicodeUTF8' => 0.21,
+        'String::UnicodeUTF8' => 0.23,
 
         # lazy loaded (via Module::Want) only when needed
         'Import::Into'        => 0,
@@ -47,7 +47,7 @@ my $builder = Module::Build->new(
 
         'Regexp::Debugger' => 0,
 
-        'App::Kit' => 0.6,
+        'App::Kit' => 0.62,
 
         'IPC::Open3::Utils' => 0.91,
     },

@@ -1,14 +1,11 @@
 package Net::DNS::RR::NSEC;
 
-#
-# $Id: NSEC.pm 1749 2019-07-21 09:15:55Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1749 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: NSEC.pm 1812 2020-10-07 18:09:53Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,11 +13,10 @@ Net::DNS::RR::NSEC - DNS NSEC resource record
 
 =cut
 
-
 use integer;
 
 use Net::DNS::DomainName;
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(:type);
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -28,8 +24,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
-	( $self->{nxtdname}, $offset ) = decode Net::DNS::DomainName(@_);
+	( $self->{nxtdname}, $offset ) = Net::DNS::DomainName->decode(@_);
 	$self->{typebm} = substr $$data, $offset, $limit - $offset;
+	return;
 }
 
 
@@ -37,7 +34,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $nxtdname = $self->{nxtdname};
-	join '', $nxtdname->encode(), $self->{typebm};
+	return join '', $nxtdname->encode(), $self->{typebm};
 }
 
 
@@ -45,7 +42,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $nxtdname = $self->{nxtdname};
-	my @rdata    = ( $nxtdname->string(), $self->typelist );
+	return ( $nxtdname->string(), $self->typelist );
 }
 
 
@@ -54,6 +51,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->nxtdname(shift);
 	$self->typelist(@_);
+	return;
 }
 
 
@@ -61,14 +59,15 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->_parse_rdata('.');
+	return;
 }
 
 
 sub nxtdname {
 	my $self = shift;
 
-	$self->{nxtdname} = new Net::DNS::DomainName(shift) if scalar @_;
-	$self->{nxtdname}->name if $self->{nxtdname};
+	$self->{nxtdname} = Net::DNS::DomainName->new(shift) if scalar @_;
+	return $self->{nxtdname} ? $self->{nxtdname}->name : undef;
 }
 
 
@@ -127,7 +126,7 @@ sub covers {
 
 sub encloser {
 	my $self  = shift;
-	my @qname = new Net::DNS::Domain(shift)->label;
+	my @qname = Net::DNS::Domain->new(shift)->label;
 
 	my @owner = $self->{owner}->label;
 	my $depth = scalar(@owner);
@@ -156,7 +155,7 @@ sub wildcard { return shift->{wildcard}; }
 
 sub _type2bm {
 	my @typearray;
-	foreach my $typename ( map split(), @_ ) {
+	foreach my $typename ( map { split() } @_ ) {
 		my $number = typebyname($typename);
 		my $window = $number >> 8;
 		my $bitnum = $number & 255;
@@ -169,7 +168,7 @@ sub _type2bm {
 	my $window = 0;
 	foreach (@typearray) {
 		if ( my $pane = $typearray[$window] ) {
-			my @content = map $_ || 0, @$pane;
+			my @content = map { $_ || 0 } @$pane;
 			$bitmap .= pack 'CC C*', $window, scalar(@content), @content;
 		}
 		$window++;
@@ -215,7 +214,7 @@ sub typebm {				## historical
 
 sub covered {				## historical
 	my $self = shift;					# uncoverable pod
-	$self->covers(@_);
+	return $self->covers(@_);
 }
 
 
@@ -226,7 +225,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR( 'name NSEC nxtdname typelist' );
+    $rr = Net::DNS::RR->new( 'name NSEC nxtdname typelist' );
 
 =head1 DESCRIPTION
 

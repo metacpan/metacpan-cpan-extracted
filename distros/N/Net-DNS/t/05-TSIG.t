@@ -1,8 +1,11 @@
-# $Id: 05-TSIG.t 1796 2020-07-28 08:22:47Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-TSIG.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
+
 use Net::DNS;
 
 my @prerequisite = qw(
@@ -13,7 +16,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1;";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -23,7 +26,7 @@ plan tests => 65;
 
 sub mysign {
 	my ( $key, $data ) = @_;
-	my $hmac = new Digest::HMAC( $key, 'Digest::MD5' );
+	my $hmac = Digest::HMAC->new( $key, 'Digest::MD5' );
 	$hmac->add($data);
 	return $hmac->digest;
 }
@@ -44,10 +47,10 @@ my $hash = {};
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash,
@@ -66,15 +69,15 @@ my $hash = {};
 	}
 
 
-	my $null   = new Net::DNS::RR("$name NULL")->encode;
-	my $empty  = new Net::DNS::RR("$name $type")->encode;
+	my $null   = Net::DNS::RR->new("$name NULL")->encode;
+	my $empty  = Net::DNS::RR->new("$name $type")->encode;
 	my $buffer = $empty;		## Note: TSIG RR gets destroyed by decoder
-	my $rxbin  = decode Net::DNS::RR( \$buffer )->encode;
+	my $rxbin  = Net::DNS::RR->decode( \$buffer )->encode;
 	my $packet = Net::DNS::Packet->new( $name, 'TKEY', 'IN' );
 	$packet->header->id(1234);				# fix packet id
 	$packet->header->rd(1);
 	my $encoded = $buffer = $rr->encode( 0, {}, $packet );
-	my $decoded = decode Net::DNS::RR( \$buffer );
+	my $decoded = Net::DNS::RR->decode( \$buffer );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
 	my $hex3    = unpack 'H*', substr( $encoded, length $null );
@@ -84,14 +87,14 @@ my $hash = {};
 	is( length($rxbin), length($null), 'decoded RDATA can be empty' );
 
 	my $wireformat = pack 'a* x', $encoded;
-	eval { decode Net::DNS::RR( \$wireformat ); };
+	eval { Net::DNS::RR->decode( \$wireformat ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "misplaced $type RR\t[$exception]" );
 }
 
 
 {
-	my $rr = new Net::DNS::RR( type => 'TSIG', key => '' );
+	my $rr = Net::DNS::RR->new( type => 'TSIG', key => '' );
 	ok( !$rr->verify(),	'verify fails on empty TSIG' );
 	ok( $rr->vrfyerrstr(),	'vrfyerrstr() reports failure' );
 	ok( !$rr->other(),	'other undefined' );
@@ -105,7 +108,7 @@ my $hash = {};
 {
 	my $mac = 'kpRyejY4uxwT9I74FYv8nQ==';
 	foreach my $method (qw(mac request_mac prior_mac)) {
-		my $rr = new Net::DNS::RR( type => 'TSIG', $method => $mac );
+		my $rr = Net::DNS::RR->new( type => 'TSIG', $method => $mac );
 		is( $rr->$method(), $mac, "correct $method" );
 	}
 }
@@ -114,9 +117,9 @@ my $hash = {};
 {
 	# Check default signing function using test cases from RFC2202, section 2.
 
-	my $expected = new Net::DNS::RR( type => 'TSIG', algorithm => 'HMAC-MD5.SIG-ALG.REG.INT' );
+	my $expected = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-MD5.SIG-ALG.REG.INT' );
 
-	my $tsig      = new Net::DNS::RR( type => 'TSIG', fudge => 300 );
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', fudge => 300 );
 	my $function  = $tsig->sig_function;			# default signing function
 	my $algorithm = $tsig->algorithm;			# default algorithm
 
@@ -184,7 +187,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA1 signing function using test cases from RFC2202, section 3.
 
-	my $tsig      = new Net::DNS::RR( type => 'TSIG', algorithm => 'HMAC-SHA' );	# alias HMAC-SHA1
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-SHA' );	# alias HMAC-SHA1
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 
@@ -252,7 +255,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA224 signing function using test cases from RFC4634, section 8.4.
 
-	my $tsig      = new Net::DNS::RR( type => 'TSIG', algorithm => 162 );	 # alias HMAC-SHA224
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 162 );	 # alias HMAC-SHA224
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 
@@ -325,7 +328,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA256 signing function using test cases from RFC4634, section 8.4.
 
-	my $tsig      = new Net::DNS::RR( type => 'TSIG', algorithm => 'HMAC-SHA256' );
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-SHA256' );
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 
@@ -396,7 +399,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA384 signing function using test cases from RFC4634, section 8.4.
 
-	my $tsig      = new Net::DNS::RR( type => 'TSIG', algorithm => 'HMAC-SHA384' );
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-SHA384' );
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 
@@ -485,7 +488,7 @@ my $hash = {};
 {
 	# Check HMAC-SHA512 signing function using test cases from RFC4634, section 8.4.
 
-	my $tsig      = new Net::DNS::RR( type => 'TSIG', algorithm => 'HMAC-SHA512' );
+	my $tsig      = Net::DNS::RR->new( type => 'TSIG', algorithm => 'HMAC-SHA512' );
 	my $algorithm = $tsig->algorithm;
 	my $function  = $tsig->sig_function;
 

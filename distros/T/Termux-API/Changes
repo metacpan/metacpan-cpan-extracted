@@ -5,3 +5,7 @@ Revision history for Termux-API
 
 0.03	2020-07-23
 	Adds new functions audio_info, elf_cleaner, speech_to_text.
+
+0.03	2020-10-24
+	- Add POD description
+	- Update Makefile with links to github

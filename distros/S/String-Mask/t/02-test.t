@@ -8,6 +8,8 @@ is(mask('thisusedtobeanemail@gmail.com', 'end'), '***************mail@gmail.com'
 is(mask('thisusedtobeanemail@gmail.com', 'end', 5), '*******************@****l.com');
 is(mask('thisusedtobeanemail@gmail.com', 'middle'), '*******dtobeanemail@g****.***');
 is(mask('thisusedtobeanemail@gmail.com', 'middle', 5), '************anema**@*****.***');
+is(mask('thisusedtobeanemail@gmail.com', 'email'), 'thisu**************@*****.***');
+is(mask('thisusedtobeanemail@gmail.com', 'email', 2), 'thisusedtobeanema**@*****.***');
 
 is(mask('9991234567'), '99912*****');
 is(mask('9991234567', 'start', 3), '999*******');

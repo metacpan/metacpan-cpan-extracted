@@ -5,10 +5,10 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Test::More;
 
 
-my @long = qw( pad empty undef ll default max_height max_width keep no_spacebar mark tabs_info tabs_prompt );
+my @long = qw( pad empty undef ll default max_height max_width keep no_spacebar mark tabs_info tabs_prompt footer );
 my @simple = qw( alignment layout order clear_screen page mouse beep hide_cursor index color codepage_mapping ); # prompt
 my @all = ( @long, @simple );
-my @skip = qw( info prompt include_highlighted meta_items busy_string justify lf footer_string ); # justify and lf deprecated; footer_string experimental
+my @skip = qw( info prompt include_highlighted meta_items busy_string footer_string ); # footer_string deprecated
 
 
 plan tests => 2 + scalar @all;

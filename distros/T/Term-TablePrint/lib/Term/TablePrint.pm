@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.122';
+our $VERSION = '0.123';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -65,7 +65,7 @@ sub _valid_options {
         binary_string     => 'Str',
         decimal_separator => 'Str',
         prompt            => 'Str',
-        table_name        => 'Str', # experimental
+        table_name        => 'Str',
         undef             => 'Str',
         #thsd_sep         => 'Str',
     };
@@ -91,7 +91,7 @@ sub _defaults {
         prompt            => '',
         tab_width         => 2,
         table_expand      => 1,
-        #table_name        => undef, # experimental
+        table_name        => undef,
         undef             => '',
         thsd_sep          => ',', #
     }
@@ -269,7 +269,7 @@ sub __recursive_code {
         my $row = choose(
             $list,
             { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
-              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer_string => $self->{table_name}, # table_name experimental
+              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $self->{table_name},
               color => $self->{color}, codepage_mapping => $self->{codepage_mapping} }
         );
         if ( ! defined $row ) {
@@ -741,7 +741,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.122
+Version 0.123
 
 =cut
 
@@ -1024,6 +1024,10 @@ the first row will not be expanded.
 If I<table_expand> is set to 0, the cursor jumps to the to first row (if not already there) when C<Return> is pressed.
 
 Default: 1
+
+=head3 table_name
+
+If set (string), I<table_name> is added in the bottom line.
 
 =head3 undef
 

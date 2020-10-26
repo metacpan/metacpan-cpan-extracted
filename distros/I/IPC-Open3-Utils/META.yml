@@ -3,23 +3,26 @@ abstract: 'simple API encapsulating the most common open3() logic/uses including
 author:
   - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IPC-Open3-Utils
 no_index:
   directory:
     - t
     - inc
 requires:
-  IO::Handle: 0
-  IO::Select: 0
-  IPC::Open3: 0
-  Test::More: 0
-version: 0.91
+  IO::Handle: '0'
+  IO::Select: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/drmuey/p5-IPC-Open3-Utils/issues
+  repository: https://github.com/drmuey/p5-IPC-Open3-Utils.git
+version: '0.92'

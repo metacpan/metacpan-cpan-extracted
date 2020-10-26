@@ -30,8 +30,7 @@ sub driver_maybe {
 	
 	$bolt = $driver->{uri} && $driver->{uri}->scheme eq 'bolt';
 	if (! $ENV{TEST_NEO4J_PASSWORD} && ! $bolt) {
-		# the driver has no chance of connecting to a real database via
-		# HTTP without a password, so we use the REST simulator instead
+		# without a password, we use the REST simulator instead
 		$driver->{client_factory} = Neo4j::Sim->factory;
 		$sim = 1;
 	}
@@ -101,7 +100,11 @@ sub server_address {
 __END__
 
 These environment variables can be specified either in the shell (using
-export/setenv) or in dist.ini (when using `dzil test`). At the very least,
+export/setenv) or in dist.ini (when using `dzil test`). The driver
+does support connecting to a Neo4j server with authentication disabled.
+However, without a password, these tests will never attempt a server
+connection, instead relying on the REST simulator (Neo4j::Sim).
+To execute these tests on a real Neo4j server, at the very least
 the password is required. If the password is the only available setting,
 default values will be used for the server URI and user name.
 

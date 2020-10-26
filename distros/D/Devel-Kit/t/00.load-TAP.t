@@ -1,6 +1,6 @@
 use Test::More;
 
-my @exported = qw(a d ei rx ri ni ci si yd jd xd sd md id pd fd dd ld ud gd bd vd ms ss be bu ce cu xe xu ue uu he hu pe pu se su qe qu);
+my @exported = qw(a d ei rx ri ni ci si yd jd xd sd md id pd fd dd ld ud gd bd vd ms ss s2 s3 s5 be bu ce cu xe xu ue uu he hu pe pu se su qe qu);
 plan tests => ( scalar(@exported) * 1 ) + 2;
 
 # do these no()'s to ensure they are off before testing Devel::Kit::TAP’s behavior regarding them
@@ -18,8 +18,8 @@ like( $@, qr/Global symbol "\$x" requires explicit package name/, 'strict enable
     local $SIG{__WARN__} = sub {
         $warn = join( '', @_ );
     };
-    eval 'print @X[0]';
-    like( $warn, qr/Scalar value \@x\[0\] better written as \$x\[0\]/i, 'warnings enabled' );
+    eval 'my $n;my $s="$n foo";';
+    like( $warn, qr/Use of uninitialized value \$n in concatenation/i, 'warnings enabled' );
 }
 
 for my $f (@exported) {

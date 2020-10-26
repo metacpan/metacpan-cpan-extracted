@@ -1,6 +1,9 @@
-# $Id: 02-text.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 02-text.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 37;
 
 
@@ -9,7 +12,7 @@ use_ok('Net::DNS::Text');
 
 {
 	my $string = 'example';
-	my $object = new Net::DNS::Text($string);
+	my $object = Net::DNS::Text->new($string);
 	ok( $object->isa('Net::DNS::Text'), 'object returned by new() constructor' );
 	is( $object->value,  $string, 'expected object->value' );
 	is( $object->string, $string, 'expected object->string' );
@@ -17,14 +20,14 @@ use_ok('Net::DNS::Text');
 
 
 {
-	eval { my $object = new Net::DNS::Text(); };
+	eval { my $object = Net::DNS::Text->new(); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "empty argument list\t[$exception]" );
 }
 
 
 {
-	eval { my $object = new Net::DNS::Text(undef); };
+	eval { my $object = Net::DNS::Text->new(undef); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "argument undefined\t[$exception]" );
 }
@@ -33,7 +36,7 @@ use_ok('Net::DNS::Text');
 {
 	my $sample = '';
 	my $expect = '""';
-	my $result = new Net::DNS::Text($sample)->string;
+	my $result = Net::DNS::Text->new($sample)->string;
 	is( $result, $expect, 'null argument' );
 }
 
@@ -41,7 +44,7 @@ use_ok('Net::DNS::Text');
 {
 	my $sample = 'example';
 	my $escape = '\e\x\a\m\p\l\e';
-	my $result = new Net::DNS::Text($escape)->string;
+	my $result = Net::DNS::Text->new($escape)->string;
 	is( $result, $sample, 'character escape' );
 }
 
@@ -49,14 +52,14 @@ use_ok('Net::DNS::Text');
 {
 	my $sample = 'A';
 	my $escape = '\065';
-	my $result = new Net::DNS::Text($escape)->string;
+	my $result = Net::DNS::Text->new($escape)->string;
 	is( $result, $sample, 'numeric escape' );
 }
 
 
 {
 	my $string = 'a' x 256;
-	my $object = new Net::DNS::Text($string);
+	my $object = Net::DNS::Text->new($string);
 	is( scalar(@$object),	       2,		'new() splits long argument' );
 	is( length( $object->value ),  length($string), 'object->value reassembles string' );
 	is( length( $object->string ), length($string), 'object->string reassembles string' );
@@ -67,7 +70,7 @@ use_ok('Net::DNS::Text');
 	my $utf8   = '\192\160';
 	my $filler = 'a' x 254;
 	my $string = join '', $filler, $utf8;
-	my $object = new Net::DNS::Text($string);
+	my $object = Net::DNS::Text->new($string);
 	is( length( $object->[0] ), length($filler), 'new() does not break UTF8 sequence' );
 }
 
@@ -76,7 +79,7 @@ use_ok('Net::DNS::Text');
 	my $sample = 'x\000x\031x\127x\128x\159\160\255x';
 	my $expect = '7800781f787f7880789fa0ff78';
 	my $length = sprintf '%02x', length pack( 'H*', $expect );
-	my $object = new Net::DNS::Text($sample);
+	my $object = Net::DNS::Text->new($sample);
 	my $buffer = $object->encode;
 	is( unpack( 'H*', $buffer ),	  $length . $expect, 'encode() returns expected data' );
 	is( unpack( 'H*', $object->raw ), $expect,	     'raw() returns expected data' );
@@ -85,7 +88,7 @@ use_ok('Net::DNS::Text');
 
 {
 	my $sample = 'example';
-	my $buffer = new Net::DNS::Text($sample)->encode;
+	my $buffer = Net::DNS::Text->new($sample)->encode;
 	my $object = decode Net::DNS::Text( \$buffer );
 	ok( $object->isa('Net::DNS::Text'), 'object returned by decode() constructor' );
 	is( $object->string, $sample, 'object matches original data' );
@@ -96,7 +99,7 @@ use_ok('Net::DNS::Text');
 
 {
 	my $sample = 'example';
-	my $buffer = new Net::DNS::Text($sample)->encode;
+	my $buffer = Net::DNS::Text->new($sample)->encode;
 	my ( $object, $next ) = decode Net::DNS::Text( \$buffer, 1, length($buffer) - 1 );
 	is( $object->string, $sample,	     'decode() extracts arbitrary substring' );
 	is( $next,	     length $buffer, 'expected offset returned by decode()' );
@@ -105,7 +108,7 @@ use_ok('Net::DNS::Text');
 
 {
 	my $sample = 'example';
-	my $buffer = substr new Net::DNS::Text($sample)->encode, 0, 2;
+	my $buffer = substr Net::DNS::Text->new($sample)->encode, 0, 2;
 	eval { my $object = decode Net::DNS::Text( \$buffer ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "corrupt wire-format\t[$exception]" );
@@ -122,7 +125,7 @@ use_ok('Net::DNS::Text');
 
 	foreach my $hexcode ( sort keys %testcase ) {
 		my $string  = $testcase{$hexcode};
-		my $content = pack 'H*', $hexcode;
+		my $content = pack 'H*',   $hexcode;
 		my $buffer  = pack 'C a*', length $content, $content;
 		my $decoded = decode Net::DNS::Text( \$buffer );
 		my $compare = $decoded->string;
@@ -143,7 +146,7 @@ use_ok('Net::DNS::Text');
 
 	foreach my $hexcode ( sort keys %testcase ) {
 		my $string  = $testcase{$hexcode};
-		my $content = pack 'H*', $hexcode;
+		my $content = pack 'H*',   $hexcode;
 		my $buffer  = pack 'C a*', length $content, $content;
 		my $decoded = decode Net::DNS::Text( \$buffer );
 		my $compare = $decoded->string;
@@ -174,7 +177,7 @@ use_ok('Net::DNS::Text');
 
 	foreach my $hexcode ( sort keys %testcase ) {
 		my $string  = $testcase{$hexcode};
-		my $encoded = new Net::DNS::Text($string)->encode;
+		my $encoded = Net::DNS::Text->new($string)->encode;
 		is( unpack( 'xH*', $encoded ), $hexcode, qq(8-bit codes:\t$string) );
 	}
 }

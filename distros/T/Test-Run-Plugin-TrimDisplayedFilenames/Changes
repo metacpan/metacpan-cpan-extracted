@@ -1,5 +1,10 @@
 Revision history for Test::Run::Plugin::TrimDisplaysFilenames
 
+0.0126   2020-10-22
+
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0125  2015-06-19
         - Add a version control repository link in META.yml.
         - Update some old links.

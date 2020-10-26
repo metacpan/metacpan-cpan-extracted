@@ -3,7 +3,7 @@ package Database::Async::Query;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 =head1 NAME
 
@@ -420,7 +420,17 @@ sub rows {
 
 =head2 single
 
-Defaults to all columns, provide a list of indices to select a subset.
+Used to retrieve data for a query that's always going to return a single row.
+
+Defaults to all columns, provide a list of indices to select a subset:
+
+ # should yield "a", "b" and "c" as the three results
+ print for await $db->query(q{select 'a', 'b', 'c'})->single->as_list;
+
+ # should yield just the ID column from the first row
+ print for await $db->query(q{select id, * from some_table})->single('id')->as_list;
+
+Returns a L<Future> which will resolve to the list of items.
 
 =cut
 
@@ -428,8 +438,8 @@ sub single {
     my ($self, @id) = @_;
     $self->{single} //= $self->row_data
         ->first
-        ->map(sub {
-            @id ? @{$_}{@id} : @$_
+        ->flat_map(sub {
+            [ @id ? @{$_}{@id} : @$_ ]
         })->as_list;
 }
 
@@ -443,5 +453,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
 

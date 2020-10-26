@@ -24042,11 +24042,6 @@ sub cells_sparkline_groups_post_worksheet_sparkline_group {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if ( exists $args{'sparkline_group_index'}) {
-        $query_params->{'sparklineGroupIndex'} = $self->{api_client}->to_query_value($args{'sparkline_group_index'});
-    }
-
-    # query params
     if ( exists $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -24062,6 +24057,13 @@ sub cells_sparkline_groups_post_worksheet_sparkline_group {
     if ( exists $args{'sheet_name'}) {
         my $_base_variable = "{" . "sheetName" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sparkline_group_index'}) {
+        my $_base_variable = "{" . "sparklineGroupIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sparkline_group_index'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 

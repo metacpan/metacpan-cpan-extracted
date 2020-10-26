@@ -1,9 +1,8 @@
 package Net::DNS::Resolver::MSWin32;
 
-#
-# $Id: MSWin32.pm 1568 2017-05-27 06:40:20Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1568 $)[1];
+use strict;
+use warnings;
+our $VERSION = (qw$Id: MSWin32.pm 1812 2020-10-07 18:09:53Z willem $)[2];
 
 
 =head1 NAME
@@ -13,16 +12,13 @@ Net::DNS::Resolver::MSWin32 - MS Windows resolver class
 =cut
 
 
-use strict;
-use warnings;
 use base qw(Net::DNS::Resolver::Base);
-
 use Carp;
 
-our $Registry;
+use constant WINHLP => defined eval 'require Win32::IPHelper';	## no critic
+use constant WINREG => defined eval 'use Win32::TieRegistry qw(KEY_READ REG_DWORD); 1';	## no critic
 
-use constant WINHLP => defined eval 'require Win32::IPHelper';
-use constant WINREG => defined eval 'use Win32::TieRegistry qw(KEY_READ REG_DWORD); 1';
+our $Registry;
 
 
 sub _init {
@@ -41,12 +37,12 @@ sub _init {
 	}
 
 
-	my @nameservers = map $_->{IpAddress}, @{$FIXED_INFO->{DnsServersList}};
+	my @nameservers = map { $_->{IpAddress} } @{$FIXED_INFO->{DnsServersList}};
 	$defaults->nameservers(@nameservers);
 
 	my $devolution = 0;
 	my $domainname = $FIXED_INFO->{DomainName} || '';
-	my @searchlist = grep length, $domainname;
+	my @searchlist = grep {length} $domainname;
 
 	if (WINREG) {
 
@@ -93,6 +89,7 @@ sub _init {
 	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
 	$defaults->_read_env;
+	return;
 }
 
 

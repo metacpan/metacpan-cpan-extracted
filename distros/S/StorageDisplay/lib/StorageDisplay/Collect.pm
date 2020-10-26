@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data. No dependencies (but perl itself)
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 
 
 use Storable;
@@ -867,8 +867,8 @@ sub collect {
 
     $dh=$self->open_cmd_pipe_root(
         qw(lvm lvs --units B --reportformat json --all -o),
-        'lv_name,seg_size,segtype,seg_start,seg_pe_ranges,vgname');
-    $self->lvmjson2perl('pv', 'lvs', 0, [], $lvm, join("\n", <$dh>));
+        'lv_name,seg_size,segtype,seg_start,seg_pe_ranges,seg_le_ranges,vgname,devices,pool_lv,lv_parent');
+    $self->lvmjson2perl('lv', 'lvs', 0, [], $lvm, join("\n", <$dh>));
     close $dh;
 
     $dh=$self->open_cmd_pipe_root(
@@ -1297,7 +1297,8 @@ sub collect {
         $closure->($data);
         close $dh;
         $dh=$self->open_cmd_pipe(qw(find /sys/devices -name sas_address));
-        while(defined(my $line=<$dh>)) {
+        my @lines=<$dh>;
+        for my $line (sort @lines) {
             chomp($line);
             my $dh2 = $self->open_file($line)
                 or die "Cannot open $line: $!\n";
@@ -1508,6 +1509,7 @@ sub select {
         push @vms, $line;
     }
     close $dh;
+    @vms = sort @vms;
     return @vms;
 }
 
@@ -1600,7 +1602,7 @@ StorageDisplay::Collect - modules required to collect data. No dependencies (but
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 Main class, allows one to register collectors and run them (through the collect method)
 

@@ -1,9 +1,9 @@
 package Net::DNS::DomainName;
 
-#
-# $Id: DomainName.pm 1605 2017-11-27 11:37:40Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: DomainName.pm 1813 2020-10-08 21:58:40Z willem $)[2];
 
 
 =head1 NAME
@@ -14,11 +14,11 @@ Net::DNS::DomainName - DNS name representation
 
     use Net::DNS::DomainName;
 
-    $object = new Net::DNS::DomainName('example.com');
+    $object = Net::DNS::DomainName->new('example.com');
     $name = $object->name;
     $data = $object->encode;
 
-    ( $object, $next ) = decode Net::DNS::DomainName( \$data, $offset );
+    ( $object, $next ) = Net::DNS::DomainName->decode( \$data, $offset );
 
 =head1 DESCRIPTION
 
@@ -26,8 +26,8 @@ The Net::DNS::DomainName module implements the concrete representation
 of DNS domain names used within DNS packets.
 
 Net::DNS::DomainName defines methods for encoding and decoding wire
-format octet strings as defined in RFC1035. All other behaviour,
-including the new() constructor, is inherited from Net::DNS::Domain.
+format octet strings. All other behaviour is inherited from
+Net::DNS::Domain.
 
 The Net::DNS::DomainName1035 and Net::DNS::DomainName2535 packages
 implement disjoint domain name subtypes which provide the name
@@ -38,8 +38,6 @@ introduced by RFC3597.
 =cut
 
 
-use strict;
-use warnings;
 use base qw(Net::DNS::Domain);
 
 use integer;
@@ -50,7 +48,7 @@ use Carp;
 
 =head2 new
 
-    $object = new Net::DNS::DomainName('example.com');
+    $object = Net::DNS::DomainName->new('example.com');
 
 Creates a domain name object which identifies the domain specified
 by the character string argument.
@@ -66,18 +64,19 @@ as defined in RFC2535(8.1).
 =cut
 
 sub canonical {
-	join '', map( { tr /\101-\132/\141-\172/;
-					pack 'C a*', length($_), $_;
-					} shift->_wire ),
-			pack 'x';
+	my @label = shift->_wire;
+	for (@label) {
+		tr /\101-\132/\141-\172/;
+	}
+	return join '', map { pack 'C a*', length($_), $_ } @label, '';
 }
 
 
 =head2 decode
 
-    $object = decode Net::DNS::DomainName( \$buffer, $offset, $hash );
+    $object = Net::DNS::DomainName->decode( \$buffer, $offset, $hash );
 
-    ( $object, $next ) = decode Net::DNS::DomainName( \$buffer, $offset, $hash );
+    ( $object, $next ) = Net::DNS::DomainName->decode( \$buffer, $offset, $hash );
 
 Creates a domain name object which represents the DNS domain name
 identified by the wire-format data at the indicated offset within
@@ -119,7 +118,7 @@ sub decode {
 			croak 'corrupt compression pointer' unless $link < $offset;
 
 			# uncoverable condition false
-			$self->{origin} = $cache->{$link} ||= decode Net::DNS::DomainName( $buffer, $link, $cache );
+			$self->{origin} = $cache->{$link} ||= Net::DNS::DomainName->decode( $buffer, $link, $cache );
 			return wantarray ? ( $self, $index + 2 ) : $self;
 		}
 	}
@@ -137,24 +136,13 @@ for inclusion in a DNS packet buffer.
 =cut
 
 sub encode {
-	join '', map pack( 'C a*', length($_), $_ ), shift->_wire, '';
+	return join '', map { pack 'C a*', length($_), $_ } shift->_wire, '';
 }
 
 
 ########################################
 
-sub _wire {				## Generate list of wire-format labels
-	my $self = shift;
-
-	my $label = $self->{label};
-	my $origin = $self->{origin} || return (@$label);
-	return ( @$label, $origin->_wire );
-}
-
-
-########################################
-
-package Net::DNS::DomainName1035;
+package Net::DNS::DomainName1035;	## no critic ProhibitMultiplePackages
 our @ISA = qw(Net::DNS::DomainName);
 
 =head1 Net::DNS::DomainName1035
@@ -165,10 +153,10 @@ defined in RFC1035.
 
     use Net::DNS::DomainName;
 
-    $object = new Net::DNS::DomainName1035('compressible.example.com');
+    $object = Net::DNS::DomainName1035->new('compressible.example.com');
     $data   = $object->encode( $offset, $hash );
 
-    ( $object, $next ) = decode Net::DNS::DomainName1035( \$data, $offset );
+    ( $object, $next ) = Net::DNS::DomainName1035->decode( \$data, $offset );
 
 Note that RFC3597 implies that the RR types defined in RFC1035
 section 3.3 are the only types eligible for compression.
@@ -210,13 +198,13 @@ sub encode {
 		$hash->{$name} = $offset;
 		$offset += 1 + $length;
 	}
-	$data .= pack 'x';
+	return $data .= pack 'x';
 }
 
 
 ########################################
 
-package Net::DNS::DomainName2535;
+package Net::DNS::DomainName2535;	## no critic ProhibitMultiplePackages
 our @ISA = qw(Net::DNS::DomainName);
 
 =head1 Net::DNS::DomainName2535
@@ -230,10 +218,10 @@ types defined prior to RFC3597.
 
     use Net::DNS::DomainName;
 
-    $object = new Net::DNS::DomainName2535('incompressible.example.com');
+    $object = Net::DNS::DomainName2535->new('incompressible.example.com');
     $data   = $object->encode( $offset, $hash );
 
-    ( $object, $next ) = decode Net::DNS::DomainName2535( \$data, $offset );
+    ( $object, $next ) = Net::DNS::DomainName2535->decode( \$data, $offset );
 
 
 =head2 encode
@@ -249,8 +237,9 @@ canonical form defined in RFC2535(8.1).
 =cut
 
 sub encode {
-	return shift->canonical unless defined $_[2];
-	join '', map pack( 'C a*', length($_), $_ ), shift->_wire, '';
+	my ( $self, $offset, $hash ) = @_;
+	return $self->canonical unless defined $hash;
+	return join '', map { pack 'C a*', length($_), $_ } $self->_wire, '';
 }
 
 1;

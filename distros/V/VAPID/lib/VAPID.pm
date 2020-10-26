@@ -1,5 +1,5 @@
 package VAPID;
-use 5.006; use strict; use warnings; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Crypt::JWT qw(encode_jwt); use Crypt::PK::ECC; use URI;
 use MIME::Base64 qw/encode_base64url decode_base64url/;
 use base 'Import::Export';
@@ -190,7 +190,7 @@ VAPID - Voluntary Application Server Identification
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -214,6 +214,10 @@ Version 0.03
 		time + 60,
 		$enc
 	);
+
+=head1 DESCRIPTION
+
+VAPID, which stands for Voluntary Application Server Identity, is a new way to send and receive website push notifications. Your VAPID keys allow you to send web push campaigns without having to send them through a service like Firebase Cloud Messaging (or FCM). Instead, the application server can voluntarily identify itself to your web push provider.
 
 =head1 EXPORT
 

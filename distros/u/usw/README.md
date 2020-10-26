@@ -43,6 +43,8 @@ And writing like this doesn't work.
 
     no usw;
 
+Since version 0.12, it dies with warning.
+
 ## Automatically repairs bugs around file path which is encoded
 
 It replaces `$SIG{__WARN__}` or/and `$SIG{__DIE__}`
@@ -65,6 +67,7 @@ Since version 0.08, you don't have to care if the environment is a Windows or no
 - [binmode](https://perldoc.perl.org/functions/binmode)
 - [%SIG](https://perldoc.perl.org/variables/%25SIG)
 - [Win32](https://metacpan.org/pod/Win32)
+- [open](https://metacpan.org/pod/open)
 
 # LICENSE
 

@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,10 +6,10 @@ use warnings;
 	package Ask::STDIO;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
+	our $VERSION   = '0.012';
 	
 	use Moo;
-	use namespace::sweep;
+	use namespace::autoclean;
 	
 	with 'Ask::API';
 	
@@ -25,9 +25,10 @@ use warnings;
 	sub entry {
 		my ($self, %o) = @_;
 		$self->info(text => $o{text}) if exists $o{text};
-		my $line;
 		
-		if ($o{hide_text}) {
+		my ( $line, $tio );
+		
+		if ( $o{hide_text} and do { require POSIX; $tio = 'POSIX::Termios'->new } ) {
 			require POSIX;
 			my $tio = POSIX::Termios->new;
 			$tio->getattr(0);
@@ -46,17 +47,17 @@ use warnings;
 	
 	sub info {
 		my ($self, %o) = @_;
-		say STDOUT $o{text};
+		print STDOUT "$o{text}\n";
 	}
 	
 	sub warning {
 		my ($self, %o) = @_;
-		say STDERR "WARNING: $o{text}";
+		print STDERR "WARNING: $o{text}\n";
 	}
 	
 	sub error {
 		my ($self, %o) = @_;
-		say STDERR "ERROR: $o{text}";
+		print STDERR "ERROR: $o{text}\n";
 	}
 }
 
@@ -92,7 +93,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

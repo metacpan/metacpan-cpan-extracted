@@ -64,7 +64,7 @@ use Moo;
 
 use Types::Standard qw/Any ArrayRef HashRef Int Str/;
 
-use Unicode::GCString;
+use String::TtyLength 0.02 qw/ tty_width /;
 
 has alignment =>
 (
@@ -194,7 +194,7 @@ has widths =>
 	required => 0,
 );
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # ------------------------------------------------
 
@@ -202,7 +202,7 @@ sub _align_to_center
 {
 	my($self, $s, $width, $padding) = @_;
 	$s           ||= '';
-	my($s_width) = Unicode::GCString -> new($s) -> chars;
+	my($s_width) = tty_width($s);
 	my($left)    = int( ($width - $s_width) / 2);
 	my($right)   = $width - $s_width - $left;
 
@@ -216,7 +216,7 @@ sub _align_to_left
 {
 	my($self, $s, $width, $padding) = @_;
 	$s           ||= '';
-	my($s_width) = Unicode::GCString -> new($s || '') -> chars;
+	my($s_width) = tty_width($s);
 	my($right)   = $width - $s_width;
 
 	return (' ' x $padding) . $s . (' ' x ($right + $padding) );
@@ -229,7 +229,7 @@ sub _align_to_right
 {
 	my($self, $s, $width, $padding) = @_;
 	$s           ||= '';
-	my($s_width) = Unicode::GCString -> new($s || '') -> chars;
+	my($s_width) = tty_width($s);
 	my($left)    = $width - $s_width;
 
 	return (' ' x ($left + $padding) ) . $s . (' ' x $padding);
@@ -256,7 +256,7 @@ sub _clean_data
 		{
 			$s = $$data[$row][$column];
 			$s = defined($s)
-					? (length($s) == 0) # Unicode::GCString should not be necessary here.
+					? (length($s) == 0) # tty_width() should not be necessary here.
 						? ($empty == empty_as_minus)
 							? '-'
 							: ($empty == empty_as_text)
@@ -568,7 +568,7 @@ sub _gather_statistics
 			push @column, $$data[$row][$column];
 		}
 
-		push @max_widths, max map{Unicode::GCString -> new($_ || '') -> chars} @column;
+		push @max_widths, max map{ tty_width($_) } @column;
 	}
 
 	$self -> widths(\@max_widths);
@@ -1779,8 +1779,7 @@ L<Text::Wrap>
 
 L<Text::WrapI18N>
 
-L<Unicode::LineBreak>. The distro also includes L<Unicode::GCString>, which I use already in
-Text::Table::Manifold.
+L<Unicode::LineBreak>.
 
 L<UNICODE LINE BREAKING ALGORITHM|http://unicode.org/reports/tr14/>
 

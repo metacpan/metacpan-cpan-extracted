@@ -16,12 +16,13 @@ my @strings = (
         "Mi illumino di immenso",
 	"L'autore di questa libreria vive in Sicilia",
 	"try it against urls",
-        "http://google.com",
+        "http://google.com/path/to/workboard?abc=def&other=thing&foo=bar",
         "http://programming.reddit.com",
         "http://github.com/antirez/smaz/tree/master",
         "/media/hdb1/music/Alben/The Bla",
 );
 
+use MIME::Base64 qw/encode_base64url/;;
 for my $string (@strings) {
 	ok(my $comp = smaz_compress($string));
 	ok(my $decomp = smaz_decompress($comp));

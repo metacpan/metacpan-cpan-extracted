@@ -54,57 +54,144 @@ Version 0.6.1
 
 =cut
 
-our $VERSION = '0.6.1';
+our $VERSION = '0.6.2';
 
 
 =head1 SYNOPSIS
 
-	Note that this documentation is intended as a reference to the module.
+Note that this documentation is intended as a reference to the module.
 
-    Metabolomics::Banks::MaConDa is allowing to build a contaminant database usefull to clean your LC-MS filtered peak list:
-    	my $oBank = Metabolomics::Banks::MaConDa->new() ;								# init the bank object
-		$oBank->getContaminantsExtensiveFromSource() ;									# get theorical contaminants from the extensive version of MaConDa database
-		$oNewBank->buildTheoPeakBankFromContaminants($queryMode) ; 						# build theorical bank (ION | NEUTRAL)
+	Metabolomics::Banks::MaConDa is allowing to build a contaminant database usefull to clean your LC-MS filtered peak list:
+	
+		my $oBank = Metabolomics::Banks::MaConDa->new() ;			# init the bank object
+		$oBank->getContaminantsExtensiveFromSource() ;			# get theorical contaminants from the extensive version of MaConDa database
+		$oNewBank->buildTheoPeakBankFromContaminants($queryMode) ;			# build theorical bank (ION | NEUTRAL)
     
-    Metabolomics::Banks::BloodExposome is giving access to a local Blood Exposome database (Cf publication here L<https://doi.org/10.1289/EHP4713>):
-    	my $oBank = Metabolomics::Banks::BloodExposome->new() ;							# init the bank object
-		$oBank->getMetabolitesFromSource($source) ;										# get theorical metabolites from local database version
-	    $oBank->buildTheoPeakBankFromEntries($IonMode) ;								# produce the new theorical bank depending of chosen acquisition mode
+	Metabolomics::Banks::BloodExposome is giving access to a local Blood Exposome database (Cf publication here L<https://doi.org/10.1289/EHP4713>):
+	
+		my $oBank = Metabolomics::Banks::BloodExposome->new() ;			# init the bank object
+		$oBank->getMetabolitesFromSource($source) ;			# get theorical metabolites from local database version
+		$oBank->buildTheoPeakBankFromEntries($IonMode) ;			# produce the new theorical bank depending of chosen acquisition mode
     
-        Metabolomics::Banks::BloodExposome is giving access to a local Knapsack database (Cf publication here L<>):
-    	my $oBank = Metabolomics::Banks::Knapsack->new() ;							# init the bank object
-		$oBank->getKSMetabolitesFromSource($source) ;										# get theorical metabolites from local database version
-	    $oBank->buildTheoPeakBankFromKnapsack($IonMode) ;								# produce the new theorical bank depending of chosen acquisition mode
+	Metabolomics::Banks::Knapsack is giving access to a local Knapsack database (Cf publication here L<https://doi.org/10.1093/pcp/pcr165>):
+	
+		my $oBank = Metabolomics::Banks::Knapsack->new() ;
+		$oBank->getKSMetabolitesFromSource($source) ;
+		$oBank->buildTheoPeakBankFromKnapsack($IonMode) ;
     
-    Metabolomics::Banks::AbInitioFragments is used abinitio fragment, adduct and isotope annotation:
+	Metabolomics::Banks::AbInitioFragments is used abinitio fragment, adduct and isotope annotation:
     
-    	my $oBank = Metabolomics::Banks::AbInitioFragments->new() ;						# init the bank object
-		$oBank->getFragmentsFromSource() ;												# get theorical fragment/adduct/isotopes loses or adds
-		$oBank->buildTheoPeakBankFromFragments($mzMolecule, $mode, $stateMolecule) ;	# produce the new theorical bank from neutral (or not) molecule mass
+		my $oBank = Metabolomics::Banks::AbInitioFragments->new() ;			# init the bank object
+		$oBank->getFragmentsFromSource() ;			# get theorical fragment/adduct/isotopes loses or adds
+		$oBank->buildTheoPeakBankFromFragments($mzMolecule, $mode, $stateMolecule) ;			# produce the new theorical bank from neutral (or not) molecule mass
 		
-		
-	When resources are built, Metabolomics::Fragment::Annotation drive the annotation process:
-		$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ; 					# get exprimental mz listing to annotate
-		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;				# init analysis object
-		$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;						# compare theorical bank vs experimental bank
+	When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
+		$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			# get exprimental mz listing to annotate
+		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;			# init analysis object
+		$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;			# compare theorical bank vs experimental bank
     
 =encoding utf8
 
 =head1 DESCRIPTION
 
-	Metabolomics::Fragment::Annotation is a full package for Perl dev allowing MS fragments annotation with ab initio database, contaminant and public metabolites ressources.
+Metabolomics::Fragment::Annotation is a full package for Perl dev allowing MS fragments annotation with ab initio database, contaminant and public metabolites ressources.
+
+All resources used are described and available here:
+
+=head1 Metabolomics::Fragment::Annotation 0.6.x
+
+Metabolomics::Fragment::Annotation Perl package proposes several databases and algorithms to help metabolomics identification step:
+
+
+=head2 Using BloodExposome database
+
+The exposome represents the sum of all exposures during the life-span of an organism (from chemicals to microbes, viruses, radiation and other sources). Exposome chemicals are a major component of the exposome and are known to alter activities of cellular pathways and structures. In humans, exposome chemicals are transported throughout the body, linking chemical exposures to phenotypes such as such as cancer, ageing or diabetes. 
+The Blood Exposome Database (L<https://bloodexposome.org>) is a collection of chemical compounds and associated information that were automatically extracted by text mining the content of PubMed and PubChem databases.
+The database also unifies chemical lists from metabolomics, systems biology, environmental epidemiology, occupational expossure, toxiology and nutrition fields.
+This db is developped and supported by Dinesh Kumar Barupal and Oliver Fiehn.
+The database can be used in following applications - 1) to rank chemicals for building target libraries and expand metabolomics assays 2) to associate blood compounds with phenotypes 3) to get detailed descriptions about chemicals 4) to prepare lists of blood chemical lists by chemical classes and associated properties. 5) to interpret of metabolomics datasets from plasma or serum analyses 6) to prioritize chemicals for hazard assessments.
+
+Metabolomics::Banks::BloodExposome is giving access to a up to date Blood Exposome database stored in metabolomics::references package
 	
+	# init the bank object
+	
+	my $oBank = Metabolomics::Banks::BloodExposome->new() ;
+	
+	# Get theorical metabolites from local database version
+	
+	$oBank->getMetabolitesFromSource($source) ;			
+	
+	# produce the new theorical bank depending of chosen acquisition mode
+	
+	$oBank->buildTheoPeakBankFromEntries($IonMode) ;
+	
+When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
+	
+	# Get experimental mz listing to annotate
+	
+	$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			
+		
+	# init analysis object based on a Knapsack bank object
+	
+	my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;			
+	
+	# Compare theorical bank vs experimental bank with a delta on mz (Da or PPM are both supported)
+	
+	$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;
+	
+Intensity and retention time variables are not used in this annotation because the reference bank does not store such features.
 
-=head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
+=head2 Using KnapSack database
 
-=head2 METHOD new
+KnapSack database is a comprehensive Species-Metabolite Relationship Database with more than 53,000 metabolites and 128,000 metabolite-species pair entities.
+This db is developped and supported by Yukiko Nakamura, Hiroko Asahi, Md. Altaf-Ul-Amin, Ken Kurokawa and Shigehiko Kanaya.
+This resource is very useful for plant or natural product community trying to identify metabolites in samples analysed by LC-MS
+ 
+ 	# init the bank object
+	
+	my $oBank = Metabolomics::Banks::Knapsack->new()
+	
+	# get theorical metabolites from last database version (crawled by metabolomics::references package)			
+	
+	$oBank->getKSMetabolitesFromSource($source) ;
+	
+	# build potential candidates depending of your acquisition mode used on LC-MS instrument and produce the new theorical bank
+	# Only POSITIVE or NEGATIVE is today supported - - "BOTH" does not work
+	
+	$oBank->buildTheoPeakBankFromKnapsack($IonMode) ;
+
+When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
+	
+	# Get experimental mz listing to annotate
+	
+	$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			
+		
+	# init analysis object based on a Knapsack bank object
+	
+	my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;			
+	
+	# Compare theorical bank vs experimental bank with a delta on mz (Da or PPM are both supported)
+	
+	$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;
+	
+Intensity and retention time variables are not used in this annotation because the reference bank does not store such features.
+
+
+=head1 PUBLIC METHODS 
+
+
+=head2 Metabolomics::Fragment::Annotation
+
+
+=over 4
+
+=item new 
 
 	## Description : new
 	## Input : $self
 	## Ouput : bless $self ;
-	## Usage : new() ;
+	## Usage : my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
 
 =cut
 
@@ -127,7 +214,7 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD compareExpMzToTheoMzList
+=item compareExpMzToTheoMzList
 
 	## Description : comparing two lists of mzs (theo and experimental) with a mz delta
 	## Input : $deltaValue, $deltaType
@@ -244,7 +331,7 @@ sub compareExpMzToTheoMzList {
 ### END of SUB
 
 
-=head2 METHOD writeTabularWithPeakBankObject
+=item writeTabularWithPeakBankObject
 
 	## Description : write a full tabular file from a template and mapping peak bank objects features
 	## Input : $oBank, $templateTabular, $tabular
@@ -293,7 +380,7 @@ sub writeTabularWithPeakBankObject {
 ### END of SUB
 
 
-=head2 METHOD writeFullTabularWithPeakBankObject
+=item writeFullTabularWithPeakBankObject
 
 	## Description : write a output containing the input data and new column concerning annotation work
 	## Input : $oBank, $inputData, $templateTabular, $tabular
@@ -379,8 +466,13 @@ sub writeFullTabularWithPeakBankObject {
 }
 ### END of SUB
 
+=head1 PRIVATE METHODS
 
-=head2 METHOD _getPeaksToAnnotated
+=head2 Metabolomics::Fragment::Annotation
+
+=over 4
+
+=item PRIVATE_ONLY _getPeaksToAnnotated
 
 	## Description : get a specific list of peaks from the Annotation analysis object
 	## Input : $self, $type
@@ -412,7 +504,7 @@ sub _getPeaksToAnnotated {
 }
 ### END of SUB
 
-=head2 METHOD _getTEMPLATE_TABULAR_FIELDS
+=item PRIVATE_ONLY _getTEMPLATE_TABULAR_FIELDS
 
 	## Description : get all fields of the tabular template file
 	## Input : $template
@@ -447,7 +539,7 @@ sub _getTEMPLATE_TABULAR_FIELDS {
 }
 ### END of SUB
 
-=head2 METHOD _mapPeakListWithTemplateFields
+=item PRIVATE_ONLY _mapPeakListWithTemplateFields
 
 	## Description : map any PeakList with any template fields from tabular
 	## Input : $fields, $peakList
@@ -475,7 +567,7 @@ sub _mapPeakListWithTemplateFields {
 }
 ### END of SUB
 
-=head2 METHOD _mz_delta_conversion
+=item PRIVATE_ONLY _mz_delta_conversion
 
 	## Description : returns the minimum and maximum mass according to the delta
 	## Input : \$mass, \$delta_type, \$mz_delta
@@ -529,7 +621,7 @@ sub _mz_delta_conversion {
 ## END of SUB
 
 
-=head2 METHOD _computeMzDeltaInMmu
+=item PRIVATE_ONLY _computeMzDeltaInMmu
 
 	## Description : compute a delta (Da) between exp. mz and calc. mz
 	## based on http://www.waters.com/waters/en_GB/Mass-Accuracy-and-Resolution/nav.htm?cid=10091028&locale=en_GB
@@ -561,7 +653,7 @@ sub _computeMzDeltaInMmu {
 }
 ### END of SUB
 
-=head2 METHOD computeMzDeltaInPpm
+=item PRIVATE_ONLY computeMzDeltaInPpm
 
 	## Description : compute a delta (PPM) between exp. mz and calc. mz - Δm/Monoisotopic calculated exact mass ×106 
 	## Input : $expMz, $calcMz
@@ -599,7 +691,10 @@ __END__
 
 =head1 AUTHOR
 
-Franck Giacomoni, C<< <franck.giacomoni at inra.fr> >>
+Franck Giacomoni, C<< <franck.giacomoni at inrae.fr> >>
+Biological computing & Metabolomics
+INRAE - UMR 1019 Human Nutrition Unit – Metabolism Exploration Platform MetaboHUB – Clermont
+
 
 =head1 SEE ALSO
 
@@ -607,8 +702,8 @@ All information about FragNot should be find here: https://services.pfem.clermon
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-metabolomics-fragnot at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Metabolomics-FragNot>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-metabolomics-fragment-annotation at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Metabolomics-Fragment-Annotation>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -622,19 +717,19 @@ You can find documentation for this module with the perldoc command.
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Metabolomics-FragNot>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Metabolomics-Fragment-Annotation>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Metabolomics-FragNot>
+L<http://annocpan.org/dist/Metabolomics-Fragment-Annotation>
 
 =item * CPAN Ratings
 
-L<https://cpanratings.perl.org/d/Metabolomics-FragNot>
+L<https://cpanratings.perl.org/d/Metabolomics-Fragment-Annotation>
 
 =item * Search CPAN
 
-L<https://metacpan.org/release/Metabolomics-FragNot>
+L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =back
 
@@ -648,9 +743,9 @@ CeCILL Copyright (C) 2019 by Franck Giacomoni
 
 Initiated by Franck Giacomoni
 
-followed by INRA PFEM team
+followed by INRAE PFEM team
 
-Web Site = INRA PFEM
+Web Site = INRAE PFEM
 
 
 =cut

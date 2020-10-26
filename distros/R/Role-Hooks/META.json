@@ -62,7 +62,7 @@
    "provides" : {
       "Role::Hooks" : {
          "file" : "lib/Role/Hooks.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Role-Hooks/project"
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

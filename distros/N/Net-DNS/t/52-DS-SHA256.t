@@ -1,7 +1,9 @@
-# $Id: 52-DS-SHA256.t 1352 2015-06-02 08:13:13Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 52-DS-SHA256.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -13,7 +15,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -23,7 +25,7 @@ plan tests => 3;
 
 # Simple known-answer tests based upon the examples given in RFC4509, section 2.3
 
-my $dnskey = new Net::DNS::RR <<'END';
+my $dnskey = Net::DNS::RR->new( <<'END' );
 dskey.example.com. 86400 IN DNSKEY 256 3 5 (	AQOeiiR0GOMYkDshWoSKz9Xz
 						fwJr1AYtsmx3TGkJaNXVbfi/
 						2pHm822aJ5iI9BMzNXxeYCmZ
@@ -35,14 +37,14 @@ dskey.example.com. 86400 IN DNSKEY 256 3 5 (	AQOeiiR0GOMYkDshWoSKz9Xz
 						) ;  key id = 60485
 END
 
-my $ds = new Net::DNS::RR <<'END';
+my $ds = Net::DNS::RR->new( <<'END' );
 dskey.example.com. 86400 IN DS 60485 5 2   (	D4B7D520E7BB5F0F67674A0C
 						CEB1E3E0614B93C4F9E99B83
 						83F6A1E4469DA50A )
 END
 
 
-my $test = create Net::DNS::RR::DS( $dnskey, digtype => 'SHA256' );
+my $test = Net::DNS::RR::DS->create( $dnskey, digtype => 'SHA256' );
 
 is( $test->string, $ds->string, 'created DS matches RFC4509 example DS' );
 

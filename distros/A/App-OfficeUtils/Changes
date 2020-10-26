@@ -1,3 +1,8 @@
+0.004   2020-10-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: xls2csv.
+
+
 0.003   2020-08-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --return-output-file.

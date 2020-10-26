@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Moo;
 extends 'Chart::Kaleido';
@@ -36,7 +36,7 @@ my $default_plotlyjs = sub {
 
 has plotlyjs => (
     is      => 'ro',
-    isa     => Str->plus_coercions(Undef, $default_plotlyjs),
+    isa     => ( Str->plus_coercions( Undef, $default_plotlyjs ) | Undef ),
     default => $default_plotlyjs,
     coerce  => 1,
 );
@@ -169,7 +169,7 @@ Chart::Kaleido::Plotly - Export static images of Plotly charts using Kaleido
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

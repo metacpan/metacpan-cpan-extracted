@@ -1,10 +1,46 @@
 ==================================================
-Changes from 2019-07-22 00:00:00 +0000 to present.
+Changes from 2019-10-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.0.5 at 2020-07-21 15:31:59 +0000
+version 1.0.6 at 2020-10-25 09:16:28 +0000
 ------------------------------------------
+
+  Change: 9f5496a5fbb1aea50d80ca951ef3acbfe8b8316d
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-10-25 10:12:59 +0000
+
+    New version 
+
+  Change: b2fa44ee04a9e5e0d4dcc57698e1ee761febd95f
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-10-25 10:12:59 +0000
+
+    Move reference data that use an old version of the program 
+
+  Change: 611c09d459d782117aafe800a50eeb650b8af253
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-10-25 10:12:59 +0000
+
+    Update rawdata 
+
+  Change: 24d6a1c2b009955560c01a245c35d8c6bf81b915
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-10-25 10:12:59 +0000
+
+    limit variation in output 
+
+  Change: 2937a86d2c857e67e74c6862801cea993f497185
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-09-25 15:49:29 +0000
+
+    Better support for LVM links between PV/LV 
+
+  Change: 867fc4c6c9d43ee1b9f6b667d39545cd1d374ba5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-07-22 06:44:28 +0000
+
+    Require perl 4.14.0 for s///r syntaxe 
 
   Change: 16310bf7b26a770e17e445493338f061b38a7dcf
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

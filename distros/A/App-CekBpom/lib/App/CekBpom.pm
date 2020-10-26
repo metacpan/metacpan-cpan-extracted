@@ -1,9 +1,9 @@
 package App::CekBpom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-22'; # DATE
+our $DATE = '2020-10-23'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -22,12 +22,12 @@ my $url_prefix = "https://cekbpom.pom.go.id/index.php";
 my %known_search_types = (
     # name => [number in bpom website's form, shortcut alias if any]
     nomor_registrasi => [0],
-    nama_produk => [1, 'n'],
+    nama_produk => [1, 'p'],
     merk => [2, 'm'],
     jumlah_dan_kemasan => [3],
     bentuk_sediaan => [4],
     komposisi => [5],
-    nama_pendaftar => [6, 'p'],
+    nama_pendaftar => [6, 'P'],
     npwp_pendaftar => [7],
 );
 
@@ -337,7 +337,7 @@ App::CekBpom - Check BPOM products via the command-line (CLI interface for cekbp
 
 =head1 VERSION
 
-This document describes version 0.010 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-10-22.
+This document describes version 0.011 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-10-23.
 
 =head1 DESCRIPTION
 

@@ -1,21 +1,17 @@
 package Net::DNS::RR::HINFO;
 
-#
-# $Id: HINFO.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: HINFO.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::HINFO - DNS HINFO resource record
 
 =cut
-
 
 use integer;
 
@@ -26,22 +22,23 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset ) = @_;
 
-	( $self->{cpu}, $offset ) = decode Net::DNS::Text( $data, $offset );
-	( $self->{os},	$offset ) = decode Net::DNS::Text( $data, $offset );
+	( $self->{cpu}, $offset ) = Net::DNS::Text->decode( $data, $offset );
+	( $self->{os},	$offset ) = Net::DNS::Text->decode( $data, $offset );
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	join '', $self->{cpu}->encode, $self->{os}->encode;
+	return join '', $self->{cpu}->encode, $self->{os}->encode;
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	join ' ', $self->{cpu}->string, $self->{os}->string;
+	return join ' ', $self->{cpu}->string, $self->{os}->string;
 }
 
 
@@ -50,22 +47,23 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->cpu(shift);
 	$self->os(@_);
+	return;
 }
 
 
 sub cpu {
 	my $self = shift;
 
-	$self->{cpu} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{cpu}->value if $self->{cpu};
+	$self->{cpu} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{cpu} ? $self->{cpu}->value : undef;
 }
 
 
 sub os {
 	my $self = shift;
 
-	$self->{os} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{os}->value if $self->{os};
+	$self->{os} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{os} ? $self->{os}->value : undef;
 }
 
 
@@ -76,7 +74,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name HINFO cpu os');
+    $rr = Net::DNS::RR->new('name HINFO cpu os');
 
 =head1 DESCRIPTION
 

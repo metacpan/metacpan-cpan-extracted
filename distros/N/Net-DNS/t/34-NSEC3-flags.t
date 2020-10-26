@@ -1,7 +1,9 @@
-# $Id: 34-NSEC3-flags.t 1561 2017-04-19 13:08:13Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 34-NSEC3-flags.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -10,7 +12,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1;";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -18,7 +20,7 @@ foreach my $package (@prerequisite) {
 plan tests => 3;
 
 
-my $rr = new Net::DNS::RR( type => 'NSEC3' );
+my $rr = Net::DNS::RR->new( type => 'NSEC3' );
 
 
 my $optout = $rr->optout;

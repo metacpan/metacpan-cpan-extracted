@@ -1,9 +1,8 @@
 package Net::DNS::Resolver::cygwin;
 
-#
-# $Id: cygwin.pm 1719 2018-11-04 05:01:43Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1719 $)[1];
+use strict;
+use warnings;
+our $VERSION = (qw$Id: cygwin.pm 1811 2020-10-05 08:24:23Z willem $)[2];
 
 
 =head1 NAME
@@ -13,21 +12,19 @@ Net::DNS::Resolver::cygwin - Cygwin resolver class
 =cut
 
 
-use strict;
-use warnings;
 use base qw(Net::DNS::Resolver::Base);
+use IO::File;
 
 
 sub _getregkey {
-	my $key = join '/', @_;
+	my @key = @_;
 
-	my $filehandle;
-	open( $filehandle, '<', $key ) or return '';
-	my $value = <$filehandle>;
-	$value =~ s/\0+$// if $value;
-	close($filehandle);
+	my $handle = IO::File->new( join( '/', @key ), '<' ) or return '';
+	my $value  = <$handle> || '';
+	close($handle);
 
-	return $value || '';
+	$value =~ s/\0+$//;
+	return $value;
 }
 
 
@@ -60,7 +57,7 @@ sub _init {
 
 	# This is (probably) adequate on NT4
 	my @nt4nameservers;
-	foreach ( grep length, _getregkey( $root, 'NameServer' ), _getregkey( $root, 'DhcpNameServer' ) ) {
+	foreach ( grep {length} _getregkey( $root, 'NameServer' ), _getregkey( $root, 'DhcpNameServer' ) ) {
 		push @nt4nameservers, split m/[\s,]+/;
 		last;
 	}
@@ -76,7 +73,7 @@ sub _init {
 
 	my $dnsadapters = join '/', $root, 'DNSRegisteredAdapters';
 	if ( opendir( $dirhandle, $dnsadapters ) ) {
-		my @adapters = grep !/^\.\.?$/, readdir($dirhandle);
+		my @adapters = grep { !/^\.\.?$/ } readdir($dirhandle);
 		closedir($dirhandle);
 		foreach my $adapter (@adapters) {
 			my $ns = _getregkey( $dnsadapters, $adapter, 'DNSServerAddresses' );
@@ -89,7 +86,7 @@ sub _init {
 
 	my $interfaces = join '/', $root, 'Interfaces';
 	if ( opendir( $dirhandle, $interfaces ) ) {
-		my @ifacelist = grep !/^\.\.?$/, readdir($dirhandle);
+		my @ifacelist = grep { !/^\.\.?$/ } readdir($dirhandle);
 		closedir($dirhandle);
 		foreach my $iface (@ifacelist) {
 			my $ip = _getregkey( $interfaces, $iface, 'DhcpIPAddress' )
@@ -98,8 +95,7 @@ sub _init {
 			next if $ip eq '0.0.0.0';
 
 			foreach (
-				grep length,
-				_getregkey( $interfaces, $iface, 'NameServer' ),
+				grep {length} _getregkey( $interfaces, $iface, 'NameServer' ),
 				_getregkey( $interfaces, $iface, 'DhcpNameServer' )
 				) {
 				push @nameservers, split m/[\s,]+/;
@@ -132,6 +128,7 @@ sub _init {
 	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
 	$defaults->_read_env;
+	return;
 }
 
 

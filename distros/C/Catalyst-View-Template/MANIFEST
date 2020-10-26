@@ -1,0 +1,24 @@
+Changes
+LICENSE
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+Makefile.PL
+README
+boilerplate.pl
+lib/Catalyst/View/Template.pm
+lib/Catalyst/View/Template.pod
+t/basic.t
+t/lib/MyApp.pm
+t/lib/MyApp/Controller/Root.pm
+t/lib/MyApp/Template/Any.pm
+t/lib/MyApp/View/AltContentType.pm
+t/lib/MyApp/View/AppConfig.pm
+t/lib/MyApp/View/DynamicPath.pm
+t/lib/MyApp/View/PkgConfig.pm
+t/lib/MyApp/View/TemplateClass.pm
+t/lib/MyApp/alt_root/test
+t/lib/MyApp/alt_root/test_dynamic_path.tt
+t/lib/MyApp/root/heart.tt
+t/lib/MyApp/root/specified.tt
+t/lib/MyApp/root/test.tt

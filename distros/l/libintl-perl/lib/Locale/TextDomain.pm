@@ -66,7 +66,7 @@ use Cwd qw (abs_path);
 
 use vars qw ($VERSION);
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 require Exporter;
 
@@ -389,7 +389,7 @@ sub __find_domain ($)
 	if (defined $try_dirs) {
 		my $found_dir = '';
 		
-		TRYDIR: foreach my $dir (map { abs_path $_ } grep { -d $_ } @$try_dirs) {
+		TRYDIR: foreach my $dir (grep { -d $_ } @$try_dirs) {
 			# Is there a message catalog?  We have to search recursively
 			# for it.  Since globbing is reported to be buggy under
 			# MS-DOS, we roll our own version.
@@ -412,7 +412,7 @@ sub __find_domain ($)
 		
 		# If there was no success, this will fall back to the default search
 		# directories.
-		bindtextdomain $domain => $found_dir;
+		bindtextdomain $domain => abs_path $found_dir;
     }
     
     # The search has completed.

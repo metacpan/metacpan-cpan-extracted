@@ -1,0 +1,42 @@
+Catalyst::View::Template
+
+This is a Catalyst view class for the Template Toolkit with the following
+design objectives:
+
+* To be as close as possible to direct use of Template Toolkit
+
+* To nevertheless integrate seamlessly with Catalyst
+
+* To make all parts of its behaviour easy to augment
+
+  Taken together with the other objectives, this should make it easy to
+  repurpose for any view class in which you might want to use Template
+  Toolkit templates.
+
+This is a rethink of Catalyst::View::TT whose focus is on providing lots
+of Catalyst-specific features on top of Template Toolkit, which
+ultimately only make templates harder to reuse or test in other contexts.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

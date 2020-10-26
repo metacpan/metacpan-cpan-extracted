@@ -1,9 +1,9 @@
 package Net::DNS::Mailbox;
 
-#
-# $Id: Mailbox.pm 1605 2017-11-27 11:37:40Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Mailbox.pm 1813 2020-10-08 21:58:40Z willem $)[2];
 
 
 =head1 NAME
@@ -14,7 +14,7 @@ Net::DNS::Mailbox - DNS mailbox representation
 
     use Net::DNS::Mailbox;
 
-    $mailbox = new Net::DNS::Mailbox('user@example.com');
+    $mailbox = Net::DNS::Mailbox->new('user@example.com');
     $address = $mailbox->address;
 
 =head1 DESCRIPTION
@@ -22,11 +22,15 @@ Net::DNS::Mailbox - DNS mailbox representation
 The Net::DNS::Mailbox module implements a subclass of DNS domain name
 objects representing the DNS coded form of RFC822 mailbox address.
 
+The Net::DNS::Mailbox1035 and Net::DNS::Mailbox2535 packages
+implement mailbox representation subtypes which provide the name
+compression and canonicalisation specified by RFC1035 and RFC2535.
+These are necessary to meet the backward compatibility requirements
+introduced by RFC3597.
+
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
@@ -37,9 +41,9 @@ use base qw(Net::DNS::DomainName);
 
 =head2 new
 
-    $mailbox = new Net::DNS::Mailbox('John Doe <john.doe@example.com>');
-    $mailbox = new Net::DNS::Mailbox('john.doe@example.com');
-    $mailbox = new Net::DNS::Mailbox('john\.doe.example.com');
+    $mailbox = Net::DNS::Mailbox->new('John Doe <john.doe@example.com>');
+    $mailbox = Net::DNS::Mailbox->new('john.doe@example.com');
+    $mailbox = Net::DNS::Mailbox->new('john\.doe.example.com');
 
 Creates a mailbox object representing the RFC822 mail address specified by
 the character string argument. An encoded domain name is also accepted for
@@ -68,7 +72,7 @@ sub new {
 		s/\./\\046/g if @host;				# escape dots in local part
 	}
 
-	bless __PACKAGE__->SUPER::new( join '.', $mbox, @host ), $class;
+	return bless __PACKAGE__->SUPER::new( join '.', $mbox, @host ), $class;
 }
 
 
@@ -92,30 +96,22 @@ sub address {
 	s/[\\"]//g;						# delete \ "
 	s/^(.*)$/"$1"/ if /["(),:;<>@\[\\\]]/;			# quote local part
 	return $_ unless scalar(@label);
-	join '@', $_, join '.', @label;
+	return join '@', $_, join '.', @label;
 }
 
 
 ########################################
 
-=head1 DOMAIN NAME COMPRESSION AND CANONICALISATION
-
-The Net::DNS::Mailbox1035 and Net::DNS::Mailbox2535 subclass
-packages implement RFC1035 domain name compression and RFC2535
-canonicalisation.
-
-=cut
-
-package Net::DNS::Mailbox1035;
+package Net::DNS::Mailbox1035;		## no critic ProhibitMultiplePackages
 our @ISA = qw(Net::DNS::Mailbox);
 
-sub encode { &Net::DNS::DomainName1035::encode; }
+sub encode { return &Net::DNS::DomainName1035::encode; }
 
 
-package Net::DNS::Mailbox2535;
+package Net::DNS::Mailbox2535;		## no critic ProhibitMultiplePackages
 our @ISA = qw(Net::DNS::Mailbox);
 
-sub encode { &Net::DNS::DomainName2535::encode; }
+sub encode { return &Net::DNS::DomainName2535::encode; }
 
 
 1;

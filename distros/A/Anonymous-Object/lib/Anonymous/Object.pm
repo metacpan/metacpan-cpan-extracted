@@ -2,7 +2,7 @@ package Anonymous::Object;
 use strict;
 use warnings;
 use Data::Dumper;
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 our $UNIQUE;
 BEGIN {
@@ -382,7 +382,7 @@ Anonymous::Object - Generate Anonymous Objects
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -421,6 +421,10 @@ Quick summary of what the module does.
 	});
 
 	$anon->build;
+
+=head1 DESCRIPTION
+
+Anonymous object. Anonymous simply means nameless. An object which has no reference is known as an anonymous object. It can be used at the time of object creation only. If you have to use an object only once, an anonymous object is a good approach.
 
 =head1 SUBROUTINES/METHODS
 

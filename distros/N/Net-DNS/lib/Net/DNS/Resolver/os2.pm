@@ -1,9 +1,8 @@
 package Net::DNS::Resolver::os2;
 
-#
-# $Id: os2.pm 1568 2017-05-27 06:40:20Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1568 $)[1];
+use strict;
+use warnings;
+our $VERSION = (qw$Id: os2.pm 1811 2020-10-05 08:24:23Z willem $)[2];
 
 
 =head1 NAME
@@ -13,30 +12,29 @@ Net::DNS::Resolver::os2 - OS2 resolver class
 =cut
 
 
-use strict;
-use warnings;
 use base qw(Net::DNS::Resolver::Base);
 
 
 my $config_file = 'resolv';
 my @config_path = ( $ENV{ETC} || '/etc' );
-my @config_file = grep -f $_ && -r _, map "$_/$config_file", @config_path;
+my @config_file = grep { -f $_ && -r _ } map {"$_/$config_file"} @config_path;
 
 my $dotfile = '.resolv.conf';
-my @dotpath = grep defined, $ENV{HOME}, '.';
-my @dotfile = grep -f $_ && -o _, map "$_/$dotfile", @dotpath;
+my @dotpath = grep {$_} $ENV{HOME}, '.';
+my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} @dotpath;
 
 
 sub _init {
 	my $defaults = shift->_defaults;
 
-	map $defaults->_read_config_file($_), @config_file;
+	$defaults->_read_config_file($_) foreach @config_file;
 
 	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
-	map $defaults->_read_config_file($_), @dotfile;
+	$defaults->_read_config_file($_) foreach @dotfile;
 
 	$defaults->_read_env;
+	return;
 }
 
 

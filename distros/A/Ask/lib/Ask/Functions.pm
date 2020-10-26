@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,31 +6,28 @@ use warnings;
 	package Ask::Functions;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
+	our $VERSION   = '0.012';
 	
-	our $ASK;
+	use Exporter::Shiny qw(
+		info warning error entry question file_selection
+		single_choice multiple_choice
+	);
 	
-	sub _called {
-		$ASK //= do { require Ask; Ask->detect };
+	sub _exporter_validate_opts {
+		my ( $class, $opts ) = @_;
 		
-		my $method = shift;
-		unshift @_, 'text' if @_ % 2;
-		return $ASK->$method(@_);
+		$opts->{'backend'} ||= do { require Ask; 'Ask'->detect };
+		$opts->{'backend'}->is_usable or die;
 	}
-
-	my @F;
-	BEGIN {
-		@F = qw(
-			info warning error entry question file_selection
-			single_choice multiple_choice
-		);
-		
-		eval qq{
-			sub $_ { unshift \@_, $_; goto \\&_called };
-		} for @F;
+	
+	for my $f ( our @EXPORT_OK ) {
+		no strict 'refs';
+		*{"_generate_$f"} = sub {
+			my ( $class, $name, $args, $opts ) = @_;
+			my $backend = $opts->{'backend'};
+			return sub { $backend->$f( @_ % 2 ? ( text => @_ ) : @_ ) };
+		};
 	}
-
-	use Sub::Exporter::Progressive -setup => { exports => \@F };
 }
 
 1;
@@ -50,6 +47,13 @@ Ask::Functions - guts behind Ask's exported functions
 This module implements the exported functions for Ask. It is kept separate
 to avoid the functions polluting the namespace of the C<Ask> package.
 
+You can force the use of a particular backend.
+
+	use Ask::Tk;
+	use Ask { backend => Ask::Tk->new }, qw( question info );
+
+This module uses L<Exporter::Tiny>.
+
 =head1 BUGS
 
 Please report any bugs to
@@ -65,7 +69,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

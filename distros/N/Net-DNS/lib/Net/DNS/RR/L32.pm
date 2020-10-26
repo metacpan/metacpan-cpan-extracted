@@ -1,21 +1,17 @@
 package Net::DNS::RR::L32;
 
-#
-# $Id: L32.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: L32.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::L32 - DNS L32 resource record
 
 =cut
-
 
 use integer;
 
@@ -25,20 +21,21 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	@{$self}{qw(preference locator32)} = unpack "\@$offset n a4", $$data;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'n a4', $self->{preference}, $self->{locator32};
+	return pack 'n a4', $self->{preference}, $self->{locator32};
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	join ' ', $self->preference, $self->locator32;
+	return join ' ', $self->preference, $self->locator32;
 }
 
 
@@ -47,6 +44,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->preference(shift);
 	$self->locator32(shift);
+	return;
 }
 
 
@@ -54,7 +52,7 @@ sub preference {
 	my $self = shift;
 
 	$self->{preference} = 0 + shift if scalar @_;
-	$self->{preference} || 0;
+	return $self->{preference} || 0;
 }
 
 
@@ -64,12 +62,12 @@ sub locator32 {
 
 	$self->{locator32} = pack 'C* @4', split /\./, $prfx if defined $prfx;
 
-	join '.', unpack 'C4', $self->{locator32} if $self->{locator32};
+	return $self->{locator32} ? join( '.', unpack 'C4', $self->{locator32} ) : undef;
 }
 
 
 my $function = sub {			## sort RRs in numerically ascending order.
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+	return $Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
 };
 
 __PACKAGE__->set_rrsort_func( 'preference', $function );
@@ -84,9 +82,9 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IN L32 preference locator32');
+    $rr = Net::DNS::RR->new('name IN L32 preference locator32');
 
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	name	   => 'example.com',
 	type	   => 'L32',
 	preference => 10,

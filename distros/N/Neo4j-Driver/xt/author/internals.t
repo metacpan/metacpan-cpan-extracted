@@ -21,7 +21,7 @@ my $s = $driver->session;
 # suite, which is by default run on installation on every platform.
 # That's why these internals are in xt/author.
 
-use Test::More 0.96 tests => 7;
+use Test::More 0.96 tests => 6;
 use Test::Exception;
 use Test::Warnings qw(warnings :no_end_test);
 
@@ -54,21 +54,6 @@ subtest 'experimental: die_on_error = 0 for REST 404' => sub {
 	$t->{transport}->{die_on_error} = 0;
 	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';
 	lives_and { warnings { is $t->run('RETURN 42')->size, 0 } } 'HTTP 404';
-};
-
-
-subtest 'experimental: support for get_person in LOMS plugin' => sub {
-	plan tests => 6;
-	$r = $s->run('RETURN 1 AS one, 2 AS two')->single;
-	lives_and { is $r->{column_keys}->count, 2 } 'ResultColumns count 2';
-	lives_and { is $r->{column_keys}->add('three'), 2 } 'ResultColumns add';
-	lives_and { is $r->{column_keys}->count, 3 } 'ResultColumns count 3';
-	$r->{row}->[2] = 'Three!';
-	lives_and { is $r->get(2), 'Three!' } 'ResultColumns get col by index';
-	lives_and { is $r->get('three'), 'Three!' } 'ResultColumns get col by name';
-	throws_ok {
-		$s->run('')->_column_keys;
-	} qr/missing columns/i, 'result missing columns';
 };
 
 

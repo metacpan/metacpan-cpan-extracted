@@ -1,0 +1,9 @@
+Revision history for JSON-Lines
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03	2020/10/25
+	- Adds get_line and get_lines methods
+	- Update Makefile with links to github
+	- Fix "\n" logic to always append after encoding json

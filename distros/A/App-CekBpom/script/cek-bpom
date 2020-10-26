@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-22'; # DATE
+our $DATE = '2020-10-23'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,15 +40,15 @@ cek-bpom - Search BPOM products via https://cekbpom.pom.go.id/
 
 =head1 VERSION
 
-This document describes version 0.010 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-10-22.
+This document describes version 0.011 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-10-23.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % cek-bpom [--bentuk-sediaan] [--debug] [--format=name] [--json]
+ % cek-bpom [-P] [--bentuk-sediaan] [--debug] [--format=name] [--json]
      [--jumlah-dan-kemasan] [--komposisi] [--log-level=level] [-m] [--merk]
-     [-n] [--(no)naked-res] [--nama-pendaftar] [--nama-produk]
+     [--(no)naked-res] [--nama-pendaftar] [--nama-produk]
      [--nomor-registrasi] [--note=s] [--npwp-pendaftar] [-p]
      [--page-result[=program]] [--queries-json=s] [--query-log-file=s]
      [--query=s+] [--quiet] [--result-dump-dir=s] [--search-type=s+]
@@ -163,13 +163,13 @@ Shortcut for --search-type=merk.
 
 See C<--search-type>.
 
-=item B<-n>
+=item B<-p>
 
 Shortcut for --search-type=nama_produk.
 
 See C<--search-type>.
 
-=item B<-p>
+=item B<-P>
 
 Shortcut for --search-type=nama_pendaftar.
 

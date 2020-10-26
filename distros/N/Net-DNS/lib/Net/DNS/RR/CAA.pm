@@ -1,21 +1,17 @@
 package Net::DNS::RR::CAA;
 
-#
-# $Id: CAA.pm 1781 2020-05-13 08:58:25Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: CAA.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::CAA - DNS CAA resource record
 
 =cut
-
 
 use integer;
 
@@ -28,15 +24,16 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $limit = $offset + $self->{rdlength};
 	$self->{flags} = unpack "\@$offset C", $$data;
-	( $self->{tag}, $offset ) = decode Net::DNS::Text( $data, $offset + 1 );
-	$self->{value} = decode Net::DNS::Text( $data, $offset, $limit - $offset );
+	( $self->{tag}, $offset ) = Net::DNS::Text->decode( $data, $offset + 1 );
+	$self->{value} = Net::DNS::Text->decode( $data, $offset, $limit - $offset );
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'C a* a*', $self->flags, $self->{tag}->encode, $self->{value}->raw;
+	return pack 'C a* a*', $self->flags, $self->{tag}->encode, $self->{value}->raw;
 }
 
 
@@ -44,6 +41,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @rdata = ( $self->flags, $self->{tag}->string, $self->{value}->string );
+	return @rdata;
 }
 
 
@@ -53,6 +51,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->flags(shift);
 	$self->tag( lc shift );
 	$self->value(shift);
+	return;
 }
 
 
@@ -60,6 +59,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->flags(0);
+	return;
 }
 
 
@@ -67,31 +67,35 @@ sub flags {
 	my $self = shift;
 
 	$self->{flags} = 0 + shift if scalar @_;
-	$self->{flags} || 0;
+	return $self->{flags} || 0;
 }
 
 
 sub critical {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x0080 ) ^ ( 0x0080 | ( $_ || 0 ) ) if scalar @_;
-		return 0x0080 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x0080 | ( $_ || 0 );
+			$_ ^= 0x0080 unless shift;
+		}
 	}
+	return 0x0080 & ( $self->{flags} || 0 );
 }
 
 
 sub tag {
 	my $self = shift;
 
-	$self->{tag} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{tag}->value if $self->{tag};
+	$self->{tag} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{tag} ? $self->{tag}->value : undef;
 }
 
 
 sub value {
 	my $self = shift;
 
-	$self->{value} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{value}->value if $self->{value};
+	$self->{value} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{value} ? $self->{value}->value : undef;
 }
 
 
@@ -102,7 +106,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IN CAA flags tag value');
+    $rr = Net::DNS::RR->new('name IN CAA flags tag value');
 
 =head1 DESCRIPTION
 

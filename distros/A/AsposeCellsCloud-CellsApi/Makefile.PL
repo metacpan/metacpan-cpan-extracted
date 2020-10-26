@@ -4,7 +4,7 @@ WriteMakefile
 (
   'NAME' => 'AsposeCellsCloud::CellsApi',
   'LICENSE' => 'MIT',
-  'VERSION' => '20.9',
+  'VERSION' => '20.10',
   'ABSTRACT' =>'Aspose.Cells Cloud SDK',
   'AUTHOR' =>'Aspose.Cells',
   'PREREQ_PM' => {

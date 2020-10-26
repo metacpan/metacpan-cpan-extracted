@@ -1,12 +1,12 @@
-# $Id: 06-packet-unique-push.t 1561 2017-04-19 13:08:13Z willem $
+#!/usr/bin/perl
+# $Id: 06-packet-unique-push.t 1815 2020-10-14 21:55:18Z willem $
+#
 
 use strict;
+use warnings;
+use Test::More tests => 45;
 
-BEGIN {
-	use Test::More tests => 45;
-
-	use_ok('Net::DNS');
-}
+use_ok('Net::DNS');
 
 
 # Matching of RR name is not case sensitive
@@ -79,7 +79,7 @@ foreach my $test (@tests) {
 
 	while ( my ( $section, $count_meth ) = each %sections ) {
 
-		my $packet = new Net::DNS::Update($domain);
+		my $packet = Net::DNS::Update->new($domain);
 
 		$packet->$method( $section => @rrs );
 
@@ -93,7 +93,7 @@ foreach my $test (@tests) {
 	#
 	while ( my ( $section, $count_meth ) = each %sections ) {
 
-		my $packet = new Net::DNS::Update($domain);
+		my $packet = Net::DNS::Update->new($domain);
 
 		foreach my $rr (@rrs) {
 			$packet->$method( $section => $rr );

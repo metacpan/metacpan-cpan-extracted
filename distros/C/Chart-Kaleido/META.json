@@ -21,6 +21,7 @@
       },
       "develop" : {
          "requires" : {
+            "Chart::Plotly" : "0",
             "Test::Pod" : "1.41"
          }
       },
@@ -47,8 +48,6 @@
       },
       "test" : {
          "requires" : {
-            "Chart::Plotly::Plot" : "0",
-            "Chart::Plotly::Trace::Scatter" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -56,11 +55,11 @@
    "provides" : {
       "Chart::Kaleido" : {
          "file" : "lib/Chart/Kaleido.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Chart::Kaleido::Plotly" : {
          "file" : "lib/Chart/Kaleido/Plotly.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -69,7 +68,7 @@
          "url" : "https://github.com/stphnlyd/perl5-Chart-Kaleido.git"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"
    ],

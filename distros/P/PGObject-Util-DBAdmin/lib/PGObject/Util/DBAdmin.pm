@@ -8,6 +8,8 @@ use Capture::Tiny 'capture';
 use Carp;
 use DBI;
 use File::Temp;
+use Log::Any;
+use Scope::Guard qw(guard);
 
 use Moo;
 use namespace::clean;
@@ -19,11 +21,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.2.1
+version 1.4.0
 
 =cut
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.4.0';
 
 
 =head1 SYNOPSIS
@@ -206,6 +208,23 @@ notes in L</"CAPTURING">.
 
 has stdout => (is => 'ro');
 
+=head2 logger
+
+Provides a reference to the logger associated with the current instance. The
+logger uses C<ref $self> as its category, eliminating the need to create
+new loggers when deriving from this class.
+
+If you want to override the logger-instantiation behaviour, please implement
+the C<_build_logger> builder method in your derived class.
+
+=cut
+
+has logger => (is => 'ro', lazy => 1, builder => '_build_logger');
+
+sub _build_logger {
+    return Log::Any->get_logger(category => ref $_[0]);
+}
+
 
 our %helpers =
     (
@@ -276,31 +295,43 @@ sub _run_command {
         # overruled by highest priority: specified environment
         ($args{env}   ? %{$args{env}} : ()),
         );
+    $self->logger->debugf(
+        sub {
+            return 'Running with environment: '
+                . join(' ', map { qq|$_="$env{$_}"| } keys %env );
+        });
 
     # Any files created should be accessible only by the current user
     my $original_umask = umask 0077;
+    {
+        my $guard = guard { umask $original_umask; };
 
-    ($self->{stdout}, $self->{stderr}, $exit_code) = capture {
-        _run_with_env(%args, env => \%env);
-    };
-
-    if(defined ($args{errlog} // $args{stdout_log})) {
-        $self->_write_log_files(%args);
+        ($self->{stdout}, $self->{stderr}, $exit_code) = capture {
+            _run_with_env(%args, env => \%env);
+        };
+        if(defined ($args{errlog} // $args{stdout_log})) {
+            $self->_write_log_files(%args);
+        }
     }
 
-    # Reset original umask
-    umask $original_umask;
-
-    # Return true if system command is successful
-    return ($exit_code == 0);
-}
-
-
-sub _unlink_file_and_croak {
-    my ($self, $filename, $message) = @_;
-
-    unlink $filename or carp "error unlinking $filename $!";
-    croak $message;
+    if ($exit_code != 0) {
+        for my $filename (@{$args{unlink}}) {
+            unlink $filename or carp "error unlinking '$filename': $!";
+        }
+        my $command = join( ' ', map { "'$_'" } @{$args{command}} );
+        my $err;
+        if ($? == -1) {
+            $err = "$!";
+        }
+        elsif ($? & 127) {
+            $err = sprintf('died with signal %d', ($? & 127));
+        }
+        else {
+            $err = sprintf('exited with code %d', ($? >> 8));
+        }
+        croak "$args{error}; (command: $command): $err";
+    }
+    return 1;
 }
 
 
@@ -400,7 +431,10 @@ as C<PGObject::Util::DBAdmin->verify_helpers()>.
 =cut
 
 around 'BUILDARGS' => sub {
-    my ($orig, $class, %args) = @_;
+    my ($orig, $class, @args) = @_;
+
+    ## 1.1.0 compatibility code (allow a reference to be passed in)
+    my %args = (@args == 1 and ref $args[0]) ? (%{$args[0]}) : (@args);
 
     # deprecated field support code block
     if (exists $args{connect_data}) {
@@ -411,7 +445,7 @@ around 'BUILDARGS' => sub {
         # Don't overwrite connect_data, because it may be used elsewhere...
         $args{connect_data} = {
             %{$args{connect_data}},
-            dbname => $args{dbname}
+            dbname => ($args{dbname} // $args{connect_data}->{dbname})
         };
 
         # Now for legacy purposes hack the connection parameters into
@@ -568,8 +602,8 @@ sub create {
     # No need to pass the database name PGDATABASE will be set
     #  if a 'dbname' connection parameter was provided
 
-    $self->_run_command(command => [@command])
-        or croak 'error running command';
+    $self->_run_command(command => [@command],
+                        error   => 'error creating database');
 
     return 1;
 }
@@ -623,7 +657,7 @@ sub run_file {
         command    => [@command],
         errlog     => $args{errlog},
         stdout_log => $args{stdout_log},
-    ) or croak 'error running command';
+        error      => "error running file '$args{file}'");
 
     return $result;
 }
@@ -682,9 +716,9 @@ sub backup {
     defined $args{compress} and push(@command, '-Z', $args{compress});
     defined $args{format}   and push(@command, "-F$args{format}");
 
-    $self->_run_command(command => [@command])
-        or $self->_unlink_file_and_croak($output_filename,
-                                         'error running pg_dump command');
+    $self->_run_command(command => [@command],
+                        unlink  => [$output_filename],
+                        error   => 'error running pg_dump command');
 
     return $output_filename;
 }
@@ -732,9 +766,9 @@ sub backup_globals {
 
     my @command = ($helper_paths{pg_dumpall}, '-g', '-f', $output_filename);
 
-    $self->_run_command(command => [@command])
-        or $self->_unlink_file_and_croak($output_filename,
-                                         'error running pg_dumpall command');
+    $self->_run_command(command => [@command],
+                        unlink  => [$output_filename],
+                        error   => 'error running pg_dumpall command');
 
     return $output_filename;
 }
@@ -784,8 +818,8 @@ sub restore {
         push(@command, '-d', $self->connect_data->{dbname});
     push(@command, $args{file});
 
-    $self->_run_command(command => [@command])
-        or croak 'error running command';
+    $self->_run_command(command => [@command],
+                        error   => "error restoring from $args{file}");
 
     return 1;
 }
@@ -806,8 +840,8 @@ sub drop {
     my @command = ($helper_paths{dropdb});
     push(@command, $self->connect_data->{dbname});
 
-    $self->_run_command(command => [@command])
-        or croak 'error running command';
+    $self->_run_command(command => [@command],
+                        error   => 'error dropping database');
 
     return 1;
 }

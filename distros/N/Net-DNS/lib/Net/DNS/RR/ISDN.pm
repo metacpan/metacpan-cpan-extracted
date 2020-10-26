@@ -1,21 +1,17 @@
 package Net::DNS::RR::ISDN;
 
-#
-# $Id: ISDN.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: ISDN.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::ISDN - DNS ISDN resource record
 
 =cut
-
 
 use integer;
 
@@ -26,8 +22,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset ) = @_;
 
-	( $self->{address}, $offset ) = decode Net::DNS::Text( $data, $offset );
-	( $self->{sa},	    $offset ) = decode Net::DNS::Text( $data, $offset );
+	( $self->{address}, $offset ) = Net::DNS::Text->decode( $data, $offset );
+	( $self->{sa},	    $offset ) = Net::DNS::Text->decode( $data, $offset );
+	return;
 }
 
 
@@ -35,7 +32,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $address = $self->{address};
-	join '', $address->encode, $self->{sa}->encode;
+	return join '', $address->encode, $self->{sa}->encode;
 }
 
 
@@ -43,7 +40,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $address = $self->{address};
-	join ' ', $address->string, $self->{sa}->string;
+	return join ' ', $address->string, $self->{sa}->string;
 }
 
 
@@ -52,6 +49,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->address(shift);
 	$self->sa(@_);
+	return;
 }
 
 
@@ -59,26 +57,27 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->sa('');
+	return;
 }
 
 
 sub address {
 	my $self = shift;
 
-	$self->{address} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{address}->value if $self->{address};
+	$self->{address} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{address} ? $self->{address}->value : undef;
 }
 
 
 sub sa {
 	my $self = shift;
 
-	$self->{sa} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{sa}->value if $self->{sa};
+	$self->{sa} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{sa} ? $self->{sa}->value : undef;
 }
 
 
-sub ISDNaddress { &address; }
+sub ISDNaddress { return &address; }
 
 
 1;
@@ -88,7 +87,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name ISDN ISDNaddress sa');
+    $rr = Net::DNS::RR->new('name ISDN ISDNaddress sa');
 
 =head1 DESCRIPTION
 

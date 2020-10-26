@@ -1,21 +1,17 @@
 package Net::DNS::RR::DNAME;
 
-#
-# $Id: DNAME.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: DNAME.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::DNAME - DNS DNAME resource record
 
 =cut
-
 
 use integer;
 
@@ -25,7 +21,8 @@ use Net::DNS::DomainName;
 sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 
-	$self->{target} = decode Net::DNS::DomainName2535(@_);
+	$self->{target} = Net::DNS::DomainName2535->decode(@_);
+	return;
 }
 
 
@@ -33,7 +30,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $target = $self->{target};
-	$target->encode(@_);
+	return $target->encode(@_);
 }
 
 
@@ -41,7 +38,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $target = $self->{target};
-	$target->string;
+	return $target->string;
 }
 
 
@@ -49,18 +46,19 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	$self->target(shift);
+	return;
 }
 
 
 sub target {
 	my $self = shift;
 
-	$self->{target} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{target}->name if $self->{target};
+	$self->{target} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{target} ? $self->{target}->name : undef;
 }
 
 
-sub dname { &target; }						# uncoverable pod
+sub dname { return &target; }					# uncoverable pod
 
 
 1;
@@ -70,7 +68,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name DNAME target');
+    $rr = Net::DNS::RR->new('name DNAME target');
 
 =head1 DESCRIPTION
 

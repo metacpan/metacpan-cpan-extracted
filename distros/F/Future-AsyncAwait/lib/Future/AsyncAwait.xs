@@ -280,18 +280,18 @@ static void panic(char *fmt, ...)
  * them
  */
 
-static int magic_free(pTHX_ SV *sv, MAGIC *mg);
+static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg);
 
-static MGVTBL vtbl = {
+static MGVTBL vtbl_suspendedstate = {
   NULL, /* get   */
   NULL, /* set   */
   NULL, /* len   */
   NULL, /* clear */
-  magic_free,
+  suspendedstate_free,
 };
 
 #ifdef HAVE_DMD_HELPER
-static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
+static int dumpmagic_suspendedstate(pTHX_ const SV *sv, MAGIC *mg)
 {
   SuspendedState *state = (SuspendedState *)mg->mg_ptr;
   int ret = 0;
@@ -412,7 +412,7 @@ static SuspendedState *MY_suspendedstate_get(pTHX_ CV *cv)
   MAGIC *magic;
 
   for(magic = mg_find((SV *)cv, PERL_MAGIC_ext); magic; magic = magic->mg_moremagic)
-    if(magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &vtbl)
+    if(magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &vtbl_suspendedstate)
       return (SuspendedState *)magic->mg_ptr;
 
   return NULL;
@@ -430,12 +430,12 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   ret->padslots = NULL;
   ret->modhookdata = NULL;
 
-  sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl, (char *)ret, 0);
+  sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl_suspendedstate, (char *)ret, 0);
 
   return ret;
 }
 
-static int magic_free(pTHX_ SV *sv, MAGIC *mg)
+static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
 {
   SuspendedState *state = (SuspendedState *)mg->mg_ptr;
 
@@ -498,9 +498,13 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
               break;
 
             case SAVEt_PADSV_AND_MORTALIZE:
-            case SAVEt_SPTR:
               SvREFCNT_dec(saved->saved.sv);
               SvREFCNT_dec(saved->cur.sv);
+              break;
+
+            case SAVEt_SPTR:
+              SvREFCNT_dec(saved->saved.sv);
+              /* saved->cur.sv does not account for an extra refcount */
               break;
 
             default:
@@ -1808,7 +1812,8 @@ static OP *pp_enterasync(pTHX)
   PADOFFSET precancel_padix = PL_op->op_targ;
 
   if(precancel_padix) {
-    PAD_SVl(precancel_padix) = (SV *)newAV();
+    SV *sv = PAD_SVl(precancel_padix) = (SV *)newAV();
+    SvPADMY_on(sv);
     save_clearsv(&PAD_SVl(precancel_padix));
   }
 
@@ -2384,7 +2389,7 @@ BOOT:
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 #ifdef HAVE_DMD_HELPER
-  DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
+  DMD_SET_MAGIC_HELPER(&vtbl_suspendedstate, dumpmagic_suspendedstate);
 #endif
 
   boot_xs_parse_sublike(0.10);

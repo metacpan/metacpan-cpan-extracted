@@ -25,10 +25,12 @@ requires:
   Capture::Tiny: '0'
   DBD::Pg: '0'
   DBI: '0'
+  Log::Any: '0'
   Moo: '0'
+  Scope::Guard: '0'
   namespace::clean: '0'
   perl: '5.01'
 resources:
   repository: https://github.com/ledgersmb/PGObject-Util-DBAdmin.git
-version: v1.2.1
+version: v1.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

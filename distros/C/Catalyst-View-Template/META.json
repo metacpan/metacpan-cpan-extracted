@@ -1,0 +1,57 @@
+{
+   "abstract" : "Template Toolkit meets Catalyst",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-Template",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.7000",
+            "MRO::Compat" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst::Test" : "0",
+            "Template" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ap/Catalyst-View-Template/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Catalyst-View-Template.git",
+         "web" : "https://github.com/ap/Catalyst-View-Template"
+      }
+   },
+   "version" : "1.001",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2020
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

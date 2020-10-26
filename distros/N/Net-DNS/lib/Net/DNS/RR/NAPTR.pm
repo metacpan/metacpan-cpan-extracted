@@ -1,21 +1,17 @@
 package Net::DNS::RR::NAPTR;
 
-#
-# $Id: NAPTR.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: NAPTR.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::NAPTR - DNS NAPTR resource record
 
 =cut
-
 
 use integer;
 
@@ -28,10 +24,11 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset, @opaque ) = @_;
 
 	@{$self}{qw(order preference)} = unpack "\@$offset n2", $$data;
-	( $self->{flags},   $offset ) = decode Net::DNS::Text( $data, $offset + 4 );
-	( $self->{service}, $offset ) = decode Net::DNS::Text( $data, $offset );
-	( $self->{regexp},  $offset ) = decode Net::DNS::Text( $data, $offset );
-	$self->{replacement} = decode Net::DNS::DomainName2535( $data, $offset, @opaque );
+	( $self->{flags},   $offset ) = Net::DNS::Text->decode( $data, $offset + 4 );
+	( $self->{service}, $offset ) = Net::DNS::Text->decode( $data, $offset );
+	( $self->{regexp},  $offset ) = Net::DNS::Text->decode( $data, $offset );
+	$self->{replacement} = Net::DNS::DomainName2535->decode( $data, $offset, @opaque );
+	return;
 }
 
 
@@ -44,6 +41,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	$rdata .= $self->{service}->encode;
 	$rdata .= $self->{regexp}->encode;
 	$rdata .= $self->{replacement}->encode( $offset + length($rdata), @opaque );
+	return $rdata;
 }
 
 
@@ -51,7 +49,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @order = @{$self}{qw(order preference)};
-	my @rdata = ( @order, map $_->string, @{$self}{qw(flags service regexp replacement)} );
+	my @rdata = ( @order, map { $_->string } @{$self}{qw(flags service regexp replacement)} );
+	return @rdata;
 }
 
 
@@ -59,6 +58,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	foreach (qw(order preference flags service regexp replacement)) { $self->$_(shift) }
+	return;
 }
 
 
@@ -66,7 +66,7 @@ sub order {
 	my $self = shift;
 
 	$self->{order} = 0 + shift if scalar @_;
-	$self->{order} || 0;
+	return $self->{order} || 0;
 }
 
 
@@ -74,45 +74,45 @@ sub preference {
 	my $self = shift;
 
 	$self->{preference} = 0 + shift if scalar @_;
-	$self->{preference} || 0;
+	return $self->{preference} || 0;
 }
 
 
 sub flags {
 	my $self = shift;
 
-	$self->{flags} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{flags}->value if $self->{flags};
+	$self->{flags} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{flags} ? $self->{flags}->value : undef;
 }
 
 
 sub service {
 	my $self = shift;
 
-	$self->{service} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{service}->value if $self->{service};
+	$self->{service} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{service} ? $self->{service}->value : undef;
 }
 
 
 sub regexp {
 	my $self = shift;
 
-	$self->{regexp} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{regexp}->value if $self->{regexp};
+	$self->{regexp} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{regexp} ? $self->{regexp}->value : undef;
 }
 
 
 sub replacement {
 	my $self = shift;
 
-	$self->{replacement} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{replacement}->name if $self->{replacement};
+	$self->{replacement} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{replacement} ? $self->{replacement}->name : undef;
 }
 
 
 my $function = sub {
 	my ( $a, $b ) = ( $Net::DNS::a, $Net::DNS::b );
-	$a->{order} <=> $b->{order}
+	return $a->{order} <=> $b->{order}
 			|| $a->{preference} <=> $b->{preference};
 };
 
@@ -128,7 +128,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name NAPTR order preference flags service regexp replacement');
+    $rr = Net::DNS::RR->new('name NAPTR order preference flags service regexp replacement');
 
 =head1 DESCRIPTION
 

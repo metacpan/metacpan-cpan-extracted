@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use JSON;
 
-our $VERSION = 0.03;
+our $VERSION = '1.00';
 
 sub new {
 	return bless( {
@@ -205,7 +205,7 @@ Termux::API - Termux::API wrapper
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -226,6 +226,12 @@ Quick summary of what the module does.
 	my $termux = Termux::API->new();
 
 	$termux->toast('testing a toast');
+
+=head1 DESCRIPTION
+
+Termux is an Android terminal emulator and Linux environment application that works directly with no rooting or setup required. A minimal base system is installed automatically, additional packages are available using the package manager.
+
+Termux::API allows you to access Android and Chrome hardware features.
 
 =head1 SUBROUTINES/METHODS
 

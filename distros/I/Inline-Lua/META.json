@@ -56,7 +56,7 @@
          "web" : "https://github.com/hoelzro/inline-lua"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.17",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23"
 }
 

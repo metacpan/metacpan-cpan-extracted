@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,11 +6,12 @@ use warnings;
 	package Ask::Fallback;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
+	our $VERSION   = '0.012';
 	
 	use Moo;
 	use Carp qw(croak);
-	use namespace::sweep;
+	use Path::Tiny qw(path);
+	use namespace::autoclean;
 	
 	with 'Ask::API';
 	
@@ -20,17 +21,17 @@ use warnings;
 	
 	sub info {
 		my ($self, %o) = @_;
-		say STDERR $o{text};
+		print STDERR "$o{text}\n";
 	}
 	
 	sub warning {
 		my ($self, %o) = @_;
-		say STDERR "WARNING: $o{text}";
+		print STDERR "WARNING: $o{text}\n";
 	}
 	
 	sub error {
 		my ($self, %o) = @_;
-		say STDERR "ERROR: $o{text}";
+		print STDERR "ERROR: $o{text}\n";
 	}
 	
 	sub question
@@ -50,8 +51,8 @@ use warnings;
 	sub file_selection
 	{
 		my ($self, %o) = @_;
-		$o{multiple} and exists $o{default} and return @{$o{default}};
-		exists $o{default} and return $o{default};
+		$o{multiple} and exists $o{default} and return map path($_), @{$o{default}};
+		exists $o{default} and return path $o{default};
 		croak "file_selection (Ask::Fallback) with no default";
 	}
 	
@@ -115,7 +116,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

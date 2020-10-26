@@ -1,0 +1,8 @@
+Revision history for Log-JSON-Lines
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    2020/10/25
+	- Update Makefile JSON::Lines dependency
+	- Update Makefile with links to github.

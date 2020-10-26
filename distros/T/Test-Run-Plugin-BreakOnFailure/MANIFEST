@@ -1,6 +1,5 @@
 Build.PL
 Changes
-Dist/tag-release.pl
 LICENSE
 MANIFEST
 META.json
@@ -10,6 +9,8 @@ README
 inc/Test/Run/Builder.pm
 lib/Test/Run/CmdLine/Plugin/BreakOnFailure.pm
 lib/Test/Run/Plugin/BreakOnFailure.pm
+scripts/bump-version-number.pl
+scripts/tag-release.pl
 t/00-load.t
 t/01-run.t
 t/02-cmdline-run.t

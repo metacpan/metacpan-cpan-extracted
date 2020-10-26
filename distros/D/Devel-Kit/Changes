@@ -1,5 +1,11 @@
 Revision history for Devel-Kit
 
+0.82 Fri Oct 23 11:22:28 2020
+    - Update req ver of App::Kit to latest
+    - added s2, s3, and s5 for sha256, sha384, sha512 respectively (thanks bk2204!)
+    - rt 105980: fix `warnings enabled` test failures
+    - Address unicode escaping test failures
+
 0.81 Sun Dec 15 11:31:47 2013
     - add missing 0.8 Changes entry
     - update required ver of Module::Want to latest silly-DIE-handler safe version
@@ -21,7 +27,7 @@ Revision history for Devel-Kit
     - require min version of module want
     - Add _CODE.pm to manifest
     - not use 'Devel::Kit' in ni() test to avoid confusion
-    
+
 0.4  Sun Jul 14 23:13:37 2013
     - Add coderef stat dumping: ci()
     - Add name space dumping support: ni()

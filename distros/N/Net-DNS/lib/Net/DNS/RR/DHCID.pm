@@ -1,21 +1,17 @@
 package Net::DNS::RR::DHCID;
 
-#
-# $Id: DHCID.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: DHCID.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::DHCID - DNS DHCID resource record
 
 =cut
-
 
 use integer;
 
@@ -28,20 +24,22 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $size = $self->{rdlength} - 3;
 	@{$self}{qw(identifiertype digesttype digest)} = unpack "\@$offset nC a$size", $$data;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'nC a*', map $self->$_, qw(identifiertype digesttype digest);
+	return pack 'nC a*', map { $self->$_ } qw(identifiertype digesttype digest);
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my @base64 = split /\s+/, encode_base64( $self->_encode_rdata );
+	my @rdata = split /\s+/, encode_base64( $self->_encode_rdata );
+	return @rdata;
 }
 
 
@@ -51,6 +49,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $data = MIME::Base64::decode( join "", @_ );
 	my $size = length($data) - 3;
 	@{$self}{qw(identifiertype digesttype digest)} = unpack "n C a$size", $data;
+	return;
 }
 
 
@@ -77,7 +76,7 @@ sub identifiertype {
 	my $self = shift;
 
 	$self->{identifiertype} = 0 + shift if scalar @_;
-	$self->{identifiertype} || 0;
+	return $self->{identifiertype} || 0;
 }
 
 
@@ -85,7 +84,7 @@ sub digesttype {
 	my $self = shift;
 
 	$self->{digesttype} = 0 + shift if scalar @_;
-	$self->{digesttype} || 0;
+	return $self->{digesttype} || 0;
 }
 
 
@@ -93,7 +92,7 @@ sub digest {
 	my $self = shift;
 
 	$self->{digest} = shift if scalar @_;
-	$self->{digest} || "";
+	return $self->{digest} || "";
 }
 
 
@@ -104,10 +103,10 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('client.example.com. DHCID ( AAAB
+    $rr = Net::DNS::RR->new('client.example.com. DHCID ( AAAB
 	xLmlskllE0MVjd57zHcWmEH3pCQ6VytcKD//7es/deY=');
 
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	name	       => 'client.example.com',
 	type	       => 'DHCID',
 	digest	       => 'ObfuscatedIdentityData',

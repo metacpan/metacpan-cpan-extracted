@@ -1,5 +1,8 @@
 Revision history for Statistics-Sampler-Multinomial
 
+0.86 20201023
+  - A few micro-optimisations
+
 0.85 20201020
   - Statistics::Sampler::Multinomial: Add update_values, get_data, and get_sum methods
     AliasMethod is unchanged.  

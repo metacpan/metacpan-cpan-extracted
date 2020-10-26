@@ -1,7 +1,9 @@
-# $Id: 42-DNSKEY-flags.t 1367 2015-06-29 08:53:56Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 42-DNSKEY-flags.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -11,7 +13,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -19,18 +21,17 @@ foreach my $package (@prerequisite) {
 plan tests => 16;
 
 
-my $dnskey = new Net::DNS::RR <<'END';
+my $dnskey = Net::DNS::RR->new( <<'END' );
 RSASHA1.example.	IN	DNSKEY	256 3 5 (
 	AwEAAZHbngk6sMoFHN8fsYY6bmGR4B9UYJIqDp+mORLEH53Xg0f6RMDtfx+H3/x7bHTUikTr26bV
 	AqsxOs2KxyJ2Xx9RGG0DB9O4gpANljtTq2tLjvaQknhJpSq9vj4CqUtr6Wu152J2aQYITBoQLHDV
-	i8mIIunparIKDmhy8TclVXg9 ; Key ID = 1623
-	)
+	i8mIIunparIKDmhy8TclVXg9 ) ; Key ID = 1623
 END
 
 ok( $dnskey, 'set up DNSKEY record' );
 
 $dnskey->flags(0);
-foreach my $flag ( qw(sep zone revoke) ) {
+foreach my $flag (qw(sep zone revoke)) {
 	my $boolean = $dnskey->$flag(0);
 	ok( !$boolean, "Boolean $flag flag has expected value" );
 

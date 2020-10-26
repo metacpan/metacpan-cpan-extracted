@@ -2,8 +2,10 @@
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2019-05-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-26'; # DATE
+our $DIST = 'App-timecalc'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,6 +35,14 @@ _
         say "timecalc version $::VERSION";
         exit 0;
     }
+}
+
+sub help_msg {
+    join("",
+         "Type time expression into the prompt, e.g.: '19:10-20:45' (or '1910-2045'), '+02:05 -00:15' (or '+205 -0015').\n",
+         "For more details on available features, 'man timecalc'.\n",
+         "\n",
+     );
 }
 
 sub eval_loop {
@@ -97,12 +107,11 @@ sub eval_loop {
         #$attribs->{term_set} = ["", "", "", ""];
     }
 
+    print help_msg();
     while ( defined ($_ = $term->readline($prompt)) ) {
         my $res;
         if ($_ eq 'help' || $_ eq '?') {
-            say "Type time expression into the prompt, e.g.: 19:10-20:45 -00:05.";
-            say "For more details on available features, 'man timecalc'.";
-            say "";
+            print help_msg();
             next;
         } elsif ($_ eq 'exit' || $_ eq 'quit') {
             last;
@@ -140,7 +149,7 @@ timecalc - Time calculation
 
 =head1 VERSION
 
-This document describes version 0.003 of timecalc (from Perl distribution App-timecalc), released on 2019-05-25.
+This document describes version 0.005 of timecalc (from Perl distribution App-timecalc), released on 2020-10-26.
 
 =head1 SYNOPSIS
 
@@ -149,13 +158,25 @@ This document describes version 0.003 of timecalc (from Perl distribution App-ti
  > +01:20
  +01:20:00
 
+ > +0120                                     # ditto
+ +01:20:00
+
  > +01:20 -00:30
+ +00:50:00
+
+ > +0120 -0030                               # ditto
  +00:50:00
 
  > +01:00 17:00-18:10:01
  +02:10:01
 
+ > +0100 1700-181001                         # ditto
+ +02:10:01
+
  > +01:00 17:00-18:10 19:30-19:45 -00:04
+ +02:21:00
+
+ > +0100 1700-1810 1930-1945 -0004           # ditto
  +02:21:00
 
 =head1 DESCRIPTION
@@ -163,10 +184,10 @@ This document describes version 0.003 of timecalc (from Perl distribution App-ti
 This is a command-line utility to perform time calculations. Currently it
 undestands a combination of:
 
- +hh:mm(:ss)?
- -hh:mm
- -hh:mm(:ss)?
- hh:mm(:ss)? - hh:mm(:ss)?
+ +hh:?mm(:?ss)?
+ -hh:?mm
+ -hh:?mm(:?ss)?
+ hh:?mm(:?ss)? - hh:?mm(:?ss)?
 
 =head1 FAQ
 
@@ -200,7 +221,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

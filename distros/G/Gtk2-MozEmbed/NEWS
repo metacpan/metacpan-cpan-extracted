@@ -1,3 +1,8 @@
+Overview of changes in Gtk2::MozEmbed 0.11
+==========================================
+
+* Added '(DEPRECATION)' to '=head1 NAME' POD block
+
 Overview of changes in Gtk2::MozEmbed 0.10
 ==========================================
 

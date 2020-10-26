@@ -1,91 +1,40 @@
 package Text::VisualPrintf;
 
+our $VERSION = "3.09";
+
 use v5.10;
 use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "3.08";
-
 use Exporter 'import';
 our @EXPORT_OK = qw(&vprintf &vsprintf);
+
+use Data::Dumper;
+use Text::VisualPrintf::Transform;
 
 sub vprintf  { &printf (@_) }
 sub vsprintf { &sprintf(@_) }
 
+use Text::VisualWidth::PP;
 our $IS_TARGET = qr/[\e\P{ASCII}]/;
+our $VISUAL_WIDTH = \&Text::VisualWidth::PP::width;
 
 sub sprintf {
     my($format, @args) = @_;
-    my $uniqstr = _sub_uniqstr($format, @args)
-	or return CORE::sprintf $format, @args;
-    my @replace;
-    for my $arg (grep { defined } @args) {
-	next unless ( ( ref $IS_TARGET eq 'Regexp' and $arg =~ $IS_TARGET ) or
-		      ( ref $IS_TARGET eq 'CODE'   and $IS_TARGET->($arg) ) );
-	my($replace, $regex, $len) = $uniqstr->($arg) or next;
-	push @replace, [ $regex, $arg, $len ];
-	$arg = $replace;
-    }
-    local $_ = CORE::sprintf $format, @args;
-    while (@replace) {
-	my($regex, $orig, $len) = @{shift @replace};
-	# capture group is defined in $regex
-	s/$regex/_replace($1, $orig, $len)/e;
-    }
-    $_;
+    my $xform = Text::VisualPrintf::Transform
+	->new(except => $format,
+	      test   => $IS_TARGET,
+	      length => $VISUAL_WIDTH);
+    $xform->encode(@args) if $xform;
+    my $s = CORE::sprintf $format, @args;
+    $xform->decode($s) if $xform;
+    $s;
 }
 
 sub printf {
     my $fh = ref($_[0]) =~ /^(?:GLOB|IO::)/ ? shift : select;
     $fh->print(&sprintf(@_));
-}
-
-sub _replace {
-    my($matched, $orig, $len) = @_;
-    my $width = length $matched;
-    if ($width == $len) {
-	$orig;
-    } else {
-	_trim($orig, $width);
-    }
-}
-
-sub _trim {
-    my($str, $width) = @_;
-    use Text::ANSI::Fold;
-    state $f = Text::ANSI::Fold->new(padding => 1);
-    my($folded, $rest, $w) = $f->fold($str, width => $width);
-    if ($w <= $width) {
-	$folded;
-    } elsif ($width == 1) {
-	' '; # wide char not fit to single column
-    } else {
-	die "Panic"; # should never reach here...
-    }
-}
-
-use Text::VisualWidth::PP;
-our $VISUAL_WIDTH = \&Text::VisualWidth::PP::width;
-
-sub _sub_uniqstr {
-    local $_ = join '', @_;
-    my @a;
-    for my $i (1 .. 255) {
-	my $c = pack "C", $i;
-	next if $c =~ /\s/ || /\Q$c/;
-	push @a, $c;
-	last if @a >= @_;
-    }
-    return if @a < 2;
-    my $lead = do { local $" = ''; qr/[^\Q@a\E]*+/ };
-    my $b = pop @a;
-    return sub {
-	my $len = $VISUAL_WIDTH->(+shift);
-	return if $len < 1;
-	my $a = $a[ (state $n)++ % @a ];
-	( $a . ($b x ($len - 1)), qr/\G${lead}\K(\Q${a}${b}\E*)/, $len );
-    };
 }
 
 1;
@@ -110,7 +59,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 =head1 VERSION
 
-Version 3.08
+Version 3.09
 
 =head1 DESCRIPTION
 

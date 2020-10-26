@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Mp3;
-$File::Sticker::Writer::Mp3::VERSION = '0.9301';
+$File::Sticker::Writer::Mp3::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Writer::Mp3 - write and standardize meta-data from MP3 file
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -61,9 +61,28 @@ sub allowed_file {
     return 0;
 } # allowed_file
 
+=head2 allowed_fields
+
+If this writer can be used for the known and wanted fields, then this returns true.
+For this writer, this always returns true.
+
+    if ($writer->allowed_fields())
+    {
+	....
+    }
+
+=cut
+
+sub allowed_fields {
+    my $self = shift;
+
+    return 1;
+} # allowed_fields
+
 =head2 known_fields
 
 Returns the fields which this writer knows about.
+This writer has no limitations.
 
     my $known_fields = $writer->known_fields();
 
@@ -80,7 +99,11 @@ sub known_fields {
         genre=>'TEXT',
         song=>'TEXT',
         url=>'TEXT',
-        tags=>'MULTI'};
+        year=>'NUMBER',
+        track=>'NUMBER',
+        tags=>'MULTI',
+        %{$self->{wanted_fields}}
+    };
 } # known_fields
 
 =head2 readonly_fields
@@ -142,6 +165,14 @@ sub replace_one_field {
     {
         $mp3->genre_set($value);
     }
+    elsif ($field eq 'year')
+    {
+        $mp3->year_set($value);
+    }
+    elsif ($field eq 'track')
+    {
+        $mp3->track_set($value);
+    }
     elsif ($field eq 'author')
     {
         # use the 'composer' field
@@ -152,14 +183,14 @@ sub replace_one_field {
         # official audio file webpage
         $mp3->select_id3v2_frame_by_descr('WOAF', $value);
     }
-    elsif ($field eq 'tags')
+    else
     {
-        my $newtags = $value;
+        my $newval = $value;
         if (ref $value eq 'ARRAY')
         {
-            $newtags = join(',', @{$value});
+            $newval = join(',', @{$value});
         }
-        $mp3->select_id3v2_frame_by_descr('TXXX[tags]', $newtags);
+        $mp3->select_id3v2_frame_by_descr("TXXX[${field}]", $newval);
     }
     $mp3->update_tags();
 } # replace_one_field
@@ -210,9 +241,9 @@ sub delete_field_from_file {
         # official audio file webpage
         $mp3->select_id3v2_frame_by_descr('WOAF', '');
     }
-    elsif ($field eq 'tags')
+    else
     {
-        $mp3->select_id3v2_frame_by_descr('TXXX[tags]', '');
+        $mp3->select_id3v2_frame_by_descr("TXXX[${field}]", '');
     }
     $mp3->update_tags();
 } # delete_field_from_file

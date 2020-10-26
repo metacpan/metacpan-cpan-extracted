@@ -1,8 +1,10 @@
-# $Id: 05-TXT.t 1784 2020-05-24 19:27:13Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-TXT.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 52;
-
 
 use Net::DNS;
 
@@ -17,20 +19,20 @@ my $wire = '0e6172626974726172795f74657874';
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -40,13 +42,13 @@ my $wire = '0e6172626974726172795f74657874';
 	}
 
 
-	my $null    = new Net::DNS::RR("$name NULL")->encode;
-	my $empty   = new Net::DNS::RR("$name $type")->encode;
-	my $rxbin   = decode Net::DNS::RR( \$empty )->encode;
-	my $txtext  = new Net::DNS::RR("$name $type")->string;
-	my $rxtext  = new Net::DNS::RR($txtext)->encode;
+	my $null    = Net::DNS::RR->new("$name NULL")->encode;
+	my $empty   = Net::DNS::RR->new("$name $type")->encode;
+	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
+	my $txtext  = Net::DNS::RR->new("$name $type")->string;
+	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
 	my $hex3    = unpack 'H*', substr( $encoded, length $null );
@@ -59,7 +61,7 @@ my $wire = '0e6172626974726172795f74657874';
 	my @wire = unpack 'C*', $encoded;
 	$wire[length($empty) - 1]--;
 	my $wireformat = pack 'C*', @wire;
-	eval { decode Net::DNS::RR( \$wireformat ); };
+	eval { Net::DNS::RR->decode( \$wireformat ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
@@ -93,15 +95,15 @@ my $wire = '0e6172626974726172795f74657874';
 			q|\230\176\180\227\129\174\233\159\179| )
 		) {
 		my $string = "$name.	TXT	$testcase";
-		my $expect = new Net::DNS::RR($string)->string; # test for consistent parsing
-		my $result = new Net::DNS::RR($expect)->string;
+		my $expect = Net::DNS::RR->new($string)->string; # test for consistent parsing
+		my $result = Net::DNS::RR->new($expect)->string;
 		is( $result, $expect, $string );
 	}
 }
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 	foreach (@attr) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
@@ -110,3 +112,4 @@ my $wire = '0e6172626974726172795f74657874';
 
 exit;
 
+__END__

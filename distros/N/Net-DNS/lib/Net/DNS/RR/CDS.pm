@@ -1,21 +1,17 @@
 package Net::DNS::RR::CDS;
 
-#
-# $Id: CDS.pm 1586 2017-08-15 09:01:57Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1586 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: CDS.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR::DS);
+
 
 =head1 NAME
 
 Net::DNS::RR::CDS - DNS CDS resource record
 
 =cut
-
 
 use integer;
 
@@ -25,12 +21,13 @@ sub algorithm {
 	return $self->SUPER::algorithm($arg) if $arg;
 	return $self->SUPER::algorithm() unless defined $arg;
 	@{$self}{qw(keytag algorithm digtype)} = ( 0, 0, 0 );
+	return;
 }
 
 
 sub digtype {
 	my ( $self, $arg ) = @_;
-	$self->SUPER::digtype( $arg ? $arg : () );
+	return $self->SUPER::digtype( $arg ? $arg : () );
 }
 
 
@@ -48,7 +45,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name CDS keytag algorithm digtype digest');
+    $rr = Net::DNS::RR->new('name CDS keytag algorithm digtype digest');
 
 =head1 DESCRIPTION
 

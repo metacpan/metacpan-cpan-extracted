@@ -1,9 +1,8 @@
 package Net::DNS::Resolver::Base;
 
-#
-# $Id: Base.pm 1802 2020-08-31 13:44:20Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1802 $)[1];
+use strict;
+use warnings;
+our $VERSION = (qw$Id: Base.pm 1818 2020-10-18 15:24:42Z willem $)[2];
 
 
 #
@@ -26,29 +25,27 @@ our $VERSION = (qw$LastChangedRevision: 1802 $)[1];
 # [Revised March 2016, June 2018]
 
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';	## no critic
 require IO::Socket::INET unless USE_SOCKET_IP;
 
 use constant IPv6 => USE_SOCKET_IP;
 
 
 # If SOCKSified Perl, use TCP instead of UDP and keep the socket open.
-use constant SOCKS => scalar eval 'require Config; $Config::Config{usesocks}';
+use constant SOCKS => scalar eval { require Config; $Config::Config{usesocks}; };
 
 
 # Allow taint tests to be optimised away when appropriate.
-use constant UNCND => $] < 5.008;	## eval '${^TAINT}' breaks old compilers
-use constant TAINT => UNCND || eval '${^TAINT}';
-use constant TESTS => TAINT && defined eval 'require Scalar::Util';
+use constant TAINT => eval { ${^TAINT} };
+use constant TESTS => TAINT && defined eval { require Scalar::Util; };
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 use IO::File;
 use IO::Select;
 use IO::Socket;
+use Socket;
 
 use Net::DNS::RR;
 use Net::DNS::Packet;
@@ -102,18 +99,19 @@ my $warned;
 
 sub _deprecate {
 	carp join ' ', 'deprecated method;', pop(@_) unless $warned++;
+	return;
 }
 
 
 sub _untaint {
-	return TAINT ? map ref($_) ? [_untaint(@$_)] : do { /^(.*)$/; $1 }, @_ : @_;
+	return TAINT ? map { ref($_) ? [_untaint(@$_)] : do { /^(.*)$/; $1 } } @_ : @_;
 }
 
 
 # These are the attributes that the user may specify in the new() constructor.
 my %public_attr = (
-	map( ( $_ => $_ ), keys %{&_defaults}, qw(domain nameserver srcaddr) ),
-	map( ( $_ => 0 ), qw(nameserver4 nameserver6 srcaddr4 srcaddr6) ),
+	map { $_ => $_ } keys %{&_defaults}, qw(domain nameserver srcaddr),
+	map { $_ => 0 } qw(nameserver4 nameserver6 srcaddr4 srcaddr6),
 	);
 
 
@@ -167,22 +165,23 @@ sub _option {
 	my ( $self, $name, @value ) = @_;
 	my $attribute = $res_option{lc $name} || return;
 	push @value, 1 unless scalar @value;
-	$self->$attribute(@value);
+	return $self->$attribute(@value);
 }
 
 
 sub _read_env {				## read resolver config environment variables
 	my $self = shift;
 
-	$self->searchlist( map split, $ENV{LOCALDOMAIN} ) if defined $ENV{LOCALDOMAIN};
+	$self->searchlist( map {split} $ENV{LOCALDOMAIN} ) if defined $ENV{LOCALDOMAIN};
 
-	$self->nameservers( map split, $ENV{RES_NAMESERVERS} ) if defined $ENV{RES_NAMESERVERS};
+	$self->nameservers( map {split} $ENV{RES_NAMESERVERS} ) if defined $ENV{RES_NAMESERVERS};
 
-	$self->searchlist( map split, $ENV{RES_SEARCHLIST} ) if defined $ENV{RES_SEARCHLIST};
+	$self->searchlist( map {split} $ENV{RES_SEARCHLIST} ) if defined $ENV{RES_SEARCHLIST};
 
-	foreach ( map split, $ENV{RES_OPTIONS} || '' ) {
+	foreach ( map {split} $ENV{RES_OPTIONS} || '' ) {
 		$self->_option( split m/:/ );
 	}
+	return;
 }
 
 
@@ -190,7 +189,7 @@ sub _read_config_file {			## read resolver config file
 	my $self = shift;
 	my $file = shift;
 
-	my $filehandle = new IO::File( $file, '<' ) or croak "$file: $!";
+	my $filehandle = IO::File->new( $file, '<' ) or croak "$file: $!";
 
 	my @nameserver;
 	my @searchlist;
@@ -200,25 +199,25 @@ sub _read_config_file {			## read resolver config file
 		s/[;#].*$//;					# strip comments
 
 		/^nameserver/ && do {
-			my ( $keyword, @ip ) = grep defined, split;
+			my ( $keyword, @ip ) = grep {defined} split;
 			push @nameserver, @ip;
 			next;
 		};
 
 		/^domain/ && do {
-			my ( $keyword, $domain ) = grep defined, split;
+			my ( $keyword, $domain ) = grep {defined} split;
 			$self->domain($domain);
 			next;
 		};
 
 		/^search/ && do {
-			my ( $keyword, @domain ) = grep defined, split;
+			my ( $keyword, @domain ) = grep {defined} split;
 			push @searchlist, @domain;
 			next;
 		};
 
 		/^option/ && do {
-			my ( $keyword, @option ) = grep defined, split;
+			my ( $keyword, @option ) = grep {defined} split;
 			foreach (@option) {
 				$self->_option( split m/:/ );
 			}
@@ -229,6 +228,7 @@ sub _read_config_file {			## read resolver config file
 
 	$self->nameservers(@nameserver) if @nameserver;
 	$self->searchlist(@searchlist)	if @searchlist;
+	return;
 }
 
 
@@ -237,8 +237,8 @@ sub string {
 	$self = $self->_defaults unless ref($self);
 
 	my @nslist = $self->nameservers();
-	my ($force)  = ( grep( $self->{$_}, qw(force_v6 force_v4) ),   'force_v4' );
-	my ($prefer) = ( grep( $self->{$_}, qw(prefer_v6 prefer_v4) ), 'prefer_v4' );
+	my ($force)  = ( grep( { $self->{$_} } qw(force_v6 force_v4) ),   'force_v4' );
+	my ($prefer) = ( grep( { $self->{$_} } qw(prefer_v6 prefer_v4) ), 'prefer_v4' );
 	return <<END;
 ;; RESOLVER state:
 ;; nameservers	= @nslist
@@ -255,23 +255,27 @@ END
 }
 
 
-sub print { print &string; }
-
-
-sub domain {
-	my $self   = shift;
-	my ($head) = $self->searchlist(@_);
-	my @list   = grep defined, $head;
-	wantarray ? @list : "@list";
+sub print {
+	print &string;
+	return;
 }
 
+
 sub searchlist {
-	my $self = shift;
+	my ( $self, @domain ) = @_;
 	$self = $self->_defaults unless ref($self);
 
-	return $self->{searchlist} = [@_] unless defined wantarray;
-	$self->{searchlist} = [@_] if scalar @_;
-	my @searchlist = @{$self->{searchlist}};
+	if ( scalar(@domain) || !defined(wantarray) ) {
+		foreach (@domain) { $_ = Net::DNS::Domain->new($_)->name }
+		$self->{searchlist} = [@domain];
+	}
+
+	return ( @{$self->{searchlist}} );
+}
+
+sub domain {
+	my ($head) = &searchlist;
+	return wantarray ? ( grep {defined} $head ) : $head;
 }
 
 
@@ -280,7 +284,7 @@ sub nameservers {
 	$self = $self->_defaults unless ref($self);
 
 	my @ip;
-	foreach my $ns ( grep defined, @_ ) {
+	foreach my $ns ( grep {defined} @_ ) {
 		if ( _ipv4($ns) || _ipv6($ns) ) {
 			push @ip, $ns;
 
@@ -297,7 +301,7 @@ sub nameservers {
 				push @iplist, _cname_addr( $packet, $names );
 			}
 
-			my %unique = map( ( $_ => $_ ), @iplist );
+			my %unique = map { $_ => $_ } @iplist;
 
 			my @address = values(%unique);		# tainted
 			carp "unresolvable name: $ns" unless scalar @address;
@@ -307,8 +311,8 @@ sub nameservers {
 	}
 
 	if ( scalar(@_) || !defined(wantarray) ) {
-		my @ipv4 = grep _ipv4($_), @ip;
-		my @ipv6 = grep _ipv6($_), @ip;
+		my @ipv4 = grep { _ipv4($_) } @ip;
+		my @ipv6 = grep { _ipv6($_) } @ip;
 		$self->{nameservers} = \@ip;
 		$self->{nameserver4} = \@ipv4;
 		$self->{nameserver6} = \@ipv6;
@@ -329,7 +333,7 @@ sub nameservers {
 	return @nameservers;
 }
 
-sub nameserver { &nameservers; }
+sub nameserver { return &nameservers; }
 
 sub _cname_addr {
 
@@ -340,11 +344,11 @@ sub _cname_addr {
 	my $packet = shift || return @null;
 	my $names = shift;
 
-	map $names->{lc( $_->qname )}++, $packet->question;
-	map $names->{lc( $_->cname )}++, grep $_->can('cname'), $packet->answer;
+	$names->{lc( $_->qname )}++ foreach $packet->question;
+	$names->{lc( $_->cname )}++ foreach grep { $_->can('cname') } $packet->answer;
 
-	my @addr = grep $_->can('address'), $packet->answer;
-	map $_->address, grep $names->{lc( $_->name )}, @addr;
+	my @addr = grep { $_->can('address') } $packet->answer;
+	return map { $_->address } grep { $names->{lc( $_->name )} } @addr;
 }
 
 
@@ -352,11 +356,12 @@ sub replyfrom {
 	return shift->{replyfrom};
 }
 
-sub answerfrom { &replyfrom; }					# uncoverable pod
+sub answerfrom { return &replyfrom; }				# uncoverable pod
 
 
 sub _reset_errorstring {
 	shift->{errorstring} = '';
+	return;
 }
 
 sub errorstring {
@@ -398,7 +403,7 @@ sub search {
 		return $packet if $packet->header->ancount;
 	}
 
-	return undef;
+	return;
 }
 
 
@@ -418,7 +423,7 @@ sub send {
 	return $reply unless $reply->header->tc;
 
 	$self->_diag('packet truncated: retrying using TCP');
-	$self->_send_tcp( $packet, $packet_data );
+	return $self->_send_tcp( $packet, $packet_data );
 }
 
 
@@ -582,7 +587,7 @@ sub _bgsend_tcp {
 		return $socket;
 	}
 
-	return undef;
+	return;
 }
 
 
@@ -592,24 +597,24 @@ sub _bgsend_udp {
 	my $port = $self->{port};
 
 	foreach my $ip ( $self->nameservers ) {
-		my $dst_sockaddr = $self->_create_dst_sockaddr( $ip, $port );
+		my $sockaddr = $self->_create_dst_sockaddr( $ip, $port );
 		my $socket = $self->_create_udp_socket($ip) || next;
 
 		$self->_diag( 'bgsend', "[$ip]:$port" );
 
-		$socket->send( $packet_data, 0, $dst_sockaddr );
+		$socket->send( $packet_data, 0, $sockaddr );
 		$self->errorstring($!);
 
 		# handle failure to detect taint inside $socket->send()
 		die 'Insecure dependency while running with -T switch'
-				if TESTS && Scalar::Util::tainted($dst_sockaddr);
+				if TESTS && Scalar::Util::tainted($sockaddr);
 
 		my $expire = time() + $self->{udp_timeout};
 		${*$socket}{net_dns_bg} = [$expire, $packet];
 		return $socket;
 	}
 
-	return undef;
+	return;
 }
 
 
@@ -640,7 +645,7 @@ sub bgbusy {
 
 sub bgisready {				## historical
 	_deprecate('prefer  ! bgbusy(...)');			# uncoverable pod
-	!&bgbusy;
+	return !&bgbusy;
 }
 
 
@@ -648,7 +653,7 @@ sub bgread {
 	while (&bgbusy) {					# side effect: TCP retry
 		IO::Select->new( $_[1] )->can_read(0.02);	# reduce my CPU usage by 3 orders of magnitude
 	}
-	&_bgread;
+	return &_bgread;
 }
 
 
@@ -693,12 +698,12 @@ sub _accept_reply {
 
 	return if $query && $header->id != $query->header->id;
 
-	$self->errorstring( $header->rcode );			# historical quirk
+	return $self->errorstring( $header->rcode );			# historical quirk
 }
 
 
 sub axfr {				## zone transfer
-	eval {
+	return eval {
 		my $self = shift;
 
 		# initialise iterator state vector
@@ -740,13 +745,13 @@ sub axfr {				## zone transfer
 sub axfr_start {			## historical
 	_deprecate('prefer  $iterator = $self->axfr(...)');	# uncoverable pod
 	my $self = shift;
-	defined( $self->{axfr_iter} = $self->axfr(@_) );
+	return defined( $self->{axfr_iter} = $self->axfr(@_) );
 }
 
 
 sub axfr_next {				## historical
 	_deprecate('prefer  $iterator->()');			# uncoverable pod
-	shift->{axfr_iter}->();
+	return shift->{axfr_iter}->();
 }
 
 
@@ -921,25 +926,22 @@ sub _create_udp_socket {
 
 
 {
-	no strict qw(subs);
-	my @udp = (
-		flags	 => Socket::AI_NUMERICHOST,
-		protocol => Socket::IPPROTO_UDP,
-		socktype => SOCK_DGRAM
-		);
+	no strict 'subs';		## no critic ProhibitNoStrict
+	use constant AI_NUMERICHOST => Socket::AI_NUMERICHOST;
+	use constant IPPROTO_UDP    => Socket::IPPROTO_UDP;
 
-	my $ip4 = USE_SOCKET_IP ? {family => AF_INET,  @udp} : {};
-	my $ip6 = USE_SOCKET_IP ? {family => AF_INET6, @udp} : {};
+	my $ip4 = {family => AF_INET,  flags => AI_NUMERICHOST, protocol => IPPROTO_UDP, socktype => SOCK_DGRAM};
+	my $ip6 = {family => AF_INET6, flags => AI_NUMERICHOST, protocol => IPPROTO_UDP, socktype => SOCK_DGRAM};
 
 	sub _create_dst_sockaddr {	## create UDP destination sockaddr structure
 		my ( $self, $ip, $port ) = @_;
 
-		unless (USE_SOCKET_IP) {
-			return sockaddr_in( $port, inet_aton($ip) ) unless _ipv6($ip);
+		unless (USE_SOCKET_IP) {				# NB: errors raised in socket->send
+			return _ipv6($ip) ? undef : sockaddr_in( $port, inet_aton($ip) );
 		}
 
-		( grep ref, Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 ), {} )[0]->{addr}
-				if USE_SOCKET_IP;		# NB: errors raised in socket->send
+		my @addrinfo = Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 );
+		return ( grep {ref} @addrinfo, {} )[0]->{addr};
 	}
 }
 
@@ -948,18 +950,20 @@ sub _create_udp_socket {
 
 sub _ipv4 {
 	for (shift) {
-		return if m/[^.0-9]/;				# dots and digits only
+		last if m/[^.0-9]/;				# dots and digits only
 		return m/\.\d+\./;				# dots separated by digits
 	}
+	return;
 }
 
 sub _ipv6 {
 	for (shift) {
-		return	 unless m/:.*:/;			# must contain two colons
+		last unless m/:.*:/;				# must contain two colons
 		return 1 unless m/[^:0-9A-Fa-f]/;		# colons and hexdigits only
 		return 1 if m/^[:.0-9A-Fa-f]+\%.+$/;		# RFC4007 scoped address
 		return m/^[:0-9A-Fa-f]+:[.0-9]+$/;		# prefix : dotted digits
 	}
+	return;
 }
 
 
@@ -1008,25 +1012,25 @@ sub dnssec {
 sub force_v6 {
 	my $self = shift;
 	my $value = scalar(@_) ? $_[0] : $self->{force_v6};
-	$self->{force_v6} = $value ? do { $self->{force_v4} = 0; 1 } : 0;
+	return $self->{force_v6} = $value ? do { $self->{force_v4} = 0; 1 } : 0;
 }
 
 sub force_v4 {
 	my $self = shift;
 	my $value = scalar(@_) ? $_[0] : $self->{force_v4};
-	$self->{force_v4} = $value ? do { $self->{force_v6} = 0; 1 } : 0;
+	return $self->{force_v4} = $value ? do { $self->{force_v6} = 0; 1 } : 0;
 }
 
 sub prefer_v6 {
 	my $self = shift;
 	my $value = scalar(@_) ? $_[0] : $self->{prefer_v6};
-	$self->{prefer_v6} = $value ? do { $self->{prefer_v4} = 0; 1 } : 0;
+	return $self->{prefer_v6} = $value ? do { $self->{prefer_v4} = 0; 1 } : 0;
 }
 
 sub prefer_v4 {
 	my $self = shift;
 	my $value = scalar(@_) ? $_[0] : $self->{prefer_v4};
-	$self->{prefer_v4} = $value ? do { $self->{prefer_v6} = 0; 1 } : 0;
+	return $self->{prefer_v4} = $value ? do { $self->{prefer_v6} = 0; 1 } : 0;
 }
 
 
@@ -1048,6 +1052,7 @@ sub tsig {
 		Net::DNS::RR::TSIG->create(@_);
 	};
 	croak "${@}unable to create TSIG record" if $@;
+	return;
 }
 
 
@@ -1071,13 +1076,14 @@ sub udppacketsize {
 #
 sub make_query_packet {			## historical
 	_deprecate('see RT#37104');				# uncoverable pod
-	&_make_query_packet;
+	return &_make_query_packet;
 }
 
 
 sub _diag {				## debug output
 	my $self = shift;
-	print "\n;; @_\n" if $self->{debug};
+	return unless $self->{debug};
+	return print "\n;; @_\n"
 }
 
 
@@ -1085,17 +1091,17 @@ sub _diag {				## debug output
 	my $parse_dig = sub {
 		require Net::DNS::ZoneFile;
 
-		my $dug = new Net::DNS::ZoneFile( \*DATA );
+		my $dug = Net::DNS::ZoneFile->new( \*DATA );
 		my @rr	= $dug->read;
 
-		my @auth = grep $_->type eq 'NS', @rr;
+		my @auth = grep { $_->type eq 'NS' } @rr;
 		my %auth = map { lc $_->nsdname => 1 } @auth;
 		my %glue;
-		my @glue = grep $auth{lc $_->name}, @rr;
-		foreach ( grep $_->can('address'), @glue ) {
+		my @glue = grep { $auth{lc $_->name} } @rr;
+		foreach ( grep { $_->can('address') } @glue ) {
 			push @{$glue{lc $_->name}}, $_->address;
 		}
-		map @$_, values %glue;
+		map { @$_ } values %glue;
 	};
 
 	my @ip;
@@ -1119,7 +1125,7 @@ sub AUTOLOAD {				## Default method
 	$name =~ s/.*://;
 	croak qq[unknown method "$name"] unless $public_attr{$name};
 
-	no strict q/refs/;
+	no strict 'refs';		## no critic ProhibitNoStrict
 	*{$AUTOLOAD} = sub {
 		my $self = shift;
 		$self = $self->_defaults unless ref($self);

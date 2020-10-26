@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-TODO.pod
 dist.ini
 lib/Neo4j/Driver.pm
 lib/Neo4j/Driver/Record.pm
@@ -16,6 +15,7 @@ lib/Neo4j/Driver/ServerInfo.pm
 lib/Neo4j/Driver/Session.pm
 lib/Neo4j/Driver/StatementResult.pm
 lib/Neo4j/Driver/SummaryCounters.pm
+lib/Neo4j/Driver/TODO.pod
 lib/Neo4j/Driver/Transaction.pm
 lib/Neo4j/Driver/Transport/Bolt.pm
 lib/Neo4j/Driver/Transport/HTTP.pm
@@ -69,6 +69,7 @@ t/simulator/a5439a4fc2d686ec7a1e7a391bde49af.json
 t/simulator/b1a1d249e95abed861cdb99d452ff1a7.json
 t/simulator/b1e7c8fb9e6a2c25ddef0bff28f1fd0d.json
 t/simulator/b4d1522bea6dbd339ea2a04c1487be22.json
+t/simulator/b5d6bd820513ce8775d1b1c71a042cde.json
 t/simulator/bedf48911c566152c9af73670e9183a3.json
 t/simulator/bf6a29e67600824baa4559de2bbe5893.json
 t/simulator/c9d365dda9414c90db5565e3d88fa5e8.json

@@ -1,9 +1,8 @@
 package Net::DNS::Resolver::os390;
 
-#
-# $Id: os390.pm 1795 2020-07-27 11:00:29Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1795 $)[1];
+use strict;
+use warnings;
+our $VERSION = (qw$Id: os390.pm 1811 2020-10-05 08:24:23Z willem $)[2];
 
 
 =head1 NAME
@@ -13,13 +12,10 @@ Net::DNS::Resolver::os390 - IBM OS/390 resolver class
 =cut
 
 
-use strict;
-use warnings;
 use base qw(Net::DNS::Resolver::Base);
-
 use IO::File;
 
-local $ENV{PATH} = join ':', grep $_, qw(/bin /usr/bin), $ENV{PATH};
+local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $ENV{PATH};
 my $sysname = eval {`sysvar SYSNAME 2>/dev/null`} || '';
 chomp $sysname;
 
@@ -40,8 +36,8 @@ my @dataset = (				## plausible places to seek resolver configuration
 
 
 my $dotfile = '.resolv.conf';
-my @dotpath = grep defined, $ENV{HOME}, '.';
-my @dotfile = grep -f $_ && -o _, map "$_/$dotfile", @dotpath;
+my @dotpath = grep {$_} $ENV{HOME}, '.';
+my @dotfile = grep { -f $_ && -o _ } map {"$_/$dotfile"} @dotpath;
 
 
 my %option = (				## map MVS config option names
@@ -55,15 +51,15 @@ my %option = (				## map MVS config option names
 sub _init {
 	my $defaults = shift->_defaults;
 	my %stop;
-	local $ENV{PATH} = join ':', grep $_, qw(/bin /usr/bin), $ENV{PATH};
+	local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $ENV{PATH};
 
-	foreach my $dataset ( Net::DNS::Resolver::Base::_untaint( grep defined, @dataset ) ) {
+	foreach my $dataset ( Net::DNS::Resolver::Base::_untaint( grep {$_} @dataset ) ) {
 		eval {
 			local $_;
 			my @nameserver;
 			my @searchlist;
 
-			my $handle = new IO::File( qq[cat "$dataset" 2>/dev/null], '-|' )
+			my $handle = IO::File->new( qq[cat "$dataset" 2>/dev/null], '-|' )
 					or die "$dataset: $!";	# "cat" able to read MVS datasets
 
 			while (<$handle>) {
@@ -76,28 +72,28 @@ sub _init {
 
 
 				m/^(NSINTERADDR|nameserver)/i && do {
-					my ( $keyword, @ip ) = grep defined, split;
+					my ( $keyword, @ip ) = grep {defined} split;
 					push @nameserver, @ip;
 					next;
 				};
 
 
 				m/^(DOMAINORIGIN|domain)/i && do {
-					my ( $keyword, @domain ) = grep defined, split;
+					my ( $keyword, @domain ) = grep {defined} split;
 					$defaults->domain(@domain) unless $stop{domain}++;
 					next;
 				};
 
 
 				m/^search/i && do {
-					my ( $keyword, @domain ) = grep defined, split;
+					my ( $keyword, @domain ) = grep {defined} split;
 					push @searchlist, @domain;
 					next;
 				};
 
 
 				m/^option/i && do {
-					my ( $keyword, @option ) = grep defined, split;
+					my ( $keyword, @option ) = grep {defined} split;
 					foreach (@option) {
 						my ( $attribute, @value ) = split m/:/;
 						$defaults->_option( $attribute, @value )
@@ -108,7 +104,7 @@ sub _init {
 
 
 				m/^RESOLVEVIA/i && do {
-					my ( $keyword, $value ) = grep defined, split;
+					my ( $keyword, $value ) = grep {defined} split;
 					$defaults->_option( 'usevc', $value eq 'TCP' )
 							unless $stop{usevc}++;
 					next;
@@ -116,7 +112,7 @@ sub _init {
 
 
 				m/^\w+\s*/ && do {
-					my ( $keyword, @value ) = grep defined, split;
+					my ( $keyword, @value ) = grep {defined} split;
 					my $attribute = $option{uc $keyword} || next;
 					$defaults->_option( $attribute, @value )
 							unless $stop{$attribute}++;
@@ -133,9 +129,10 @@ sub _init {
 
 	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
-	map $defaults->_read_config_file($_), @dotfile;
+	$defaults->_read_config_file($_) foreach @dotfile;
 
 	$defaults->_read_env;
+	return;
 }
 
 

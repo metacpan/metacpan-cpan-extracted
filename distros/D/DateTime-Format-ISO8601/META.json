@@ -83,11 +83,11 @@
    "provides" : {
       "DateTime::Format::ISO8601" : {
          "file" : "lib/DateTime/Format/ISO8601.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "DateTime::Format::ISO8601::Types" : {
          "file" : "lib/DateTime/Format/ISO8601/Types.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/houseabsolute/DateTime-Format-ISO8601"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -132,7 +132,7 @@
                }
             },
             "name" : "@DROLSKY/Git::GatherDir",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -864,14 +864,15 @@
                }
             },
             "name" : "@DROLSKY/Git::Check",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%V%n%n%c"
+                  "commit_msg" : "v%V%n%n%c",
+                  "signoff" : 0
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -896,7 +897,7 @@
                }
             },
             "name" : "@DROLSKY/Commit generated files",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -905,7 +906,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.14",
+                  "tag" : "v0.15",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -918,7 +919,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Tag",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -935,7 +936,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Push",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -957,7 +958,8 @@
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "Bump version after release"
+                  "commit_msg" : "Bump version after release",
+                  "signoff" : 0
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -978,7 +980,7 @@
                }
             },
             "name" : "@DROLSKY/Commit version bump",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -995,7 +997,7 @@
                }
             },
             "name" : "@DROLSKY/Push version bump",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::MakeMaker",

@@ -1,21 +1,17 @@
 package Net::DNS::RR::URI;
 
-#
-# $Id: URI.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: URI.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::URI - DNS URI resource record
 
 =cut
-
 
 use integer;
 
@@ -29,7 +25,8 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $limit = $offset + $self->{rdlength};
 	@{$self}{qw(priority weight)} = unpack( "\@$offset n2", $$data );
 	$offset += 4;
-	$self->{target} = decode Net::DNS::Text( $data, $offset, $limit - $offset );
+	$self->{target} = Net::DNS::Text->decode( $data, $offset, $limit - $offset );
+	return;
 }
 
 
@@ -37,7 +34,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $target = $self->{target};
-	pack 'n2 a*', @{$self}{qw(priority weight)}, $target->raw;
+	return pack 'n2 a*', @{$self}{qw(priority weight)}, $target->raw;
 }
 
 
@@ -45,14 +42,16 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $target = $self->{target};
-	my @rdata = ( $self->priority, $self->weight, $target->string );
+	my @rdata  = ( $self->priority, $self->weight, $target->string );
+	return @rdata;
 }
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
-	map $self->$_(shift), qw(priority weight target);
+	$self->$_(shift) foreach qw(priority weight target);
+	return;
 }
 
 
@@ -60,7 +59,7 @@ sub priority {
 	my $self = shift;
 
 	$self->{priority} = 0 + shift if scalar @_;
-	$self->{priority} || 0;
+	return $self->{priority} || 0;
 }
 
 
@@ -68,22 +67,22 @@ sub weight {
 	my $self = shift;
 
 	$self->{weight} = 0 + shift if scalar @_;
-	$self->{weight} || 0;
+	return $self->{weight} || 0;
 }
 
 
 sub target {
 	my $self = shift;
 
-	$self->{target} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{target}->value if $self->{target};
+	$self->{target} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{target} ? $self->{target}->value : undef;
 }
 
 
 # order RRs by numerically increasing priority, decreasing weight
 my $function = sub {
 	my ( $a, $b ) = ( $Net::DNS::a, $Net::DNS::b );
-	$a->{priority} <=> $b->{priority}
+	return $a->{priority} <=> $b->{priority}
 			|| $b->{weight} <=> $a->{weight};
 };
 
@@ -99,7 +98,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name URI priority weight target');
+    $rr = Net::DNS::RR->new('name URI priority weight target');
 
 =head1 DESCRIPTION
 

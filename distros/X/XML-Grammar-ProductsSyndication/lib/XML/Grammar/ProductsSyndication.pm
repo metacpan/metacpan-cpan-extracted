@@ -5,17 +5,17 @@ use strict;
 
 use 5.008;
 
-use File::Spec;
+use File::Spec ();
 
-use XML::Grammar::ProductsSyndication::ConfigData;
+use XML::Grammar::ProductsSyndication::ConfigData ();
 
-use XML::LibXML;
-use XML::LibXSLT;
-use XML::Amazon;
-use LWP::UserAgent;
-use Imager;
+use XML::LibXML ();
+use XML::LibXSLT ();
+use XML::Amazon ();
+use LWP::UserAgent ();
+use Imager ();
 
-use base 'Class::Accessor';
+use parent 'Class::Accessor';
 
 __PACKAGE__->mk_accessors(qw(
     _data_dir
@@ -32,11 +32,11 @@ XML::Grammar::ProductsSyndication - an XML Grammar for ProductsSyndication.
 
 =head1 VERSION
 
-Version 0.0405
+Version 0.0406
 
 =cut
 
-our $VERSION = '0.0405';
+our $VERSION = '0.0406';
 
 =head1 SYNOPSIS
 
@@ -436,10 +436,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/XML::Grammar::ProductsSyndication>
 
 =item * CPAN Ratings
 

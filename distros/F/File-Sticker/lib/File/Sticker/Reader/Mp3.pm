@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Mp3;
-$File::Sticker::Reader::Mp3::VERSION = '0.9301';
+$File::Sticker::Reader::Mp3::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Reader::Mp3 - read and standardize meta-data from MP3 file
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,7 @@ sub allowed_file {
 =head2 known_fields
 
 Returns the fields which this reader knows about.
+This writer has no limitations.
 
     my $known_fields = $reader->known_fields();
 
@@ -79,9 +80,13 @@ sub known_fields {
         author=>'TEXT',
         description=>'TEXT',
         song=>'TEXT',
-        url=>'TEXT',
         genre=>'TEXT',
-        tags=>'MULTI'};
+        url=>'TEXT',
+        year=>'NUMBER',
+        track=>'NUMBER',
+        tags=>'MULTI',
+        %{$self->{wanted_fields}}
+        };
 } # known_fields
 
 =head2 read_meta
@@ -100,82 +105,66 @@ sub read_meta {
     my $mp3 = MP3::Tag->new($filename);
     my %meta = ();
 
-    # album => dublincore.title
-    # title => song
-    # artist => dublincore.creator
-    # comment => dublincore.description
-    # Skip the following fields: track
-    my $comment;
-    my $info = $mp3->autoinfo(1);
-    my @tags = ();
-    foreach my $key (sort keys %{$info})
+    my $known_fields = $self->known_fields();
+    foreach my $field (sort keys %{$known_fields})
     {
-        my $val = $info->{$key};
-        say STDERR "$key=", $val->[0] if $self->{verbose} > 2;
-        if ($key eq 'album')
+        if ($field eq 'title')
         {
-            $meta{'title'} = $val->[0];
+            $meta{'title'} = $mp3->album();
         }
-        elsif ($key =~ /song|title/)
+        elsif ($field eq 'song')
         {
-            $meta{'song'} = $val->[0];
+            $meta{'song'} = $mp3->title();
         }
-        elsif ($key eq 'artist')
+        elsif ($field eq 'description')
         {
-            $meta{'creator'} = $val->[0];
-        }
-        elsif ($key eq 'comment')
-        {
-            $meta{'description'} = $val->[0];
-        }
-        elsif ($key eq 'year')
-        {
-            $meta{'year'} = $val->[0];
-        }
-        elsif ($key eq 'genre')
-        {
-            $meta{'genre'} = $val->[0];
-        }
-        elsif ($key =~ /track/)
-        {
-            # skip
-        }
-        else
-        {
-            if ($val->[0])
+            $meta{'description'} = $mp3->comment();
+            if (!$meta{description}) # try the COMM field
             {
-                my $tag = $key . "-" . $val->[0];
-                $tag =~ s/\&/and/g;
-                $tag =~ s/[^-_\s0-9a-zA-Z]//g;
-                $tag =~ s/\s+/_/g; # replace spaces with underscores
-                $tag =~ s/_-_/-/g; # replace _-_ with -
-                push @tags, $tag;
+                $meta{$field} = $mp3->select_id3v2_frame_by_descr('COMM');
             }
         }
-    }
-
-    # get url
-    # official audio file webpage
-    my $value = $mp3->select_id3v2_frame_by_descr('WOAF');
-    $meta{url} = $value if $value;
-    # official audio source webpage
-    $value = $mp3->select_id3v2_frame_by_descr('WOAS');
-    $meta{url} = $value if !$meta{url} and $value;
-
-    # author (as distinct from artist)
-    $value = $mp3->composer();
-    $meta{author} = $value if $value;
-
-    # get freeform tags from the TXXX field (see setpod)
-    if ($mp3->have_id3v2_frame('TXXX', [qw(tags)]))
-    {
-        my $tagframe = $mp3->select_id3v2_frame('TXXX', [qw(tags)], undef);
-        my @ftags = split(/,/, $tagframe);
-        push @tags, @ftags;
-    }
-    if (@tags)
-    {
-        $meta{tags} = join(',', @tags);
+        elsif ($field eq 'creator')
+        {
+            $meta{'creator'} = $mp3->artist();
+        }
+        elsif ($field eq 'genre')
+        {
+            $meta{'genre'} = $mp3->genre();
+        }
+        elsif ($field eq 'year')
+        {
+            $meta{'year'} = $mp3->year();
+        }
+        elsif ($field eq 'track')
+        {
+            $meta{'track'} = $mp3->track();
+        }
+        elsif ($field eq 'author')
+        {
+            # author (as distinct from artist) use the 'composer' field
+            $meta{'author'} = $mp3->composer();
+        }
+        elsif ($field eq 'url')
+        {
+            # get url
+            # official audio file webpage
+            my $value = $mp3->select_id3v2_frame_by_descr('WOAF');
+            $meta{url} = $value if $value;
+            # official audio source webpage
+            $value = $mp3->select_id3v2_frame_by_descr('WOAS');
+            $meta{url} = $value if !$meta{url} and $value;
+        }
+        else # freeform text fields
+        {
+            if ($mp3->have_id3v2_frame('TXXX', [$field]))
+            {
+                my $tagframe = $mp3->select_id3v2_frame('TXXX', [$field], undef);
+                $meta{$field} = $tagframe;
+            }
+        }
+        # Delete any fields that are undefined
+        delete $meta{$field} if !defined $meta{$field};
     }
 
     return \%meta;

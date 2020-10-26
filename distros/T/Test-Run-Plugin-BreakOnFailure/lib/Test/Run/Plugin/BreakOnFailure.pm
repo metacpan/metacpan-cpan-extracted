@@ -16,11 +16,11 @@ upon the first failure.
 
 =head1 VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 =cut
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 extends('Test::Run::Base');
 
@@ -65,14 +65,6 @@ sub _run_all_tests_loop
 
 Shlomi Fish, L<http://www.shlomifish.org/> .
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-test-run-plugin-alternateinterpreters at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test::Run::Plugin::BreakOnFailure>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -82,10 +74,6 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::Plugin::BreakOnFailure>
 
 =item * CPAN Ratings
 
@@ -114,7 +102,7 @@ L<Test::Run>, L<Test::Run::CmdLine>, L<TAP::Parser>
 
 Copyright 2010 Shlomi Fish.
 
-This program is distributed under the MIT (X11) License:
+This program is distributed under the MIT (Expat) License:
 L<http://www.opensource.org/licenses/mit-license.php>
 
 Permission is hereby granted, free of charge, to any person

@@ -1,7 +1,10 @@
-# $Id: 65-RRSIG-RSASHA1.t 1747 2019-06-27 15:02:31Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 65-RRSIG-RSASHA1.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
+use IO::File;
 use Test::More;
 
 my %prerequisite = (
@@ -11,8 +14,8 @@ my %prerequisite = (
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep $_, $prerequisite{$package};
-	next if eval "use $package @revision; 1;";
+	my @revision = grep {$_} $prerequisite{$package};
+	next if eval "use $package @revision; 1;";		## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -20,14 +23,13 @@ foreach my $package ( sort keys %prerequisite ) {
 plan tests => 32;
 
 
-my $ksk = new Net::DNS::RR <<'END';
+my $ksk = Net::DNS::RR->new( <<'END' );
 RSASHA1.example.	IN	DNSKEY	257 3 5 (
 	AwEAAefP0RzK3K39a5wznjeWA1PssI2dxqPb9SL+ppY8wcimOuEBmSJP5n6/bwg923VFlRiYJHe5
 	if4saxWCYenQ46hWz44sK943K03tfHkxo54ayAk/7dMj1wQ7Dby5FJ1AAMGZZO65BlKSD+2BTcwp
 	IL9mAYuhHYfkG6FTEEKgHVmOVmtyKWA3gl3RrSSgXzTWnUS5b/jEeh2SflXG9eXabaoVXEHQN+oJ
 	dTiAiErZW4+Zlx5pIrSycZBpIdWvn4t71L3ik6GctQqG9ln12j2ngji3blVI3ENMnUc237jUeYsy
-	k7E5TughQctLYOFXHaeTMgJt0LUTyv3gIgDTRmvgQDU= ; Key ID = 4501
-	)
+	k7E5TughQctLYOFXHaeTMgJt0LUTyv3gIgDTRmvgQDU= ) ; Key ID = 4501
 END
 
 ok( $ksk, 'set up RSA public ksk' );
@@ -37,8 +39,8 @@ my $keyfile = $ksk->privatekeyname;
 
 END { unlink($keyfile) if defined $keyfile; }
 
-open( KSK, ">$keyfile" ) or die "$keyfile $!";
-print KSK <<'END';
+my $handle = IO::File->new( $keyfile, '>' ) || die "$keyfile $!";
+print $handle <<'END';
 Private-key-format: v1.2
 Algorithm: 5 (RSASHA1)
 Modulus: 58/RHMrcrf1rnDOeN5YDU+ywjZ3Go9v1Iv6mljzByKY64QGZIk/mfr9vCD3bdUWVGJgkd7mJ/ixrFYJh6dDjqFbPjiwr3jcrTe18eTGjnhrICT/t0yPXBDsNvLkUnUAAwZlk7rkGUpIP7YFNzCkgv2YBi6Edh+QboVMQQqAdWY5Wa3IpYDeCXdGtJKBfNNadRLlv+MR6HZJ+Vcb15dptqhVcQdA36gl1OICIStlbj5mXHmkitLJxkGkh1a+fi3vUveKToZy1Cob2WfXaPaeCOLduVUjcQ0ydRzbfuNR5izKTsTlO6CFBy0tg4Vcdp5MyAm3QtRPK/eAiANNGa+BANQ==
@@ -50,34 +52,32 @@ Exponent1: nGakbdMmIx9EaMuhRhwIJTWGhz+jCdDrnhI4LRTqM019oiDke7VFHvH1va18t9F/Ek/3Z
 Exponent2: evAuKygVGsxghXtEkQ9rOfOMTGDtdyVxiMO8mdKt9plV69kHLz1n9RRtoVXmx28ynQtK/YvFdlUulzb+fWwWHTGv4scq8V9uITKSWwxJcNMx3upCyugDfuh0aoX6vBV5lMXBtWPmnusbOTBZgArvTLSPI/qwCEiedE1j34/dYVs=
 Coefficient: JTEzUDflC+G0if7uqsJ2sw/x2aCHMjsCxYSmx2bJOW/nhQTQpzafL0N8E6WmKuEP4qAaqQjWrDyxy0XcAJrfcojJb+a3j2ndxYpev7Rq8f7P6M7qqVL0Nzj9rWFH7pyvWMnH584viuhPcDogy8ymHpNNuAF+w98qjnGD8UECiV4=
 END
-close(KSK);
+close($handle);
 
-my $private = new Net::DNS::SEC::Private($keyfile);
+my $private = Net::DNS::SEC::Private->new($keyfile);
 ok( $private, 'set up RSA private key' );
 
 
-my $bad1 = new Net::DNS::RR <<'END';
+my $bad1 = Net::DNS::RR->new( <<'END' );
 RSASHA1.example.	IN	DNSKEY	256 3 5 (
 	AwEAAZHbngk6sMoFHN8fsYY6bmGR4B9UYJIqDp+mORLEH53Xg0f6RMDtfx+H3/x7bHTUikTr26bV
 	AqsxOs2KxyJ2Xx9RGG0DB9O4gpANljtTq2tLjvaQknhJpSq9vj4CqUtr6Wu152J2aQYITBoQLHDV
-	i8mIIunparIKDmhy8TclVXg9 ; Key ID = 1623
-	)
+	i8mIIunparIKDmhy8TclVXg9 ) ; Key ID = 1623
 END
 
 
-my $bad2 = new Net::DNS::RR <<'END';
+my $bad2 = Net::DNS::RR->new( <<'END' );
 ECDSAP256SHA256.example.	IN	DNSKEY	( 256 3 13
 	7Y4BZY1g9uzBwt3OZexWk7iWfkiOt0PZ5o7EMip0KBNxlBD+Z58uWutYZIMolsW8v/3rfgac45lO
-	IikBZK4KZg== ; Key ID = 44222
-	)
+	IikBZK4KZg== ) ; Key ID = 44222
 END
 
 
-my @rrset = ( $bad1, $ksk );
+my @rrset    = ( $bad1, $ksk );
 my @badrrset = ($bad1);
 
 {
-	my $object = create Net::DNS::RR::RRSIG( \@rrset, $keyfile );
+	my $object = Net::DNS::RR::RRSIG->create( \@rrset, $keyfile );
 	ok( $object->sig(), 'create RRSIG over rrset using private ksk' );
 
 	my $verified = $object->verify( \@rrset, $ksk );
@@ -87,7 +87,7 @@ my @badrrset = ($bad1);
 
 
 {
-	my $object = create Net::DNS::RR::RRSIG( \@rrset, $keyfile );
+	my $object = Net::DNS::RR::RRSIG->create( \@rrset, $keyfile );
 
 	my $verified = $object->verify( \@badrrset, $bad1 );
 	ok( !$verified,		 'verify fails using wrong key' );
@@ -96,7 +96,7 @@ my @badrrset = ($bad1);
 
 
 {
-	my $object = create Net::DNS::RR::RRSIG( \@rrset, $keyfile );
+	my $object = Net::DNS::RR::RRSIG->create( \@rrset, $keyfile );
 
 	my $verified = $object->verify( \@badrrset, $bad2 );
 	ok( !$verified,		 'verify fails using key with wrong algorithm' );
@@ -105,7 +105,7 @@ my @badrrset = ($bad1);
 
 
 {
-	my $object = create Net::DNS::RR::RRSIG( \@rrset, $keyfile );
+	my $object = Net::DNS::RR::RRSIG->create( \@rrset, $keyfile );
 
 	my $verified = $object->verify( \@rrset, [$bad1, $bad2, $ksk] );
 	ok( $verified, 'verify using array of keys' );
@@ -114,7 +114,7 @@ my @badrrset = ($bad1);
 
 
 {
-	my $object = create Net::DNS::RR::RRSIG( \@rrset, $keyfile );
+	my $object = Net::DNS::RR::RRSIG->create( \@rrset, $keyfile );
 
 	my $verified = $object->verify( \@badrrset, [$bad1, $bad2, $ksk] );
 	ok( !$verified,		 'verify fails using wrong rrset' );
@@ -123,9 +123,9 @@ my @badrrset = ($bad1);
 
 
 {
-	my $wild   = new Net::DNS::RR('*.example. A 10.1.2.3');
-	my $match  = new Net::DNS::RR('leaf.twig.example. A 10.1.2.3');
-	my $object = create Net::DNS::RR::RRSIG( [$wild], $keyfile );
+	my $wild   = Net::DNS::RR->new('*.example. A 10.1.2.3');
+	my $match  = Net::DNS::RR->new('leaf.twig.example. A 10.1.2.3');
+	my $object = Net::DNS::RR::RRSIG->create( [$wild], $keyfile );
 
 	my $verified = $object->verify( [$match], $ksk );
 	ok( $verified, 'wildcard matches child domain name' );
@@ -134,9 +134,9 @@ my @badrrset = ($bad1);
 
 
 {
-	my $wild   = new Net::DNS::RR('*.example. A 10.1.2.3');
-	my $bogus  = new Net::DNS::RR('example. A 10.1.2.3');
-	my $object = create Net::DNS::RR::RRSIG( [$wild], $keyfile );
+	my $wild   = Net::DNS::RR->new('*.example. A 10.1.2.3');
+	my $bogus  = Net::DNS::RR->new('example. A 10.1.2.3');
+	my $object = Net::DNS::RR::RRSIG->create( [$wild], $keyfile );
 
 	my $verified = $object->verify( [$bogus], $ksk );
 	ok( !$verified,		 'wildcard does not match parent domain' );
@@ -150,34 +150,34 @@ my @badrrset = ($bad1);
 		siginception  => $time,
 		sigexpiration => $time,
 		);
-	my $object = create Net::DNS::RR::RRSIG( \@rrset, $keyfile, %args );
+	my $object = Net::DNS::RR::RRSIG->create( \@rrset, $keyfile, %args );
 
 	ok( !$object->verify( \@rrset, $ksk ), 'verify fails for postdated RRSIG' );
-	ok( $object->vrfyerrstr, 'observe rrsig->vrfyerrstr' );
+	ok( $object->vrfyerrstr,	       'observe rrsig->vrfyerrstr' );
 	sleep 1 until $time < time();
 	ok( !$object->verify( \@rrset, $ksk ), 'verify fails for expired RRSIG' );
-	ok( $object->vrfyerrstr, 'observe rrsig->vrfyerrstr' );
+	ok( $object->vrfyerrstr,	       'observe rrsig->vrfyerrstr' );
 }
 
 
 {
-	my $object   = new Net::DNS::RR( type => 'RRSIG' );
+	my $object   = Net::DNS::RR->new( type => 'RRSIG' );
 	my $class    = ref($object);
 	my $array    = [];
-	my $dnskey   = new Net::DNS::RR( type => 'DNSKEY' );
-	my $private  = new Net::DNS::SEC::Private($keyfile);
-	my $packet   = new Net::DNS::Packet();
-	my $rr1	     = new Net::DNS::RR( name => 'example', type => 'A' );
-	my $rr2	     = new Net::DNS::RR( name => 'differs', type => 'A' );
-	my $rr3	     = new Net::DNS::RR( type => 'A', ttl => 1 );
-	my $rr4	     = new Net::DNS::RR( type => 'A', ttl => 2 );
-	my $rr5	     = new Net::DNS::RR( class => 'IN', type => 'A' );
-	my $rr6	     = new Net::DNS::RR( class => 'ANY', type => 'A' );
-	my $rr7	     = new Net::DNS::RR( type => 'A' );
-	my $rr8	     = new Net::DNS::RR( type => 'AAAA' );
+	my $dnskey   = Net::DNS::RR->new( type => 'DNSKEY' );
+	my $private  = Net::DNS::SEC::Private->new($keyfile);
+	my $packet   = Net::DNS::Packet->new();
+	my $rr1	     = Net::DNS::RR->new( name	=> 'example', type => 'A' );
+	my $rr2	     = Net::DNS::RR->new( name	=> 'differs', type => 'A' );
+	my $rr3	     = Net::DNS::RR->new( type	=> 'A',	      ttl  => 1 );
+	my $rr4	     = Net::DNS::RR->new( type	=> 'A',	      ttl  => 2 );
+	my $rr5	     = Net::DNS::RR->new( class => 'IN',      type => 'A' );
+	my $rr6	     = Net::DNS::RR->new( class => 'ANY',     type => 'A' );
+	my $rr7	     = Net::DNS::RR->new( type	=> 'A' );
+	my $rr8	     = Net::DNS::RR->new( type	=> 'AAAA' );
 	my @testcase = (		## test create() with invalid arguments
-		[$dnskey, $dnskey],
-		[$array,  $private],
+		[$dnskey,      $dnskey],
+		[$array,       $private],
 		[[$rr1, $rr2], $private],
 		[[$rr3, $rr4], $private],
 		[[$rr5, $rr6], $private],
@@ -185,7 +185,7 @@ my @badrrset = ($bad1);
 		);
 
 	foreach my $arglist (@testcase) {
-		my @argtype = map ref($_), @$arglist;
+		my @argtype = map { ref($_) } @$arglist;
 		eval { $class->create(@$arglist); };
 		my ($exception) = split /\n/, "$@\n";
 		ok( $exception, "create(@argtype)\t[$exception]" );
@@ -194,10 +194,10 @@ my @badrrset = ($bad1);
 
 
 {
-	my $object   = new Net::DNS::RR( type => 'RRSIG' );
-	my $packet   = new Net::DNS::Packet();
-	my $dnskey   = new Net::DNS::RR( type => 'DNSKEY' );
-	my $dsrec    = new Net::DNS::RR( type => 'DS' );
+	my $object   = Net::DNS::RR->new( type => 'RRSIG' );
+	my $packet   = Net::DNS::Packet->new();
+	my $dnskey   = Net::DNS::RR->new( type => 'DNSKEY' );
+	my $dsrec    = Net::DNS::RR->new( type => 'DS' );
 	my $scalar   = 'SCALAR';
 	my @testcase = (		## test verify() with invalid arguments
 		[$packet, $dnskey],
@@ -206,7 +206,7 @@ my @badrrset = ($bad1);
 		);
 
 	foreach my $arglist (@testcase) {
-		my @argtype = map ref($_) || $_, @$arglist;
+		my @argtype = map { ref($_) || $_ } @$arglist;
 		eval { $object->verify(@$arglist); };
 		my ($exception) = split /\n/, "$@\n";
 		ok( $exception, "verify(@argtype)\t[$exception]" );
@@ -215,12 +215,12 @@ my @badrrset = ($bad1);
 
 
 {
-	my $object   = new Net::DNS::RR( type => 'RRSIG', algorithm => 0 );
+	my $object = Net::DNS::RR->new( type => 'RRSIG', algorithm => 0 );
 
 	foreach my $method (qw(_CreateSig _VerifySig)) {
 		eval { $object->$method(); };
-		my $errorstring = $object->vrfyerrstr();
-		my ($exception) = split /\n/, "$@$errorstring\n";
+		my $errorstring = $object->vrfyerrstr() || $@;
+		my ($exception) = split /\n/, "$errorstring\n";
 		ok( $exception, "$method()\t[$exception]" );
 	}
 }

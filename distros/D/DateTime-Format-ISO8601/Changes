@@ -1,3 +1,9 @@
+0.15     2020-10-24
+
+- Fixed the SYNOPSIS, which showed calling parse_time with a string that would
+  cause an error. Reported by Yuki Yoshida. GH #12.
+
+
 0.14     2020-08-16
 
 - Require DateTime 1.45, which added a year_length() method that this package

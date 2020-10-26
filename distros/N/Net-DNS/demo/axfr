@@ -1,7 +1,8 @@
-#!/usr/local/bin/perl -w
-# $Id: axfr 264 2005-04-06 09:16:15Z olaf $
+#!/usr/bin/perl
+# $Id: axfr 1815 2020-10-14 21:55:18Z willem $
 
 use strict;
+use warnings;
 use vars qw($opt_f $opt_q $opt_s $opt_D);
 use File::Basename;
 use Getopt::Std;
@@ -38,7 +39,7 @@ unless (-d $basedir) {
 
 my $dir = $basedir;
 my $subdir;
-foreach $subdir (split(m#/#, $zonedir)) {
+foreach my $subdir (split(m#/#, $zonedir)) {
 	$dir .= "/" . $subdir;
 	unless (-d $dir) {
 		mkdir($dir, 0777) or die "can't mkdir $dir: $!\n";
@@ -65,7 +66,7 @@ if (-e $zonefile && !defined $opt_f) {
 		my($serial_file, $serial_zone);
 
 		my $rr;
-		foreach $rr (@$zoneref) {
+		foreach my $rr (@$zoneref) {
 			if ($rr->type eq "SOA") {
 				$serial_file = $rr->serial;
 				last;
@@ -77,7 +78,7 @@ if (-e $zonefile && !defined $opt_f) {
 		die "couldn't get SOA for $zone: ", $res->errorstring, "\n"
 			unless defined $soa;
 
-		foreach $rr ($soa->answer) {
+		foreach my $rr ($soa->answer) {
 			if ($rr->type eq "SOA") {
 				$serial_zone = $rr->serial;
 				last;

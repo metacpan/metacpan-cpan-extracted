@@ -1,14 +1,11 @@
 package Net::DNS::RR::TKEY;
 
-#
-# $Id: TKEY.pm 1528 2017-01-18 21:44:58Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: TKEY.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,12 +13,11 @@ Net::DNS::RR::TKEY - DNS TKEY resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
 
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(:class :type);
 use Net::DNS::DomainName;
 
 use constant ANY  => classbyname qw(ANY);
@@ -34,7 +30,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $limit = $offset + $self->{rdlength};
 
-	( $self->{algorithm}, $offset ) = decode Net::DNS::DomainName(@_);
+	( $self->{algorithm}, $offset ) = Net::DNS::DomainName->decode(@_);
 
 	@{$self}{qw(inception expiration mode error)} = unpack "\@$offset N2n2", $$data;
 	$offset += 12;
@@ -48,6 +44,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$offset += $other_size + 2;
 
 	croak('corrupt TKEY data') unless $offset == $limit;	# more or less FUBAR
+	return;
 }
 
 
@@ -84,8 +81,8 @@ sub encode {				## overide RR method
 sub algorithm {
 	my $self = shift;
 
-	$self->{algorithm} = new Net::DNS::DomainName(shift) if scalar @_;
-	$self->{algorithm}->name if $self->{algorithm};
+	$self->{algorithm} = Net::DNS::DomainName->new(shift) if scalar @_;
+	return $self->{algorithm} ? $self->{algorithm}->name : undef;
 }
 
 
@@ -93,7 +90,7 @@ sub inception {
 	my $self = shift;
 
 	$self->{inception} = 0 + shift if scalar @_;
-	$self->{inception} || 0;
+	return $self->{inception} || 0;
 }
 
 
@@ -101,7 +98,7 @@ sub expiration {
 	my $self = shift;
 
 	$self->{expiration} = 0 + shift if scalar @_;
-	$self->{expiration} || 0;
+	return $self->{expiration} || 0;
 }
 
 
@@ -109,7 +106,7 @@ sub mode {
 	my $self = shift;
 
 	$self->{mode} = 0 + shift if scalar @_;
-	$self->{mode} || 0;
+	return $self->{mode} || 0;
 }
 
 
@@ -117,7 +114,7 @@ sub error {
 	my $self = shift;
 
 	$self->{error} = 0 + shift if scalar @_;
-	$self->{error} || 0;
+	return $self->{error} || 0;
 }
 
 
@@ -125,7 +122,7 @@ sub key {
 	my $self = shift;
 
 	$self->{key} = shift if scalar @_;
-	$self->{key} || "";
+	return $self->{key} || "";
 }
 
 
@@ -133,11 +130,11 @@ sub other {
 	my $self = shift;
 
 	$self->{other} = shift if scalar @_;
-	$self->{other} || "";
+	return $self->{other} || "";
 }
 
 
-sub other_data { &other; }					# uncoverable pod
+sub other_data { return &other; }				# uncoverable pod
 
 
 1;

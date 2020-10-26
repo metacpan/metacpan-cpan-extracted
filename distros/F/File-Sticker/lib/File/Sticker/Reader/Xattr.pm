@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Xattr;
-$File::Sticker::Reader::Xattr::VERSION = '0.9301';
+$File::Sticker::Reader::Xattr::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Reader::Xattr - read and standardize meta-data from ExtAttr file
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 

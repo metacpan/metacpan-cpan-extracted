@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,13 +6,19 @@ use warnings;
 	package Ask::Wx;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
-
+	our $VERSION   = '0.012';
+	
 	use Moo;
+	use Path::Tiny 'path';
 	use Wx;
-	use namespace::sweep;
-
+	use namespace::autoclean;
+	
 	with 'Ask::API';
+	
+	sub is_usable {
+		my ($self) = @_;
+		return !! $ENV{'DISPLAY'};
+	}
 	
 	sub quality {
 		return 10;  # raise to 50 once multi file selection implemented
@@ -21,11 +27,13 @@ use warnings;
 	sub info
 	{
 		my ($self, %o) = @_;
-		$o{messagebox_icon}    //= Wx::wxICON_INFORMATION();
-		$o{messagebox_buttons} //= Wx::wxOK();
+		$o{messagebox_icon}    = Wx::wxICON_INFORMATION() unless defined $o{messagebox_icon};
+		$o{messagebox_buttons} = Wx::wxOK()               unless defined $o{messagebox_buttons};
+		$o{text}               = ''                       unless exists $o{text};
+		$o{title}              = 'Information'            unless exists $o{title};
 		Wx::MessageBox(
-			($o{text}  // ''),
-			($o{title} // 'Information'),
+			$o{text},
+			$o{title},
 			$o{messagebox_icon} | $o{messagebox_buttons},
 		);
 	}
@@ -57,57 +65,67 @@ use warnings;
 	{
 		my ($self, %o) = @_;
 		
-		return Wx::GetPasswordFromUser(
-			($o{text}  // ''),
-			($o{title} // 'Text entry'),
-			($o{entry_text} // ''),
-		) if $o{hide_text};
+		$o{text}        = ''           unless exists $o{text};
+		$o{title}       = 'Text extry' unless exists $o{title};
+		$o{entry_text}  = ''           unless exists $o{entry_text};
 		
-		return Wx::GetTextFromUser(
-			($o{text}  // ''),
-			($o{title} // 'Text entry'),
-			($o{entry_text} // ''),
-		);
+		$o{hide_text}
+			? Wx::GetPasswordFromUser( $o{text}, $o{title}, $o{entry_text} )
+			: Wx::GetTextFromUser( $o{text}, $o{title}, $o{entry_text} );
 	}
 	
 	sub file_selection
 	{
 		my ($self, %o) = @_;
 		
-		return Wx::DirSelector($o{text} // '')
+		$o{text} = '' unless exists $o{text};
+		
+		return Wx::DirSelector($o{text})
 			if $o{dir};
 		
 		warn "Multiple file selection box not implemented in Ask::Wx yet!\n"
 			if $o{multiple};
 		
-		return Wx::FileSelector(
-			($o{text} // ''),
+		my $f = Wx::FileSelector(
+			$o{text},
 			'',    # default path
 			'',    # default filename
 			'',    # default extension
 			'*.*', # wildcard
 			$o{save} ? Wx::wxFD_SAVE() : Wx::wxFD_OPEN(),
 		);
+		
+		path($f);
 	}
 	
 	sub single_choice
 	{
 		my ($self, %o) = @_;
+		
+		$o{text}        = ''           unless exists $o{text};
+		$o{title}       = 'Choose one' unless exists $o{title};
+		$o{choices}     = []           unless defined $o{choices};
+		
 		my $return = Wx::GetSingleChoiceIndex(
-			($o{text} // $o{title} // ''),
-			($o{title} // 'Choose one'),
+			$o{text} || $o{title},
+			$o{title},
 			[ map $_->[1], @{$o{choices}} ],
 		);
 		return if $return < 0;
 		return $o{choices}[$return][0];
 	}
-
+	
 	sub multiple_choice
 	{
 		my ($self, %o) = @_;
+		
+		$o{text}        = ''           unless exists $o{text};
+		$o{title}       = 'Choose one' unless exists $o{title};
+		$o{choices}     = []           unless defined $o{choices};
+		
 		my @return = Wx::GetMultipleChoices(
-			($o{text} // $o{title} // ''),
-			($o{title} // 'Choose'),
+			$o{text} || $o{title},
+			$o{title},
 			[ map $_->[1], @{$o{choices}} ],
 		);
 		return if @return && $return[0] < 0;
@@ -147,7 +165,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

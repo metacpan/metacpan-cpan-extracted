@@ -10,7 +10,7 @@ use FFI::Build::Platform;
 use overload '""' => sub { $_[0]->path }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Base class for File::Build files
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 
 sub new
@@ -158,7 +158,7 @@ FFI::Build::File::Base - Base class for File::Build files
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 SYNOPSIS
 

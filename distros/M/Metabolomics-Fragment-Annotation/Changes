@@ -1,5 +1,9 @@
 Revision history for Metabolomics-Fragment-Annotation
 
+0.6.1	2020-10-26
+	- POD update
+	- 
+
 0.6.1	2020-10-14
 	- fix inheritance issue
 

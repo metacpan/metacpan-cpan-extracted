@@ -1,21 +1,17 @@
 package Net::DNS::RR::NSEC3PARAM;
 
-#
-# $Id: NSEC3PARAM.pm 1741 2019-04-16 13:10:38Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: NSEC3PARAM.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::NSEC3PARAM - DNS NSEC3PARAM resource record
 
 =cut
-
 
 use integer;
 
@@ -28,6 +24,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $size = unpack "\@$offset x4 C", $$data;
 	@{$self}{qw(algorithm flags iterations saltbin)} = unpack "\@$offset CCnx a$size", $$data;
+	return;
 }
 
 
@@ -35,14 +32,14 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $salt = $self->saltbin;
-	pack 'CCnCa*', @{$self}{qw(algorithm flags iterations)}, length($salt), $salt;
+	return pack 'CCnCa*', @{$self}{qw(algorithm flags iterations)}, length($salt), $salt;
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	join ' ', $self->algorithm, $self->flags, $self->iterations, $self->salt || '-';
+	return join ' ', $self->algorithm, $self->flags, $self->iterations, $self->salt || '-';
 }
 
 
@@ -54,6 +51,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->iterations(shift);
 	my $salt = shift;
 	$self->salt($salt) unless $salt eq '-';
+	return;
 }
 
 
@@ -61,7 +59,7 @@ sub algorithm {
 	my $self = shift;
 
 	$self->{algorithm} = 0 + shift if scalar @_;
-	$self->{algorithm} || 0;
+	return $self->{algorithm} || 0;
 }
 
 
@@ -69,7 +67,7 @@ sub flags {
 	my $self = shift;
 
 	$self->{flags} = 0 + shift if scalar @_;
-	$self->{flags} || 0;
+	return $self->{flags} || 0;
 }
 
 
@@ -77,14 +75,14 @@ sub iterations {
 	my $self = shift;
 
 	$self->{iterations} = 0 + shift if scalar @_;
-	$self->{iterations} || 0;
+	return $self->{iterations} || 0;
 }
 
 
 sub salt {
 	my $self = shift;
 	return unpack "H*", $self->saltbin() unless scalar @_;
-	$self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	return $self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -92,13 +90,13 @@ sub saltbin {
 	my $self = shift;
 
 	$self->{saltbin} = shift if scalar @_;
-	$self->{saltbin} || "";
+	return $self->{saltbin} || "";
 }
 
 
 ########################################
 
-sub hashalgo { &algorithm; }					# uncoverable pod
+sub hashalgo { return &algorithm; }				# uncoverable pod
 
 
 1;
@@ -108,7 +106,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name NSEC3PARAM algorithm flags iterations salt');
+    $rr = Net::DNS::RR->new('name NSEC3PARAM algorithm flags iterations salt');
 
 =head1 DESCRIPTION
 

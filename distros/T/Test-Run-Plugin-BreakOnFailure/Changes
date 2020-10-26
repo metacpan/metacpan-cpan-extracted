@@ -1,5 +1,9 @@
 Revision history for Test::Run::Plugin::AlternateInterpreters
 
+0.0.6   2020-10-22
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0.5   2015-05-31
         - Replace links with metacpan.org.
         - Add VCS repository to the META.yml/META.json.

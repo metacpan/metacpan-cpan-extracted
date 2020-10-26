@@ -260,8 +260,8 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		{ "@FS@/" [
-			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.72 GiB\nFree: 3.94 GiB\nUsed: 5.27 GiB";
-			style=striped;fillcolor="pink;0.594976.2:green"
+			label="/\nDevice: /dev/vgchu/root\next4\nSize: 9.72 GiB\nFree: 2.86 GiB\nUsed: 6.34 GiB";
+			style=striped;fillcolor="pink;0.705692.2:green"
 		]; }
 		{ "@FS@/boot/efi" [
 			label="/boot/efi\nDevice: /dev/sda1\nvfat\nSize: 477 GiB\nFree: 477 GiB\nUsed: 5.38 MiB";
@@ -303,9 +303,9 @@ digraph "machine"{
 	"LVM@os@PV@sdb1" -> "dm-4"
 	"LVM@os@PV@sdb1" -> "dm-5"
 	// Links from LVM VG: vgchu
-	"LVM@vgchu@PV@sda2" -> "dm-0"
 	"LVM@vgchu@PV@sda2" -> "dm-6"
 	"LVM@vgchu@PV@sdc1" -> "dm-7"
+	"LVM@vgchu@PV@sda2" -> "dm-0"
 	// Links from MegaCli: Controller c0
 	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p0" -> "sda"
 	"@LSIMegacli@0@dev@LSIMegaCli@c0u0p1" -> "sda"

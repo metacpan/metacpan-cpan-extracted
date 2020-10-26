@@ -1,4 +1,8 @@
 Revision history for Code-TidyAll-Plugin-ClangFormat
 
+0.0.2       2020-10-22
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0.1       2019-01-24
     - First version, released on an unsuspecting world

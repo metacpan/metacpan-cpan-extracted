@@ -1,3 +1,12 @@
+0.011   2020-10-23  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	[Incompatible changes]
+
+        - [ux] Remove short alias option -n because it's ambiguous (*n*omor izin
+	  edar, *n*ama pendaftar, *n*ama produk), make -p as short alias for
+	  --nama-produk instead and -P for --nama-pendaftar.
+
+
 0.010   2020-10-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Add options: --query-log-file, --result-dump-dir, --note.

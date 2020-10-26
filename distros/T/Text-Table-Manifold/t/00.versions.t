@@ -16,8 +16,8 @@ use Module::Runtime;
 use Moo;
 use Scalar::Util;
 use strict;
+use String::TtyLength;
 use Types::Standard;
-use Unicode::GCString;
 use utf8;
 use warnings;
 
@@ -34,8 +34,8 @@ my(@modules) = qw
 	Moo
 	Scalar::Util
 	strict
+	String::TtyLength
 	Types::Standard
-	Unicode::GCString
 	utf8
 	warnings
 /;

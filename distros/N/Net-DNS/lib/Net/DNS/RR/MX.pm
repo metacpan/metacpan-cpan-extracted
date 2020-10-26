@@ -1,21 +1,17 @@
 package Net::DNS::RR::MX;
 
-#
-# $Id: MX.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: MX.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::MX - DNS MX resource record
 
 =cut
-
 
 use integer;
 
@@ -27,7 +23,8 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset, @opaque ) = @_;
 
 	$self->{preference} = unpack( "\@$offset n", $$data );
-	$self->{exchange} = decode Net::DNS::DomainName1035( $data, $offset + 2, @opaque );
+	$self->{exchange}   = Net::DNS::DomainName1035->decode( $data, $offset + 2, @opaque );
+	return;
 }
 
 
@@ -36,7 +33,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my ( $offset, @opaque ) = @_;
 
 	my $exchange = $self->{exchange};
-	pack 'n a*', $self->preference, $exchange->encode( $offset + 2, @opaque );
+	return pack 'n a*', $self->preference, $exchange->encode( $offset + 2, @opaque );
 }
 
 
@@ -44,7 +41,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $exchange = $self->{exchange};
-	join ' ', $self->preference, $exchange->string;
+	return join ' ', $self->preference, $exchange->string;
 }
 
 
@@ -53,6 +50,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->preference(shift);
 	$self->exchange(shift);
+	return;
 }
 
 
@@ -60,6 +58,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->preference(10);
+	return;
 }
 
 
@@ -67,20 +66,20 @@ sub preference {
 	my $self = shift;
 
 	$self->{preference} = 0 + shift if scalar @_;
-	$self->{preference} || 0;
+	return $self->{preference} || 0;
 }
 
 
 sub exchange {
 	my $self = shift;
 
-	$self->{exchange} = new Net::DNS::DomainName1035(shift) if scalar @_;
-	$self->{exchange}->name if $self->{exchange};
+	$self->{exchange} = Net::DNS::DomainName1035->new(shift) if scalar @_;
+	return $self->{exchange} ? $self->{exchange}->name : undef;
 }
 
 
 my $function = sub {			## sort RRs in numerically ascending order.
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+	return $Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
 };
 
 __PACKAGE__->set_rrsort_func( 'preference', $function );
@@ -95,7 +94,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name MX preference exchange');
+    $rr = Net::DNS::RR->new('name MX preference exchange');
 
 =head1 DESCRIPTION
 

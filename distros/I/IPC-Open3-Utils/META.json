@@ -3,8 +3,8 @@
    "author" : [
       "Daniel Muey <http://drmuey.com/cpan_contact.pl>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -40,5 +40,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.91"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/drmuey/p5-IPC-Open3-Utils/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/drmuey/p5-IPC-Open3-Utils.git",
+         "web" : "https://github.com/drmuey/p5-IPC-Open3-Utils"
+      }
+   },
+   "version" : "0.92"
 }

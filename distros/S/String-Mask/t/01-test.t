@@ -8,6 +8,8 @@ is(String::Mask::mask('thisusedtobeanemail@gmail.com', 'end'), '***************m
 is(String::Mask::mask('thisusedtobeanemail@gmail.com', 'end', 5), '*******************@****l.com');
 is(String::Mask::mask('thisusedtobeanemail@gmail.com', 'middle'), '*******dtobeanemail@g****.***');
 is(String::Mask::mask('thisusedtobeanemail@gmail.com', 'middle', 5), '************anema**@*****.***');
+is(String::Mask::mask('thisusedtobeanemail@gmail.com', 'email'), 'thisu**************@*****.***');
+is(String::Mask::mask('thisusedtobeanemail@gmail.com', 'email', 2), 'thisusedtobeanema**@*****.***');
 
 is(String::Mask::mask('9991234567'), '99912*****');
 is(String::Mask::mask('9991234567', 'start', 3), '999*******');

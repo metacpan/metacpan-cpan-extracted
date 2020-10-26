@@ -1,9 +1,12 @@
-# $Id: 02-IDN.t 1804 2020-09-07 07:57:36Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 02-IDN.t 1816 2020-10-16 09:44:21Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More;
 
-					## vvv	verbatim from Domain.pm
+## vvv	verbatim from Domain.pm
 use constant ASCII => ref eval {
 	require Encode;
 	Encode::find_encoding('ascii');
@@ -13,9 +16,9 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
-use constant LIBIDN2 => ref eval 'require Net::LibIDN2; Net::LibIDN2->can("idn2_to_ascii_8")';
-use constant LIBIDN  => LIBIDN2 ? undef : defined eval 'require Net::LibIDN';
-					## ^^^	verbatim from Domain.pm
+use constant LIBIDN2 => defined eval { require Net::LibIDN2 };
+use constant LIBIDN  => LIBIDN2 ? undef : defined eval { require Net::LibIDN };
+## ^^^	verbatim from Domain.pm
 
 
 use constant LIBIDNOK => LIBIDN && scalar eval {
@@ -61,23 +64,23 @@ use_ok('Net::DNS::Domain');
 my $a_label = 'xn--fiqs8s';
 my $u_label = eval { pack( 'U*', 20013, 22269 ); };
 
-is( new Net::DNS::Domain($a_label)->name,   $a_label,	 'IDN A-label domain->name' );
-is( new Net::DNS::Domain($a_label)->fqdn,   "$a_label.", 'IDN A-label domain->fqdn' );
-is( new Net::DNS::Domain($a_label)->string, "$a_label.", 'IDN A-label domain->string' );
-is( new Net::DNS::Domain($a_label)->xname,  $u_label,	 'IDN A-label domain->xname' );
+is( Net::DNS::Domain->new($a_label)->name,   $a_label,	  'IDN A-label domain->name' );
+is( Net::DNS::Domain->new($a_label)->fqdn,   "$a_label.", 'IDN A-label domain->fqdn' );
+is( Net::DNS::Domain->new($a_label)->string, "$a_label.", 'IDN A-label domain->string' );
+is( Net::DNS::Domain->new($a_label)->xname,  $u_label,	  'IDN A-label domain->xname' );
 
-is( new Net::DNS::Domain($u_label)->name,   $a_label,	 'IDN U-label domain->name' );
-is( new Net::DNS::Domain($u_label)->fqdn,   "$a_label.", 'IDN U-label domain->fqdn' );
-is( new Net::DNS::Domain($u_label)->string, "$a_label.", 'IDN U-label domain->string' );
-is( new Net::DNS::Domain($u_label)->xname,  $u_label,	 'IDN U-label domain->xname' );
-
-
-is( new Net::DNS::Domain($u_label)->xname, $u_label, 'IDN cached domain->xname' );
-
-is( new Net::DNS::Domain('xn--')->xname, 'xn--', 'IDN bogus domain->xname' );
+is( Net::DNS::Domain->new($u_label)->name,   $a_label,	  'IDN U-label domain->name' );
+is( Net::DNS::Domain->new($u_label)->fqdn,   "$a_label.", 'IDN U-label domain->fqdn' );
+is( Net::DNS::Domain->new($u_label)->string, "$a_label.", 'IDN U-label domain->string' );
+is( Net::DNS::Domain->new($u_label)->xname,  $u_label,	  'IDN U-label domain->xname' );
 
 
-eval { new Net::DNS::Domain( pack 'U*', 65533, 92, 48, 65533 ); };
+is( Net::DNS::Domain->new($u_label)->xname, $u_label, 'IDN cached domain->xname' );
+
+is( Net::DNS::Domain->new('xn--')->xname, 'xn--', 'IDN bogus domain->xname' );
+
+
+eval { Net::DNS::Domain->new( pack 'U*', 65533, 92, 48, 65533 ); };
 my ($exception) = split /\n/, "$@\n";
 ok( $exception, "invalid name\t[$exception]" );
 

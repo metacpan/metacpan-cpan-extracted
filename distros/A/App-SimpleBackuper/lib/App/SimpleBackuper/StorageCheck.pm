@@ -11,9 +11,9 @@ sub StorageCheck {
 	
 	my %fails;
 	
-	print "Fetching files listing from storage...\t";
+	print "Fetching files listing from storage...\t" if $options->{verbose};
 	my $listing = $state->{storage}->listing();
-	print keys(%$listing)." files done\n";
+	print keys(%$listing)." files done\n" if $options->{verbose};
 	
 	if(@{ $state->{db}->{backups} } and (! exists $listing->{db} or ! exists $listing->{'db.key'})) {
 		if($fix) {
@@ -80,7 +80,7 @@ sub StorageCheck {
 		print "But the lost data will remain lost.\n";
 		exit -2;
 	} else {
-		print "Storage checking done.\n";
+		print "Storage checking done.\n" if $options->{verbose};
 	}
 }
 

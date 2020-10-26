@@ -1,21 +1,17 @@
 package Net::DNS::RR::MR;
 
-#
-# $Id: MR.pm 1528 2017-01-18 21:44:58Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: MR.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::MR - DNS MR resource record
 
 =cut
-
 
 use integer;
 
@@ -25,7 +21,8 @@ use Net::DNS::DomainName;
 sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 
-	$self->{newname} = decode Net::DNS::DomainName1035(@_);
+	$self->{newname} = Net::DNS::DomainName1035->decode(@_);
+	return;
 }
 
 
@@ -33,7 +30,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $newname = $self->{newname} || return '';
-	$newname->encode(@_);
+	return $newname->encode(@_);
 }
 
 
@@ -41,7 +38,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $newname = $self->{newname} || return '';
-	$newname->string;
+	return $newname->string;
 }
 
 
@@ -49,14 +46,15 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	$self->newname(shift);
+	return;
 }
 
 
 sub newname {
 	my $self = shift;
 
-	$self->{newname} = new Net::DNS::DomainName1035(shift) if scalar @_;
-	$self->{newname}->name if $self->{newname};
+	$self->{newname} = Net::DNS::DomainName1035->new(shift) if scalar @_;
+	return $self->{newname} ? $self->{newname}->name : undef;
 }
 
 
@@ -67,7 +65,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name MR newname');
+    $rr = Net::DNS::RR('name MR newname');
 
 =head1 DESCRIPTION
 

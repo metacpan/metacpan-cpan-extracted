@@ -15,6 +15,9 @@ t/01-catRAND.t
 t/01-catSEQ.t
 t/01-catWRAND.t
 t/01-exec.t
+t/02-alternation.t
+t/02-caseinsensitive.t
+t/02-swapregex.t 
 t/test_cat1.txt
 t/test_cat.txt
 t/manifest.t

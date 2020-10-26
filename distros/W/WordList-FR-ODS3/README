@@ -1,0 +1,85 @@
+NAME
+    WordList::FR::ODS3 - ODS3 wordlist
+
+VERSION
+    This document describes version 0.001 of WordList::FR::ODS3 (from Perl
+    distribution WordList-FR-ODS3), released on 2020-05-23.
+
+SYNOPSIS
+     use WordList::FR::ODS3;
+
+     my $wl = WordList::FR::ODS3->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+DESCRIPTION
+    From <http://www.gtoal.com/scrabble/details/french/>: "The official
+    French scrabble wordlist is ODS. There have been three major releases of
+    this; ODS2 (aka ODS '94), ODS3 (aka ODS '99) and ODS 2000. ODS 2 and
+    ODS3 are available on the net if you know where to look."
+
+    The list of words is from <http://chr.amet.perso.infonie.fr/ods3.htm>.
+
+    Some notes about this wordlist: unaccented, uses random-seek algorithm
+    for pick() (which gives higher probability for longer words).
+
+STATISTICS
+     +----------------------------------+------------------+
+     | key                              | value            |
+     +----------------------------------+------------------+
+     | avg_word_len                     | 9.99297417460274 |
+     | longest_word_len                 | 15               |
+     | num_words                        | 364370           |
+     | num_words_contain_nonword_chars  | 0                |
+     | num_words_contain_unicode        | 0                |
+     | num_words_contain_whitespace     | 0                |
+     | num_words_contains_nonword_chars | 0                |
+     | num_words_contains_unicode       | 0                |
+     | num_words_contains_whitespace    | 0                |
+     | shortest_word_len                | 2                |
+     +----------------------------------+------------------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-FR-ODS3>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-FR-ODS3>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-FR-ODS3>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList::FR::ODS3::7To8
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

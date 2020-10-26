@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 
 my %WriteMakefileArgs = (
     NAME             => 'Termux::API',
@@ -21,6 +22,21 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Termux-API-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/Termux-API.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/Termux-API',
+            },
+        },
+    },
+    META_ADD => {
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+    }
+
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

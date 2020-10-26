@@ -1,4 +1,8 @@
 
+4.21  2020-10-25
+  - Added reset method to Mojo::Pg.
+  - Changed SQL style to use uppercase keywords.
+
 4.20  2020-10-01
   - Fixed fork-safety feature to work with more than one fork.
 

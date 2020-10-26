@@ -11,6 +11,7 @@ my $app = App::Kit->new();
 is( $app, $app->fs->_app, '_app() returns instantiation app' );
 
 # $app->fs->cwd
+Class::Unload->unload("Cwd") if exists $INC{'Cwd.pm'};
 ok( !exists $INC{'Cwd.pm'}, 'Sanity: Cwd not loaded before cwd()' );
 is( $app->fs->cwd, Cwd::cwd(), 'cwd() meth returns same Cwd::cwd' );    # since the method loads the module the second arg works without an explicit use statement
 ok( exists $INC{'Cwd.pm'}, 'Cwd lazy loaded on initial cwd()' );
@@ -137,7 +138,7 @@ ok( !exists $INC{'File/Slurp.pm'}, 'Sanity: File::Slurp not loaded before read_f
 is_deeply [ $app->fs->read_file($fsfile) ], [ "foo\n", "bar\n" ], 'read_file() in array context';
 ok( exists $INC{'File/Slurp.pm'}, 'File::Slurp lazy loaded on initial read_file()' );
 is $app->fs->read_file($fsfile), "foo\nbar\n", 'read_file() in scalar context';
-dies_ok { $app->fs->read_file($fsdir) } 'read_file() failure is fatal';
+dies_ok { $app->fs->read_file('') } 'read_file() failure is fatal';    # $fsdir die for me usually but not for all (e.g. 75564f20-675a-11e3-bd14-e3bee4621ba3 same version of F::S, diff perls, etc) so lets try empoty string
 
 # more $app->fs->read_dir
 is_deeply [ $app->fs->read_dir($fsdir) ], ['foo'], 'read_dir() on dir w/ files';
@@ -321,7 +322,7 @@ is_deeply( $data, $my_data, 'yaml_read loads expected data again' );
 $app->fs->yaml_write( $yaml_file, { 'unistr' => "I \x{2665} Unicode" } );
 is( $app->fs->read_file($yaml_file), qq{--- \n"unistr": 'I ♥ Unicode'\n}, 'yaml_write does unicode string as bytes (i.e. a utf8 string)' );
 $data = $app->fs->yaml_read($yaml_file);
-is_deeply( $data, { 'unistr' => "I \xe2\x99\xa5 Unicode" }, 'yaml_read reads previsouly unicode string written as bytes string as bytes' );
+is_deeply( $data, { 'unistr' => "I \xe2\x99\xa5 Unicode" }, 'yaml_read reads previously unicode string written as bytes string as bytes' );
 
 dies_ok { $app->fs->yaml_write($hack_dir) } 'yaml_write dies on failure';
 dies_ok { $app->fs->yaml_read( $$ . 'asfvadfvdfva' . time ) } 'yaml_read dies on failure';
@@ -329,13 +330,13 @@ dies_ok { $app->fs->yaml_read( $$ . 'asfvadfvdfva' . time ) } 'yaml_read dies on
 #### JSON ##
 
 ok( $app->fs->json_write( $json_file, $my_data ), 'json_write returns true on success' );
-like( $app->fs->read_file($json_file), qr/"utf8": "I ♥ Perl"/, 'json_write had expected content written' );    # string can change, no way to SortKeys like w/ YAML::Syck, so just make sure utf8 not written in escape syntax
+like( $app->fs->read_file($json_file), qr/"utf8": "I \xe2\x99\xa5 Perl"/, 'json_write had expected content written' );    # string can change, no way to SortKeys like w/ YAML::Syck, so just make sure utf8 not written in escape syntax
 
 $data = $app->fs->json_read($json_file);
 is_deeply( $data, $my_data, 'json_read loads expected data' );
 
 ok( $app->fs->json_write( $json_file, $data ), 'json_write returns true on success again' );
-like( $app->fs->read_file($json_file), qr/"utf8": "I ♥ Perl"/, 'json_write had expected content written' );    # string can change, no way to SortKeys like w/ YAML::Syck, so just make sure utf8 not written in escape syntax
+like( $app->fs->read_file($json_file), qr/"utf8": "I ♥ Perl"/, 'json_write had expected content written' );             # string can change, no way to SortKeys like w/ YAML::Syck, so just make sure utf8 not written in escape syntax
 
 $data = $app->fs->json_read($json_file);
 is_deeply( $data, $my_data, 'json_read loads expected data again' );
@@ -347,5 +348,41 @@ is_deeply( $data, { 'unistr' => "I \xe2\x99\xa5 Unicode" }, 'json_read reads pre
 
 dies_ok { $app->fs->json_write($hack_dir) } 'json_write dies on failure';
 dies_ok { $app->fs->json_read( $$ . 'asfvadfvdfva' . time ) } 'json_read dies on failure';
+
+################
+#### appdir() ##
+################
+
+is( $app->fs->appdir, $app->fs->spec->catdir( $app->fs->bindir(), '.' . $app->str->prefix() . '.d' ), 'appdir() returns expected string' );
+my $curprfx = $app->str->prefix;
+$app->str->prefix("yabba");
+is( $app->fs->appdir, $app->fs->spec->catdir( $app->fs->bindir(), '.yabba.d' ), 'appdir() returns expected string each time (e.g. when prefix changes)' );
+$app->str->prefix($curprfx);
+
+#####################################
+#### is_safe_part() is_safe_path() ##
+#####################################
+
+is_deeply( [ $app->fs->is_safe_part() ],           [], 'is_safe_part no arg' );
+is_deeply( [ $app->fs->is_safe_part(undef) ],      [], 'is_safe_part undef' );
+is_deeply( [ $app->fs->is_safe_part('') ],         [], 'is_safe_part no empty' );
+is_deeply( [ $app->fs->is_safe_part("\x{2665}") ], [], 'is_safe_part no unicode' );
+is_deeply( [ $app->fs->is_safe_part("foo/bar") ],  [], 'is_safe_part path' );
+
+is_deeply( [ $app->fs->is_safe_path() ],               [], 'is_safe_path no arg' );
+is_deeply( [ $app->fs->is_safe_path(undef) ],          [], 'is_safe_path undef' );
+is_deeply( [ $app->fs->is_safe_path('') ],             [], 'is_safe_path no empty' );
+is_deeply( [ $app->fs->is_safe_path("\x{2665}/foo") ], [], 'is_safe_path no unicode' );
+
+is_deeply( [ $app->fs->is_safe_path('/foo/bar') ],  [], 'is_safe_path abs' );
+is_deeply( [ $app->fs->is_safe_path("foo/bar/") ],  [], 'is_safe_path trailing' );
+is_deeply( [ $app->fs->is_safe_path('/foo/bar/') ], [], 'is_safe_path abs and trailing' );
+
+is( $app->fs->is_safe_path( '/foo/bar', 1 ), 1, 'is_safe_path abs ok' );
+is( $app->fs->is_safe_path( "foo/bar/",  0, 1 ), 1, 'is_safe_path trailing ok' );
+is( $app->fs->is_safe_path( "/foo/bar/", 1, 1 ), 1, 'is_safe_path abd and trailing ok' );
+
+ok( $app->fs->is_safe_part("foo"),     "is_safe_part() path part OK" );
+ok( $app->fs->is_safe_path("foo/bar"), "is_safe_path() path OK" );
 
 done_testing;

@@ -1,14 +1,11 @@
 package Net::DNS::RR::RRSIG;
 
-#
-# $Id: RRSIG.pm 1779 2020-05-11 09:11:17Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: RRSIG.pm 1819 2020-10-19 08:07:24Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,32 +13,32 @@ Net::DNS::RR::RRSIG - DNS RRSIG resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
-use MIME::Base64;
 use Time::Local;
 
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(:type);
 
 use constant DEBUG => 0;
 
-use constant UTIL => defined eval 'use Scalar::Util 1.25; 1;';
+use constant UTIL => defined eval { require Scalar::Util; };
+
+eval { require MIME::Base64 };
 
 # IMPORTANT: Downstream distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
 use constant USESEC => defined $INC{'Net/DNS/SEC.pm'};		# Discover how we got here, without exposing any crypto
 								# Discourage static code analysers and casual greppers
-use constant DNSSEC => USESEC && defined eval join '', qw(r e q u i r e), ' Net::DNS', qw(:: SEC :: Private);
+use constant DNSSEC => USESEC && defined eval join '', qw(r e q u i r e), ' Net::DNS', qw(:: SEC :: Private);	## no critic
 
 my @index;
 if (DNSSEC) {
-	my $key = new Net::DNS::RR( type => 'DNSKEY', key => 'AwEAAQ==' );
-	foreach my $class ( map "Net::DNS::SEC::$_", qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
-		my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";	# 1.14 API
-		@algorithms = grep eval { $key->algorithm($_); $class->verify( '', $key, '' ); 1 }, ( 1 .. 16 )
-				unless scalar(@algorithms);	# Grotesquely inefficient; but need to support older API
-		push @index, map( ( $_ => $class ), @algorithms );
+	my $key = Net::DNS::RR->new( type => 'DNSKEY', key => 'AwEAAQ==' );
+	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
+		my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";	## no critic
+		@algorithms = grep { eval { $key->algorithm($_); $class->verify( '', $key, '' ); 1 } } ( 1 .. 16 )
+				unless scalar(@algorithms);	# Grotesquely inefficient; but need to support pre-1.14 API
+		push @index, map { ( $_ => $class ) } @algorithms;
 	}
 }
 
@@ -60,8 +57,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $limit = $offset + $self->{rdlength};
 	@{$self}{@field} = unpack "\@$offset n C2 N3 n", $$data;
-	( $self->{signame}, $offset ) = decode Net::DNS::DomainName( $data, $offset + 18 );
+	( $self->{signame}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 18 );
 	$self->{sigbin} = substr $$data, $offset, $limit - $offset;
+	return;
 }
 
 
@@ -69,7 +67,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $signame = $self->{signame};
-	pack 'n C2 N3 n a* a*', @{$self}{@field}, $signame->canonical, $self->sigbin;
+	return pack 'n C2 N3 n a* a*', @{$self}{@field}, $signame->canonical, $self->sigbin;
 }
 
 
@@ -77,8 +75,9 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $signame = $self->{signame};
-	my @sig64   = split /\s+/, encode_base64( $self->sigbin );
-	my @rdata   = ( map( $self->$_, @field ), $signame->string, @sig64 );
+	my @sig64   = split /\s+/, MIME::Base64::encode( $self->sigbin );
+	my @rdata   = ( map( { $self->$_ } @field ), $signame->string, @sig64 );
+	return @rdata;
 }
 
 
@@ -87,6 +86,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	foreach ( @field, qw(signame) ) { $self->$_(shift) }
 	$self->signature(@_);
+	return;
 }
 
 
@@ -94,6 +94,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->sigval(30);
+	return;
 }
 
 
@@ -128,7 +129,8 @@ sub _defaults {				## specify RR attribute default values
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
+	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
 	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
@@ -142,7 +144,7 @@ sub _defaults {				## specify RR attribute default values
 
 	sub _algbyval {
 		my $value = shift;
-		$algbyval{$value} || return $value;
+		return $algbyval{$value} || return $value;
 	}
 }
 
@@ -151,7 +153,7 @@ sub typecovered {
 	my $self = shift;
 	$self->{typecovered} = typebyname(shift) if scalar @_;
 	my $typecode = $self->{typecovered};
-	typebyval($typecode) if defined wantarray && defined $typecode;
+	return defined $typecode ? typebyval($typecode) : undef;
 }
 
 
@@ -173,7 +175,7 @@ sub labels {
 	my $self = shift;
 
 	$self->{labels} = 0 + shift if scalar @_;
-	$self->{labels} || 0;
+	return $self->{labels} || 0;
 }
 
 
@@ -181,7 +183,7 @@ sub orgttl {
 	my $self = shift;
 
 	$self->{orgttl} = 0 + shift if scalar @_;
-	$self->{orgttl} || 0;
+	return $self->{orgttl} || 0;
 }
 
 
@@ -201,14 +203,14 @@ sub siginception {
 	return UTIL ? Scalar::Util::dualvar( $time, _time2string($time) ) : _time2string($time);
 }
 
-sub sigex { &sigexpiration; }		## historical
+sub sigex { return &sigexpiration; }	## historical
 
-sub sigin { &siginception; }		## historical
+sub sigin { return &siginception; }	## historical
 
 sub sigval {
 	my $self = shift;
 	no integer;
-	( $self->{sigval} ) = map int( 86400 * $_ ), @_;
+	return ( $self->{sigval} ) = map { int( 86400 * $_ ) } @_;
 }
 
 
@@ -216,22 +218,22 @@ sub keytag {
 	my $self = shift;
 
 	$self->{keytag} = 0 + shift if scalar @_;
-	$self->{keytag} || 0;
+	return $self->{keytag} || 0;
 }
 
 
 sub signame {
 	my $self = shift;
 
-	$self->{signame} = new Net::DNS::DomainName(shift) if scalar @_;
-	$self->{signame}->name if $self->{signame};
+	$self->{signame} = Net::DNS::DomainName->new(shift) if scalar @_;
+	return $self->{signame} ? $self->{signame}->name : undef;
 }
 
 
 sub sig {
 	my $self = shift;
 	return MIME::Base64::encode( $self->sigbin(), "" ) unless scalar @_;
-	$self->sigbin( MIME::Base64::decode( join "", @_ ) );
+	return $self->sigbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -239,11 +241,11 @@ sub sigbin {
 	my $self = shift;
 
 	$self->{sigbin} = shift if scalar @_;
-	$self->{sigbin} || "";
+	return $self->{sigbin} || "";
 }
 
 
-sub signature { &sig; }
+sub signature { return &sig; }
 
 
 sub create {
@@ -258,14 +260,14 @@ sub create {
 
 		# All the TTLs need to be the same in the data RRset.
 		my $ttl = $RR->ttl;
-		croak 'RRs in RRset do not have same TTL' if grep $_->ttl != $ttl, @$rrsetref;
+		croak 'RRs in RRset do not have same TTL' if grep { $_->ttl != $ttl } @$rrsetref;
 
 		my $private = ref($priv_key) ? $priv_key : Net::DNS::SEC::Private->new($priv_key);
 		croak 'unable to parse private key' unless ref($private) eq 'Net::DNS::SEC::Private';
 
-		my @label = grep $_ ne chr(42), $RR->{owner}->_wire;	# count labels
+		my @label = grep { $_ ne chr(42) } $RR->{owner}->_wire;	   # count labels
 
-		my $self = new Net::DNS::RR(
+		my $self = Net::DNS::RR->new(
 			name	     => $RR->name,
 			type	     => 'RRSIG',
 			class	     => 'IN',
@@ -382,79 +384,11 @@ sub verify {
 
 sub vrfyerrstr {
 	my $self = shift;
-	$self->{vrfyerrstr};
+	return $self->{vrfyerrstr};
 }
 
 
 ########################################
-
-sub _ordered($$) {			## irreflexive 32-bit partial ordering
-	use integer;
-	my ( $a, $b ) = @_;
-
-	return defined $b unless defined $a;			# ( undef, any )
-	return 0 unless defined $b;				# ( any, undef )
-
-	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
-	if ( $a < 0 ) {						# translate $a<0 region
-		$a = ( $a ^ 0x80000000 ) & 0xFFFFFFFF;		#  0	 <= $a < 2**31
-		$b = ( $b ^ 0x80000000 ) & 0xFFFFFFFF;		# -2**31 <= $b < 2**32
-	}
-
-	return $a < $b ? ( $a > ( $b - 0x80000000 ) ) : ( $b < ( $a - 0x80000000 ) );
-}
-
-
-my $y1998 = timegm( 0, 0, 0, 1, 0, 1998 );
-my $y2026 = timegm( 0, 0, 0, 1, 0, 2026 );
-my $y2082 = $y2026 << 1;
-my $y2054 = $y2082 - $y1998;
-my $m2026 = int( 0x80000000 - $y2026 );
-my $m2054 = int( 0x80000000 - $y2054 );
-my $t2082 = int( $y2082 & 0x7FFFFFFF );
-my $t2100 = 1960058752;
-
-sub _string2time {			## parse time specification string
-	my $arg = shift;
-	croak 'undefined time' unless defined $arg;
-	return int($arg) if length($arg) < 12;
-	my ( $y, $m, @dhms ) = unpack 'a4 a2 a2 a2 a2 a2', $arg . '00';
-	if ( $arg lt '20380119031408' ) {			# calendar folding
-		return timegm( reverse(@dhms), $m - 1, $y ) if $y < 2026;
-		return timegm( reverse(@dhms), $m - 1, $y - 56 ) + $y2026;
-	} elsif ( $y > 2082 ) {
-		my $z = timegm( reverse(@dhms), $m - 1, $y - 84 );    # expunge 29 Feb 2100
-		return $z < 1456790400 ? $z + $y2054 : $z + $y2054 - 86400;
-	}
-	return ( timegm( reverse(@dhms), $m - 1, $y - 56 ) + $y2054 ) - $y1998;
-}
-
-
-sub _time2string {			## format time specification string
-	my $arg = shift;
-	croak 'undefined time' unless defined $arg;
-	my $ls31 = int( $arg & 0x7FFFFFFF );
-	if ( $arg & 0x80000000 ) {
-
-		if ( $ls31 > $t2082 ) {
-			$ls31 += 86400 unless $ls31 < $t2100;	# expunge 29 Feb 2100
-			my ( $yy, $mm, @dhms ) = reverse( ( gmtime( $ls31 + $m2054 ) )[0 .. 5] );
-			return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1984, $mm + 1, @dhms;
-		}
-
-		my ( $yy, $mm, @dhms ) = reverse( ( gmtime( $ls31 + $m2026 ) )[0 .. 5] );
-		return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1956, $mm + 1, @dhms;
-
-
-	} elsif ( $ls31 > $y2026 ) {
-		my ( $yy, $mm, @dhms ) = reverse( ( gmtime( $ls31 - $y2026 ) )[0 .. 5] );
-		return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1956, $mm + 1, @dhms;
-	}
-
-	my ( $yy, $mm, @dhms ) = reverse( ( gmtime $ls31 )[0 .. 5] );
-	return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1900, $mm + 1, @dhms;
-}
-
 
 sub _CreateSigData {
 
@@ -484,7 +418,7 @@ sub _CreateSigData {
 		my $suffix = $wild->canonical;
 		unshift @label, chr(42);			# asterisk
 
-		my @RR	  = map bless( {%$_}, ref($_) ), @$rrsetref;   # shallow RR clone
+		my @RR	  = map { bless( {%$_}, ref($_) ) } @$rrsetref;	   # shallow RR clone
 		my $rr	  = $RR[0];
 		my $class = $rr->class;
 		my $type  = $rr->type;
@@ -511,7 +445,7 @@ sub _CreateSigData {
 			$table{substr $canonical, $offset} = $canonical;
 		}
 
-		$sigdata = join '', $sigdata, map $table{$_}, sort keys %table;
+		$sigdata = join '', $sigdata, map { $table{$_} } sort keys %table;
 
 		if (DEBUG) {
 			my $i = 0;
@@ -536,10 +470,10 @@ sub _CreateSig {
 		my $algorithm = $self->algorithm;
 		my $class     = $DNSSEC_siggen{$algorithm};
 
-		eval {
-			return $self->sigbin( $class->sign(@_) ) if $class;
-			die "algorithm $algorithm not supported\n";
-		} || croak "${@}signature generation failed";
+		return eval {
+			die "algorithm $algorithm not supported\n" unless $class;
+			$self->sigbin( $class->sign(@_) );
+		} || return croak "${@}signature generation failed";
 	}
 }
 
@@ -552,8 +486,8 @@ sub _VerifySig {
 		my $class     = $DNSSEC_verify{$algorithm};
 
 		my $retval = eval {
-			return $class->verify( @_, $self->sigbin ) if $class;
-			die "algorithm $algorithm not supported\n";
+			die "algorithm $algorithm not supported\n" unless $class;
+			$class->verify( @_, $self->sigbin );
 		};
 
 		unless ($retval) {
@@ -570,6 +504,72 @@ sub _VerifySig {
 }
 
 
+sub _ordered() {			## irreflexive 32-bit partial ordering
+	use integer;
+	my ( $n1, $n2 ) = @_;
+
+	return 0 unless defined $n2;				# ( any, undef )
+	return 1 unless defined $n1;				# ( undef, any )
+
+	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
+	if ( $n2 < 0 ) {					# fold, leaving $n2 non-negative
+		$n1 = ( $n1 & 0xFFFFFFFF ) ^ 0x80000000;	# -2**31 <= $n1 < 2**32
+		$n2 = ( $n2 & 0x7FFFFFFF );			#  0	 <= $n2 < 2**31
+	}
+
+	return $n1 < $n2 ? ( $n1 > ( $n2 - 0x80000000 ) ) : ( $n2 < ( $n1 - 0x80000000 ) );
+}
+
+
+my $y1998 = timegm( 0, 0, 0, 1, 0, 1998 );
+my $y2026 = timegm( 0, 0, 0, 1, 0, 2026 );
+my $y2082 = $y2026 << 1;
+my $y2054 = $y2082 - $y1998;
+my $m2026 = int( 0x80000000 - $y2026 );
+my $m2054 = int( 0x80000000 - $y2054 );
+my $t2082 = int( $y2082 & 0x7FFFFFFF );
+my $t2100 = 1960058752;
+
+sub _string2time {			## parse time specification string
+	my $arg = shift;
+	return int($arg) if length($arg) < 12;
+	my ( $y, $m, @dhms ) = unpack 'a4 a2 a2 a2 a2 a2', $arg . '00';
+	if ( $arg lt '20380119031408' ) {			# calendar folding
+		return timegm( reverse(@dhms), $m - 1, $y ) if $y < 2026;
+		return timegm( reverse(@dhms), $m - 1, $y - 56 ) + $y2026;
+	} elsif ( $y > 2082 ) {
+		my $z = timegm( reverse(@dhms), $m - 1, $y - 84 );    # expunge 29 Feb 2100
+		return $z < 1456790400 ? $z + $y2054 : $z + $y2054 - 86400;
+	}
+	return ( timegm( reverse(@dhms), $m - 1, $y - 56 ) + $y2054 ) - $y1998;
+}
+
+
+sub _time2string {			## format time specification string
+	my $arg	 = shift;
+	my $ls31 = int( $arg & 0x7FFFFFFF );
+	if ( $arg & 0x80000000 ) {
+
+		if ( $ls31 > $t2082 ) {
+			$ls31 += 86400 unless $ls31 < $t2100;	# expunge 29 Feb 2100
+			my ( $yy, $mm, @dhms ) = reverse( ( gmtime( $ls31 + $m2054 ) )[0 .. 5] );
+			return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1984, $mm + 1, @dhms;
+		}
+
+		my ( $yy, $mm, @dhms ) = reverse( ( gmtime( $ls31 + $m2026 ) )[0 .. 5] );
+		return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1956, $mm + 1, @dhms;
+
+
+	} elsif ( $ls31 > $y2026 ) {
+		my ( $yy, $mm, @dhms ) = reverse( ( gmtime( $ls31 - $y2026 ) )[0 .. 5] );
+		return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1956, $mm + 1, @dhms;
+	}
+
+	my ( $yy, $mm, @dhms ) = reverse( ( gmtime $ls31 )[0 .. 5] );
+	return sprintf '%d%02d%02d%02d%02d%02d', $yy + 1900, $mm + 1, @dhms;
+}
+
+
 1;
 __END__
 
@@ -577,12 +577,12 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name RRSIG typecovered algorithm labels
+    $rr = Net::DNS::RR->new('name RRSIG typecovered algorithm labels
 				orgttl sigexpiration siginception
 				keytag signame signature');
 
     use Net::DNS::SEC;
-    $sigrr = create Net::DNS::RR::RRSIG( \@rrset, $keypath,
+    $sigrr = Net::DNS::RR::RRSIG->create( \@rrset, $keypath,
 					sigex => 20191231010101
 					sigin => 20191201010101
 					);
@@ -705,9 +705,9 @@ Create a signature over a RR set.
 
     $keypath = '/home/olaf/keys/Kbla.foo.+001+60114.private';
 
-    $sigrr = create Net::DNS::RR::RRSIG( \@rrsetref, $keypath );
+    $sigrr = Net::DNS::RR::RRSIG->create( \@rrsetref, $keypath );
 
-    $sigrr = create Net::DNS::RR::RRSIG( \@rrsetref, $keypath,
+    $sigrr = Net::DNS::RR::RRSIG->create( \@rrsetref, $keypath,
 					sigex => 20191231010101
 					sigin => 20191201010101
 					);
@@ -718,7 +718,7 @@ Create a signature over a RR set.
 
     $private = Net::DNS::SEC::Private->new($keypath);
 
-    $sigrr= create Net::DNS::RR::RRSIG( \@rrsetref, $private );
+    $sigrr= Net::DNS::RR::RRSIG->create( \@rrsetref, $private );
 
 
 create() is an alternative constructor for a RRSIG RR object.  

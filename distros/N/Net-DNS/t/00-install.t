@@ -1,19 +1,23 @@
-# $Id: 00-install.t 1779 2020-05-11 09:11:17Z willem $ -*-perl-*-
+#!/usr/bin/perl
+# $Id: 00-install.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More;
 use File::Spec;
 use File::Find;
+use IO::File;
 use ExtUtils::MakeMaker;
 
 
 my %manifest;
-open( MANIFEST, 'MANIFEST' ) or BAIL_OUT("MANIFEST: $!");
-while (<MANIFEST>) {
+my $handle = IO::File->new( 'MANIFEST', '<' ) or BAIL_OUT("MANIFEST: $!");
+while (<$handle>) {
 	my ($filename) = split;
 	$manifest{$filename}++;
 }
-close MANIFEST;
+close $handle;
 
 plan skip_all => 'No versions from git checkouts' if -e '.git';
 

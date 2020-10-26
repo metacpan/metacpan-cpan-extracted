@@ -1,8 +1,11 @@
-# $Id: 05-KEY.t 1354 2015-06-05 08:20:53Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-KEY.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
+
 use Net::DNS;
 
 my @prerequisite = qw(
@@ -10,7 +13,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -41,20 +44,20 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -68,9 +71,9 @@ my $wire = join '', qw( 010003050103D22A6CA77F35B893206FD35E4C506D8378843709B97E
 	}
 
 
-	my $empty   = new Net::DNS::RR("$name NULL");
+	my $empty   = Net::DNS::RR->new("$name NULL");
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $decoded->encode;
 	my $hex2    = uc unpack 'H*', $encoded;
 	my $hex3    = uc unpack 'H*', substr( $encoded, length $empty->encode );

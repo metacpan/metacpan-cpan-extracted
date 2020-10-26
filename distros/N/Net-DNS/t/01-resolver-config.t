@@ -1,7 +1,11 @@
-# $Id: 01-resolver-config.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 01-resolver-config.t 1813 2020-10-08 21:58:40Z willem $	-*-perl-*-
+#
 
 use strict;
-use Test::More tests => 24;
+use warnings;
+use IO::File;
+use Test::More tests => 23;
 
 use Net::DNS::Resolver;
 
@@ -10,13 +14,10 @@ local $ENV{'RES_SEARCHLIST'};
 local $ENV{'LOCALDOMAIN'};
 local $ENV{'RES_OPTIONS'};
 
-
-BEGIN {
-	eval {
-		open( TOUCH, '>.resolv.conf' ) || die $!;	# owned by effective UID
-		close(TOUCH);
-	};
-}
+eval {
+	my $fh = IO::File->new( '.resolv.conf', '>' ) || die $!;    # owned by effective UID
+	close($fh);
+};
 
 
 my $resolver = Net::DNS::Resolver->new();
@@ -27,8 +28,6 @@ for (@Net::DNS::Resolver::ISA) {
 }
 
 ok( $resolver->isa('Net::DNS::Resolver'), 'new() created object' );
-
-ok( $resolver->print, '$resolver->print' );
 
 ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' );
 
@@ -112,6 +111,16 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 
 	is( $resolver->DESTROY, undef, 'DESTROY() exists to placate pre-5.18 AUTOLOAD' );
 }
+
+
+eval {					## exercise printing functions
+	my $object = Net::DNS::Resolver->new();
+	my $file   = "01-resolver.tmp";
+	my $handle = IO::File->new( $file, '>' ) || die "Could not open $file for writing";
+	select( ( select($handle), $object->print )[0] );
+	close($handle);
+	unlink($file);
+};
 
 
 exit;

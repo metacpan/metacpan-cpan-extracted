@@ -1,12 +1,12 @@
 package File::Sticker::Writer;
-$File::Sticker::Writer::VERSION = '0.9301';
+$File::Sticker::Writer::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Writer - write and standardize meta-data from files
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 

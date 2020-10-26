@@ -8,7 +8,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -18,6 +18,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Path::Tiny 'path';
 
 BEGIN { $ENV{PERL_ASK_BACKEND} = 'Ask::Callback' };
 
@@ -55,16 +56,18 @@ my $ask = Ask->detect(
 
 {
 	@input = qw( file1.txt file2.txt file3.txt file4.txt );
+	my $got = $ask->file_selection(text => 'Enter "file1.txt"');
+	isa_ok( $got, 'Path::Tiny' );
 	is(
-		$ask->file_selection(text => 'Enter "file1.txt"'),
-		'file1.txt',
+		$got,
+		path 'file1.txt',
 	);
 	is_deeply(
 		[ $ask->file_selection(
 			text     => 'Enter "file2.txt", "file3.txt" and "file4.txt"',
 			multiple => 1,
 		) ],
-		[ qw( file2.txt file3.txt file4.txt ) ],
+		[ map path($_), qw( file2.txt file3.txt file4.txt ) ],
 	);
 	flush_buffers();
 }

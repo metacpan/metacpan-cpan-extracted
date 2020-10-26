@@ -1,0 +1,52 @@
+---
+abstract: 'Create and Manipulate 3D Vertexes and Meshes and output for 3D printing'
+author:
+  - 'Peter C. Jones <petercj AT cpan.org>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0.86'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0.86'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - 3D
+  - CAD
+  - STL
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CAD-Mesh3D
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  CAD::Mesh3D:
+    file: lib/CAD/Mesh3D.pm
+    version: '0.003'
+requires:
+  CAD::Format::STL: v0.2.1
+  Carp: '0'
+  Exporter: '5.57'
+  Math::Vector::Real: '0.18'
+  perl: '5.010000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pryrt/CAD-Mesh3D/issues
+  repository: https://github.com/pryrt/CAD-Mesh3D.git
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

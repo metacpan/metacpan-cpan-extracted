@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,9 +6,10 @@ use warnings;
 	package Ask::API;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
+	our $VERSION   = '0.012';
 	
 	use Moo::Role;
+	use Path::Tiny 'path';
 	
 	requires 'entry';  # get a string of text
 	requires 'info';   # display a string of text
@@ -49,19 +50,41 @@ use warnings;
 	}
 	
 	sub file_selection {
-		my ($self, %o) = @_;
+		my ( $self, %opts ) = ( shift, @_ );
 		
-		if ($o{multiple}) {
-			$self->info(text => $o{text} // 'Enter file names (blank to finish)');
-			my @filenames;
-			while (my $f = $self->entry) {
-				push @filenames, $f;
+		$opts{text} ||= 'Enter file name';
+		
+		my @chosen;
+		
+		FILE: {
+			my $got = $self->entry( text => $opts{text} );
+			
+			if ( not length $got ) {
+				last FILE if $opts{multiple};
+				redo FILE;
 			}
-			return @filenames;
-		}
-		else {
-			return $self->entry(text => ($o{text} // 'Enter file name'));
-		}
+			
+			$got = path $got;
+			
+			if ( $opts{existing} and not $got->exists ) {
+				$self->error( text => 'Does not exist.' );
+				redo FILE;
+			}
+			
+			if ( $opts{directory} and not $got->is_dir ) {
+				$self->error( text => 'Is not a directory.' );
+				redo FILE;
+			}
+			
+			push @chosen, $got;
+			
+			if ( $opts{multiple} ) {
+				$self->info( text => 'Enter another file, or leave blank to finish.' );
+				redo FILE;
+			}
+		};
+		
+		$opts{multiple} ? @chosen : $chosen[0];
 	}
 	
 	my $format_choices = sub {
@@ -88,7 +111,7 @@ use warnings;
 		for (;;) {
 			my $response = $self->entry(
 				text       => "$o{text}. Choices: $choices. (Separate multiple choices with white space.)",
-				entry_text => ($repeat // ''),
+				entry_text => $repeat || '',
 			);
 			($allowed, $disallowed) = $self->$filter_chosen($o{choices}, $response);
 			if (@$disallowed) {
@@ -115,7 +138,7 @@ use warnings;
 		for (;;) {
 			my $response = $self->entry(
 				text       => "$o{text}. Choices: $choices. (Choose one.)",
-				entry_text => ($repeat // ''),
+				entry_text => $repeat || '',
 			);
 			($allowed, $disallowed) = $self->$filter_chosen($o{choices}, $response);
 			if (@$disallowed) {
@@ -178,7 +201,7 @@ methods, but they're not espcially good, so you probably want to implement
 most of those too.
 
 If you name your package C<< Ask::Something >> then C<< Ask->detect >>
-will find it (via [mod://Module::Pluggable]).
+will find it (via L<Module::Pluggable>).
 
 Methods used during detection are C<is_usable> which is called as an
 object method, and should return a boolean indicating its usability (for
@@ -205,7 +228,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.17';
+$Neo4j::Driver::ServerInfo::VERSION = '0.18';
 
 use URI 1.25;
 
@@ -13,6 +13,7 @@ use URI 1.25;
 sub new {
 	my ($class, $server_info) = @_;
 	
+	# don't store the full URI here - it may contain auth credentials
 	return bless [
 		URI->new( $server_info->{uri} )->host_port,
 		$server_info->{version},
@@ -38,7 +39,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

@@ -1,21 +1,17 @@
 package Net::DNS::RR::CERT;
 
-#
-# $Id: CERT.pm 1773 2020-03-17 08:40:55Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1773 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: CERT.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::CERT - DNS CERT resource record
 
 =cut
-
 
 use integer;
 
@@ -68,7 +64,8 @@ my %certtype = (
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
+	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
 	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
@@ -82,7 +79,7 @@ my %certtype = (
 
 	sub _algbyval {
 		my $value = shift;
-		$algbyval{$value} || return $value;
+		return $algbyval{$value} || return $value;
 	}
 }
 
@@ -93,13 +90,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	@{$self}{qw(certtype keytag algorithm)} = unpack "\@$offset n2 C", $$data;
 	$self->{certbin} = substr $$data, $offset + 5, $self->{rdlength} - 5;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack "n2 C a*", $self->certtype, $self->keytag, $self->algorithm, $self->{certbin};
+	return pack "n2 C a*", $self->certtype, $self->keytag, $self->algorithm, $self->{certbin};
 }
 
 
@@ -108,6 +106,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 	my @param = ( $self->certtype, $self->keytag, $self->algorithm );
 	my @rdata = ( @param, split /\s+/, encode_base64( $self->{certbin} ) );
+	return @rdata;
 }
 
 
@@ -118,6 +117,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->keytag(shift);
 	$self->algorithm(shift);
 	$self->cert(@_);
+	return;
 }
 
 
@@ -131,7 +131,7 @@ sub certtype {
 
 	my $typenum = $certtype{$certtype};
 	$typenum || croak qq[unknown certtype "$certtype"];
-	$self->{certtype} = $typenum;
+	return $self->{certtype} = $typenum;
 }
 
 
@@ -139,7 +139,7 @@ sub keytag {
 	my $self = shift;
 
 	$self->{keytag} = 0 + shift if scalar @_;
-	$self->{keytag} || 0;
+	return $self->{keytag} || 0;
 }
 
 
@@ -148,31 +148,31 @@ sub algorithm {
 
 	return $self->{algorithm} unless defined $arg;
 	return _algbyval( $self->{algorithm} ) if uc($arg) eq 'MNEMONIC';
-	$self->{algorithm} = _algbyname($arg);
+	return $self->{algorithm} = _algbyname($arg);
 }
 
 
-sub certificate { &certbin; }
+sub certificate { return &certbin; }
 
 
 sub certbin {
 	my $self = shift;
 
 	$self->{certbin} = shift if scalar @_;
-	$self->{certbin} || "";
+	return $self->{certbin} || "";
 }
 
 
 sub cert {
 	my $self = shift;
 	return MIME::Base64::encode( $self->certbin(), "" ) unless scalar @_;
-	$self->certbin( MIME::Base64::decode( join "", @_ ) );
+	return $self->certbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
-sub format { &certtype; }					# uncoverable pod
+sub format { return &certtype; }				# uncoverable pod
 
-sub tag { &keytag; }						# uncoverable pod
+sub tag { return &keytag; }					# uncoverable pod
 
 
 1;
@@ -182,7 +182,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name IN CERT certtype keytag algorithm cert');
+    $rr = Net::DNS::RR->new('name IN CERT certtype keytag algorithm cert');
 
 =head1 DESCRIPTION
 

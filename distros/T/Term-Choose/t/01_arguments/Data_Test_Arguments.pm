@@ -14,7 +14,7 @@ sub valid_values {
         index        => [ 0, 1 ],
         alignment    => [ 0, 1, 2 ],
         layout       => [ 0, 1, 2, 3 ],
-        mouse        => [ 0, 1, 2, 3, 4 ],
+        mouse        => [ 0, 1 ],
         order        => [ 0, 1 ],
         page         => [ 0, 1 ],
 
@@ -54,9 +54,9 @@ sub mixed_options_1 {
 
 sub mixed_options_2 {
     return {
-        mark => [ 0 ], no_spacebar => [ 11, 0, 8 ], lf => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '',
+        mark => [ 0 ], no_spacebar => [ 11, 0, 8 ], tabs_prompt => [ 1, 1 ], undef => '', prompt => 'prompt_line', empty => '',
         pad => 3, default => 9, max_width => 19, max_height => 119, ll => 15, keep => 1, page => 1, order => 1,
-        mouse => 0, layout => 3, alignment => 0, index => 0, hide_cursor => 1, clear_screen => undef, beep => 0,
+        mouse => 1, layout => 3, alignment => 0, index => 0, hide_cursor => 1, clear_screen => undef, beep => 0,
         tabs_prompt => [ 4, 4 ]
     };
 }
@@ -72,7 +72,7 @@ sub invalid_values {
         index        => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
         alignment    => [ grep { ! /^[ 0 1 2 ]\z/x }       @invalid ],
         layout       => [ grep { ! /^[ 0 1 2 3 ]\z/x }     @invalid ],
-        mouse        => [ grep { ! /^[ 0 1 2 3 4 ]\z/x }   @invalid ],
+        mouse        => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
         order        => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
         page         => [ grep { ! /^[ 0 1 ]\z/x }         @invalid ],
         keep         => [ grep { ! /^[ 1-9 ][ 0-9 ]*\z/x } @invalid ],

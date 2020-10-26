@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
-#
-# $Id: RR.pm 1796 2020-07-28 08:22:47Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1796 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: RR.pm 1812 2020-10-07 18:09:53Z willem $)[2];
 
 
 =head1 NAME
@@ -14,9 +14,9 @@ Net::DNS::RR - DNS resource record base class
 
     use Net::DNS;
 
-    $rr = new Net::DNS::RR('example.com IN AAAA 2001:DB8::1');
+    $rr = Net::DNS::RR->new('example.com IN AAAA 2001:DB8::1');
 
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	    owner   => 'example.com',
 	    type    => 'AAAA',
 	    address => '2001:DB8::1'
@@ -31,14 +31,12 @@ See also the manual pages for each specific RR type.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
-use constant LIB => grep $_ ne '.', grep !ref($_), @INC;
+use constant LIB => grep { $_ ne '.' } grep { !ref($_) } @INC;
 
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(%classbyname :class :type);
 use Net::DNS::DomainName;
 
 
@@ -57,8 +55,8 @@ sub new {
 		scalar @_ > 2 ? &_new_hash : &_new_string;
 	} || do {
 		my $class = shift || __PACKAGE__;
-		my @param = map defined($_) ? split /\s+/ : 'undef', @_;
-		my $stmnt = substr "new $class( @param )", 0, 80;
+		my @param = map { defined($_) ? split /\s+/ : 'undef' } @_;
+		my $stmnt = substr "$class->new( @param )", 0, 80;
 		croak "${@}in $stmnt\n";
 	};
 }
@@ -66,10 +64,10 @@ sub new {
 
 =head2 new (from string)
 
-    $aaaa  = new Net::DNS::RR('host.example.com. 86400 AAAA 2001:DB8::1');
-    $mx	   = new Net::DNS::RR('example.com. 7200 MX 10 mailhost.example.com.');
-    $cname = new Net::DNS::RR('www.example.com 300 IN CNAME host.example.com');
-    $txt   = new Net::DNS::RR('txt.example.com 3600 HS TXT "text data"');
+    $aaaa  = Net::DNS::RR->new('host.example.com. 86400 AAAA 2001:DB8::1');
+    $mx	   = Net::DNS::RR->new('example.com. 7200 MX 10 mailhost.example.com.');
+    $cname = Net::DNS::RR->new('www.example.com 300 IN CNAME host.example.com');
+    $txt   = Net::DNS::RR->new('txt.example.com 3600 HS TXT "text data"');
 
 Returns an object of the appropriate RR type, or a L<Net::DNS::RR> object
 if the type is not implemented. The attribute values are extracted from the
@@ -102,7 +100,7 @@ sub _new_string {
 	s/\\\(/\\040/g;						# disguise escaped bracket
 	s/\\\)/\\041/g;						# disguise escaped bracket
 	s/\\;/\\059/g;						# disguise escaped semicolon
-	my ( $owner, @token ) = grep defined && length, split /$PARSE_REGEX/o;
+	my ( $owner, @token ) = grep { defined && length } split /$PARSE_REGEX/o;
 
 	croak 'unable to parse RR string' unless scalar @token;
 	my $t1 = uc $token[0];
@@ -112,11 +110,11 @@ sub _new_string {
 	if ( not defined $t2 ) {				# <owner> <type>
 		@token = ('ANY') if $classbyname{$t1};		# <owner> <class>
 	} elsif ( $t1 =~ /^\d/ ) {
-		$ttl = shift @token;				# <owner> <ttl> [<class>] <type>
+		$ttl   = shift @token;				# <owner> <ttl> [<class>] <type>
 		$class = shift @token if $classbyname{uc $t2} || $t2 =~ /^CLASS\d/i;
 	} elsif ( $classbyname{$t1} || $t1 =~ /^CLASS\d/ ) {
 		$class = shift @token;				# <owner> <class> [<ttl>] <type>
-		$ttl = shift @token if $t2 =~ /^\d/;
+		$ttl   = shift @token if $t2 =~ /^\d/;
 	}
 
 	my $type      = shift(@token);
@@ -146,9 +144,9 @@ sub _new_string {
 
 =head2 new (from hash)
 
-    $rr = new Net::DNS::RR(%hash);
+    $rr = Net::DNS::RR->new(%hash);
 
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	    owner   => 'host.example.com',
 	    ttl	    => 86400,
 	    class   => 'IN',
@@ -156,7 +154,7 @@ sub _new_string {
 	    address => '2001:DB8::1'
 	    );
  
-    $rr = new Net::DNS::RR(
+    $rr = Net::DNS::RR->new(
 	    owner   => 'txt.example.com',
 	    type    => 'TXT',
 	    txtdata => [ 'one', 'two' ]
@@ -271,7 +269,7 @@ sub encode {
 	my $owner = $self->{owner}->encode( $offset, @opaque );
 	my ( $type, $class, $ttl ) = @{$self}{qw(type class ttl)};
 	my $rdata = $self->_empty ? '' : $self->_encode_rdata( $offset + length($owner) + RRFIXEDSZ, @opaque );
-	pack 'a* n2 N n a*', $owner, $type, $class || 1, $ttl || 0, length $rdata, $rdata;
+	return pack 'a* n2 N n a*', $owner, $type, $class || 1, $ttl || 0, length $rdata, $rdata;
 }
 
 
@@ -294,7 +292,7 @@ sub canonical {
 	my $owner = $self->{owner}->canonical;
 	my ( $type, $class, $ttl ) = @{$self}{qw(type class ttl)};
 	my $rdata = $self->_empty ? '' : $self->_encode_rdata( length($owner) + RRFIXEDSZ );
-	pack 'a* n2 N n a*', $owner, $type, $class || 1, $ttl || 0, length $rdata, $rdata;
+	return pack 'a* n2 N n a*', $owner, $type, $class || 1, $ttl || 0, length $rdata, $rdata;
 }
 
 
@@ -309,6 +307,7 @@ Calls the string method to get the formatted RR representation.
 
 sub print {
 	print shift->string, "\n";
+	return;
 }
 
 
@@ -327,7 +326,7 @@ sub string {
 	my $self = shift;
 
 	my $name = $self->{owner}->string;
-	my @ttl	 = grep defined, $self->{ttl};
+	my @ttl	 = grep {defined} $self->{ttl};
 	my @core = ( $name, @ttl, $self->class, $self->type );
 
 	my $empty = $self->_empty;
@@ -342,7 +341,7 @@ sub string {
 	my $last = pop(@line);					# last or only line
 	$last = join $tab, @core, "@rdata" unless scalar(@line);
 
-	join "\n\t", @line, _wrap( $last, map "; $_", $self->_annotation );
+	return join "\n\t", @line, _wrap( $last, map {"; $_"} $self->_annotation );
 }
 
 
@@ -375,14 +374,14 @@ Returns a token list representation of the RR zone file string.
 sub token {
 	my $self = shift;
 
-	my @ttl = grep defined, $self->{ttl};
+	my @ttl	 = grep {defined} $self->{ttl};
 	my @core = ( $self->{owner}->string, @ttl, $self->class, $self->type );
 
 	my @rdata = $self->_empty ? () : eval { $self->_format_rdata };
 
 	# parse into quoted strings, contiguous non-whitespace and (discarded) comments
-	my @parse = map split( /$PARSE_REGEX/o, $_ ), @rdata;
-	my @token = ( @core, grep defined && length, @parse );
+	my @parse = map { split( /$PARSE_REGEX/o, $_ ) } @rdata;
+	return ( @core, grep { defined && length } @parse );
 }
 
 
@@ -399,14 +398,14 @@ and provisioning software.
 sub generic {
 	my $self = shift;
 
-	my @ttl = grep defined, $self->{ttl};
-	my @class = map "CLASS$_", grep defined, $self->{class};
-	my @core = ( $self->{owner}->string, @ttl, @class, "TYPE$self->{type}" );
-	my $data = $self->rdata;
-	my @data = ( '\\#', length($data), split /(\S{32})/, unpack 'H*', $data );
-	my @line = _wrap( "@core (", @data, ')' );
+	my @ttl	  = grep {defined} $self->{ttl};
+	my @class = map	 {"CLASS$_"} grep {defined} $self->{class};
+	my @core  = ( $self->{owner}->string, @ttl, @class, "TYPE$self->{type}" );
+	my $data  = $self->rdata;
+	my @data  = ( '\\#', length($data), split /(\S{32})/, unpack 'H*', $data );
+	my @line  = _wrap( "@core (", @data, ')' );
 	return join "\n\t", @line if scalar(@line) > 1;
-	join ' ', @core, @data;
+	return join ' ', @core, @data;
 }
 
 
@@ -420,11 +419,11 @@ Returns the owner name of the record.
 
 sub owner {
 	my $self = shift;
-	$self->{owner} = new Net::DNS::DomainName1035(shift) if scalar @_;
-	$self->{owner}->name if defined wantarray;
+	$self->{owner} = Net::DNS::DomainName1035->new(shift) if scalar @_;
+	return defined wantarray ? $self->{owner}->name : undef;
 }
 
-sub name { &owner; }			## historical
+sub name { return &owner; }		## historical
 
 
 =head2 type
@@ -438,7 +437,7 @@ Returns the record type.
 sub type {
 	my $self = shift;
 	croak 'not possible to change RR->type' if scalar @_;
-	typebyval( $self->{type} );
+	return typebyval( $self->{type} );
 }
 
 
@@ -453,7 +452,7 @@ Resource record class.
 sub class {
 	my $self = shift;
 	return $self->{class} = classbyname(shift) if scalar @_;
-	defined $self->{class} ? classbyval( $self->{class} ) : 'IN';
+	return defined $self->{class} ? classbyval( $self->{class} ) : 'IN';
 }
 
 
@@ -476,13 +475,13 @@ sub ttl {
 
 	return $self->{ttl} || 0 unless defined $time;		# avoid defining rr->{ttl}
 
-	my $ttl = 0;
+	my $ttl	 = 0;
 	my %time = reverse split /(\D)\D*/, $time . 'S';
 	while ( my ( $u, $t ) = each %time ) {
 		my $scale = $unit{uc $u} || die qq(bad time: $t$u);
 		$ttl += $t * $scale;
 	}
-	$self->{ttl} = $ttl;
+	return $self->{ttl} = $ttl;
 }
 
 
@@ -494,18 +493,18 @@ sub ttl {
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $self, $data, $offset ) = @_;
-	$self->{rdata} = substr $$data, $offset, $self->{rdlength};
+	return $self->{rdata} = substr $$data, $offset, $self->{rdlength};
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
-	my $rdata = shift->{rdata};
+	return shift->{rdata};
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string
 	my $rdata = shift->rdata;				# RFC3597 unknown RR format
-	my @rdata = ( '\\#', length($rdata), split /(\S{32})/, unpack 'H*', $rdata );
+	return ( '\\#', length($rdata), split /(\S{32})/, unpack 'H*', $rdata );
 }
 
 
@@ -526,17 +525,17 @@ sub dump {				## print internal data structure
 	require Data::Dumper;					# uncoverable pod
 	local $Data::Dumper::Maxdepth = $Data::Dumper::Maxdepth || 6;
 	local $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys || 1;
-	print Data::Dumper::Dumper(@_);
+	return print Data::Dumper::Dumper(@_);
 }
 
 sub rdatastr {				## historical RR subtype method
-	&rdstring;						# uncoverable pod
+	return &rdstring;					# uncoverable pod
 }
 
 
 =head2 rdata
 
-    $rr = new Net::DNS::RR( type => NULL, rdata => 'arbitrary' );
+    $rr = Net::DNS::RR->new( type => NULL, rdata => 'arbitrary' );
 
 Resource record data section when viewed as opaque octets.
 
@@ -550,7 +549,8 @@ sub rdata {
 	my $data = shift || '';
 	my $hash = {};
 	$self->_decode_rdata( \$data, 0, $hash ) if ( $self->{rdlength} = length $data );
-	croak 'unexpected compression pointer in rdata' if keys %$hash;
+	croak 'compression pointer in rdata'	 if keys %$hash;
+	return;
 }
 
 
@@ -568,7 +568,7 @@ sub rdstring {
 	my @rdata = $self->_empty ? () : eval { $self->_format_rdata };
 	carp $@ if $@;
 
-	join "\n\t", _wrap(@rdata);
+	return join "\n\t", _wrap(@rdata);
 }
 
 
@@ -581,7 +581,7 @@ Returns the uncompressed length of the encoded RR-specific data.
 =cut
 
 sub rdlength {
-	length shift->rdata;
+	return length shift->rdata;
 }
 
 
@@ -628,6 +628,7 @@ sub set_rrsort_func {
 
 	my ($type) = $class =~ m/::([^:]+)$/;
 	$rrsortfunct{$type}{$attribute} = $function;
+	return;
 }
 
 
@@ -640,15 +641,15 @@ get_rrsort_func() returns a reference to the comparator function.
 
 =cut
 
-my $default = sub { $Net::DNS::a->canonical() cmp $Net::DNS::b->canonical(); };
+my $default = sub { return $Net::DNS::a->canonical() cmp $Net::DNS::b->canonical(); };
 
 sub get_rrsort_func {
-	my $class = shift;
+	my $class     = shift;
 	my $attribute = shift || 'default_sort';
 
 	my ($type) = $class =~ m/::([^:]+)$/;
 
-	$rrsortfunct{$type}{$attribute} || $default;
+	return $rrsortfunct{$type}{$attribute} || return $default;
 }
 
 
@@ -666,7 +667,7 @@ sub get_rrsort_func {
 # to be copied into the newly created object.
 
 our %_MINIMAL = ( 255 => bless ['type' => 255], __PACKAGE__ );
-our %_LOADED = %_MINIMAL;
+our %_LOADED  = %_MINIMAL;
 
 sub _subclass {
 	my ( $class, $rrname, $default ) = @_;
@@ -682,13 +683,13 @@ sub _subclass {
 
 			my $subclass = join '::', __PACKAGE__, $identifier;
 
-			unless ( eval "require $subclass" ) {
+			unless ( eval "require $subclass" ) {	## no critic ProhibitStringyEval
 				push @INC, sub {
 					Net::DNS::Parameters::_typespec("$rrtype.RRTYPE");
 				};
 
 				$subclass = join '::', __PACKAGE__, "TYPE$rrtype";
-				eval "require $subclass";
+				eval "require $subclass";	## no critic ProhibitStringyEval
 			}
 
 			$subclass = __PACKAGE__ if $@;
@@ -707,14 +708,14 @@ sub _subclass {
 	}
 
 	my $prebuilt = $default ? $_LOADED{$rrname} : $_MINIMAL{$rrname};
-	bless {@$prebuilt}, ref($prebuilt);			# create object
+	return bless {@$prebuilt}, ref($prebuilt);		# create object
 }
 
 
 sub _annotation {
 	my $self = shift;
 	$self->{annotation} = ["@_"] if scalar @_;
-	return @{$self->{annotation} || []} if wantarray;
+	return wantarray ? @{$self->{annotation} || []} : ();
 }
 
 
@@ -722,14 +723,15 @@ my $warned;
 
 sub _deprecate {
 	carp join ' ', 'deprecated method;', pop(@_) unless $warned++;
+	return;
 }
 
 
-my %ignore = map( ( $_ => 1 ), @core, 'annotation', '#' );
+my %ignore = map { ( $_ => 1 ) } @core, 'annotation', '#';
 
 sub _empty {
 	my $self = shift;
-	not( $self->{'#'} ||= scalar grep !$ignore{$_}, keys %$self );
+	return not( $self->{'#'} ||= scalar grep { !$ignore{$_} } keys %$self );
 }
 
 
@@ -763,22 +765,22 @@ our $AUTOLOAD;
 sub DESTROY { }				## Avoid tickling AUTOLOAD (in cleanup)
 
 sub AUTOLOAD {				## Default method
-	my $self = shift;
+	my $self     = shift;
 	my ($method) = reverse split /::/, $AUTOLOAD;
 
 	for ($method) {			## tolerate mixed-case attribute name
 		return $self->$_(@_) if tr [A-Z-] [a-z_];
 	}
 
-	no strict q/refs/;
+	no strict 'refs';		## no critic ProhibitNoStrict
 	*{$AUTOLOAD} = sub {undef};	## suppress repetition and deep recursion
 	my $oref = ref($self);
 	croak qq[$self has no class method "$method"] unless $oref;
 
 	my $string = $self->string;
-	my @object = grep defined($_), $oref, $oref->VERSION;
+	my @object = grep { defined($_) } $oref, $oref->VERSION;
 	my $module = join '::', __PACKAGE__, $self->type;
-	eval("require $module") if $oref eq __PACKAGE__;
+	eval("require $module") if $oref eq __PACKAGE__;	## no critic ProhibitStringyEval
 
 	@_ = ( <<"END", $@, "@object" );
 ***  FATAL PROGRAM ERROR!!	Unknown instance method "$method"

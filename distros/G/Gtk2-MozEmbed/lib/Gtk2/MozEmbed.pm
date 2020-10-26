@@ -13,7 +13,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
   my $self = shift();
@@ -29,7 +29,7 @@ __END__
 
 =head1 NAME
 
-Gtk2::MozEmbed - Perl interface to the Mozilla embedding widget
+Gtk2::MozEmbed - (DEPRECATED) Perl interface to the Mozilla embedding widget
 
 =head1 SYNOPSIS
 

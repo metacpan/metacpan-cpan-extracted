@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Carp qw( croak );
 use DateTime 1.45;
@@ -366,7 +366,7 @@ DateTime::Format::Builder->create_class(
                 regex       => qr/^ (\d\d) -?? W (\d\d) -?? (\d) $/x,
                 params      => [qw( year week day_of_week )],
                 postprocess => [ \&_fix_2_digit_year, \&_normalize_week ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',          'from_day_of_year' ],
             },
             {
                 #YYWww 85W15
@@ -375,7 +375,7 @@ DateTime::Format::Builder->create_class(
                 regex       => qr/^ (\d\d) -?? W (\d\d) $/x,
                 params      => [qw( year week )],
                 postprocess => [ \&_fix_2_digit_year, \&_normalize_week ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',          'from_day_of_year' ],
             },
             {
                 #-YWwwD -5W155
@@ -384,7 +384,7 @@ DateTime::Format::Builder->create_class(
                 regex       => qr/^ - (\d) -?? W (\d\d) -?? (\d) $/x,
                 params      => [qw( year week day_of_week )],
                 postprocess => [ \&_fix_1_digit_year, \&_normalize_week ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',          'from_day_of_year' ],
             },
             {
                 #-YWww -5W15
@@ -393,7 +393,7 @@ DateTime::Format::Builder->create_class(
                 regex       => qr/^ - (\d) -?? W (\d\d) $/x,
                 params      => [qw( year week )],
                 postprocess => [ \&_fix_1_digit_year, \&_normalize_week ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',          'from_day_of_year' ],
             },
             {
                 #-WwwD -W155
@@ -402,7 +402,7 @@ DateTime::Format::Builder->create_class(
                 regex       => qr/^ - W (\d\d) -?? (\d) $/x,
                 params      => [qw( week day_of_week )],
                 postprocess => [ \&_add_year, \&_normalize_week ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',  'from_day_of_year' ],
             },
             {
                 #-Www -W15
@@ -410,7 +410,7 @@ DateTime::Format::Builder->create_class(
                 regex       => qr/^ - W (\d\d) $/x,
                 params      => [qw( week )],
                 postprocess => [ \&_add_year, \&_normalize_week ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',  'from_day_of_year' ],
             },
             {
                 #-W-D -W-5
@@ -817,7 +817,7 @@ DateTime::Format::Builder->create_class(
                             T (\d\d) :?? (\d\d) ([+-] \d{2,4}) $/x,
                 params => [qw( year week day_of_week hour minute time_zone)],
                 postprocess => [ \&_normalize_week, \&_normalize_offset ],
-                constructor => [ 'DateTime', 'from_day_of_year' ],
+                constructor => [ 'DateTime',        'from_day_of_year' ],
             },
         ],
         parse_time => [
@@ -1095,24 +1095,32 @@ DateTime::Format::ISO8601 - Parses ISO8601 formats
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
     use DateTime::Format::ISO8601;
 
-    my $str = '2020-07-25T11:32:31';
+    my $datetime_str = '2020-07-25T11:32:31';
+    my $dt       = DateTime::Format::ISO8601->parse_datetime($datetime_str);
+    say $dt;
 
-    my $dt = DateTime::Format::ISO8601->parse_datetime($str);
-    $dt = DateTime::Format::ISO8601->parse_time($str);
+    # This format is ambiguous and could be either a date or time, so use the
+    # parse_time method.
+    my $time_str = '113231';
+    $dt = DateTime::Format::ISO8601->parse_time($time_str);
+    say $dt;
 
     # or
 
     my $iso8601 = DateTime::Format::ISO8601->new;
-    $dt = $iso8601->parse_datetime($str);
-    $dt = $iso8601->parse_time($str);
+    $dt = $iso8601->parse_datetime($datetime_str);
+    say $dt;
 
-    $str = DateTime::Format::ISO8601->format_datetime($dt);
+    $dt = $iso8601->parse_time($time_str);
+    say $dt;
+
+    say DateTime::Format::ISO8601->format_datetime($dt);
 
 =head1 DESCRIPTION
 

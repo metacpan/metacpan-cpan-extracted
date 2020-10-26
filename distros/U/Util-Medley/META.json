@@ -88,7 +88,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.051",
+   "version" : "0.052",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "JSON::XS version 4.02"
 }

@@ -1,9 +1,9 @@
 package Net::DNS::ZoneFile;
 
-#
-# $Id: ZoneFile.pm 1769 2020-02-13 10:40:40Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1769 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: ZoneFile.pm 1813 2020-10-08 21:58:40Z willem $)[2];
 
 
 =head1 NAME
@@ -14,7 +14,7 @@ Net::DNS::ZoneFile - DNS zone file
 
     use Net::DNS::ZoneFile;
 
-    $zonefile = new Net::DNS::ZoneFile( 'named.example' );
+    $zonefile = Net::DNS::ZoneFile->new( 'named.example' );
 
     while ( $rr = $zonefile->read ) {
 	$rr->print;
@@ -42,8 +42,6 @@ automatically to all subsequent records.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 use IO::File;
@@ -51,7 +49,7 @@ use IO::File;
 use base qw(Exporter);
 our @EXPORT = qw(parse read readfh);
 
-use constant PERLIO => defined eval 'require PerlIO';
+use constant PERLIO => defined eval { require PerlIO };
 
 require Net::DNS::Domain;
 require Net::DNS::RR;
@@ -62,10 +60,10 @@ require Net::DNS::RR;
 
 =head2 new
 
-    $zonefile = new Net::DNS::ZoneFile( 'filename', ['example.com'] );
+    $zonefile = Net::DNS::ZoneFile->new( 'filename', ['example.com'] );
 
-    $handle   = new IO::File( 'filename', '<:encoding(ISO8859-7)' );
-    $zonefile = new Net::DNS::ZoneFile( $handle, ['example.com'] );
+    $handle   = IO::File->new( 'filename', '<:encoding(ISO8859-7)' );
+    $zonefile = Net::DNS::ZoneFile->new( $handle, ['example.com'] );
 
 The new() constructor returns a Net::DNS::ZoneFile object which
 represents the zone file specified in the argument list.
@@ -95,7 +93,7 @@ sub new {
 	}
 
 	croak 'filename argument undefined' unless $file;
-	$self->{filehandle} = new IO::File( $file, '<' ) or croak "$file: $!";
+	$self->{filehandle} = IO::File->new( $file, '<' ) or croak "$file: $!";
 	$self->{fileopen}{$file}++;
 	$self->{filename} = $file;
 	return $self;
@@ -185,7 +183,7 @@ zone file.
 
 sub origin {
 	my $context = shift->{context};
-	return &$context( sub { new Net::DNS::Domain('@') } )->string;
+	return &$context( sub { Net::DNS::Domain->new('@') } )->string;
 }
 
 
@@ -265,7 +263,7 @@ sub _read {
 	my $filename = shift;
 	local $include_dir = shift;
 
-	my $zonefile = new Net::DNS::ZoneFile( _filename($filename) );
+	my $zonefile = Net::DNS::ZoneFile->new( _filename($filename) );
 	my @zone;
 	eval {
 		local $SIG{__DIE__};
@@ -280,13 +278,13 @@ sub _read {
 
 {
 
-	package Net::DNS::ZoneFile::Text;
+	package Net::DNS::ZoneFile::Text;	## no critic ProhibitMultiplePackages
 
 	use overload ( '<>' => 'readline' );
 
 	sub new {
-		my $self = bless {}, shift;
-		my $data = shift;
+		my ( $class, $data ) = @_;
+		my $self = bless {}, $class;
 		$self->{data} = [split /\n/, ref($data) ? $$data : $data];
 		return $self;
 	}
@@ -342,7 +340,7 @@ sub parse {
 	my ($arg1) = @_;
 	shift if !ref($arg1) && $arg1 eq __PACKAGE__;
 	my $text = shift;
-	return &readfh( new Net::DNS::ZoneFile::Text($text), @_ );
+	return &readfh( Net::DNS::ZoneFile::Text->new($text), @_ );
 }
 
 
@@ -351,13 +349,13 @@ sub parse {
 
 {
 
-	package Net::DNS::ZoneFile::Generator;
+	package Net::DNS::ZoneFile::Generator;	## no critic ProhibitMultiplePackages
 
 	use overload ( '<>' => 'readline' );
 
 	sub new {
-		my $self = bless {}, shift;
-		my ( $range, $template, $line ) = @_;
+		my ( $class, $range, $template, $line ) = @_;
+		my $self = bless {}, $class;
 
 		$template =~ s/\\\$/\\036/g;			# disguise escaped dollar
 		$template =~ s/\$\$/\\036/g;			# disguise escaped dollar
@@ -376,7 +374,7 @@ sub parse {
 
 	sub readline {
 		my $self = shift;
-		return undef unless $self->{count}-- > 0;	# EOF
+		return unless $self->{count}-- > 0;		# EOF
 
 		my $instant = $self->{instant};			# update iterator state
 		$self->{instant} += $self->{step};
@@ -424,11 +422,11 @@ sub parse {
 sub _generate {				## expand $GENERATE into input stream
 	my ( $self, $range, $template ) = @_;
 
-	my $handle = new Net::DNS::ZoneFile::Generator( $range, $template, $self->line );
+	my $handle = Net::DNS::ZoneFile::Generator->new( $range, $template, $self->line );
 
 	delete $self->{latest};					# forget previous owner
-	$self->{parent}	    = bless {%$self}, ref($self);	# save state, create link
-	$self->{filehandle} = $handle;
+	$self->{parent} = bless {%$self}, ref($self);		# save state, create link
+	return $self->{filehandle} = $handle;
 }
 
 
@@ -448,8 +446,8 @@ sub _getline {				## get line from current source
 			s/\\\(/\\040/g;				# disguise escaped bracket
 			s/\\\)/\\041/g;				# disguise escaped bracket
 			s/\\;/\\059/g;				# disguise escaped semicolon
-			my @token = grep defined && length, split /$LEX_REGEX/o;
-			if ( grep( $_ eq '(', @token ) && !grep( $_ eq ')', @token ) ) {
+			my @token = grep { defined && length } split /$LEX_REGEX/o;
+			if ( grep( { $_ eq '(' } @token ) && !grep( { $_ eq ')' } @token ) ) {
 				while (<$fh>) {
 					s/\\\\/\\092/g;		# disguise escaped escape
 					s/\\"/\\034/g;		# disguise escaped quote
@@ -457,9 +455,9 @@ sub _getline {				## get line from current source
 					s/\\\)/\\041/g;		# disguise escaped bracket
 					s/\\;/\\059/g;		# disguise escaped semicolon
 					$_ = pop(@token) . $_;	# splice fragmented string
-					my @part = grep defined && length, split /$LEX_REGEX/o;
+					my @part = grep { defined && length } split /$LEX_REGEX/o;
 					push @token, @part;
-					last if grep $_ eq ')', @part;
+					last if grep { $_ eq ')' } @part;
 				}
 				$_ = join ' ', @token;		# reconstitute RR string
 			}
@@ -495,9 +493,9 @@ sub _getline {				## get line from current source
 
 	$self->{eom} = $self->line;				# end of file
 	$fh->close();
-	my $link = $self->{parent} || return undef;		# end of zone
+	my $link = $self->{parent} || return;			# end of zone
 	%$self = %$link;					# end $INCLUDE
-	$self->_getline;					# resume input
+	return $self->_getline;					# resume input
 }
 
 
@@ -505,7 +503,7 @@ sub _getRR {				## get RR from current source
 	my $self = shift;
 
 	local $_;
-	$self->_getline || return undef;			# line already in $_
+	$self->_getline || return;				# line already in $_
 
 	my $noname = s/^\s/\@\t/;				# placeholder for empty RR name
 
@@ -535,7 +533,7 @@ sub _include {				## open $INCLUDE file
 	die qq(\$INCLUDE $file: Unexpected recursion) if $opened->{$file}++;
 
 	my $discipline = PERLIO ? join( ':', '<', PerlIO::get_layers $self->{filehandle} ) : '<';
-	my $filehandle = new IO::File( $file, $discipline ) or die qq(\$INCLUDE $file: $!);
+	my $filehandle = IO::File->new( $file, $discipline ) or die qq(\$INCLUDE $file: $!);
 
 	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link
@@ -552,6 +550,7 @@ sub _origin {				## change $ORIGIN (scope: current file)
 	$context = Net::DNS::Domain->origin(undef) unless $context;
 	$self->{context} = &$context( sub { Net::DNS::Domain->origin($name) } );
 	delete $self->{latest};					# forget previous owner
+	return;
 }
 
 

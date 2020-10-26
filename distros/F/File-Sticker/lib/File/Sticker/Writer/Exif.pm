@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Exif;
-$File::Sticker::Writer::Exif::VERSION = '0.9301';
+$File::Sticker::Writer::Exif::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Writer::Exif - write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -26,6 +26,7 @@ nomenclature, such as "tags" for things called tags, or Keywords or Subject etc.
 use common::sense;
 use File::LibMagic;
 use Image::ExifTool qw(:Public);
+use YAML::Any;
 
 use parent qw(File::Sticker::Writer);
 
@@ -79,7 +80,9 @@ sub known_fields {
         description=>'TEXT',
         location=>'TEXT',
         url=>'TEXT',
-        tags=>'MULTI'};
+        tags=>'MULTI',
+        %{$self->{wanted_fields}},
+    };
 } # known_fields
 
 =head2 readonly_fields
@@ -120,7 +123,7 @@ Overwrite the given field. This does no checking.
 sub replace_one_field {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami(), " field=$args{field},value=$args{value}" if $self->{verbose} > 2;
 
     my $filename = $self->_get_the_real_file(filename=>$args{filename});
     my $field = $args{field};
@@ -129,6 +132,7 @@ sub replace_one_field {
     my $ft = $self->{file_magic}->info_from_filename($filename);
     my $et = new Image::ExifTool;
     $et->Options(ListSep=>',',ListSplit=>',');
+    $et->ExtractInfo($filename);
 
     my $success;
     if ($field eq 'url')
@@ -138,6 +142,10 @@ sub replace_one_field {
     elsif ($field eq 'creator')
     {
         $success = $et->SetNewValue('Creator', $value);
+    }
+    elsif ($field eq 'copyright')
+    {
+        $success = $et->SetNewValue('License', $value);
     }
     elsif ($field eq 'title')
     {
@@ -172,6 +180,13 @@ sub replace_one_field {
             $success = $et->SetNewValue('Subject', \@tags);
         }
     }
+    else # freeform field
+    {
+        # Need to read all the YAML, change this field, and write it again
+        my $fdata = $self->_read_freeform_data(exif=>$et);
+        $fdata->{$field} = $value;
+        $success = $self->_write_freeform_data(newdata=>$fdata,exif=>$et);
+    }
 
     if ($success)
     {
@@ -191,7 +206,7 @@ Completely remove the given field. This does no checking.
 sub delete_field_from_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami(), " field=$args{field}" if $self->{verbose} > 2;
 
     my $filename = $self->_get_the_real_file(filename=>$args{filename});
     my $field = $args{field};
@@ -199,6 +214,7 @@ sub delete_field_from_file {
     my $ft = $self->{file_magic}->info_from_filename($filename);
     my $et = new Image::ExifTool;
     $et->Options(ListSep=>',',ListSplit=>',');
+    $et->ExtractInfo($filename);
 
     my $success;
     if ($field eq 'url')
@@ -227,6 +243,17 @@ sub delete_field_from_file {
     elsif ($field eq 'tags')
     {
         $success = $et->SetNewValue('Keywords');
+        $success = $et->SetNewValue('Subject');
+    }
+    else # freeform field
+    {
+        # Need to read all the YAML, change this field, and write it again
+        my $fdata = $self->_read_freeform_data(exif=>$et);
+        if (exists $fdata->{$field})
+        {
+            delete $fdata->{$field};
+            $success = $self->_write_freeform_data(newdata=>$fdata,exif=>$et);
+        }
     }
 
     if ($success)
@@ -261,6 +288,74 @@ sub _get_the_real_file {
     }
     return $filename;
 } # _get_the_real_file
+
+=head2 _read_freeform_data
+
+Read the freeform data as YAML data from the UserComment field
+    
+    my $ydata = $self->_read_freeform_data(exif=>$exif);
+
+=cut
+
+sub _read_freeform_data {
+    my $self = shift;
+    my %args = @_;
+    say STDERR whoami() if $self->{verbose} > 2;
+
+    my $ydata;
+    my $et = $args{exif};
+    my $ystring = $et->GetValue('UserComment');
+    $ystring = $et->GetNewValue('UserComment') if !$ystring;
+    say STDERR "ystring=$ystring" if $self->{verbose} > 2;
+    if ($ystring)
+    {
+        eval {$ydata = Load($ystring);};
+        if ($@)
+        {
+            warn __PACKAGE__, " Load of YAML data failed: $@";
+        }
+        elsif (!$ydata)
+        {
+            warn __PACKAGE__, " no legal YAML";
+        }
+    }
+    say STDERR Dump($ydata) if $self->{verbose} > 2;
+    return $ydata;
+} # _read_freeform_data
+
+=head2 _write_freeform_data
+
+Write the freeform data as YAML data from the UserComment field
+This overwrites whatever is there, it does not check.
+    
+    $self->_read_freeform_data(newdata=>\%newdata,exif=>$exif);
+
+=cut
+
+sub _write_freeform_data {
+    my $self = shift;
+    my %args = @_;
+    say STDERR whoami() if $self->{verbose} > 2;
+
+    my $newdata = $args{newdata};
+    my $et = $args{exif};
+    # restore multi-value comma-separated fields to arrays
+    foreach my $fn (keys %{$self->{wanted_fields}})
+    {
+        if ($self->{wanted_fields}->{$fn} eq 'MULTI'
+                and exists $newdata->{$fn}
+                and defined $newdata->{$fn}
+                and $newdata->{$fn} =~ /,/)
+        {
+            my @vals = split(/,/, $newdata->{$fn});
+            $newdata->{$fn} = \@vals;
+        }
+    }
+    my $ystring = Dump($newdata);
+    say STDERR "ystring=$ystring" if $self->{verbose} > 2;
+    my $success = $et->SetNewValue('UserComment', $ystring);
+    return $success;
+} # _write_freeform_data
 
 =head1 BUGS
 

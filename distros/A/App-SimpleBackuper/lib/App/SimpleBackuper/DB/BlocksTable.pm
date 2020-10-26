@@ -33,30 +33,4 @@ sub unpack {
 	};
 }
 
-sub debug {
-	my($self, $id, $data) = @_;
-	state %debug;
-	if($data) {
-		$debug{$id} .= $data;
-	} else {
-		return $debug{$id};
-	}
-}
-
-sub upsert {
-	my($self, $search_row, $data) = @_;
-	
-	$self->debug($data->{id} => 'u');
-	
-	return $self->SUPER::upsert($search_row, $data);
-}
-
-sub delete {
-	my($self, $row) = @_;
-	
-	$self->debug($row->{id} => 'd');
-	
-	return $self->SUPER::delete($row);
-}
-
 1;

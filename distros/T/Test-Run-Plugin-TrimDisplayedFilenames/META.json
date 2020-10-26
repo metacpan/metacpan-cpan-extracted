@@ -4,13 +4,13 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run-Plugin-TrimDisplayedFilenames",
    "prereqs" : {
@@ -44,11 +44,11 @@
    "provides" : {
       "Test::Run::CmdLine::Plugin::TrimDisplayedFilenames" : {
          "file" : "lib/Test/Run/CmdLine/Plugin/TrimDisplayedFilenames.pm",
-         "version" : "0.0125"
+         "version" : "0.0126"
       },
       "Test::Run::Plugin::TrimDisplayedFilenames" : {
          "file" : "lib/Test/Run/Plugin/TrimDisplayedFilenames.pm",
-         "version" : "0.0125"
+         "version" : "0.0126"
       }
    },
    "release_status" : "stable",
@@ -58,8 +58,9 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ],
       "repository" : {
-         "url" : "https://bitbucket.org/shlomif/perl-test-run"
+         "url" : "https://github.com/shlomif/perl-test-run"
       }
    },
-   "version" : "0.0125"
+   "version" : "0.0126",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

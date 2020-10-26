@@ -20,10 +20,10 @@ name: DateTime-Format-ISO8601
 provides:
   DateTime::Format::ISO8601:
     file: lib/DateTime/Format/ISO8601.pm
-    version: '0.14'
+    version: '0.15'
   DateTime::Format::ISO8601::Types:
     file: lib/DateTime/Format/ISO8601/Types.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Carp: '0'
   DateTime: '1.45'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Format-ISO8601/issues
   homepage: https://metacpan.org/release/DateTime-HiRes
   repository: git://github.com/houseabsolute/DateTime-Format-ISO8601.git
-version: '0.14'
+version: '0.15'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -66,7 +66,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -640,13 +640,14 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CODE_OF_CONDUCT.md
@@ -665,7 +666,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -673,7 +674,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.14
+          tag: v0.15
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -682,7 +683,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -694,7 +695,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -712,6 +713,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'Bump version after release'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -725,7 +727,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -737,7 +739,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
       config:

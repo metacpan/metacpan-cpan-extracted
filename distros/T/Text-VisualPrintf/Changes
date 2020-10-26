@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-VisualPrintf
 
+3.09 2020-10-23T06:15:14Z
+
+    - Cut off the string replacement part into Transform.pm.
+
 3.08 2020-10-22T02:05:15Z
 
     - Make interface more generic.

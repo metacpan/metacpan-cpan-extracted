@@ -88,6 +88,9 @@ my @strings = (
 my @sum_hash = (
     [ 'ms', 'I ♥ perl', "debug(): MD5 Sum: 040ab5366f264eb28f4e310a994fde15\n" ],
     [ 'ss', 'I ♥ perl', "debug(): SHA1 Hash: d95af59dffb410853e85b28d6025d2825b257c42\n" ],
+    [ 's2', 'I ♥ perl', "debug(): SHA256 Hash: 5ea84ee48c167ac9ae5d2b375564f4f9b43d9e8cdbf2618377cf3d188c0cf10b\n" ],
+    [ 's3', 'I ♥ perl', "debug(): SHA384 Hash: d5d10c798443cc778fb4c89b6a461ec990812a9e8b2d734ac6c7e4b676a6a9b1d64a16c89a69c690470e79cd8b98c44d\n" ],
+    [ 's5', 'I ♥ perl', "debug(): SHA512 Hash: 4c5be38240fb9ee4bb5795341627d99429f7450a22fbffdae1fe5a703b0c71a804e0e69db369bd0064c9bd44e84d09277103b2570d8b57c3050837c20efa0c46\n" ],
 );
 
 my @encode_unencode_escape_unescape = (
@@ -107,12 +110,12 @@ my @encode_unencode_escape_unescape = (
     [ 'pe', 'at@commercial.I.♥.perl',                "debug(): Punycode: at\@commercial.I.xn--g6h.perl\n" ],
     [ 'pe', 'at＠fullwidth.commercial.I.♥.perl',    "debug(): Punycode: at\@fullwidth.commercial.I.xn--g6h.perl\n" ],
     [ 'pe', 'at﹫small.commercial.I.♥.perl',        "debug(): Punycode: at\@small.commercial.I.xn--g6h.perl\n" ],
-    [ 'pu', "I.xn--g6h.perl",                          "debug(): From Punycode: i.♥.perl\n" ],                                                                                                                                                                                  # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
-    [ 'pu', "at\@commercial.I.xn--g6h.perl",           "debug(): From Punycode: at\@commercial.i.♥.perl\n" ],                                                                                                                                                                   # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
-    [ 'pu', "at\@fullwidth.commercial.I.xn--g6h.perl", "debug(): From Punycode: at\@fullwidth.commercial.i.♥.perl\n" ],                                                                                                                                                         # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
-    [ 'pu', "at\@small.commercial.I.xn--g6h.perl",     "debug(): From Punycode: at\@small.commercial.i.♥.perl\n" ],                                                                                                                                                             # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
-    [ 'se', "I ♥ perl's awesomeness!",               qq{debug(): Given: I ♥ perl's awesomeness!\n\n\tmy \$bytes = "I ♥ perl\\'s awesomeness!";\n\n\tmy \$utf8 = "I \\xe2\\x99\\xa5 perl\\'s awesomeness!";\n\n\tmy \$unicode = "I \\x{2665} perl\\'s awesomeness!";\n} ],
-    [ 'su', q{I \xe2\x99\xa5 perl\\'s awesomeness!},   qq{debug(): Given: I \\xe2\\x99\\xa5 perl\\'s awesomeness!\n\tRenders: I ♥ perl's awesomeness!\n} ],
+    [ 'pu', "I.xn--g6h.perl",                          "debug(): From Punycode: I.♥.perl\n" ],                                                                                                                                                                                                          # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
+    [ 'pu', "at\@commercial.I.xn--g6h.perl",           "debug(): From Punycode: at\@commercial.I.♥.perl\n" ],                                                                                                                                                                                           # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
+    [ 'pu', "at\@fullwidth.commercial.I.xn--g6h.perl", "debug(): From Punycode: at\@fullwidth.commercial.I.♥.perl\n" ],                                                                                                                                                                                 # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
+    [ 'pu', "at\@small.commercial.I.xn--g6h.perl",     "debug(): From Punycode: at\@small.commercial.I.♥.perl\n" ],                                                                                                                                                                                     # rt 91059 ? the i is lc’d ? - its supposed to be domain not arbitrary string
+    [ 'se', "I ♥ perl's awesomeness!",               qq{debug(): Given: I ♥ perl's awesomeness!\n\n\tmy \$bytes = "I\\ ♥\\ perl\\'s\\ awesomeness\\!";\n\n\tmy \$utf8 = "I\\ \\xe2\\x99\\xa5\\ perl\\'s\\ awesomeness\\!";\n\n\tmy \$unicode = "I\\ \\x{2665}\\ perl\\'s\\ awesomeness\\!";\n} ],
+    [ 'su', q{I \xe2\x99\xa5 perl\\'s awesomeness\!},  qq{debug(): Given: I \\xe2\\x99\\xa5 perl\\'s awesomeness\\!\n\tRenders: I ♥ perl's awesomeness!\n} ],
 );
 
 plan tests => 18 + ( 3 * @data_formats ) + @sum_hash + ( 6 * @strings ) + ( 6 * @filesys ) + @encode_unencode_escape_unescape + 3 + 5 + 15 + 4 + 3 + 9;

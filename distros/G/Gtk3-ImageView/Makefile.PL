@@ -45,8 +45,6 @@ NAME = Gtk3-ImageView
 MANIFEST = $(shell cat MANIFEST)
 SOURCE = $(filter %.pm %.PL %.pl %.t,$(MANIFEST))
 SOURCE_TIDY = $(foreach file,$(SOURCE),$(file).tdy)
-TLD = net
-VENDOR = sourceforge
 
 htdocs/index.html : lib/Gtk3/ImageView.pm
 	[ -d htdocs ] || mkdir htdocs

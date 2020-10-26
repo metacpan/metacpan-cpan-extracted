@@ -1,13 +1,12 @@
 package Net::DNS;
 
-#
-# $Id: DNS.pm 1806 2020-09-11 18:48:57Z willem $
-#
-require 5.006;
+use strict;
+use warnings;
+
 our $VERSION;
-$VERSION = '1.27';
-$VERSION = eval $VERSION;
-our $SVNVERSION = (qw$LastChangedRevision: 1806 $)[1];
+$VERSION = '1.28';
+$VERSION = eval { $VERSION };
+our $SVNVERSION = (qw$Id: DNS.pm 1821 2020-10-23 14:40:41Z willem $)[2];
 
 
 =head1 NAME
@@ -30,8 +29,6 @@ See RFC 1035 or DNS and BIND (Albitz & Liu) for details.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 
 use base qw(Exporter);
@@ -47,7 +44,7 @@ require Net::DNS::RR;
 require Net::DNS::Update;
 
 
-sub version { $VERSION; }
+sub version { return $VERSION; }
 
 
 #
@@ -60,10 +57,11 @@ sub version { $VERSION; }
 #
 sub rr {
 	my ($arg1) = @_;
-	my $res = ref($arg1) ? shift : new Net::DNS::Resolver();
+	my $res = ref($arg1) ? shift : Net::DNS::Resolver->new();
 
 	my $reply = $res->query(@_);
-	my @list = $reply ? $reply->answer : ();
+	my @list  = $reply ? $reply->answer : ();
+	return @list;
 }
 
 
@@ -88,7 +86,7 @@ sub mx {
 	# Then we return the list.
 
 	my @list = sort { $a->preference <=> $b->preference }
-			grep $_->type eq 'MX', &rr( @res, $name, 'MX', @class );
+			grep { $_->type eq 'MX' } &rr( @res, $name, 'MX', @class );
 	return @list;
 }
 
@@ -104,22 +102,23 @@ sub rrsort {
 	my ( $attribute, @rr ) = @_;	## NB: attribute is optional
 	( @rr, $attribute ) = @_ if ref($attribute) =~ /^Net::DNS::RR/;
 
-	my @extracted = grep $_->type eq $rrtype, @rr;
+	my @extracted = grep { $_->type eq $rrtype } @rr;
 	return @extracted unless scalar @extracted;
 	my $func   = "Net::DNS::RR::$rrtype"->get_rrsort_func($attribute);
 	my @sorted = sort $func @extracted;
+	return @sorted;
 }
 
 
 #
-# Auxiliary functions to support policy-driven zone serial numbering.
+# Auxilliary functions to support policy-driven zone serial numbering.
 #
 #	$successor = $soa->serial(SEQUENTIAL);
 #	$successor = $soa->serial(UNIXTIME);
 #	$successor = $soa->serial(YYYYMMDDxx);
 #
 
-sub SEQUENTIAL {undef}
+sub SEQUENTIAL { return (undef) }
 
 sub UNIXTIME { return CORE::time; }
 
@@ -130,19 +129,19 @@ sub YYYYMMDDxx {
 
 
 #
-# Auxiliary functions to support dynamic update.
+# Auxilliary functions to support dynamic update.
 #
 
 sub yxrrset {
-	my $rr = new Net::DNS::RR(@_);
+	my $rr = Net::DNS::RR->new(@_);
 	$rr->ttl(0);
 	$rr->class('ANY') unless $rr->rdata;
 	return $rr;
 }
 
 sub nxrrset {
-	my $rr = new Net::DNS::RR(@_);
-	new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(@_);
+	return Net::DNS::RR->new(
 		name  => $rr->name,
 		type  => $rr->type,
 		class => 'NONE'
@@ -150,9 +149,9 @@ sub nxrrset {
 }
 
 sub yxdomain {
-	my ( $domain, @etc ) = map split, @_;
-	my $rr = new Net::DNS::RR( scalar(@etc) ? @_ : ( name => $domain ) );
-	new Net::DNS::RR(
+	my ( $domain, @etc ) = map {split} @_;
+	my $rr = Net::DNS::RR->new( scalar(@etc) ? @_ : ( name => $domain ) );
+	return Net::DNS::RR->new(
 		name  => $rr->name,
 		type  => 'ANY',
 		class => 'ANY'
@@ -160,9 +159,9 @@ sub yxdomain {
 }
 
 sub nxdomain {
-	my ( $domain, @etc ) = map split, @_;
-	my $rr = new Net::DNS::RR( scalar(@etc) ? @_ : ( name => $domain ) );
-	new Net::DNS::RR(
+	my ( $domain, @etc ) = map {split} @_;
+	my $rr = Net::DNS::RR->new( scalar(@etc) ? @_ : ( name => $domain ) );
+	return Net::DNS::RR->new(
 		name  => $rr->name,
 		type  => 'ANY',
 		class => 'NONE'
@@ -170,14 +169,14 @@ sub nxdomain {
 }
 
 sub rr_add {
-	my $rr = new Net::DNS::RR(@_);
+	my $rr = Net::DNS::RR->new(@_);
 	$rr->{ttl} = 86400 unless defined $rr->{ttl};
 	return $rr;
 }
 
 sub rr_del {
-	my ( $domain, @etc ) = map split, @_;
-	my $rr = new Net::DNS::RR( scalar(@etc) ? @_ : ( name => $domain, type => 'ANY' ) );
+	my ( $domain, @etc ) = map {split} @_;
+	my $rr = Net::DNS::RR->new( scalar(@etc) ? @_ : ( name => $domain, type => 'ANY' ) );
 	$rr->class( $rr->rdata ? 'NONE' : 'ANY' );
 	$rr->ttl(0);
 	return $rr;
@@ -229,8 +228,7 @@ additional, a list of L<Net::DNS::RR> objects
 =head2 Update Objects
 
 L<Net::DNS::Update> is a subclass of L<Net::DNS::Packet>
-used to create dynamic update requests.
-
+useful for creating dynamic update requests.
 
 =head2 Header Object
 
@@ -253,7 +251,7 @@ The type of an RR object must be checked before calling any methods.
 
 =head1 METHODS
 
-Net::DNS exports methods and auxiliary functions to support
+Net::DNS exports methods and auxilliary functions to support
 DNS updates, zone serial number management, and simple DNS queries.
 
 =head2 version
@@ -307,9 +305,13 @@ This method does not look up address records; it resolves MX only.
 
 =head1 Dynamic DNS Update Support
 
-The Net::DNS module provides auxiliary functions which support
+The Net::DNS module provides auxilliary functions which support
 dynamic DNS update requests.
 
+    $update = Net::DNS::Update->new( 'example.com' );
+
+    $update->push( prereq => nxrrset('example.com. AAAA') );
+    $update->push( update => rr_add('example.com. 86400 AAAA 2001::DB8::F00') );
 
 =head2 yxrrset
 
@@ -320,11 +322,10 @@ value-dependent:
     # RRset exists (value-independent)
     $update->push( pre => yxrrset("host.example.com AAAA") );
 
-Meaning:  At least one RR with the specified name and type must
-exist.
+Meaning:  At least one RR with the specified name and type must exist.
 
     # RRset exists (value-dependent)
-    $update->push( pre => yxrrset("host.example.com AAAA 2001:DB8::dead:beef") );
+    $update->push( pre => yxrrset("host.example.com AAAA 2001:DB8::1") );
 
 Meaning:  At least one RR with the specified name and type must
 exist and must have matching data.
@@ -372,7 +373,7 @@ be created.
 
 Use this method to add RRs to a zone.
 
-    $update->push( update => rr_add("host.example.com AAAA 2001:DB8::dead:beef") );
+    $update->push( update => rr_add("host.example.com AAAA 2001:DB8::c001:a1e") );
 
 Meaning:  Add this RR to the zone.
 
@@ -412,8 +413,11 @@ be created.
 
 =head1 Zone Serial Number Management
 
-The Net::DNS module provides auxiliary functions which support
+The Net::DNS module provides auxilliary functions which support
 policy-driven zone serial numbering regimes.
+
+    $soa->serial(SEQUENTIAL);
+    $soa->serial(YYYMMDDxx);
 
 =head2 SEQUENTIAL
 
@@ -433,7 +437,7 @@ elapsed since the previous update is less than one second.
 
     $successor = $soa->serial( YYYYMMDDxx );
 
-The 32 bit value returned by the auxiliary C<YYYYMMDDxx()> function
+The 32 bit value returned by the auxilliary C<YYYYMMDDxx()> function
 will be used as the base for the date-coded zone serial number.
 Serial number increments must be limited to 100 per day for the
 date information to remain useful.

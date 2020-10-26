@@ -1,15 +1,25 @@
 Revision history for InfluxDB-Client
 
-0.01    2020-04-27
-        First version, barely tested.
+0.06    2020-10-26
+        - Enhance client unit test
 
-0.02    2020-04-28
-        - Fix POD issues
-        - Add some POD documentation
-        - Minor API changes
+0.05    2020-10-26
+        - Fix bug with perl 5.16.3 when using defined without parens
+
+0.04    2020-10-26
+        - Fix warning in constructor when some options not defined
 
 0.03    2020-05-13
         - Add strict_udp option
         - Switch to JSON (previously JSON::MaybeXS)
         - Make database optional in methods
         - Add send_data() method
+
+0.02    2020-04-28
+        - Fix POD issues
+        - Add some POD documentation
+        - Minor API changes
+
+0.01    2020-04-27
+        First version, barely tested.
+

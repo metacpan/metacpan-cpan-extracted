@@ -1,11 +1,14 @@
-# $Id: 07-zonefile.t 1804 2020-09-07 07:57:36Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 07-zonefile.t 1816 2020-10-16 09:44:21Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use IO::File;
 
 use Test::More tests => 91;
 
-					## vvv	verbatim from Domain.pm
+## vvv	verbatim from Domain.pm
 use constant ASCII => ref eval {
 	require Encode;
 	Encode::find_encoding('ascii');
@@ -15,9 +18,9 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
-use constant LIBIDN2 => ref eval 'require Net::LibIDN2; Net::LibIDN2->can("idn2_to_ascii_8")';
-use constant LIBIDN  => LIBIDN2 ? undef : defined eval 'require Net::LibIDN';
-					## ^^^	verbatim from Domain.pm
+use constant LIBIDN2 => defined eval { require Net::LibIDN2 };
+use constant LIBIDN  => LIBIDN2 ? undef : defined eval { require Net::LibIDN };
+## ^^^	verbatim from Domain.pm
 
 
 use constant LIBIDNOK => LIBIDN && scalar eval {
@@ -42,13 +45,12 @@ END {
 }
 
 sub source {				## zone file builder
-	my $text = shift;
-	my @args = @_;
+	my ( $text, @args ) = @_;
 
 	my $tag	 = ++$seq;
 	my $file = "zone$tag.txt";
 
-	my $handle = new IO::File( $file, '>' );		# create test file
+	my $handle = IO::File->new( $file, '>' );		# create test file
 	die "Failed to create $file" unless $handle;
 	eval { binmode($handle) };				# suppress encoding layer
 	push @file, $file;
@@ -56,7 +58,7 @@ sub source {				## zone file builder
 	print $handle $text;
 	close $handle;
 
-	return new Net::DNS::ZoneFile( $file, @args );
+	return Net::DNS::ZoneFile->new( $file, @args );
 }
 
 
@@ -64,21 +66,21 @@ my $recursive = join ' ', '$INCLUDE', source('$INCLUDE zone1.txt')->name;
 
 
 {
-	eval { new Net::DNS::ZoneFile(undef); };
+	eval { Net::DNS::ZoneFile->new(undef); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "new(): invalid argument\t[$exception]" );
 }
 
 
 {
-	eval { new Net::DNS::ZoneFile( [] ); };
+	eval { Net::DNS::ZoneFile->new( [] ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "new(): not a file handle\t[$exception]" );
 }
 
 
 {
-	eval { new Net::DNS::ZoneFile('zone0.txt'); };		# presumed not to exist
+	eval { Net::DNS::ZoneFile->new('zone0.txt'); };		# presumed not to exist
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "new(): non-existent file\t[$exception]" );
 }
@@ -101,7 +103,7 @@ my $recursive = join ' ', '$INCLUDE', source('$INCLUDE zone1.txt')->name;
 
 
 {					## initial origin
-	my $tld = 'test';
+	my $tld	     = 'test';
 	my $absolute = source( '', "$tld." );
 	is( $absolute->origin, "$tld.", 'new ZoneFile with absolute origin' );
 
@@ -284,7 +286,7 @@ EOF
 	is( $ns->name,	  $origin,	  '@	NS	has expected name' );
 	is( $ns->nsdname, "host.$origin", '@	NS	has expected rdata' );
 
-	my $rr = $zonefile->read;
+	my $rr	   = $zonefile->read;
 	my $expect = join '.', 'nested', $origin;
 	is( $rr->name, $expect, 'scope of $ORIGIN encompasses nested $INCLUDE' );
 
@@ -482,8 +484,8 @@ SKIP: {					## Non-ASCII zone content
 
 	my $greek = pack 'C*', 103, 114, 9, 84, 88, 84, 9, 229, 224, 241, 231, 234, 225, 10;
 	my $file1 = source($greek);
-	my $fh1	  = new IO::File( $file1->name, '<:encoding(ISO8859-7)' );		       # Greek
-	my $zone1 = new Net::DNS::ZoneFile($fh1);
+	my $fh1	  = IO::File->new( $file1->name, '<:encoding(ISO8859-7)' );    # Greek
+	my $zone1 = Net::DNS::ZoneFile->new($fh1);
 	my $txtgr = $zone1->read;
 	my $text  = pack 'U*', 949, 944, 961, 951, 954, 945;
 	is( $txtgr->txtdata, $text, 'ISO8859-7 TXT rdata' );
@@ -491,8 +493,8 @@ SKIP: {					## Non-ASCII zone content
 	eval { binmode(DATA) };					# suppress encoding layer
 	my $jptxt = join "\n", <DATA>;
 	my $file2 = source($jptxt);
-	my $fh2	  = new IO::File( $file2->name, '<:utf8' );	# UTF-8 character encoding
-	my $zone2 = new Net::DNS::ZoneFile($fh2);
+	my $fh2	  = IO::File->new( $file2->name, '<:utf8' );	# UTF-8 character encoding
+	my $zone2 = Net::DNS::ZoneFile->new($fh2);
 	my $txtrr = $zone2->read;				# TXT RR with kanji RDATA
 	my @rdata = $txtrr->txtdata;
 	my $rdata = $txtrr->txtdata;

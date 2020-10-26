@@ -3,7 +3,7 @@ package Database::Async::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 =head1 NAME
 
@@ -311,7 +311,7 @@ sub load_from {
         for my $table_name (sort keys $schema_details->{tables}->%*) {
             my $table_details = $schema_details->{tables}{$table_name};
             for($table_details->{fields}->@*) {
-                $_->{nullable} = 1 unless exists $_->{nullable} 
+                $_->{nullable} = 1 unless exists $_->{nullable}
             }
             push $pending{table}->@*, {
                 schema  => $schema,
@@ -433,7 +433,7 @@ sub load_from {
             $log->error('Currently pending items:');
             s/\v+$// for map $_->{error}, @missing;
             $log->errorf('- %s.%s (%s) - %s', $_->{schema}, $_->{name}, $_->{type}, $_->{error}) for @missing;
-            die 'Unable to resolve dependencies, bailing out' 
+            die 'Unable to resolve dependencies, bailing out';
         }
         $found = 0;
     }
@@ -595,5 +595,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
 

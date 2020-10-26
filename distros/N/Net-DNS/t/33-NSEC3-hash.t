@@ -1,7 +1,9 @@
-# $Id: 33-NSEC3-hash.t 1679 2018-05-24 12:09:36Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 33-NSEC3-hash.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 
@@ -12,7 +14,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1;";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -20,7 +22,7 @@ foreach my $package (@prerequisite) {
 plan tests => 12;
 
 
-my $nsec3param = new Net::DNS::RR('example NSEC3PARAM 1 0 12 aabbccdd');
+my $nsec3param = Net::DNS::RR->new('example NSEC3PARAM 1 0 12 aabbccdd');
 
 my $algorithm = $nsec3param->algorithm;
 my $iteration = $nsec3param->iterations;

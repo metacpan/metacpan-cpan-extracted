@@ -5,7 +5,9 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.17';
+$Neo4j::Driver::Type::Node::VERSION = '0.18';
+
+use overload '%{}' => \&_hash, fallback => 1;
 
 use Carp qw(croak);
 
@@ -13,7 +15,7 @@ use Carp qw(croak);
 sub get {
 	my ($self, $property) = @_;
 	
-	return $self->{$property};
+	return $$self->{$property};
 }
 
 
@@ -21,14 +23,14 @@ sub labels {
 	my ($self) = @_;
 	
 	croak 'labels() in scalar context not supported' unless wantarray;
-	return @{ $self->{_meta}->{labels} };
+	return @{ $$self->{_meta}->{labels} };
 }
 
 
 sub properties {
 	my ($self) = @_;
 	
-	my $properties = { %$self };
+	my $properties = { %$$self };
 	delete $properties->{_meta};
 	return $properties;
 }
@@ -37,14 +39,30 @@ sub properties {
 sub id {
 	my ($self) = @_;
 	
-	return $self->{_meta}->{id};
+	return $$self->{_meta}->{id};
 }
 
 
 sub deleted {
 	my ($self) = @_;
 	
-	return $self->{_meta}->{deleted};
+	return $$self->{_meta}->{deleted};
+}
+
+
+sub _hash {
+	my ($self) = @_;
+	
+	warnings::warnif deprecated => "Direct hash access is deprecated; use " . __PACKAGE__ . "->properties()";
+	return $$self;
+}
+
+
+# for experimental Cypher type system customisation only
+sub _private {
+	my ($self) = @_;
+	
+	return $$self;
 }
 
 
@@ -62,7 +80,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -140,18 +158,6 @@ these features.
  $labels = $node->labels;  # fails
 
 The C<labels()> method C<die>s if called in scalar context.
-
-=head2 Direct data structure access
-
- $property_value = $node->{property_key};
-
-Currently, the node's properties may be directly accessed as
-if the node was a simple hashref. This is a concession to
-backwards compatibility, as the data structure only started being
-blessed as an object in version 0.13.
-
-Relying on this implementation detail is deprecated.
-Use the accessor methods C<get()> and C<properties()> instead.
 
 =head2 Deletion indicator
 

@@ -3,51 +3,51 @@ abstract: 'Handy toolbox of things to ease development/debugging.'
 author:
   - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Devel-Kit
 no_index:
   directory:
     - t
     - inc
 requires:
-  App::Kit: 0.6
-  Capture::Tiny: 0
-  Config::INI::Reader: 0
-  Convert::Base32::Crockford: 0
-  Data::Dumper: 0
-  Data::MessagePack: 0
-  Devel::CountOps: 0
-  Devel::Peek: 0
-  Devel::Size: 0
-  Devel::Symdump: 0
-  Digest::MD5: 0
-  Digest::SHA: 0
-  File::Slurp: 0
-  File::Temp: 0
-  HTML::Entities: 0
-  IPC::Open3::Utils: 0.91
-  Import::Into: 0
-  JSON::Syck: 0
-  MIME::Base64: 0
-  MIME::QuotedPrint: 0
-  Module::Want: 0.6
-  Net::IDN::Encode: 0
-  Regexp::Debugger: 0
-  Storable: 0
-  String::UnicodeUTF8: 0.21
-  Test::Mock::Cmd: 0
-  Test::More: 0
-  Time::HiRes: 0
-  URI::Escape: 0
-  Unix::PID::Tiny: 0
-  XML::Parser: 0
-  YAML::Syck: 0
-version: 0.81
+  App::Kit: '0.62'
+  Capture::Tiny: '0'
+  Config::INI::Reader: '0'
+  Convert::Base32::Crockford: '0'
+  Data::Dumper: '0'
+  Data::MessagePack: '0'
+  Devel::CountOps: '0'
+  Devel::Peek: '0'
+  Devel::Size: '0'
+  Devel::Symdump: '0'
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  HTML::Entities: '0'
+  IPC::Open3::Utils: '0.91'
+  Import::Into: '0'
+  JSON::Syck: '0'
+  MIME::Base64: '0'
+  MIME::QuotedPrint: '0'
+  Module::Want: '0.6'
+  Net::IDN::Encode: '0'
+  Regexp::Debugger: '0'
+  Storable: '0'
+  String::UnicodeUTF8: '0.23'
+  Test::Mock::Cmd: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  URI::Escape: '0'
+  Unix::PID::Tiny: '0'
+  XML::Parser: '0'
+  YAML::Syck: '0'
+version: '0.82'

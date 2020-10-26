@@ -1,8 +1,11 @@
-# $Id: 05-RRSIG.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-RRSIG.t 1818 2020-10-18 15:24:42Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
+
 use Net::DNS;
 
 my @prerequisite = qw(
@@ -11,12 +14,12 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
 
-plan tests => 73;
+plan tests => 71;
 
 
 my $name = 'net-dns.org';
@@ -37,20 +40,20 @@ my $wire =
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -64,9 +67,9 @@ my $wire =
 	}
 
 
-	my $empty   = new Net::DNS::RR("$name $type");
+	my $empty   = Net::DNS::RR->new("$name $type");
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = uc unpack 'H*', $decoded->encode;
 	my $hex2    = uc unpack 'H*', $encoded;
 	my $hex3    = uc unpack 'H*', substr( $encoded, length $empty->encode );
@@ -78,10 +81,10 @@ my $wire =
 {
 	my @rdata	= @data;
 	my $sig		= pop @rdata;
-	my $lc		= new Net::DNS::RR( lc(". $type @rdata ") . $sig );
-	my $rr		= new Net::DNS::RR( uc(". $type @rdata ") . $sig );
+	my $lc		= Net::DNS::RR->new( lc(". $type @rdata ") . $sig );
+	my $rr		= Net::DNS::RR->new( uc(". $type @rdata ") . $sig );
 	my $hash	= {};
-	my $predecessor = $rr->encode( 0, $hash );
+	my $predecessor = $rr->encode( 0,		    $hash );
 	my $compressed	= $rr->encode( length $predecessor, $hash );
 	ok( length $compressed == length $predecessor, 'encoded RDATA not compressible' );
 	is( $rr->encode,    $lc->encode, 'encoded RDATA names downcased' );
@@ -90,7 +93,7 @@ my $wire =
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 	foreach ( @attr, 'rdstring' ) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
@@ -98,7 +101,7 @@ my $wire =
 
 
 {
-	my $rr	  = new Net::DNS::RR(". $type @data");
+	my $rr	  = Net::DNS::RR->new(". $type @data");
 	my $class = ref($rr);
 
 	$rr->algorithm(255);
@@ -119,25 +122,23 @@ my $wire =
 
 
 {
-	my $object   = new Net::DNS::RR( type => $type );
+	my $object   = Net::DNS::RR->new(". $type");
 	my $class    = ref($object);
 	my $scalar   = '';
-	my %testcase = (		## test callable with invalid arguments
+	my %testcase = (		## methods callable with invalid arguments
 		'_CreateSig'	 => [$object, $scalar, $object],
-		'_CreateSigData' => [$object, $scalar],
-		'_string2time'	 => [undef],
-		'_time2string'	 => [undef],
+		'_CreateSigData' => [$object, $object],
 		'_VerifySig'	 => [$object, $object, $object],
 		'create'	 => [$class,  $scalar, $object],
 		'verify'	 => [$object, $object, $object],
 		);
 
+	$object->{algorithm} = 0;				# induce exception
+
 	foreach my $method ( sort keys %testcase ) {
 		my $arglist = $testcase{$method};
-		$object->{algorithm} = 0;			# induce exception
-		no strict q/refs/;
-		my $subroutine = join '::', $class, $method;
-		eval { &$subroutine(@$arglist); };
+		my ( $object, @arglist ) = @$arglist;
+		eval { $object->$method(@arglist) };
 		my ($exception) = split /\n/, "$@\n";
 		ok( defined $exception, "$method method callable\t[$exception]" );
 	}
@@ -173,12 +174,12 @@ my $wire =
 
 
 {
-	ok( Net::DNS::RR::RRSIG::_ordered( undef,      0 ),	     '_ordered( undef, 0 )' );
-	ok( Net::DNS::RR::RRSIG::_ordered( 0,	       1 ),	     '_ordered( 0, 1 )' );
-	ok( Net::DNS::RR::RRSIG::_ordered( 0x7fffffff, 0x80000000 ), '_ordered( 0x7fffffff, 0x80000000 )' );
-	ok( Net::DNS::RR::RRSIG::_ordered( 0xffffffff, 0 ),	     '_ordered( 0xffffffff, 0 )' );
-	ok( Net::DNS::RR::RRSIG::_ordered( -2,	       -1 ),	     '_ordered( -2, -1 )' );
-	ok( Net::DNS::RR::RRSIG::_ordered( -1,	       0 ),	     '_ordered( -1, 0 )' );
+	ok( Net::DNS::RR::RRSIG::_ordered( undef,	0 ),	      '_ordered( undef, 0 )' );
+	ok( Net::DNS::RR::RRSIG::_ordered( 0,		1 ),	      '_ordered( 0, 1 )' );
+	ok( Net::DNS::RR::RRSIG::_ordered( 0x7fffffff,	0x80000000 ), '_ordered( 0x7fffffff, 0x80000000 )' );
+	ok( Net::DNS::RR::RRSIG::_ordered( 0xffffffff,	0 ),	      '_ordered( 0xffffffff, 0 )' );
+	ok( Net::DNS::RR::RRSIG::_ordered( -2,		-1 ),	      '_ordered( -2, -1 )' );
+	ok( Net::DNS::RR::RRSIG::_ordered( -1,		0 ),	      '_ordered( -1, 0 )' );
 	ok( !Net::DNS::RR::RRSIG::_ordered( undef,	undef ),      '!_ordered( undef, undef )' );
 	ok( !Net::DNS::RR::RRSIG::_ordered( 0,		undef ),      '!_ordered( 0, undef )' );
 	ok( !Net::DNS::RR::RRSIG::_ordered( 0x80000000, 0x7fffffff ), '!_ordered( 0x80000000, 0x7fffffff )' );
@@ -189,7 +190,7 @@ my $wire =
 
 
 {
-	my $rr = new Net::DNS::RR("$name $type @data");
+	my $rr = Net::DNS::RR->new("$name $type @data");
 	$rr->print;
 }
 

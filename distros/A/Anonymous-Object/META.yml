@@ -7,8 +7,8 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.143240'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +18,16 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Anonymous::Object:
+    file: lib/Anonymous/Object.pm
+    version: '0.05'
 requires:
   Data::Dumper: '0'
   Scalar::Util: '0'
   Type::Tiny: '1.010006'
   perl: '5.006'
-version: '0.04'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Anonymous-Object.git
+version: 0.05
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

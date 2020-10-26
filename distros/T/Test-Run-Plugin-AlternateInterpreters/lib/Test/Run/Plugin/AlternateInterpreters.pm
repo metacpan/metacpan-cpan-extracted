@@ -15,11 +15,11 @@ Test::Run::Plugin::AlternateInterpreters - Define different interpreters for dif
 
 =head1 VERSION
 
-Version 0.0124
+Version 0.0125
 
 =cut
 
-our $VERSION = '0.0124';
+our $VERSION = '0.0125';
 
 has 'alternate_interpreters' => (is => "rw", isa => "ArrayRef");
 
@@ -84,10 +84,6 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::Plugin::AlternateInterpreters>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Test::Run::Plugin::AlternateInterpreters>
@@ -117,7 +113,7 @@ L<Test::Run>, L<Test::Run::CmdLine>, L<TAP::Parser>
 
 Copyright 2007 Shlomi Fish, all rights reserved.
 
-This program is released under the following license: MIT X11.
+This program is released under the following license: MIT Expat.
 
 =cut
 

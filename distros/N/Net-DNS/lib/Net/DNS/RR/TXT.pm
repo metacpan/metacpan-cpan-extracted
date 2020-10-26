@@ -1,23 +1,19 @@
 package Net::DNS::RR::TXT;
 
-#
-# $Id: TXT.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: TXT.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
 
 =encoding utf8
+
 
 =head1 NAME
 
 Net::DNS::RR::TXT - DNS TXT resource record
 
 =cut
-
 
 use integer;
 
@@ -33,11 +29,12 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $text;
 	my $txtdata = $self->{txtdata} = [];
 	while ( $offset < $limit ) {
-		( $text, $offset ) = decode Net::DNS::Text( $data, $offset );
+		( $text, $offset ) = Net::DNS::Text->decode( $data, $offset );
 		push @$txtdata, $text;
 	}
 
 	croak('corrupt TXT data') unless $offset == $limit;	# more or less FUBAR
+	return;
 }
 
 
@@ -45,7 +42,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $txtdata = $self->{txtdata};
-	join '', map $_->encode, @$txtdata;
+	return join '', map { $_->encode } @$txtdata;
 }
 
 
@@ -53,27 +50,28 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $txtdata = $self->{txtdata};
-	my @txtdata = map $_->string, @$txtdata;
+	return ( map { $_->string } @$txtdata );
 }
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
-	$self->{txtdata} = [map Net::DNS::Text->new($_), @_];
+	$self->{txtdata} = [map { Net::DNS::Text->new($_) } @_];
+	return;
 }
 
 
 sub txtdata {
 	my $self = shift;
 
-	$self->{txtdata} = [map Net::DNS::Text->new($_), @_] if scalar @_;
+	$self->{txtdata} = [map { Net::DNS::Text->new($_) } @_] if scalar @_;
 
 	my $txtdata = $self->{txtdata} || [];
 
-	return ( map $_->value, @$txtdata ) if wantarray;
+	return ( map { $_->value } @$txtdata ) if wantarray;
 
-	join ' ', map $_->value, @$txtdata if defined wantarray;
+	return defined(wantarray) ? join( ' ', map { $_->value } @$txtdata ) : '';
 }
 
 
@@ -87,20 +85,20 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR( 'name TXT  txtdata ...' );
+    $rr = Net::DNS::RR->new( 'name TXT  txtdata ...' );
 
-    $rr = new Net::DNS::RR( name    => 'name',
+    $rr = Net::DNS::RR->new( name    => 'name',
 			    type    => 'TXT',
 			    txtdata => 'single text string'
 			    );
 
-    $rr = new Net::DNS::RR( name    => 'name',
+    $rr = Net::DNS::RR->new( name    => 'name',
 			    type    => 'TXT',
 			    txtdata => [ 'multiple', 'strings', ... ]
 			    );
 
     use utf8;
-    $rr = new Net::DNS::RR( 'jp TXT    古池や　蛙飛込む　水の音' );
+    $rr = Net::DNS::RR->new( 'jp TXT    古池や　蛙飛込む　水の音' );
 
 =head1 DESCRIPTION
 

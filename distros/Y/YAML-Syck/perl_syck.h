@@ -554,8 +554,7 @@ yaml_syck_parser_handler
                 if (hv_store_ent(map, key, val, 0) != NULL)
                     USE_OBJECT(val);
                 sv = newRV_noinc((SV*)map);
-                if ( load_blessed )
-                    sv_bless(sv, gv_stashpv("YAML::Syck::BadAlias", TRUE));
+                sv_bless(sv, gv_stashpv("YAML::Syck::BadAlias", TRUE));
             }
             else
 #endif

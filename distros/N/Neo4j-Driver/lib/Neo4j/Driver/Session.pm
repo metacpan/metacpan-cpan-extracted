@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.17';
+$Neo4j::Driver::Session::VERSION = '0.18';
 
 use URI 1.25;
 
@@ -67,7 +67,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

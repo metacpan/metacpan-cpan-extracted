@@ -1,21 +1,17 @@
 package Net::DNS::RR::ZONEMD;
 
-#
-# $Id: ZONEMD.pm 1771 2020-02-25 14:23:23Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1771 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: ZONEMD.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::ZONEMD - DNS ZONEMD resource record
 
 =cut
-
 
 use integer;
 
@@ -28,13 +24,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
 	@{$self}{qw(serial scheme algorithm digestbin)} = unpack 'NC2a*', $rdata;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'NC2a*', @{$self}{qw(serial scheme algorithm digestbin)};
+	return pack 'NC2a*', @{$self}{qw(serial scheme algorithm digestbin)};
 }
 
 
@@ -43,6 +40,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 	my @digest = split /(\S{64})/, $self->digest || qq("");
 	my @rdata  = ( @{$self}{qw(serial scheme algorithm)}, @digest );
+	return @rdata;
 }
 
 
@@ -53,6 +51,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->scheme(shift);
 	$self->algorithm(shift);
 	$self->digest(@_);
+	return;
 }
 
 
@@ -60,6 +59,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->_parse_rdata( 0, 1, 1, '' );
+	return;
 }
 
 
@@ -67,7 +67,7 @@ sub serial {
 	my $self = shift;
 
 	$self->{serial} = 0 + shift if scalar @_;
-	$self->{serial} || 0;
+	return $self->{serial} || 0;
 }
 
 
@@ -75,7 +75,7 @@ sub scheme {
 	my $self = shift;
 
 	$self->{scheme} = 0 + shift if scalar @_;
-	$self->{scheme} || 0;
+	return $self->{scheme} || 0;
 }
 
 
@@ -83,14 +83,14 @@ sub algorithm {
 	my $self = shift;
 
 	$self->{algorithm} = 0 + shift if scalar @_;
-	$self->{algorithm} || 0;
+	return $self->{algorithm} || 0;
 }
 
 
 sub digest {
 	my $self = shift;
 	return unpack "H*", $self->digestbin() unless scalar @_;
-	$self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	return $self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -98,7 +98,7 @@ sub digestbin {
 	my $self = shift;
 
 	$self->{digestbin} = shift if scalar @_;
-	$self->{digestbin} || "";
+	return $self->{digestbin} || "";
 }
 
 
@@ -109,7 +109,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR("example.com. ZONEMD 2018031500 1 1
+    $rr = Net::DNS::RR->new("example.com. ZONEMD 2018031500 1 1
 	FEBE3D4CE2EC2FFA4BA99D46CD69D6D29711E55217057BEE
 	7EB1A7B641A47BA7FED2DD5B97AE499FAFA4F22C6BD647DE");
 

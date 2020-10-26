@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 9bb10abfe9a275e31b0dc81146b0075a404a9681bef78f7449568e392357636e CHANGES
+SHA256 5a4b2836e95acf5a467eca9fdcbaa32b53aa557c6ed6c3cd4d8f95532ef526d0 LICENSE
+SHA256 9547291be95ecedc3b997a42d2852cf05f181df43737a4c92a1c2e89b5c4556f MANIFEST
+SHA256 dbda033934a402de328b9dcf4a54122e753d94c472b8b4e7a73eb73aee515bc1 META.json
+SHA256 34e2d2c340ed464edccf1ec78345fcdfa028f38869048e396ad872276d5c9914 META.yml
+SHA256 b6c63233ef6c8576ea5af9c400ff82b0d74b3ccfebada019d7e81385259956c5 Makefile.PL
+SHA256 57cda532df84c60dd745b79faaa2570cf26112c6d7e08687a882dc50fb93b0b5 README.md
+SHA256 640e94d8378e427dc4d518335d5df48bfa87d7bccea40e78b1068d46e8bd3e45 files/cube.stl
+SHA256 f1358ad1616c9cc3957dc10c5a225cd009f17d58071cc20081eca54903c8cb66 files/cube_binary.stl
+SHA256 39c5766566b7e5a1465ae29fc571e82a40693769a19df28be559bac7cf1b4b66 lib/CAD/Mesh3D.pm
+SHA256 f9b99d4e01bef738a1fb9cf38cb3f7a260dd1c070ccc993b1ad177c0842a8216 lib/CAD/Mesh3D/ProvideNewFormat.pod
+SHA256 8005e18eb4043ce22e57612b9a654b1b375d82814ca144788ffe643d9e597e40 lib/CAD/Mesh3D/STL.pm
+SHA256 a0ee63cd4614f5d6635fd7d5c90d4b23f289b8610758c3ab40b23c986f69e9e9 patch/STL.pm
+SHA256 f2efb994ff1c390cb4c5d3a93a6c98c7ed73f9d4b95abe35f681860e09b49c62 t/00-use.t
+SHA256 6314e9b19568a81124bc932815b5af65b84819e359d78d13ee3b93f047a7b9a2 t/10-initialize.t
+SHA256 ddd4971450d23993736241b398be0a443845dc1e7abfca16374354e0314de032 t/20-math.t
+SHA256 a308eb2270ed77ece69a8fccbff351a45e8c2830546567c4509b6ca0ce6a5f8b t/40-format.t
+SHA256 8f33a2a95e84dbfa6f3f94dd0318400420a6cd9ffbd96e256f138d7610b1c6b7 t/99-fault.t
+SHA256 cfc85141d08cbb75bf5d281a1403b39807df38fd735fae22483a47d35c00a07d t/STL-inputStl.t
+SHA256 d62c6a5ee14452219e2f8e4945ec0d611a8272f45c3cd258625b0a4450105744 t/STL-outputStl.t
+SHA256 a1b3b03e62509510b9f573eb7c8c3997d1c02cccf7ee28debc224ade94e2a334 xt/00-sign.t
+SHA256 4db6ba292995d924c9086faa9bd1f4755d6440eac05c7657d2ee64b5b25c9827 xt/README.md
+SHA256 8d45dc71db90024703aa6366e70f135e792e8803d762f31807affb59e919ca4b xt/stl_bin_crlf.t
+SHA256 21d8edb456cfc44cef9dda42879a69ec9034153cb3d49b9e6ff62c7354ad1c8e xt/stl_load.t
+SHA256 b7e424ce65d4d17a9af9e8f345851a09339e8f9b6bf20342f5e54655db70bca8 xt/stl_save.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE6ADa9A+awTiidH7W+iz85Wilrc8FAl+V+EIACgkQ+iz85Wil
+rc/vNBAAjbKxKb9w/bqjuxuHhlrC8lXsPVmgKJkDrQuPhIZT0F3qKI/2+ptQEtUP
+ah7OgnWx5L41e9MDm+E5o617L1GDVECrHxbZjaL++AzIJxRd0Qyq0Hyum/Zkn+oC
+vEPeWDzH1KEBe8zr9UN6NSpcQrcS0xQC2ytscwcC08YcmALCuLxsWcxaGNe0cwqB
+b6+JnVKJKqEkNmbGIPAz2zZc2tF7lD6E0VSKtFvoxQ10w23VA1etEV7AvbyolWOQ
+TrRfxqfFW3nH5R2CkaGY6tjSRkG0WStqaUxXyLCQ7q5mV4R+PFl0xLaymsLeV7hP
+NKOZY3Jee8EebWs6DeN8bcjIwNk2/CbJDetK6G8P4AsVn7iyNZlRASsLAYTr5uWG
+3tyCPbWhG3tmhwsCH15DjI8Juww/bkS9RZ10/yAbc/uiZFCooiVny4z7kF4EGm/K
+i4ZizlFp8kSAEw/YJmVTxjgpAI95Rn9SWcsh40CLtiTRhbDP4mUFBHLuNyEM+7qy
+/ZJY75yfyEzF0qfZmgfrlN0j+sBztSgFKH1w+Qo37BxDZSC7DzdqfCEVCj9mQX97
+i64AtOSefGQQc/W7ktKx0E/Q5d8ieEvp4OqcKLT4wrqVddRlYU0vxVXFRe0schNB
+SWgkneLwTR0FNv1eZPlog74XyK22H8fYxsnY4r9/FWW26PcBXzw=
+=OWoA
+-----END PGP SIGNATURE-----

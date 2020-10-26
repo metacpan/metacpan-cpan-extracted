@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Filename::Video - Video filename
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Regexp::Pattern::Filename::Video (from Perl distribution
-    Regexp-Pattern-Filename-Video), released on 2020-04-01.
+    Regexp-Pattern-Filename-Video), released on 2020-05-31.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -22,11 +22,13 @@ PATTERNS
 
         No extension.
 
-         "foo" =~ re("Filename::Video::filename_video");  # doesn't match
+         "foo" =~ re("Filename::Video::filename_video");  # DOESN'T MATCH
 
         Not an extension.
 
-         "mp4" =~ re("Filename::Video::filename_video");  # doesn't match
+         "mp4" =~ re("Filename::Video::filename_video");  # DOESN'T MATCH
+
+        Example #3.
 
          "foo.mp4" =~ re("Filename::Video::filename_video");  # matches
 
@@ -36,9 +38,11 @@ PATTERNS
 
         Regex is anchored.
 
-         "foo.MKV is the file" =~ re("Filename::Video::filename_video");  # doesn't match
+         "foo.MKV is the file" =~ re("Filename::Video::filename_video");  # DOESN'T MATCH
 
-         "foo.mp3" =~ re("Filename::Video::filename_video");  # doesn't match
+        Example #6.
+
+         "foo.mp3" =~ re("Filename::Video::filename_video");  # DOESN'T MATCH
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -57,9 +61,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Filename::Video
+
     Regexp::Pattern
 
-    Filename::Video
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

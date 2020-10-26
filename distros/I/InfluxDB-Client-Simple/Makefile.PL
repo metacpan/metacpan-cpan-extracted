@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        'Test::Warnings' => '0',
     },
     PREREQ_PM => {
         'IO::Socket::INET' => '0',

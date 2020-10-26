@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::Table::Manifold.
 
+1.02 2020-09-19 12:00:00
+	- Switch to String::TtyLength's tty_width() for calculating width of strings.
+	- Add test case with wide text.
+
 1.01  2018-11-22:09:55:00
 	- Update pre-reqs for deal with test failures for CPAN Testers.
 	- Adopt new repo structure. For details, see

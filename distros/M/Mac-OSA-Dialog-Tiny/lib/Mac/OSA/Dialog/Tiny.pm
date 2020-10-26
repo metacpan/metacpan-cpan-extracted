@@ -1,11 +1,11 @@
 package Mac::OSA::Dialog::Tiny;
 
-use 5.010; use strict; use warnings;our $VERSION = '0.04';
+use 5.010; use strict; use warnings;our $VERSION = '1.00';
 
 use base 'Import::Export';
 
 our %EX = (
-		dialog => [qw/all/]
+	dialog => [qw/all/]
 );
 
 sub dialog {
@@ -22,11 +22,11 @@ __END__
 
 =head1 NAME
 
-Mac::OSA::Dialog::Tiny - The great new Mac::OSA::Dialog::Tiny!
+Mac::OSA::Dialog::Tiny - native mac dialogs
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 
@@ -41,18 +41,22 @@ Version 0.04
 		b => ['smoked'],
 	);
 
-=head1 EXPORT
+=head1 DESCRIPTION
 
-Trigger a simple native dialog alert from my script.
+A dialog is a type of window that elicits a response from the user.
+
+=head1 EXPORT
 
 =head2 dialog
 
-	m => message
-	t => title
-	i => icon (from current directory)
-	b => button text
+Trigger a simple native dialog alert from a script.
 
-=cut
+	dialog(	
+		m => $message,
+		t => $title,
+		i => $icon, #(from current directory)
+		b => $button_text
+	);
 
 =head1 AUTHOR
 

@@ -10,7 +10,7 @@ our @EXPORT = qw( dlopen dlerror dlsym dlclose );
 push @EXPORT, grep /RTLD_/, keys %FFI::Platypus::DL::;
 
 # ABSTRACT: Slightly non-portable interface to libdl
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 
 1;
@@ -27,7 +27,7 @@ FFI::Platypus::DL - Slightly non-portable interface to libdl
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 SYNOPSIS
 

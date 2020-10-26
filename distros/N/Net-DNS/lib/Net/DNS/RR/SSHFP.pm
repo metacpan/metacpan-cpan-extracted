@@ -1,14 +1,11 @@
 package Net::DNS::RR::SSHFP;
 
-#
-# $Id: SSHFP.pm 1741 2019-04-16 13:10:38Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: SSHFP.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,12 +13,11 @@ Net::DNS::RR::SSHFP - DNS SSHFP resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
 
-use constant BABBLE => defined eval 'require Digest::BubbleBabble';
+use constant BABBLE => defined eval { require Digest::BubbleBabble };
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -30,13 +26,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $size = $self->{rdlength} - 2;
 	@{$self}{qw(algorithm fptype fpbin)} = unpack "\@$offset C2 a$size", $$data;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'C2 a*', @{$self}{qw(algorithm fptype fpbin)};
+	return pack 'C2 a*', @{$self}{qw(algorithm fptype fpbin)};
 }
 
 
@@ -45,7 +42,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 	$self->_annotation( $self->babble ) if BABBLE;
 	my @fprint = split /(\S{64})/, $self->fp;
-	my @rdata = ( $self->algorithm, $self->fptype, @fprint );
+	my @rdata  = ( $self->algorithm, $self->fptype, @fprint );
+	return @rdata;
 }
 
 
@@ -55,6 +53,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->algorithm(shift);
 	$self->fptype(shift);
 	$self->fp(@_);
+	return;
 }
 
 
@@ -62,7 +61,7 @@ sub algorithm {
 	my $self = shift;
 
 	$self->{algorithm} = 0 + shift if scalar @_;
-	$self->{algorithm} || 0;
+	return $self->{algorithm} || 0;
 }
 
 
@@ -70,14 +69,14 @@ sub fptype {
 	my $self = shift;
 
 	$self->{fptype} = 0 + shift if scalar @_;
-	$self->{fptype} || 0;
+	return $self->{fptype} || 0;
 }
 
 
 sub fp {
 	my $self = shift;
 	return unpack "H*", $self->fpbin() unless scalar @_;
-	$self->fpbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	return $self->fpbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -85,7 +84,7 @@ sub fpbin {
 	my $self = shift;
 
 	$self->{fpbin} = shift if scalar @_;
-	$self->{fpbin} || "";
+	return $self->{fpbin} || "";
 }
 
 
@@ -94,7 +93,7 @@ sub babble {
 }
 
 
-sub fingerprint { &fp; }		## historical
+sub fingerprint { return &fp; }		## historical
 
 
 1;
@@ -104,7 +103,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name SSHFP algorithm fptype fp');
+    $rr = Net::DNS::RR->new('name SSHFP algorithm fptype fp');
 
 =head1 DESCRIPTION
 

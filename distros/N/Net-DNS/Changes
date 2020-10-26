@@ -1,4 +1,10 @@
-$Id: Changes 1806 2020-09-11 18:48:57Z willem $                       -*-text-*-
+$Id: Changes 1821 2020-10-23 14:40:41Z willem $                       -*-text-*-
+
+
+**** 1.28 Oct 23, 2020
+
+	Eliminate indirect object syntax.
+	Eliminate grep/map <expression>.
 
 
 **** 1.27 Sep 11, 2020

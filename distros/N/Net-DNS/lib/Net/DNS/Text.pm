@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
-#
-# $Id: Text.pm 1762 2020-02-02 21:39:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1762 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Text.pm 1813 2020-10-08 21:58:40Z willem $)[2];
 
 
 =head1 NAME
@@ -14,11 +14,11 @@ Net::DNS::Text - DNS text representation
 
     use Net::DNS::Text;
 
-    $object = new Net::DNS::Text('example');
+    $object = Net::DNS::Text->new('example');
     $string = $object->string;
 
-    $object = decode Net::DNS::Text( \$data, $offset );
-    ( $object, $next ) = decode Net::DNS::Text( \$data, $offset );
+    $object = Net::DNS::Text->decode( \$data, $offset );
+    ( $object, $next ) = Net::DNS::Text->decode( \$data, $offset );
 
     $data = $object->encode;
     $text = $object->value;
@@ -34,8 +34,6 @@ lifetime.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
@@ -54,7 +52,7 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see Unicode TR#16 3.6]
 
 =head2 new
 
-    $object = new Net::DNS::Text('example');
+    $object = Net::DNS::Text->new('example');
 
 Creates a text object which encapsulates a single character
 string component of a resource record.
@@ -84,7 +82,7 @@ sub new {
 
 	while ( length $_ > 255 ) {
 		my $chunk = substr( $_, 0, 255 );		# carve into chunks
-		substr( $chunk, -length($1) ) = '' if $chunk =~ /.([\300-\377][\200-\277]*)$/;
+		$chunk =~ s/[\300-\377][\200-\277]*$//;
 		push @$self, $chunk;
 		substr( $_, 0, length $chunk ) = '';
 	}
@@ -96,9 +94,9 @@ sub new {
 
 =head2 decode
 
-    $object = decode Net::DNS::Text( \$buffer, $offset );
+    $object = Net::DNS::Text->decode( \$buffer, $offset );
 
-    ( $object, $next ) = decode Net::DNS::Text( \$buffer, $offset );
+    ( $object, $next ) = Net::DNS::Text->decode( \$buffer, $offset );
 
 Creates a text object which represents the decoded data at the
 indicated offset within the data buffer.
@@ -142,7 +140,7 @@ suitable for inclusion in a DNS packet buffer.
 
 sub encode {
 	my $self = shift;
-	join '', map pack( 'C a*', length $_, $_ ), @$self;
+	return join '', map { pack( 'C a*', length $_, $_ ) } @$self;
 }
 
 
@@ -157,7 +155,7 @@ without the explicit length field.
 
 sub raw {
 	my $self = shift;
-	join '', map pack( 'a*', $_ ), @$self;
+	return join '', map { pack( 'a*', $_ ) } @$self;
 }
 
 
@@ -172,7 +170,7 @@ Character string representation of the text object.
 sub value {
 	return unless defined wantarray;
 	my $self = shift;
-	_decode_utf8( join '', @$self );
+	return _decode_utf8( join '', @$self );
 }
 
 
@@ -187,8 +185,8 @@ Conditionally quoted zone file representation of the text object.
 sub string {
 	my $self = shift;
 
-	my @s = map split( '', $_ ), @$self;			# escape special and ASCII non-printable
-	my $s = _decode_utf8( join '', map $escape{$_}, @s );
+	my @s = map { split '', $_ } @$self;			# escape special and ASCII non-printable
+	my $s = _decode_utf8( join '', map { $escape{$_} } @s );
 	return $s =~ /\\034|[ \t\n\r\f();]|^$/ ? qq("$s") : $s; # quote special characters and empty string
 }
 
@@ -209,7 +207,7 @@ sub _decode_utf8 {			## UTF-8 to perl internal encoding
 	[ !"#$%&'()*+,\-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~?] unless ASCII;
 
 	my $z = length($_) - length($_);			# pre-5.18 taint workaround
-	ASCII ? substr( ( UTF8 ? $utf8 : $ascii )->decode($_), $z ) : $_;
+	return ASCII ? substr( ( UTF8 ? $utf8 : $ascii )->decode($_), $z ) : $_;
 }
 
 
@@ -222,7 +220,7 @@ sub _encode_utf8 {			## perl internal encoding to UTF-8
 	[\040-\176] unless ASCII;
 
 	my $z = length($_) - length($_);			# pre-5.18 taint workaround
-	ASCII ? substr( ( UTF8 ? $utf8 : $ascii )->encode($_), $z ) : $_;
+	return ASCII ? substr( ( UTF8 ? $utf8 : $ascii )->encode($_), $z ) : $_;
 }
 
 
@@ -230,7 +228,7 @@ sub _encode_utf8 {			## perl internal encoding to UTF-8
 	my @C0 = ( 0 .. 31 );					# control characters
 	my @NA = UTF8 ? ( 192, 193, 216 .. 223, 245 .. 255 ) : ( 128 .. 255 );
 
-	my %table = map( ( $_ => $_ ), map pack( 'C', $_ ), ( 0 .. 255 ) );
+	my %table = map { ( chr($_) => chr($_) ) } ( 0 .. 255 );
 
 	foreach my $n ( @C0, 34, 92, 127, @NA ) {		# numerical escape
 		my $codepoint = sprintf( '%03u', $n );

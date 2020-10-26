@@ -1,14 +1,11 @@
 package Net::DNS::RR::CSYNC;
 
-#
-# $Id: CSYNC.pm 1781 2020-05-13 08:58:25Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: CSYNC.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,10 +13,8 @@ Net::DNS::RR::CSYNC - DNS CSYNC resource record
 
 =cut
 
-
 use integer;
 
-use Net::DNS::Parameters;
 use Net::DNS::RR::NSEC;
 
 
@@ -31,13 +26,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	@{$self}{qw(soaserial flags)} = unpack "\@$offset Nn", $$data;
 	$offset += 6;
 	$self->{typebm} = substr $$data, $offset, $limit - $offset;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'N n a*', $self->soaserial, $self->flags, $self->{typebm};
+	return pack 'N n a*', $self->soaserial, $self->flags, $self->{typebm};
 }
 
 
@@ -45,6 +41,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @rdata = ( $self->soaserial, $self->flags, $self->typelist );
+	return @rdata;
 }
 
 
@@ -54,6 +51,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->soaserial(shift);
 	$self->flags(shift);
 	$self->typelist(@_);
+	return;
 }
 
 
@@ -61,39 +59,44 @@ sub soaserial {
 	my $self = shift;
 
 	$self->{soaserial} = 0 + shift if scalar @_;
-	$self->{soaserial} || 0;
+	return $self->{soaserial} || 0;
 }
-
-
-sub SOAserial {&soaserial}
 
 
 sub flags {
 	my $self = shift;
 
 	$self->{flags} = 0 + shift if scalar @_;
-	$self->{flags} || 0;
+	return $self->{flags} || 0;
 }
 
 
 sub immediate {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
-		return 0x0001 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x0001 | ( $_ || 0 );
+			$_ ^= 0x0001 unless shift;
+		}
 	}
+	return 0x0001 & ( $self->{flags} || 0 );
 }
 
 
 sub soaminimum {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x0002 ) ^ ( 0x0002 | ( $_ || 0 ) ) if scalar @_;
-		return 0x0002 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x0002 | ( $_ || 0 );
+			$_ ^= 0x0002 unless shift;
+		}
 	}
+	return 0x0002 & ( $self->{flags} || 0 );
 }
 
 
 sub typelist {
-	&Net::DNS::RR::NSEC::typelist;
+	return &Net::DNS::RR::NSEC::typelist;
 }
 
 
@@ -104,7 +107,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name CSYNC SOAserial flags typelist');
+    $rr = Net::DNS::RR->new('name CSYNC SOAserial flags typelist');
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,23 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.48'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::PluginBundle::Author::TEAM' => '0',
+                                      'Software::License::Perl_5' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
                                       'Test::CPANfile' => '0.02',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -20,15 +28,18 @@ do { my $x = {
                                       'Future::AsyncAwait' => '0.33',
                                       'IO::Async' => '0.68',
                                       'IO::Async::Notifier' => '0.68',
+                                      'JSON::MaybeUTF8' => '0',
                                       'List::Util' => '1.50',
                                       'Log::Any' => '1.050',
                                       'Module::Load' => '0',
                                       'Path::Tiny' => '0.108',
                                       'Ryu' => '1.008',
                                       'Ryu::Async' => '0.016',
+                                      'Scalar::Util' => '1.50',
                                       'Syntax::Keyword::Try' => '0.11',
                                       'URI' => '0',
                                       'URI::db' => '0.19',
+                                      'YAML::XS' => '0',
                                       'curry' => '0',
                                       'indirect' => '0',
                                       'mro' => '0',

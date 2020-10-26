@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl -w
-# $Id: check_zone 638 2007-05-15 18:59:26Z olaf $
+# $Id: check_zone 1811 2020-10-05 08:24:23Z willem $
 
 =head1 NAME
 
@@ -91,9 +91,11 @@ There appears to be a bug in the resolver AXFR routine where, if one server cann
 =cut
 
 
-require 'assert.pl';
+#require 'assert.pl';
 
 use strict;
+use warnings;
+use Carp;
 use vars qw($opt_r);
 use vars qw($opt_v);
 use vars qw($opt_a);
@@ -111,7 +113,7 @@ die "Usage: ", basename($0), " [ -r -v ] [ -a alternate_domain] [ -e eqivalent_d
 
 
 our $exit_status = 0;
-$SIG{__WARN__} = sub {$exit_status=1 ; print STDERR @_ };
+local $SIG{__WARN__} = sub {$exit_status=1 ; print STDERR @_ };
 
 
 
@@ -130,26 +132,30 @@ foreach my $key (sort keys %exceptions) {
 check_domain(@ARGV);
 exit $exit_status;
 
+sub assert { croak 'violated assertion' unless shift; return }
+
 
 sub parse_exceptions_file {
 	my %exceptions;
 	my $file = $opt_e || "";
 	return %exceptions unless ( -r $file);
-	open FH, $file or warn "Couldn't read $file: $!";
-	my $line;
-	while ( defined ($line = <FH>) ) {
-		chomp $line;
-		#print "      raw line: $line\n";
-		next if $line =~ /^\s*#/;
-		$line =~ s/#.*$//;
-		$line =~ s/^\s*//;
-		$line =~ s/\s*$//;
-		$line =~ s/'//g;
-		my ($left, $right) = (split /[\s:]+/, $line)[0, -1];
+	open( my $fh, '<', $file );
+	die "Couldn't read $file: $!" unless $fh;
+	while (<$fh>) {
+		chomp;
+		#print "      raw line: $_\n";
+		next if /^$/;
+		next if /^\s*#/;
+		s/#.*$//;
+		s/^\s*//;
+		s/\s*$//;
+		s/'//g;
+		my ($left, $right) = (split /[\s:]+/, $_)[0, -1];
 		push @{$exceptions{$left}}, $right;
 		#print "processed line: $line\n";
 		
 	}
+	close($fh);
 	return %exceptions;
 }
 
@@ -167,7 +173,7 @@ sub check_domain {
     print "$domain (class $class)\n";
     print "\n";
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     $res->defnames( 0 );
     $res->retry( 2 );
 
@@ -187,7 +193,7 @@ sub check_domain {
     }
 
     printf( "List of name servers returned from '%s'\n", $res->answerfrom );
-    foreach $ns_rr ( $nspack->answer ) {
+    foreach my $ns_rr ( $nspack->answer ) {
         
         $ns_rr->print if( $opt_v );
 
@@ -216,7 +222,7 @@ sub check_domain {
     
     $res->nameservers( @nsl );
 
-    foreach $ns ( @nsl ) {
+    foreach my $ns ( @nsl ) {
     
         $res->nameservers( $ns );
         
@@ -288,6 +294,7 @@ sub check_domain {
             check_domain($_, $class);
         }
     }
+    return;
 }
 
 sub check_soa {
@@ -297,7 +304,7 @@ sub check_soa {
     my( $ns, $soa_rr );
     my $rr_count = 0;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
 
     $res->defnames( 0 );
     $res->retry( 2 );
@@ -307,7 +314,7 @@ sub check_soa {
     #   SOA for the somain.
     #
     
-    foreach $ns ( @$nsl ) {
+    foreach my $ns ( @$nsl ) {
     
         my $soa = 0;
         my $nspack;
@@ -331,7 +338,7 @@ sub check_soa {
         # the name servers.
         #
         
-        foreach $soa_rr ( $nspack->answer ) {
+        foreach my $soa_rr ( $nspack->answer ) {
 
             $soa_rr->print if( $opt_v );
 
@@ -364,13 +371,14 @@ sub check_soa {
     
     print "\t*** SOAs are different!\n" if( $soa_diff );
     print "$rr_count SOA RRs checked.\n";
+    return;
 }
 
 sub check_ptr {
 
     my( $domain, $class, $nsl, $zone ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     my $ptr_rr;
     my $rr_count = 0;
 
@@ -378,7 +386,7 @@ sub check_ptr {
     $res->retry( 2 );
     $res->nameservers( @$nsl );
 
-    foreach $ptr_rr ( grep { $_->type eq 'PTR' } @$zone ) {
+    foreach my $ptr_rr ( grep { $_->type eq 'PTR' } @$zone ) {
 
         my @types;
     
@@ -406,12 +414,13 @@ sub check_ptr {
     }
 
     print "$rr_count PTR RRs checked.\n";
+    return;
 }
 
 sub check_ns {
 
     my( $domain, $class, $nsl, $zone ) = @_;
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     my $ns_rr;
     my $rr_count = 0;
 
@@ -428,7 +437,7 @@ sub check_ns {
     # against the name has an associated PTR RR.
     #
 
-    foreach $ns_rr ( grep { $_->type eq 'NS' } @$zone ) {
+    foreach my $ns_rr ( grep { $_->type eq 'NS' } @$zone ) {
 
         my @types;
 
@@ -455,13 +464,14 @@ sub check_ns {
     }
     
     print "$rr_count NS RRs checked.\n";
+    return;
 }
 
 sub check_a {
 
     my( $domain, $class, $nsl, $zone ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     my $a_rr;
     my $rr_count = 0;
 
@@ -475,7 +485,7 @@ sub check_a {
     # matches the A RR.
     #
 
-    foreach $a_rr ( grep { $_->type eq 'A' } @$zone ) {
+    foreach my $a_rr ( grep { $_->type eq 'A' } @$zone ) {
 
         $a_rr->print if( $opt_v );
 
@@ -490,6 +500,7 @@ sub check_a {
     }
 
     print "$rr_count A RRs checked.\n";
+    return;
 }
 
 
@@ -497,7 +508,7 @@ sub check_mx {
 
     my( $domain, $class, $nsl, $zone ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     my $mx_rr;
     my $rr_count = 0;
 
@@ -511,7 +522,7 @@ sub check_mx {
     # A RR has a matching PTR RR.
     #
 
-    foreach $mx_rr ( grep { $_->type eq 'MX' } @$zone ) {
+    foreach my $mx_rr ( grep { $_->type eq 'MX' } @$zone ) {
 
         $mx_rr->print if( $opt_v );
 
@@ -526,13 +537,14 @@ sub check_mx {
     }
 
     print "$rr_count MX RRs checked.\n";
+    return;
 }
 
 sub check_cname {
 
     my( $domain, $class, $nsl, $zone ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     my $cname_rr;
     my $rr_count = 0;
 
@@ -546,7 +558,7 @@ sub check_cname {
     # A RR has a matching PTR RR.
     #
 
-    foreach $cname_rr ( grep { $_->type eq 'CNAME' } @$zone ) {
+    foreach my $cname_rr ( grep { $_->type eq 'CNAME' } @$zone ) {
 
         my @types;
 
@@ -573,6 +585,7 @@ sub check_cname {
     }
 
     print "$rr_count CNAME RRs checked.\n";
+    return;
 }
 
 sub check_w_equivs_and_exceptions {
@@ -590,14 +603,14 @@ sub check_w_equivs_and_exceptions {
 		$right =~ s/\.?$opt_a$//;
 		$right =~ s/\.?$main_domain$//;
 	}
-	return (eval ("\"$left\" $comp \"$right\"") );
+	return (eval { "\"$left\" $comp \"$right\"" } );
 }
 
 sub xcheck_a2ptr {
 
     my( $a_rr, $domain, $class, $nsl ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
 
     $res->defnames( 0 );
     $res->retry( 2 );
@@ -614,7 +627,7 @@ sub xcheck_a2ptr {
     if( defined( $ans )) {
 
         my $ptr_rr;
-        foreach $ptr_rr ( $ans->answer ) {
+        foreach my $ptr_rr ( $ans->answer ) {
 
             $ptr_rr->print if( $opt_v );
 
@@ -636,6 +649,7 @@ sub xcheck_a2ptr {
         warn( "\tNO PTR RR for '", $a_rr->name, 
                 "' at address '", $a_rr->address,"'\n" );
     }
+    return;
 }
 
 
@@ -643,7 +657,7 @@ sub xcheck_ptr2a {
 
     my( $ptr_rr, $domain, $class, $nsl ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
 
     $res->defnames( 0 );
     $res->retry( 2 );
@@ -660,7 +674,7 @@ sub xcheck_ptr2a {
     if( defined( $ans )) {
             
         my $a_rr;
-        foreach $a_rr ( $ans->answer ) {
+        foreach my $a_rr ( $ans->answer ) {
 
             $a_rr->print if( $opt_v );
 
@@ -682,6 +696,7 @@ sub xcheck_ptr2a {
         warn( "\tNO A RR for '", $ptr_rr->ptrdname, 
                 "' at address '", ip_ptr2a_str( $ptr_rr->address ), "'\n" );
     }
+    return;
 }
 
 
@@ -689,7 +704,7 @@ sub xcheck_name {
 
     my( $name, $domain, $class, $nsl ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
 
     $res->defnames( 0 );
     $res->retry( 2 );
@@ -707,7 +722,7 @@ sub xcheck_name {
         #
 
         my $a_rr;
-        foreach $a_rr ( $ans->answer ) {
+        foreach my $a_rr ( $ans->answer ) {
 
             $a_rr->print if( $opt_v );
 
@@ -724,7 +739,7 @@ sub xcheck_name {
         
         warn( "\t", $name, " has no A RR\n" );
     }
-
+    return;
 }
 
 
@@ -732,7 +747,7 @@ sub types4name {
 
     my( $name, $domain, $class, $nsl ) = @_;
 
-    my $res = new Net::DNS::Resolver;
+    my $res = Net::DNS::Resolver->new();
     my @rr_types;
 
     $res->defnames( 0 );
@@ -746,7 +761,7 @@ sub types4name {
     if( defined( $ans )) {
         
         my $any_rr;
-        foreach $any_rr ( $ans->answer ) {
+        foreach my $any_rr ( $ans->answer ) {
 
             $any_rr->print if( $opt_v );
 
@@ -792,6 +807,7 @@ sub ip_parts {
     }
 
     assert( 0 );
+    return;
 }
 
 

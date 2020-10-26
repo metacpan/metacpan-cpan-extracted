@@ -1,21 +1,17 @@
 package Net::DNS::RR::AMTRELAY;
 
-#
-# $Id: AMTRELAY.pm 1781 2020-05-13 08:58:25Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: AMTRELAY.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::AMTRELAY - DNS AMTRELAY resource record
 
 =cut
-
 
 use integer;
 
@@ -35,10 +31,11 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	for ( $self->relaytype ) {
 		/^0$/ && do { $self->{relay} = '' };
-		/^3$/ && return $self->{relay} = decode Net::DNS::DomainName( $data, $offset + 2 );
+		/^3$/ && return $self->{relay} = Net::DNS::DomainName->decode( $data, $offset + 2 );
 		/^2$/ && return $self->{relay} = pack( 'a16', $self->{relay} );
 		/^1$/ && return $self->{relay} = pack( 'a4',  $self->{relay} );
 	}
+	return;
 }
 
 
@@ -47,18 +44,19 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 
 	for ( $self->relaytype ) {
 		/^0$/ && do { $self->{relay} = '' };
-		/^3$/ && return pack( 'C2 a*', @{$self}{qw(precedence relaytype)}, $self->{relay}->encode );
+		/^3$/ && return pack( 'C2 a*',	@{$self}{qw(precedence relaytype)}, $self->{relay}->encode );
 		/^2$/ && return pack( 'C2 a16', @{$self}{qw(precedence relaytype relay)} );
 		/^1$/ && return pack( 'C2 a4',	@{$self}{qw(precedence relaytype relay)} );
 	}
-	pack( 'C2 a*', @{$self}{qw(precedence relaytype relay)} );
+	return pack( 'C2 a*', @{$self}{qw(precedence relaytype relay)} );
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my @rdata = map $self->$_, qw(precedence D relaytype relay);
+	my @rdata = map { $self->$_ } qw(precedence D relaytype relay);
+	return @rdata;
 }
 
 
@@ -68,6 +66,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	foreach (qw(precedence D relaytype relay)) {
 		$self->$_(shift);
 	}
+	return;
 }
 
 
@@ -75,6 +74,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	@{$self}{qw(precedence relaytype relay)} = ( 0, 0, '' );
+	return;
 }
 
 
@@ -82,22 +82,21 @@ sub precedence {
 	my $self = shift;
 
 	$self->{precedence} = 0 + shift if scalar @_;
-	$self->{precedence} || 0;
+	return $self->{precedence} || 0;
 }
 
 
-sub D {
-	my $self = shift;
+sub d {
+	my $self = shift;					# uncoverable pod
 	$self->{relaytype} = $self->relaytype | ( $_[0] ? 0x80 : 0 ) if scalar @_;
-	$self->{relaytype} ? $self->{relaytype} >> 7 : 0;
+	return $self->{relaytype} ? $self->{relaytype} >> 7 : 0;
 }
 
-sub d { &D; }							# uncoverable pod
 
 sub relaytype {
 	my $self = shift;
 	$self->{relaytype} = $self->D ? shift | 0x80 : shift if scalar @_;
-	$self->{relaytype} ? $self->{relaytype} & 0x7f : 0;
+	return $self->{relaytype} ? $self->{relaytype} & 0x7f : 0;
 }
 
 
@@ -122,7 +121,7 @@ sub relay {
 		};
 		/\..+/ && do {
 			$self->relaytype(3);
-			$self->{relay} = new Net::DNS::DomainName($_);
+			$self->{relay} = Net::DNS::DomainName->new($_);
 			last;
 		};
 		croak 'unrecognised relay type';
@@ -130,12 +129,12 @@ sub relay {
 
 	if ( defined wantarray ) {
 		for ( $self->relaytype ) {
-			/^1$/ && return Net::DNS::RR::A::address(    {address => $self->{relay}} );
+			/^1$/ && return Net::DNS::RR::A::address( {address => $self->{relay}} );
 			/^2$/ && return Net::DNS::RR::AAAA::address( {address => $self->{relay}} );
 			/^3$/ && return wantarray ? $self->{relay}->string : $self->{relay}->name;
 		}
-		wantarray ? '.' : undef;
 	}
+	return wantarray ? '.' : undef;
 }
 
 
@@ -155,7 +154,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('owner AMTRELAY precedence D relaytype relay');
+    $rr = Net::DNS::RR->new('owner AMTRELAY precedence D relaytype relay');
 
 =head1 DESCRIPTION
 

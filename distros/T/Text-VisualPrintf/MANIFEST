@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/Text/VisualPrintf.pm
 lib/Text/VisualPrintf/IO.pm
+lib/Text/VisualPrintf/Transform.pm
 minil.toml
 t/00_compile.t
 t/01_simple.t

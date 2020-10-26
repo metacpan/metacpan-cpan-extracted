@@ -46,6 +46,7 @@ sub request {
 	}
 	return $self->GET($url, $headers) if $method eq 'GET';
 	return $self->not_implemented($method, $url) unless $method eq 'POST';
+	return $self->bad_request() if ($ENV{NEO4J} // 0) =~ m/^4\b/;
 	return $self->not_found($url) if $url !~ m|^/db/data/transaction\b|;
 	
 	my $hash = request_hash($url, $content);
@@ -98,6 +99,14 @@ sub not_implemented {
 }
 
 
+sub bad_request {
+	my ($self) = @_;
+	$self->{json} = '{"error":"Cypher query filter active."}';
+	$self->{status} = 400;  # HTTP: Bad Request
+	return $self;
+}
+
+
 sub responseContent {
 	my ($self) = @_;
 	return $self->{json};
@@ -139,8 +148,8 @@ sub store {
 	my $hash = request_hash($url, $request);
 	$response //= '';
 	$response =~ s/{"expires":"[A-Za-z0-9 :,+-]+"}/{"expires":"Thu, 01 Jan 1970 00:00:00 +0000"}/;
+	File::Slurp::write_file "$path/$hash.txt", "$url\n\n\n$request" if $write_txt;  # useful for debugging
 	File::Slurp::write_file "$path/$hash.json", $response;
-	File::Slurp::write_file "$path/$hash.txt", "$url\n\n\n$request" if $write_txt;
 }
 
 
@@ -164,6 +173,7 @@ package Neo4j::Sim::Response;
 
 sub status_line {
 	my $status = ${ shift() }->{status};
+	return "400 Bad Request" if $status == 400;
 	return "401 Unauthorized" if $status == 401;
 	return "404 Not Found" if $status == 404;
 	return "501 Not Implemented";

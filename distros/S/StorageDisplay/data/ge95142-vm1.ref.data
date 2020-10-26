@@ -3,64 +3,64 @@ $VAR1 = {
           'dm' => {
                     'dm-0' => {
                                 'DM_BLKDEVNAME' => 'dm-0',
-                                'DM_BLKDEVS_USED' => 'sdb2',
+                                'DM_BLKDEVS_USED' => 'sda2',
                                 'DM_NAME' => 'vgchu-root',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
                     'dm-1' => {
                                 'DM_BLKDEVNAME' => 'dm-1',
-                                'DM_BLKDEVS_USED' => 'sdb2',
+                                'DM_BLKDEVS_USED' => 'sda2',
                                 'DM_NAME' => 'vgchu-swap',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
                     'dm-2' => {
                                 'DM_BLKDEVNAME' => 'dm-2',
-                                'DM_BLKDEVS_USED' => 'sdb2',
+                                'DM_BLKDEVS_USED' => 'sda2',
                                 'DM_NAME' => 'vgchu-home',
                                 'DM_SUBSYSTEM' => 'LVM'
                               },
                     'dm-3' => {
                                 'DM_BLKDEVNAME' => 'dm-3',
-                                'DM_BLKDEVS_USED' => 'sda2',
+                                'DM_BLKDEVS_USED' => 'sdb2',
                                 'DM_NAME' => 'vgchu-scratch',
                                 'DM_SUBSYSTEM' => 'LVM'
                               }
                   },
           'fs' => {
                     '/dev/dm-1' => {
-                                     'free' => '10231369728',
+                                     'free' => 9877581824,
                                      'fstype' => 'swap',
                                      'mountpoint' => 'SWAP',
                                      'size' => '10737414144',
-                                     'used' => '506044416'
+                                     'used' => '859832320'
                                    },
                     '/dev/mapper/vgchu-home' => {
-                                                  'free' => '12636672000',
+                                                  'free' => '12073730048',
                                                   'fstype' => 'ext4',
                                                   'mountpoint' => '/home',
                                                   'size' => '15786254336',
-                                                  'used' => '2359717888'
+                                                  'used' => '2922659840'
                                                 },
                     '/dev/mapper/vgchu-root' => {
-                                                  'free' => '3691372544',
+                                                  'free' => '4648673280',
                                                   'fstype' => 'ext4',
                                                   'mountpoint' => '/',
                                                   'size' => '21003583488',
-                                                  'used' => '16221691904'
+                                                  'used' => '15264391168'
                                                 },
                     '/dev/mapper/vgchu-scratch' => {
-                                                     'free' => '2827103875072',
+                                                     'free' => '328680550400',
                                                      'fstype' => 'ext4',
                                                      'mountpoint' => '/srv/scratch',
                                                      'size' => '4326856564736',
-                                                     'used' => '1315293270016'
+                                                     'used' => '3813716594688'
                                                    },
-                    '/dev/sdb1' => {
-                                     'free' => '91709440',
+                    '/dev/sda1' => {
+                                     'free' => '91705344',
                                      'fstype' => 'vfat',
                                      'mountpoint' => '/boot/efi',
                                      'size' => '97033216',
-                                     'used' => '5323776'
+                                     'used' => '5327872'
                                    }
                   },
           'libvirt' => {},
@@ -71,11 +71,11 @@ $VAR1 = {
                                    'disc-gran' => 4096,
                                    'disc-max' => 1073741824,
                                    'disc-zero' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' ),
-                                   'fsavail' => '3691405312',
+                                   'fsavail' => '4648706048',
                                    'fssize' => '21003583488',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '77%',
-                                   'fsused' => '16221659136',
+                                   'fsuse%' => '73%',
+                                   'fsused' => '15264358400',
                                    'group' => undef,
                                    'hctl' => undef,
                                    'hotplug' => do{my $o},
@@ -86,7 +86,7 @@ $VAR1 = {
                                    'min-io' => 512,
                                    'mode' => 'brw-rw----',
                                    'model' => undef,
-                                   'mountpoint' => '/mnt',
+                                   'mountpoint' => '/',
                                    'name' => 'vgchu-root',
                                    'opt-io' => 0,
                                    'owner' => undef,
@@ -96,7 +96,7 @@ $VAR1 = {
                                    'partuuid' => undef,
                                    'path' => '/dev/mapper/vgchu-root',
                                    'phy-sec' => 512,
-                                   'pkname' => 'sdb2',
+                                   'pkname' => 'sda2',
                                    'pttype' => undef,
                                    'ptuuid' => undef,
                                    'ra' => 128,
@@ -150,7 +150,7 @@ $VAR1 = {
                                    'partuuid' => undef,
                                    'path' => '/dev/mapper/vgchu-swap',
                                    'phy-sec' => 512,
-                                   'pkname' => 'sdb2',
+                                   'pkname' => 'sda2',
                                    'pttype' => undef,
                                    'ptuuid' => undef,
                                    'ra' => 128,
@@ -179,11 +179,11 @@ $VAR1 = {
                                    'disc-gran' => 4096,
                                    'disc-max' => 1073741824,
                                    'disc-zero' => do{my $o},
-                                   'fsavail' => '12636672000',
+                                   'fsavail' => '12073730048',
                                    'fssize' => '15786254336',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '15%',
-                                   'fsused' => '2359717888',
+                                   'fsuse%' => '19%',
+                                   'fsused' => '2922659840',
                                    'group' => undef,
                                    'hctl' => undef,
                                    'hotplug' => do{my $o},
@@ -204,7 +204,7 @@ $VAR1 = {
                                    'partuuid' => undef,
                                    'path' => '/dev/mapper/vgchu-home',
                                    'phy-sec' => 512,
-                                   'pkname' => 'sdb2',
+                                   'pkname' => 'sda2',
                                    'pttype' => undef,
                                    'ptuuid' => undef,
                                    'ra' => 128,
@@ -233,11 +233,11 @@ $VAR1 = {
                                    'disc-gran' => 4096,
                                    'disc-max' => 1073741824,
                                    'disc-zero' => do{my $o},
-                                   'fsavail' => '2827103875072',
+                                   'fsavail' => '328680550400',
                                    'fssize' => '4326856564736',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '30%',
-                                   'fsused' => '1315293270016',
+                                   'fsuse%' => '88%',
+                                   'fsused' => '3813716594688',
                                    'group' => undef,
                                    'hctl' => undef,
                                    'hotplug' => do{my $o},
@@ -258,7 +258,7 @@ $VAR1 = {
                                    'partuuid' => undef,
                                    'path' => '/dev/mapper/vgchu-scratch',
                                    'phy-sec' => 512,
-                                   'pkname' => 'sda2',
+                                   'pkname' => 'sdb2',
                                    'pttype' => undef,
                                    'ptuuid' => undef,
                                    'ra' => 128,
@@ -293,7 +293,7 @@ $VAR1 = {
                                   'fsuse%' => undef,
                                   'fsused' => undef,
                                   'group' => undef,
-                                  'hctl' => '6:0:0:2',
+                                  'hctl' => '6:0:0:0',
                                   'hotplug' => do{my $o},
                                   'kname' => 'sda',
                                   'label' => undef,
@@ -314,7 +314,7 @@ $VAR1 = {
                                   'phy-sec' => 512,
                                   'pkname' => undef,
                                   'pttype' => 'gpt',
-                                  'ptuuid' => '51f6098d-e270-47af-8bbb-11f86342e435',
+                                  'ptuuid' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
                                   'ra' => 128,
                                   'rand' => do{my $o},
                                   'rev' => '2.5+',
@@ -323,8 +323,8 @@ $VAR1 = {
                                   'rota' => do{my $o},
                                   'rq-size' => 256,
                                   'sched' => 'mq-deadline',
-                                  'serial' => 'drive-scsi0-0-0-2',
-                                  'size' => '4398046511104',
+                                  'serial' => 'drive-scsi0-0-0-0',
+                                  'size' => '53687091200',
                                   'state' => 'running',
                                   'subsystems' => 'block:scsi:virtio:pci',
                                   'tran' => undef,
@@ -335,6 +335,60 @@ $VAR1 = {
                                   'wwn' => undef,
                                   'zoned' => 'none'
                                 },
+                       'sda1' => {
+                                   'alignment' => 0,
+                                   'disc-aln' => 0,
+                                   'disc-gran' => 4096,
+                                   'disc-max' => 1073741824,
+                                   'disc-zero' => do{my $o},
+                                   'fsavail' => '91705344',
+                                   'fssize' => '97033216',
+                                   'fstype' => 'vfat',
+                                   'fsuse%' => '5%',
+                                   'fsused' => '5327872',
+                                   'group' => undef,
+                                   'hctl' => undef,
+                                   'hotplug' => do{my $o},
+                                   'kname' => 'sda1',
+                                   'label' => undef,
+                                   'log-sec' => 512,
+                                   'maj:min' => '8:1',
+                                   'min-io' => 512,
+                                   'mode' => 'brw-rw----',
+                                   'model' => undef,
+                                   'mountpoint' => '/boot/efi',
+                                   'name' => 'sda1',
+                                   'opt-io' => 0,
+                                   'owner' => undef,
+                                   'partflags' => undef,
+                                   'partlabel' => 'efi',
+                                   'parttype' => 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b',
+                                   'partuuid' => 'c3b77c4b-800d-4f79-9ab8-c11775e839a7',
+                                   'path' => '/dev/sda1',
+                                   'phy-sec' => 512,
+                                   'pkname' => 'sda',
+                                   'pttype' => 'gpt',
+                                   'ptuuid' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
+                                   'ra' => 128,
+                                   'rand' => do{my $o},
+                                   'rev' => undef,
+                                   'rm' => do{my $o},
+                                   'ro' => do{my $o},
+                                   'rota' => do{my $o},
+                                   'rq-size' => 256,
+                                   'sched' => 'mq-deadline',
+                                   'serial' => undef,
+                                   'size' => 98566144,
+                                   'state' => undef,
+                                   'subsystems' => 'block:scsi:virtio:pci',
+                                   'tran' => undef,
+                                   'type' => 'part',
+                                   'uuid' => 'BD03-519C',
+                                   'vendor' => undef,
+                                   'wsame' => 262144,
+                                   'wwn' => undef,
+                                   'zoned' => 'none'
+                                 },
                        'sda2' => {
                                    'alignment' => 0,
                                    'disc-aln' => 0,
@@ -361,14 +415,14 @@ $VAR1 = {
                                    'opt-io' => 0,
                                    'owner' => undef,
                                    'partflags' => undef,
-                                   'partlabel' => 'disk2pv',
+                                   'partlabel' => 'pv-hera-disk1',
                                    'parttype' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
-                                   'partuuid' => '17eea494-f594-438c-9795-d98d9d92783d',
+                                   'partuuid' => '9b7c5e65-d461-47e6-92bc-e63fbd751c3d',
                                    'path' => '/dev/sda2',
                                    'phy-sec' => 512,
                                    'pkname' => 'sda',
                                    'pttype' => 'gpt',
-                                   'ptuuid' => '51f6098d-e270-47af-8bbb-11f86342e435',
+                                   'ptuuid' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
                                    'ra' => 128,
                                    'rand' => do{my $o},
                                    'rev' => undef,
@@ -378,12 +432,12 @@ $VAR1 = {
                                    'rq-size' => 256,
                                    'sched' => 'mq-deadline',
                                    'serial' => undef,
-                                   'size' => '4396971720704',
+                                   'size' => '53586427904',
                                    'state' => undef,
                                    'subsystems' => 'block:scsi:virtio:pci',
                                    'tran' => undef,
                                    'type' => 'part',
-                                   'uuid' => 'wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
+                                   'uuid' => '2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz',
                                    'vendor' => undef,
                                    'wsame' => 262144,
                                    'wwn' => undef,
@@ -401,7 +455,7 @@ $VAR1 = {
                                   'fsuse%' => undef,
                                   'fsused' => undef,
                                   'group' => undef,
-                                  'hctl' => '6:0:0:0',
+                                  'hctl' => '6:0:0:2',
                                   'hotplug' => do{my $o},
                                   'kname' => 'sdb',
                                   'label' => undef,
@@ -422,7 +476,7 @@ $VAR1 = {
                                   'phy-sec' => 512,
                                   'pkname' => undef,
                                   'pttype' => 'gpt',
-                                  'ptuuid' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
+                                  'ptuuid' => '51f6098d-e270-47af-8bbb-11f86342e435',
                                   'ra' => 128,
                                   'rand' => do{my $o},
                                   'rev' => '2.5+',
@@ -431,8 +485,8 @@ $VAR1 = {
                                   'rota' => do{my $o},
                                   'rq-size' => 256,
                                   'sched' => 'mq-deadline',
-                                  'serial' => 'drive-scsi0-0-0-0',
-                                  'size' => '53687091200',
+                                  'serial' => 'drive-scsi0-0-0-2',
+                                  'size' => '4398046511104',
                                   'state' => 'running',
                                   'subsystems' => 'block:scsi:virtio:pci',
                                   'tran' => undef,
@@ -443,60 +497,6 @@ $VAR1 = {
                                   'wwn' => undef,
                                   'zoned' => 'none'
                                 },
-                       'sdb1' => {
-                                   'alignment' => 0,
-                                   'disc-aln' => 0,
-                                   'disc-gran' => 4096,
-                                   'disc-max' => 1073741824,
-                                   'disc-zero' => do{my $o},
-                                   'fsavail' => '91709440',
-                                   'fssize' => '97033216',
-                                   'fstype' => 'vfat',
-                                   'fsuse%' => '5%',
-                                   'fsused' => '5323776',
-                                   'group' => undef,
-                                   'hctl' => undef,
-                                   'hotplug' => do{my $o},
-                                   'kname' => 'sdb1',
-                                   'label' => undef,
-                                   'log-sec' => 512,
-                                   'maj:min' => '8:17',
-                                   'min-io' => 512,
-                                   'mode' => 'brw-rw----',
-                                   'model' => undef,
-                                   'mountpoint' => '/boot/efi',
-                                   'name' => 'sdb1',
-                                   'opt-io' => 0,
-                                   'owner' => undef,
-                                   'partflags' => undef,
-                                   'partlabel' => 'efi',
-                                   'parttype' => 'c12a7328-f81f-11d2-ba4b-00a0c93ec93b',
-                                   'partuuid' => 'c3b77c4b-800d-4f79-9ab8-c11775e839a7',
-                                   'path' => '/dev/sdb1',
-                                   'phy-sec' => 512,
-                                   'pkname' => 'sdb',
-                                   'pttype' => 'gpt',
-                                   'ptuuid' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
-                                   'ra' => 128,
-                                   'rand' => do{my $o},
-                                   'rev' => undef,
-                                   'rm' => do{my $o},
-                                   'ro' => do{my $o},
-                                   'rota' => do{my $o},
-                                   'rq-size' => 256,
-                                   'sched' => 'mq-deadline',
-                                   'serial' => undef,
-                                   'size' => 98566144,
-                                   'state' => undef,
-                                   'subsystems' => 'block:scsi:virtio:pci',
-                                   'tran' => undef,
-                                   'type' => 'part',
-                                   'uuid' => 'BD03-519C',
-                                   'vendor' => undef,
-                                   'wsame' => 262144,
-                                   'wwn' => undef,
-                                   'zoned' => 'none'
-                                 },
                        'sdb2' => {
                                    'alignment' => 0,
                                    'disc-aln' => 0,
@@ -523,14 +523,14 @@ $VAR1 = {
                                    'opt-io' => 0,
                                    'owner' => undef,
                                    'partflags' => undef,
-                                   'partlabel' => 'pv-hera-disk1',
+                                   'partlabel' => 'disk2pv',
                                    'parttype' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
-                                   'partuuid' => '9b7c5e65-d461-47e6-92bc-e63fbd751c3d',
+                                   'partuuid' => '17eea494-f594-438c-9795-d98d9d92783d',
                                    'path' => '/dev/sdb2',
                                    'phy-sec' => 512,
                                    'pkname' => 'sdb',
                                    'pttype' => 'gpt',
-                                   'ptuuid' => '32c821d7-9ed2-4e52-b20b-a2c14c8e0015',
+                                   'ptuuid' => '51f6098d-e270-47af-8bbb-11f86342e435',
                                    'ra' => 128,
                                    'rand' => do{my $o},
                                    'rev' => undef,
@@ -540,12 +540,12 @@ $VAR1 = {
                                    'rq-size' => 256,
                                    'sched' => 'mq-deadline',
                                    'serial' => undef,
-                                   'size' => '53586427904',
+                                   'size' => '4396971720704',
                                    'state' => undef,
                                    'subsystems' => 'block:scsi:virtio:pci',
                                    'tran' => undef,
                                    'type' => 'part',
-                                   'uuid' => '2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz',
+                                   'uuid' => 'wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
                                    'vendor' => undef,
                                    'wsame' => 262144,
                                    'wwn' => undef,
@@ -610,24 +610,8 @@ $VAR1 = {
                                  'sda' => {
                                             'children' => [
                                                             {
-                                                              'children' => [
-                                                                              {
-                                                                                'kname' => 'dm-3',
-                                                                                'name' => 'vgchu-scratch'
-                                                                              }
-                                                                            ],
-                                                              'kname' => 'sda2',
-                                                              'name' => 'sda2'
-                                                            }
-                                                          ],
-                                            'kname' => 'sda',
-                                            'name' => 'sda'
-                                          },
-                                 'sdb' => {
-                                            'children' => [
-                                                            {
-                                                              'kname' => 'sdb1',
-                                                              'name' => 'sdb1'
+                                                              'kname' => 'sda1',
+                                                              'name' => 'sda1'
                                                             },
                                                             {
                                                               'children' => [
@@ -644,6 +628,22 @@ $VAR1 = {
                                                                                 'name' => 'vgchu-home'
                                                                               }
                                                                             ],
+                                                              'kname' => 'sda2',
+                                                              'name' => 'sda2'
+                                                            }
+                                                          ],
+                                            'kname' => 'sda',
+                                            'name' => 'sda'
+                                          },
+                                 'sdb' => {
+                                            'children' => [
+                                                            {
+                                                              'children' => [
+                                                                              {
+                                                                                'kname' => 'dm-3',
+                                                                                'name' => 'vgchu-scratch'
+                                                                              }
+                                                                            ],
                                                               'kname' => 'sdb2',
                                                               'name' => 'sdb2'
                                                             }
@@ -658,40 +658,62 @@ $VAR1 = {
                                },
           'lvm' => {
                      'vgchu' => {
-                                  'pvs' => [
+                                  'lvs' => [
                                              {
+                                               'devices' => '/dev/sda2(7680)',
+                                               'lv_name' => 'home',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sda2:7680-11519',
+                                               'seg_pe_ranges' => '/dev/sda2:7680-11519',
+                                               'seg_size' => '16106127360B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'linear',
+                                               'vg_name' => 'vgchu'
+                                             },
+                                             {
+                                               'devices' => '/dev/sda2(0)',
+                                               'lv_name' => 'root',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sda2:0-5119',
+                                               'seg_pe_ranges' => '/dev/sda2:0-5119',
+                                               'seg_size' => '21474836480B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'linear',
+                                               'vg_name' => 'vgchu'
+                                             },
+                                             {
+                                               'devices' => '/dev/sdb2(0)',
                                                'lv_name' => 'scratch',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '20971520B',
-                                               'pv_name' => '/dev/sda2',
-                                               'pv_size' => '4396968574976B',
-                                               'pv_used' => '4396947603456B',
-                                               'pvseg_size' => '1048314',
-                                               'pvseg_start' => '0',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sdb2:0-1048313',
+                                               'seg_pe_ranges' => '/dev/sdb2:0-1048313',
                                                'seg_size' => '4396947603456B',
                                                'seg_start' => '0B',
                                                'segtype' => 'linear',
                                                'vg_name' => 'vgchu'
                                              },
                                              {
-                                               'lv_name' => '',
-                                               'lv_role' => 'public',
-                                               'pv_free' => '20971520B',
-                                               'pv_name' => '/dev/sda2',
-                                               'pv_size' => '4396968574976B',
-                                               'pv_used' => '4396947603456B',
-                                               'pvseg_size' => '5',
-                                               'pvseg_start' => '1048314',
-                                               'seg_size' => '20971520B',
+                                               'devices' => '/dev/sda2(5120)',
+                                               'lv_name' => 'swap',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sda2:5120-7679',
+                                               'seg_pe_ranges' => '/dev/sda2:5120-7679',
+                                               'seg_size' => '10737418240B',
                                                'seg_start' => '0B',
-                                               'segtype' => 'free',
+                                               'segtype' => 'linear',
                                                'vg_name' => 'vgchu'
-                                             },
+                                             }
+                                           ],
+                                  'pvs' => [
                                              {
                                                'lv_name' => 'root',
                                                'lv_role' => 'public',
                                                'pv_free' => '5263851520B',
-                                               'pv_name' => '/dev/sdb2',
+                                               'pv_name' => '/dev/sda2',
                                                'pv_size' => '53582233600B',
                                                'pv_used' => '48318382080B',
                                                'pvseg_size' => '5120',
@@ -705,7 +727,7 @@ $VAR1 = {
                                                'lv_name' => 'swap',
                                                'lv_role' => 'public',
                                                'pv_free' => '5263851520B',
-                                               'pv_name' => '/dev/sdb2',
+                                               'pv_name' => '/dev/sda2',
                                                'pv_size' => '53582233600B',
                                                'pv_used' => '48318382080B',
                                                'pvseg_size' => '2560',
@@ -719,7 +741,7 @@ $VAR1 = {
                                                'lv_name' => 'home',
                                                'lv_role' => 'public',
                                                'pv_free' => '5263851520B',
-                                               'pv_name' => '/dev/sdb2',
+                                               'pv_name' => '/dev/sda2',
                                                'pv_size' => '53582233600B',
                                                'pv_used' => '48318382080B',
                                                'pvseg_size' => '3840',
@@ -733,12 +755,40 @@ $VAR1 = {
                                                'lv_name' => '',
                                                'lv_role' => 'public',
                                                'pv_free' => '5263851520B',
-                                               'pv_name' => '/dev/sdb2',
+                                               'pv_name' => '/dev/sda2',
                                                'pv_size' => '53582233600B',
                                                'pv_used' => '48318382080B',
                                                'pvseg_size' => '1255',
                                                'pvseg_start' => '11520',
                                                'seg_size' => '5263851520B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'free',
+                                               'vg_name' => 'vgchu'
+                                             },
+                                             {
+                                               'lv_name' => 'scratch',
+                                               'lv_role' => 'public',
+                                               'pv_free' => '20971520B',
+                                               'pv_name' => '/dev/sdb2',
+                                               'pv_size' => '4396968574976B',
+                                               'pv_used' => '4396947603456B',
+                                               'pvseg_size' => '1048314',
+                                               'pvseg_start' => '0',
+                                               'seg_size' => '4396947603456B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'linear',
+                                               'vg_name' => 'vgchu'
+                                             },
+                                             {
+                                               'lv_name' => '',
+                                               'lv_role' => 'public',
+                                               'pv_free' => '20971520B',
+                                               'pv_name' => '/dev/sdb2',
+                                               'pv_size' => '4396968574976B',
+                                               'pv_used' => '4396947603456B',
+                                               'pvseg_size' => '5',
+                                               'pvseg_start' => '1048314',
+                                               'seg_size' => '20971520B',
                                                'seg_start' => '0B',
                                                'segtype' => 'free',
                                                'vg_name' => 'vgchu'
@@ -784,17 +834,17 @@ $VAR1 = {
                                               },
                                   'vgs-pv' => {
                                                 '/dev/sda2' => {
-                                                                 'pv_free' => '20971520B',
+                                                                 'pv_free' => '5263851520B',
                                                                  'pv_name' => '/dev/sda2',
-                                                                 'pv_size' => '4396968574976B',
-                                                                 'pv_used' => '4396947603456B',
+                                                                 'pv_size' => '53582233600B',
+                                                                 'pv_used' => '48318382080B',
                                                                  'vg_name' => 'vgchu'
                                                                },
                                                 '/dev/sdb2' => {
-                                                                 'pv_free' => '5263851520B',
+                                                                 'pv_free' => '20971520B',
                                                                  'pv_name' => '/dev/sdb2',
-                                                                 'pv_size' => '53582233600B',
-                                                                 'pv_used' => '48318382080B',
+                                                                 'pv_size' => '4396968574976B',
+                                                                 'pv_used' => '4396947603456B',
                                                                  'vg_name' => 'vgchu'
                                                                }
                                               },
@@ -807,30 +857,6 @@ $VAR1 = {
                    },
           'partitions' => {
                             'sda' => {
-                                       'label' => 'QEMU QEMU HARDDISK',
-                                       'parts' => [
-                                                    {
-                                                      'kind' => 'free',
-                                                      'size' => '1073724416',
-                                                      'start' => '17408'
-                                                    },
-                                                    {
-                                                      'flags' => 'lvm',
-                                                      'id' => '2',
-                                                      'kind' => 'part',
-                                                      'label' => 'disk2pv',
-                                                      'size' => '4396971720704',
-                                                      'start' => '1073741824'
-                                                    },
-                                                    {
-                                                      'kind' => 'free',
-                                                      'size' => '1031680',
-                                                      'start' => '4398045462528'
-                                                    }
-                                                  ],
-                                       'size' => '4398046511104'
-                                     },
-                            'sdb' => {
                                        'label' => 'QEMU QEMU HARDDISK',
                                        'parts' => [
                                                     {
@@ -861,6 +887,30 @@ $VAR1 = {
                                                     }
                                                   ],
                                        'size' => '53687091200'
+                                     },
+                            'sdb' => {
+                                       'label' => 'QEMU QEMU HARDDISK',
+                                       'parts' => [
+                                                    {
+                                                      'kind' => 'free',
+                                                      'size' => '1073724416',
+                                                      'start' => '17408'
+                                                    },
+                                                    {
+                                                      'flags' => 'lvm',
+                                                      'id' => '2',
+                                                      'kind' => 'part',
+                                                      'label' => 'disk2pv',
+                                                      'size' => '4396971720704',
+                                                      'start' => '1073741824'
+                                                    },
+                                                    {
+                                                      'kind' => 'free',
+                                                      'size' => '1031680',
+                                                      'start' => '4398045462528'
+                                                    }
+                                                  ],
+                                       'size' => '4398046511104'
                                      }
                           },
           'udev' => {
@@ -926,7 +976,121 @@ $VAR1 = {
                                                                 'BUSNUM' => '001',
                                                                 'DEVNAME' => '/dev/bus/usb/001/001',
                                                                 'DEVNUM' => '001',
-                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb1',
+                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb1',
+                                                                'DEVTYPE' => 'usb_device',
+                                                                'DRIVER' => 'usb',
+                                                                'ID_BUS' => 'usb',
+                                                                'ID_FOR_SEAT' => 'usb-pci-0000_00_1d_0',
+                                                                'ID_MODEL' => 'UHCI_Host_Controller',
+                                                                'ID_MODEL_ENC' => 'UHCI\\x20Host\\x20Controller',
+                                                                'ID_MODEL_FROM_DATABASE' => '1.1 root hub',
+                                                                'ID_MODEL_ID' => '0001',
+                                                                'ID_PATH' => 'pci-0000:00:1d.0',
+                                                                'ID_PATH_TAG' => 'pci-0000_00_1d_0',
+                                                                'ID_REVISION' => '0504',
+                                                                'ID_SERIAL' => 'Linux_5.4.0-0.bpo.4-amd64_uhci_hcd_UHCI_Host_Controller_0000:00:1d.0',
+                                                                'ID_SERIAL_SHORT' => '0000:00:1d.0',
+                                                                'ID_USB_INTERFACES' => ':090000:',
+                                                                'ID_VENDOR' => 'Linux_5.4.0-0.bpo.4-amd64_uhci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.4.0-0.bpo.4-amd64\\x20uhci_hcd',
+                                                                'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
+                                                                'ID_VENDOR_ID' => '1d6b',
+                                                                'MAJOR' => '189',
+                                                                'MINOR' => '0',
+                                                                'PRODUCT' => '1d6b/1/504',
+                                                                'SUBSYSTEM' => 'usb',
+                                                                'TAGS' => ':seat:',
+                                                                'TYPE' => '9/0/0',
+                                                                'USEC_INITIALIZED' => '3095962'
+                                                              },
+                                             'name' => 'bus/usb/001/001',
+                                             'names' => [
+                                                          'bus/usb/001/001'
+                                                        ],
+                                             'path' => '/devices/pci0000:00/0000:00:1d.0/usb1'
+                                           },
+                      'bus/usb/002/001' => {
+                                             '_udev_infos' => {
+                                                                'BUSNUM' => '002',
+                                                                'DEVNAME' => '/dev/bus/usb/002/001',
+                                                                'DEVNUM' => '001',
+                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.1/usb2',
+                                                                'DEVTYPE' => 'usb_device',
+                                                                'DRIVER' => 'usb',
+                                                                'ID_BUS' => 'usb',
+                                                                'ID_FOR_SEAT' => 'usb-pci-0000_00_1d_1',
+                                                                'ID_MODEL' => 'UHCI_Host_Controller',
+                                                                'ID_MODEL_ENC' => 'UHCI\\x20Host\\x20Controller',
+                                                                'ID_MODEL_FROM_DATABASE' => '1.1 root hub',
+                                                                'ID_MODEL_ID' => '0001',
+                                                                'ID_PATH' => 'pci-0000:00:1d.1',
+                                                                'ID_PATH_TAG' => 'pci-0000_00_1d_1',
+                                                                'ID_REVISION' => '0504',
+                                                                'ID_SERIAL' => 'Linux_5.4.0-0.bpo.4-amd64_uhci_hcd_UHCI_Host_Controller_0000:00:1d.1',
+                                                                'ID_SERIAL_SHORT' => '0000:00:1d.1',
+                                                                'ID_USB_INTERFACES' => ':090000:',
+                                                                'ID_VENDOR' => 'Linux_5.4.0-0.bpo.4-amd64_uhci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.4.0-0.bpo.4-amd64\\x20uhci_hcd',
+                                                                'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
+                                                                'ID_VENDOR_ID' => '1d6b',
+                                                                'MAJOR' => '189',
+                                                                'MINOR' => '128',
+                                                                'PRODUCT' => '1d6b/1/504',
+                                                                'SUBSYSTEM' => 'usb',
+                                                                'TAGS' => ':seat:',
+                                                                'TYPE' => '9/0/0',
+                                                                'USEC_INITIALIZED' => '3124524'
+                                                              },
+                                             'name' => 'bus/usb/002/001',
+                                             'names' => [
+                                                          'bus/usb/002/001'
+                                                        ],
+                                             'path' => '/devices/pci0000:00/0000:00:1d.1/usb2'
+                                           },
+                      'bus/usb/003/001' => {
+                                             '_udev_infos' => {
+                                                                'BUSNUM' => '003',
+                                                                'DEVNAME' => '/dev/bus/usb/003/001',
+                                                                'DEVNUM' => '001',
+                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.2/usb3',
+                                                                'DEVTYPE' => 'usb_device',
+                                                                'DRIVER' => 'usb',
+                                                                'ID_BUS' => 'usb',
+                                                                'ID_FOR_SEAT' => 'usb-pci-0000_00_1d_2',
+                                                                'ID_MODEL' => 'UHCI_Host_Controller',
+                                                                'ID_MODEL_ENC' => 'UHCI\\x20Host\\x20Controller',
+                                                                'ID_MODEL_FROM_DATABASE' => '1.1 root hub',
+                                                                'ID_MODEL_ID' => '0001',
+                                                                'ID_PATH' => 'pci-0000:00:1d.2',
+                                                                'ID_PATH_TAG' => 'pci-0000_00_1d_2',
+                                                                'ID_REVISION' => '0504',
+                                                                'ID_SERIAL' => 'Linux_5.4.0-0.bpo.4-amd64_uhci_hcd_UHCI_Host_Controller_0000:00:1d.2',
+                                                                'ID_SERIAL_SHORT' => '0000:00:1d.2',
+                                                                'ID_USB_INTERFACES' => ':090000:',
+                                                                'ID_VENDOR' => 'Linux_5.4.0-0.bpo.4-amd64_uhci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.4.0-0.bpo.4-amd64\\x20uhci_hcd',
+                                                                'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
+                                                                'ID_VENDOR_ID' => '1d6b',
+                                                                'MAJOR' => '189',
+                                                                'MINOR' => '256',
+                                                                'PRODUCT' => '1d6b/1/504',
+                                                                'SUBSYSTEM' => 'usb',
+                                                                'TAGS' => ':seat:',
+                                                                'TYPE' => '9/0/0',
+                                                                'USEC_INITIALIZED' => '3152616'
+                                                              },
+                                             'name' => 'bus/usb/003/001',
+                                             'names' => [
+                                                          'bus/usb/003/001'
+                                                        ],
+                                             'path' => '/devices/pci0000:00/0000:00:1d.2/usb3'
+                                           },
+                      'bus/usb/004/001' => {
+                                             '_udev_infos' => {
+                                                                'BUSNUM' => '004',
+                                                                'DEVNAME' => '/dev/bus/usb/004/001',
+                                                                'DEVNUM' => '001',
+                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb4',
                                                                 'DEVTYPE' => 'usb_device',
                                                                 'DRIVER' => 'usb',
                                                                 'ID_BUS' => 'usb',
@@ -937,34 +1101,34 @@ $VAR1 = {
                                                                 'ID_MODEL_ID' => '0002',
                                                                 'ID_PATH' => 'pci-0000:00:1d.7',
                                                                 'ID_PATH_TAG' => 'pci-0000_00_1d_7',
-                                                                'ID_REVISION' => '0503',
-                                                                'ID_SERIAL' => 'Linux_5.3.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1d.7',
+                                                                'ID_REVISION' => '0504',
+                                                                'ID_SERIAL' => 'Linux_5.4.0-0.bpo.4-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1d.7',
                                                                 'ID_SERIAL_SHORT' => '0000:00:1d.7',
                                                                 'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.3.0-0.bpo.2-amd64_ehci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.3.0-0.bpo.2-amd64\\x20ehci_hcd',
+                                                                'ID_VENDOR' => 'Linux_5.4.0-0.bpo.4-amd64_ehci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.4.0-0.bpo.4-amd64\\x20ehci_hcd',
                                                                 'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
                                                                 'ID_VENDOR_ID' => '1d6b',
                                                                 'MAJOR' => '189',
-                                                                'MINOR' => '0',
-                                                                'PRODUCT' => '1d6b/2/503',
+                                                                'MINOR' => '384',
+                                                                'PRODUCT' => '1d6b/2/504',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2993704'
+                                                                'USEC_INITIALIZED' => '3153576'
                                                               },
-                                             'name' => 'bus/usb/001/001',
+                                             'name' => 'bus/usb/004/001',
                                              'names' => [
-                                                          'bus/usb/001/001'
+                                                          'bus/usb/004/001'
                                                         ],
-                                             'path' => '/devices/pci0000:00/0000:00:1d.7/usb1'
+                                             'path' => '/devices/pci0000:00/0000:00:1d.7/usb4'
                                            },
-                      'bus/usb/001/002' => {
+                      'bus/usb/004/002' => {
                                              '_udev_infos' => {
-                                                                'BUSNUM' => '001',
-                                                                'DEVNAME' => '/dev/bus/usb/001/002',
+                                                                'BUSNUM' => '004',
+                                                                'DEVNAME' => '/dev/bus/usb/004/002',
                                                                 'DEVNUM' => '002',
-                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1',
+                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1',
                                                                 'DEVTYPE' => 'usb_device',
                                                                 'DRIVER' => 'usb',
                                                                 'ID_BUS' => 'usb',
@@ -980,131 +1144,17 @@ $VAR1 = {
                                                                 'ID_VENDOR_FROM_DATABASE' => 'Adomax Technology Co., Ltd',
                                                                 'ID_VENDOR_ID' => '0627',
                                                                 'MAJOR' => '189',
-                                                                'MINOR' => '1',
+                                                                'MINOR' => '385',
                                                                 'PRODUCT' => '627/1/0',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TYPE' => '0/0/0',
-                                                                'USEC_INITIALIZED' => '3478815'
+                                                                'USEC_INITIALIZED' => '3464114'
                                                               },
-                                             'name' => 'bus/usb/001/002',
+                                             'name' => 'bus/usb/004/002',
                                              'names' => [
-                                                          'bus/usb/001/002'
+                                                          'bus/usb/004/002'
                                                         ],
-                                             'path' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1'
-                                           },
-                      'bus/usb/002/001' => {
-                                             '_udev_infos' => {
-                                                                'BUSNUM' => '002',
-                                                                'DEVNAME' => '/dev/bus/usb/002/001',
-                                                                'DEVNUM' => '001',
-                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2',
-                                                                'DEVTYPE' => 'usb_device',
-                                                                'DRIVER' => 'usb',
-                                                                'ID_BUS' => 'usb',
-                                                                'ID_FOR_SEAT' => 'usb-pci-0000_00_1d_0',
-                                                                'ID_MODEL' => 'UHCI_Host_Controller',
-                                                                'ID_MODEL_ENC' => 'UHCI\\x20Host\\x20Controller',
-                                                                'ID_MODEL_FROM_DATABASE' => '1.1 root hub',
-                                                                'ID_MODEL_ID' => '0001',
-                                                                'ID_PATH' => 'pci-0000:00:1d.0',
-                                                                'ID_PATH_TAG' => 'pci-0000_00_1d_0',
-                                                                'ID_REVISION' => '0503',
-                                                                'ID_SERIAL' => 'Linux_5.3.0-0.bpo.2-amd64_uhci_hcd_UHCI_Host_Controller_0000:00:1d.0',
-                                                                'ID_SERIAL_SHORT' => '0000:00:1d.0',
-                                                                'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.3.0-0.bpo.2-amd64_uhci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.3.0-0.bpo.2-amd64\\x20uhci_hcd',
-                                                                'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
-                                                                'ID_VENDOR_ID' => '1d6b',
-                                                                'MAJOR' => '189',
-                                                                'MINOR' => '128',
-                                                                'PRODUCT' => '1d6b/1/503',
-                                                                'SUBSYSTEM' => 'usb',
-                                                                'TAGS' => ':seat:',
-                                                                'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2994034'
-                                                              },
-                                             'name' => 'bus/usb/002/001',
-                                             'names' => [
-                                                          'bus/usb/002/001'
-                                                        ],
-                                             'path' => '/devices/pci0000:00/0000:00:1d.0/usb2'
-                                           },
-                      'bus/usb/003/001' => {
-                                             '_udev_infos' => {
-                                                                'BUSNUM' => '003',
-                                                                'DEVNAME' => '/dev/bus/usb/003/001',
-                                                                'DEVNUM' => '001',
-                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.1/usb3',
-                                                                'DEVTYPE' => 'usb_device',
-                                                                'DRIVER' => 'usb',
-                                                                'ID_BUS' => 'usb',
-                                                                'ID_FOR_SEAT' => 'usb-pci-0000_00_1d_1',
-                                                                'ID_MODEL' => 'UHCI_Host_Controller',
-                                                                'ID_MODEL_ENC' => 'UHCI\\x20Host\\x20Controller',
-                                                                'ID_MODEL_FROM_DATABASE' => '1.1 root hub',
-                                                                'ID_MODEL_ID' => '0001',
-                                                                'ID_PATH' => 'pci-0000:00:1d.1',
-                                                                'ID_PATH_TAG' => 'pci-0000_00_1d_1',
-                                                                'ID_REVISION' => '0503',
-                                                                'ID_SERIAL' => 'Linux_5.3.0-0.bpo.2-amd64_uhci_hcd_UHCI_Host_Controller_0000:00:1d.1',
-                                                                'ID_SERIAL_SHORT' => '0000:00:1d.1',
-                                                                'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.3.0-0.bpo.2-amd64_uhci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.3.0-0.bpo.2-amd64\\x20uhci_hcd',
-                                                                'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
-                                                                'ID_VENDOR_ID' => '1d6b',
-                                                                'MAJOR' => '189',
-                                                                'MINOR' => '256',
-                                                                'PRODUCT' => '1d6b/1/503',
-                                                                'SUBSYSTEM' => 'usb',
-                                                                'TAGS' => ':seat:',
-                                                                'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2994416'
-                                                              },
-                                             'name' => 'bus/usb/003/001',
-                                             'names' => [
-                                                          'bus/usb/003/001'
-                                                        ],
-                                             'path' => '/devices/pci0000:00/0000:00:1d.1/usb3'
-                                           },
-                      'bus/usb/004/001' => {
-                                             '_udev_infos' => {
-                                                                'BUSNUM' => '004',
-                                                                'DEVNAME' => '/dev/bus/usb/004/001',
-                                                                'DEVNUM' => '001',
-                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.2/usb4',
-                                                                'DEVTYPE' => 'usb_device',
-                                                                'DRIVER' => 'usb',
-                                                                'ID_BUS' => 'usb',
-                                                                'ID_FOR_SEAT' => 'usb-pci-0000_00_1d_2',
-                                                                'ID_MODEL' => 'UHCI_Host_Controller',
-                                                                'ID_MODEL_ENC' => 'UHCI\\x20Host\\x20Controller',
-                                                                'ID_MODEL_FROM_DATABASE' => '1.1 root hub',
-                                                                'ID_MODEL_ID' => '0001',
-                                                                'ID_PATH' => 'pci-0000:00:1d.2',
-                                                                'ID_PATH_TAG' => 'pci-0000_00_1d_2',
-                                                                'ID_REVISION' => '0503',
-                                                                'ID_SERIAL' => 'Linux_5.3.0-0.bpo.2-amd64_uhci_hcd_UHCI_Host_Controller_0000:00:1d.2',
-                                                                'ID_SERIAL_SHORT' => '0000:00:1d.2',
-                                                                'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.3.0-0.bpo.2-amd64_uhci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.3.0-0.bpo.2-amd64\\x20uhci_hcd',
-                                                                'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
-                                                                'ID_VENDOR_ID' => '1d6b',
-                                                                'MAJOR' => '189',
-                                                                'MINOR' => '384',
-                                                                'PRODUCT' => '1d6b/1/503',
-                                                                'SUBSYSTEM' => 'usb',
-                                                                'TAGS' => ':seat:',
-                                                                'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2994859'
-                                                              },
-                                             'name' => 'bus/usb/004/001',
-                                             'names' => [
-                                                          'bus/usb/004/001'
-                                                        ],
-                                             'path' => '/devices/pci0000:00/0000:00:1d.2/usb4'
+                                             'path' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1'
                                            },
                       'console' => {
                                      '_udev_infos' => {
@@ -1114,7 +1164,7 @@ $VAR1 = {
                                                         'MAJOR' => '5',
                                                         'MINOR' => '1',
                                                         'SUBSYSTEM' => 'tty',
-                                                        'USEC_INITIALIZED' => '8736705'
+                                                        'USEC_INITIALIZED' => '9486662'
                                                       },
                                      'name' => 'console',
                                      'names' => [
@@ -1142,6 +1192,7 @@ $VAR1 = {
                                                      'DEVNAME' => '/dev/dm-0',
                                                      'DEVPATH' => '/devices/virtual/block/dm-0',
                                                      'DEVTYPE' => 'disk',
+                                                     'DM_ACTIVATION' => '1',
                                                      'DM_LV_NAME' => 'root',
                                                      'DM_NAME' => 'vgchu-root',
                                                      'DM_SUSPENDED' => '0',
@@ -1162,7 +1213,7 @@ $VAR1 = {
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '3556354'
+                                                     'USEC_INITIALIZED' => '3728976'
                                                    },
                                   'name' => 'dm-0',
                                   'names' => [
@@ -1182,6 +1233,7 @@ $VAR1 = {
                                                      'DEVNAME' => '/dev/dm-1',
                                                      'DEVPATH' => '/devices/virtual/block/dm-1',
                                                      'DEVTYPE' => 'disk',
+                                                     'DM_ACTIVATION' => '1',
                                                      'DM_LV_NAME' => 'swap',
                                                      'DM_NAME' => 'vgchu-swap',
                                                      'DM_SUSPENDED' => '0',
@@ -1200,7 +1252,7 @@ $VAR1 = {
                                                      'MINOR' => '1',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '3740167'
+                                                     'USEC_INITIALIZED' => '3936883'
                                                    },
                                   'name' => 'dm-1',
                                   'names' => [
@@ -1239,7 +1291,7 @@ $VAR1 = {
                                                      'MINOR' => '2',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '9031501'
+                                                     'USEC_INITIALIZED' => '9760332'
                                                    },
                                   'name' => 'dm-2',
                                   'names' => [
@@ -1277,7 +1329,7 @@ $VAR1 = {
                                                      'MINOR' => '3',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '9033478'
+                                                     'USEC_INITIALIZED' => '9762275'
                                                    },
                                   'name' => 'dm-3',
                                   'names' => [
@@ -1302,8 +1354,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
-                                                          'USEC_INITIALIZED' => '3024690'
+                                                          'TAGS' => ':uaccess:master-of-seat:seat:',
+                                                          'USEC_INITIALIZED' => '3123129'
                                                         },
                                        'name' => 'dri/card0',
                                        'names' => [
@@ -1324,8 +1376,8 @@ $VAR1 = {
                                                                'MAJOR' => '226',
                                                                'MINOR' => '128',
                                                                'SUBSYSTEM' => 'drm',
-                                                               'TAGS' => ':seat:uaccess:',
-                                                               'USEC_INITIALIZED' => '8635614'
+                                                               'TAGS' => ':uaccess:seat:',
+                                                               'USEC_INITIALIZED' => '9401288'
                                                              },
                                             'name' => 'dri/renderD128',
                                             'names' => [
@@ -1345,7 +1397,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'graphics',
                                                     'TAGS' => ':seat:',
-                                                    'USEC_INITIALIZED' => '3066694'
+                                                    'USEC_INITIALIZED' => '3169476'
                                                   },
                                  'name' => 'fb0',
                                  'names' => [
@@ -1371,7 +1423,7 @@ $VAR1 = {
                       'hidraw0' => {
                                      '_udev_infos' => {
                                                         'DEVNAME' => '/dev/hidraw0',
-                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1/1-1:1.0/0003:0627:0001.0001/hidraw/hidraw0',
+                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1/4-1:1.0/0003:0627:0001.0001/hidraw/hidraw0',
                                                         'MAJOR' => '248',
                                                         'MINOR' => '0',
                                                         'SUBSYSTEM' => 'hidraw'
@@ -1380,7 +1432,7 @@ $VAR1 = {
                                      'names' => [
                                                   'hidraw0'
                                                 ],
-                                     'path' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1/1-1:1.0/0003:0627:0001.0001/hidraw/hidraw0'
+                                     'path' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1/4-1:1.0/0003:0627:0001.0001/hidraw/hidraw0'
                                    },
                       'hpet' => {
                                   '_udev_infos' => {
@@ -1428,7 +1480,7 @@ $VAR1 = {
                                                              'MINOR' => '64',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '9294150',
+                                                             'USEC_INITIALIZED' => '10065709',
                                                              'XKBLAYOUT' => 'fr',
                                                              'XKBMODEL' => 'pc105',
                                                              'XKBVARIANT' => 'latin9'
@@ -1454,7 +1506,7 @@ $VAR1 = {
                                                              'MINOR' => '65',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '9294073',
+                                                             'USEC_INITIALIZED' => '10065557',
                                                              'XKBLAYOUT' => 'fr',
                                                              'XKBMODEL' => 'pc105',
                                                              'XKBVARIANT' => 'latin9'
@@ -1469,7 +1521,7 @@ $VAR1 = {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-id/usb-QEMU_QEMU_USB_Tablet_42-event-mouse /dev/input/by-path/pci-0000:00:1d.7-usb-0:1:1.0-event-mouse',
                                                              'DEVNAME' => '/dev/input/event2',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1/1-1:1.0/0003:0627:0001.0001/input/input4/event2',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1/4-1:1.0/0003:0627:0001.0001/input/input4/event2',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_MOUSE' => '1',
@@ -1492,7 +1544,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '66',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '9494704'
+                                                             'USEC_INITIALIZED' => '10236752'
                                                            },
                                           'name' => 'input/event2',
                                           'names' => [
@@ -1500,7 +1552,7 @@ $VAR1 = {
                                                        'input/by-path/pci-0000:00:1d.7-usb-0:1:1.0-event-mouse',
                                                        'input/event2'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1/1-1:1.0/0003:0627:0001.0001/input/input4/event2'
+                                          'path' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1/4-1:1.0/0003:0627:0001.0001/input/input4/event2'
                                         },
                       'input/event3' => {
                                           '_udev_infos' => {
@@ -1517,7 +1569,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '67',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '9294195'
+                                                             'USEC_INITIALIZED' => '10065657'
                                                            },
                                           'name' => 'input/event3',
                                           'names' => [
@@ -1539,7 +1591,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '68',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '9294139'
+                                                             'USEC_INITIALIZED' => '10068723'
                                                            },
                                           'name' => 'input/event4',
                                           'names' => [
@@ -1566,7 +1618,7 @@ $VAR1 = {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-id/usb-QEMU_QEMU_USB_Tablet_42-mouse /dev/input/by-path/pci-0000:00:1d.7-usb-0:1:1.0-mouse',
                                                              'DEVNAME' => '/dev/input/mouse0',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1/1-1:1.0/0003:0627:0001.0001/input/input4/mouse0',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1/4-1:1.0/0003:0627:0001.0001/input/input4/mouse0',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_MOUSE' => '1',
@@ -1588,7 +1640,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '32',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '9083685'
+                                                             'USEC_INITIALIZED' => '9723242'
                                                            },
                                           'name' => 'input/mouse0',
                                           'names' => [
@@ -1596,7 +1648,7 @@ $VAR1 = {
                                                        'input/by-path/pci-0000:00:1d.7-usb-0:1:1.0-mouse',
                                                        'input/mouse0'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1d.7/usb1/1-1/1-1:1.0/0003:0627:0001.0001/input/input4/mouse0'
+                                          'path' => '/devices/pci0000:00/0000:00:1d.7/usb4/4-1/4-1:1.0/0003:0627:0001.0001/input/input4/mouse0'
                                         },
                       'input/mouse1' => {
                                           '_udev_infos' => {
@@ -1612,7 +1664,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '33',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '8733647'
+                                                             'USEC_INITIALIZED' => '9406383'
                                                            },
                                           'name' => 'input/mouse1',
                                           'names' => [
@@ -1636,6 +1688,290 @@ $VAR1 = {
                                              ],
                                   'path' => '/devices/virtual/mem/kmsg'
                                 },
+                      'loop-control' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/loop-control',
+                                                             'DEVPATH' => '/devices/virtual/misc/loop-control',
+                                                             'MAJOR' => '10',
+                                                             'MINOR' => '237',
+                                                             'SUBSYSTEM' => 'misc'
+                                                           },
+                                          'name' => 'loop-control',
+                                          'names' => [
+                                                       'loop-control'
+                                                     ],
+                                          'path' => '/devices/virtual/misc/loop-control'
+                                        },
+                      'loop0' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop0',
+                                                      'DEVPATH' => '/devices/virtual/block/loop0',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '0',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461507574'
+                                                    },
+                                   'name' => 'loop0',
+                                   'names' => [
+                                                'loop0'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop0'
+                                 },
+                      'loop1' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop1',
+                                                      'DEVPATH' => '/devices/virtual/block/loop1',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '1',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461476015'
+                                                    },
+                                   'name' => 'loop1',
+                                   'names' => [
+                                                'loop1'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop1'
+                                 },
+                      'loop10' => {
+                                    '_udev_infos' => {
+                                                       'DEVNAME' => '/dev/loop10',
+                                                       'DEVPATH' => '/devices/virtual/block/loop10',
+                                                       'DEVTYPE' => 'disk',
+                                                       'MAJOR' => '7',
+                                                       'MINOR' => '10',
+                                                       'SUBSYSTEM' => 'block',
+                                                       'SYSTEMD_READY' => '0',
+                                                       'TAGS' => ':systemd:',
+                                                       'USEC_INITIALIZED' => '1065080603958'
+                                                     },
+                                    'name' => 'loop10',
+                                    'names' => [
+                                                 'loop10'
+                                               ],
+                                    'path' => '/devices/virtual/block/loop10'
+                                  },
+                      'loop11' => {
+                                    '_udev_infos' => {
+                                                       'DEVNAME' => '/dev/loop11',
+                                                       'DEVPATH' => '/devices/virtual/block/loop11',
+                                                       'DEVTYPE' => 'disk',
+                                                       'MAJOR' => '7',
+                                                       'MINOR' => '11',
+                                                       'SUBSYSTEM' => 'block',
+                                                       'SYSTEMD_READY' => '0',
+                                                       'TAGS' => ':systemd:',
+                                                       'USEC_INITIALIZED' => '1065080676004'
+                                                     },
+                                    'name' => 'loop11',
+                                    'names' => [
+                                                 'loop11'
+                                               ],
+                                    'path' => '/devices/virtual/block/loop11'
+                                  },
+                      'loop12' => {
+                                    '_udev_infos' => {
+                                                       'DEVNAME' => '/dev/loop12',
+                                                       'DEVPATH' => '/devices/virtual/block/loop12',
+                                                       'DEVTYPE' => 'disk',
+                                                       'MAJOR' => '7',
+                                                       'MINOR' => '12',
+                                                       'SUBSYSTEM' => 'block',
+                                                       'SYSTEMD_READY' => '0',
+                                                       'TAGS' => ':systemd:',
+                                                       'USEC_INITIALIZED' => '1065080757092'
+                                                     },
+                                    'name' => 'loop12',
+                                    'names' => [
+                                                 'loop12'
+                                               ],
+                                    'path' => '/devices/virtual/block/loop12'
+                                  },
+                      'loop13' => {
+                                    '_udev_infos' => {
+                                                       'DEVNAME' => '/dev/loop13',
+                                                       'DEVPATH' => '/devices/virtual/block/loop13',
+                                                       'DEVTYPE' => 'disk',
+                                                       'MAJOR' => '7',
+                                                       'MINOR' => '13',
+                                                       'SUBSYSTEM' => 'block',
+                                                       'SYSTEMD_READY' => '0',
+                                                       'TAGS' => ':systemd:',
+                                                       'USEC_INITIALIZED' => '1065080712729'
+                                                     },
+                                    'name' => 'loop13',
+                                    'names' => [
+                                                 'loop13'
+                                               ],
+                                    'path' => '/devices/virtual/block/loop13'
+                                  },
+                      'loop14' => {
+                                    '_udev_infos' => {
+                                                       'DEVNAME' => '/dev/loop14',
+                                                       'DEVPATH' => '/devices/virtual/block/loop14',
+                                                       'DEVTYPE' => 'disk',
+                                                       'MAJOR' => '7',
+                                                       'MINOR' => '14',
+                                                       'SUBSYSTEM' => 'block',
+                                                       'SYSTEMD_READY' => '0',
+                                                       'TAGS' => ':systemd:',
+                                                       'USEC_INITIALIZED' => '1065080762800'
+                                                     },
+                                    'name' => 'loop14',
+                                    'names' => [
+                                                 'loop14'
+                                               ],
+                                    'path' => '/devices/virtual/block/loop14'
+                                  },
+                      'loop2' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop2',
+                                                      'DEVPATH' => '/devices/virtual/block/loop2',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '2',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461448535'
+                                                    },
+                                   'name' => 'loop2',
+                                   'names' => [
+                                                'loop2'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop2'
+                                 },
+                      'loop3' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop3',
+                                                      'DEVPATH' => '/devices/virtual/block/loop3',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '3',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461476348'
+                                                    },
+                                   'name' => 'loop3',
+                                   'names' => [
+                                                'loop3'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop3'
+                                 },
+                      'loop4' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop4',
+                                                      'DEVPATH' => '/devices/virtual/block/loop4',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '4',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461476109'
+                                                    },
+                                   'name' => 'loop4',
+                                   'names' => [
+                                                'loop4'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop4'
+                                 },
+                      'loop5' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop5',
+                                                      'DEVPATH' => '/devices/virtual/block/loop5',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '5',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461476150'
+                                                    },
+                                   'name' => 'loop5',
+                                   'names' => [
+                                                'loop5'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop5'
+                                 },
+                      'loop6' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop6',
+                                                      'DEVPATH' => '/devices/virtual/block/loop6',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '6',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461476236'
+                                                    },
+                                   'name' => 'loop6',
+                                   'names' => [
+                                                'loop6'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop6'
+                                 },
+                      'loop7' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop7',
+                                                      'DEVPATH' => '/devices/virtual/block/loop7',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '7',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461499917'
+                                                    },
+                                   'name' => 'loop7',
+                                   'names' => [
+                                                'loop7'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop7'
+                                 },
+                      'loop8' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop8',
+                                                      'DEVPATH' => '/devices/virtual/block/loop8',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '8',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1064461674936'
+                                                    },
+                                   'name' => 'loop8',
+                                   'names' => [
+                                                'loop8'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop8'
+                                 },
+                      'loop9' => {
+                                   '_udev_infos' => {
+                                                      'DEVNAME' => '/dev/loop9',
+                                                      'DEVPATH' => '/devices/virtual/block/loop9',
+                                                      'DEVTYPE' => 'disk',
+                                                      'MAJOR' => '7',
+                                                      'MINOR' => '9',
+                                                      'SUBSYSTEM' => 'block',
+                                                      'SYSTEMD_READY' => '0',
+                                                      'TAGS' => ':systemd:',
+                                                      'USEC_INITIALIZED' => '1065072500764'
+                                                    },
+                                   'name' => 'loop9',
+                                   'names' => [
+                                                'loop9'
+                                              ],
+                                   'path' => '/devices/virtual/block/loop9'
+                                 },
                       'mapper/control' => {
                                             '_udev_infos' => {
                                                                'DEVNAME' => '/dev/mapper/control',
@@ -1664,48 +2000,6 @@ $VAR1 = {
                                             ],
                                  'path' => '/devices/virtual/mem/mem'
                                },
-                      'memory_bandwidth' => {
-                                              '_udev_infos' => {
-                                                                 'DEVNAME' => '/dev/memory_bandwidth',
-                                                                 'DEVPATH' => '/devices/virtual/misc/memory_bandwidth',
-                                                                 'MAJOR' => '10',
-                                                                 'MINOR' => '59',
-                                                                 'SUBSYSTEM' => 'misc'
-                                                               },
-                                              'name' => 'memory_bandwidth',
-                                              'names' => [
-                                                           'memory_bandwidth'
-                                                         ],
-                                              'path' => '/devices/virtual/misc/memory_bandwidth'
-                                            },
-                      'network_latency' => {
-                                             '_udev_infos' => {
-                                                                'DEVNAME' => '/dev/network_latency',
-                                                                'DEVPATH' => '/devices/virtual/misc/network_latency',
-                                                                'MAJOR' => '10',
-                                                                'MINOR' => '61',
-                                                                'SUBSYSTEM' => 'misc'
-                                                              },
-                                             'name' => 'network_latency',
-                                             'names' => [
-                                                          'network_latency'
-                                                        ],
-                                             'path' => '/devices/virtual/misc/network_latency'
-                                           },
-                      'network_throughput' => {
-                                                '_udev_infos' => {
-                                                                   'DEVNAME' => '/dev/network_throughput',
-                                                                   'DEVPATH' => '/devices/virtual/misc/network_throughput',
-                                                                   'MAJOR' => '10',
-                                                                   'MINOR' => '60',
-                                                                   'SUBSYSTEM' => 'misc'
-                                                                 },
-                                                'name' => 'network_throughput',
-                                                'names' => [
-                                                             'network_throughput'
-                                                           ],
-                                                'path' => '/devices/virtual/misc/network_throughput'
-                                              },
                       'null' => {
                                   '_udev_infos' => {
                                                      'DEVMODE' => '0666',
@@ -1758,7 +2052,7 @@ $VAR1 = {
                                                      'MAJOR' => '5',
                                                      'MINOR' => '2',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8736812'
+                                                     'USEC_INITIALIZED' => '9486779'
                                                    },
                                   'name' => 'ptmx',
                                   'names' => [
@@ -1781,6 +2075,23 @@ $VAR1 = {
                                                ],
                                     'path' => '/devices/virtual/mem/random'
                                   },
+                      'rfkill' => {
+                                    '_udev_infos' => {
+                                                       'DEVNAME' => '/dev/rfkill',
+                                                       'DEVPATH' => '/devices/virtual/misc/rfkill',
+                                                       'MAJOR' => '10',
+                                                       'MINOR' => '242',
+                                                       'SUBSYSTEM' => 'misc',
+                                                       'SYSTEMD_WANTS' => 'systemd-rfkill.socket',
+                                                       'TAGS' => ':systemd:uaccess:seat:',
+                                                       'USEC_INITIALIZED' => '15160210'
+                                                     },
+                                    'name' => 'rfkill',
+                                    'names' => [
+                                                 'rfkill'
+                                               ],
+                                    'path' => '/devices/virtual/misc/rfkill'
+                                  },
                       'rtc0' => {
                                   '_udev_infos' => {
                                                      'DEVLINKS' => '/dev/rtc',
@@ -1789,7 +2100,7 @@ $VAR1 = {
                                                      'MAJOR' => '252',
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'rtc',
-                                                     'USEC_INITIALIZED' => '2933037'
+                                                     'USEC_INITIALIZED' => '3026729'
                                                    },
                                   'name' => 'rtc0',
                                   'names' => [
@@ -1800,99 +2111,9 @@ $VAR1 = {
                                 },
                       'sda' => {
                                  '_udev_infos' => {
-                                                    'DEVLINKS' => '/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2 /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2',
-                                                    'DEVNAME' => '/dev/sda',
-                                                    'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sda',
-                                                    'DEVTYPE' => 'disk',
-                                                    'ID_BUS' => 'scsi',
-                                                    'ID_MODEL' => 'QEMU_HARDDISK',
-                                                    'ID_MODEL_ENC' => 'QEMU\\x20HARDDISK\\x20\\x20\\x20',
-                                                    'ID_PART_TABLE_TYPE' => 'gpt',
-                                                    'ID_PART_TABLE_UUID' => '51f6098d-e270-47af-8bbb-11f86342e435',
-                                                    'ID_PATH' => 'pci-0000:02:00.0-scsi-0:0:0:2',
-                                                    'ID_PATH_TAG' => 'pci-0000_02_00_0-scsi-0_0_0_2',
-                                                    'ID_REVISION' => '2.5+',
-                                                    'ID_SCSI' => '1',
-                                                    'ID_SERIAL' => '0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2',
-                                                    'ID_SERIAL_SHORT' => 'drive-scsi0-0-0-2',
-                                                    'ID_TYPE' => 'disk',
-                                                    'ID_VENDOR' => 'QEMU',
-                                                    'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
-                                                    'MAJOR' => '8',
-                                                    'MINOR' => '0',
-                                                    'SUBSYSTEM' => 'block',
-                                                    'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '3434341'
-                                                  },
-                                 'name' => 'sda',
-                                 'names' => [
-                                              'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2',
-                                              'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2',
-                                              'sda'
-                                            ],
-                                 'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sda'
-                               },
-                      'sda2' => {
-                                  '_udev_infos' => {
-                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80 /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2-part2 /dev/disk/by-partlabel/disk2pv /dev/disk/by-partuuid/17eea494-f594-438c-9795-d98d9d92783d /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2-part2',
-                                                     'DEVNAME' => '/dev/sda2',
-                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sda/sda2',
-                                                     'DEVTYPE' => 'partition',
-                                                     'ID_BUS' => 'scsi',
-                                                     'ID_FS_TYPE' => 'LVM2_member',
-                                                     'ID_FS_USAGE' => 'raid',
-                                                     'ID_FS_UUID' => 'wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
-                                                     'ID_FS_UUID_ENC' => 'wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
-                                                     'ID_FS_VERSION' => 'LVM2 001',
-                                                     'ID_MODEL' => 'LVM PV wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80 on /dev/sda2',
-                                                     'ID_MODEL_ENC' => 'QEMU\\x20HARDDISK\\x20\\x20\\x20',
-                                                     'ID_PART_ENTRY_DISK' => '8:0',
-                                                     'ID_PART_ENTRY_NAME' => 'disk2pv',
-                                                     'ID_PART_ENTRY_NUMBER' => '2',
-                                                     'ID_PART_ENTRY_OFFSET' => '2097152',
-                                                     'ID_PART_ENTRY_SCHEME' => 'gpt',
-                                                     'ID_PART_ENTRY_SIZE' => '8587835392',
-                                                     'ID_PART_ENTRY_TYPE' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
-                                                     'ID_PART_ENTRY_UUID' => '17eea494-f594-438c-9795-d98d9d92783d',
-                                                     'ID_PART_TABLE_TYPE' => 'gpt',
-                                                     'ID_PART_TABLE_UUID' => '51f6098d-e270-47af-8bbb-11f86342e435',
-                                                     'ID_PATH' => 'pci-0000:02:00.0-scsi-0:0:0:2',
-                                                     'ID_PATH_TAG' => 'pci-0000_02_00_0-scsi-0_0_0_2',
-                                                     'ID_REVISION' => '2.5+',
-                                                     'ID_SCSI' => '1',
-                                                     'ID_SERIAL' => '0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2',
-                                                     'ID_SERIAL_SHORT' => 'drive-scsi0-0-0-2',
-                                                     'ID_TYPE' => 'disk',
-                                                     'ID_VENDOR' => 'QEMU',
-                                                     'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
-                                                     'MAJOR' => '8',
-                                                     'MINOR' => '2',
-                                                     'PARTN' => '2',
-                                                     'PARTNAME' => 'disk2pv',
-                                                     'SUBSYSTEM' => 'block',
-                                                     'SYSTEMD_ALIAS' => '/dev/block/8:2',
-                                                     'SYSTEMD_READY' => '1',
-                                                     'SYSTEMD_WANTS' => 'lvm2-pvscan@8:2.service',
-                                                     'TAGS' => ':systemd:',
-                                                     'UDISKS_IGNORE' => '1',
-                                                     'USEC_INITIALIZED' => '3468906'
-                                                   },
-                                  'name' => 'sda2',
-                                  'names' => [
-                                               'disk/by-id/lvm-pv-uuid-wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
-                                               'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2-part2',
-                                               'disk/by-partlabel/disk2pv',
-                                               'disk/by-partuuid/17eea494-f594-438c-9795-d98d9d92783d',
-                                               'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2-part2',
-                                               'sda2'
-                                             ],
-                                  'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sda/sda2'
-                                },
-                      'sdb' => {
-                                 '_udev_infos' => {
                                                     'DEVLINKS' => '/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0 /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:0',
-                                                    'DEVNAME' => '/dev/sdb',
-                                                    'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sdb',
+                                                    'DEVNAME' => '/dev/sda',
+                                                    'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sda',
                                                     'DEVTYPE' => 'disk',
                                                     'ID_BUS' => 'scsi',
                                                     'ID_MODEL' => 'QEMU_HARDDISK',
@@ -1909,24 +2130,24 @@ $VAR1 = {
                                                     'ID_VENDOR' => 'QEMU',
                                                     'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
                                                     'MAJOR' => '8',
-                                                    'MINOR' => '16',
+                                                    'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '3404644'
+                                                    'USEC_INITIALIZED' => '3508720'
                                                   },
-                                 'name' => 'sdb',
+                                 'name' => 'sda',
                                  'names' => [
                                               'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0',
                                               'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:0',
-                                              'sdb'
+                                              'sda'
                                             ],
-                                 'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sdb'
+                                 'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sda'
                                },
-                      'sdb1' => {
+                      'sda1' => {
                                   '_udev_infos' => {
                                                      'DEVLINKS' => '/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0-part1 /dev/disk/by-partlabel/efi /dev/disk/by-partuuid/c3b77c4b-800d-4f79-9ab8-c11775e839a7 /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:0-part1 /dev/disk/by-uuid/BD03-519C',
-                                                     'DEVNAME' => '/dev/sdb1',
-                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sdb/sdb1',
+                                                     'DEVNAME' => '/dev/sda1',
+                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sda/sda1',
                                                      'DEVTYPE' => 'partition',
                                                      'ID_BUS' => 'scsi',
                                                      'ID_FS_TYPE' => 'vfat',
@@ -1936,7 +2157,7 @@ $VAR1 = {
                                                      'ID_FS_VERSION' => 'FAT32',
                                                      'ID_MODEL' => 'QEMU_HARDDISK',
                                                      'ID_MODEL_ENC' => 'QEMU\\x20HARDDISK\\x20\\x20\\x20',
-                                                     'ID_PART_ENTRY_DISK' => '8:16',
+                                                     'ID_PART_ENTRY_DISK' => '8:0',
                                                      'ID_PART_ENTRY_NAME' => 'efi',
                                                      'ID_PART_ENTRY_NUMBER' => '1',
                                                      'ID_PART_ENTRY_OFFSET' => '2048',
@@ -1956,30 +2177,30 @@ $VAR1 = {
                                                      'ID_VENDOR' => 'QEMU',
                                                      'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
                                                      'MAJOR' => '8',
-                                                     'MINOR' => '17',
+                                                     'MINOR' => '1',
                                                      'PARTN' => '1',
                                                      'PARTNAME' => 'efi',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
                                                      'UDISKS_IGNORE' => '1',
-                                                     'USEC_INITIALIZED' => '3446054'
+                                                     'USEC_INITIALIZED' => '3576503'
                                                    },
-                                  'name' => 'sdb1',
+                                  'name' => 'sda1',
                                   'names' => [
                                                'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0-part1',
                                                'disk/by-partlabel/efi',
                                                'disk/by-partuuid/c3b77c4b-800d-4f79-9ab8-c11775e839a7',
                                                'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:0-part1',
                                                'disk/by-uuid/BD03-519C',
-                                               'sdb1'
+                                               'sda1'
                                              ],
-                                  'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sdb/sdb1'
+                                  'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sda/sda1'
                                 },
-                      'sdb2' => {
+                      'sda2' => {
                                   '_udev_infos' => {
                                                      'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0-part2 /dev/disk/by-partlabel/pv-hera-disk1 /dev/disk/by-partuuid/9b7c5e65-d461-47e6-92bc-e63fbd751c3d /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:0-part2',
-                                                     'DEVNAME' => '/dev/sdb2',
-                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sdb/sdb2',
+                                                     'DEVNAME' => '/dev/sda2',
+                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sda/sda2',
                                                      'DEVTYPE' => 'partition',
                                                      'ID_BUS' => 'scsi',
                                                      'ID_FS_TYPE' => 'LVM2_member',
@@ -1987,9 +2208,9 @@ $VAR1 = {
                                                      'ID_FS_UUID' => '2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz',
                                                      'ID_FS_UUID_ENC' => '2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz',
                                                      'ID_FS_VERSION' => 'LVM2 001',
-                                                     'ID_MODEL' => 'LVM PV 2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz on /dev/sdb2',
+                                                     'ID_MODEL' => 'LVM PV 2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz on /dev/sda2',
                                                      'ID_MODEL_ENC' => 'QEMU\\x20HARDDISK\\x20\\x20\\x20',
-                                                     'ID_PART_ENTRY_DISK' => '8:16',
+                                                     'ID_PART_ENTRY_DISK' => '8:0',
                                                      'ID_PART_ENTRY_NAME' => 'pv-hera-disk1',
                                                      'ID_PART_ENTRY_NUMBER' => '2',
                                                      'ID_PART_ENTRY_OFFSET' => '194560',
@@ -2009,27 +2230,117 @@ $VAR1 = {
                                                      'ID_VENDOR' => 'QEMU',
                                                      'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
                                                      'MAJOR' => '8',
-                                                     'MINOR' => '18',
+                                                     'MINOR' => '2',
                                                      'PARTN' => '2',
                                                      'PARTNAME' => 'pv-hera-disk1',
                                                      'SUBSYSTEM' => 'block',
-                                                     'SYSTEMD_ALIAS' => '/dev/block/8:18',
+                                                     'SYSTEMD_ALIAS' => '/dev/block/8:2',
                                                      'SYSTEMD_READY' => '1',
-                                                     'SYSTEMD_WANTS' => 'lvm2-pvscan@8:18.service',
+                                                     'SYSTEMD_WANTS' => 'lvm2-pvscan@8:2.service',
                                                      'TAGS' => ':systemd:',
                                                      'UDISKS_IGNORE' => '1',
-                                                     'USEC_INITIALIZED' => '3432750'
+                                                     'USEC_INITIALIZED' => '3536354'
                                                    },
-                                  'name' => 'sdb2',
+                                  'name' => 'sda2',
                                   'names' => [
                                                'disk/by-id/lvm-pv-uuid-2kh1ED-rYn2-XCF9-Us31-4MY7-6pNj-TkWuFz',
                                                'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0-part2',
                                                'disk/by-partlabel/pv-hera-disk1',
                                                'disk/by-partuuid/9b7c5e65-d461-47e6-92bc-e63fbd751c3d',
                                                'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:0-part2',
+                                               'sda2'
+                                             ],
+                                  'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sda/sda2'
+                                },
+                      'sdb' => {
+                                 '_udev_infos' => {
+                                                    'DEVLINKS' => '/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2 /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2',
+                                                    'DEVNAME' => '/dev/sdb',
+                                                    'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sdb',
+                                                    'DEVTYPE' => 'disk',
+                                                    'ID_BUS' => 'scsi',
+                                                    'ID_MODEL' => 'QEMU_HARDDISK',
+                                                    'ID_MODEL_ENC' => 'QEMU\\x20HARDDISK\\x20\\x20\\x20',
+                                                    'ID_PART_TABLE_TYPE' => 'gpt',
+                                                    'ID_PART_TABLE_UUID' => '51f6098d-e270-47af-8bbb-11f86342e435',
+                                                    'ID_PATH' => 'pci-0000:02:00.0-scsi-0:0:0:2',
+                                                    'ID_PATH_TAG' => 'pci-0000_02_00_0-scsi-0_0_0_2',
+                                                    'ID_REVISION' => '2.5+',
+                                                    'ID_SCSI' => '1',
+                                                    'ID_SERIAL' => '0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2',
+                                                    'ID_SERIAL_SHORT' => 'drive-scsi0-0-0-2',
+                                                    'ID_TYPE' => 'disk',
+                                                    'ID_VENDOR' => 'QEMU',
+                                                    'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
+                                                    'MAJOR' => '8',
+                                                    'MINOR' => '16',
+                                                    'SUBSYSTEM' => 'block',
+                                                    'TAGS' => ':systemd:',
+                                                    'USEC_INITIALIZED' => '3528431'
+                                                  },
+                                 'name' => 'sdb',
+                                 'names' => [
+                                              'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2',
+                                              'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2',
+                                              'sdb'
+                                            ],
+                                 'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sdb'
+                               },
+                      'sdb2' => {
+                                  '_udev_infos' => {
+                                                     'DEVLINKS' => '/dev/disk/by-id/lvm-pv-uuid-wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80 /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2-part2 /dev/disk/by-partlabel/disk2pv /dev/disk/by-partuuid/17eea494-f594-438c-9795-d98d9d92783d /dev/disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2-part2',
+                                                     'DEVNAME' => '/dev/sdb2',
+                                                     'DEVPATH' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sdb/sdb2',
+                                                     'DEVTYPE' => 'partition',
+                                                     'ID_BUS' => 'scsi',
+                                                     'ID_FS_TYPE' => 'LVM2_member',
+                                                     'ID_FS_USAGE' => 'raid',
+                                                     'ID_FS_UUID' => 'wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
+                                                     'ID_FS_UUID_ENC' => 'wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
+                                                     'ID_FS_VERSION' => 'LVM2 001',
+                                                     'ID_MODEL' => 'LVM PV wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80 on /dev/sdb2',
+                                                     'ID_MODEL_ENC' => 'QEMU\\x20HARDDISK\\x20\\x20\\x20',
+                                                     'ID_PART_ENTRY_DISK' => '8:16',
+                                                     'ID_PART_ENTRY_NAME' => 'disk2pv',
+                                                     'ID_PART_ENTRY_NUMBER' => '2',
+                                                     'ID_PART_ENTRY_OFFSET' => '2097152',
+                                                     'ID_PART_ENTRY_SCHEME' => 'gpt',
+                                                     'ID_PART_ENTRY_SIZE' => '8587835392',
+                                                     'ID_PART_ENTRY_TYPE' => 'e6d6d379-f507-44c2-a23c-238f2a3df928',
+                                                     'ID_PART_ENTRY_UUID' => '17eea494-f594-438c-9795-d98d9d92783d',
+                                                     'ID_PART_TABLE_TYPE' => 'gpt',
+                                                     'ID_PART_TABLE_UUID' => '51f6098d-e270-47af-8bbb-11f86342e435',
+                                                     'ID_PATH' => 'pci-0000:02:00.0-scsi-0:0:0:2',
+                                                     'ID_PATH_TAG' => 'pci-0000_02_00_0-scsi-0_0_0_2',
+                                                     'ID_REVISION' => '2.5+',
+                                                     'ID_SCSI' => '1',
+                                                     'ID_SERIAL' => '0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2',
+                                                     'ID_SERIAL_SHORT' => 'drive-scsi0-0-0-2',
+                                                     'ID_TYPE' => 'disk',
+                                                     'ID_VENDOR' => 'QEMU',
+                                                     'ID_VENDOR_ENC' => 'QEMU\\x20\\x20\\x20\\x20',
+                                                     'MAJOR' => '8',
+                                                     'MINOR' => '18',
+                                                     'PARTN' => '2',
+                                                     'PARTNAME' => 'disk2pv',
+                                                     'SUBSYSTEM' => 'block',
+                                                     'SYSTEMD_ALIAS' => '/dev/block/8:18',
+                                                     'SYSTEMD_READY' => '1',
+                                                     'SYSTEMD_WANTS' => 'lvm2-pvscan@8:18.service',
+                                                     'TAGS' => ':systemd:',
+                                                     'UDISKS_IGNORE' => '1',
+                                                     'USEC_INITIALIZED' => '3552012'
+                                                   },
+                                  'name' => 'sdb2',
+                                  'names' => [
+                                               'disk/by-id/lvm-pv-uuid-wb3OUy-z1a5-uH2N-no14-eVMl-TlnK-qZEe80',
+                                               'disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-2-part2',
+                                               'disk/by-partlabel/disk2pv',
+                                               'disk/by-partuuid/17eea494-f594-438c-9795-d98d9d92783d',
+                                               'disk/by-path/pci-0000:02:00.0-scsi-0:0:0:2-part2',
                                                'sdb2'
                                              ],
-                                  'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:0/block/sdb/sdb2'
+                                  'path' => '/devices/pci0000:00/0000:00:02.1/0000:02:00.0/virtio2/host6/target6:0:0/6:0:0:2/block/sdb/sdb2'
                                 },
                       'sg0' => {
                                  '_udev_infos' => {
@@ -2069,8 +2380,8 @@ $VAR1 = {
                                                     'MAJOR' => '21',
                                                     'MINOR' => '2',
                                                     'SUBSYSTEM' => 'scsi_generic',
-                                                    'TAGS' => ':seat:uaccess:',
-                                                    'USEC_INITIALIZED' => '8542890'
+                                                    'TAGS' => ':uaccess:seat:',
+                                                    'USEC_INITIALIZED' => '9286413'
                                                   },
                                  'name' => 'sg2',
                                  'names' => [
@@ -2103,7 +2414,7 @@ $VAR1 = {
                                                               'MINOR' => '5',
                                                               'SUBSYSTEM' => 'sound',
                                                               'TAGS' => ':uaccess:',
-                                                              'USEC_INITIALIZED' => '9296958'
+                                                              'USEC_INITIALIZED' => '10231119'
                                                             },
                                            'name' => 'snd/controlC0',
                                            'names' => [
@@ -2120,7 +2431,7 @@ $VAR1 = {
                                                            'MINOR' => '4',
                                                            'SUBSYSTEM' => 'sound',
                                                            'TAGS' => ':uaccess:',
-                                                           'USEC_INITIALIZED' => '9258251'
+                                                           'USEC_INITIALIZED' => '10212327'
                                                          },
                                         'name' => 'snd/hwC0D0',
                                         'names' => [
@@ -2137,7 +2448,7 @@ $VAR1 = {
                                                              'MINOR' => '3',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '9258724'
+                                                             'USEC_INITIALIZED' => '10212102'
                                                            },
                                           'name' => 'snd/pcmC0D0c',
                                           'names' => [
@@ -2154,7 +2465,7 @@ $VAR1 = {
                                                              'MINOR' => '2',
                                                              'SUBSYSTEM' => 'sound',
                                                              'TAGS' => ':uaccess:',
-                                                             'USEC_INITIALIZED' => '9258658'
+                                                             'USEC_INITIALIZED' => '10212333'
                                                            },
                                           'name' => 'snd/pcmC0D0p',
                                           'names' => [
@@ -2170,7 +2481,7 @@ $VAR1 = {
                                                           'MINOR' => '33',
                                                           'SUBSYSTEM' => 'sound',
                                                           'TAGS' => ':uaccess:',
-                                                          'USEC_INITIALIZED' => '8828899'
+                                                          'USEC_INITIALIZED' => '9715983'
                                                         },
                                        'name' => 'snd/timer',
                                        'names' => [
@@ -2206,8 +2517,8 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'SYSTEMD_MOUNT_DEVICE_BOUND' => '1',
-                                                    'TAGS' => ':uaccess:seat:systemd:',
-                                                    'USEC_INITIALIZED' => '3351114'
+                                                    'TAGS' => ':systemd:uaccess:seat:',
+                                                    'USEC_INITIALIZED' => '3486939'
                                                   },
                                  'name' => 'sr0',
                                  'names' => [
@@ -2228,7 +2539,7 @@ $VAR1 = {
                                                     'MAJOR' => '5',
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'tty',
-                                                    'USEC_INITIALIZED' => '8736898'
+                                                    'USEC_INITIALIZED' => '9486696'
                                                   },
                                  'name' => 'tty',
                                  'names' => [
@@ -2244,7 +2555,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8737008'
+                                                     'USEC_INITIALIZED' => '9486810'
                                                    },
                                   'name' => 'tty0',
                                   'names' => [
@@ -2260,7 +2571,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '1',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8737243'
+                                                     'USEC_INITIALIZED' => '9486885'
                                                    },
                                   'name' => 'tty1',
                                   'names' => [
@@ -2276,7 +2587,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '10',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737334'
+                                                      'USEC_INITIALIZED' => '9486991'
                                                     },
                                    'name' => 'tty10',
                                    'names' => [
@@ -2292,7 +2603,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '11',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737513'
+                                                      'USEC_INITIALIZED' => '9487224'
                                                     },
                                    'name' => 'tty11',
                                    'names' => [
@@ -2308,7 +2619,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '12',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737406'
+                                                      'USEC_INITIALIZED' => '9487310'
                                                     },
                                    'name' => 'tty12',
                                    'names' => [
@@ -2324,7 +2635,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '13',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737458'
+                                                      'USEC_INITIALIZED' => '9487251'
                                                     },
                                    'name' => 'tty13',
                                    'names' => [
@@ -2340,7 +2651,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '14',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737723'
+                                                      'USEC_INITIALIZED' => '9487309'
                                                     },
                                    'name' => 'tty14',
                                    'names' => [
@@ -2356,7 +2667,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '15',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737651'
+                                                      'USEC_INITIALIZED' => '9487569'
                                                     },
                                    'name' => 'tty15',
                                    'names' => [
@@ -2372,7 +2683,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '16',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737786'
+                                                      'USEC_INITIALIZED' => '9487544'
                                                     },
                                    'name' => 'tty16',
                                    'names' => [
@@ -2388,7 +2699,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '17',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8737809'
+                                                      'USEC_INITIALIZED' => '9487812'
                                                     },
                                    'name' => 'tty17',
                                    'names' => [
@@ -2404,7 +2715,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '18',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738039'
+                                                      'USEC_INITIALIZED' => '9487729'
                                                     },
                                    'name' => 'tty18',
                                    'names' => [
@@ -2420,7 +2731,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '19',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738169'
+                                                      'USEC_INITIALIZED' => '9487799'
                                                     },
                                    'name' => 'tty19',
                                    'names' => [
@@ -2436,7 +2747,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '2',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8738103'
+                                                     'USEC_INITIALIZED' => '9487919'
                                                    },
                                   'name' => 'tty2',
                                   'names' => [
@@ -2452,7 +2763,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '20',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738387'
+                                                      'USEC_INITIALIZED' => '9487983'
                                                     },
                                    'name' => 'tty20',
                                    'names' => [
@@ -2468,7 +2779,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '21',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738309'
+                                                      'USEC_INITIALIZED' => '9488083'
                                                     },
                                    'name' => 'tty21',
                                    'names' => [
@@ -2484,7 +2795,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '22',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738591'
+                                                      'USEC_INITIALIZED' => '9488129'
                                                     },
                                    'name' => 'tty22',
                                    'names' => [
@@ -2500,7 +2811,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '23',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738499'
+                                                      'USEC_INITIALIZED' => '9488393'
                                                     },
                                    'name' => 'tty23',
                                    'names' => [
@@ -2516,7 +2827,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '24',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738580'
+                                                      'USEC_INITIALIZED' => '9488381'
                                                     },
                                    'name' => 'tty24',
                                    'names' => [
@@ -2532,7 +2843,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '25',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738758'
+                                                      'USEC_INITIALIZED' => '9488449'
                                                     },
                                    'name' => 'tty25',
                                    'names' => [
@@ -2548,7 +2859,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '26',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738966'
+                                                      'USEC_INITIALIZED' => '9488750'
                                                     },
                                    'name' => 'tty26',
                                    'names' => [
@@ -2564,7 +2875,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '27',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739083'
+                                                      'USEC_INITIALIZED' => '9488637'
                                                     },
                                    'name' => 'tty27',
                                    'names' => [
@@ -2580,7 +2891,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '28',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8738995'
+                                                      'USEC_INITIALIZED' => '9488883'
                                                     },
                                    'name' => 'tty28',
                                    'names' => [
@@ -2596,7 +2907,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '29',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739319'
+                                                      'USEC_INITIALIZED' => '9488782'
                                                     },
                                    'name' => 'tty29',
                                    'names' => [
@@ -2612,7 +2923,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '3',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8739246'
+                                                     'USEC_INITIALIZED' => '9489067'
                                                    },
                                   'name' => 'tty3',
                                   'names' => [
@@ -2628,7 +2939,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '30',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739499'
+                                                      'USEC_INITIALIZED' => '9489048'
                                                     },
                                    'name' => 'tty30',
                                    'names' => [
@@ -2644,7 +2955,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '31',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739404'
+                                                      'USEC_INITIALIZED' => '9489174'
                                                     },
                                    'name' => 'tty31',
                                    'names' => [
@@ -2660,7 +2971,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '32',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739481'
+                                                      'USEC_INITIALIZED' => '9489144'
                                                     },
                                    'name' => 'tty32',
                                    'names' => [
@@ -2676,7 +2987,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '33',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739567'
+                                                      'USEC_INITIALIZED' => '9489250'
                                                     },
                                    'name' => 'tty33',
                                    'names' => [
@@ -2692,7 +3003,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '34',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739801'
+                                                      'USEC_INITIALIZED' => '9489360'
                                                     },
                                    'name' => 'tty34',
                                    'names' => [
@@ -2708,7 +3019,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '35',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739717'
+                                                      'USEC_INITIALIZED' => '9489418'
                                                     },
                                    'name' => 'tty35',
                                    'names' => [
@@ -2724,7 +3035,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '36',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740008'
+                                                      'USEC_INITIALIZED' => '9489738'
                                                     },
                                    'name' => 'tty36',
                                    'names' => [
@@ -2740,7 +3051,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '37',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8739955'
+                                                      'USEC_INITIALIZED' => '9489749'
                                                     },
                                    'name' => 'tty37',
                                    'names' => [
@@ -2756,7 +3067,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '38',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740200'
+                                                      'USEC_INITIALIZED' => '9489881'
                                                     },
                                    'name' => 'tty38',
                                    'names' => [
@@ -2772,7 +3083,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '39',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740288'
+                                                      'USEC_INITIALIZED' => '9489949'
                                                     },
                                    'name' => 'tty39',
                                    'names' => [
@@ -2788,7 +3099,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '4',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8740270'
+                                                     'USEC_INITIALIZED' => '9489907'
                                                    },
                                   'name' => 'tty4',
                                   'names' => [
@@ -2804,7 +3115,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '40',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740333'
+                                                      'USEC_INITIALIZED' => '9490013'
                                                     },
                                    'name' => 'tty40',
                                    'names' => [
@@ -2820,7 +3131,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '41',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740381'
+                                                      'USEC_INITIALIZED' => '9490123'
                                                     },
                                    'name' => 'tty41',
                                    'names' => [
@@ -2836,7 +3147,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '42',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740634'
+                                                      'USEC_INITIALIZED' => '9490214'
                                                     },
                                    'name' => 'tty42',
                                    'names' => [
@@ -2852,7 +3163,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '43',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740633'
+                                                      'USEC_INITIALIZED' => '9490319'
                                                     },
                                    'name' => 'tty43',
                                    'names' => [
@@ -2868,7 +3179,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '44',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740872'
+                                                      'USEC_INITIALIZED' => '9490412'
                                                     },
                                    'name' => 'tty44',
                                    'names' => [
@@ -2884,7 +3195,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '45',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740766'
+                                                      'USEC_INITIALIZED' => '9490687'
                                                     },
                                    'name' => 'tty45',
                                    'names' => [
@@ -2900,7 +3211,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '46',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740890'
+                                                      'USEC_INITIALIZED' => '9490569'
                                                     },
                                    'name' => 'tty46',
                                    'names' => [
@@ -2916,7 +3227,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '47',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741016'
+                                                      'USEC_INITIALIZED' => '9490835'
                                                     },
                                    'name' => 'tty47',
                                    'names' => [
@@ -2932,7 +3243,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '48',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8740999'
+                                                      'USEC_INITIALIZED' => '9490746'
                                                     },
                                    'name' => 'tty48',
                                    'names' => [
@@ -2948,7 +3259,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '49',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8743176'
+                                                      'USEC_INITIALIZED' => '9490851'
                                                     },
                                    'name' => 'tty49',
                                    'names' => [
@@ -2964,7 +3275,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '5',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8743145'
+                                                     'USEC_INITIALIZED' => '9490975'
                                                    },
                                   'name' => 'tty5',
                                   'names' => [
@@ -2980,7 +3291,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '50',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741474'
+                                                      'USEC_INITIALIZED' => '9491232'
                                                     },
                                    'name' => 'tty50',
                                    'names' => [
@@ -2996,7 +3307,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '51',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741350'
+                                                      'USEC_INITIALIZED' => '9491336'
                                                     },
                                    'name' => 'tty51',
                                    'names' => [
@@ -3012,7 +3323,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '52',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741477'
+                                                      'USEC_INITIALIZED' => '9491229'
                                                     },
                                    'name' => 'tty52',
                                    'names' => [
@@ -3028,7 +3339,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '53',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741825'
+                                                      'USEC_INITIALIZED' => '9491374'
                                                     },
                                    'name' => 'tty53',
                                    'names' => [
@@ -3044,7 +3355,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '54',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741851'
+                                                      'USEC_INITIALIZED' => '9491448'
                                                     },
                                    'name' => 'tty54',
                                    'names' => [
@@ -3060,7 +3371,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '55',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741788'
+                                                      'USEC_INITIALIZED' => '9491691'
                                                     },
                                    'name' => 'tty55',
                                    'names' => [
@@ -3076,7 +3387,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '56',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8741919'
+                                                      'USEC_INITIALIZED' => '9491813'
                                                     },
                                    'name' => 'tty56',
                                    'names' => [
@@ -3092,7 +3403,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '57',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742146'
+                                                      'USEC_INITIALIZED' => '9491727'
                                                     },
                                    'name' => 'tty57',
                                    'names' => [
@@ -3108,7 +3419,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '58',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742182'
+                                                      'USEC_INITIALIZED' => '9491785'
                                                     },
                                    'name' => 'tty58',
                                    'names' => [
@@ -3124,7 +3435,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '59',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742255'
+                                                      'USEC_INITIALIZED' => '9491902'
                                                     },
                                    'name' => 'tty59',
                                    'names' => [
@@ -3140,7 +3451,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '6',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8742555'
+                                                     'USEC_INITIALIZED' => '9492163'
                                                    },
                                   'name' => 'tty6',
                                   'names' => [
@@ -3156,7 +3467,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '60',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742607'
+                                                      'USEC_INITIALIZED' => '9492079'
                                                     },
                                    'name' => 'tty60',
                                    'names' => [
@@ -3172,7 +3483,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '61',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742686'
+                                                      'USEC_INITIALIZED' => '9492334'
                                                     },
                                    'name' => 'tty61',
                                    'names' => [
@@ -3188,7 +3499,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '62',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742808'
+                                                      'USEC_INITIALIZED' => '9492318'
                                                     },
                                    'name' => 'tty62',
                                    'names' => [
@@ -3204,7 +3515,7 @@ $VAR1 = {
                                                       'MAJOR' => '4',
                                                       'MINOR' => '63',
                                                       'SUBSYSTEM' => 'tty',
-                                                      'USEC_INITIALIZED' => '8742863'
+                                                      'USEC_INITIALIZED' => '9492519'
                                                     },
                                    'name' => 'tty63',
                                    'names' => [
@@ -3220,7 +3531,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '7',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8742971'
+                                                     'USEC_INITIALIZED' => '9492648'
                                                    },
                                   'name' => 'tty7',
                                   'names' => [
@@ -3236,7 +3547,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '8',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8743008'
+                                                     'USEC_INITIALIZED' => '9492571'
                                                    },
                                   'name' => 'tty8',
                                   'names' => [
@@ -3252,7 +3563,7 @@ $VAR1 = {
                                                      'MAJOR' => '4',
                                                      'MINOR' => '9',
                                                      'SUBSYSTEM' => 'tty',
-                                                     'USEC_INITIALIZED' => '8743146'
+                                                     'USEC_INITIALIZED' => '9492667'
                                                    },
                                   'name' => 'tty9',
                                   'names' => [
@@ -3269,7 +3580,7 @@ $VAR1 = {
                                                       'MINOR' => '64',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '8600564'
+                                                      'USEC_INITIALIZED' => '9338958'
                                                     },
                                    'name' => 'ttyS0',
                                    'names' => [
@@ -3286,7 +3597,7 @@ $VAR1 = {
                                                       'MINOR' => '65',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '8597504'
+                                                      'USEC_INITIALIZED' => '9355015'
                                                     },
                                    'name' => 'ttyS1',
                                    'names' => [
@@ -3303,7 +3614,7 @@ $VAR1 = {
                                                       'MINOR' => '66',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '8597830'
+                                                      'USEC_INITIALIZED' => '9354991'
                                                     },
                                    'name' => 'ttyS2',
                                    'names' => [
@@ -3320,7 +3631,7 @@ $VAR1 = {
                                                       'MINOR' => '67',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '8597982'
+                                                      'USEC_INITIALIZED' => '9354590'
                                                     },
                                    'name' => 'ttyS3',
                                    'names' => [
@@ -3660,7 +3971,7 @@ $VAR1 = {
                                                          'MINOR' => '1',
                                                          'SUBSYSTEM' => 'virtio-ports',
                                                          'TAGS' => ':systemd:',
-                                                         'USEC_INITIALIZED' => '8752339'
+                                                         'USEC_INITIALIZED' => '9503125'
                                                        },
                                       'name' => 'vport3p1',
                                       'names' => [
@@ -3678,7 +3989,7 @@ $VAR1 = {
                                                          'MINOR' => '2',
                                                          'SUBSYSTEM' => 'virtio-ports',
                                                          'TAGS' => ':systemd:',
-                                                         'USEC_INITIALIZED' => '8752007'
+                                                         'USEC_INITIALIZED' => '9503545'
                                                        },
                                       'name' => 'vport3p2',
                                       'names' => [
@@ -3774,6 +4085,12 @@ $VAR1->{'lsblk'}{'sda'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
 $VAR1->{'lsblk'}{'sda'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sda'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sda'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
+$VAR1->{'lsblk'}{'sda1'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
+$VAR1->{'lsblk'}{'sda1'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
+$VAR1->{'lsblk'}{'sda1'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
+$VAR1->{'lsblk'}{'sda1'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
+$VAR1->{'lsblk'}{'sda1'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
+$VAR1->{'lsblk'}{'sda1'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
 $VAR1->{'lsblk'}{'sda2'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sda2'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sda2'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
@@ -3786,12 +4103,6 @@ $VAR1->{'lsblk'}{'sdb'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
 $VAR1->{'lsblk'}{'sdb'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sdb'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sdb'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
-$VAR1->{'lsblk'}{'sdb1'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
-$VAR1->{'lsblk'}{'sdb1'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
-$VAR1->{'lsblk'}{'sdb1'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
-$VAR1->{'lsblk'}{'sdb1'}{'rm'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
-$VAR1->{'lsblk'}{'sdb1'}{'ro'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
-$VAR1->{'lsblk'}{'sdb1'}{'rota'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};
 $VAR1->{'lsblk'}{'sdb2'}{'disc-zero'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sdb2'}{'hotplug'} = $VAR1->{'lsblk'}{'dm-0'}{'disc-zero'};
 $VAR1->{'lsblk'}{'sdb2'}{'rand'} = $VAR1->{'lsblk'}{'dm-0'}{'rota'};

@@ -1,5 +1,5 @@
 package Util::Medley::Exec;
-$Util::Medley::Exec::VERSION = '0.051';
+$Util::Medley::Exec::VERSION = '0.052';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -13,6 +13,7 @@ use Text::ASCIITable;
 use Text::Table;
 
 with 
+    'Util::Medley::Roles::Attributes::File',
     'Util::Medley::Roles::Attributes::Logger',
     'Util::Medley::Roles::Attributes::String',
     'Util::Medley::Roles::Attributes::List';
@@ -23,7 +24,7 @@ Util::Medley::Exec - proxy for cmdline to libs
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =cut
 
@@ -124,6 +125,40 @@ method fileType (Str :$file!) {
     say $util->fileType($file);
 }
 
+method snakeizeInPlace (Str  :$string!,
+                        Str  :$file,
+                        Bool :$useStdin) {
+
+    my @content;
+    if ($useStdin) {
+        while(<STDIN>) {
+            push @content, $_;	
+        }	
+    }
+    else {
+    	@content = $self->File->read(path => $file);
+    }                        	
+   
+    my $stringSnakeized = $self->String->snakeize($string); 
+    my @output;
+     
+    foreach my $line (@content) {
+   
+        my $copy = $line; 
+        $copy =~ s/$string/$stringSnakeized/g;
+        push @output, $copy;
+    }
+    
+    if ($useStdin) {
+    	foreach my $line (@output) {
+    	   print $line;	
+    	}
+    }
+    else {
+        $self->File->write(path => $file, content => \@output);	
+    }
+}
+                        
 method yamlBeautifyFile (Str :$file!,
                          Int :$sortDepth = 0) {
 

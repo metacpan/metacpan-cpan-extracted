@@ -4,7 +4,7 @@
       "Daniel Muey <http://drmuey.com/cpan_contact.pl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Kit" : "0.6",
+            "App::Kit" : "0.62",
             "Capture::Tiny" : "0",
             "Config::INI::Reader" : "0",
             "Convert::Base32::Crockford" : "0",
@@ -56,7 +56,7 @@
             "Net::IDN::Encode" : "0",
             "Regexp::Debugger" : "0",
             "Storable" : "0",
-            "String::UnicodeUTF8" : "0.21",
+            "String::UnicodeUTF8" : "0.23",
             "Test::Mock::Cmd" : "0",
             "Test::More" : "0",
             "Time::HiRes" : "0",
@@ -68,5 +68,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.81"
+   "version" : "0.82"
 }

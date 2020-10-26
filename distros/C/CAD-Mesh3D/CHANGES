@@ -1,0 +1,16 @@
+Revision history for Perl distribution Win32-Mechanize-NotepadPlusPlus
+
+v0.003 2020-Oct-25
+    - Don't auto-patch CAD::Format::STL, so move the binmode check back to xt,
+      get rid of the patching script, and provide a link to the patched file
+      from the POD. (#7)
+    - t\STL-outputStl.t: get rid of English dependency for system-based error
+      messages (#6)
+    - automatically propagate version number to all modules, and make copyright
+      notice consistent throughout
+
+v0.002 2020-Oct-24
+    - Initial public release
+
+v0.001
+    - Initial pre-release development

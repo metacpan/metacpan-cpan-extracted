@@ -1,5 +1,9 @@
 Revision history for XML::Grammar::ProductsSyndication
 
+0.0406  2020-10-22
+    - Avoid stale POD
+        - Inspired by Lady_Aleena.
+
 0.0405  2018-05-29
         - Change build_requires to test_requires .
 

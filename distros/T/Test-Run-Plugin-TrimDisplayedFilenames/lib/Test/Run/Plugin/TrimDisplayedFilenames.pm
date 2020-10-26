@@ -3,16 +3,16 @@ package Test::Run::Plugin::TrimDisplayedFilenames;
 use warnings;
 use strict;
 
-use 5.008;
+use 5.014;
 
 use Moose;
 
 use MRO::Compat;
-use File::Spec;
-use File::Basename;
+use File::Spec ();
+use File::Basename qw/ basename dirname /;
 use List::MoreUtils ();
 
-extends ('Test::Run::Base');
+extends('Test::Run::Base');
 
 =head1 NAME
 
@@ -21,72 +21,65 @@ of the displayed filename to deal with excessively long ones.
 
 =head1 VERSION
 
-Version 0.0125
+Version 0.0126
 
 =cut
 
-our $VERSION = '0.0125';
+our $VERSION = '0.0126';
 
-has 'trim_displayed_filenames_query' => (is => "rw", isa => "Str");
-
+has 'trim_displayed_filenames_query' => ( is => "rw", isa => "Str" );
 
 sub _process_filename_dirs
 {
-    my ($self, $fn, $callback) = @_;
+    my ( $self, $fn, $callback ) = @_;
 
     my $basename = basename($fn);
     my $dirpath  = dirname($fn);
 
-    my ($volume, $directories, $filename) = File::Spec->splitpath($dirpath, 1);
+    my ( $volume, $directories, $filename ) =
+        File::Spec->splitpath( $dirpath, 1 );
 
     # The actual manipulation.
-    my $dirs = $callback->([File::Spec->splitdir($directories)]);
+    my $dirs = $callback->( [ File::Spec->splitdir($directories) ] );
 
     my $final_dir =
-        File::Spec->catpath(
-            $volume, File::Spec->catdir(@$dirs), $filename
-        );
+        File::Spec->catpath( $volume, File::Spec->catdir(@$dirs), $filename );
 
-    if ($final_dir eq "")
+    if ( $final_dir eq "" )
     {
         return $basename;
     }
     else
     {
-        return File::Spec->catfile(
-            $final_dir, $basename
-        );
+        return File::Spec->catfile( $final_dir, $basename );
     }
 }
 
 sub _get_search_from_callback
 {
-    my ($self, $options) = @_;
+    my ( $self, $options ) = @_;
 
-    return
-        +($options->{search_from} eq "start")
-            ? \&List::MoreUtils::firstidx
-            : \&List::MoreUtils::lasttidx
-            ;
+    return +( $options->{search_from} eq "start" )
+        ? \&List::MoreUtils::firstidx
+        : \&List::MoreUtils::lasttidx;
 }
 
 sub _get_array_portion
 {
-    my ($self, $options, $dirs, $idx) = @_;
+    my ( $self, $options, $dirs, $idx ) = @_;
 
     my @copy = @$dirs;
 
-    return
-    [
-        +($options->{keep_from} eq "start")
-            ? splice(@copy, 0, $idx)
-            : splice(@copy, $idx+1)
+    return [
+        +( $options->{keep_from} eq "start" )
+        ? splice( @copy, 0, $idx )
+        : splice( @copy, $idx + 1 )
     ];
 }
 
 sub _trim_filename_dir_components
 {
-    my ($self, $filename, $component_callback, $options) = @_;
+    my ( $self, $filename, $component_callback, $options ) = @_;
 
     $options ||= { 'search_from' => "start", 'keep_from' => "end" };
 
@@ -97,73 +90,68 @@ sub _trim_filename_dir_components
 
             my $idx =
                 $self->_get_search_from_callback($options)
-                     ->($component_callback, @$dirs)
-                ;
+                ->( $component_callback, @$dirs );
 
-            if (!defined($idx))
+            if ( !defined($idx) )
             {
-                return $dirs
+                return $dirs;
             }
 
-            return $self->_get_array_portion($options, $dirs, $idx);
+            return $self->_get_array_portion( $options, $dirs, $idx );
         },
     );
 }
 
 sub _process_output_leader_fn
 {
-    my ($self, $fn) = @_;
+    my ( $self, $fn ) = @_;
 
     my $query = $self->trim_displayed_filenames_query();
 
-    if (!defined($query))
+    if ( !defined($query) )
     {
         return $fn;
     }
 
-    if ($query =~ m{\A(fromre|keep):(.*)}ms)
+    if ( $query =~ m{\A(fromre|keep):(.*)}ms )
     {
-        my ($cmd, $arg) = ($1, $2);
+        my ( $cmd, $arg ) = ( $1, $2 );
 
-        if ($cmd eq "fromre")
+        if ( $cmd eq "fromre" )
         {
             my $re = qr{$arg};
 
-            return
-                $self->_trim_filename_dir_components(
-                    $fn,
-                    sub { $_ =~ m{$re} },
-                    +{ search_from => "start", keep_from => "end" }
-                );
+            return $self->_trim_filename_dir_components(
+                $fn,
+                sub { $_ =~ m{$re} },
+                +{ search_from => "start", keep_from => "end" }
+            );
         }
-        else # $cmd eq "keep"
+        else    # $cmd eq "keep"
         {
             # We need to decrement 1 because there's also the filename.
             my $num_keep = int($arg);
-            return
-                $self->_process_filename_dirs(
-                    $fn,
-                    sub {
-                        my @dirs = @{shift()};
-                        return
-                            +($num_keep <= 1)
-                                ? []
-                                : [splice(@dirs, -($num_keep-1))]
-                                ;
-                    },
-                );
+            return $self->_process_filename_dirs(
+                $fn,
+                sub {
+                    my @dirs = @{ shift() };
+                    return +( $num_keep <= 1 )
+                        ? []
+                        : [ splice( @dirs, -( $num_keep - 1 ) ) ];
+                },
+            );
         }
     }
     else
     {
         # TODO - Replace with an exception object.
-        die "Unrecognized trim_displayed_filename_query."
+        die "Unrecognized trim_displayed_filename_query.";
     }
 }
 
 sub _calc_test_file_data_display_path
 {
-    my ($self, $idx, $test_file) = @_;
+    my ( $self, $idx, $test_file ) = @_;
 
     return $self->_process_output_leader_fn($test_file);
 }
@@ -202,10 +190,6 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test::Run::Plugin::TrimDisplayedFilenames>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Test::Run::Plugin::TrimDisplayedFilenames>
@@ -240,4 +224,4 @@ This program is released under the following license: MIT X11.
 
 =cut
 
-1; # End of Test::Run::Plugin::TrimDisplayedFilenames
+1;    # End of Test::Run::Plugin::TrimDisplayedFilenames

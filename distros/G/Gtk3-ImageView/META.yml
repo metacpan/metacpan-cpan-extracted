@@ -1,5 +1,5 @@
 ---
-abstract: 'Gtk3 port of the Gtk2::ImageView image viewer widget'
+abstract: 'Image viewer widget for Gtk3'
 author:
   - 'Jeffrey Ratcliffe <jffry@posteo.net>'
   - 'Alexey Sokolov <sokolov@google.com>'
@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ requires:
   Glib: '1.21'
   Gtk3: '0'
   Readonly: '0'
-version: '2'
+version: '4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

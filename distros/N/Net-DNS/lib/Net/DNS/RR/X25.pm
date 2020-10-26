@@ -1,21 +1,17 @@
 package Net::DNS::RR::X25;
 
-#
-# $Id: X25.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: X25.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::X25 - DNS X25 resource record
 
 =cut
-
 
 use integer;
 
@@ -26,21 +22,22 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset ) = @_;
 
-	$self->{address} = decode Net::DNS::Text( $data, $offset );
+	$self->{address} = Net::DNS::Text->decode( $data, $offset );
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	$self->{address}->encode;
+	return $self->{address}->encode;
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	$self->{address}->string;
+	return $self->{address}->string;
 }
 
 
@@ -48,18 +45,19 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
 	$self->address(shift);
+	return;
 }
 
 
 sub address {
 	my $self = shift;
 
-	$self->{address} = new Net::DNS::Text(shift) if scalar @_;
-	$self->{address}->value if $self->{address};
+	$self->{address} = Net::DNS::Text->new(shift) if scalar @_;
+	return $self->{address} ? $self->{address}->value : undef;
 }
 
 
-sub PSDNaddress { &address; }
+sub PSDNaddress { return &address; }
 
 
 1;
@@ -69,7 +67,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name X25 PSDNaddress');
+    $rr = Net::DNS::RR->new('name X25 PSDNaddress');
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -19,12 +19,18 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  JSON::Schema::Generate:
+    file: lib/JSON/Schema/Generate.pm
+    version: '0.06'
 requires:
-  Blessed::Merge: '0.11'
+  Blessed::Merge: '1.00'
   Compiled::Params::OO: '0.04'
   JSON: '0'
   Tie::IxHash: '1.23'
   Type::Tiny: '1.010001'
   perl: '5.006'
-version: '0.05'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/JSON-Schema-Generate.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

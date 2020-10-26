@@ -1,5 +1,8 @@
 Revision history for Perl extension Inline::Lua.
 
+0.17 October 25 2020
+        - Fix memory freeing problem for booleans (#31)
+
 0.16 February 16 2020
         - Fix passing integers into Lua functions - thanks Andy Beverley!
 

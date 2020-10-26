@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable 0.44;
+package Test::Future::AsyncAwait::Awaitable 0.45;
 
 use v5.14;
 use warnings;
@@ -180,6 +180,9 @@ sub test_awaitable
       $cancel->( $f1 );
 
       ok(  $f2->AWAIT_IS_CANCELLED, 'AWAIT_IS_CANCELLED true after AWAIT_ON_CANCEL propagation' );
+
+      $f1->can( "AWAIT_CHAIN_CANCEL" ) or
+         diag "TODO: Class does not implement AWAIT_CHAIN_CANCEL";
    };
 }
 

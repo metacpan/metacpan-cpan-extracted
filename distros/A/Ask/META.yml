@@ -1,46 +1,98 @@
 ---
 abstract: 'ask your users about stuff'
 author:
-  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0.61
+  Test::More: '0.98'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 0
-generated_by: 'Module::Install version 1.06'
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Ask
+  version: '1.4'
 name: Ask
 no_index:
   directory:
+    - eg
     - examples
     - inc
     - t
     - xt
+optional_features: {}
+provides:
+  Ask:
+    file: lib/Ask.pm
+    version: '0.012'
+  Ask::API:
+    file: lib/Ask/API.pm
+    version: '0.012'
+  Ask::Callback:
+    file: lib/Ask/Callback.pm
+    version: '0.012'
+  Ask::Caroline:
+    file: lib/Ask/Caroline.pm
+    version: '0.012'
+  Ask::Clui:
+    file: lib/Ask/Clui.pm
+    version: '0.012'
+  Ask::Fallback:
+    file: lib/Ask/Fallback.pm
+    version: '0.012'
+  Ask::Functions:
+    file: lib/Ask/Functions.pm
+    version: '0.012'
+  Ask::Gtk:
+    file: lib/Ask/Gtk.pm
+    version: '0.012'
+  Ask::Prima:
+    file: lib/Ask/Prima.pm
+    version: '0.012'
+  Ask::Question:
+    file: lib/Ask/Question.pm
+    version: '0.012'
+  Ask::STDIO:
+    file: lib/Ask/STDIO.pm
+    version: '0.012'
+  Ask::Tk:
+    file: lib/Ask/Tk.pm
+    version: '0.012'
+  Ask::Wx:
+    file: lib/Ask/Wx.pm
+    version: '0.012'
+  Ask::Zenity:
+    file: lib/Ask/Zenity.pm
+    version: '0.012'
+  AskX::AutoLang:
+    file: lib/AskX/AutoLang.pm
+    version: '0.012'
 recommends:
-  File::Which: 0
-  Gtk2: 0
-  System::Command: 0
-  Tk: 0
-  Wx: 0
+  Caroline: '0'
+  File::Which: '0'
+  Gtk2: '0'
+  System::Command: '0'
+  Term::ANSIColor: '0'
+  Term::Clui: '0'
+  Tk: '0'
 requires:
-  Lingua::Boolean::Tiny: 0.003
-  Module::Runtime: 0
-  Moo: 1.000006
-  Sub::Exporter::Progressive: 0
-  namespace::sweep: 0.006
-  perl: 5.10.0
+  Exporter::Shiny: '0'
+  Lingua::Boolean::Tiny: '0.003'
+  Module::Pluggable: '0'
+  Module::Runtime: '0'
+  Moo: '1.000006'
+  Path::Tiny: '0'
+  Type::Utils: '0'
+  namespace::autoclean: '0'
+  perl: '5.008008'
 resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Ask/project
   bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Ask
   homepage: https://metacpan.org/release/Ask
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/tobyink/p5-ask
-version: 0.007
+  repository: git://github.com/tobyink/p5-ask.git
+version: '0.012'
 x_contributors:
-  - 'Graham Knop <haarg@cpan.org>'
+  - 'Graham Knop (HAARG) <haarg@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

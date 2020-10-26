@@ -499,5 +499,3 @@ lib/AsposeCellsCloud/Role/AutoDoc.pm
 Makefile.PL
 MANIFEST
 README.md
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

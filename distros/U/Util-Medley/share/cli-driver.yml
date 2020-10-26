@@ -115,7 +115,22 @@ file-type:
       required:
         hard: 
           f: file
-                
+
+snakeize-in-place:
+  class:
+    name: Util::Medley::Exec
+    attr:
+      optional:
+  method:
+    name: snakeizeInPlace
+    args:
+      required:
+        s: string
+      optional:
+        f: file
+      flags:
+        stdin: useStdin
+                                   
 yaml-beautify-file:
   class:
     name: Util::Medley::Exec

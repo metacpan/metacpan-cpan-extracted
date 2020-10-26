@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 use open ":std", ":encoding(UTF-8)";
 use base 'Import::Export';
 
@@ -285,7 +285,7 @@ sub smaz_compress {
 	my ($input, $verbatim, $input_index, @output) = (shift, '', 0);
 	while ($input_index < length $input) {
 		my ($encoded, $j, $i) = (0, (length($input) - $input_index) < 7 ? (length($input) - $input_index) : 7);
-		for ($j = ($i = $j); $j <= 0 ? $i < 0 : $i > 0; $j = ($j <= 0) ? ($i += 1) : ($i -= 1)) {
+		for ($j = ($i = $j); $j <= 0 ? $i < 0 : $i > 0; $j = ($j <= 0) ? $i++ : $i--) {
 			my $code = $CODEBOOK{substr($input, $input_index, $j)};
 			if (defined $code) {
 				if ($verbatim) {
@@ -341,7 +341,7 @@ Smaz - compression for very small strings!
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 
@@ -368,8 +368,6 @@ that Smaz is able to compress even strings of two or three bytes!
 For example the string "the" is compressed into a single byte.
 
 =head1 EXPORT
-
-=head1 SUBROUTINES/METHODS
 
 =head2 smaz_compress
 
@@ -402,7 +400,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Smaz
-
 
 You can also look for information at:
 

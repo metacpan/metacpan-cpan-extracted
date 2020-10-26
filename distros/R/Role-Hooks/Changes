@@ -6,4 +6,19 @@ Home page:    <https://metacpan.org/release/Role-Hooks>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Role-Hooks>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2020-10-26
+
+ [ Bug Fixes ]
+ - Stop polluting Role::Tiny namespace.
+   Graham Knop++
+   <https://github.com/tobyink/p5-role-hooks/pull/1>
+
+0.002	2020-10-23
+
+ [ Bug Fixes ]
+ - Died applying a role to a non-Moo* class, with Moose loaded.
+   Fixes RT#133595.
+   Gianni Ceccarelli++
+   <https://rt.cpan.org/Ticket/Display.html?id=133595>
+
 0.001	2020-02-18	Initial release

@@ -1,11 +1,12 @@
 #
-# $Id: Makefile.PL 1802 2020-08-31 13:44:20Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1814 2020-10-14 21:49:16Z willem $	-*-perl-*-
 #
 
+use 5.008008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use constant MM => eval $ExtUtils::MakeMaker::VERSION;
+my $MM = $ExtUtils::MakeMaker::VERSION;
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
@@ -14,13 +15,24 @@ use constant MM => eval $ExtUtils::MakeMaker::VERSION;
 my @author = ( 'Dick Franks', 'Olaf Kolkman', 'Michael Fuhr' );
 
 my %metadata = (
-	NAME		 => 'Net::DNS',
-	VERSION_FROM	 => 'lib/Net/DNS.pm',
-	ABSTRACT_FROM	 => 'lib/Net/DNS.pm',
-	AUTHOR		 => MM < 6.58 ? "$author[0] et al" : [@author],
-	LICENSE		 => 'mit',
-	MIN_PERL_VERSION => 5.006,
-	);
+	NAME		   => 'Net::DNS',
+	VERSION_FROM	   => 'lib/Net/DNS.pm',
+	ABSTRACT_FROM	   => 'lib/Net/DNS.pm',
+	AUTHOR		   => $MM < 6.58 ? "$author[0] et al" : [@author],
+	LICENSE		   => 'mit',
+	MIN_PERL_VERSION   => '5.008008',
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.66,
+		'Getopt::Long'	      => 2.43,
+		'IO::File'	      => 1.08,
+		'IO::Socket::IP'      => 0.38,
+		},
+	TEST_REQUIRES => {
+		'File::Find'	=> 1.05,
+		'File::Spec'	=> 0.86,
+		'Test::Builder' => 0,
+		'Test::More'	=> 0,
+		} );
 
 
 my %platform = (			## platform-specific dependencies
@@ -40,7 +52,6 @@ my %prerequisite = (
 	'Digest::SHA'	 => 5.23,
 	'Encode'	 => 2.26,
 	'Exporter'	 => 5.56,
-	'File::Find'	 => 1.05,
 	'File::Spec'	 => 0.86,
 	'IO::File'	 => 1.08,
 	'IO::Select'	 => 1.14,
@@ -50,8 +61,6 @@ my %prerequisite = (
 	'PerlIO'	 => 1.05,
 	'Scalar::Util'	 => 1.25,
 	'Time::Local'	 => 1.19,
-	'Test::Builder'	 => 0,
-	'Test::More'	 => 0,
 	%$platform
 	);
 
@@ -74,21 +83,22 @@ my @debris = qw(.resolv.conf *.lock);
 #
 # Get the command line args
 #
-use constant USE_GETOPT => defined eval 'use Getopt::Long; 1';
+use constant USE_GETOPT => defined eval { require Getopt::Long };
 
-my $help = 0;
-my $IPv6_tests = 1;
+my $help	 = 0;
+my $IPv6_tests	 = 1;
 my $online_tests = 2;			##  2 = non-fatal, 1 = on, 0 = off  ##
 
 my @options = (
 	'online-tests!'		 => \$online_tests,
+	'noonline-tests'	 => sub { $online_tests = 0; },
 	'non-fatal-online-tests' => sub { $online_tests = 2; },
 	'IPv6-tests!'		 => \$IPv6_tests,
 	'help!'			 => \$help
 	);
 
 
-if ( USE_GETOPT && !GetOptions(@options) ) {
+if ( USE_GETOPT && !Getopt::Long::GetOptions(@options) ) {
 	print "Error: Unrecognized option.\n";
 	print "Try perl Makefile.PL --help for more information\n";
 	exit 1;
@@ -96,7 +106,7 @@ if ( USE_GETOPT && !GetOptions(@options) ) {
 
 
 if ($help) {
-	print <<EOT;
+	print <<'EOT';
 
 Usage: perl Makefile.PL [OPTION...]
 
@@ -125,7 +135,7 @@ EOT
 #
 # Enable tests if we have internet connection	(code lifted from LWP)
 #
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';	## no critic
 require IO::Socket::INET unless USE_SOCKET_IP;
 
 if ($online_tests) {
@@ -158,24 +168,25 @@ my $nonfatal = 't/online.nonfatal';
 push @debris, $enable, $IPv6, $nonfatal;
 
 if ($online_tests) {
-	open( ENABLED, '>', $enable ) or die "Can't touch $enable $!";
-	close(ENABLED);
+	require IO::File;
+	my $fh1 = IO::File->new( $enable, '>' ) or die "Can't touch $enable $!";
+	close($fh1);
 
 	if ( $online_tests == 2 ) {
-		open( NONFATAL, '>', $nonfatal ) or die "Can't touch $nonfatal $!";
-		close(NONFATAL);
 		print "\nActivating Non Fatal Online Tests...\n";
+		my $fh2 = IO::File->new( $nonfatal, '>' ) or die "Can't touch $nonfatal $!";
+		close($fh2);
 	} else {
 		print "\nActivating Online Tests...\n";
 	}
 
 	if ( USE_SOCKET_IP && $IPv6_tests ) {
 		print "\nActivating IPv6 Tests...\n";
-		open( ENABLED, '>', $IPv6 ) or die "Can't touch $IPv6 $!";
-		close(ENABLED);
+		my $fh3 = IO::File->new( $IPv6, '>' ) or die "Can't touch $IPv6 $!";
+		close($fh3);
 	}
 
-	print <<EOT;
+	print <<'EOT';
 
 Warning!
 ========
@@ -192,7 +203,7 @@ WriteMakefile(				## Makefile & distribution metadata
 	%metadata,
 	PREREQ_PM  => {%prerequisite},
 	META_MERGE => {recommends => {%optional}},
-	clean	   => {FILES => "@debris"},
+	clean	   => {FILES	  => "@debris"},
 	);
 
 
@@ -201,7 +212,7 @@ package MY;				## customise generated Makefile
 sub test {
 	return shift->SUPER::test() if $^O =~ /cygwin|MSWin/i;
 
-	join '', shift->SUPER::test(), <<'END';
+	return join '', shift->SUPER::test(), <<'END';
 # suppress parallel test execution
 FULLPERLRUN = HARNESS_OPTIONS=c $(FULLPERL)
 END
@@ -227,21 +238,20 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	eval 'require Net::DNS; $Net::DNS::VERSION =~ s/(\.\d)$/${1}0/';
-	my @version = grep $_, ( 'version', $Net::DNS::VERSION );
+	my @version = ( 'version', eval { require Net::DNS; $Net::DNS::VERSION; } );
 
 	my $nameregex = '\W+Net\W+DNS.pm$';
-	my @installed = grep $_ && m/$nameregex/io, values %INC;
+	my @installed = grep { $_ && m/$nameregex/io } values %INC;
 	my %occluded;
 
 	foreach (@installed) {
-		my $path = $1 if m/^(.+)$nameregex/i;
+		my $path = m/^(.+)$nameregex/io ? $1 : '';
 		my %seen;
 		foreach (@INC) {
 			$seen{$_}++;				# find $path in @INC
 			last if $_ eq $path;
 		}
-		foreach ( grep !$seen{$_}, @INC ) {
+		foreach ( grep { !$seen{$_} } @INC ) {
 			$occluded{$_}++;			# suppress install
 		}
 	}

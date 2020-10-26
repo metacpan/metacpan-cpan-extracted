@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.712   2020-10-25
+    - Removed deprecated options 'justify' and 'lf'.
+    - Option 'mouse': values other than 0 and 1 are no longer allowed.
+    - Renamed 'footer_string' to 'footer'.
+    - New option 'footer'.
+    - Update documentation.
+
 1.711   2020-04-21
     - Update unicode table to unicode 13.0.
     - Update footer_string format.

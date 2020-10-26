@@ -1,8 +1,11 @@
-# $Id: 03-parameters.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 03-parameters.t 1812 2020-10-07 18:09:53Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(:class :type :opcode :rcode :ednsoption :dsotype);
 local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
@@ -16,8 +19,8 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 {					## check class conversion functions
 	my $anon = 65500;
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::classbyval ) {
-		my $name = classbyval($_);
-		my $code = eval { classbyname($name) };
+		my $name	= classbyval($_);
+		my $code	= eval { classbyname($name) };
 		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "classbyname($name)\t$exception" );
 	}
@@ -38,8 +41,8 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 {					## check type conversion functions
 	my $anon = 65500;
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::typebyval ) {
-		my $name = typebyval($_);
-		my $code = eval { typebyname($name) };
+		my $name	= typebyval($_);
+		my $code	= eval { typebyname($name) };
 		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "typebyname($name)\t$exception" );
 	}
@@ -61,8 +64,8 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 {					## check OPCODE type conversion functions
 	my $anon = 255;
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::opcodebyval ) {
-		my $name = opcodebyval($_);
-		my $code = eval { opcodebyname($name) };
+		my $name	= opcodebyval($_);
+		my $code	= eval { opcodebyname($name) };
 		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "opcodebyname($name)\t$exception" );
 	}
@@ -79,8 +82,8 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 {					## check RCODE conversion functions
 	my $anon = 4095;
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::rcodebyval ) {
-		my $name = rcodebyval($_);
-		my $code = eval { rcodebyname($name) };
+		my $name	= rcodebyval($_);
+		my $code	= eval { rcodebyname($name) };
 		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "rcodebyname($name)\t$exception" );
 	}
@@ -97,8 +100,8 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 {					## check EDNS option conversion functions
 	my $anon = 65535;
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::ednsoptionbyval ) {
-		my $name = ednsoptionbyval($_);
-		my $code = eval { ednsoptionbyname($name) };
+		my $name	= ednsoptionbyval($_);
+		my $code	= eval { ednsoptionbyname($name) };
 		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "ednsoptionbyname($name)\t$exception" );
 	}
@@ -114,8 +117,8 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 {					## check DSO type conversion functions
 	my $anon = 65535;
 	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::dsotypebyval ) {
-		my $name = dsotypebyval($_);
-		my $code = eval { dsotypebyname($name) };
+		my $name	= dsotypebyval($_);
+		my $code	= eval { dsotypebyname($name) };
 		my ($exception) = split /\n/, "$@\n";
 		is( $code, $_, "dsotypebyname($name)\t$exception" );
 	}
@@ -128,7 +131,7 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 }
 
 
-					## exercise but do not test ad hoc RRtype registration
+## exercise but do not test ad hoc RRtype registration
 Net::DNS::Parameters::register( 'TOY', 65280 );			# RR type name and number
 Net::DNS::Parameters::register( 'TOY', 65280 );			# ignore duplicate entry
 eval { Net::DNS::Parameters::register('ANY') };			# reject CLASS identifier

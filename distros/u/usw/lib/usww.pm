@@ -1,7 +1,7 @@
 package usww;
 use 5.012005;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 use parent 'usw';
 

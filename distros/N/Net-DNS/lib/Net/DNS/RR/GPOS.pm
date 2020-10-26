@@ -1,21 +1,17 @@
 package Net::DNS::RR::GPOS;
 
-#
-# $Id: GPOS.pm 1528 2017-01-18 21:44:58Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: GPOS.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::GPOS - DNS GPOS resource record
 
 =cut
-
 
 use integer;
 
@@ -28,10 +24,11 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
-	( $self->{latitude},  $offset ) = decode Net::DNS::Text( $data, $offset ) if $offset < $limit;
-	( $self->{longitude}, $offset ) = decode Net::DNS::Text( $data, $offset ) if $offset < $limit;
-	( $self->{altitude},  $offset ) = decode Net::DNS::Text( $data, $offset ) if $offset < $limit;
+	( $self->{latitude},  $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
+	( $self->{longitude}, $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
+	( $self->{altitude},  $offset ) = Net::DNS::Text->decode( $data, $offset ) if $offset < $limit;
 	croak('corrupt GPOS data') unless $offset == $limit;	# more or less FUBAR
+	return;
 }
 
 
@@ -39,7 +36,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	return '' unless defined $self->{altitude};
-	join '', map $self->{$_}->encode, qw(latitude longitude altitude);
+	return join '', map { $self->{$_}->encode } qw(latitude longitude altitude);
 }
 
 
@@ -47,7 +44,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	return '' unless defined $self->{altitude};
-	join ' ', map $self->{$_}->string, qw(latitude longitude altitude);
+	return join ' ', map { $self->{$_}->string } qw(latitude longitude altitude);
 }
 
 
@@ -58,6 +55,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->longitude(shift);
 	$self->altitude(shift);
 	die 'too many arguments for GPOS' if scalar @_;
+	return;
 }
 
 
@@ -65,39 +63,40 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->_parse_rdata(qw(0.0 0.0 0.0));
+	return;
 }
 
 
 sub latitude {
 	my $self = shift;
 	$self->{latitude} = _fp2text(shift) if scalar @_;
-	_text2fp( $self->{latitude} ) if defined wantarray;
+	return defined(wantarray) ? _text2fp( $self->{latitude} ) : undef;
 }
 
 
 sub longitude {
 	my $self = shift;
 	$self->{longitude} = _fp2text(shift) if scalar @_;
-	_text2fp( $self->{longitude} ) if defined wantarray;
+	return defined(wantarray) ? _text2fp( $self->{longitude} ) : undef;
 }
 
 
 sub altitude {
 	my $self = shift;
 	$self->{altitude} = _fp2text(shift) if scalar @_;
-	_text2fp( $self->{altitude} ) if defined wantarray;
+	return defined(wantarray) ? _text2fp( $self->{altitude} ) : undef;
 }
 
 
 ########################################
 
 sub _fp2text {
-	return new Net::DNS::Text( sprintf( '%1.10g', shift ) );
+	return Net::DNS::Text->new( sprintf( '%1.10g', shift ) );
 }
 
 sub _text2fp {
 	no integer;
-	return 0.0 + shift->value;
+	return ( 0.0 + shift->value );
 }
 
 
@@ -108,7 +107,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name GPOS latitude longitude altitude');
+    $rr = Net::DNS::RR->new('name GPOS latitude longitude altitude');
 
 =head1 DESCRIPTION
 

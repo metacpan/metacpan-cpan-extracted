@@ -22,7 +22,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.50';
+our $VERSION = '1.51';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -871,7 +871,6 @@ my @stations = (
 ['BSLS','Berlin-Schlachtensee',8089085,13.215025,52.439976],
 ['BSZF','Berlin-Schulzendorf',8089000,13.245929,52.613096],
 ['BSGR','Berlin-Schöneberg',8089474,13.352068,52.479377],
-['BFHS','Berlin-Schönefeld Flughafen',8010109,13.51271,52.391062],
 ['BSWP','Berlin-Schöneweide',8010041,13.509395,52.455127],
 ['BSW','Berlin-Schöneweide (S)',8089168,13.509115,52.454976],
 ['BSNH','Berlin-Schönholz',8089087,13.381111,52.571422],
@@ -2475,6 +2474,9 @@ my @stations = (
 ['MFLI','Flintsbach',8002012,12.128024,47.724252],
 ['RFLO','Flomersheim',8002014,8.333801,49.513958],
 ['DFM','Floßmühle',8011548,13.181082,50.758757],
+['BFBI','Flughafen BER - Terminal 1-2',8011201,13.5119498,52.3648038],
+['BFBB','Flughafen BER - Terminal 1-2 (S-Bahn)',8089201,13.5119176,52.3648431],
+['BFHS','Flughafen BER - Terminal 5 (Schönefeld)',8010109,13.51271,52.391062],
 ['XAWIF','Flughafen Wien',8100353,16.5624642326075,48.1211401029154],
 ['XSFL','Flums',8509413,9.34791662856585,47.0966128467643],
 ['DFL','Flöha',8010108,13.075152,50.854355],
@@ -8955,7 +8957,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 DESCRIPTION
 

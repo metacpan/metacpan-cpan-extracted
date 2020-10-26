@@ -1,21 +1,17 @@
 package Net::DNS::RR::RT;
 
-#
-# $Id: RT.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: RT.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::RT - DNS RT resource record
 
 =cut
-
 
 use integer;
 
@@ -26,8 +22,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset, @opaque ) = @_;
 
-	$self->{preference} = unpack( "\@$offset n", $$data );
-	$self->{intermediate} = decode Net::DNS::DomainName2535( $data, $offset + 2, @opaque );
+	$self->{preference}   = unpack( "\@$offset n", $$data );
+	$self->{intermediate} = Net::DNS::DomainName2535->decode( $data, $offset + 2, @opaque );
+	return;
 }
 
 
@@ -35,14 +32,14 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	pack 'n a*', $self->preference, $self->{intermediate}->encode( $offset + 2, @opaque );
+	return pack 'n a*', $self->preference, $self->{intermediate}->encode( $offset + 2, @opaque );
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	join ' ', $self->preference, $self->{intermediate}->string;
+	return join ' ', $self->preference, $self->{intermediate}->string;
 }
 
 
@@ -51,6 +48,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->preference(shift);
 	$self->intermediate(shift);
+	return;
 }
 
 
@@ -58,20 +56,20 @@ sub preference {
 	my $self = shift;
 
 	$self->{preference} = 0 + shift if scalar @_;
-	$self->{preference} || 0;
+	return $self->{preference} || 0;
 }
 
 
 sub intermediate {
 	my $self = shift;
 
-	$self->{intermediate} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{intermediate}->name if $self->{intermediate};
+	$self->{intermediate} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{intermediate} ? $self->{intermediate}->name : undef;
 }
 
 
 my $function = sub {			## sort RRs in numerically ascending order.
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+	return $Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
 };
 
 __PACKAGE__->set_rrsort_func( 'preference', $function );
@@ -86,7 +84,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name RT preference intermediate');
+    $rr = Net::DNS::RR->new('name RT preference intermediate');
 
 =head1 DESCRIPTION
 

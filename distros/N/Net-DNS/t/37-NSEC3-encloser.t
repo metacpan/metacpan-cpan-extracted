@@ -1,7 +1,9 @@
-# $Id: 37-NSEC3-encloser.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 37-NSEC3-encloser.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 use Net::DNS;
 use Net::DNS::ZoneFile;
@@ -12,7 +14,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "use $package; 1;";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -22,7 +24,7 @@ plan tests => 4;
 
 ## Based on examples from RFC5155, Appendix B
 
-my @nsec3 = parse Net::DNS::ZoneFile <<'END';
+my @nsec3 = Net::DNS::ZoneFile->parse( <<'END' );
 0p9mhaveqvm6t7vbl5lop2u3t2rp3tom.example.	IN	NSEC3	( 1 1 12 aabbccdd
 	2t7b4g4vsa5smi47k61mv5bv1a22bojr NS SOA MX RRSIG DNSKEY NSEC3PARAM )
 

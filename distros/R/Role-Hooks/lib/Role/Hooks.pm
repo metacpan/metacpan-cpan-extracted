@@ -7,13 +7,16 @@ package Role::Hooks;
 use Class::Method::Modifiers qw( install_modifier );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.003';
 
 our %CALLBACKS_BEFORE_APPLY;
 our %CALLBACKS_AFTER_APPLY;
 our %ARGS;
 
 BEGIN { *DEBUG = $ENV{'PERL_ROLE_HOOKS_DEBUG'} ? sub(){1} : sub(){0} };
+
+# limited version of Safe::Isa
+my $_isa = sub { ref( $_[0] ) and $_[0]->isa( $_[1] ) };
 
 sub _croak {
 	my ($me, $msg, @args) = @_;
@@ -50,13 +53,13 @@ sub is_role {
 	
 	if ($INC{'Moose/Meta/Role.pm'}
 	and do { require Moose::Util; 1 }
-	and Moose::Util::find_meta($target)->isa('Moose::Meta::Role')) {
+	and Moose::Util::find_meta($target)->$_isa('Moose::Meta::Role')) {
 		return 'Moose::Role';
 	}
 	
 	if ($INC{'Mouse/Meta/Role.pm'}
 	and do { require Mouse::Util; 1 }
-	and Mouse::Util::find_meta($target)->isa('Mouse::Meta::Role')) {
+	and Mouse::Util::find_meta($target)->$_isa('Mouse::Meta::Role')) {
 		return 'Mouse::Role';
 	}
 	
@@ -124,13 +127,13 @@ sub after_apply {
 			my $orig = shift;
 			my @steps = $orig->(@_);
 			return (
-				'_run_callbacks_before_apply',
+				__PACKAGE__ . '::_run_role_tiny_before_callbacks',
 				@steps,
-				'_run_callbacks_after_apply',
+				__PACKAGE__ . '::_run_role_tiny_after_callbacks',
 			);
 		};
 		
-		install_modifier 'Role::Tiny', fresh => '_run_callbacks_before_apply', sub {
+		*_run_role_tiny_before_callbacks = sub {
 			my (undef, $to, $role) = @_;
 			$me->_debug("Calling role hooks for $role before application to $to") if DEBUG;
 			my @callbacks = @{ $CALLBACKS_BEFORE_APPLY{$role} || [] };
@@ -140,7 +143,7 @@ sub after_apply {
 			return;
 		};
 		
-		install_modifier 'Role::Tiny', fresh => '_run_callbacks_after_apply', sub {
+		*_run_role_tiny_after_callbacks = sub {
 			my (undef, $to, $role) = @_;
 			$me->_debug("Calling role hooks for $role after application to $to") if DEBUG;
 			my @callbacks = @{ $CALLBACKS_AFTER_APPLY{$role} || [] };
@@ -176,7 +179,7 @@ sub after_apply {
 			my $orig = shift;
 			my @steps = $orig->(@_);
 			return List::Util::uniqstr(
-				'_run_callbacks_before_apply',
+				__PACKAGE__ . '::_run_role_tiny_before_callbacks',
 				@steps,
 			);
 		};

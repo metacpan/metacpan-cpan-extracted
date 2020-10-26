@@ -1,0 +1,65 @@
+{
+   "abstract" : "Log in JSONLines format",
+   "author" : [
+      "LNATION <email@lngation.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-JSON-Lines",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0.45",
+            "Fcntl" : "0",
+            "JSON::Lines" : "0.03",
+            "POSIX" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::JSON::Lines" : {
+         "file" : "lib/Log/JSON/Lines.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Log-JSON-Lines.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Log-JSON-Lines"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

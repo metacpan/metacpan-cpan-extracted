@@ -1,8 +1,11 @@
-# $Id: 05-IPSECKEY.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-IPSECKEY.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
+
 use Net::DNS;
 
 my @prerequisite = qw(
@@ -10,7 +13,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -30,20 +33,20 @@ my $wire =
 
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -57,13 +60,13 @@ my $wire =
 	}
 
 
-	my $null    = new Net::DNS::RR("$name NULL")->encode;
-	my $empty   = new Net::DNS::RR("$name $type")->encode;
-	my $rxbin   = decode Net::DNS::RR( \$empty )->encode;
-	my $txtext  = new Net::DNS::RR("$name $type")->string;
-	my $rxtext  = new Net::DNS::RR($txtext)->encode;
+	my $null    = Net::DNS::RR->new("$name NULL")->encode;
+	my $empty   = Net::DNS::RR->new("$name $type")->encode;
+	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
+	my $txtext  = Net::DNS::RR->new("$name $type")->string;
+	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
 	my $hex3    = unpack 'H*', substr( $encoded, length $null );
@@ -76,10 +79,10 @@ my $wire =
 
 
 {
-	my $lc		= new Net::DNS::RR( lc ". $type @data" );
-	my $rr		= new Net::DNS::RR( uc ". $type @data" );
+	my $lc		= Net::DNS::RR->new( lc ". $type @data" );
+	my $rr		= Net::DNS::RR->new( uc ". $type @data" );
 	my $hash	= {};
-	my $predecessor = $rr->encode( 0, $hash );
+	my $predecessor = $rr->encode( 0,		    $hash );
 	my $compressed	= $rr->encode( length $predecessor, $hash );
 	ok( length $compressed == length $predecessor, 'encoded RDATA not compressible' );
 	isnt( $rr->encode,    $lc->encode, 'encoded RDATA names not downcased' );
@@ -88,36 +91,36 @@ my $wire =
 
 
 {
-	my $rr = new Net::DNS::RR("$name $type @data");
+	my $rr = Net::DNS::RR->new("$name $type @data");
 	foreach ( undef, qw(192.0.2.38 2001:db8:0:8002:0:0:2000:1 gateway.example.com) ) {
 		my $gateway = $_ || '.';
 		$rr->gateway($gateway);
 		is( scalar( $rr->gateway ), $_, "rr->gateway( '$gateway' )" );
-		my $rr2 = new Net::DNS::RR( $rr->string );
+		my $rr2 = Net::DNS::RR->new( $rr->string );
 		is( $rr2->rdstring, $rr->rdstring, 'new/string transparent' );
 		my $encoded = $rr->encode;
-		my $decoded = decode Net::DNS::RR( \$encoded );
+		my $decoded = Net::DNS::RR->decode( \$encoded );
 		is( $decoded->rdstring, $rr->rdstring, 'encode/decode transparent' );
 	}
 }
 
 
 {
-	my $rr = eval { new Net::DNS::RR( type => $type, gateway => 'X' ); };
+	my $rr = eval { Net::DNS::RR->new( type => $type, gateway => 'X' ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "unrecognised gateway type\t[$exception]" );
 }
 
 
 {
-	my $rr = eval { new Net::DNS::RR(". $type \\# 3 01ff05"); };
+	my $rr = eval { Net::DNS::RR->new(". $type \\# 3 01ff05"); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "exception raised in decode\t[$exception]" );
 }
 
 
 {
-	my $rr = new Net::DNS::RR(". $type @data");
+	my $rr = Net::DNS::RR->new(". $type @data");
 	$rr->{gatetype} = 255;
 	eval { $rr->encode };
 	my ($exception) = split /\n/, "$@\n";
@@ -126,7 +129,7 @@ my $wire =
 
 
 {
-	my $rr = new Net::DNS::RR(". $type @data");
+	my $rr = Net::DNS::RR->new(". $type @data");
 	$rr->{gatetype} = 255;
 	eval { my $gateway = $rr->gateway; };
 	my ($exception) = split /\n/, "$@\n";
@@ -135,7 +138,7 @@ my $wire =
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 	foreach (@attr) {
 		ok( !$rr->$_(), "$_ attribute of empty RR undefined" );
 	}
@@ -143,7 +146,7 @@ my $wire =
 
 
 {
-	my $rr = new Net::DNS::RR("$name $type @data");
+	my $rr = Net::DNS::RR->new("$name $type @data");
 	$rr->print;
 }
 

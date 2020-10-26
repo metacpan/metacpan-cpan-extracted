@@ -4,13 +4,13 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Run-Plugin-BreakOnFailure",
    "prereqs" : {
@@ -44,11 +44,11 @@
    "provides" : {
       "Test::Run::CmdLine::Plugin::BreakOnFailure" : {
          "file" : "lib/Test/Run/CmdLine/Plugin/BreakOnFailure.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       },
       "Test::Run::Plugin::BreakOnFailure" : {
          "file" : "lib/Test/Run/Plugin/BreakOnFailure.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -61,5 +61,6 @@
          "url" : "https://bitbucket.org/shlomif/perl-test-run"
       }
    },
-   "version" : "v0.0.5"
+   "version" : "v0.0.6",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -1,5 +1,21 @@
 Revision history for Database-Async
 
+0.012     2020-10-24 22:28:00+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - Removed AutoPrereqs dzil plugin since it was picking up downstream dependencies
+    due to `require` lines, thanks to CHORNY for reporting
+    (https://github.com/team-at-cpan/Database-Async/issues/5)
+
+0.011     2020-10-23 18:47:35+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - $query->single now documented, and properly returns all requested values
+
 0.010     2019-11-06 00:14:42+08:00 Asia/Kuala_Lumpur
     No new features.
 

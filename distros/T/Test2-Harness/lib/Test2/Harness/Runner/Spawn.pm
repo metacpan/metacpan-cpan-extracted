@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Spawn;
 use strict;
 use warnings;
 
-our $VERSION = '1.000030';
+our $VERSION = '1.000032';
 
 use parent 'Test2::Harness::Runner::Job';
 use Test2::Harness::Util::HashBase;
@@ -17,7 +17,7 @@ sub out_file { sprintf('/proc/%i/fd/1', $_[0]->{+TASK}->{owner}) }
 sub err_file { sprintf('/proc/%i/fd/2', $_[0]->{+TASK}->{owner}) }
 sub in_file  { undef }
 
-sub args { $_[0]->{+TASK}->{args} //= [] }
+sub args { @{$_[0]->{+TASK}->{args} //= []} }
 
 sub job_dir { "" }
 sub run_dir { "" }

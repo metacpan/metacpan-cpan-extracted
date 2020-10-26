@@ -4,13 +4,13 @@
       "Jaap Karssenberg <pardus@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-MimeInfo",
    "no_index" : {
@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "Carp" : "0",
+            "Encode::Locale" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
             "File::BaseDir" : "0.03",
@@ -55,15 +56,18 @@
          "url" : "https://github.com/mbeijen/File-MimeInfo"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_contributors" : [
       "Bernhard RosenkrÃ¤nzer <bero@lindev.ch>",
       "Christian Ludwig <chrissicool@gmail.com>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Jitka Plesnikova <jplesnik@redhat.com>",
       "Jonathan Dowland <jmtd@debian.org>",
+      "Martin Vassor <martin.vassor@alumni.epfl.ch>",
       "Michiel Beijen <michiel.beijen@gmail.com>",
+      "Nikos Skalkotos <skalkoto@grnet.gr>",
       "Nitish Bezzala <nbezzala@yahoo.com>",
+      "Oleg Kostyuk <cub.uanic@gmail.com>",
       "Patrick Burroughs (Celti) <celti@celti.name>",
       "Rudolf Leermakers <rudolf@hatsuseno.org>",
       "Sean Smith <ssmith@ncsgraphics.com>",
@@ -71,5 +75,5 @@
       "brian m. carlson <sandals@crustytoothpaste.net>",
       "gregor herrmann <gregoa@debian.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

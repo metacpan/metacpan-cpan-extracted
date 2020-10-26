@@ -35,11 +35,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Chart::Plotly::Plot" => 0,
-    "Chart::Plotly::Trace::Scatter" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,8 +46,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::Plotly::Kaleido" => 0,
-  "Chart::Plotly::Plot" => 0,
-  "Chart::Plotly::Trace::Scatter" => 0,
   "File::ShareDir" => "1.116",
   "File::Which" => 0,
   "IPC::Run" => "0.99",

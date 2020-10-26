@@ -1,3 +1,9 @@
+Version 1.32 - 26 Oct 2020
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/5
+
 Version 1.31 - 19 Nov 2018
 
 * Fixes this bug in Locale::Simple:

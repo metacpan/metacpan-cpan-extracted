@@ -1,21 +1,17 @@
 package Net::DNS::RR::PX;
 
-#
-# $Id: PX.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: PX.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::PX - DNS PX resource record
 
 =cut
-
 
 use integer;
 
@@ -27,8 +23,9 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset, @opaque ) = @_;
 
 	$self->{preference} = unpack( "\@$offset n", $$data );
-	( $self->{map822},  $offset ) = decode Net::DNS::DomainName2535( $data, $offset + 2, @opaque );
-	( $self->{mapx400}, $offset ) = decode Net::DNS::DomainName2535( $data, $offset + 0, @opaque );
+	( $self->{map822},  $offset ) = Net::DNS::DomainName2535->decode( $data, $offset + 2, @opaque );
+	( $self->{mapx400}, $offset ) = Net::DNS::DomainName2535->decode( $data, $offset + 0, @opaque );
+	return;
 }
 
 
@@ -37,9 +34,10 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my ( $offset, @opaque ) = @_;
 
 	my $mapx400 = $self->{mapx400};
-	my $rdata = pack( 'n', $self->{preference} );
+	my $rdata   = pack( 'n', $self->{preference} );
 	$rdata .= $self->{map822}->encode( $offset + 2, @opaque );
 	$rdata .= $mapx400->encode( $offset + length($rdata), @opaque );
+	return $rdata;
 }
 
 
@@ -47,6 +45,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @rdata = ( $self->preference, $self->{map822}->string, $self->{mapx400}->string );
+	return @rdata;
 }
 
 
@@ -56,6 +55,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->preference(shift);
 	$self->map822(shift);
 	$self->mapx400(shift);
+	return;
 }
 
 
@@ -63,28 +63,28 @@ sub preference {
 	my $self = shift;
 
 	$self->{preference} = 0 + shift if scalar @_;
-	$self->{preference} || 0;
+	return $self->{preference} || 0;
 }
 
 
 sub map822 {
 	my $self = shift;
 
-	$self->{map822} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{map822}->name if $self->{map822};
+	$self->{map822} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{map822} ? $self->{map822}->name : undef;
 }
 
 
 sub mapx400 {
 	my $self = shift;
 
-	$self->{mapx400} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{mapx400}->name if $self->{mapx400};
+	$self->{mapx400} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{mapx400} ? $self->{mapx400}->name : undef;
 }
 
 
 my $function = sub {			## sort RRs in numerically ascending order.
-	$Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
+	return $Net::DNS::a->{'preference'} <=> $Net::DNS::b->{'preference'};
 };
 
 __PACKAGE__->set_rrsort_func( 'preference', $function );
@@ -99,7 +99,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name PX preference map822 mapx400');
+    $rr = Net::DNS::RR->new('name PX preference map822 mapx400');
 
 =head1 DESCRIPTION
 

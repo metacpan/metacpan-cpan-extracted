@@ -1,5 +1,8 @@
 Revision history of Chart-Kaleido
 
+0.006       2020-10-24
+    - Remove Chart::Plotly from build_requires to make installation easier.
+
 0.005       2020-10-18
     - Fix Chart::Plotly::Plot object as save() or transform() parameter.
     - all_formats, scope_name, scope_flags are now like class

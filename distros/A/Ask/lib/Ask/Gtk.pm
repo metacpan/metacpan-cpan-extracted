@@ -1,4 +1,4 @@
-use 5.010;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,21 +6,26 @@ use warnings;
 	package Ask::Gtk;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
-
+	our $VERSION   = '0.012';
+	
 	use Moo;
 	use Gtk2 -init;
-	use URI;
-	use namespace::sweep;
-
+	use Path::Tiny 'path';
+	use namespace::autoclean;
+	
 	with 'Ask::API';
+	
+	sub is_usable {
+		my ($self) = @_;
+		return !! $ENV{'DISPLAY'};
+	}
 	
 	sub info
 	{
 		my ($self, %o) = @_;
 		
-		$o{messagedialog_type}    //= 'info';
-		$o{messagedialog_buttons} //= 'ok';
+		$o{messagedialog_type}    ||= 'info';
+		$o{messagedialog_buttons} ||= 'ok';
 		
 		my $msg = Gtk2::MessageDialog->new(
 			undef,
@@ -64,7 +69,7 @@ use warnings;
 		my $return;
 		
 		my $dialog = Gtk2::Dialog->new(
-			($o{title} // 'Message'),
+			($o{title} || 'Message'),
 			undef,
 			[qw/ modal destroy-with-parent /],
 			'gtk-ok' => 'none',
@@ -77,7 +82,7 @@ use warnings;
 		
 		my $entry = Gtk2::Entry->new;
 		$dialog->vbox->add($entry);
-		$entry->set_text($o{entry_text} // '');
+		$entry->set_text($o{entry_text} || '');
 		$entry->select_region(0, length $entry->get_text);
 		$entry->set_visibility(! $o{hide_text});
 		
@@ -100,8 +105,10 @@ use warnings;
 		my ($self, %o) = @_;
 		my @return;
 		
+		require URI;
+		
 		my $dialog = Gtk2::FileChooserDialog->new(
-			($o{title} // $o{text} // 'File selection'),
+			($o{title} || $o{text} || 'File selection'),
 			undef,
 			$o{directory} ? 'select-folder' : $o{save} ? 'save' : 'open',
 			'gtk-ok' => 'none',
@@ -110,7 +117,7 @@ use warnings;
 		$dialog->set_select_multiple(!!$o{multiple});
 		
 		my $done = sub {
-			@return = map { URI::->new($_)->file } $dialog->get_uris;
+			@return = map path( 'URI'->new($_)->file ), $dialog->get_uris;
 			$dialog->destroy;
 			Gtk2->main_quit;
 		};
@@ -119,7 +126,8 @@ use warnings;
 		
 		$dialog->show;
 		Gtk2->main;
-		return @return;
+		
+		$o{multiple} ? @return : $return[0];
 	}
 
 	sub _choice
@@ -129,7 +137,7 @@ use warnings;
 		my $return;
 		
 		my $dialog = Gtk2::Dialog->new(
-			($o{title} // 'Choose'),
+			($o{title} || 'Choose'),
 			undef,
 			[qw/ modal destroy-with-parent /],
 			'gtk-ok' => 'none',
@@ -154,7 +162,7 @@ use warnings;
 		$tree_view->append_column($tree_column);
 		$dialog->vbox->set_size_request(300, 300);
 		$dialog->vbox->add($tree_view);
-		$tree_view->get_selection->set_mode($o{_tree_mode} // 'single');
+		$tree_view->get_selection->set_mode($o{_tree_mode} || 'single');
 		
 		my @return;
 		my $done = sub {
@@ -176,7 +184,7 @@ use warnings;
 	sub multiple_choice
 	{
 		my ($self, %o) = @_;
-		$o{title} //= 'Choose';
+		$o{title} ||= 'Choose';
 		$o{_tree_mode} = 'multiple';
 		return $self->_choice(%o);
 	}
@@ -184,7 +192,7 @@ use warnings;
 	sub single_choice
 	{
 		my ($self, %o) = @_;
-		$o{title} //= 'Choose one';
+		$o{title} ||= 'Choose one';
 		$o{_tree_mode} = 'single';
 		my ($r) = $self->_choice(%o);
 		return $r;
@@ -223,7 +231,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

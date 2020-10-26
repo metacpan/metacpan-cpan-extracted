@@ -1,6 +1,9 @@
-# $Id: 01-resolver-env.t 1709 2018-09-07 08:03:09Z willem $  -*-perl-*-
+#!/usr/bin/perl
+# $Id: 01-resolver-env.t 1815 2020-10-14 21:55:18Z willem $  -*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 10;
 
 use Net::DNS::Resolver;

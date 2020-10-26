@@ -1,6 +1,9 @@
-# $Id: 03-header.t 1749 2019-07-21 09:15:55Z willem $
+#!/usr/bin/perl
+# $Id: 03-header.t 1815 2020-10-14 21:55:18Z willem $
+#
 
 use strict;
+use warnings;
 use Test::More;
 
 use Net::DNS::Packet;
@@ -9,7 +12,7 @@ use Net::DNS::Parameters;
 plan tests => 72;
 
 
-my $packet = new Net::DNS::Packet(qw(. NS IN));
+my $packet = Net::DNS::Packet->new(qw(. NS IN));
 my $header = $packet->header;
 ok( $header->isa('Net::DNS::Header'), 'packet->header object' );
 
@@ -23,10 +26,11 @@ sub waggle {
 		my $stored = $object->$attribute();
 		is( $stored, $value, "expected value after header->$attribute($value)" );
 	}
+	return;
 }
 
 
-my $newid = new Net::DNS::Packet->header->id;
+my $newid = Net::DNS::Packet->new()->header->id;
 waggle( $header, 'id', $header->id, $newid, $header->id );
 
 waggle( $header, 'opcode', qw(STATUS UPDATE QUERY) );
@@ -61,7 +65,7 @@ like( $header->string, '/adcount = 0/',	    'string() has adcount correct' );
 #
 # Check that the aliases work
 #
-my $rr = new Net::DNS::RR('example.com. 10800 A 192.0.2.1');
+my $rr = Net::DNS::RR->new('example.com. 10800 A 192.0.2.1');
 my @rr = ( $rr, $rr );
 $packet->push( prereq	  => $rr );
 $packet->push( update	  => $rr, @rr );
@@ -89,7 +93,7 @@ foreach my $method (qw(qdcount ancount nscount arcount)) {
 
 my $data = $packet->data;
 
-my $packet2 = new Net::DNS::Packet( \$data );
+my $packet2 = Net::DNS::Packet->new( \$data );
 
 my $string = $packet->header->string;
 
@@ -106,21 +110,22 @@ SKIP: {
 	waggle( $header, 'do', 0, 1, 0, 1 );
 	waggle( $header, 'rcode', qw(BADVERS BADMODE BADNAME FORMERR NOERROR) );
 
-	my $packet = new Net::DNS::Packet();			# empty EDNS size solicitation
+	my $packet = Net::DNS::Packet->new();			# empty EDNS size solicitation
 	my $udplim = 1280;
 	$packet->edns->size($udplim);
 	my $encoded = $packet->data;
-	my $decoded = new Net::DNS::Packet( \$encoded );
+	my $decoded = Net::DNS::Packet->new( \$encoded );
 	is( $decoded->edns->size, $udplim, 'EDNS size request assembled correctly' );
 }
 
 
 eval {					## exercise printing functions
-	my $filename = "03-header.tmp";
-	open( TEMP, ">$filename" ) || die "Could not open $filename for writing";
-	select( ( select(TEMP), $header->print )[0] );
-	close(TEMP);
-	unlink($filename);
+	require IO::File;
+	my $file   = "03-header.tmp";
+	my $handle = IO::File->new( $file, '>' ) || die "Could not open $file for writing";
+	select( ( select($handle), $header->print )[0] );
+	close($handle);
+	unlink($file);
 };
 
 

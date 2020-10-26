@@ -347,8 +347,6 @@ sub _file_proc {
 		if(@{ $file->{versions} } and $file->{versions}->[-1]->{mtime} == $version{mtime}) {
 			$version{parts} = $file->{versions}->[-1]->{parts}; # If mtime not changed then file not changed
 			
-			$blocks->debug($file->{versions}->[-1]->{block_id} => file => $file->{id} => 'version'); 
-			
 			$version{block_id} = $file->{versions}->[-1]->{block_id};
 			
 			my $block = $blocks->find_row({ id => $version{block_id} });
@@ -463,7 +461,7 @@ sub _file_proc {
 			my $block;
 			if(1 == %block_ids) {
 				$block = $blocks->find_row({ id => keys %block_ids });
-				die "Block #".join(', ', keys %block_ids)." wasn't found. debug: ".$blocks->debug(keys %block_ids) if ! $block;
+				die "Block #".join(', ', keys %block_ids)." wasn't found" if ! $block;
 			}
 			elsif(%block_ids) {
 				# Search for block with highest parts count
@@ -484,9 +482,14 @@ sub _file_proc {
 						my $block_file = $files->unpack( $files->[ $block_file_index ] );
 						foreach my $version ( @{ $block_file->{versions} } ) {
 							next if $version->{block_id} != $bi;
-							$blocks->debug($block->{id} => file => $file->{id} => 'new version');
 							$version->{block_id} = $block->{id};
 							$block->{parts_cnt} += @{ $version->{parts} };
+							foreach my $vpart (@{ $version->{parts} }) {
+								my $part = $parts->find_row({ hash => $vpart->{hash} });
+								next if $part->{block_id} == $block->{id};
+								$part->{block_id} = $block->{id};
+								$parts->upsert({ hash => $part->{hash} }, $part);
+							}
 						}
 						$files->[ $block_file_index ] = $files->pack( $block_file );
 					}
@@ -509,7 +512,6 @@ sub _file_proc {
 			$block->{last_backup_id} = $state->{last_backup_id};
 			$blocks->upsert({ id => $block->{id} }, $block);
 			
-			$blocks->debug($block->{id} => file => $file->{id} => 'new version');
 			$version{block_id} = $block->{id};
 		}
 	}

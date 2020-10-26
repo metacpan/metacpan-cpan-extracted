@@ -1,14 +1,11 @@
 package Net::DNS::RR::OPT;
 
-#
-# $Id: OPT.pm 1784 2020-05-24 19:27:13Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1784 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: OPT.pm 1812 2020-10-07 18:09:53Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,15 +13,14 @@ Net::DNS::RR::OPT - DNS OPT resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(:rcode :ednsoption);
 
 use constant CLASS_TTL_RDLENGTH => length pack 'n N n', (0) x 3;
 
-use constant OPT => typebyname qw(OPT);
+use constant OPT => Net::DNS::Parameters::typebyname qw(OPT);
 
 require Net::DNS::DomainName;
 require Net::DNS::RR::A;
@@ -49,6 +45,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 		$self->{option}{$code} = $value;
 		$offset += $length + 4;
 	}
+	return;
 }
 
 
@@ -56,7 +53,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $option = $self->{option} || {};
-	join '', map pack( 'nna*', $_, length $option->{$_}, $option->{$_} ), keys %$option;
+	return join '', map { pack( 'nna*', $_, length $option->{$_}, $option->{$_} ) } keys %$option;
 }
 
 
@@ -66,7 +63,7 @@ sub encode {				## overide RR method
 	my $data = $self->_encode_rdata;
 	my $size = $self->size;
 	my @xttl = ( $self->rcode >> 4, $self->version, $self->flags );
-	pack 'C n n C2n n a*', 0, OPT, $size, @xttl, length($data), $data;
+	return pack 'C n n C2n n a*', 0, OPT, $size, @xttl, length($data), $data;
 }
 
 
@@ -77,7 +74,7 @@ sub string {				## overide RR method
 	my $flags  = sprintf '%04x', $self->flags;
 	my $rcode  = $self->rcode;
 	my $size   = $self->size;
-	my @option = map join( "\n;;\t\t\t\t", $self->_format_option($_) ), $self->options;
+	my @option = map { join( "\n;;\t\t\t\t", $self->_format_option($_) ) } $self->options;
 	my @format = join "\n;;\t\t", @option;
 
 	$rcode = 0 if $rcode < 16;				# weird: 1 .. 15 not EDNS codes!!
@@ -99,15 +96,15 @@ QQ
 sub class {				## overide RR method
 	my $self = shift;
 	$self->_deprecate(qq[please use "size()"]);
-	$self->size(@_);
+	return $self->size(@_);
 }
 
 sub ttl {				## overide RR method
 	my $self = shift;
 	$self->_deprecate(qq[please use "flags()" or "rcode()"]);
-	my @rcode = map unpack( 'C',   pack 'N', $_ ), @_;
-	my @flags = map unpack( 'x2n', pack 'N', $_ ), @_;
-	pack 'C2n', $self->rcode(@rcode), $self->version, $self->flags(@flags);
+	my @rcode = map { unpack( 'C',	 pack 'N', $_ ) } @_;
+	my @flags = map { unpack( 'x2n', pack 'N', $_ ) } @_;
+	return pack 'C2n', $self->rcode(@rcode), $self->version, $self->flags(@flags);
 }
 
 
@@ -115,7 +112,7 @@ sub version {
 	my $self = shift;
 
 	$self->{version} = 0 + shift if scalar @_;
-	$self->{version} || 0;
+	return $self->{version} || 0;
 }
 
 
@@ -131,14 +128,14 @@ sub rcode {
 	return $self->{rcode} || 0 unless scalar @_;
 	delete $self->{rdlength};				# (ab)used to signal incomplete value
 	my $val = shift || 0;
-	$self->{rcode} = $val < 16 ? 0 : $val;			# discard non-EDNS rcodes 1 .. 15
+	return $self->{rcode} = $val < 16 ? 0 : $val;		# discard non-EDNS rcodes 1 .. 15
 }
 
 
 sub flags {
 	my $self = shift;
-	return $self->{flags} || 0 unless scalar @_;
-	$self->{flags} = shift;
+	$self->{flags} = shift if scalar @_;
+	return $self->{flags} || 0;
 }
 
 
@@ -146,13 +143,14 @@ sub options {
 	my ($self) = @_;
 	my $option = $self->{option} || {};
 	my @option = sort { $a <=> $b } keys %$option;
+	return @option;
 }
 
 sub option {
 	my $self   = shift;
 	my $number = ednsoptionbyname(shift);
 	return $self->_get_option($number) unless scalar @_;
-	$self->_set_option( $number, @_ );
+	return $self->_set_option( $number, @_ );
 }
 
 
@@ -167,7 +165,7 @@ sub _format_option {
 	my $defined = length($payload) && $package->can('_image');
 	my @element = $defined ? eval { $package->_image($payload) } : unpack 'H*', $payload;
 	my $protect = pop(@element);
-	Net::DNS::RR::_wrap( "$option\t=> (", map( "$_,", @element ), "$protect )" );
+	return Net::DNS::RR::_wrap( "$option\t=> (", map( {"$_,"} @element ), "$protect )" );
 }
 
 
@@ -177,11 +175,11 @@ sub _get_option {
 	my $options = $self->{option} || {};
 	my $payload = $options->{$number};
 	return $payload unless wantarray;
-	return () unless $payload;
+	return ()	unless $payload;
 	my $package = join '::', __PACKAGE__, ednsoptionbyval($number);
 	$package =~ s/-/_/g;
 	return ( 'OPTION-DATA' => $payload ) unless $package->can('_decompose');
-	my @payload = eval { $package->_decompose($payload) };
+	return eval { $package->_decompose($payload) };
 }
 
 
@@ -208,31 +206,32 @@ sub _set_option {
 			}
 		}
 	}
-	$options->{$number} = $value;
+	return $options->{$number} = $value;
 }
 
 
 sub _specified {
 	my $self = shift;
-	my @spec = grep $self->{$_}, qw(size flags rcode option);
-	scalar @spec;
+	return scalar grep { $self->{$_} } qw(size flags rcode option);
 }
 
 
 ########################################
 
+## no critic ProhibitMultiplePackages
 package Net::DNS::RR::OPT::DAU;					# RFC6975
 
 sub _compose {
-	my ( $class, @argument ) = @_;
-	pack 'C*', @argument;
+	shift;
+	return pack 'C*', @_;
 }
 
 sub _decompose {
 	my @payload = unpack 'C*', $_[1];
+	return @payload;
 }
 
-sub _image { &_decompose; }
+sub _image { return &_decompose; }
 
 
 package Net::DNS::RR::OPT::DHU;					# RFC6975
@@ -244,21 +243,21 @@ our @ISA = qw(Net::DNS::RR::OPT::DAU);
 
 package Net::DNS::RR::OPT::CLIENT_SUBNET;			# RFC7871
 
-my %family = qw(1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
+my %family = qw(0 Net::DNS::RR::AAAA	1 Net::DNS::RR::A	2 Net::DNS::RR::AAAA);
 my @field8 = qw(FAMILY SOURCE-PREFIX-LENGTH SCOPE-PREFIX-LENGTH ADDRESS);
 
 sub _compose {
-	my ( $class, %argument ) = @_;
+	my ( $class, %argument ) = ( map( ( $_ => 0 ), @field8 ), @_ );
 	my $address = bless( {}, $family{$argument{FAMILY}} )->address( $argument{ADDRESS} );
 	my $bitmask = $argument{'SOURCE-PREFIX-LENGTH'};
-	pack "a* B$bitmask", pack( 'nC2', map $_ || 0, @argument{@field8} ), unpack 'B*', $address;
+	pack "a* B$bitmask", pack( 'nC2', @argument{@field8} ), unpack 'B*', $address;
 }
 
 sub _decompose {
 	my %hash;
 	@hash{@field8} = unpack 'nC2a*', $_[1];
 	$hash{ADDRESS} = bless( {address => $hash{ADDRESS}}, $family{$hash{FAMILY}} )->address;
-	my @payload = map { ( $_ => $hash{$_} ) } @field8;
+	my @payload = map( ( $_ => $hash{$_} ), @field8 );
 }
 
 sub _image {
@@ -356,8 +355,8 @@ sub _image { join ' => ', &_decompose; }
 package Net::DNS::RR::OPT::KEY_TAG;				# RFC8145
 
 sub _compose {
-	my ( $class, @argument ) = @_;
-	pack 'n*', @argument;
+	shift;
+	pack 'n*', @_;
 }
 
 sub _decompose {
@@ -372,14 +371,17 @@ package Net::DNS::RR::OPT::EXTENDED_ERROR;			# draft-ietf-dnsop-extended-error
 my @field15 = qw(INFO-CODE EXTRA-TEXT);
 
 sub _compose {
-	my ( $class, %argument ) = @_;
-	my ( $ic, $et ) = map $_ || '', @argument{@field15};
-	pack 'na*', $ic, Net::DNS::Text->new($et)->raw;
+	my ( $class, %argument ) = ( 'INFO-CODE' => 0, 'EXTRA-TEXT' => '', @_ );
+	my ( $code,  $text )	 = @argument{@field15};
+	pack 'na*', $code, Net::DNS::Text->new($text)->raw;
 }
 
 sub _decompose {
-	my ( $ic, $et ) = unpack 'na*', $_[1];
-	my @payload = ( 'INFO-CODE' => $ic, 'EXTRA-TEXT' => Net::DNS::Text->decode( \$et, 0, length $et )->value );
+	my ( $code, $text ) = unpack 'na*', $_[1];
+	my @payload = (
+		'INFO-CODE'  => $code,
+		'EXTRA-TEXT' => Net::DNS::Text->decode( \$text, 0, length $text )->value
+		);
 }
 
 sub _image {
@@ -395,7 +397,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $packet = new Net::DNS::Packet( ... );
+    $packet = Net::DNS::Packet->new( ... );
 
     $packet->header->do(1);			# extended flag
 

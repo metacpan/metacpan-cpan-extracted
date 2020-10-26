@@ -8,11 +8,12 @@
 #
 use strict;
 use warnings;
+use 5.14.0;
 
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 
 1;
 
@@ -756,9 +757,11 @@ sub removeVMsPartitions {
 sub createPartitionTables {
     my $self = shift;
     $self->log("Creating partition tables");
-    foreach my $p (sort keys %{$self->get_info('partitions')}) {
-        next if defined($self->get_info('partitions', $p, 'dos-extended'));
-        $self->createPartitionTable($p);
+    if (defined($self->get_info('partitions'))) {
+	foreach my $p (sort keys %{$self->get_info('partitions')}) {
+	    next if defined($self->get_info('partitions', $p, 'dos-extended'));
+	    $self->createPartitionTable($p);
+	}
     }
 }
 
@@ -2484,7 +2487,7 @@ sub _xv {
     while (defined(my $e=$it->next)) {
         return $e if $e->lvmname eq $name;
     }
-    print STDERR "E: no $kind with name $name\n";
+    #print STDERR "E: no $kind with name $name\n";
     return;
 }
 
@@ -2613,14 +2616,45 @@ sub BUILD {
         #print STDERR "name: ", $args->{'name'}, "\n";
         $self->_lvs(StorageDisplay::LVM::LVs->new($self, $st, $args->{'lvm-info'}));
         $self->addChild($self->lvs);
-        my $links = $args->{'lvm-info'}->{'pvs'};
+        #my $links = $args->{'lvm-info'}->{'pvs'};
+        #foreach my $l (@{$links}) {
+        #    if ($l->{segtype} ne "free"
+        #        && $l->{lv_role} ne "private,pool,spare"
+        #        && $l->{lv_role} ne "private,thin,pool,metadata"
+        #        && $l->{lv_role} ne "private,thin,pool,data") {
+        #        $self->_add_link({pv => $l->{pv_name},
+        #                          lv => $l->{lv_name}});
+        #    }
+        #}
+        my $links = $args->{'lvm-info'}->{'lvs'};
         foreach my $l (@{$links}) {
-            if ($l->{segtype} ne "free"
-                && $l->{lv_role} ne "private,pool,spare"
-                && $l->{lv_role} ne "private,thin,pool,metadata"
-                && $l->{lv_role} ne "private,thin,pool,data") {
-                $self->_add_link({pv => $l->{pv_name},
+            if ($l->{'pool_lv'} ne '') {
+                $self->_add_link({source_name => $l->{'pool_lv'},
+                                  source_type => 'lv',
                                   lv => $l->{lv_name}});
+            }
+            if ($l->{'lv_parent'} ne '') {
+                $self->_add_link({source_name => $l->{lv_name},
+                                  source_type => 'lv',
+                                  lv => $l->{lv_parent}});
+            }
+            foreach my $devpos (split(/,/, $l->{'seg_le_ranges'})) {
+                if ($devpos !~ m/^(.*):[0-9]+-[0-9]+$/) {
+                    $st->warn("Cannot parse seg_le_ranges $devpos for ".$l->{lv_name});
+                } else {
+                    my $source_name = $1;
+                    #$st->warn("Parsing seg_pe_ranges $devpos for ".$l->{lv_name});
+                    my $type = 'pv';
+                    if (index($l->{'seg_pe_ranges'},$devpos) == -1) {
+                        $type = 'lv';
+                        #$st->warn("switching to LV for $devpos for ".$l->{lv_name});
+                    #} else {
+                    #    $st->warn("ok : $devpos in ".$l->{'seg_pe_ranges'});
+                    }
+                    $self->_add_link({source_name => $source_name,
+                                      source_type => $type,
+                                      lv => $l->{lv_name}});
+                }
             }
         }
     }
@@ -2640,8 +2674,18 @@ has 'lv' => (
 
 sub dotLinks {
     my $self = shift;
+    my $source = sub {
+        my $name = shift;
+        my $type = shift;
+        my $source =  $self->$type($name);
+        if (defined($source)) {
+            return $source->linkname;
+        }
+        print STDERR "E: FIXME: No source for $name ($type)\n";
+        return "''";
+    };
     return map {
-        $self->pv($_->{pv})->linkname.' -> '.$self->lv($_->{lv})->linkname
+        $source->($_->{source_name}, $_->{source_type}).' -> '.$self->lv($_->{lv})->linkname
     } $self->internal_links;
 }
 
@@ -4621,7 +4665,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 Replay commands
 

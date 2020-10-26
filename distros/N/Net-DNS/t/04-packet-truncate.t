@@ -1,17 +1,20 @@
-# $Id: 04-packet-truncate.t 1779 2020-05-11 09:11:17Z willem $ -*-perl-*-
+#!/usr/bin/perl
+# $Id: 04-packet-truncate.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 33;
 
 use Net::DNS;
 use Net::DNS::ZoneFile;
 
-my $source = new Net::DNS::ZoneFile( \*DATA );
+my $source = Net::DNS::ZoneFile->new( \*DATA );
 
 my @rr = $source->read;
 
 {
-	my $packet = new Net::DNS::Packet('query.example.');
+	my $packet = Net::DNS::Packet->new('query.example.');
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
@@ -30,7 +33,7 @@ my @rr = $source->read;
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example.');
+	my $packet = Net::DNS::Packet->new('query.example.');
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
@@ -49,12 +52,12 @@ my @rr = $source->read;
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example.');
+	my $packet = Net::DNS::Packet->new('query.example.');
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
 
-	my $keyrr = new Net::DNS::RR('tsig.example KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=');
+	my $keyrr = Net::DNS::RR->new('tsig.example KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=');
 
 	my $tsig = eval { $packet->sign_tsig($keyrr) };
 
@@ -75,8 +78,8 @@ my @rr = $source->read;
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example.');
-	my @auth = map Net::DNS::RR->new( type => 'NS', nsdname => $_->name ), @rr;
+	my $packet = Net::DNS::Packet->new('query.example.');
+	my @auth   = map { Net::DNS::RR->new( type => 'NS', nsdname => $_->name ) } @rr;
 	$packet->unique_push( authority => @auth );
 	$packet->push( additional => @rr );
 	$packet->edns->size(2048);				# + all bells and whistles
@@ -101,19 +104,19 @@ my @rr = $source->read;
 
 
 {
-	my $packet = new Net::DNS::Packet('query.example.');
+	my $packet = Net::DNS::Packet->new('query.example.');
 	$packet->push( additional => @rr, @rr );		# two of everything
 	my $unlimited = length $packet->data;
 	my $truncated = length $packet->truncate( $unlimited >> 1 );
 	ok( $truncated, "check RRsets in truncated additional section" );
 
 	my %rrset;
-	foreach my $rr ( grep $_->type eq 'A', $packet->additional ) {
+	foreach my $rr ( grep { $_->type eq 'A' } $packet->additional ) {
 		my $name = $rr->name;
 		$rrset{"$name. A"}++;
 	}
 
-	foreach my $rr ( grep $_->type eq 'AAAA', $packet->additional ) {
+	foreach my $rr ( grep { $_->type eq 'AAAA' } $packet->additional ) {
 		my $name = $rr->name;
 		$rrset{"$name. AAAA"}++;
 	}

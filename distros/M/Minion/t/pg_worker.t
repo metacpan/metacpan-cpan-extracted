@@ -7,12 +7,13 @@ use Test::More;
 plan skip_all => 'set TEST_ONLINE to enable this test' unless $ENV{TEST_ONLINE};
 
 use Minion;
+use Mojo::IOLoop;
 
 # Isolate tests
 require Mojo::Pg;
 my $pg = Mojo::Pg->new($ENV{TEST_ONLINE});
-$pg->db->query('drop schema if exists minion_worker_test cascade');
-$pg->db->query('create schema minion_worker_test');
+$pg->db->query('DROP SCHEMA IF EXISTS minion_worker_test CASCADE');
+$pg->db->query('CREATE SCHEMA minion_worker_test');
 my $minion = Minion->new(Pg => $ENV{TEST_ONLINE});
 $minion->backend->pg->search_path(['minion_worker_test']);
 
@@ -24,6 +25,7 @@ subtest 'Basics' => sub {
     }
   );
   my $worker = $minion->worker;
+  $worker->status->{dequeue_timeout} = 0;
   $worker->on(
     dequeue => sub {
       my ($worker, $job) = @_;
@@ -36,6 +38,23 @@ subtest 'Basics' => sub {
   $worker->run;
   is $max, 4, 'right value';
   is_deeply $minion->job($id)->info->{result}, {just => 'works!'}, 'right result';
+};
+
+subtest 'Clean up event loop' => sub {
+  my $timer = 0;
+  Mojo::IOLoop->recurring(0 => sub { $timer++ });
+  my $worker = $minion->worker;
+  $worker->status->{dequeue_timeout} = 0;
+  $worker->on(
+    dequeue => sub {
+      my ($worker, $job) = @_;
+      $job->on(reap => sub { kill 'INT', $$ });
+    }
+  );
+  my $id = $minion->enqueue('test');
+  $worker->run;
+  is_deeply $minion->job($id)->info->{result}, {just => 'works!'}, 'right result';
+  is $timer, 0, 'timer has been cleaned up';
 };
 
 subtest 'Signals' => sub {
@@ -69,12 +88,12 @@ subtest 'Signals' => sub {
   is $status->{dequeue_timeout},    5,   'right value';
   is $status->{heartbeat_interval}, 300, 'right value';
   is $status->{jobs},               4,   'right value';
-  is_deeply $status->{queues}, ['default'], 'right structure';
-  is $status->{performed}, 1, 'right value';
-  ok $status->{repair_interval}, 'has a value';
+  is_deeply $status->{queues},      ['default'], 'right structure';
+  is $status->{performed},          1, 'right value';
+  ok $status->{repair_interval},    'has a value';
 };
 
 # Clean up once we are done
-$pg->db->query('drop schema minion_worker_test cascade');
+$pg->db->query('DROP SCHEMA minion_worker_test CASCADE');
 
 done_testing();

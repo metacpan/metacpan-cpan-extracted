@@ -38,10 +38,7 @@
       "runtime" : {
          "recommends" : {
             "B::Deparse" : "0",
-            "BSD::Resource" : "0",
             "Clone" : "0",
-            "DBD::CSV" : "0",
-            "DBI" : "0",
             "Encode" : "0",
             "Eval::WithLexicals" : "0",
             "Function::Parameters" : "0",
@@ -49,13 +46,9 @@
             "Method::Signatures" : "0",
             "PadWalker" : "0",
             "Term::ReadLine::Gnu" : "0",
-            "Test::Pod::Snippets" : "0",
-            "Text::CSV" : "0",
-            "Text::Markdown" : "0",
-            "URI" : "0"
+            "Text::Markdown" : "0"
          },
          "requires" : {
-            "Capture::Tiny" : "0",
             "Digest" : "0",
             "File::Path" : "0",
             "Getopt::Long" : "0",
@@ -63,10 +56,8 @@
             "Math::BigInt" : "0",
             "NEXT" : "0",
             "Scalar::Util" : "0",
-            "Sub::Util" : "0",
             "Symbol" : "0",
             "Test::More" : "0.96",
-            "Test::Requires" : "0",
             "autobox" : "0",
             "base" : "0",
             "overload" : "0",
@@ -76,7 +67,17 @@
          }
       },
       "test" : {
-         "requires" : {}
+         "requires" : {
+            "BSD::Resource" : "0",
+            "Capture::Tiny" : "0",
+            "DBD::CSV" : "0",
+            "DBI" : "0",
+            "Sub::Util" : "0",
+            "Test::Pod::Snippets" : "0",
+            "Test::Requires" : "0",
+            "Text::CSV" : "0",
+            "URI" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -87,6 +88,6 @@
          "web" : "https://github.com/pflanze/functional-perl"
       }
    },
-   "version" : "v0.72.33",
+   "version" : "v0.72.34",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

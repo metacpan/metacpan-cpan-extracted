@@ -1,6 +1,9 @@
-# $Id: 02-domain.t 1784 2020-05-24 19:27:13Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 02-domain.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 53;
 
 
@@ -9,10 +12,10 @@ use_ok('Net::DNS::Domain');
 
 {
 	my $name   = 'example.com';
-	my $domain = new Net::DNS::Domain($name);
+	my $domain = Net::DNS::Domain->new($name);
 	ok( $domain->isa('Net::DNS::Domain'), 'object returned by new() constructor' );
 
-	my $same = new Net::DNS::Domain($name);
+	my $same = Net::DNS::Domain->new($name);
 	is( $same, $domain, "same name returns cached object" );
 
 	my %cache;
@@ -21,8 +24,8 @@ use_ok('Net::DNS::Domain');
 		$j = ( $i++ >> 1 ) + 1;
 		my $fill = "name-$i";
 		my $test = "name-$j";
-		$cache{$fill} = new Net::DNS::Domain($fill);
-		last unless $cache{$test} == new Net::DNS::Domain($test);
+		$cache{$fill} = Net::DNS::Domain->new($fill);
+		last unless $cache{$test} == Net::DNS::Domain->new($test);
 	}
 	my $size = $i - $j;
 	ok( $size, "name cache at least $size deep" );
@@ -30,21 +33,21 @@ use_ok('Net::DNS::Domain');
 
 
 {
-	my $domain = eval { new Net::DNS::Domain(); };
+	my $domain = eval { Net::DNS::Domain->new(); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "empty argument list\t[$exception]" );
 }
 
 
 {
-	my $domain = eval { new Net::DNS::Domain(undef); };
+	my $domain = eval { Net::DNS::Domain->new(undef); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "argument undefined\t[$exception]" );
 }
 
 
 {
-	my $domain = new Net::DNS::Domain('name');
+	my $domain = Net::DNS::Domain->new('name');
 	is( $domain->name,   'name',  '$domain->name() without trailing dot' );
 	is( $domain->fqdn,   'name.', '$domain->fqdn() with trailing dot' );
 	is( $domain->string, 'name.', '$domain->string() with trailing dot' );
@@ -52,7 +55,7 @@ use_ok('Net::DNS::Domain');
 
 
 {
-	my $root = new Net::DNS::Domain('.');
+	my $root = Net::DNS::Domain->new('.');
 	is( $root->name,   '.', '$root->name() represented by single dot' );
 	is( $root->fqdn,   '.', '$root->fqdn() represented by single dot' );
 	is( $root->xname,  '.', '$root->xname() represented by single dot' );
@@ -61,7 +64,7 @@ use_ok('Net::DNS::Domain');
 
 
 {
-	my $domain = new Net::DNS::Domain('example.com');
+	my $domain = Net::DNS::Domain->new('example.com');
 	my $labels = @{[$domain->label]};
 	is( $labels, 2, 'domain labels separated by dots' );
 }
@@ -71,7 +74,7 @@ use constant ESC => '\\';
 
 {
 	my $case   = ESC . '.';
-	my $domain = new Net::DNS::Domain("example${case}com");
+	my $domain = Net::DNS::Domain->new("example${case}com");
 	my $labels = @{[$domain->label]};
 	is( $labels, 1, "$case devoid of special meaning" );
 }
@@ -79,7 +82,7 @@ use constant ESC => '\\';
 
 {
 	my $case   = ESC . ESC;
-	my $domain = new Net::DNS::Domain("example${case}.com");
+	my $domain = Net::DNS::Domain->new("example${case}.com");
 	my $labels = @{[$domain->label]};
 	is( $labels, 2, "$case devoid of special meaning" );
 }
@@ -87,7 +90,7 @@ use constant ESC => '\\';
 
 {
 	my $case   = ESC . ESC . ESC . '.';
-	my $domain = new Net::DNS::Domain("example${case}com");
+	my $domain = Net::DNS::Domain->new("example${case}com");
 	my $labels = @{[$domain->label]};
 	is( $labels, 1, "$case devoid of special meaning" );
 }
@@ -95,7 +98,7 @@ use constant ESC => '\\';
 
 {
 	my $case   = '\092';
-	my $domain = new Net::DNS::Domain("example${case}.com");
+	my $domain = Net::DNS::Domain->new("example${case}.com");
 	my $labels = @{[$domain->label]};
 	is( $labels, 2, "$case devoid of special meaning" );
 }
@@ -103,11 +106,11 @@ use constant ESC => '\\';
 
 {
 	my $name   = 'simple-name';
-	my $simple = new Net::DNS::Domain($name);
+	my $simple = Net::DNS::Domain->new($name);
 	is( $simple->name, $name, "$name absolute by default" );
 
 	my $create = origin Net::DNS::Domain(undef);
-	my $domain = &$create( sub { new Net::DNS::Domain($name); } );
+	my $domain = &$create( sub { Net::DNS::Domain->new($name); } );
 	is( $domain->name, $name, "$name absolute if origin undefined" );
 }
 
@@ -115,7 +118,7 @@ use constant ESC => '\\';
 {
 	my $name   = 'simple-name';
 	my $create = origin Net::DNS::Domain('.');
-	my $domain = &$create( sub { new Net::DNS::Domain($name); } );
+	my $domain = &$create( sub { Net::DNS::Domain->new($name); } );
 	is( $domain->name, $name, "$name absolute if origin '.'" );
 	my @label = $domain->label;
 	is( scalar(@label), 1, "$name has single label" );
@@ -126,14 +129,14 @@ use constant ESC => '\\';
 	my $name   = 'simple-name';
 	my $suffix = 'example.com';
 	my $create = origin Net::DNS::Domain($suffix);
-	my $domain = &$create( sub { new Net::DNS::Domain($name); } );
-	my $expect = new Net::DNS::Domain("$name.$suffix");
+	my $domain = &$create( sub { Net::DNS::Domain->new($name); } );
+	my $expect = Net::DNS::Domain->new("$name.$suffix");
 	is( $domain->name, $expect->name, "origin appended to $name" );
 
-	my $root = new Net::DNS::Domain('@');
+	my $root = Net::DNS::Domain->new('@');
 	is( $root->name, '.', 'bare @ represents root by default' );
 
-	my $origin = &$create( sub { new Net::DNS::Domain('@'); } );
+	my $origin = &$create( sub { Net::DNS::Domain->new('@'); } );
 	is( $origin->name, $suffix, 'bare @ represents defined origin' );
 }
 
@@ -141,7 +144,7 @@ use constant ESC => '\\';
 {
 	foreach my $char (qw(" ( ) ; @)) {
 		my $name   = $char . 'example.com.';
-		my $domain = new Net::DNS::Domain($name);
+		my $domain = Net::DNS::Domain->new($name);
 		is( $domain->string, ESC . $name, "escape leading $char in string" );
 	}
 }
@@ -150,7 +153,7 @@ use constant ESC => '\\';
 {
 	foreach my $part (qw(_rvp._tcp *)) {
 		my $name   = "$part.example.com.";
-		my $domain = new Net::DNS::Domain($name);
+		my $domain = Net::DNS::Domain->new($name);
 		is( $domain->string, $name, "permit leading $part" );
 	}
 }
@@ -158,28 +161,28 @@ use constant ESC => '\\';
 
 {
 	my $ldh	   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-0123456789';
-	my $domain = new Net::DNS::Domain($ldh);
+	my $domain = Net::DNS::Domain->new($ldh);
 	is( $domain->name, $ldh, '63 octet LDH character label' );
 }
 
 
 {
-	my $name      = 'LO-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-NG!';
-	my $domain    = eval { new Net::DNS::Domain("$name") };
+	my $name	= 'LO-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-NG!';
+	my $domain	= eval { Net::DNS::Domain->new("$name") };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "long domain label\t[$exception]" );
 }
 
 
 {
-	my $domain = eval { new Net::DNS::Domain('.example.com') };
+	my $domain = eval { Net::DNS::Domain->new('.example.com') };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "empty initial label\t[$exception]" );
 }
 
 
 {
-	my $domain = eval { new Net::DNS::Domain("example..com"); };
+	my $domain = eval { Net::DNS::Domain->new("example..com"); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "empty interior label\t[$exception]" );
 }
@@ -187,7 +190,7 @@ use constant ESC => '\\';
 
 {
 	my $name   = 'example.com';
-	my $domain = new Net::DNS::Domain("$name...");
+	my $domain = Net::DNS::Domain->new("$name...");
 	is( $domain->name, $name, 'ignore gratuitous trailing dots' );
 }
 
@@ -197,7 +200,7 @@ use constant ESC => '\\';
 		'\000\001\002\003\004\005\006\007\008\009\010\011\012\013\014\015',
 		'\016\017\018\019\020\021\022\023\024\025\026\027\028\029\030\031'
 		) {
-		my $domain = new Net::DNS::Domain($case);
+		my $domain = Net::DNS::Domain->new($case);
 		is( $domain->name, $case, "C0 controls:\t$case" );
 	}
 }
@@ -212,7 +215,7 @@ use constant ESC => '\\';
 		'`abcdefghijklmno',				#  96 ..
 		'pqrstuvwxyz{|}~\127'				# 112 ..
 		) {
-		my $domain = new Net::DNS::Domain($case);
+		my $domain = Net::DNS::Domain->new($case);
 		is( $domain->name, $case, "G0 graphics:\t$case" );
 	}
 }
@@ -229,7 +232,7 @@ use constant ESC => '\\';
 		'\224\225\226\227\228\229\230\231\232\233\234\235\236\237\238\239',
 		'\240\241\242\243\244\245\246\247\248\249\250\251\252\253\254\255'
 		) {
-		my $domain = new Net::DNS::Domain($case);
+		my $domain = Net::DNS::Domain->new($case);
 		is( $domain->name, $case, "8-bit codes:\t$case" );
 	}
 }

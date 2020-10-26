@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 20.9
+    version: 20.10
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Object::AboveAverage:
@@ -540,5 +540,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 20.9
+version: 20.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

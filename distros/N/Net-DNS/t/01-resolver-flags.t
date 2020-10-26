@@ -1,6 +1,9 @@
-# $Id: 01-resolver-flags.t 1779 2020-05-11 09:11:17Z willem $  -*-perl-*-
+#!/usr/bin/perl
+# $Id: 01-resolver-flags.t 1815 2020-10-14 21:55:18Z willem $  -*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More tests => 23;
 
 use Net::DNS::Resolver;

@@ -1,14 +1,11 @@
 package Net::DNS::RR::DS;
 
-#
-# $Id: DS.pm 1779 2020-05-11 09:11:17Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: DS.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,16 +13,15 @@ Net::DNS::RR::DS - DNS DS resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
 
-use constant BABBLE => defined eval 'require Digest::BubbleBabble';
+use constant BABBLE => defined eval { require Digest::BubbleBabble };
 
-eval 'require Digest::SHA';		## optional for simple Net::DNS RR
-eval 'require Digest::GOST';
-eval 'require Digest::GOST::CryptoPro';
+eval { require Digest::SHA };		## optional for simple Net::DNS RR
+eval { require Digest::GOST };
+eval { require Digest::GOST::CryptoPro };
 
 my %digest = (
 	'1' => ['Digest::SHA', 1],
@@ -65,7 +61,8 @@ my %digest = (
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
+	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
 	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
@@ -79,7 +76,7 @@ my %digest = (
 
 	sub _algbyval {
 		my $value = shift;
-		$algbyval{$value} || return $value;
+		return $algbyval{$value} || return $value;
 	}
 }
 
@@ -101,7 +98,8 @@ my %digest = (
 
 	my %digestbyval = reverse @digestbyname;
 
-	my @digestrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @digestbyname;
+	foreach (@digestbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @digestrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @digestbyname;
 	my %digestbyname = ( @digestalias, @digestrehash );	# work around broken cperl
 
 	sub _digestbyname {
@@ -115,7 +113,7 @@ my %digest = (
 
 	sub _digestbyval {
 		my $value = shift;
-		$digestbyval{$value} || return $value;
+		return $digestbyval{$value} || return $value;
 	}
 }
 
@@ -126,13 +124,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
 	@{$self}{qw(keytag algorithm digtype digestbin)} = unpack 'n C2 a*', $rdata;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'n C2 a*', @{$self}{qw(keytag algorithm digtype digestbin)};
+	return pack 'n C2 a*', @{$self}{qw(keytag algorithm digtype digestbin)};
 }
 
 
@@ -142,6 +141,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	$self->_annotation( $self->babble ) if BABBLE && $self->{algorithm};
 	my @param = @{$self}{qw(keytag algorithm digtype)};
 	my @rdata = ( @param, split /(\S{64})/, $self->digest || '-' );
+	return @rdata;
 }
 
 
@@ -153,6 +153,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->keytag($keytag);
 	$self->digtype(shift);
 	$self->digest(@_);
+	return;
 }
 
 
@@ -160,7 +161,7 @@ sub keytag {
 	my $self = shift;
 
 	$self->{keytag} = 0 + shift if scalar @_;
-	$self->{keytag} || 0;
+	return $self->{keytag} || 0;
 }
 
 
@@ -174,7 +175,7 @@ sub algorithm {
 
 	return $self->{algorithm} unless defined $arg;
 	return _algbyval( $self->{algorithm} ) if uc($arg) eq 'MNEMONIC';
-	$self->{algorithm} = _algbyname($arg) || die _algbyname('')    # disallow algorithm(0)
+	return $self->{algorithm} = _algbyname($arg) || die _algbyname('')    # disallow algorithm(0)
 }
 
 
@@ -188,14 +189,14 @@ sub digtype {
 
 	return $self->{digtype} unless defined $arg;
 	return _digestbyval( $self->{digtype} ) if uc($arg) eq 'MNEMONIC';
-	$self->{digtype} = _digestbyname($arg) || die _digestbyname('')	   # disallow digtype(0)
+	return $self->{digtype} = _digestbyname($arg) || die _digestbyname('')	  # disallow digtype(0)
 }
 
 
 sub digest {
 	my $self = shift;
 	return unpack "H*", $self->digestbin() unless scalar @_;
-	$self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	return $self->digestbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -203,7 +204,7 @@ sub digestbin {
 	my $self = shift;
 
 	$self->{digestbin} = shift if scalar @_;
-	$self->{digestbin} || "";
+	return $self->{digestbin} || "";
 }
 
 
@@ -223,7 +224,7 @@ sub create {
 	croak "Unable to create $type record for revoked key" if $keyrr->revoke;
 	croak "Unable to create $type record for invalid key" unless $keyrr->protocol == 3;
 
-	my $self = new Net::DNS::RR(
+	my $self = Net::DNS::RR->new(
 		owner	  => $keyrr->owner,			# per definition, same as keyrr
 		type	  => $type,
 		class	  => $keyrr->class,
@@ -248,7 +249,7 @@ sub create {
 
 sub verify {
 	my ( $self, $key ) = @_;
-	my $verify = create Net::DNS::RR::DS( $key, ( digtype => $self->digtype ) );
+	my $verify = Net::DNS::RR::DS->create( $key, ( digtype => $self->digtype ) );
 	return $verify->digestbin eq $self->digestbin;
 }
 
@@ -260,10 +261,10 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name DS keytag algorithm digtype digest');
+    $rr = Net::DNS::RR->new('name DS keytag algorithm digtype digest');
 
     use Net::DNS::SEC;
-    $ds = create Net::DNS::RR::DS(
+    $ds = Net::DNS::RR::DS->create(
 	$dnskeyrr,
 	digtype => 'SHA256',
 	ttl	=> 3600
@@ -344,7 +345,7 @@ method is called.
 
     use Net::DNS::SEC;
 
-    $dsrr = create Net::DNS::RR::DS($keyrr, digtype => 'SHA-256' );
+    $dsrr = Net::DNS::RR::DS->create($keyrr, digtype => 'SHA-256' );
     $keyrr->print;
     $dsrr->print;
 

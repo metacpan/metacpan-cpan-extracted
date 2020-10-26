@@ -1,21 +1,17 @@
 package Net::DNS::RR::NSEC3;
 
-#
-# $Id: NSEC3.pm 1781 2020-05-13 08:58:25Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: NSEC3.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR::NSEC);
+
 
 =head1 NAME
 
 Net::DNS::RR::NSEC3 - DNS NSEC3 resource record
 
 =cut
-
 
 use integer;
 
@@ -26,7 +22,7 @@ use Carp;
 
 require Net::DNS::DomainName;
 
-eval 'require Digest::SHA';		## optional for simple Net::DNS RR
+eval { require Digest::SHA };		## optional for simple Net::DNS RR
 
 my %digest = (
 	'1' => ['Digest::SHA', 1],				# RFC3658
@@ -41,19 +37,22 @@ my %digest = (
 
 	my %digestbyval = reverse @digestbyname;
 
-	my @digestrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @digestbyname;
+	foreach (@digestbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @digestrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @digestbyname;
 	my %digestbyname = ( @digestalias, @digestrehash );	# work around broken cperl
 
 	sub _digestbyname {
-		my $name = shift;
-		my $key	 = uc $name;				# synthetic key
-		$key =~ s /[\W_]//g;				# strip non-alphanumerics
-		$digestbyname{$key} || croak qq[unknown digest type "$name"];
+		my $arg = shift;
+		my $key = uc $arg;				# synthetic key
+		$key =~ s/[\W_]//g;				# strip non-alphanumerics
+		my $val = $digestbyname{$key};
+		croak qq[unknown algorithm "$arg"] unless defined $val;
+		return $val;
 	}
 
 	sub _digestbyval {
 		my $value = shift;
-		$digestbyval{$value} || return $value;
+		return $digestbyval{$value} || return $value;
 	}
 }
 
@@ -72,6 +71,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$offset += 1 + $hsize;
 	$self->{typebm} = substr $$data, $offset, ( $limit - $offset );
 	$self->{hashfn} = _hashfn( $algorithm, $iterations, $saltbin );
+	return;
 }
 
 
@@ -80,7 +80,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 
 	my $salt = $self->saltbin;
 	my $hash = $self->{hnxtname};
-	pack 'CCn C a* C a* a*', $self->algorithm, $self->flags, $self->iterations,
+	return pack 'CCn C a* C a* a*', $self->algorithm, $self->flags, $self->iterations,
 			length($salt), $salt,
 			length($hash), $hash,
 			$self->{typebm};
@@ -94,6 +94,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 		$self->algorithm, $self->flags, $self->iterations,
 		$self->salt || '-', $self->hnxtname, $self->typelist
 		);
+	return @rdata;
 }
 
 
@@ -108,6 +109,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->hnxtname(shift);
 	$self->typelist(@_);
 	$self->{hashfn} = _hashfn( $alg, $iter, $self->{saltbin} );
+	return;
 }
 
 
@@ -115,6 +117,7 @@ sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
 	$self->_parse_rdata( 1, 0, 0, '' );
+	return;
 }
 
 
@@ -136,15 +139,19 @@ sub flags {
 	my $self = shift;
 
 	$self->{flags} = 0 + shift if scalar @_;
-	$self->{flags} || 0;
+	return $self->{flags} || 0;
 }
 
 
 sub optout {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x01 ) ^ ( 0x01 | ( $_ || 0 ) ) if scalar @_;
-		return 0x01 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x01 | ( $_ || 0 );
+			$_ ^= 0x01 unless shift;
+		}
 	}
+	return 0x01 & ( $self->{flags} || 0 );
 }
 
 
@@ -152,14 +159,14 @@ sub iterations {
 	my $self = shift;
 
 	$self->{iterations} = 0 + shift if scalar @_;
-	$self->{iterations} || 0;
+	return $self->{iterations} || 0;
 }
 
 
 sub salt {
 	my $self = shift;
 	return unpack "H*", $self->saltbin() unless scalar @_;
-	$self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	return $self->saltbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -167,14 +174,14 @@ sub saltbin {
 	my $self = shift;
 
 	$self->{saltbin} = shift if scalar @_;
-	$self->{saltbin} || "";
+	return $self->{saltbin} || "";
 }
 
 
 sub hnxtname {
 	my $self = shift;
 	$self->{hnxtname} = _decode_base32hex(shift) if scalar @_;
-	_encode_base32hex( $self->{hnxtname} ) if defined wantarray;
+	return defined(wantarray) ? _encode_base32hex( $self->{hnxtname} ) : undef;
 }
 
 
@@ -185,7 +192,7 @@ sub match {
 	my $ownerhash = _decode_base32hex($owner);
 
 	my $hashfn = $self->{hashfn};
-	$ownerhash eq &$hashfn($name);
+	return $ownerhash eq &$hashfn($name);
 }
 
 sub covers {
@@ -195,7 +202,7 @@ sub covers {
 	my $ownerhash = _decode_base32hex($owner);
 	my $nexthash  = $self->{hnxtname};
 
-	my @label = new Net::DNS::DomainName($name)->label;
+	my @label = Net::DNS::DomainName->new($name)->label;
 	my @close = @label;
 	foreach (@zone) { pop(@close) }				# strip zone labels
 	return if lc($name) ne lc( join '.', @close, @zone );	# out of zone
@@ -220,7 +227,7 @@ sub encloser {
 	my $ownerhash = _decode_base32hex($owner);
 	my $nexthash  = $self->{hnxtname};
 
-	my @label = new Net::DNS::DomainName($qname)->label;
+	my @label = Net::DNS::DomainName->new($qname)->label;
 	my @close = @label;
 	foreach (@zone) { pop(@close) }				# strip zone labels
 	return if lc($qname) ne lc( join '.', @close, @zone );	# out of zone
@@ -252,13 +259,13 @@ sub _decode_base32hex {
 	local $_ = shift || '';
 	tr [0-9A-Va-v\060-\071\101-\126\141-\166] [\000-\037\012-\037\000-\037\012-\037];
 	my $l = ( 5 * length ) & ~7;
-	pack "B$l", join '', map unpack( 'x3a5', unpack 'B8', $_ ), split //;
+	return pack "B$l", join '', map { unpack( 'x3a5', unpack 'B8', $_ ) } split //;
 }
 
 
 sub _encode_base32hex {
-	my @split = grep length, split /(\S{5})/, unpack 'B*', shift;
-	local $_ = join '', map pack( 'B*', "000$_" ), @split;
+	my @split = grep {length} split /(\S{5})/, unpack 'B*', shift;
+	local $_ = join '', map { pack( 'B*', "000$_" ) } @split;
 	tr [\000-\037] [0-9a-v];
 	return $_;
 }
@@ -284,7 +291,7 @@ sub _hashfn {
 			if $exception;
 
 	return sub {
-		my $name  = new Net::DNS::DomainName(shift)->canonical;
+		my $name  = Net::DNS::DomainName->new(shift)->canonical;
 		my $key	  = join '', $name, $key_adjunct;
 		my $cache = $$cache1{$key} ||= $$cache2{$key};	# two layer cache
 		return $cache if defined $cache;
@@ -303,7 +310,7 @@ sub _hashfn {
 }
 
 
-sub hashalgo { &algorithm; }					# uncoverable pod
+sub hashalgo { return &algorithm; }				# uncoverable pod
 
 sub name2hash {
 	my $hashalg    = shift;					# uncoverable pod
@@ -311,7 +318,7 @@ sub name2hash {
 	my $iterations = shift || 0;
 	my $salt       = pack 'H*', shift || '';
 	my $hash       = _hashfn( $hashalg, $iterations, $salt );
-	_encode_base32hex( &$hash($name) );
+	return _encode_base32hex( &$hash($name) );
 }
 
 
@@ -322,7 +329,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name NSEC3 algorithm flags iterations salt hnxtname');
+    $rr = Net::DNS::RR->new('name NSEC3 algorithm flags iterations salt hnxtname');
 
 =head1 DESCRIPTION
 

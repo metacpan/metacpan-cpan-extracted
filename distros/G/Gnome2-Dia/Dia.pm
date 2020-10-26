@@ -15,7 +15,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub import {
   my $self = shift();
@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Gnome2::Dia - Perl interface to the DiaCanvas2 library
+Gnome2::Dia - (DEPRECATED) Perl interface to the DiaCanvas2 library
 
 =head1 SYNOPSIS
 

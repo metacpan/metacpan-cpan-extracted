@@ -1,5 +1,9 @@
 #!/usr/bin/perl
-$VERSION = (qw$LastChangedRevision: 1740 $)[1];
+
+use strict;
+use warnings;
+
+my $VERSION = (qw$LastChangedRevision: 1811 $)[1];
 
 =head1 NAME
 
@@ -146,8 +150,6 @@ O'Reilly, 2000.
 =cut
 
 
-use strict;
-
 use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
 	require Encode;
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
@@ -163,7 +165,7 @@ warn "Can't locate Getopt::Std\n" if $@;
 
 my @arg = qw( domain [nameserver] );				# arguments
 
-my @flag = map "[-$_]", split( //, $options );			# documentation
+my @flag = map { "[-$_]" } split( //, $options );		# documentation
 die eval { system("perldoc -F $self"); "" }, <<END unless scalar @ARGV;
 	Synopsis:  $self @flag @arg
 END
@@ -195,28 +197,28 @@ my $udp_wait	= 0.100;					# minimum polling interval
 
 local $SIG{__WARN__} = sub { };					# suppress all warnings
 
-my $resolver = new Net::DNS::Resolver(@conf);			# create resolver object
+my $resolver = Net::DNS::Resolver->new(@conf);			# create resolver object
 $resolver->nameservers(@nameserver) or die $resolver->string;
 
 
-my $question  = new Net::DNS::Question($domain);		# invert IP address/prefix
+my $question  = Net::DNS::Question->new($domain);		# invert IP address/prefix
 my $name      = lc $question->qname;
 my $NetDNSrev = &Net::DNS::version;
 die "\tFeature not supported by Net::DNS $NetDNSrev\n" if $name =~ m#[:/\s]|\.\d+$#;
 
 my $packet = $resolver->send( "_nx_.$name", 'CNAME' ) or die $resolver->errorstring;
-my ($zone) = map lc( $_->name ), $packet->authority;
+my ($zone) = map { lc( $_->name ) } $packet->authority;
 
 my @ns = ( $zone or $name eq '.' ) ? NS($zone) : ();		# find NS serving name
 die "\nno such zone: $name\n\n", $resolver->string unless @ns;	# game over
 
 
-my @nsname = grep $_ ne $zone, map $_->nsdname, @ns;		# extract server names from NS records
+my @nsname = grep { $_ ne $zone } map { $_->nsdname } @ns;	# extract server names from NS records
 my @server = @nameserver ? (@nameserver) : ( sort @nsname );
 
 $resolver->dnssec(1) if $dnssec;
 
-my @soa = grep $_->type eq 'SOA', displayRR( $zone, 'SOA' );
+my @soa = grep { $_->type eq 'SOA' } displayRR( $zone, 'SOA' );
 foreach my $soa (@soa) {					# simple sanity check
 	my $owner = lc $soa->name;				# zone name
 	my $mname = lc $soa->mname;				# primary server
@@ -298,9 +300,9 @@ exit;
 sub checkNS0 {				## initial status vector for checkNS
 	my $serial = undef;
 	my $hash   = {};
-	my $res	   = new Net::DNS::Resolver(@conf);
+	my $res	   = Net::DNS::Resolver->new(@conf);
 
-	foreach my $soa ( grep $_->type eq 'SOA', @ncache, @soa ) {
+	foreach my $soa ( grep { $_->type eq 'SOA' } @ncache, @soa ) {
 		my $mname = lc $soa->mname;			# populate hash with name/IP of primary
 		next if $mname eq lc $soa->name;		# RFC6303 local zone
 		foreach ( $mname, $res->nameservers($mname) ) { $hash->{$_} = $mname }
@@ -319,7 +321,7 @@ sub checkNS {				## query nameservers (concurrently) and report status
 	my $element = pop(@_) || return checkNS0;		# pop element, terminate if undef
 	my ( $ns, $if ) = split / /, lc $element;		# name + optional interface IP
 
-	my $res = new Net::DNS::Resolver(@conf);		# use clean resolver for each test
+	my $res = Net::DNS::Resolver->new(@conf);		# use clean resolver for each test
 	my @xip = $res->nameservers( $if || $ns );		# point at nameserver
 	my $ip	= pop @xip;					# last (or only) interface
 	$res->nameservers($ip) if @xip;
@@ -359,7 +361,7 @@ sub checkNS {				## query nameservers (concurrently) and report status
 	} elsif ( $packet->header->rcode ne 'NOERROR' ) {
 		$rcode = $packet->header->rcode;		# NXDOMAIN or fault at nameserver
 	} else {
-		@soa = grep $_->type eq 'SOA', $packet->answer;
+		@soa = grep { $_->type eq 'SOA' } $packet->answer;
 		foreach my $soa (@soa) {
 			my $mname = lc $soa->mname;		# hash MNAME by IP
 			my @ip = $hash->{$mname} ? () : $res->nameservers($mname);
@@ -378,7 +380,7 @@ sub checkNS {				## query nameservers (concurrently) and report status
 	}
 
 	if ($verbose) {						# show PTR record
-		my @ptr = grep $_->type eq 'PTR', $ip ? displayRR($ip) : ();
+		my @ptr = grep { $_->type eq 'PTR' } $ip ? displayRR($ip) : ();
 		my @fwd = sort map { lc $_->ptrdname } @ptr;
 		foreach my $name ( @fwd ? @fwd : ($ns) ) {	# show address records
 			displayRR( $name, 'A' );
@@ -394,8 +396,8 @@ sub checkNS {				## query nameservers (concurrently) and report status
 
 	my @result = @fail;					# analyse response
 	my @auth   = @soa ? () : $packet->authority;
-	my @ncache = grep $_->type eq 'SOA', @auth;
-	my @refer  = grep $_->type eq 'NS', @auth;
+	my @ncache = grep { $_->type eq 'SOA' } @auth;
+	my @refer  = grep { $_->type eq 'NS' } @auth;
 	if (@soa) {
 		if ( @soa > 1 ) {
 			report('multiple SOA records');		# RFC2181, 6.1
@@ -408,10 +410,10 @@ sub checkNS {				## query nameservers (concurrently) and report status
 	} elsif (@ncache) {
 		my ($ttl) = map { $_->ttl } @soa = @ncache;	# RFC2308, 2.2(1)(2)
 		report( 'negative cache', ttl($ttl) );
-		return @fail unless grep $_->name =~ /^$zone$/i, @ncache;
+		return @fail unless grep { $_->name =~ /^$zone$/i } @ncache;
 		report('requested SOA in authority section; violates RFC2308');
 	} elsif (@refer) {
-		my @n = grep $_->nsdname =~ /$ns/i, @refer;	# RFC2308, 2.2(4)
+		my @n = grep { $_->nsdname =~ /$ns/i } @refer;	# RFC2308, 2.2(4)
 		report('authoritative data expired') if @n;	# self referral
 		report('not configured for zone') unless @n;
 		return @fail;
@@ -426,7 +428,7 @@ sub checkNS {				## query nameservers (concurrently) and report status
 
 	if ( $primary && ordered( $serial, $latest ) ) {	# primary should have latest data
 		my $response = $res->send( $zone, 'SOA' );	# repeat test before pointing finger
-		my ($retest) = grep $_->type eq 'SOA', $response ? $response->answer : ();
+		my ($retest) = grep { $_->type eq 'SOA' } $response ? $response->answer : ();
 		$serial = $retest->serial if ordered( $serial, $retest->serial );
 	}
 
@@ -451,7 +453,8 @@ sub checkNS {				## query nameservers (concurrently) and report status
 
 sub delay {				## short duration sleep
 	my $duration = shift;					# seconds
-	sleep( 1 + $duration ) unless eval { defined select( undef, undef, undef, $duration ) };
+	sleep( 1 + $duration ) unless eval { defined select( undef, undef, undef, $duration ) };	## no critic
+	return;
 }
 
 
@@ -466,7 +469,7 @@ sub displayRR {				## print specified RRs or error code
 	my @annotation = $name ? ("; $name\n") : ();
 	my @answer     = $packet->answer;
 	my @authority  = $packet->authority;
-	my @ncache     = grep $_->type eq 'SOA', @authority;	# per RFC2308
+	my @ncache     = grep { $_->type eq 'SOA' } @authority;	# per RFC2308
 	my @workaround = $qtype eq 'SOA' ? @ncache : ();	# SOA misplaced/withheld?
 	my @remark     = @workaround ? qw(unexpected) : ();
 
@@ -497,7 +500,7 @@ sub NCACHE {				## report observed NCACHE TTL for domain
 		report( 'wildcard invalidates NCACHE test:', $_->string );
 		return ();
 	}
-	my @ncache = grep $_->type eq 'SOA', $reply->authority;
+	my @ncache = grep { $_->type eq 'SOA' } $reply->authority;
 	for (@ncache) {
 		my $serial = $_->serial;
 		my ($seen) = ( @soa, @ncache );
@@ -514,29 +517,29 @@ sub NS {				## find NS records for domain
 	my $packet = $resolver->send( $name, 'NS' ) or die $resolver->string;
 
 	# Bear in mind the possibility of malformed zones!
-	my @answer = grep $_->type eq 'NS', $packet->answer, $packet->authority;
+	return ( grep { $_->type eq 'NS' } $packet->answer, $packet->authority );
 }
 
 
 sub ordered {				## irreflexive 32-bit partial ordering
 	use integer;
-	my ( $a, $b ) = @_;
+	my ( $l, $r ) = @_;
 
-	return defined $b unless defined $a;			# ( undef, any )
-	return 0 unless defined $b;				# ( any, undef )
+	return defined $r unless defined $l;			# ( undef, any )
+	return 0 unless defined $r;				# ( any, undef )
 
 	# unwise to assume 32-bit arithmetic, or that integer overflow goes unpunished
-	if ( $a < 0 ) {						# translate $a<0 region
-		$a = ( $a ^ 0x80000000 ) & 0xFFFFFFFF;		#  0	 <= $a < 2**31
-		$b = ( $b ^ 0x80000000 ) & 0xFFFFFFFF;		# -2**31 <= $b < 2**32
+	if ( $l < 0 ) {						# translate $a<0 region
+		$l = ( $l ^ 0x80000000 ) & 0xFFFFFFFF;		#  0	 <= $l < 2**31
+		$r = ( $r ^ 0x80000000 ) & 0xFFFFFFFF;		# -2**31 <= $r < 2**32
 	}
 
-	return $a < $b ? ( $a > ( $b - 0x80000000 ) ) : ( $b < ( $a - 0x80000000 ) );
+	return $l < $r ? ( $l > ( $r - 0x80000000 ) ) : ( $b < ( $l - 0x80000000 ) );
 }
 
 
 sub report {				## concatenate strings into fault report
-	print '### ', join( "\t", @_ ), "\n";
+	return print '### ', join( "\t", @_ ), "\n";
 }
 
 

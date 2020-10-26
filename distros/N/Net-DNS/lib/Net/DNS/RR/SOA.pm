@@ -1,21 +1,17 @@
 package Net::DNS::RR::SOA;
 
-#
-# $Id: SOA.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: SOA.pm 1819 2020-10-19 08:07:24Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::SOA - DNS SOA resource record
 
 =cut
-
 
 use integer;
 
@@ -27,9 +23,10 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $self = shift;
 	my ( $data, $offset, @opaque ) = @_;
 
-	( $self->{mname}, $offset ) = decode Net::DNS::DomainName1035(@_);
-	( $self->{rname}, $offset ) = decode Net::DNS::Mailbox1035( $data, $offset, @opaque );
+	( $self->{mname}, $offset ) = Net::DNS::DomainName1035->decode(@_);
+	( $self->{rname}, $offset ) = Net::DNS::Mailbox1035->decode( $data, $offset, @opaque );
 	@{$self}{qw(serial refresh retry expire minimum)} = unpack "\@$offset N5", $$data;
+	return;
 }
 
 
@@ -41,6 +38,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $rdata = $self->{mname}->encode(@_);
 	$rdata .= $rname->encode( $offset + length($rdata), @opaque );
 	$rdata .= pack 'N5', $self->serial, @{$self}{qw(refresh retry expire minimum)};
+	return $rdata;
 }
 
 
@@ -51,12 +49,11 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $rname  = $self->{rname}->string;
 	my $serial = $self->serial;
 	my $spacer = length "$serial" > 7 ? "" : "\t";
-	my @rdata  = $mname, $rname, join "\n\t\t\t\t",
-			"\t\t\t$serial$spacer\t;serial",
-			"$self->{refresh}\t\t;refresh",
-			"$self->{retry}\t\t;retry",
-			"$self->{expire}\t\t;expire",
-			"$self->{minimum}\t\t;minimum\n";
+	return ($mname, $rname,
+		join( "\n\t\t\t\t",
+			"\t\t\t$serial$spacer\t;serial", "$self->{refresh}\t\t;refresh",
+			"$self->{retry}\t\t;retry",	 "$self->{expire}\t\t;expire",
+			"$self->{minimum}\t\t;minimum\n" ) );
 }
 
 
@@ -69,6 +66,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	for (qw(refresh retry expire minimum)) {
 		$self->$_( Net::DNS::RR::ttl( {}, shift ) ) if scalar @_;
 	}
+	return;
 }
 
 
@@ -77,22 +75,23 @@ sub _defaults {				## specify RR attribute default values
 
 	$self->_parse_rdata(qw(. . 0 4h 1h 3w 1h));
 	delete $self->{serial};
+	return;
 }
 
 
 sub mname {
 	my $self = shift;
 
-	$self->{mname} = new Net::DNS::DomainName1035(shift) if scalar @_;
-	$self->{mname}->name if $self->{mname};
+	$self->{mname} = Net::DNS::DomainName1035->new(shift) if scalar @_;
+	return $self->{mname} ? $self->{mname}->name : undef;
 }
 
 
 sub rname {
 	my $self = shift;
 
-	$self->{rname} = new Net::DNS::Mailbox1035(shift) if scalar @_;
-	$self->{rname}->address if $self->{rname};
+	$self->{rname} = Net::DNS::Mailbox1035->new(shift) if scalar @_;
+	return $self->{rname} ? $self->{rname}->address : undef;
 }
 
 
@@ -102,11 +101,12 @@ sub serial {
 	return $self->{serial} || 0 unless scalar @_;		# current/default value
 
 	my $value = shift;					# replace if in sequence
-	return $self->{serial} = 0 + ( $value || 0 ) if _ordered( $self->{serial}, $value );
+	return $self->{serial} = ( $value & 0xFFFFFFFF ) if _ordered( $self->{serial}, $value );
 
 	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
-	my $serial = ( 0 + $self->{serial} ) & 0xFFFFFFFF;
-	return $self->{serial} = $serial ^ 0xFFFFFFFF if ( $serial & 0x7FFFFFFF ) == 0x7FFFFFFF;    # wrap
+	my $serial = 0xFFFFFFFF & ( $self->{serial} || 0 );
+	return $self->{serial} = 0x80000000 if $serial == 0x7FFFFFFF;	 # wrap
+	return $self->{serial} = 0x00000000 if $serial == 0xFFFFFFFF;	 # wrap
 	return $self->{serial} = $serial + 1;			# increment
 }
 
@@ -115,7 +115,7 @@ sub refresh {
 	my $self = shift;
 
 	$self->{refresh} = 0 + shift if scalar @_;
-	$self->{refresh} || 0;
+	return $self->{refresh} || 0;
 }
 
 
@@ -123,7 +123,7 @@ sub retry {
 	my $self = shift;
 
 	$self->{retry} = 0 + shift if scalar @_;
-	$self->{retry} || 0;
+	return $self->{retry} || 0;
 }
 
 
@@ -131,7 +131,7 @@ sub expire {
 	my $self = shift;
 
 	$self->{expire} = 0 + shift if scalar @_;
-	$self->{expire} || 0;
+	return $self->{expire} || 0;
 }
 
 
@@ -139,26 +139,26 @@ sub minimum {
 	my $self = shift;
 
 	$self->{minimum} = 0 + shift if scalar @_;
-	$self->{minimum} || 0;
+	return $self->{minimum} || 0;
 }
 
 
 ########################################
 
-sub _ordered($$) {			## irreflexive 32-bit partial ordering
+sub _ordered() {			## irreflexive 32-bit partial ordering
 	use integer;
-	my ( $a, $b ) = @_;
+	my ( $n1, $n2 ) = @_;
 
-	return 1 unless defined $a;				# ( undef, any )
-	return 0 unless defined $b;				# ( any, undef )
+	return 0 unless defined $n2;				# ( any, undef )
+	return 1 unless defined $n1;				# ( undef, any )
 
 	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
-	if ( $a < 0 ) {						# translate $a<0 region
-		$a = ( $a ^ 0x80000000 ) & 0xFFFFFFFF;		#  0	 <= $a < 2**31
-		$b = ( $b ^ 0x80000000 ) & 0xFFFFFFFF;		# -2**31 <= $b < 2**32
+	if ( $n2 < 0 ) {					# fold, leaving $n2 non-negative
+		$n1 = ( $n1 & 0xFFFFFFFF ) ^ 0x80000000;	# -2**31 <= $n1 < 2**32
+		$n2 = ( $n2 & 0x7FFFFFFF );			#  0	 <= $n2 < 2**31
 	}
 
-	return $a < $b ? ( $a > ( $b - 0x80000000 ) ) : ( $b < ( $a - 0x80000000 ) );
+	return $n1 < $n2 ? ( $n1 > ( $n2 - 0x80000000 ) ) : ( $n2 < ( $n1 - 0x80000000 ) );
 }
 
 
@@ -169,7 +169,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name SOA mname rname 0 14400 3600 1814400 3600');
+    $rr = Net::DNS::RR->new('name SOA mname rname 0 14400 3600 1814400 3600');
 
 =head1 DESCRIPTION
 
@@ -255,14 +255,14 @@ widely used zone serial numbering policies.
     $successor = $soa->serial( SEQUENTIAL );
 
 The existing serial number is incremented modulo 2**32 because the
-value returned by the auxiliary SEQUENTIAL() function can never
+value returned by the auxilliary SEQUENTIAL() function can never
 satisfy the serial number ordering constraint.
 
 =head2 Date Encoded
 
     $successor = $soa->serial( YYYYMMDDxx );
 
-The 32 bit value returned by the auxiliary YYYYMMDDxx() function will
+The 32 bit value returned by the auxilliary YYYYMMDDxx() function will
 be used if it satisfies the ordering constraint, otherwise the serial
 number will be incremented as above.
 
@@ -273,7 +273,7 @@ information to remain useful.
 
     $successor = $soa->serial( UNIXTIME );
 
-The 32 bit value returned by the auxiliary UNIXTIME() function will
+The 32 bit value returned by the auxilliary UNIXTIME() function will
 used if it satisfies the ordering constraint, otherwise the existing
 serial number will be incremented as above.
 

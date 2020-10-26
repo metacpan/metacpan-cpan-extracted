@@ -1,0 +1,184 @@
+=head1 NAME
+
+CAD::Mesh3D::ProvideNewFormat - Documents how to provide a new format to CAD::Mesh3D
+
+=head1 DESCRIPTION
+
+L<CAD::Mesh3D> will be C<use>d to handle the math, and provides wrappers to output to or input from
+a given format.  But each format will need to separately implement those input and output functions,
+and will need to provide a function that will tell L<CAD::Mesh3D> what the input and output functions
+are.
+
+=head1 ENABLING FORMATS
+
+Please tell your user to enable your format.  For example, if you're developing C<CAD::Mesh3D::PNG>,
+then tell your user to enable using
+
+ use CAD::Mesh3D qw/+PNG :formats/;
+
+or
+
+ use CAD::Mesh3D;
+ enableFormat( 'PNG' );
+
+If you are using a different namespace, such as C<I::Must::Be::Different::PngFormat>, they can enable
+your format using
+
+ use CAD::Mesh3D;
+ enableFormat( 'PNG' => 'I::Must::Be::Different::PngFormat');
+
+When C<enableFormat( $format )> is used without a C<$module> argument, the module name will default to
+C<$module = "CAD::Mesh3D::$format">.
+
+Either way, C<$module> is the module you're developing.
+
+=head1 INPUT AND OUTPUT FUNCTIONS
+
+You need to define input and/or output functions, to tell L<CAD::Mesh3D> how to
+needs to know how to find your input and output functions.  These input and output
+functions will be used to transfer data in your format into a L<CAD::Mesh3D> B<Mesh>,
+and convert a B<Mesh> into your format.  You also need to inform L<CAD::Mesh3D>
+how to access your functions.
+
+=head2 _io_functions
+
+To inform L<CAD::Mesh3D> of the location of your functions, L<CAD::Mesh3D> requires you to provide a
+function named C<_io_functions()> which returns a hash with C<input> and/or C<output> keys, pointing
+to coderef values.
+
+ sub _io_functions {
+     return (
+         output => \&outputStl,
+         input => sub { croak sprintf "Sorry, %s's developer has not yet debugged inputting from STL", __PACKAGE__ },
+     );
+ }
+
+If your C<_io_functions()> returns a hash missing one or both of those keys, or if you have the key set to C<undef>,
+as in these next two examples, then C<CAD::Mesh3D> will define some error functions which will C<die> with a
+meaningful message.
+
+ sub _io_functions {
+     return (
+         output => \&outputStl,
+     );
+ }
+
+ sub _io_functions {
+     return (
+         output => \&outputStl,
+         input => undef,
+     );
+ }
+
+=head2 Output Function
+
+Your output function should take at least two arguments, the C<$mesh> and the
+C<$file>, and should output that mesh using your file format into C<$file>.
+You may feel free to define other arguments as needed, but those two should
+be first, to maintain consistency across file formats.
+
+The user will call C<CAD::Mesh3D::output( $mesh, $formatName =E<gt> $file )>.
+C<CAD::Mesh3D> will check its list of enabled formats against C<$formatName>; if
+C<$formatName> is found, it will pass the remaining arguments to the output it
+obtained from L<_io_functions()|/"_io_functions">.
+
+Note that C<$file> could, in theory, be either a file name, or a filehandle to
+the file, already opened in the right mode.  L<CAD::Mesh3D::STL> gives an example
+of how to handle that.  It is recommend, though not required, that your function
+accepts either one.
+
+This snippet shows the basic form of the output function, or you can see L<CAD::Mesh3D::STL>
+for a working example:
+
+ sub my_plaintext_output_function {
+     my $mesh = shift;
+     my $file = shift;
+     my %args = @_;
+
+     # open $file if necesssary, or do error checking
+     ...
+
+     for my $facet ( @$mesh ) {
+         ... # process facets and write to file as approrpriate
+     }
+ }
+
+When documenting how your user will use this function, it is recommended to use
+the C<CAD::Mesh3D::output()> wrapper, rather than telling your user to use your
+internal function directly.  For example, your B<SYNOPSIS> might be:
+
+ use CAD::Mesh3D qw/+YourFormat :formats/;
+ $mesh = ...;  # define your mesh here using CAD::Mesh3D
+ $mesh->output( YourFormat => $filename );
+
+=head2 Input Function
+
+Your input function needs take at least one argument, the C<$file>, and
+should populate that mesh from the supplied C<$file>.
+You may feel free to define other arguments as needed, but those two should
+be first, to maintain consistency across file formats.
+
+The user will call C<my $mesh = CAD::Mesh3D::input( $formatName =E<gt> $file )>.
+C<CAD::Mesh3D> will check its list of enabled formats against C<$formatName>; if
+C<$formatName> is found, it will pass the remaining arguments to the output it
+obtained from L<_io_functions()|/"_io_functions">.
+
+Note that C<$file> could, in theory, be either a file name, or a filehandle to
+the file, already opened in the right mode.  L<CAD::Mesh3D::STL> gives an example
+of how to handle that.  It is recommend, though not required, that your function
+accepts either one.
+
+This snippet shows the basic form of the output function, or you can see L<CAD::Mesh3D::STL>
+for a working example:
+
+ sub my_plaintext_input_function {
+     my $file = shift;
+     my %args = @_;
+
+     # open $file if necesssary, or do error checking
+     ...
+
+     my @facets = ();
+     foreach my $f ( 1 .. $nFacetsDesired ) {
+        # populate with three vertexes, preferably using createVertex(), from your $file
+        my @verts = ( createVertex(...), createVertex(...), createVertex(...) );
+
+        # append to the list of facets
+        push @facets, createFacet(@verts);
+     }
+
+     # combine those facets into a mesh
+     return createMesh( @facets );
+ }
+
+When documenting how your user will use this function, it is recommended to use
+the C<CAD::Mesh3D::input()> wrapper, rather than telling your user to use your
+internal function directly.  For example, your B<SYNOPSIS> might be:
+
+ use CAD::Mesh3D qw/+YourFormat :formats/;
+ $mesh = input( YourFormat => $filename );
+
+=head1 EXAMPLE
+
+The L<CAD::Mesh3D::STL> shows an example of how I used these rules to implement
+the STL file format.
+
+=head1 AUTHOR
+
+Peter C. Jones C<E<lt>petercj AT cpan DOT orgE<gt>>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2017,2018,2019,2020 Peter C. Jones
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+
+1;

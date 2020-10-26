@@ -22,6 +22,7 @@ t/4_filehandle.t
 t/5_sub_string_segfault.t
 t/6_lua_calls_perl_calls_lua.t
 t/7_errors.t
+t/8_bools.t
 typemap
 xt/author/critic.t
 xt/author/pod-coverage.t

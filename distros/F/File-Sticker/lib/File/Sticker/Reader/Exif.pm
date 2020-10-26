@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Exif;
-$File::Sticker::Reader::Exif::VERSION = '0.9301';
+$File::Sticker::Reader::Exif::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker::Reader::Exif - read and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -26,6 +26,7 @@ nomenclature, such as "tags" for things called tags, or Keywords or Subject etc.
 use common::sense;
 use File::LibMagic;
 use Image::ExifTool qw(:Public);
+use YAML::Any;
 use File::Spec;
 
 use parent qw(File::Sticker::Reader);
@@ -45,7 +46,8 @@ sub whoami  { ( caller(1) )[3] }
 =head2 allowed_file
 
 If this reader can be used for the given file, then this returns true.
-File must be one of: an image, PDF, or EPUB.
+File must be one of: an image or PDF.
+(Since ExifTool can't write to EPUB, there's no point reading them either.)
 
 =cut
 
@@ -56,9 +58,8 @@ sub allowed_file {
 
     $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
-    if ($ft->{mime_type} =~ /(image|pdf|epub)/)
+    if ($ft->{mime_type} =~ /(image|pdf)/)
     {
-        say STDERR 'Reader ' . $self->name() . ' allows filetype ' . $ft->{mime_type} . ' of ' . $file if $self->{verbose} > 1;
         return 1;
     }
     return 0;
@@ -77,10 +78,12 @@ sub known_fields {
 
     return {
         title=>'TEXT',
-        url=>'TEXT',
         creator=>'TEXT',
-        date=>'TEXT',
         description=>'TEXT',
+        location=>'TEXT',
+        url=>'TEXT',
+        tags=>'MULTI',
+        date=>'TEXT',
         copyright=>'TEXT',
         filesize=>'TEXT',
         flash=>'TEXT',
@@ -88,8 +91,8 @@ sub known_fields {
         imageheight=>'NUMBER',
         imagewidth=>'NUMBER',
         megapixels=>'NUMBER',
-        location=>'TEXT',
-        tags=>'MULTI'};
+        %{$self->{wanted_fields}},
+    };
 } # known_fields
 
 =head2 read_meta
@@ -121,7 +124,7 @@ sub read_meta {
     # There are multiple fields which could be used as a file "description".
     # Check through them until you find a non-empty one.
     my $description = '';
-    foreach my $field (qw(Description Caption-Abstract Comment ImageDescription UserComment))
+    foreach my $field (qw(Description Caption-Abstract Comment ImageDescription))
     {
         if (exists $info->{$field} and $info->{$field} and !$description)
         {
@@ -236,6 +239,32 @@ Title
         if (exists $info->{$field} and $info->{$field})
         {
             $meta{lc($field)} = $info->{$field};
+        }
+    }
+
+    # -------------------------------------------------
+    # Freeform Fields
+    # These are stored as YAML data in the UserComment field.
+    # -------------------------------------------------
+    if (exists $info->{UserComment} and $info->{UserComment})
+    {
+        say STDERR "UserComment=", $info->{UserComment} if $self->{verbose} > 2;
+        my $data;
+        eval {$data = Load($info->{UserComment});};
+        if ($@)
+        {
+            warn __PACKAGE__, " Load of YAML data failed: $@";
+        }
+        elsif (!$data)
+        {
+            warn __PACKAGE__, " no legal YAML";
+        }
+        else # okay
+        {
+            foreach my $field (sort keys %{$data})
+            {
+                $meta{$field} = $data->{$field};
+            }
         }
     }
 

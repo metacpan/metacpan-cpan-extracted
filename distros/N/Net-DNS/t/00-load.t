@@ -1,37 +1,41 @@
-# $Id: 00-load.t 1781 2020-05-13 08:58:25Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 00-load.t 1818 2020-10-18 15:24:42Z willem $	-*-perl-*-
+#
 
 use strict;
+use warnings;
 use Test::More;
 
+use Net::DNS::RR::RRSIG;		## preempt Net::DNS::SEC configuration
 
 my @module = qw(
-	Net::DNS
-	Net::DNS::SEC
-	Digest::BubbleBabble
-	Digest::HMAC
-	Digest::MD5
-	Digest::SHA
-	Encode
-	File::Spec
-	IO::File
-	IO::Select
-	IO::Socket::INET
-	IO::Socket::IP
-	MIME::Base64
-	Net::LibIDN
-	Net::LibIDN2
-	PerlIO
-	Scalar::Util
-	Time::Local
-	Win32::API
-	Win32::IPHelper
-	Win32::TieRegistry
-	);
+		Net::DNS
+		Net::DNS::SEC
+		Digest::BubbleBabble
+		Digest::HMAC
+		Digest::MD5
+		Digest::SHA
+		Encode
+		File::Spec
+		IO::File
+		IO::Select
+		IO::Socket::INET
+		IO::Socket::IP
+		MIME::Base64
+		Net::LibIDN
+		Net::LibIDN2
+		PerlIO
+		Scalar::Util
+		Time::Local
+		Win32::API
+		Win32::IPHelper
+		Win32::TieRegistry
+		);
 
 my @diag;
 foreach my $module (@module) {
-	eval "require $module";
-	for ( grep $_, eval { $module->VERSION } ) {
+	eval "require $module";		## no critic
+	for ( eval { $module->VERSION || () } ) {
 		s/^(\d+\.\d)$/${1}0/;
 		push @diag, sprintf "%-25s  %s", $module, $_;
 	}
@@ -67,7 +71,7 @@ foreach my $rr (@rrs) {
 local $SIG{__WARN__} = sub { };					# suppress warnings
 
 foreach my $rr (@rrs) {
-	my $object = eval { new Net::DNS::RR( name => '.', type => $rr ); };
+	my $object = eval { Net::DNS::RR->new( name => '.', type => $rr ); };
 	diag($@) if $@;						# report exceptions
 
 	ok( is_rr_loaded($rr), "loaded package Net::DNS::RR::$rr" );
@@ -76,11 +80,8 @@ foreach my $rr (@rrs) {
 
 #
 # Check that Net::DNS symbol table was imported correctly
-{
-	no strict 'refs';
-	foreach my $sym (@Net::DNS::EXPORT) {
-		ok( defined &{$sym}, "$sym is imported" );
-	}
+foreach my $sym (@Net::DNS::EXPORT) {
+	ok( defined &{$sym}, "$sym is imported" );
 }
 
 

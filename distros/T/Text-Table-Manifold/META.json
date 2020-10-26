@@ -4,13 +4,13 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Table-Manifold",
    "no_index" : {
@@ -38,8 +38,8 @@
             "Module::Runtime" : "0.014",
             "Moo" : "1.006",
             "Scalar::Util" : "1.5",
+            "String::TtyLength" : "0.02",
             "Types::Standard" : "1.000004",
-            "Unicode::GCString" : "2013.1",
             "open" : "0",
             "strict" : "0",
             "utf8" : "0",
@@ -64,6 +64,6 @@
          "web" : "https://github.com/ronsavage/Text-Table-Manifold"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

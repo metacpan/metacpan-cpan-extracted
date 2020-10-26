@@ -1,5 +1,8 @@
 Revision history for Perl extension usw
 
+0.12 2020-10-25T23:33:11Z
+    - start to warn with 'no usw'. it dies
+
 0.11 2020-10-07T23:41:07Z
     - fixed the issue #2
     - tried to skip tests that seem impossible
@@ -8,7 +11,7 @@ Revision history for Perl extension usw
     - some windows have no `cat`? try to use `type` instead of cat
 
 0.09 2020-10-06T06:43:39Z
-    - fixed #1 incorrect tests run on Windows other than with cp932.
+    fixed incorrect tests run on Windows other than with cp932.
 
 0.08 2020-10-05T11:13:26Z
     - now we can use usw; in Windows

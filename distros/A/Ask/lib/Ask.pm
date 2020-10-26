@@ -1,4 +1,4 @@
-use 5.010000;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -6,26 +6,26 @@ use warnings;
 	package Ask;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.007';
+	our $VERSION   = '0.012';
 	
 	use Carp qw(croak);
 	use Moo::Role qw();
 	use Module::Runtime qw(use_module use_package_optimistically);
 	use Module::Pluggable (
 		search_path => 'Ask',
-		except      => [qw/ Ask::API Ask::Functions /],
+		except      => [qw/ Ask::API Ask::Functions Ask::Question /],
 		inner       => 0,
 		require     => 0,
 		sub_name    => '__plugins',
 	);
-	use namespace::sweep;
+	use namespace::autoclean;
 	
 	sub import {
 		shift;
 		if (@_) {
 			require Ask::Functions;
 			unshift @_, 'Ask::Functions';
-			goto \&Ask::Functions::import;
+			goto( $_[0]->can( 'import' ) );
 		}
 	}
 	
@@ -33,14 +33,18 @@ use warnings;
 		__plugins(@_);
 	}
 	
+	sub backends {
+		my $class  = shift;
+		sort { $b->quality <=> $a->quality }
+			grep { eval { use_package_optimistically($_)->DOES('Ask::API') } }
+			$class->plugins;
+	}
+	
 	sub detect {
 		my $class  = shift;
 		my %args   = @_==1 ? %{$_[0]} : @_;
 		
-		my @implementations =
-			reverse sort { $a->quality <=> $b->quality }
-			grep { use_package_optimistically($_)->DOES('Ask::API') }
-			$class->plugins;
+		my @implementations = $class->backends;
 		
 		if (exists $ENV{PERL_ASK_BACKEND}) {
 			@implementations = use_module($ENV{PERL_ASK_BACKEND});
@@ -49,14 +53,19 @@ use warnings;
 			@implementations = use_module('Ask::Fallback');
 		}
 		
-		my @traits = @{ delete($args{traits}) // [] };
+		my @traits = @{ delete($args{traits}) || [] };
 		for my $i (@implementations) {
 			my $k = @traits ? "Moo::Role"->create_class_with_roles($i, @traits) : $i;
-			my $self = eval { $k->new(\%args) } or next;
+			my $self = eval { $k->new({ %args, %{ $args{$i} or {} } }) } or next;
 			return $self if $self->is_usable;
 		}
 		
 		croak "No usable backend for Ask";
+	}
+	
+	sub Q {
+		require Ask::Question;
+		'Ask::Question'->new( @_ );
 	}
 }
 
@@ -91,7 +100,7 @@ what sets C<Ask> apart from them is that C<Ask> will detect how your script
 is being run (in a terminal, headless, etc) and choose an appropriate way
 to interact with the user.
 
-=head2 Class Method
+=head2 Class Methods
 
 =over
 
@@ -99,6 +108,14 @@ to interact with the user.
 
 A constructor, sort of. It inspects the program's environment and returns an
 object that implements the Ask API (see below).
+
+Backend-specific arguments can be provided:
+
+  my $ask = Ask->detect(
+    %common_args,
+    'Ask::STDIO'  => \%stdio_args,
+    'Ask::Zenity' => \%zenity_args,
+  );
 
 Note that these objects don't usually inherit from C<Ask>, so the following
 will typically be false:
@@ -110,6 +127,22 @@ Instead, check:
 
    my $ask = Ask->detect(%arguments);
    $ask->DOES("Ask::API");
+
+=item C<< Ask->backends >>
+
+Returns a list of available backends. Each backend is a Perl class name. Some
+of the backends may be available (i.e. installed and able to be compiled)
+without being usable under current circumstances (e.g. the Gtk2 backend is
+available but cannot be used because no X server is running). To check
+usability, instantiate the class and call C<is_usable> on the instance.
+
+The list is sorted in "quality" order, best to worst, though quality is
+subjective.
+
+=item C<< Ask->plugins >>
+
+The same as C<< Ask->backends >>, but doesn't check that each result is a
+loadable Perl class, and doesn't sort them in any particular order.
 
 =back
 
@@ -188,6 +221,9 @@ used to I<hint> that you want a directory.
 The C<default> argument can be used to supply a default return value if the
 user cannot be asked for some reason (e.g. running on an unattended terminal).
 If C<multiple> is true, then this must be an arrayref.
+
+Until version 0.011, returned values are strings. Thereafter, returned values
+are L<Path::Tiny> objects.
 
 =item C<< single_choice(text => $text, choices => \@choices) >>
 
@@ -311,19 +347,27 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Ask>.
 
 =head1 SEE ALSO
 
-See L<Ask::API> for documentation of API internals.
-
-Bundled Ask API backends:
+Terminal backends:
 
 =over
 
 =item *
 
-L<Ask::Callback> - implementation for testing; redirects input and output to callback functions.
+L<Ask::STDIO> - very basic usage of STDIN/STDOUT/STDERR
 
 =item *
 
-L<Ask::Fallback> - returns default answers; for scripts running unattended.
+L<Ask::Caroline> - uses L<Caroline> and L<Term::ANSIColor> for better interaction
+
+=item *
+
+L<Ask::Clui> - uses L<Term::Clui> for better interaction
+
+=back
+
+GUI backends:
+
+=over
 
 =item *
 
@@ -331,7 +375,7 @@ L<Ask::Gtk> - GUI using L<Gtk2>.
 
 =item *
 
-L<Ask::STDIO> - based on STDIN/STDOUT/STDERR
+L<Ask::Prima> - GUI using L<Prima>.
 
 =item *
 
@@ -347,6 +391,24 @@ L<Ask::Zenity> - GUI using the C<< /usr/bin/zenity >> binary (part of GNOME)
 
 =back
 
+Backends which perform no real user interaction:
+
+=over
+
+=item *
+
+L<Ask::Callback> - implementation for testing; redirects input and output to callback functions.
+
+=item *
+
+L<Ask::Fallback> - returns default answers; for scripts running unattended.
+
+=back
+
+See L<Ask::API> for documentation of API internals.
+
+See L<Ask::Question> for an alternative way of using Ask.
+
 Similar modules: L<IO::Prompt>, L<IO::Prompt::Tiny> and many others.
 
 =head1 AUTHOR
@@ -355,7 +417,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2012-2013 by Toby Inkster.
+This software is copyright (c) 2012-2013, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

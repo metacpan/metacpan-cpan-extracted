@@ -1,21 +1,17 @@
 package Net::DNS::RR::SRV;
 
-#
-# $Id: SRV.pm 1597 2017-09-22 08:04:02Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: SRV.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
 Net::DNS::RR::SRV - DNS SRV resource record
 
 =cut
-
 
 use integer;
 
@@ -28,7 +24,8 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	@{$self}{qw(priority weight port)} = unpack( "\@$offset n3", $$data );
 
-	$self->{target} = decode Net::DNS::DomainName2535( $data, $offset + 6, @opaque );
+	$self->{target} = Net::DNS::DomainName2535->decode( $data, $offset + 6, @opaque );
+	return;
 }
 
 
@@ -37,8 +34,8 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my ( $offset, @opaque ) = @_;
 
 	my $target = $self->{target};
-	my @nums = ( $self->priority, $self->weight, $self->port );
-	pack 'n3 a*', @nums, $target->encode( $offset + 6, @opaque );
+	my @nums   = ( $self->priority, $self->weight, $self->port );
+	return pack 'n3 a*', @nums, $target->encode( $offset + 6, @opaque );
 }
 
 
@@ -46,7 +43,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $target = $self->{target};
-	my @rdata = ( $self->priority, $self->weight, $self->port, $target->string );
+	my @rdata  = ( $self->priority, $self->weight, $self->port, $target->string );
+	return @rdata;
 }
 
 
@@ -56,6 +54,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	foreach my $attr (qw(priority weight port target)) {
 		$self->$attr(shift);
 	}
+	return;
 }
 
 
@@ -63,7 +62,7 @@ sub priority {
 	my $self = shift;
 
 	$self->{priority} = 0 + shift if scalar @_;
-	$self->{priority} || 0;
+	return $self->{priority} || 0;
 }
 
 
@@ -71,7 +70,7 @@ sub weight {
 	my $self = shift;
 
 	$self->{weight} = 0 + shift if scalar @_;
-	$self->{weight} || 0;
+	return $self->{weight} || 0;
 }
 
 
@@ -79,22 +78,22 @@ sub port {
 	my $self = shift;
 
 	$self->{port} = 0 + shift if scalar @_;
-	$self->{port} || 0;
+	return $self->{port} || 0;
 }
 
 
 sub target {
 	my $self = shift;
 
-	$self->{target} = new Net::DNS::DomainName2535(shift) if scalar @_;
-	$self->{target}->name if $self->{target};
+	$self->{target} = Net::DNS::DomainName2535->new(shift) if scalar @_;
+	return $self->{target} ? $self->{target}->name : undef;
 }
 
 
 # order RRs by numerically increasing priority, decreasing weight
 my $function = sub {
 	my ( $a, $b ) = ( $Net::DNS::a, $Net::DNS::b );
-	$a->{priority} <=> $b->{priority}
+	return $a->{priority} <=> $b->{priority}
 			|| $b->{weight} <=> $a->{weight};
 };
 
@@ -110,7 +109,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name SRV priority weight port target');
+    $rr = Net::DNS::RR->new('name SRV priority weight port target');
 
 =head1 DESCRIPTION
 

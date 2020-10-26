@@ -1,5 +1,5 @@
 package Util::Medley::PkgManager::YUM;
-$Util::Medley::PkgManager::YUM::VERSION = '0.051';
+$Util::Medley::PkgManager::YUM::VERSION = '0.052';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -17,7 +17,7 @@ Util::Medley::PkgManager::YUM - Class for interacting with YUM
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =cut
 

@@ -1,3 +1,11 @@
+0.002   2020-05-31  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::Regexp::Pattern
+          (0.007) to tweak example display.
+
+
 0.001   2020-04-01  Released-By: PERLANCAR
 
         - First early release.

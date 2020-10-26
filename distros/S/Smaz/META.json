@@ -3,7 +3,7 @@
    "author" : [
       "LNATION <email@lnation.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -43,7 +43,24 @@
          }
       }
    },
+   "provides" : {
+      "Smaz" : {
+         "file" : "lib/Smaz.pm",
+         "version" : "1.00"
+      },
+      "SmazBijection" : {
+         "file" : "lib/SmazBijection.pm",
+         "version" : "0.02"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/SMAZ.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/SMAZ"
+      }
+   },
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

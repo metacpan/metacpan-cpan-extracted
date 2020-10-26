@@ -35,7 +35,9 @@
             "Capture::Tiny" : "0",
             "DBD::Pg" : "0",
             "DBI" : "0",
+            "Log::Any" : "0",
             "Moo" : "0",
+            "Scope::Guard" : "0",
             "namespace::clean" : "0",
             "perl" : "5.01"
          }
@@ -57,6 +59,6 @@
          "web" : "https://github.com/ledgersmb/PGObject-Util-DBAdmin"
       }
    },
-   "version" : "v1.2.1",
+   "version" : "v1.4.0",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

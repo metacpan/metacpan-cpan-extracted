@@ -6,6 +6,7 @@ Source: https://metacpan.org/release/Role-Hooks
 Files: Changes
  META.json
  META.yml
+ Makefile.PL
  dist.ini
  doap.ttl
  t/02roletiny.t
@@ -35,8 +36,8 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Files: t/rt-133595.t
+Copyright: This software is copyright (c) 2020 by Gianni Ceccarelli.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

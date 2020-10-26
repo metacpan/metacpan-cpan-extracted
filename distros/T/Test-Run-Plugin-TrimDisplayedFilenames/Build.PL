@@ -34,7 +34,7 @@ my $builder = Test::Run::Builder->new(
         resources =>
         {
             homepage => "http://web-cpan.shlomifish.org/modules/Test-Run/",
-            repository => "https://bitbucket.org/shlomif/perl-test-run",
+            repository => "https://github.com/shlomif/perl-test-run",
         },
     },
     add_to_cleanup      => [ 'Test-Run-Plugin-TrimDisplayedFilenames-*' ],

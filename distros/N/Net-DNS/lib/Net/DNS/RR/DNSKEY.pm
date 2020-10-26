@@ -1,14 +1,11 @@
 package Net::DNS::RR::DNSKEY;
 
-#
-# $Id: DNSKEY.pm 1781 2020-05-13 08:58:25Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1781 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: DNSKEY.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,12 +13,11 @@ Net::DNS::RR::DNSKEY - DNS DNSKEY resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
 
-use constant BASE64 => defined eval 'require MIME::Base64';
+use constant BASE64 => defined eval { require MIME::Base64 };
 
 #
 # source: http://www.iana.org/assignments/dns-sec-alg-numbers
@@ -54,7 +50,8 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
+	foreach (@algbyname) { s/[\W_]//g; }			# strip non-alphanumerics
+	my @algrehash = map { /^\d/ ? ($_) x 3 : uc($_) } @algbyname;
 	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
@@ -68,7 +65,7 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 
 	sub _algbyval {
 		my $value = shift;
-		$algbyval{$value} || return $value;
+		return $algbyval{$value} || return $value;
 	}
 }
 
@@ -80,13 +77,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $rdata = substr $$data, $offset, $self->{rdlength};
 	$self->{keybin} = unpack '@4 a*', $rdata;
 	@{$self}{qw(flags protocol algorithm)} = unpack 'n C*', $rdata;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'n C2 a*', @{$self}{qw(flags protocol algorithm keybin)};
+	return pack 'n C2 a*', @{$self}{qw(flags protocol algorithm keybin)};
 }
 
 
@@ -98,6 +96,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	return $self->SUPER::_format_rdata() unless BASE64;
 	my @param = ( @{$self}{qw(flags protocol)}, $algorithm );
 	my @rdata = ( @param, split /\s+/, MIME::Base64::encode( $self->{keybin} ) || '-' );
+	return @rdata;
 }
 
 
@@ -109,6 +108,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->algorithm(shift);
 	$self->flags($flags);
 	$self->key(@_);
+	return;
 }
 
 
@@ -119,6 +119,7 @@ sub _defaults {				## specify RR attribute default values
 	$self->flags(256);
 	$self->protocol(3);
 	$self->keybin('');
+	return;
 }
 
 
@@ -126,31 +127,43 @@ sub flags {
 	my $self = shift;
 
 	$self->{flags} = 0 + shift if scalar @_;
-	$self->{flags} || 0;
+	return $self->{flags} || 0;
 }
 
 
 sub zone {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x0100 ) ^ ( 0x0100 | ( $_ || 0 ) ) if scalar @_;
-		return 0x0100 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x0100 | ( $_ || 0 );
+			$_ ^= 0x0100 unless shift;
+		}
 	}
+	return 0x0100 & ( $self->{flags} || 0 );
 }
 
 
 sub revoke {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x0080 ) ^ ( 0x0080 | ( $_ || 0 ) ) if scalar @_;
-		return 0x0080 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x0080 | ( $_ || 0 );
+			$_ ^= 0x0080 unless shift;
+		}
 	}
+	return 0x0080 & ( $self->{flags} || 0 );
 }
 
 
 sub sep {
-	for ( shift->{flags} ) {
-		$_ = ( $_[0] ? 0 : 0x0001 ) ^ ( 0x0001 | ( $_ || 0 ) ) if scalar @_;
-		return 0x0001 & ( $_ || 0 );
+	my $self = shift;
+	if ( scalar @_ ) {
+		for ( $self->{flags} ) {
+			$_ = 0x0001 | ( $_ || 0 );
+			$_ ^= 0x0001 unless shift;
+		}
 	}
+	return 0x0001 & ( $self->{flags} || 0 );
 }
 
 
@@ -158,7 +171,7 @@ sub protocol {
 	my $self = shift;
 
 	$self->{protocol} = 0 + shift if scalar @_;
-	$self->{protocol} || 0;
+	return $self->{protocol} || 0;
 }
 
 
@@ -172,14 +185,14 @@ sub algorithm {
 
 	return $self->{algorithm} unless defined $arg;
 	return _algbyval( $self->{algorithm} ) if uc($arg) eq 'MNEMONIC';
-	$self->{algorithm} = _algbyname($arg) || die _algbyname('')    # disallow algorithm(0)
+	return $self->{algorithm} = _algbyname($arg) || die _algbyname('')    # disallow algorithm(0)
 }
 
 
 sub key {
 	my $self = shift;
 	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
-	$self->keybin( MIME::Base64::decode( join "", @_ ) );
+	return $self->keybin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -187,30 +200,30 @@ sub keybin {
 	my $self = shift;
 
 	$self->{keybin} = shift if scalar @_;
-	$self->{keybin} || "";
+	return $self->{keybin} || "";
 }
 
 
-sub publickey { shift->key(@_); }
+sub publickey { return shift->key(@_); }
 
 
 sub privatekeyname {
 	my $self = shift;
 	my $name = $self->signame;
-	sprintf 'K%s+%03d+%05d.private', $name, $self->algorithm, $self->keytag;
+	return sprintf 'K%s+%03d+%05d.private', $name, $self->algorithm, $self->keytag;
 }
 
 
 sub signame {
 	my $self = shift;
-	my $name = lc $self->{owner}->fqdn;
+	return lc $self->{owner}->fqdn;
 }
 
 
 sub keylength {
 	my $self = shift;
 
-	my $keybin = $self->keybin || return undef;
+	my $keybin = $self->keybin || return;
 
 	local $_ = _algbyval( $self->{algorithm} );
 
@@ -233,7 +246,7 @@ sub keylength {
 		return ( $T << 6 ) + 512;
 	}
 
-	length($keybin) << 2;		## ECDSA / ECC-GOST
+	return length($keybin) << 2;	## ECDSA / EdDSA
 }
 
 
@@ -262,7 +275,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name DNSKEY flags protocol algorithm publickey');
+    $rr = Net::DNS::RR->new('name DNSKEY flags protocol algorithm publickey');
 
 =head1 DESCRIPTION
 

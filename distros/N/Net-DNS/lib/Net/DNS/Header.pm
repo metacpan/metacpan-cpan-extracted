@@ -1,9 +1,9 @@
 package Net::DNS::Header;
 
-#
-# $Id: Header.pm 1709 2018-09-07 08:03:09Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Header.pm 1812 2020-10-07 18:09:53Z willem $)[2];
 
 
 =head1 NAME
@@ -14,7 +14,7 @@ Net::DNS::Header - DNS packet header
 
     use Net::DNS;
 
-    $packet = new Net::DNS::Packet;
+    $packet = Net::DNS::Packet->new();
     $header = $packet->header;
 
 
@@ -25,12 +25,10 @@ C<Net::DNS::Header> represents the header portion of a DNS packet.
 =cut
 
 
-use strict;
-use warnings;
 use integer;
 use Carp;
 
-use Net::DNS::Parameters;
+use Net::DNS::Parameters qw(:opcode :rcode);
 
 
 =head1 METHODS
@@ -38,7 +36,7 @@ use Net::DNS::Parameters;
 
 =head2 $packet->header
 
-    $packet = new Net::DNS::Packet;
+    $packet = Net::DNS::Packet->new();
     $header = $packet->header;
 
 Net::DNS::Header objects emanate from the Net::DNS::Packet header()
@@ -105,7 +103,10 @@ Prints the string representation of the packet header.
 
 =cut
 
-sub print { print &string; }
+sub print {
+	print &string;
+	return;
+}
 
 
 =head2 id
@@ -120,10 +121,10 @@ A random value is assigned if the argument value is undefined.
 =cut
 
 sub id {
-	my $self = shift;
-	$$self->{id} = shift if scalar @_;
+	my ( $self, @arg ) = @_;
+	$$self->{id} = shift(@arg) if scalar @arg;
 	return $$self->{id} if defined $$self->{id};
-	$$self->{id} = int rand(0xffff);
+	return $$self->{id} = int rand(0xffff);
 }
 
 
@@ -137,13 +138,14 @@ Gets or sets the query opcode (the purpose of the query).
 =cut
 
 sub opcode {
-	my $self = shift;
+	my ( $self, $arg ) = @_;
+	my $opcode;
 	for ( $$self->{status} ) {
-		return opcodebyval( ( $_ >> 11 ) & 0x0f ) unless scalar @_;
-		my $opcode = opcodebyname(shift);
+		return opcodebyval( ( $_ >> 11 ) & 0x0f ) unless defined $arg;
+		$opcode = opcodebyname($arg);
 		$_ = ( $_ & 0x87ff ) | ( $opcode << 11 );
-		return $opcode;
 	}
+	return $opcode;
 }
 
 
@@ -157,23 +159,22 @@ Gets or sets the query response code (the status of the query).
 =cut
 
 sub rcode {
-	my $self = shift;
+	my ( $self, $arg ) = @_;
+	my $rcode;
 	for ( $$self->{status} ) {
-		my $arg = shift;
 		my $opt = $$self->edns;
 		unless ( defined $arg ) {
-			my $rcode = $opt->rcode;
 			return rcodebyval( $_ & 0x0f ) unless $opt->_specified;
-			$rcode = ( $rcode & 0xff0 ) | ( $_ & 0x00f );
+			$rcode = ( $opt->rcode & 0xff0 ) | ( $_ & 0x00f );
 			$opt->rcode($rcode);			# write back full 12-bit rcode
 			return $rcode == 16 ? 'BADVERS' : rcodebyval($rcode);
 		}
-		my $rcode = rcodebyname($arg);
+		$rcode = rcodebyname($arg);
 		$opt->rcode($rcode);				# full 12-bit rcode
 		$_ &= 0xfff0;					# low 4-bit rcode
 		$_ |= ( $rcode & 0x000f );
-		return $rcode;
 	}
+	return $rcode;
 }
 
 
@@ -187,7 +188,7 @@ Gets or sets the query response flag.
 =cut
 
 sub qr {
-	shift->_dnsflag( 0x8000, @_ );
+	return shift->_dnsflag( 0x8000, @_ );
 }
 
 
@@ -201,7 +202,7 @@ Gets or sets the authoritative answer flag.
 =cut
 
 sub aa {
-	shift->_dnsflag( 0x0400, @_ );
+	return shift->_dnsflag( 0x0400, @_ );
 }
 
 
@@ -215,7 +216,7 @@ Gets or sets the truncated packet flag.
 =cut
 
 sub tc {
-	shift->_dnsflag( 0x0200, @_ );
+	return shift->_dnsflag( 0x0200, @_ );
 }
 
 
@@ -229,7 +230,7 @@ Gets or sets the recursion desired flag.
 =cut
 
 sub rd {
-	shift->_dnsflag( 0x0100, @_ );
+	return shift->_dnsflag( 0x0100, @_ );
 }
 
 
@@ -243,7 +244,7 @@ Gets or sets the recursion available flag.
 =cut
 
 sub ra {
-	shift->_dnsflag( 0x0080, @_ );
+	return shift->_dnsflag( 0x0080, @_ );
 }
 
 
@@ -254,7 +255,7 @@ Unassigned bit, should always be zero.
 =cut
 
 sub z {
-	shift->_dnsflag( 0x0040, @_ );
+	return shift->_dnsflag( 0x0040, @_ );
 }
 
 
@@ -271,7 +272,7 @@ and is allowed to set the bit by policy.)
 =cut
 
 sub ad {
-	shift->_dnsflag( 0x0020, @_ );
+	return shift->_dnsflag( 0x0020, @_ );
 }
 
 
@@ -285,7 +286,7 @@ Gets or sets the checking disabled flag.
 =cut
 
 sub cd {
-	shift->_dnsflag( 0x0010, @_ );
+	return shift->_dnsflag( 0x0010, @_ );
 }
 
 
@@ -305,6 +306,7 @@ sub qdcount {
 	my $self = shift;
 	return $$self->{count}[0] || scalar @{$$self->{question}} unless scalar @_;
 	carp 'header->qdcount attribute is read-only' unless $warned++;
+	return;
 }
 
 
@@ -324,6 +326,7 @@ sub ancount {
 	my $self = shift;
 	return $$self->{count}[1] || scalar @{$$self->{answer}} unless scalar @_;
 	carp 'header->ancount attribute is read-only' unless $warned++;
+	return;
 }
 
 
@@ -343,6 +346,7 @@ sub nscount {
 	my $self = shift;
 	return $$self->{count}[2] || scalar @{$$self->{authority}} unless scalar @_;
 	carp 'header->nscount attribute is read-only' unless $warned++;
+	return;
 }
 
 
@@ -361,12 +365,13 @@ sub arcount {
 	my $self = shift;
 	return $$self->{count}[3] || scalar @{$$self->{additional}} unless scalar @_;
 	carp 'header->arcount attribute is read-only' unless $warned++;
+	return;
 }
 
-sub zocount { &qdcount; }
-sub prcount { &ancount; }
-sub upcount { &nscount; }
-sub adcount { &arcount; }
+sub zocount { return &qdcount; }
+sub prcount { return &ancount; }
+sub upcount { return &nscount; }
+sub adcount { return &arcount; }
 
 
 =head1 EDNS Protocol Extensions
@@ -382,7 +387,7 @@ Gets or sets the EDNS DNSSEC OK flag.
 =cut
 
 sub do {
-	shift->_ednsflag( 0x8000, @_ );
+	return shift->_ednsflag( 0x8000, @_ );
 }
 
 
@@ -438,21 +443,21 @@ sub _dnsflag {
 		my $set = $_ | $flag;
 		my $not = $set - $flag;
 		$_ = (shift) ? $set : $not if scalar @_;
-		return ( $_ & $flag ) ? 1 : 0;
+		$flag = ( $_ & $flag ) ? 1 : 0;
 	}
+	return $flag;
 }
 
 
 sub _ednsflag {
-	my $self = shift;
-	my $flag = shift;
+	my ( $self, $flag, @val ) = @_;
 	my $edns = $$self->edns->flags || 0;
-	return $flag & $edns ? 1 : 0 unless scalar @_;
+	return $flag & $edns ? 1 : 0 unless scalar @val;
 	my $set = $flag | $edns;
 	my $not = $set - $flag;
-	my $new = (shift) ? $set : $not;
-	$$self->edns->flags($new) unless $new == $edns;
-	return ( $new & $flag ) ? 1 : 0;
+	my $val = shift(@val) ? $set : $not;
+	$$self->edns->flags($val) unless $val == $edns;
+	return ( $val & $flag ) ? 1 : 0;
 }
 
 

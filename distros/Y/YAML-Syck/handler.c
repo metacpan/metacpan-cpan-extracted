@@ -32,6 +32,16 @@ syck_hdlr_add_anchor( SyckParser *p, char *a, SyckNode *n )
 {
     SyckNode *ntmp = NULL;
 
+    if (n->anchor != NULL) {
+        /*
+         * Note: An error should be returned here. But this is better than
+         * not checking at all because it will abort the program with a
+         * memory corruption error.
+         * Happens if you have two anchors after each other or an anchor
+         * before an alias
+         * */
+        return n;
+    }
     n->anchor = a;
     if ( p->bad_anchors != NULL )
     {

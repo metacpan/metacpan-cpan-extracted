@@ -52,11 +52,11 @@ $VAR1 = {
                   },
           'fs' => {
                     '/dev/mapper/vgchu-root' => {
-                                                  'free' => '4226306048',
+                                                  'free' => '3071016960',
                                                   'fstype' => 'ext4',
                                                   'mountpoint' => '/',
                                                   'size' => '10434699264',
-                                                  'used' => '5654745088'
+                                                  'used' => '6810034176'
                                                 },
                     '/dev/sda1' => {
                                      'free' => '511868043264',
@@ -105,11 +105,11 @@ $VAR1 = {
                                    'disc-gran' => 0,
                                    'disc-max' => 0,
                                    'disc-zero' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' ),
-                                   'fsavail' => '4226314240',
+                                   'fsavail' => '3071025152',
                                    'fssize' => '10434699264',
                                    'fstype' => 'ext4',
-                                   'fsuse%' => '54%',
-                                   'fsused' => '5654736896',
+                                   'fsuse%' => '65%',
+                                   'fsused' => '6810025984',
                                    'group' => undef,
                                    'hctl' => undef,
                                    'hotplug' => do{my $o},
@@ -1089,7 +1089,7 @@ $VAR1 = {
                                                                   'H/W Model' => 'PERC H710P Adapter',
                                                                   'ID' => 'c0',
                                                                   'RAM' => '1024MB',
-                                                                  'Temp' => '78C'
+                                                                  'Temp' => '84C'
                                                                 }
                                                       },
                                       'Disk' => {
@@ -1102,7 +1102,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:0]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '38C',
+                                                                'Temp' => '34C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1115,7 +1115,7 @@ $VAR1 = {
                                                                  'Slot ID' => '[32:10]',
                                                                  'Speed' => '6.0Gb/s',
                                                                  'Status' => 'Online, Spun Up',
-                                                                 'Temp' => '36C',
+                                                                 'Temp' => '32C',
                                                                  'Type' => 'HDD',
                                                                  'sector size' => 512
                                                                },
@@ -1129,7 +1129,7 @@ $VAR1 = {
                                                                  'Slot ID' => '[32:11]',
                                                                  'Speed' => '6.0Gb/s',
                                                                  'Status' => 'Hotspare, Spun Up',
-                                                                 'Temp' => '35C',
+                                                                 'Temp' => '31C',
                                                                  'Type' => 'HDD',
                                                                  'sector size' => 512
                                                                },
@@ -1142,7 +1142,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:1]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '38C',
+                                                                'Temp' => '34C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1156,7 +1156,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:2]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Unconfigured(good), Spun Up',
-                                                                'Temp' => '38C',
+                                                                'Temp' => '34C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1170,7 +1170,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:3]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Unconfigured(good), Spun Up',
-                                                                'Temp' => '37C',
+                                                                'Temp' => '33C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1183,7 +1183,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:4]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '38C',
+                                                                'Temp' => '34C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1196,7 +1196,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:5]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '38C',
+                                                                'Temp' => '34C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1209,7 +1209,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:8]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Online, Spun Up',
-                                                                'Temp' => '37C',
+                                                                'Temp' => '33C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               },
@@ -1223,7 +1223,7 @@ $VAR1 = {
                                                                 'Slot ID' => '[32:9]',
                                                                 'Speed' => '6.0Gb/s',
                                                                 'Status' => 'Hotspare, Spun Up',
-                                                                'Temp' => '36C',
+                                                                'Temp' => '32C',
                                                                 'Type' => 'HDD',
                                                                 'sector size' => 512
                                                               }
@@ -1232,6 +1232,68 @@ $VAR1 = {
                            },
           'lvm' => {
                      'os' => {
+                               'lvs' => [
+                                          {
+                                            'devices' => '/dev/sdb1(0)',
+                                            'lv_name' => 'home',
+                                            'lv_parent' => '',
+                                            'pool_lv' => '',
+                                            'seg_le_ranges' => '/dev/sdb1:0-4767',
+                                            'seg_pe_ranges' => '/dev/sdb1:0-4767',
+                                            'seg_size' => '19998441472B',
+                                            'seg_start' => '0B',
+                                            'segtype' => 'linear',
+                                            'vg_name' => 'os'
+                                          },
+                                          {
+                                            'devices' => '/dev/sdb1(4768)',
+                                            'lv_name' => 'root',
+                                            'lv_parent' => '',
+                                            'pool_lv' => '',
+                                            'seg_le_ranges' => '/dev/sdb1:4768-16687',
+                                            'seg_pe_ranges' => '/dev/sdb1:4768-16687',
+                                            'seg_size' => '49996103680B',
+                                            'seg_start' => '0B',
+                                            'segtype' => 'linear',
+                                            'vg_name' => 'os'
+                                          },
+                                          {
+                                            'devices' => '/dev/sdb1(16688)',
+                                            'lv_name' => 'swap',
+                                            'lv_parent' => '',
+                                            'pool_lv' => '',
+                                            'seg_le_ranges' => '/dev/sdb1:16688-47681',
+                                            'seg_pe_ranges' => '/dev/sdb1:16688-47681',
+                                            'seg_size' => '129998258176B',
+                                            'seg_start' => '0B',
+                                            'segtype' => 'linear',
+                                            'vg_name' => 'os'
+                                          },
+                                          {
+                                            'devices' => '/dev/sdb1(47682)',
+                                            'lv_name' => 'tmp',
+                                            'lv_parent' => '',
+                                            'pool_lv' => '',
+                                            'seg_le_ranges' => '/dev/sdb1:47682-71522',
+                                            'seg_pe_ranges' => '/dev/sdb1:47682-71522',
+                                            'seg_size' => '99996401664B',
+                                            'seg_start' => '0B',
+                                            'segtype' => 'linear',
+                                            'vg_name' => 'os'
+                                          },
+                                          {
+                                            'devices' => '/dev/sdb1(71523)',
+                                            'lv_name' => 'var',
+                                            'lv_parent' => '',
+                                            'pool_lv' => '',
+                                            'seg_le_ranges' => '/dev/sdb1:71523-76290',
+                                            'seg_pe_ranges' => '/dev/sdb1:71523-76290',
+                                            'seg_size' => '19998441472B',
+                                            'seg_start' => '0B',
+                                            'segtype' => 'linear',
+                                            'vg_name' => 'os'
+                                          }
+                                        ],
                                'pvs' => [
                                           {
                                             'lv_name' => 'home',
@@ -1381,6 +1443,44 @@ $VAR1 = {
                                            }
                              },
                      'vgchu' => {
+                                  'lvs' => [
+                                             {
+                                               'devices' => '/dev/sda2(2560)',
+                                               'lv_name' => 'kvm-hera-disk1',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sda2:2560-15359',
+                                               'seg_pe_ranges' => '/dev/sda2:2560-15359',
+                                               'seg_size' => '53687091200B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'linear',
+                                               'vg_name' => 'vgchu'
+                                             },
+                                             {
+                                               'devices' => '/dev/sdc1(0)',
+                                               'lv_name' => 'kvm-hera-disk2',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sdc1:0-1048575',
+                                               'seg_pe_ranges' => '/dev/sdc1:0-1048575',
+                                               'seg_size' => '4398046511104B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'linear',
+                                               'vg_name' => 'vgchu'
+                                             },
+                                             {
+                                               'devices' => '/dev/sda2(0)',
+                                               'lv_name' => 'root',
+                                               'lv_parent' => '',
+                                               'pool_lv' => '',
+                                               'seg_le_ranges' => '/dev/sda2:0-2559',
+                                               'seg_pe_ranges' => '/dev/sda2:0-2559',
+                                               'seg_size' => '10737418240B',
+                                               'seg_start' => '0B',
+                                               'segtype' => 'linear',
+                                               'vg_name' => 'vgchu'
+                                             }
+                                           ],
                                   'pvs' => [
                                              {
                                                'lv_name' => 'root',
@@ -1663,7 +1763,7 @@ $VAR1 = {
                                          '_udev_infos' => {
                                                             'DEVNAME' => '/dev/bsg/0:2:0:0',
                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:03.0/0000:03:00.0/host0/target0:2:0/0:2:0:0/bsg/0:2:0:0',
-                                                            'MAJOR' => '250',
+                                                            'MAJOR' => '251',
                                                             'MINOR' => '0',
                                                             'SUBSYSTEM' => 'bsg'
                                                           },
@@ -1677,7 +1777,7 @@ $VAR1 = {
                                          '_udev_infos' => {
                                                             'DEVNAME' => '/dev/bsg/0:2:1:0',
                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:03.0/0000:03:00.0/host0/target0:2:1/0:2:1:0/bsg/0:2:1:0',
-                                                            'MAJOR' => '250',
+                                                            'MAJOR' => '251',
                                                             'MINOR' => '1',
                                                             'SUBSYSTEM' => 'bsg'
                                                           },
@@ -1691,7 +1791,7 @@ $VAR1 = {
                                          '_udev_infos' => {
                                                             'DEVNAME' => '/dev/bsg/0:2:2:0',
                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:03.0/0000:03:00.0/host0/target0:2:2/0:2:2:0/bsg/0:2:2:0',
-                                                            'MAJOR' => '250',
+                                                            'MAJOR' => '251',
                                                             'MINOR' => '2',
                                                             'SUBSYSTEM' => 'bsg'
                                                           },
@@ -1705,7 +1805,7 @@ $VAR1 = {
                                          '_udev_infos' => {
                                                             'DEVNAME' => '/dev/bsg/5:0:0:0',
                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1f.2/ata5/host5/target5:0:0/5:0:0:0/bsg/5:0:0:0',
-                                                            'MAJOR' => '250',
+                                                            'MAJOR' => '251',
                                                             'MINOR' => '3',
                                                             'SUBSYSTEM' => 'bsg'
                                                           },
@@ -1731,21 +1831,21 @@ $VAR1 = {
                                                                 'ID_MODEL_ID' => '0002',
                                                                 'ID_PATH' => 'pci-0000:00:1a.0',
                                                                 'ID_PATH_TAG' => 'pci-0000_00_1a_0',
-                                                                'ID_REVISION' => '0504',
-                                                                'ID_SERIAL' => 'Linux_5.4.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1a.0',
+                                                                'ID_REVISION' => '0506',
+                                                                'ID_SERIAL' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1a.0',
                                                                 'ID_SERIAL_SHORT' => '0000:00:1a.0',
                                                                 'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.4.0-0.bpo.2-amd64_ehci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.4.0-0.bpo.2-amd64\\x20ehci_hcd',
+                                                                'ID_VENDOR' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.6.0-0.bpo.2-amd64\\x20ehci_hcd',
                                                                 'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
                                                                 'ID_VENDOR_ID' => '1d6b',
                                                                 'MAJOR' => '189',
                                                                 'MINOR' => '0',
-                                                                'PRODUCT' => '1d6b/2/504',
+                                                                'PRODUCT' => '1d6b/2/506',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2162035'
+                                                                'USEC_INITIALIZED' => '1625876'
                                                               },
                                              'name' => 'bus/usb/001/001',
                                              'names' => [
@@ -1782,7 +1882,7 @@ $VAR1 = {
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/1',
-                                                                'USEC_INITIALIZED' => '2634496'
+                                                                'USEC_INITIALIZED' => '2097896'
                                                               },
                                              'name' => 'bus/usb/001/002',
                                              'names' => [
@@ -1820,7 +1920,7 @@ $VAR1 = {
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '3041150'
+                                                                'USEC_INITIALIZED' => '2500367'
                                                               },
                                              'name' => 'bus/usb/001/003',
                                              'names' => [
@@ -1854,7 +1954,7 @@ $VAR1 = {
                                                                 'PRODUCT' => '624/249/0',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TYPE' => '0/0/0',
-                                                                'USEC_INITIALIZED' => '6651293'
+                                                                'USEC_INITIALIZED' => '2983671'
                                                               },
                                              'name' => 'bus/usb/001/004',
                                              'names' => [
@@ -1878,21 +1978,21 @@ $VAR1 = {
                                                                 'ID_MODEL_ID' => '0002',
                                                                 'ID_PATH' => 'pci-0000:00:1d.0',
                                                                 'ID_PATH_TAG' => 'pci-0000_00_1d_0',
-                                                                'ID_REVISION' => '0504',
-                                                                'ID_SERIAL' => 'Linux_5.4.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1d.0',
+                                                                'ID_REVISION' => '0506',
+                                                                'ID_SERIAL' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd_EHCI_Host_Controller_0000:00:1d.0',
                                                                 'ID_SERIAL_SHORT' => '0000:00:1d.0',
                                                                 'ID_USB_INTERFACES' => ':090000:',
-                                                                'ID_VENDOR' => 'Linux_5.4.0-0.bpo.2-amd64_ehci_hcd',
-                                                                'ID_VENDOR_ENC' => 'Linux\\x205.4.0-0.bpo.2-amd64\\x20ehci_hcd',
+                                                                'ID_VENDOR' => 'Linux_5.6.0-0.bpo.2-amd64_ehci_hcd',
+                                                                'ID_VENDOR_ENC' => 'Linux\\x205.6.0-0.bpo.2-amd64\\x20ehci_hcd',
                                                                 'ID_VENDOR_FROM_DATABASE' => 'Linux Foundation',
                                                                 'ID_VENDOR_ID' => '1d6b',
                                                                 'MAJOR' => '189',
                                                                 'MINOR' => '128',
-                                                                'PRODUCT' => '1d6b/2/504',
+                                                                'PRODUCT' => '1d6b/2/506',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/0',
-                                                                'USEC_INITIALIZED' => '2162023'
+                                                                'USEC_INITIALIZED' => '1625926'
                                                               },
                                              'name' => 'bus/usb/002/001',
                                              'names' => [
@@ -1929,7 +2029,7 @@ $VAR1 = {
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TAGS' => ':seat:',
                                                                 'TYPE' => '9/0/1',
-                                                                'USEC_INITIALIZED' => '2658759'
+                                                                'USEC_INITIALIZED' => '2117724'
                                                               },
                                              'name' => 'bus/usb/002/002',
                                              'names' => [
@@ -1942,33 +2042,32 @@ $VAR1 = {
                                                                 'BUSNUM' => '002',
                                                                 'DEVNAME' => '/dev/bus/usb/002/003',
                                                                 'DEVNUM' => '003',
-                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5',
+                                                                'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2',
                                                                 'DEVTYPE' => 'usb_device',
                                                                 'DRIVER' => 'usb',
                                                                 'ID_BUS' => 'usb',
-                                                                'ID_MODEL' => 'HP_Basic_USB_Keyboard',
-                                                                'ID_MODEL_ENC' => 'HP\\x20Basic\\x20USB\\x20Keyboard',
-                                                                'ID_MODEL_FROM_DATABASE' => 'KU-0316 Keyboard',
-                                                                'ID_MODEL_ID' => '0024',
-                                                                'ID_REVISION' => '0130',
-                                                                'ID_SERIAL' => 'CHICONY_HP_Basic_USB_Keyboard',
-                                                                'ID_USB_INTERFACES' => ':030101:',
-                                                                'ID_VENDOR' => 'CHICONY',
-                                                                'ID_VENDOR_ENC' => 'CHICONY',
-                                                                'ID_VENDOR_FROM_DATABASE' => 'HP, Inc',
-                                                                'ID_VENDOR_ID' => '03f0',
+                                                                'ID_MODEL' => 'Lenovo_Calliope_USB_Keyboard',
+                                                                'ID_MODEL_ENC' => 'Lenovo\\x20Calliope\\x20USB\\x20Keyboard',
+                                                                'ID_MODEL_ID' => '608c',
+                                                                'ID_REVISION' => '0107',
+                                                                'ID_SERIAL' => 'Lenovo_Lenovo_Calliope_USB_Keyboard',
+                                                                'ID_USB_INTERFACES' => ':030101:030000:',
+                                                                'ID_VENDOR' => 'Lenovo',
+                                                                'ID_VENDOR_ENC' => 'Lenovo',
+                                                                'ID_VENDOR_FROM_DATABASE' => 'Lenovo',
+                                                                'ID_VENDOR_ID' => '17ef',
                                                                 'MAJOR' => '189',
                                                                 'MINOR' => '130',
-                                                                'PRODUCT' => '3f0/24/130',
+                                                                'PRODUCT' => '17ef/608c/107',
                                                                 'SUBSYSTEM' => 'usb',
                                                                 'TYPE' => '0/0/0',
-                                                                'USEC_INITIALIZED' => '3073617'
+                                                                'USEC_INITIALIZED' => '2526830'
                                                               },
                                              'name' => 'bus/usb/002/003',
                                              'names' => [
                                                           'bus/usb/002/003'
                                                         ],
-                                             'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5'
+                                             'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2'
                                            },
                       'console' => {
                                      '_udev_infos' => {
@@ -2025,7 +2124,7 @@ $VAR1 = {
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2944491'
+                                                     'USEC_INITIALIZED' => '2476323'
                                                    },
                                   'name' => 'dm-0',
                                   'names' => [
@@ -2064,7 +2163,7 @@ $VAR1 = {
                                                      'MINOR' => '1',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '6953723'
+                                                     'USEC_INITIALIZED' => '8302341'
                                                    },
                                   'name' => 'dm-1',
                                   'names' => [
@@ -2102,7 +2201,7 @@ $VAR1 = {
                                                      'MINOR' => '2',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '6955285'
+                                                     'USEC_INITIALIZED' => '8381207'
                                                    },
                                   'name' => 'dm-2',
                                   'names' => [
@@ -2140,7 +2239,7 @@ $VAR1 = {
                                                      'MINOR' => '3',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '6955814'
+                                                     'USEC_INITIALIZED' => '8382168'
                                                    },
                                   'name' => 'dm-3',
                                   'names' => [
@@ -2178,7 +2277,7 @@ $VAR1 = {
                                                      'MINOR' => '4',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '6956181'
+                                                     'USEC_INITIALIZED' => '8383206'
                                                    },
                                   'name' => 'dm-4',
                                   'names' => [
@@ -2216,7 +2315,7 @@ $VAR1 = {
                                                      'MINOR' => '5',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '6957069'
+                                                     'USEC_INITIALIZED' => '8384326'
                                                    },
                                   'name' => 'dm-5',
                                   'names' => [
@@ -2250,7 +2349,7 @@ $VAR1 = {
                                                      'MINOR' => '6',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '7367175'
+                                                     'USEC_INITIALIZED' => '8867972'
                                                    },
                                   'name' => 'dm-6',
                                   'names' => [
@@ -2283,7 +2382,7 @@ $VAR1 = {
                                                      'MINOR' => '7',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '7367981'
+                                                     'USEC_INITIALIZED' => '8869146'
                                                    },
                                   'name' => 'dm-7',
                                   'names' => [
@@ -2307,8 +2406,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:uaccess:seat:',
-                                                          'USEC_INITIALIZED' => '7492371'
+                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
+                                                          'USEC_INITIALIZED' => '9095401'
                                                         },
                                        'name' => 'dri/card0',
                                        'names' => [
@@ -2329,8 +2428,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '1',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:uaccess:seat:',
-                                                          'USEC_INITIALIZED' => '1405873489024'
+                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
+                                                          'USEC_INITIALIZED' => '11234462'
                                                         },
                                        'name' => 'dri/card1',
                                        'names' => [
@@ -2351,8 +2450,8 @@ $VAR1 = {
                                                           'MAJOR' => '226',
                                                           'MINOR' => '2',
                                                           'SUBSYSTEM' => 'drm',
-                                                          'TAGS' => ':master-of-seat:uaccess:seat:',
-                                                          'USEC_INITIALIZED' => '1405873905672'
+                                                          'TAGS' => ':master-of-seat:seat:uaccess:',
+                                                          'USEC_INITIALIZED' => '11262922'
                                                         },
                                        'name' => 'dri/card2',
                                        'names' => [
@@ -2373,8 +2472,8 @@ $VAR1 = {
                                                                'MAJOR' => '226',
                                                                'MINOR' => '128',
                                                                'SUBSYSTEM' => 'drm',
-                                                               'TAGS' => ':uaccess:seat:',
-                                                               'USEC_INITIALIZED' => '1405873488163'
+                                                               'TAGS' => ':seat:uaccess:',
+                                                               'USEC_INITIALIZED' => '11233831'
                                                              },
                                             'name' => 'dri/renderD128',
                                             'names' => [
@@ -2395,8 +2494,8 @@ $VAR1 = {
                                                                'MAJOR' => '226',
                                                                'MINOR' => '129',
                                                                'SUBSYSTEM' => 'drm',
-                                                               'TAGS' => ':uaccess:seat:',
-                                                               'USEC_INITIALIZED' => '1405873906025'
+                                                               'TAGS' => ':seat:uaccess:',
+                                                               'USEC_INITIALIZED' => '11262599'
                                                              },
                                             'name' => 'dri/renderD129',
                                             'names' => [
@@ -2416,7 +2515,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'graphics',
                                                     'TAGS' => ':seat:',
-                                                    'USEC_INITIALIZED' => '7490992'
+                                                    'USEC_INITIALIZED' => '9095219'
                                                   },
                                  'name' => 'fb0',
                                  'names' => [
@@ -2442,8 +2541,8 @@ $VAR1 = {
                       'hidraw0' => {
                                      '_udev_infos' => {
                                                         'DEVNAME' => '/dev/hidraw0',
-                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5/2-1.5:1.0/0003:03F0:0024.0001/hidraw/hidraw0',
-                                                        'MAJOR' => '246',
+                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.0/0003:17EF:608C.0001/hidraw/hidraw0',
+                                                        'MAJOR' => '247',
                                                         'MINOR' => '0',
                                                         'SUBSYSTEM' => 'hidraw'
                                                       },
@@ -2451,13 +2550,13 @@ $VAR1 = {
                                      'names' => [
                                                   'hidraw0'
                                                 ],
-                                     'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5/2-1.5:1.0/0003:03F0:0024.0001/hidraw/hidraw0'
+                                     'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.0/0003:17EF:608C.0001/hidraw/hidraw0'
                                    },
                       'hidraw1' => {
                                      '_udev_infos' => {
                                                         'DEVNAME' => '/dev/hidraw1',
-                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0002/hidraw/hidraw1',
-                                                        'MAJOR' => '246',
+                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/hidraw/hidraw1',
+                                                        'MAJOR' => '247',
                                                         'MINOR' => '1',
                                                         'SUBSYSTEM' => 'hidraw'
                                                       },
@@ -2465,13 +2564,13 @@ $VAR1 = {
                                      'names' => [
                                                   'hidraw1'
                                                 ],
-                                     'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0002/hidraw/hidraw1'
+                                     'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/hidraw/hidraw1'
                                    },
                       'hidraw2' => {
                                      '_udev_infos' => {
                                                         'DEVNAME' => '/dev/hidraw2',
-                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0003/hidraw/hidraw2',
-                                                        'MAJOR' => '246',
+                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0003/hidraw/hidraw2',
+                                                        'MAJOR' => '247',
                                                         'MINOR' => '2',
                                                         'SUBSYSTEM' => 'hidraw'
                                                       },
@@ -2479,13 +2578,13 @@ $VAR1 = {
                                      'names' => [
                                                   'hidraw2'
                                                 ],
-                                     'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0003/hidraw/hidraw2'
+                                     'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0003/hidraw/hidraw2'
                                    },
                       'hidraw3' => {
                                      '_udev_infos' => {
                                                         'DEVNAME' => '/dev/hidraw3',
-                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0004/hidraw/hidraw3',
-                                                        'MAJOR' => '246',
+                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0004/hidraw/hidraw3',
+                                                        'MAJOR' => '247',
                                                         'MINOR' => '3',
                                                         'SUBSYSTEM' => 'hidraw'
                                                       },
@@ -2493,7 +2592,21 @@ $VAR1 = {
                                      'names' => [
                                                   'hidraw3'
                                                 ],
-                                     'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0004/hidraw/hidraw3'
+                                     'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0004/hidraw/hidraw3'
+                                   },
+                      'hidraw4' => {
+                                     '_udev_infos' => {
+                                                        'DEVNAME' => '/dev/hidraw4',
+                                                        'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0005/hidraw/hidraw4',
+                                                        'MAJOR' => '247',
+                                                        'MINOR' => '4',
+                                                        'SUBSYSTEM' => 'hidraw'
+                                                      },
+                                     'name' => 'hidraw4',
+                                     'names' => [
+                                                  'hidraw4'
+                                                ],
+                                     'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0005/hidraw/hidraw4'
                                    },
                       'hpet' => {
                                   '_udev_infos' => {
@@ -2511,46 +2624,240 @@ $VAR1 = {
                                 },
                       'input/event0' => {
                                           '_udev_infos' => {
-                                                             'DEVLINKS' => '/dev/input/by-id/usb-CHICONY_HP_Basic_USB_Keyboard-event-kbd /dev/input/by-path/pci-0000:00:1d.0-usb-0:1.5:1.0-event-kbd',
+                                                             'DEVLINKS' => '/dev/input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-event-kbd /dev/input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.0-event-kbd',
                                                              'DEVNAME' => '/dev/input/event0',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5/2-1.5:1.0/0003:03F0:0024.0001/input/input0/event0',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.0/0003:17EF:608C.0001/input/input0/event0',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_KEY' => '1',
                                                              'ID_INPUT_KEYBOARD' => '1',
-                                                             'ID_MODEL' => 'HP_Basic_USB_Keyboard',
-                                                             'ID_MODEL_ENC' => 'HP\\x20Basic\\x20USB\\x20Keyboard',
-                                                             'ID_MODEL_ID' => '0024',
-                                                             'ID_PATH' => 'pci-0000:00:1d.0-usb-0:1.5:1.0',
-                                                             'ID_PATH_TAG' => 'pci-0000_00_1d_0-usb-0_1_5_1_0',
-                                                             'ID_REVISION' => '0130',
-                                                             'ID_SERIAL' => 'CHICONY_HP_Basic_USB_Keyboard',
+                                                             'ID_MODEL' => 'Lenovo_Calliope_USB_Keyboard',
+                                                             'ID_MODEL_ENC' => 'Lenovo\\x20Calliope\\x20USB\\x20Keyboard',
+                                                             'ID_MODEL_ID' => '608c',
+                                                             'ID_PATH' => 'pci-0000:00:1d.0-usb-0:1.2:1.0',
+                                                             'ID_PATH_TAG' => 'pci-0000_00_1d_0-usb-0_1_2_1_0',
+                                                             'ID_REVISION' => '0107',
+                                                             'ID_SERIAL' => 'Lenovo_Lenovo_Calliope_USB_Keyboard',
                                                              'ID_TYPE' => 'hid',
                                                              'ID_USB_DRIVER' => 'usbhid',
-                                                             'ID_USB_INTERFACES' => ':030101:',
+                                                             'ID_USB_INTERFACES' => ':030101:030000:',
                                                              'ID_USB_INTERFACE_NUM' => '00',
-                                                             'ID_VENDOR' => 'CHICONY',
-                                                             'ID_VENDOR_ENC' => 'CHICONY',
-                                                             'ID_VENDOR_ID' => '03f0',
+                                                             'ID_VENDOR' => 'Lenovo',
+                                                             'ID_VENDOR_ENC' => 'Lenovo',
+                                                             'ID_VENDOR_ID' => '17ef',
                                                              'MAJOR' => '13',
                                                              'MINOR' => '64',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '6717475'
+                                                             'USEC_INITIALIZED' => '8105260'
                                                            },
                                           'name' => 'input/event0',
                                           'names' => [
-                                                       'input/by-id/usb-CHICONY_HP_Basic_USB_Keyboard-event-kbd',
-                                                       'input/by-path/pci-0000:00:1d.0-usb-0:1.5:1.0-event-kbd',
+                                                       'input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-event-kbd',
+                                                       'input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.0-event-kbd',
                                                        'input/event0'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5/2-1.5:1.0/0003:03F0:0024.0001/input/input0/event0'
+                                          'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.0/0003:17EF:608C.0001/input/input0/event0'
                                         },
                       'input/event1' => {
                                           '_udev_infos' => {
-                                                             'DEVLINKS' => '/dev/input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-event-kbd /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.0-event-kbd',
+                                                             'DEVLINKS' => '/dev/input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-event-if01 /dev/input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-event',
                                                              'DEVNAME' => '/dev/input/event1',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0002/input/input1/event1',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input1/event1',
+                                                             'ID_BUS' => 'usb',
+                                                             'ID_INPUT' => '1',
+                                                             'ID_INPUT_KEY' => '1',
+                                                             'ID_MODEL' => 'Lenovo_Calliope_USB_Keyboard',
+                                                             'ID_MODEL_ENC' => 'Lenovo\\x20Calliope\\x20USB\\x20Keyboard',
+                                                             'ID_MODEL_ID' => '608c',
+                                                             'ID_PATH' => 'pci-0000:00:1d.0-usb-0:1.2:1.1',
+                                                             'ID_PATH_TAG' => 'pci-0000_00_1d_0-usb-0_1_2_1_1',
+                                                             'ID_REVISION' => '0107',
+                                                             'ID_SERIAL' => 'Lenovo_Lenovo_Calliope_USB_Keyboard',
+                                                             'ID_TYPE' => 'hid',
+                                                             'ID_USB_DRIVER' => 'usbhid',
+                                                             'ID_USB_INTERFACES' => ':030101:030000:',
+                                                             'ID_USB_INTERFACE_NUM' => '01',
+                                                             'ID_VENDOR' => 'Lenovo',
+                                                             'ID_VENDOR_ENC' => 'Lenovo',
+                                                             'ID_VENDOR_ID' => '17ef',
+                                                             'MAJOR' => '13',
+                                                             'MINOR' => '65',
+                                                             'SUBSYSTEM' => 'input',
+                                                             'TAGS' => ':power-switch:',
+                                                             'USEC_INITIALIZED' => '8096870'
+                                                           },
+                                          'name' => 'input/event1',
+                                          'names' => [
+                                                       'input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-event-if01',
+                                                       'input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-event',
+                                                       'input/event1'
+                                                     ],
+                                          'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input1/event1'
+                                        },
+                      'input/event10' => {
+                                           '_udev_infos' => {
+                                                              'DEVNAME' => '/dev/input/event10',
+                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input12/event10',
+                                                              'ID_INPUT' => '1',
+                                                              'ID_INPUT_SWITCH' => '1',
+                                                              'ID_PATH' => 'pci-0000:43:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_43_00_1',
+                                                              'MAJOR' => '13',
+                                                              'MINOR' => '74',
+                                                              'SUBSYSTEM' => 'input',
+                                                              'TAGS' => ':power-switch:',
+                                                              'USEC_INITIALIZED' => '9084198'
+                                                            },
+                                           'name' => 'input/event10',
+                                           'names' => [
+                                                        'input/event10'
+                                                      ],
+                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input12/event10'
+                                         },
+                      'input/event11' => {
+                                           '_udev_infos' => {
+                                                              'DEVNAME' => '/dev/input/event11',
+                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input14/event11',
+                                                              'ID_INPUT' => '1',
+                                                              'ID_INPUT_SWITCH' => '1',
+                                                              'ID_PATH' => 'pci-0000:43:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_43_00_1',
+                                                              'MAJOR' => '13',
+                                                              'MINOR' => '75',
+                                                              'SUBSYSTEM' => 'input',
+                                                              'TAGS' => ':power-switch:',
+                                                              'USEC_INITIALIZED' => '9048004'
+                                                            },
+                                           'name' => 'input/event11',
+                                           'names' => [
+                                                        'input/event11'
+                                                      ],
+                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input14/event11'
+                                         },
+                      'input/event12' => {
+                                           '_udev_infos' => {
+                                                              'DEVNAME' => '/dev/input/event12',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input9/event12',
+                                                              'ID_INPUT' => '1',
+                                                              'ID_INPUT_SWITCH' => '1',
+                                                              'ID_PATH' => 'pci-0000:02:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_02_00_1',
+                                                              'MAJOR' => '13',
+                                                              'MINOR' => '76',
+                                                              'SUBSYSTEM' => 'input',
+                                                              'TAGS' => ':power-switch:',
+                                                              'USEC_INITIALIZED' => '9051936'
+                                                            },
+                                           'name' => 'input/event12',
+                                           'names' => [
+                                                        'input/event12'
+                                                      ],
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input9/event12'
+                                         },
+                      'input/event13' => {
+                                           '_udev_infos' => {
+                                                              'DEVNAME' => '/dev/input/event13',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input11/event13',
+                                                              'ID_INPUT' => '1',
+                                                              'ID_INPUT_SWITCH' => '1',
+                                                              'ID_PATH' => 'pci-0000:02:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_02_00_1',
+                                                              'MAJOR' => '13',
+                                                              'MINOR' => '77',
+                                                              'SUBSYSTEM' => 'input',
+                                                              'TAGS' => ':power-switch:',
+                                                              'USEC_INITIALIZED' => '9055946'
+                                                            },
+                                           'name' => 'input/event13',
+                                           'names' => [
+                                                        'input/event13'
+                                                      ],
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input11/event13'
+                                         },
+                      'input/event14' => {
+                                           '_udev_infos' => {
+                                                              'DEVNAME' => '/dev/input/event14',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input13/event14',
+                                                              'ID_INPUT' => '1',
+                                                              'ID_INPUT_SWITCH' => '1',
+                                                              'ID_PATH' => 'pci-0000:02:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_02_00_1',
+                                                              'MAJOR' => '13',
+                                                              'MINOR' => '78',
+                                                              'SUBSYSTEM' => 'input',
+                                                              'TAGS' => ':power-switch:',
+                                                              'USEC_INITIALIZED' => '9048001'
+                                                            },
+                                           'name' => 'input/event14',
+                                           'names' => [
+                                                        'input/event14'
+                                                      ],
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input13/event14'
+                                         },
+                      'input/event15' => {
+                                           '_udev_infos' => {
+                                                              'DEVNAME' => '/dev/input/event15',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input15/event15',
+                                                              'ID_INPUT' => '1',
+                                                              'ID_INPUT_SWITCH' => '1',
+                                                              'ID_PATH' => 'pci-0000:02:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_02_00_1',
+                                                              'MAJOR' => '13',
+                                                              'MINOR' => '79',
+                                                              'SUBSYSTEM' => 'input',
+                                                              'TAGS' => ':power-switch:',
+                                                              'USEC_INITIALIZED' => '9051991'
+                                                            },
+                                           'name' => 'input/event15',
+                                           'names' => [
+                                                        'input/event15'
+                                                      ],
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/input15/event15'
+                                         },
+                      'input/event2' => {
+                                          '_udev_infos' => {
+                                                             'DEVLINKS' => '/dev/input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-if01-event-joystick /dev/input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-event-joystick',
+                                                             'DEVNAME' => '/dev/input/event2',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input2/event2',
+                                                             'ID_BUS' => 'usb',
+                                                             'ID_FOR_SEAT' => 'input-pci-0000_00_1d_0-usb-0_1_2_1_1',
+                                                             'ID_INPUT' => '1',
+                                                             'ID_INPUT_JOYSTICK' => '1',
+                                                             'ID_INPUT_KEY' => '1',
+                                                             'ID_MODEL' => 'Lenovo_Calliope_USB_Keyboard',
+                                                             'ID_MODEL_ENC' => 'Lenovo\\x20Calliope\\x20USB\\x20Keyboard',
+                                                             'ID_MODEL_ID' => '608c',
+                                                             'ID_PATH' => 'pci-0000:00:1d.0-usb-0:1.2:1.1',
+                                                             'ID_PATH_TAG' => 'pci-0000_00_1d_0-usb-0_1_2_1_1',
+                                                             'ID_REVISION' => '0107',
+                                                             'ID_SERIAL' => 'Lenovo_Lenovo_Calliope_USB_Keyboard',
+                                                             'ID_TYPE' => 'hid',
+                                                             'ID_USB_DRIVER' => 'usbhid',
+                                                             'ID_USB_INTERFACES' => ':030101:030000:',
+                                                             'ID_USB_INTERFACE_NUM' => '01',
+                                                             'ID_VENDOR' => 'Lenovo',
+                                                             'ID_VENDOR_ENC' => 'Lenovo',
+                                                             'ID_VENDOR_ID' => '17ef',
+                                                             'MAJOR' => '13',
+                                                             'MINOR' => '66',
+                                                             'SUBSYSTEM' => 'input',
+                                                             'TAGS' => ':power-switch:seat:uaccess:',
+                                                             'USEC_INITIALIZED' => '8072927'
+                                                           },
+                                          'name' => 'input/event2',
+                                          'names' => [
+                                                       'input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-if01-event-joystick',
+                                                       'input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-event-joystick',
+                                                       'input/event2'
+                                                     ],
+                                          'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input2/event2'
+                                        },
+                      'input/event3' => {
+                                          '_udev_infos' => {
+                                                             'DEVLINKS' => '/dev/input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-event-kbd /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.0-event-kbd',
+                                                             'DEVNAME' => '/dev/input/event3',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0003/input/input3/event3',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_KEY' => '1',
@@ -2571,24 +2878,24 @@ $VAR1 = {
                                                              'ID_VENDOR_ENC' => 'Avocent',
                                                              'ID_VENDOR_ID' => '0624',
                                                              'MAJOR' => '13',
-                                                             'MINOR' => '65',
+                                                             'MINOR' => '67',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '6722543'
+                                                             'USEC_INITIALIZED' => '8089074'
                                                            },
-                                          'name' => 'input/event1',
+                                          'name' => 'input/event3',
                                           'names' => [
                                                        'input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-event-kbd',
                                                        'input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.0-event-kbd',
-                                                       'input/event1'
+                                                       'input/event3'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0002/input/input1/event1'
+                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.0/0003:0624:0249.0003/input/input3/event3'
                                         },
-                      'input/event2' => {
+                      'input/event4' => {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-if01-event-mouse /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.1-event-mouse',
-                                                             'DEVNAME' => '/dev/input/event2',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0003/input/input2/event2',
+                                                             'DEVNAME' => '/dev/input/event4',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0004/input/input4/event4',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_MOUSE' => '1',
@@ -2608,23 +2915,23 @@ $VAR1 = {
                                                              'ID_VENDOR_ENC' => 'Avocent',
                                                              'ID_VENDOR_ID' => '0624',
                                                              'MAJOR' => '13',
-                                                             'MINOR' => '66',
+                                                             'MINOR' => '68',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '6861865'
+                                                             'USEC_INITIALIZED' => '8124407'
                                                            },
-                                          'name' => 'input/event2',
+                                          'name' => 'input/event4',
                                           'names' => [
                                                        'input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-if01-event-mouse',
                                                        'input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.1-event-mouse',
-                                                       'input/event2'
+                                                       'input/event4'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0003/input/input2/event2'
+                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0004/input/input4/event4'
                                         },
-                      'input/event3' => {
+                      'input/event5' => {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-if02-event-mouse /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.2-event-mouse',
-                                                             'DEVNAME' => '/dev/input/event3',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0004/input/input3/event3',
+                                                             'DEVNAME' => '/dev/input/event5',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0005/input/input5/event5',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_MOUSE' => '1',
@@ -2644,59 +2951,137 @@ $VAR1 = {
                                                              'ID_VENDOR_ENC' => 'Avocent',
                                                              'ID_VENDOR_ID' => '0624',
                                                              'MAJOR' => '13',
-                                                             'MINOR' => '67',
+                                                             'MINOR' => '69',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '6793631'
+                                                             'USEC_INITIALIZED' => '8148999'
                                                            },
-                                          'name' => 'input/event3',
+                                          'name' => 'input/event5',
                                           'names' => [
                                                        'input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-if02-event-mouse',
                                                        'input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.2-event-mouse',
-                                                       'input/event3'
+                                                       'input/event5'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0004/input/input3/event3'
+                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0005/input/input5/event5'
                                         },
-                      'input/event4' => {
+                      'input/event6' => {
                                           '_udev_infos' => {
-                                                             'DEVNAME' => '/dev/input/event4',
-                                                             'DEVPATH' => '/devices/LNXSYSTM:00/LNXPWRBN:00/input/input4/event4',
+                                                             'DEVNAME' => '/dev/input/event6',
+                                                             'DEVPATH' => '/devices/LNXSYSTM:00/LNXPWRBN:00/input/input6/event6',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_KEY' => '1',
                                                              'ID_PATH' => 'acpi-LNXPWRBN:00',
                                                              'ID_PATH_TAG' => 'acpi-LNXPWRBN_00',
                                                              'MAJOR' => '13',
-                                                             'MINOR' => '68',
+                                                             'MINOR' => '70',
                                                              'SUBSYSTEM' => 'input',
                                                              'TAGS' => ':power-switch:',
-                                                             'USEC_INITIALIZED' => '6721151'
+                                                             'USEC_INITIALIZED' => '8088063'
                                                            },
-                                          'name' => 'input/event4',
+                                          'name' => 'input/event6',
                                           'names' => [
-                                                       'input/event4'
+                                                       'input/event6'
                                                      ],
-                                          'path' => '/devices/LNXSYSTM:00/LNXPWRBN:00/input/input4/event4'
+                                          'path' => '/devices/LNXSYSTM:00/LNXPWRBN:00/input/input6/event6'
                                         },
-                      'input/event5' => {
+                      'input/event7' => {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-path/platform-pcspkr-event-spkr',
-                                                             'DEVNAME' => '/dev/input/event5',
-                                                             'DEVPATH' => '/devices/platform/pcspkr/input/input5/event5',
+                                                             'DEVNAME' => '/dev/input/event7',
+                                                             'DEVPATH' => '/devices/platform/pcspkr/input/input7/event7',
                                                              'ID_INPUT' => '1',
                                                              'ID_PATH' => 'platform-pcspkr',
                                                              'ID_PATH_TAG' => 'platform-pcspkr',
                                                              'ID_SERIAL' => 'noserial',
                                                              'MAJOR' => '13',
-                                                             'MINOR' => '69',
+                                                             'MINOR' => '71',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '6709201'
+                                                             'USEC_INITIALIZED' => '8081098'
                                                            },
-                                          'name' => 'input/event5',
+                                          'name' => 'input/event7',
                                           'names' => [
                                                        'input/by-path/platform-pcspkr-event-spkr',
-                                                       'input/event5'
+                                                       'input/event7'
                                                      ],
-                                          'path' => '/devices/platform/pcspkr/input/input5/event5'
+                                          'path' => '/devices/platform/pcspkr/input/input7/event7'
                                         },
+                      'input/event8' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/input/event8',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input8/event8',
+                                                             'ID_INPUT' => '1',
+                                                             'ID_INPUT_SWITCH' => '1',
+                                                             'ID_PATH' => 'pci-0000:43:00.1',
+                                                             'ID_PATH_TAG' => 'pci-0000_43_00_1',
+                                                             'MAJOR' => '13',
+                                                             'MINOR' => '72',
+                                                             'SUBSYSTEM' => 'input',
+                                                             'TAGS' => ':power-switch:',
+                                                             'USEC_INITIALIZED' => '9051945'
+                                                           },
+                                          'name' => 'input/event8',
+                                          'names' => [
+                                                       'input/event8'
+                                                     ],
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input8/event8'
+                                        },
+                      'input/event9' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/input/event9',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input10/event9',
+                                                             'ID_INPUT' => '1',
+                                                             'ID_INPUT_SWITCH' => '1',
+                                                             'ID_PATH' => 'pci-0000:43:00.1',
+                                                             'ID_PATH_TAG' => 'pci-0000_43_00_1',
+                                                             'MAJOR' => '13',
+                                                             'MINOR' => '73',
+                                                             'SUBSYSTEM' => 'input',
+                                                             'TAGS' => ':power-switch:',
+                                                             'USEC_INITIALIZED' => '9051988'
+                                                           },
+                                          'name' => 'input/event9',
+                                          'names' => [
+                                                       'input/event9'
+                                                     ],
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/input10/event9'
+                                        },
+                      'input/js0' => {
+                                       '_udev_infos' => {
+                                                          'DEVLINKS' => '/dev/input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-if01-joystick /dev/input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-joystick',
+                                                          'DEVNAME' => '/dev/input/js0',
+                                                          'DEVPATH' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input2/js0',
+                                                          'ID_BUS' => 'usb',
+                                                          'ID_FOR_SEAT' => 'input-pci-0000_00_1d_0-usb-0_1_2_1_1',
+                                                          'ID_INPUT' => '1',
+                                                          'ID_INPUT_JOYSTICK' => '1',
+                                                          'ID_INPUT_KEY' => '1',
+                                                          'ID_MODEL' => 'Lenovo_Calliope_USB_Keyboard',
+                                                          'ID_MODEL_ENC' => 'Lenovo\\x20Calliope\\x20USB\\x20Keyboard',
+                                                          'ID_MODEL_ID' => '608c',
+                                                          'ID_PATH' => 'pci-0000:00:1d.0-usb-0:1.2:1.1',
+                                                          'ID_PATH_TAG' => 'pci-0000_00_1d_0-usb-0_1_2_1_1',
+                                                          'ID_REVISION' => '0107',
+                                                          'ID_SERIAL' => 'Lenovo_Lenovo_Calliope_USB_Keyboard',
+                                                          'ID_TYPE' => 'hid',
+                                                          'ID_USB_DRIVER' => 'usbhid',
+                                                          'ID_USB_INTERFACES' => ':030101:030000:',
+                                                          'ID_USB_INTERFACE_NUM' => '01',
+                                                          'ID_VENDOR' => 'Lenovo',
+                                                          'ID_VENDOR_ENC' => 'Lenovo',
+                                                          'ID_VENDOR_ID' => '17ef',
+                                                          'MAJOR' => '13',
+                                                          'MINOR' => '0',
+                                                          'SUBSYSTEM' => 'input',
+                                                          'TAGS' => ':seat:uaccess:',
+                                                          'USEC_INITIALIZED' => '7981704'
+                                                        },
+                                       'name' => 'input/js0',
+                                       'names' => [
+                                                    'input/by-id/usb-Lenovo_Lenovo_Calliope_USB_Keyboard-if01-joystick',
+                                                    'input/by-path/pci-0000:00:1d.0-usb-0:1.2:1.1-joystick',
+                                                    'input/js0'
+                                                  ],
+                                       'path' => '/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.2/2-1.2:1.1/0003:17EF:608C.0002/input/input2/js0'
+                                     },
                       'input/mice' => {
                                         '_udev_infos' => {
                                                            'DEVNAME' => '/dev/input/mice',
@@ -2715,7 +3100,7 @@ $VAR1 = {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-if01-mouse /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.1-mouse',
                                                              'DEVNAME' => '/dev/input/mouse0',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0003/input/input2/mouse0',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0004/input/input4/mouse0',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_MOUSE' => '1',
@@ -2737,7 +3122,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '32',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '6735304'
+                                                             'USEC_INITIALIZED' => '7994783'
                                                            },
                                           'name' => 'input/mouse0',
                                           'names' => [
@@ -2745,13 +3130,13 @@ $VAR1 = {
                                                        'input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.1-mouse',
                                                        'input/mouse0'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0003/input/input2/mouse0'
+                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.1/0003:0624:0249.0004/input/input4/mouse0'
                                         },
                       'input/mouse1' => {
                                           '_udev_infos' => {
                                                              'DEVLINKS' => '/dev/input/by-id/usb-Avocent_Keyboard_Mouse_Function_20110426-if02-mouse /dev/input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.2-mouse',
                                                              'DEVNAME' => '/dev/input/mouse1',
-                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0004/input/input3/mouse1',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0005/input/input5/mouse1',
                                                              'ID_BUS' => 'usb',
                                                              'ID_INPUT' => '1',
                                                              'ID_INPUT_MOUSE' => '1',
@@ -2773,7 +3158,7 @@ $VAR1 = {
                                                              'MAJOR' => '13',
                                                              'MINOR' => '33',
                                                              'SUBSYSTEM' => 'input',
-                                                             'USEC_INITIALIZED' => '6657932'
+                                                             'USEC_INITIALIZED' => '7995647'
                                                            },
                                           'name' => 'input/mouse1',
                                           'names' => [
@@ -2781,13 +3166,13 @@ $VAR1 = {
                                                        'input/by-path/pci-0000:00:1a.0-usb-0:1.6.1:1.2-mouse',
                                                        'input/mouse1'
                                                      ],
-                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0004/input/input3/mouse1'
+                                          'path' => '/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.6/1-1.6.1/1-1.6.1:1.2/0003:0624:0249.0005/input/input5/mouse1'
                                         },
                       'ipmi0' => {
                                    '_udev_infos' => {
                                                       'DEVNAME' => '/dev/ipmi0',
                                                       'DEVPATH' => '/devices/platform/dmi-ipmi-si.0/ipmi/ipmi0',
-                                                      'MAJOR' => '243',
+                                                      'MAJOR' => '244',
                                                       'MINOR' => '0',
                                                       'SUBSYSTEM' => 'ipmi'
                                                     },
@@ -2819,8 +3204,8 @@ $VAR1 = {
                                                     'MAJOR' => '10',
                                                     'MINOR' => '232',
                                                     'SUBSYSTEM' => 'misc',
-                                                    'TAGS' => ':uaccess:seat:',
-                                                    'USEC_INITIALIZED' => '8146478'
+                                                    'TAGS' => ':seat:uaccess:',
+                                                    'USEC_INITIALIZED' => '10636630'
                                                   },
                                  'name' => 'kvm',
                                  'names' => [
@@ -2932,7 +3317,7 @@ $VAR1 = {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/ptp0',
                                                      'DEVPATH' => '/devices/pci0000:40/0000:40:01.0/0000:41:00.0/ptp/ptp0',
-                                                     'MAJOR' => '248',
+                                                     'MAJOR' => '249',
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'ptp'
                                                    },
@@ -2946,7 +3331,7 @@ $VAR1 = {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/ptp1',
                                                      'DEVPATH' => '/devices/pci0000:40/0000:40:01.0/0000:41:00.1/ptp/ptp1',
-                                                     'MAJOR' => '248',
+                                                     'MAJOR' => '249',
                                                      'MINOR' => '1',
                                                      'SUBSYSTEM' => 'ptp'
                                                    },
@@ -2960,7 +3345,7 @@ $VAR1 = {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/ptp2',
                                                      'DEVPATH' => '/devices/pci0000:00/0000:00:1c.4/0000:06:00.0/ptp/ptp2',
-                                                     'MAJOR' => '248',
+                                                     'MAJOR' => '249',
                                                      'MINOR' => '2',
                                                      'SUBSYSTEM' => 'ptp'
                                                    },
@@ -2974,7 +3359,7 @@ $VAR1 = {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/ptp3',
                                                      'DEVPATH' => '/devices/pci0000:40/0000:40:01.0/0000:41:00.2/ptp/ptp3',
-                                                     'MAJOR' => '248',
+                                                     'MAJOR' => '249',
                                                      'MINOR' => '3',
                                                      'SUBSYSTEM' => 'ptp'
                                                    },
@@ -2988,7 +3373,7 @@ $VAR1 = {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/ptp4',
                                                      'DEVPATH' => '/devices/pci0000:40/0000:40:01.0/0000:41:00.3/ptp/ptp4',
-                                                     'MAJOR' => '248',
+                                                     'MAJOR' => '249',
                                                      'MINOR' => '4',
                                                      'SUBSYSTEM' => 'ptp'
                                                    },
@@ -3002,7 +3387,7 @@ $VAR1 = {
                                   '_udev_infos' => {
                                                      'DEVNAME' => '/dev/ptp5',
                                                      'DEVPATH' => '/devices/pci0000:00/0000:00:1c.4/0000:06:00.1/ptp/ptp5',
-                                                     'MAJOR' => '248',
+                                                     'MAJOR' => '249',
                                                      'MINOR' => '5',
                                                      'SUBSYSTEM' => 'ptp'
                                                    },
@@ -3035,7 +3420,7 @@ $VAR1 = {
                                                      'MAJOR' => '252',
                                                      'MINOR' => '0',
                                                      'SUBSYSTEM' => 'rtc',
-                                                     'USEC_INITIALIZED' => '2106342'
+                                                     'USEC_INITIALIZED' => '1557619'
                                                    },
                                   'name' => 'rtc0',
                                   'names' => [
@@ -3072,7 +3457,7 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '2631203'
+                                                    'USEC_INITIALIZED' => '2107350'
                                                   },
                                  'name' => 'sda',
                                  'names' => [
@@ -3126,7 +3511,7 @@ $VAR1 = {
                                                      'PARTNAME' => 'EFI',
                                                      'SUBSYSTEM' => 'block',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2802758'
+                                                     'USEC_INITIALIZED' => '2276390'
                                                    },
                                   'name' => 'sda1',
                                   'names' => [
@@ -3186,7 +3571,7 @@ $VAR1 = {
                                                      'SYSTEMD_READY' => '1',
                                                      'SYSTEMD_WANTS' => 'lvm2-pvscan@8:2.service',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2726576'
+                                                     'USEC_INITIALIZED' => '2199998'
                                                    },
                                   'name' => 'sda2',
                                   'names' => [
@@ -3228,7 +3613,7 @@ $VAR1 = {
                                                     'MINOR' => '16',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '2642770'
+                                                    'USEC_INITIALIZED' => '2123564'
                                                   },
                                  'name' => 'sdb',
                                  'names' => [
@@ -3285,7 +3670,7 @@ $VAR1 = {
                                                      'SYSTEMD_READY' => '1',
                                                      'SYSTEMD_WANTS' => 'lvm2-pvscan@8:17.service',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2662682'
+                                                     'USEC_INITIALIZED' => '2143415'
                                                    },
                                   'name' => 'sdb1',
                                   'names' => [
@@ -3327,7 +3712,7 @@ $VAR1 = {
                                                     'MINOR' => '32',
                                                     'SUBSYSTEM' => 'block',
                                                     'TAGS' => ':systemd:',
-                                                    'USEC_INITIALIZED' => '2666127'
+                                                    'USEC_INITIALIZED' => '1895424'
                                                   },
                                  'name' => 'sdc',
                                  'names' => [
@@ -3384,7 +3769,7 @@ $VAR1 = {
                                                      'SYSTEMD_READY' => '1',
                                                      'SYSTEMD_WANTS' => 'lvm2-pvscan@8:33.service',
                                                      'TAGS' => ':systemd:',
-                                                     'USEC_INITIALIZED' => '2670136'
+                                                     'USEC_INITIALIZED' => '1900377'
                                                    },
                                   'name' => 'sdc1',
                                   'names' => [
@@ -3450,8 +3835,8 @@ $VAR1 = {
                                                     'MAJOR' => '21',
                                                     'MINOR' => '3',
                                                     'SUBSYSTEM' => 'scsi_generic',
-                                                    'TAGS' => ':uaccess:seat:',
-                                                    'USEC_INITIALIZED' => '6415813'
+                                                    'TAGS' => ':seat:uaccess:',
+                                                    'USEC_INITIALIZED' => '7769799'
                                                   },
                                  'name' => 'sg3',
                                  'names' => [
@@ -3473,6 +3858,310 @@ $VAR1 = {
                                                  ],
                                       'path' => '/devices/virtual/misc/snapshot'
                                     },
+                      'snd/controlC0' => {
+                                           '_udev_infos' => {
+                                                              'DEVLINKS' => '/dev/snd/by-path/pci-0000:02:00.1',
+                                                              'DEVNAME' => '/dev/snd/controlC0',
+                                                              'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/controlC0',
+                                                              'ID_PATH' => 'pci-0000:02:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_02_00_1',
+                                                              'MAJOR' => '116',
+                                                              'MINOR' => '19',
+                                                              'SUBSYSTEM' => 'sound',
+                                                              'TAGS' => ':uaccess:',
+                                                              'USEC_INITIALIZED' => '8737771'
+                                                            },
+                                           'name' => 'snd/controlC0',
+                                           'names' => [
+                                                        'snd/by-path/pci-0000:02:00.1',
+                                                        'snd/controlC0'
+                                                      ],
+                                           'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/controlC0'
+                                         },
+                      'snd/controlC1' => {
+                                           '_udev_infos' => {
+                                                              'DEVLINKS' => '/dev/snd/by-path/pci-0000:43:00.1',
+                                                              'DEVNAME' => '/dev/snd/controlC1',
+                                                              'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/controlC1',
+                                                              'ID_PATH' => 'pci-0000:43:00.1',
+                                                              'ID_PATH_TAG' => 'pci-0000_43_00_1',
+                                                              'MAJOR' => '116',
+                                                              'MINOR' => '10',
+                                                              'SUBSYSTEM' => 'sound',
+                                                              'TAGS' => ':uaccess:',
+                                                              'USEC_INITIALIZED' => '8729650'
+                                                            },
+                                           'name' => 'snd/controlC1',
+                                           'names' => [
+                                                        'snd/by-path/pci-0000:43:00.1',
+                                                        'snd/controlC1'
+                                                      ],
+                                           'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/controlC1'
+                                         },
+                      'snd/hwC0D0' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC0D0',
+                                                           'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D0',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '15',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8732484'
+                                                         },
+                                        'name' => 'snd/hwC0D0',
+                                        'names' => [
+                                                     'snd/hwC0D0'
+                                                   ],
+                                        'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D0'
+                                      },
+                      'snd/hwC0D1' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC0D1',
+                                                           'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D1',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '16',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8732479'
+                                                         },
+                                        'name' => 'snd/hwC0D1',
+                                        'names' => [
+                                                     'snd/hwC0D1'
+                                                   ],
+                                        'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D1'
+                                      },
+                      'snd/hwC0D2' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC0D2',
+                                                           'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D2',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '17',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8732499'
+                                                         },
+                                        'name' => 'snd/hwC0D2',
+                                        'names' => [
+                                                     'snd/hwC0D2'
+                                                   ],
+                                        'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D2'
+                                      },
+                      'snd/hwC0D3' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC0D3',
+                                                           'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D3',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '18',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8732280'
+                                                         },
+                                        'name' => 'snd/hwC0D3',
+                                        'names' => [
+                                                     'snd/hwC0D3'
+                                                   ],
+                                        'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/hwC0D3'
+                                      },
+                      'snd/hwC1D0' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC1D0',
+                                                           'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D0',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '6',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8728132'
+                                                         },
+                                        'name' => 'snd/hwC1D0',
+                                        'names' => [
+                                                     'snd/hwC1D0'
+                                                   ],
+                                        'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D0'
+                                      },
+                      'snd/hwC1D1' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC1D1',
+                                                           'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D1',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '7',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8728002'
+                                                         },
+                                        'name' => 'snd/hwC1D1',
+                                        'names' => [
+                                                     'snd/hwC1D1'
+                                                   ],
+                                        'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D1'
+                                      },
+                      'snd/hwC1D2' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC1D2',
+                                                           'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D2',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '8',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8728125'
+                                                         },
+                                        'name' => 'snd/hwC1D2',
+                                        'names' => [
+                                                     'snd/hwC1D2'
+                                                   ],
+                                        'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D2'
+                                      },
+                      'snd/hwC1D3' => {
+                                        '_udev_infos' => {
+                                                           'DEVNAME' => '/dev/snd/hwC1D3',
+                                                           'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D3',
+                                                           'MAJOR' => '116',
+                                                           'MINOR' => '9',
+                                                           'SUBSYSTEM' => 'sound',
+                                                           'TAGS' => ':uaccess:',
+                                                           'USEC_INITIALIZED' => '8728234'
+                                                         },
+                                        'name' => 'snd/hwC1D3',
+                                        'names' => [
+                                                     'snd/hwC1D3'
+                                                   ],
+                                        'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/hwC1D3'
+                                      },
+                      'snd/pcmC0D3p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC0D3p',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D3p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '11',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8731584'
+                                                           },
+                                          'name' => 'snd/pcmC0D3p',
+                                          'names' => [
+                                                       'snd/pcmC0D3p'
+                                                     ],
+                                          'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D3p'
+                                        },
+                      'snd/pcmC0D7p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC0D7p',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D7p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '12',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8731588'
+                                                           },
+                                          'name' => 'snd/pcmC0D7p',
+                                          'names' => [
+                                                       'snd/pcmC0D7p'
+                                                     ],
+                                          'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D7p'
+                                        },
+                      'snd/pcmC0D8p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC0D8p',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D8p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '13',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8731638'
+                                                           },
+                                          'name' => 'snd/pcmC0D8p',
+                                          'names' => [
+                                                       'snd/pcmC0D8p'
+                                                     ],
+                                          'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D8p'
+                                        },
+                      'snd/pcmC0D9p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC0D9p',
+                                                             'DEVPATH' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D9p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '14',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8731655'
+                                                           },
+                                          'name' => 'snd/pcmC0D9p',
+                                          'names' => [
+                                                       'snd/pcmC0D9p'
+                                                     ],
+                                          'path' => '/devices/pci0000:00/0000:00:02.0/0000:02:00.1/sound/card0/pcmC0D9p'
+                                        },
+                      'snd/pcmC1D3p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC1D3p',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D3p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '2',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8728023'
+                                                           },
+                                          'name' => 'snd/pcmC1D3p',
+                                          'names' => [
+                                                       'snd/pcmC1D3p'
+                                                     ],
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D3p'
+                                        },
+                      'snd/pcmC1D7p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC1D7p',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D7p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '3',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8727985'
+                                                           },
+                                          'name' => 'snd/pcmC1D7p',
+                                          'names' => [
+                                                       'snd/pcmC1D7p'
+                                                     ],
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D7p'
+                                        },
+                      'snd/pcmC1D8p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC1D8p',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D8p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '4',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8728047'
+                                                           },
+                                          'name' => 'snd/pcmC1D8p',
+                                          'names' => [
+                                                       'snd/pcmC1D8p'
+                                                     ],
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D8p'
+                                        },
+                      'snd/pcmC1D9p' => {
+                                          '_udev_infos' => {
+                                                             'DEVNAME' => '/dev/snd/pcmC1D9p',
+                                                             'DEVPATH' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D9p',
+                                                             'DEVTYPE' => 'pcm',
+                                                             'MAJOR' => '116',
+                                                             'MINOR' => '5',
+                                                             'SUBSYSTEM' => 'sound',
+                                                             'TAGS' => ':uaccess:',
+                                                             'USEC_INITIALIZED' => '8728077'
+                                                           },
+                                          'name' => 'snd/pcmC1D9p',
+                                          'names' => [
+                                                       'snd/pcmC1D9p'
+                                                     ],
+                                          'path' => '/devices/pci0000:40/0000:40:03.0/0000:43:00.1/sound/card1/pcmC1D9p'
+                                        },
                       'snd/timer' => {
                                        '_udev_infos' => {
                                                           'DEVNAME' => '/dev/snd/timer',
@@ -3481,7 +4170,7 @@ $VAR1 = {
                                                           'MINOR' => '33',
                                                           'SUBSYSTEM' => 'sound',
                                                           'TAGS' => ':uaccess:',
-                                                          'USEC_INITIALIZED' => '6997791'
+                                                          'USEC_INITIALIZED' => '8130145'
                                                         },
                                        'name' => 'snd/timer',
                                        'names' => [
@@ -3517,8 +4206,8 @@ $VAR1 = {
                                                     'MINOR' => '0',
                                                     'SUBSYSTEM' => 'block',
                                                     'SYSTEMD_MOUNT_DEVICE_BOUND' => '1',
-                                                    'TAGS' => ':systemd:uaccess:seat:',
-                                                    'USEC_INITIALIZED' => '2739170'
+                                                    'TAGS' => ':seat:systemd:uaccess:',
+                                                    'USEC_INITIALIZED' => '2250137'
                                                   },
                                  'name' => 'sr0',
                                  'names' => [
@@ -4449,7 +5138,7 @@ $VAR1 = {
                                                       'MINOR' => '64',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '6545203'
+                                                      'USEC_INITIALIZED' => '7875057'
                                                     },
                                    'name' => 'ttyS0',
                                    'names' => [
@@ -4465,7 +5154,7 @@ $VAR1 = {
                                                       'MINOR' => '65',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '6544959'
+                                                      'USEC_INITIALIZED' => '7874949'
                                                     },
                                    'name' => 'ttyS1',
                                    'names' => [
@@ -4481,7 +5170,7 @@ $VAR1 = {
                                                       'MINOR' => '66',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '6543099'
+                                                      'USEC_INITIALIZED' => '7873823'
                                                     },
                                    'name' => 'ttyS2',
                                    'names' => [
@@ -4497,7 +5186,7 @@ $VAR1 = {
                                                       'MINOR' => '67',
                                                       'SUBSYSTEM' => 'tty',
                                                       'TAGS' => ':systemd:',
-                                                      'USEC_INITIALIZED' => '6543468'
+                                                      'USEC_INITIALIZED' => '7873836'
                                                     },
                                    'name' => 'ttyS3',
                                    'names' => [
@@ -4814,21 +5503,6 @@ $VAR1 = {
                                               ],
                                    'path' => '/devices/virtual/vc/vcsu6'
                                  },
-                      'vfio/vfio' => {
-                                       '_udev_infos' => {
-                                                          'DEVMODE' => '0666',
-                                                          'DEVNAME' => '/dev/vfio/vfio',
-                                                          'DEVPATH' => '/devices/virtual/misc/vfio',
-                                                          'MAJOR' => '10',
-                                                          'MINOR' => '196',
-                                                          'SUBSYSTEM' => 'misc'
-                                                        },
-                                       'name' => 'vfio/vfio',
-                                       'names' => [
-                                                    'vfio/vfio'
-                                                  ],
-                                       'path' => '/devices/virtual/misc/vfio'
-                                     },
                       'vga_arbiter' => {
                                          '_udev_infos' => {
                                                             'DEVNAME' => '/dev/vga_arbiter',
@@ -4875,7 +5549,7 @@ $VAR1 = {
                                        '_udev_infos' => {
                                                           'DEVNAME' => '/dev/watchdog0',
                                                           'DEVPATH' => '/devices/virtual/watchdog/watchdog0',
-                                                          'MAJOR' => '244',
+                                                          'MAJOR' => '246',
                                                           'MINOR' => '0',
                                                           'SUBSYSTEM' => 'watchdog'
                                                         },

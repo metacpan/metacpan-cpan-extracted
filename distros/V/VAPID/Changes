@@ -5,3 +5,7 @@ Revision history for VAPID
 
 0.03    2020/10/18
 	- Update Makefile dependencies with latest versions
+
+1.00    2020/10/24
+	- Add POD description
+	- Update Makefile with links to github

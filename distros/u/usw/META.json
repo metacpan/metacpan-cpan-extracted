@@ -54,11 +54,11 @@
    "provides" : {
       "usw" : {
          "file" : "lib/usw.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "usww" : {
          "file" : "lib/usww.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -72,11 +72,11 @@
          "web" : "https://github.com/worthmine/usw"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "worthmine <worthmine@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1
 }

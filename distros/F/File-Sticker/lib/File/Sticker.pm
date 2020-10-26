@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '0.9301';
+$File::Sticker::VERSION = '1.01';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 0.9301
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -33,10 +33,10 @@ use Path::Tiny;
 
 use Module::Pluggable instantiate => 'new',
 search_path => ['File::Sticker::Reader'],
-sub_name => 'readers';
+sub_name => 'all_readers';
 use Module::Pluggable instantiate => 'new',
 search_path => ['File::Sticker::Writer'],
-sub_name => 'writers';
+sub_name => 'all_writers';
 
 # FOR DEBUGGING
 =head1 DEBUGGING
@@ -80,30 +80,55 @@ sub new {
         }
     }
     # -------------------------------------
+    # Modules
+    my %to_disable = ();
+    foreach my $mod (@{$self->{disable}})
+    {
+        $to_disable{$mod} = 1;
+    }
+
+    # -------------------------------------
     # Readers
-    my @readers = $self->readers();
+    my @readers = $self->all_readers();
+    $self->{_readers} = [];
     foreach my $rd (@readers)
     {
-        print STDERR "READER: ", $rd->name(), "\n" if $self->{verbose} > 1;
-	$rd->init(%new_args);
+        my $nm = $rd->name();
+        if ($to_disable{$nm})
+        {
+            print STDERR "DISABLE READER: ${nm}\n" if $self->{verbose} > 1;
+        }
+        else
+        {
+            print STDERR "READER: ${nm}\n" if $self->{verbose} > 1;
+            $rd->init(%new_args);
+            push @{$self->{_readers}}, $rd;
+        }
     }
-    $self->{_readers} = \@readers;
 
     # -------------------------------------
     # Writers
     my @writers = ();
     my @fallback_writers = ();
-    foreach my $wt ($self->writers())
+    foreach my $wt ($self->all_writers())
     {
-        print STDERR "WRITER: ", $wt->name(), "\n" if $self->{verbose} > 1;
-	$wt->init(%new_args);
-        if ($wt->is_fallback())
+        my $nm = $wt->name();
+        if ($to_disable{$nm})
         {
-            push @fallback_writers, $wt;
+            print STDERR "DISABLE WRITER: ${nm}\n" if $self->{verbose} > 1;
         }
         else
         {
-            push @writers, $wt;
+            print STDERR "WRITER: ${nm}\n" if $self->{verbose} > 1;
+            $wt->init(%new_args);
+            if ($wt->is_fallback())
+            {
+                push @fallback_writers, $wt;
+            }
+            else
+            {
+                push @writers, $wt;
+            }
         }
     }
     $self->{_writers} = \@writers;
@@ -143,12 +168,13 @@ sub new {
 
 This will read the meta-data from the file, using all possible ways.
 
-    my $info = $fs->read_meta($filename);
+    my $info = $fs->read_meta(filename=>$filename,read_all=>0);
 
 =cut
 sub read_meta ($%) {
     my $self = shift;
-    my $filename = shift;
+    my %args = @_;
+    my $filename = $args{filename};
     say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
 
     if (!-r $filename)
@@ -172,6 +198,32 @@ sub read_meta ($%) {
             my $newmeta = $merge->merge($meta, $info);
             $meta = $newmeta;
             print STDERR "META: ", Dump($meta), "\n" if $self->{verbose} > 1;
+        }
+    }
+
+    # If we only want the wanted_fields, remove anything that isn't wanted
+    if (!$args{read_all}
+            and exists $self->{wanted_fields}
+            and defined $self->{wanted_fields})
+    {
+        my @fields = sort keys %{$meta};
+        foreach my $fn (@fields)
+        {
+            if (! exists $self->{wanted_fields}->{$fn})
+            {
+                delete $meta->{$fn};
+            }
+        }
+    }
+    else # read all, including derived values
+    {
+        my $derived = $self->derive_values(filename=>$filename,meta=>$meta);
+        foreach my $field (sort keys %{$derived})
+        {
+            if (!exists $meta->{$field} and $derived->{$field})
+            {
+                $meta->{$field} = $derived->{$field};
+            }
         }
     }
 
@@ -201,7 +253,7 @@ sub add_field_to_file {
     {
         return undef;
     }
-    my $old_meta = $self->read_meta($filename);
+    my $old_meta = $self->read_meta(filename=>$filename,read_all=>0);
     my $derived = $self->derive_values(filename=>$filename,meta=>$old_meta);
     if ($self->{derive} and defined $derived->{$field})
     {
@@ -429,7 +481,7 @@ sub update_db {
             $transaction_on = 1;
             $num_trans = 0;
         }
-        my $meta = $self->read_meta($filename);
+        my $meta = $self->read_meta(filename=>$filename,read_all=>0);
 
         # If there are desired fields which are derivable
         # but which are not set in the file itself,

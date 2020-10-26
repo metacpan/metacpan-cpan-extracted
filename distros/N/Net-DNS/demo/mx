@@ -1,5 +1,5 @@
-#!/usr/local/bin/perl -w
-# $Id: mx 264 2005-04-06 09:16:15Z olaf $
+#!/usr/bin/perl
+# $Id: mx 1815 2020-10-14 21:55:18Z willem $
 
 =head1 NAME
 
@@ -25,6 +25,7 @@ L<Net::DNS>
 =cut
 
 use strict;
+use warnings;
 use File::Basename;
 use Net::DNS;
 

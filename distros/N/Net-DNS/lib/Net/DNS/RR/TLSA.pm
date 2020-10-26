@@ -1,14 +1,11 @@
 package Net::DNS::RR::TLSA;
 
-#
-# $Id: TLSA.pm 1741 2019-04-16 13:10:38Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1741 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: TLSA.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -16,11 +13,10 @@ Net::DNS::RR::TLSA - DNS TLSA resource record
 
 =cut
 
-
 use integer;
 
 use Carp;
-use constant BABBLE => defined eval 'require Digest::BubbleBabble';
+use constant BABBLE => defined eval { require Digest::BubbleBabble };
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
@@ -32,13 +28,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	@{$self}{qw(usage selector matchingtype)} = unpack "\@$offset C3", $$data;
 	$offset += 3;
 	$self->{certbin} = substr $$data, $offset, $next - $offset;
+	return;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'C3 a*', @{$self}{qw(usage selector matchingtype certbin)};
+	return pack 'C3 a*', @{$self}{qw(usage selector matchingtype certbin)};
 }
 
 
@@ -46,8 +43,9 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	$self->_annotation( $self->babble ) if BABBLE;
-	my @cert = split /(\S{64})/, $self->cert;
+	my @cert  = split /(\S{64})/, $self->cert;
 	my @rdata = ( $self->usage, $self->selector, $self->matchingtype, @cert );
+	return @rdata;
 }
 
 
@@ -58,6 +56,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->selector(shift);
 	$self->matchingtype(shift);
 	$self->cert(@_);
+	return;
 }
 
 
@@ -65,7 +64,7 @@ sub usage {
 	my $self = shift;
 
 	$self->{usage} = 0 + shift if scalar @_;
-	$self->{usage} || 0;
+	return $self->{usage} || 0;
 }
 
 
@@ -73,7 +72,7 @@ sub selector {
 	my $self = shift;
 
 	$self->{selector} = 0 + shift if scalar @_;
-	$self->{selector} || 0;
+	return $self->{selector} || 0;
 }
 
 
@@ -81,14 +80,14 @@ sub matchingtype {
 	my $self = shift;
 
 	$self->{matchingtype} = 0 + shift if scalar @_;
-	$self->{matchingtype} || 0;
+	return $self->{matchingtype} || 0;
 }
 
 
 sub cert {
 	my $self = shift;
 	return unpack "H*", $self->certbin() unless scalar @_;
-	$self->certbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
+	return $self->certbin( pack "H*", join "", map { /^"*([\dA-Fa-f]*)"*$/ || croak("corrupt hex"); $1 } @_ );
 }
 
 
@@ -96,11 +95,11 @@ sub certbin {
 	my $self = shift;
 
 	$self->{certbin} = shift if scalar @_;
-	$self->{certbin} || "";
+	return $self->{certbin} || "";
 }
 
 
-sub certificate { &cert; }
+sub certificate { return &cert; }
 
 
 sub babble {
@@ -115,7 +114,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name TLSA usage selector matchingtype certificate');
+    $rr = Net::DNS::RR->new('name TLSA usage selector matchingtype certificate');
 
 =head1 DESCRIPTION
 

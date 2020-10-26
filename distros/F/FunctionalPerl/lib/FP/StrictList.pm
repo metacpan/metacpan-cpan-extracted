@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -93,9 +93,39 @@ use FP::List;
 use Chj::TEST;
 use FP::Combinators qw(flip2of3 flip);
 
-{
-    package FP::StrictList::Null;
-    our @ISA= qw(FP::List::Null FP::StrictList::List);
+
+package FP::StrictList::List {
+
+    sub strictlist {
+        @_==1 or die "wrong number of arguments";
+        my $s=shift;
+        $s
+    }
+
+    sub list {
+        @_==1 or die "wrong number of arguments";
+        my $s=shift;
+        # Should it *really* convert to a non-strict list? This is
+        # just a list with the added information that it's proper,
+        # after all; equality should work just fine, in fact the
+        # current FP_Equal_equal for FP::List is not sensitive on
+        # subclasses (looks like has different issues though); *but*,
+        # `equal` itself will short cut to an `undef` if the types are
+        # not the same, so that won't work. XX should this change??
+        FP::List::list($s->values)
+    }
+
+    sub stream {
+        @_==1 or die "wrong number of arguments";
+        my ($l)= @_;
+        # XX isn't this stupid? Same as above. The current load test
+        # in FP::Abstract::Sequence::t requires this behaviour.
+        FP::Stream::stream($l->values)
+    }
+}
+
+package FP::StrictList::Null {
+    our @ISA= qw(FP::StrictList::List FP::List::Null);
 
     sub pair_namespace { "FP::StrictList::Pair" }
     *null= \&FP::StrictList::strictnull;
@@ -119,9 +149,8 @@ use FP::Combinators qw(flip2of3 flip);
     FP::Interfaces::implemented qw(FP::Abstract::Equal);
 }
 
-{
-    package FP::StrictList::Pair;
-    our @ISA= qw(FP::List::Pair FP::StrictList::List);
+package FP::StrictList::Pair {
+    our @ISA= qw(FP::StrictList::List FP::List::Pair);
 
     *null= \&FP::StrictList::strictnull;
 

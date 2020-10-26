@@ -1,8 +1,11 @@
-# $Id: 05-HIP.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 05-HIP.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
+
 use Net::DNS;
 
 my @prerequisite = qw(
@@ -10,7 +13,7 @@ my @prerequisite = qw(
 		);
 
 foreach my $package (@prerequisite) {
-	next if eval "require $package";
+	next if eval "require $package";## no critic
 	plan skip_all => "$package not installed";
 	exit;
 }
@@ -37,20 +40,20 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 		);
 
 {
-	my $typecode = unpack 'xn', new Net::DNS::RR(". $type")->encode;
+	my $typecode = unpack 'xn', Net::DNS::RR->new(". $type")->encode;
 	is( $typecode, $code, "$type RR type code = $code" );
 
 	my $hash = {};
 	@{$hash}{@attr} = @data;
 
-	my $rr = new Net::DNS::RR(
+	my $rr = Net::DNS::RR->new(
 		name => $name,
 		type => $type,
 		%$hash
 		);
 
 	my $string = $rr->string;
-	my $rr2	   = new Net::DNS::RR($string);
+	my $rr2	   = Net::DNS::RR->new($string);
 	is( $rr2->string, $string, 'new/string transparent' );
 
 	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
@@ -72,14 +75,14 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 
 
 {
-	my $rr	    = new Net::DNS::RR("$name $type @data");
-	my $null    = new Net::DNS::RR("$name NULL")->encode;
-	my $empty   = new Net::DNS::RR("$name $type")->encode;
-	my $rxbin   = decode Net::DNS::RR( \$empty )->encode;
-	my $txtext  = new Net::DNS::RR("$name $type")->string;
-	my $rxtext  = new Net::DNS::RR($txtext)->encode;
+	my $rr	    = Net::DNS::RR->new("$name $type @data");
+	my $null    = Net::DNS::RR->new("$name NULL")->encode;
+	my $empty   = Net::DNS::RR->new("$name $type")->encode;
+	my $rxbin   = Net::DNS::RR->decode( \$empty )->encode;
+	my $txtext  = Net::DNS::RR->new("$name $type")->string;
+	my $rxtext  = Net::DNS::RR->new($txtext)->encode;
 	my $encoded = $rr->encode;
-	my $decoded = decode Net::DNS::RR( \$encoded );
+	my $decoded = Net::DNS::RR->decode( \$encoded );
 	my $hex1    = unpack 'H*', $encoded;
 	my $hex2    = unpack 'H*', $decoded->encode;
 	my $hex3    = unpack 'H*', substr( $encoded, length $null );
@@ -92,14 +95,14 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 	my @wire = unpack 'C*', $encoded;
 	$wire[length($empty) - 1]--;
 	my $wireformat = pack 'C*', @wire;
-	eval { decode Net::DNS::RR( \$wireformat ); };
+	eval { Net::DNS::RR->decode( \$wireformat ); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "corrupt wire-format\t[$exception]" );
 }
 
 
 {
-	my $rr = new Net::DNS::RR(". $type @data");
+	my $rr = Net::DNS::RR->new(". $type @data");
 	eval { $rr->hit('123456789XBCDEF'); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "corrupt hexadecimal\t[$exception]" );
@@ -107,10 +110,10 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 
 
 {
-	my $lc		= new Net::DNS::RR( lc ". $type @data" );
-	my $rr		= new Net::DNS::RR( uc ". $type @data" );
+	my $lc		= Net::DNS::RR->new( lc ". $type @data" );
+	my $rr		= Net::DNS::RR->new( uc ". $type @data" );
 	my $hash	= {};
-	my $predecessor = $rr->encode( 0, $hash );
+	my $predecessor = $rr->encode( 0,		    $hash );
 	my $compressed	= $rr->encode( length $predecessor, $hash );
 	ok( length $compressed == length $predecessor, 'encoded RDATA not compressible' );
 	isnt( $rr->encode,    $lc->encode, 'encoded RDATA names not downcased' );
@@ -119,7 +122,7 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 
 
 {
-	my $rr = new Net::DNS::RR(". $type");
+	my $rr = Net::DNS::RR->new(". $type");
 	foreach (@attr) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
@@ -127,7 +130,7 @@ my $wire = join '', qw( 10020084200100107b1a74df365639cc39f1d57803010001b771ca13
 
 
 {
-	my $rr = new Net::DNS::RR("$name $type @data");
+	my $rr = Net::DNS::RR->new("$name $type @data");
 	local $SIG{__WARN__} = sub { };				# suppress deprecation warning
 	eval { $rr->pkalgorithm() };				# historical
 	eval { $rr->pubkey() };					# historical

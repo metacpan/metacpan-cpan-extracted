@@ -1,3 +1,8 @@
+Overview of changes in Gnome2::Dia 0.06
+=======================================
+
+* Added '(DEPRECATION)' to '=head1 NAME' POD block
+
 Overview of changes in Gnome2::Dia 0.05
 =======================================
 

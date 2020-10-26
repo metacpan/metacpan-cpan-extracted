@@ -1,14 +1,11 @@
 package Net::DNS::RR::NULL;
 
-#
-# $Id: NULL.pm 1528 2017-01-18 21:44:58Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
-
-
 use strict;
 use warnings;
+our $VERSION = (qw$Id: NULL.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+
 use base qw(Net::DNS::RR);
+
 
 =head1 NAME
 
@@ -24,7 +21,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name NULL \# length hexdata ...');
+    $rr = Net::DNS::RR->new('name NULL \# length hexdata ...');
 
 =head1 DESCRIPTION
 

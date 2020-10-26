@@ -7,7 +7,7 @@ use FFI::Platypus;
 use Scalar::Util qw( readonly );
 
 # ABSTRACT: Convert a pointer to a string and back
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 
 use constant _incantation =>
@@ -76,7 +76,7 @@ FFI::Platypus::Type::StringPointer - Convert a pointer to a string and back
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 SYNOPSIS
 

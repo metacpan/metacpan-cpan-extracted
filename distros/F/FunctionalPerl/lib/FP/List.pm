@@ -201,8 +201,7 @@ our $immutable= 1; # whether pairs are to be made immutable
 #use FP::Array 'array_fold_right'; can't, recursive dependency XX (see copy below)
 #(Chj::xIOUtil triggers it)
 
-{
-    package FP::List::List;
+package FP::List::List {
     use FP::Lazy;
 
     use Chj::NamespaceCleanAbove;
@@ -221,6 +220,24 @@ our $immutable= 1; # whether pairs are to be made immutable
         lazy { $l }
     }
 
+    sub strictlist {
+        @_==1 or die "wrong number of arguments";
+        my $s=shift;
+        FP::StrictList::strictlist($s->values)
+    }
+
+    sub purearray {
+        @_==1 or die "wrong number of arguments";
+        my $s=shift;
+        FP::_::PureArray->new_from_array([$s->values])
+    }
+
+    sub mutablearray {
+        @_==1 or die "wrong number of arguments";
+        my $s=shift;
+        FP::_::MutableArray->new_from_array([$s->values])
+    }
+
     sub preferred_fold {
         my $s=shift;
         $s->fold(@_)
@@ -229,8 +246,7 @@ our $immutable= 1; # whether pairs are to be made immutable
     _END_
 }
 
-{
-    package FP::List::Null;
+package FP::List::Null {
     our @ISA= qw(FP::List::List);
 
     sub pair_namespace { "FP::List::Pair" }
@@ -284,8 +300,7 @@ our $immutable= 1; # whether pairs are to be made immutable
 
 }
 
-{
-    package FP::List::Pair;
+package FP::List::Pair {
     our @ISA= qw(FP::List::List);
 
     sub is_null { '' }
@@ -1366,6 +1381,7 @@ sub make_filter {
             $l= force $l;
             is_null $l ? $l : do {
                 my ($a,$r)= $l->first_and_rest;
+                no warnings 'recursion';
                 my $r2= &$filter ($fn, $r);
                 &$fn($a) ? cons($a, $r2) : $r2
             }
@@ -2151,15 +2167,13 @@ sub ldie {
 }
 
 
-{
-    package FP::List::Null;
+package FP::List::Null {
     FP::Interfaces::implemented qw(FP::Abstract::Pure
                                    FP::Abstract::Sequence
                                    FP::Abstract::Equal
                                    FP::Abstract::Show);
 }
-{
-    package FP::List::Pair;
+package FP::List::Pair {
     FP::Interfaces::implemented qw(FP::Abstract::Pure
                                    FP::Abstract::Sequence
                                    FP::Abstract::Equal
