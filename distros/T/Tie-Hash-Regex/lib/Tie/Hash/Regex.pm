@@ -24,7 +24,7 @@ Tie::Hash::Regex - Match hash keys using Regular Expressions
 
 or (new! improved!)
 
-  my $h : Regex;
+  my %h : Regex;
 
 =head1 DESCRIPTION
 
@@ -56,8 +56,13 @@ using the slightly less readable:
 
 =head2 ATTRIBUTE INTERFACE
 
-From version 0.06, you can use attributes to define your hash as being tied
-to Tie::Hash::Regex. You'll need to install the module Attribute::Handlers.
+From version 0.06, you can use attributes to define your hash as being
+tied to Tie::Hash::Regex. You'll need to install the module
+Attribute::Handlers. Simply declare your hash using the attribute
+syntax: 
+
+    my %hash :Regex;
+
 
 =cut
 
@@ -76,7 +81,7 @@ use Attribute::Handlers autotie => { "__CALLER__::Regex" => __PACKAGE__ };
 @EXPORT = qw();
 @EXPORT_OK =();
 
-$VERSION = 1.12;
+$VERSION = 1.13;
 
 =head1 METHODS
 

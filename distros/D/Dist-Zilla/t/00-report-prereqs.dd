@@ -13,6 +13,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'App::cpanminus' => '0',
                                         'Archive::Tar::Wrapper' => '0.15',
                                         'Data::OptList' => '0.110',
                                         'Term::ReadLine::Gnu' => '0'

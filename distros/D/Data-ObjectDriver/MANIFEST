@@ -14,6 +14,7 @@ lib/Data/ObjectDriver/Driver/Cache/Cache.pm
 lib/Data/ObjectDriver/Driver/Cache/Memcached.pm
 lib/Data/ObjectDriver/Driver/Cache/RAM.pm
 lib/Data/ObjectDriver/Driver/DBD.pm
+lib/Data/ObjectDriver/Driver/DBD/MariaDB.pm
 lib/Data/ObjectDriver/Driver/DBD/Oracle.pm
 lib/Data/ObjectDriver/Driver/DBD/Pg.pm
 lib/Data/ObjectDriver/Driver/DBD/SQLite.pm
@@ -54,6 +55,7 @@ t/35-multiplexed.t
 t/41-callbacks.t
 t/42-callbacks-multi-pk.t
 t/50-profiling.t
+t/60-fork.t
 t/lib/Cache/Memory.pm
 t/lib/DodTestUtil.pm
 t/lib/ErrorTest.pm

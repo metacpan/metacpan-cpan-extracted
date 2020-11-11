@@ -1,3 +1,6 @@
+0.11 2020-10-28T22:42:50+01:00
+ - Don't process CSS when CSS::Struct returns blank string.
+
 0.10 2020-10-03T15:10:32+02:00
  - Add HTML element lang attribute.
  - Add tests for script_js and script_js_src.

@@ -1,5 +1,38 @@
 Revision history for Rex
 
+1.13.1 2020-11-05 Ferenc Erki <erkiferenc@gmail.com>
+ [DOCUMENTATION]
+ - Clarify perlcritic policy
+
+1.13.0.3-TRIAL 2020-10-31 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix gathering OS version for Cygwin
+ - Fix excessive caching when querying a CMDB item
+ - Fix gathering OS version for Windows
+ - Add missing autodie feature flag
+
+ [REVISION]
+ - Replace List::MoreUtils with List::Util
+
+1.13.0.2-TRIAL 2020-10-28 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix CMDB hostname when Rex is being run locally
+ - Fix replacing hostname macro in CMDB paths
+ - Fix host information gathering on Windows
+ - Fix hostname detection on Windows
+ - Fix CMDB path separators on Windows
+
+ [DOCUMENTATION]
+ - Clarify CMDB documentation
+
+ [REVISION]
+ - Add initial CMDB path tests
+
+1.13.0.1-TRIAL 2020-10-13 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix MD5 checksumming when default perl does not have Digest::MD5 or
+   incompatible with the perl running rex
+
 1.13.0 2020-10-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Fix MD5 checksumming if filename looks like md5 output

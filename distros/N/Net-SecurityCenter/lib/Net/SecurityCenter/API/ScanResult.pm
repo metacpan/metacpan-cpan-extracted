@@ -4,14 +4,13 @@ use warnings;
 use strict;
 
 use Carp;
-use English qw( -no_match_vars );
 use IO::Uncompress::Unzip qw(unzip $UnzipError);
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -55,6 +54,8 @@ sub download {
     my $sc_scan_data     = $self->client->post( "/scanResult/$scan_result_id/download", { 'downloadType' => 'v2' } );
     my $nessus_scan_data = q{};
 
+    return if ( !$sc_scan_data );
+
     if ($sc_scan_data) {
         unzip \$sc_scan_data => \$nessus_scan_data or croak "Failed to uncompress Nessus scan: $UnzipError\n";
     }
@@ -62,12 +63,12 @@ sub download {
     return $nessus_scan_data if ( !$filename );
 
     open my $fh, '>', $filename
-        or croak("Could not open file '$filename': $OS_ERROR");
+        or croak("Could not open file '$filename': $!");
 
     print $fh $nessus_scan_data;
 
     close $fh
-        or carp("Failed to close file '$filename': $OS_ERROR");
+        or carp("Failed to close file '$filename': $!");
 
     return 1;
 
@@ -105,11 +106,13 @@ sub list {
     my $raw    = delete( $params->{'raw'} );
     my $scans  = $self->client->get( '/scanResult', $params );
 
+    return if ( !$scans );
+
     if ($raw) {
-        return $scans;
+        return wantarray ? @{$scans} : $scans;
     }
 
-    return sc_merge($scans);
+    return wantarray ? @{ sc_merge($scans) } : sc_merge($scans);
 
 }
 
@@ -163,9 +166,8 @@ sub get {
 
     my $scan_result = $self->client->get( "/scanResult/$scan_result_id", $params );
 
-    if ($raw) {
-        return $scan_result;
-    }
+    return              if ( !$scan_result );
+    return $scan_result if ($raw);
 
     return sc_normalize_hash($scan_result);
 
@@ -187,6 +189,8 @@ sub progress {
         fields => [ 'id', 'totalChecks', 'completedChecks' ]
     );
 
+    return if ( !$scan_data );
+
     return sprintf( '%d', ( $scan_data->{'completedChecks'} * 100 ) / $scan_data->{'totalChecks'} );
 
 }
@@ -206,6 +210,8 @@ sub status {
         id     => $scan_result_id,
         fields => [ 'id', 'status' ]
     );
+
+    return if ( !$scan_data );
 
     return lc( $scan_data->{'status'} );
 
@@ -425,8 +431,8 @@ Get list of scans results (completed, running, etc.).
 
     my $scans = $sc->list(
         start_date => '2020-01-01',
-        end_date => '2020-02-01',
-        fields => 'id,name,description,startTime,finishTime',
+        end_date   => '2020-02-01',
+        fields     => 'id,name,description,startTime,finishTime',
     );
 
 

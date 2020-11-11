@@ -316,7 +316,9 @@ too).
     Works like rxjs's "delay", except the parameter is in seconds instead of ms.
 
         # (pause 11 seconds) 0, 1, 2, 3, ...
-        rx_interval(1)->pipe( op_delay(10) )->subscribe($observer);
+        rx_interval(1)->pipe(
+            op_delay(10)
+        )->subscribe($observer);
 
 - op\_distinct\_until\_changed
 
@@ -499,7 +501,7 @@ too).
             rx_of(10, 20, 30),
             rx_throw_error('foo'),
         )->pipe(
-            op_repeat(2),
+            op_retry(2),
         )->subscribe($observer);
 
 - op\_sample\_time

@@ -4,56 +4,32 @@
 
 # Synopsis
 
-        #!/usr/bin/env perl
-
-        use strict;
-        use warnings;
-
         use DBI;
-
         use GraphViz2;
         use GraphViz2::DBI;
 
-        use Log::Handler;
-
-        # ---------------
-
         exit 0 if (! $ENV{DBI_DSN});
 
-        my($logger) = Log::Handler -> new;
-
-        $logger -> add
-                (
-                 screen =>
-                 {
-                         maxlevel       => 'debug',
-                         message_layout => '%m',
-                         minlevel       => 'error',
-                 }
-                );
-
-        my($graph) = GraphViz2 -> new
-                (
-                 edge   => {color => 'grey'},
-                 global => {directed => 1},
-                 graph  => {rankdir => 'TB'},
-                 logger => $logger,
-                 node   => {color => 'blue', shape => 'oval'},
-                );
+        my($graph) = GraphViz2->new (
+                edge   => {color => 'grey'},
+                global => {directed => 1},
+                graph  => {rankdir => 'TB'},
+                node   => {color => 'blue', shape => 'oval'},
+        );
         my($attr)              = {};
         $$attr{sqlite_unicode} = 1 if ($ENV{DBI_DSN} =~ /SQLite/i);
-        my($dbh)               = DBI -> connect($ENV{DBI_DSN}, $ENV{DBI_USER}, $ENV{DBI_PASS}, $attr);
+        my($dbh)               = DBI->connect($ENV{DBI_DSN}, $ENV{DBI_USER}, $ENV{DBI_PASS}, $attr);
 
-        $dbh -> do('PRAGMA foreign_keys = ON') if ($ENV{DBI_DSN} =~ /SQLite/i);
+        $dbh->do('PRAGMA foreign_keys = ON') if ($ENV{DBI_DSN} =~ /SQLite/i);
 
-        my($g) = GraphViz2::DBI -> new(dbh => $dbh, graph => $graph);
+        my($g) = GraphViz2::DBI->new(dbh => $dbh, graph => $graph);
 
-        $g -> create(name => '');
+        $g->create;
 
         my($format)      = shift || 'svg';
-        my($output_file) = shift || File::Spec -> catfile('html', "dbi.schema.$format");
+        my($output_file) = shift || File::Spec->catfile('html', "dbi.schema.$format");
 
-        $graph -> run(format => $format, output_file => $output_file);
+        $graph->run(format => $format, output_file => $output_file);
 
 See scripts/dbi.schema.pl (["Scripts Shipped with this Module" in GraphViz2](https://metacpan.org/pod/GraphViz2#Scripts-Shipped-with-this-Module)).
 
@@ -72,7 +48,7 @@ Here is the list of [output formats](http://www.graphviz.org/content/output-form
 
 ## Calling new()
 
-`new()` is called as `my($obj) = GraphViz2::DBI -> new(k1 => v1, k2 => v2, ...)`.
+`new()` is called as `my($obj) = GraphViz2::DBI->new(k1 => v1, k2 => v2, ...)`.
 
 It returns a new object of type `GraphViz2::DBI`.
 
@@ -88,14 +64,14 @@ Key-value pairs accepted in the parameter list:
 
     This option specifies the GraphViz2 object to use. This allows you to configure it as desired.
 
-    The default is GraphViz2 -> new. The default attributes are the same as in the synopsis, above,
+    The default is GraphViz2->new. The default attributes are the same as in the synopsis, above,
     except for the graph label of course.
 
     This key is optional.
 
 # Methods
 
-## create(exclude => \[\], include => \[\], name => $name)
+## create(exclude => \[\], include => \[\])
 
 Creates the graph, which is accessible via the graph() method, or via the graph object you passed to
 new().
@@ -116,11 +92,6 @@ Parameters:
 
     If none are listed for inclusion, _all_ tables are included.
 
-- o name
-
-    $name is the string which will be placed in the root node of the tree.
-    It may be omitted, in which case the root node is omitted.
-
 ## graph()
 
 Returns the graph object, either the one supplied to new() or the one created during the call to
@@ -134,13 +105,6 @@ For plotting foreign keys, the code has an algorithm to find the primary table/k
 foreign table/key pair point to.
 
 The steps are listed here, in the order they are tested. The first match stops the search.
-
-- o Check a hash for special cases
-
-    Currently, the only special case is a foreign key of `spouse_id`. It is assumed to point to a
-    primary key called `person_id`.
-
-    There is no option available, at the moment, to override this check.
 
 - o Ask the database for foreign key information
 
@@ -167,21 +131,7 @@ See ["FAQ" in DBIx::Admin::TableInfo](https://metacpan.org/pod/DBIx::Admin::Tabl
 
 ## How does GraphViz2::DBI draw edges from foreign keys to primary keys?
 
-It assumes that the primary table's name is a plural word, and that the foreign key's name is
-prefixed by the singular
-of the primary table's name, separated by '\_'.
-
-Thus a (primary) table 'people' with a primary key 'id' will be pointed to by a table
-'phone\_numbers' using a column 'person\_id'.
-
-Table 'phone\_numbers' will probably have a primary key 'id' but that is not used (unless some other
-table has a foreign key pointing to the 'phone\_numbers' table).
-
-The conversion of plural to singular is done with [Lingua::EN::PluralToSingular](https://metacpan.org/pod/Lingua::EN::PluralToSingular).
-
-If this naming convention does not hold, then both the source and destination ports default to '1',
-which is the port of the 1st column (in alphabetical order) in each table. The table name itself is
-port '0'.
+It uses [DBIx::Admin::TableInfo](https://metacpan.org/pod/DBIx::Admin::TableInfo).
 
 # Scripts Shipped with this Module
 

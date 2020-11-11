@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -45,32 +45,29 @@ is_oneref( $widget, '$widget has refcount 1 at EOF' );
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.09;
+class TestWidget extends Tickit::Widget {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use base qw( Tickit::Widget );
-use constant WIDGET_PEN_FROM_STYLE => 1;
+   method render_to_rb
+   {
+      ( my $rb, $render_rect ) = @_;
 
-sub render_to_rb
-{
-   my $self = shift;
-   ( my $rb, $render_rect ) = @_;
+      $rb->text_at( 0, 0, "Hello" );
+   }
 
-   $rb->text_at( 0, 0, "Hello" );
-}
+   method lines { 1 }
+   method cols  { 5 }
 
-sub lines { 1 }
-sub cols  { 5 }
+   method window_gained
+   {
+      ( $gained_window ) = @_;
+      $self->SUPER::window_gained( @_ );
+   }
 
-sub window_gained
-{
-   my $self = shift;
-   ( $gained_window ) = @_;
-   $self->SUPER::window_gained( @_ );
-}
-
-sub window_lost
-{
-   my $self = shift;
-   ( $lost_window ) = @_;
-   $self->SUPER::window_lost( @_ );
+   method window_lost
+   {
+      ( $lost_window ) = @_;
+      $self->SUPER::window_lost( @_ );
+   }
 }

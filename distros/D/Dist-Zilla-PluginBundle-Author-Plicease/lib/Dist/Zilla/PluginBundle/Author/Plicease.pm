@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.57 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.58 {
 
   use 5.014;
   use Moose;
@@ -211,30 +211,33 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.57 {
     {
       $self->_my_add_plugin([
         'Author::Plicease::ReadmeAnyFromPod' => {
-                type            => 'text',
-                filename        => 'README',
-                location        => 'build',
-          maybe source_filename => $self->payload->{readme_from},
-          maybe default_branch  => $self->payload->{default_branch},
+                type              => 'text',
+                filename          => 'README',
+                location          => 'build',
+          maybe source_filename   => $self->payload->{readme_from},
+          maybe default_branch    => $self->payload->{default_branch},
         },
       ]);
 
       $self->_my_add_plugin([
         'Author::Plicease::ReadmeAnyFromPod' => ReadMePodInRoot => {
-                type            => 'gfm',
-                filename        => 'README.md',
-                location        => 'root',
-          maybe source_filename => $self->payload->{readme_from},
-          maybe default_branch  => $self->payload->{default_branch},
+                type              => 'gfm',
+                filename          => 'README.md',
+                location          => 'root',
+          maybe source_filename   => $self->payload->{readme_from},
+          maybe default_branch    => $self->payload->{default_branch},
 
           # these are for my ReadmeAnyFromPod wrapper.
-                travis_status   => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
-          maybe appveyor        => $self->payload->{appveyor},
-          maybe travis_user     => $self->payload->{travis_user} // $self->payload->{github_user},
-          maybe appveyor_user   => $self->payload->{appveyor_user},
-          maybe cirrus_user     => $self->payload->{cirrus_user},
-          maybe github_user     => $self->payload->{github_user},
-          maybe workflow        => $self->payload->{workflow},
+                travis_status     => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
+          maybe appveyor          => $self->payload->{appveyor},
+          maybe travis_user       => $self->payload->{travis_user} // $self->payload->{github_user},
+          maybe travis_com        => $self->payload->{travis_com},
+          maybe travis_base       => $self->payload->{travis_base},
+          maybe travis_image_base => $self->payload->{travis_image_base},
+          maybe appveyor_user     => $self->payload->{appveyor_user},
+          maybe cirrus_user       => $self->payload->{cirrus_user},
+          maybe github_user       => $self->payload->{github_user},
+          maybe workflow          => $self->payload->{workflow},
        },
      ]);
     }
@@ -307,7 +310,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.57
+version 2.58
 
 =head1 SYNOPSIS
 
@@ -475,6 +478,18 @@ if C<release_tests> is true.
 =head2 travis_status
 
 if set to true, then include a link to the travis build page in the readme.
+
+=head2 travis_com
+
+If set to true use travis-ci.com instead of travis-ci.org.
+
+=head2 travis_base
+
+Base URL for travis-ci.
+
+=head2 travis_image_base
+
+Base URL for the travis-ci status button.
 
 =head2 appveyor
 

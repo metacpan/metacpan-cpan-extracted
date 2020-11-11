@@ -139,7 +139,9 @@ Betriebsbhf. Schöneweide
 Adlershof
 Altglienicke
 Grünbergallee
-Flughafen Berlin-Schönefeld
+Flughafen BER - Terminal 5
+Waßmannsdorf
+Flughafen BER - Terminal 1-2
 
 # S46
 Grünau
@@ -271,9 +273,6 @@ Hellersdorf
 Louis-Lewin-Str.
 Hönow
 
-# U55
-Bundestag
-
 # U6
 Alt-Mariendorf
 Westphalweg
@@ -387,7 +386,6 @@ Schloßstr.
 3|U3|
 4|U4|
 5|U5|
-55|U55|
 6|U6|
 7|U7|
 8|U8|
@@ -451,7 +449,6 @@ Schloßstr.
 1001,1025,1026|Bornholmer Str.|Wollankstr.
 6|Borsigwerke|Alt-Tegel
 1001|Botanischer Garten|Rathaus Steglitz
-55|Brandenburger Tor|Bundestag
 1001,1025,1026,1002|Brandenburger Tor|Friedrichstr.
 3|Breitenbachplatz|Podbielskiallee
 7|Britz-Süd|Parchimer Allee
@@ -460,7 +457,6 @@ Schloßstr.
 9|Bundesplatz|Friedrich-Wilhelm-Platz
 1041|Bundesplatz|Heidelberger Platz
 1046|Bundesplatz|Innsbrucker Platz
-55|Bundestag|Hauptbahnhof
 2|Bülowstr.|Nollendorfplatz
 1003|Charlottenburg|Savignyplatz
 1003,1005,1007,1009|Charlottenburg|Westkreuz
@@ -478,7 +474,9 @@ Schloßstr.
 3|Fehrbelliner Platz|Heidelberger Platz
 7|Fehrbelliner Platz|Konstanzer Str.
 1001|Feuerbachstr.|Friedenau
-1009|Flughafen Berlin-Schönefeld|Grünbergallee
+1009|Flughafen BER - Terminal 1-2|Waßmannsdorf
+1009|Flughafen BER - Terminal 5|Grünbergallee
+1045|Flughafen BER - Terminal 5|Waßmannsdorf
 5|Frankfurter Allee|Magdalenenstr.
 1041|Frankfurter Allee|Ostkreuz
 1008,1085|Frankfurter Allee|Storkower Str.
@@ -511,7 +509,7 @@ Schloßstr.
 1008,1085|Grünau|Adlershof
 1046|Grünau|Eichwalde
 1009|Grünbergallee|Altglienicke
-1045|Grünbergallee|Flughafen Berlin-Schönefeld
+1045|Grünbergallee|Flughafen BER - Terminal 5
 1,3|Görlitzer Bhf.|Kottbusser Tor
 9|Güntzelstr.|Berliner Str.
 1003|Hackescher Markt|Alexanderplatz
@@ -754,6 +752,8 @@ Schloßstr.
 1003,1005,1007,1009|Warschauer Str.|Ostbahnhof
 1,3|Warschauer Str.|Schlesisches Tor
 1075|Wartenberg|Hohenschönhausen
+1045|Waßmannsdorf|Flughafen BER - Terminal 1-2
+1009|Waßmannsdorf|Flughafen BER - Terminal 5
 5|Weberwiese|Frankfurter Tor
 1041|Wedding|Gesundbrunnen
 6|Wedding|Leopoldplatz

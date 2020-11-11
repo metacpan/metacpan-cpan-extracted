@@ -1,5 +1,10 @@
 Revision history for Chart::GGPlot
 
+0.0011      2020-11-04
+  - Use Chart::Plotly::Image to generate static images for Plotly Backend.
+  - Speedup boxplot rendering.
+  - Bump MooseX::MungeHas version requirement.
+
 0.0009      2020-02-24
   - For plotly backend's show() in browser method, use fluid layout by
     default. Also allows specifying width and height.

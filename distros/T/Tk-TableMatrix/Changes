@@ -2,6 +2,14 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.26   10/26/2020
+
+* Fix RT #133587: improper handling of line endings differing from `$/`
+  in pTk.exc files causes build failure (tries compiling
+  known-uncompilable files—e.g. tkAppInit.c, tkTablePs.c)
+* Add GitHub repository to module metadata
+* Apply POD fixes (originally by Debian package maintainer Bart Martens)
+
 Release 1.25   10/19/2020
 
 * add dependencies / RT #133557

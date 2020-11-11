@@ -1,0 +1,156 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-08'; # DATE
+our $DIST = 'App-GrepUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Getopt::Long;
+
+my @grep_argv;
+
+sub parse_cmdline {
+    Getopt::Long::Configure('pass_through');
+    my $res = GetOptions(
+        'version|V'        => sub {
+            no warnings 'once';
+            say "grep-terms version ", ($main::VERSION // 'dev');
+            exit 0;
+        },
+        'help'           => sub {
+            print <<USAGE;
+Usage:
+  grep-terms [GREP-TERM-OPTIONS]... <TERMS> [GREP-OPTIONS | FILES]...
+  grep-terms --help
+  grep-terms --version|-V
+Grep-term Options:
+
+Examples:
+  % grep-terms "foo bar baz -qux -quux" -i file.txt
+
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+    log_trace "ARGV: %s", \@ARGV;
+    die "grep-terms: Please supply terms" unless @ARGV;
+    my $terms = shift @ARGV;
+    #log_trace "terms: %s", $terms;
+    my $re = '^';
+    for my $term (split /\s+/, $terms) {
+        if ($term =~ s/^-//) {
+            $re .= "(?!.*$term)";
+        } else {
+            $re .= "(?=.*$term)";
+        }
+    }
+    push @grep_argv, '-P', '-e', $re, @ARGV;
+}
+
+sub run {
+    log_trace "Exec: %s", ["grep", @grep_argv];
+    exec "grep", @grep_argv;
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Print lines that match terms
+# PODNAME: grep-terms
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+grep-terms - Print lines that match terms
+
+=head1 VERSION
+
+This document describes version 0.002 of grep-terms (from Perl distribution App-GrepUtils), released on 2020-11-08.
+
+=head1 SYNOPSIS
+
+ % grep-terms [GREP-TERM-OPTIONS]... <TERMS> [GREP-OPTIONS | FILES]...
+ % grep-terms --help
+ % grep-terms --version|-V
+
+Example:
+
+  % grep-terms "foo bar baz -qux -quux" -i file.txt
+
+will print lines from F<file.txt> that contain "foo", "bar", "baz" (in no
+particular order) and do not contain "qux" or "quux".
+
+=head1 DESCRIPTION
+
+C<grep-terms> is a simple wrapper for Unix command C<grep>. It converts I<terms>
+(the first argument) like this:
+
+ "foo bar baz -qux -quux"
+
+to:
+
+ -P -e '^(?=.*foo)(?=.*bar)(?=.*baz)(?!.*qux)(?!.*quux)'
+
+It allows searching each term in I<terms> in no particular order and negative
+search (using the dash prefix syntax). The drawback is that grep won't highlight
+the terms. Use L<abgrep> for that.
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-GrepUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-GrepUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GrepUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<abgrep> from L<App::abgrep>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

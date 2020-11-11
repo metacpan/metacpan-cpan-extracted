@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ArrayRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ArrayRef::VERSION   = '1.010006';
+	$Types::Standard::ArrayRef::VERSION   = '1.012000';
 }
 
 $Types::Standard::ArrayRef::VERSION =~ tr/_//d;
@@ -24,12 +24,12 @@ sub __constraint_generator
 	return Types::Standard::ArrayRef unless @_;
 	
 	my $param = shift;
-	Types::TypeTiny::TypeTiny->check($param)
+	Types::TypeTiny::is_TypeTiny($param)
 		or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
 	
 	my ($min, $max) = (0, -1);
-	$min = Types::Standard::Int->assert_return(shift) if @_;
-	$max = Types::Standard::Int->assert_return(shift) if @_;
+	$min = Types::Standard::assert_Int(shift) if @_;
+	$max = Types::Standard::assert_Int(shift) if @_;
 	
 	my $param_compiled_check = $param->compiled_check;
 	my $xsub;

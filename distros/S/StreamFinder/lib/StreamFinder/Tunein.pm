@@ -18,11 +18,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::Tunein;
 
-	my $station = new StreamFinder::Tunein(<url>);
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $station = new StreamFinder::Tunein($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
 

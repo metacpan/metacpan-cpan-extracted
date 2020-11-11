@@ -5,11 +5,11 @@ use strict;
 
 use Carp;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -40,16 +40,22 @@ sub list {
         fields => $common_template->{'fields'},
         org_id => {
             allow => qr/^\d+$/,
-        }
+        },
+        raw => {},
     };
 
     my $params = sc_check_params( $tmpl, \%args );
+    my $raw    = delete( $params->{'raw'} );
 
     my $response = $self->client->get( '/user', $params );
 
     return if ( !$response );
 
-    return $response;
+    if ($raw) {
+        return wantarray ? @{$response} : $response;
+    }
+
+    return wantarray ? @{ sc_normalize_array($response) } : sc_normalize_array($response);
 
 }
 
@@ -62,16 +68,22 @@ sub get {
     my $tmpl = {
         fields => $common_template->{'fields'},
         id     => $common_template->{'id'},
+        raw    => {},
     };
 
-    my $params = sc_check_params( $tmpl, \%args );
-
+    my $params  = sc_check_params( $tmpl, \%args );
+    my $raw     = delete( $params->{'raw'} );
     my $user_id = delete( $params->{'id'} );
 
     my $response = $self->client->get( "/user/$user_id", $params );
 
     return if ( !$response );
-    return $response;
+
+    if ($raw) {
+        return $response;
+    }
+
+    return sc_normalize_hash($response);
 
 }
 

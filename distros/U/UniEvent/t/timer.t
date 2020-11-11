@@ -2,8 +2,6 @@ use 5.012;
 use warnings;
 use lib 't/lib'; use MyTest;
 
-catch_run('timer');
-
 my $l = UniEvent::Loop->default;
 
 subtest 'once timer' => sub {
@@ -85,14 +83,14 @@ subtest 'change repeat' => sub {
         my $initial_meth = shift;
         my $t = new UniEvent::Timer;
         $t->event->add(sub { $l->stop });
-        $t->$initial_meth(0.01);
-        $t->repeat(0.02);
+        $t->$initial_meth(0.02);
+        $t->repeat(0.04);
         time_mark();
         $l->run;
-        check_mark(0.01, "changing repeat doesn't apply for the next call ($initial_meth)");
+        check_mark(0.02, "changing repeat doesn't apply for the next call ($initial_meth)");
         time_mark();
         $l->run;
-        check_mark(0.02, "changing repeat applies for further calls ($initial_meth)");
+        check_mark(0.04, "changing repeat applies for further calls ($initial_meth)");
     };
     subtest 'once'  => $sub, 'once';
     subtest 'start' => $sub, 'start';

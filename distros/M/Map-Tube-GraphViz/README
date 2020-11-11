@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::GraphViz;
+
      my $obj = Map::Tube::GraphViz->new(%params);
      $obj->graph($output_file);
 
@@ -87,11 +88,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use English;
      use Error::Pure qw(err);
      use Map::Tube::GraphViz;
@@ -136,11 +135,9 @@ EXAMPLE1
      # -rw-r--r-- 1 skim skim 1503067 Jan 27 07:24 Berlin.png
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use English;
      use Error::Pure qw(err);
      use Map::Tube::GraphViz;
@@ -187,11 +184,9 @@ EXAMPLE2
      # -rw-r--r-- 1 skim skim 885928 Jan 27 07:43 Berlin.png
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use English;
      use Error::Pure qw(err);
      use GraphViz2;
@@ -249,11 +244,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 1212857 Jan 27 07:51 Berlin.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use English;
      use Error::Pure qw(err);
      use Map::Tube::GraphViz;
@@ -304,16 +297,20 @@ DEPENDENCIES
     Map::Tube::GraphViz::Utils, Scalar::Util.
 
 SEE ALSO
-    Map::Tube, Map::Tube::Graph, Map::Tube::Plugin::Graph,
-    Map::Tube::Text::Table, Task::Map::Tube.
+    Map::Metro::Graph
+        Map::Metro graph.
 
-    Map::Metro::Graph.
+    Task::Map::Tube
+        Install the Map::Tube modules.
+
+    Task::Map::Tube::Metro
+        Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-GraphViz>
+    <https://github.com/michal-josef-spacek/Map-Tube-GraphViz>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
@@ -321,10 +318,12 @@ CONTRIBUTORS
     Gisbert W. Selke gws@cpan.org
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2020 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

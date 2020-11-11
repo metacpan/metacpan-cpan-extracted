@@ -1,5 +1,11 @@
 #define PERL_NO_GET_CONTEXT
 
+#ifdef __cplusplus
+extern "C++" {
+#include <algorithm>
+}
+#endif
+
 extern "C" {
 #include "EXTERN.h"
 #include "perl.h"

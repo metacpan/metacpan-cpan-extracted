@@ -3,9 +3,9 @@ NAME
     dists
 
 VERSION
-    This document describes version 0.040 of
+    This document describes version 0.041 of
     Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution
-    Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2018-09-08.
+    Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2020-10-27.
 
 SYNOPSIS
     In dist.ini:
@@ -42,7 +42,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2014, 2013 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2014, 2013 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

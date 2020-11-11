@@ -1,5 +1,11 @@
 Revision history for Perl extension Class::C3.
 
+0.35 - 2020-11-09
+    - update bundled ExtUtils::HasCompiler to 0.022
+    - support PUREPERL_ONLY environment variable during installation
+    - fix no-XS test to not require newer Test::More that declared prereq
+    - drop optional Devel::Hide prereq
+
 0.34 - 2018-04-19
     - update bundled ExtUtils::HasCompiler to 0.021
     - fix some examples in pod

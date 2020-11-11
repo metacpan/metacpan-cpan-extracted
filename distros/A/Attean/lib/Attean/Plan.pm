@@ -8,7 +8,7 @@ Attean::Plan - Representation of SPARQL query plan operators
 
 =head1 VERSION
 
-This document describes Attean::Plan version 0.026
+This document describes Attean::Plan version 0.027
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Evaluates a quad pattern against the model.
 
 =cut
 
-package Attean::Plan::Quad 0.026 {
+package Attean::Plan::Quad 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed reftype);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -137,7 +137,7 @@ Evaluates a join (natural-, anti-, or left-) using a nested loop.
 
 =cut
 
-package Attean::Plan::NestedLoopJoin 0.026 {
+package Attean::Plan::NestedLoopJoin 0.027 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use namespace::clean;
@@ -226,7 +226,7 @@ Evaluates a join (natural-, anti-, or left-) using a hash join.
 
 =cut
 
-package Attean::Plan::HashJoin 0.026 {
+package Attean::Plan::HashJoin 0.027 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use namespace::clean;
@@ -367,7 +367,7 @@ package Attean::Plan::HashJoin 0.026 {
 
 =cut
 
-package Attean::Plan::Construct 0.026 {
+package Attean::Plan::Construct 0.027 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use Types::Standard qw(Str ArrayRef ConsumerOf InstanceOf);
@@ -458,7 +458,7 @@ package Attean::Plan::Construct 0.026 {
 
 =cut
 
-package Attean::Plan::Describe 0.026 {
+package Attean::Plan::Describe 0.027 {
 	use Moo;
 	use Attean::RDF;
 	use List::MoreUtils qw(all);
@@ -544,7 +544,7 @@ named variable binding.
 
 =cut
 
-package Attean::Plan::EBVFilter 0.026 {
+package Attean::Plan::EBVFilter 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ConsumerOf);
@@ -603,7 +603,7 @@ ordering.
 
 =cut
 
-package Attean::Plan::Merge 0.026 {
+package Attean::Plan::Merge 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ArrayRef ConsumerOf);
@@ -632,7 +632,7 @@ Evaluates a set of sub-plans, returning the union of results.
 
 =cut
 
-package Attean::Plan::Union 0.026 {
+package Attean::Plan::Union 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use namespace::clean;
@@ -703,7 +703,7 @@ expressions, binding the produced values to new variables.
 
 =cut
 
-package Attean::Plan::Extend 0.026 {
+package Attean::Plan::Extend 0.027 {
 	use Moo;
 	use Encode;
 	use Data::UUID;
@@ -760,44 +760,55 @@ package Attean::Plan::Extend 0.026 {
 			my $datatype	= $expr->datatype->value;
 			my ($child)	= @{ $expr->children };
 			my $term	= $self->evaluate_expression($model, $child, $r);
+
+			if ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#string$>) {
+				my $value	= $term->value;
+				if ($term->does('Attean::API::IRI')) {
+					return Attean::Literal->new(value => $term->value);
+				} elsif ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
+					my $v	= ($value eq 'true' or $value eq '1') ? 'true' : 'false';
+					return Attean::Literal->new(value => $v);
+				} elsif ($term->does('Attean::API::NumericLiteral')) {
+					my $v	= $term->numeric_value();
+					if ($v == int($v)) {
+						return Attean::Literal->new(value => int($v));
+					}
+				}
+				
+				return Attean::Literal->new(value => $value);
+			}
+
 			die "TypeError $op" unless (blessed($term) and $term->does('Attean::API::Literal'));
-			if ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#(integer|float|double)>) {
+			if ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#(integer|float|double|decimal)>) {
 				my $value	= $term->value;
 				my $num;
 				if ($datatype eq 'http://www.w3.org/2001/XMLSchema#integer') {
 					if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
-						$value	= ($value eq 'true') ? '1' : '0';
+						$value	= ($value eq 'true' or $value eq '1') ? '1' : '0';
 					} elsif ($term->does('Attean::API::NumericLiteral')) {
-						if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#double' or (int($value) != $value)) {
-							die "cannot cast to xsd:integer as precision would be lost";
-						} else {
-							$value	= int($value);
-						}
-					} elsif (looks_like_number($value)) {
-						if ($value =~ /[eE]/) {	# double
-							die "cannot to xsd:integer as precision would be lost";
-						} elsif (int($value) != $value) {
-							die "cannot to xsd:integer as precision would be lost";
-						}
+						my $v	= $term->numeric_value();
+						$v		=~ s/[.].*$//;
+						$value	= int($v);
+					} elsif ($value =~ /^[-+]\d+$/) {
+						my ($v) = "$value";
+						$v		=~ s/[.].*$//;
+						$value	= int($v);
 					}
 					$num	= $value;
 				} elsif ($datatype eq 'http://www.w3.org/2001/XMLSchema#decimal') {
 					if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
 						$value	= ($value eq 'true') ? '1' : '0';
 					} elsif ($term->does('Attean::API::NumericLiteral')) {
-						if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#double' or (int($value) != $value)) {
-							die "cannot cast to xsd:decimal as precision would be lost";
-						} else {
-							$value	= $term->numeric_value;
-						}
+						$value	= $term->numeric_value;
 					} elsif (looks_like_number($value)) {
 						if ($value =~ /[eE]/) {	# double
 							die "cannot cast to xsd:decimal as precision would be lost";
-						} elsif (int($value) != $value) {
-							die "cannot cast to xsd:decimal as precision would be lost";
 						}
+						$value = +$value;
 					}
-					$num	= $value;
+					$num	= "$value";
+					$num	=~ s/[.]0+$/.0/;
+					$num	=~ s/[.](\d+)0*$/.$1/;
 				} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#(float|double)$>) {
 					my $typename	= $1;
 					if ($term->datatype->value eq 'http://www.w3.org/2001/XMLSchema#boolean') {
@@ -811,7 +822,32 @@ package Attean::Plan::Extend 0.026 {
 					}
 					$num	= sprintf("%e", $value);
 				}
-				return Attean::Literal->new(value => $num, datatype => $expr->datatype);
+				my $c	= Attean::Literal->new(value => $num, datatype => $expr->datatype);
+				if (my $term = $c->canonicalized_term()) {
+					return $term;
+				} else {
+					die "Term value is not a valid lexical form for $datatype";
+				}
+			} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#boolean$>) {
+				if ($term->does('Attean::API::NumericLiteral')) {
+					my $value	= $term->numeric_value;
+					return ($value == 0) ? Attean::Literal->false : Attean::Literal->true;
+				} else {
+					my $value	= $term->value;
+					if ($value =~ m/^(true|false|0|1)$/) {
+						return ($value eq 'true' or $value eq '1') ? Attean::Literal->true : Attean::Literal->false;
+					} else {
+						die "Bad lexical form for xsd:boolean: '$value'";
+					}
+				}
+			} elsif ($datatype =~ m<^http://www.w3.org/2001/XMLSchema#dateTime$>) {
+				my $value	= $term->value;
+				my $c	= Attean::Literal->new(value => $value, datatype => $expr->datatype);
+				if ($c->does('Attean::API::DateTimeLiteral') and $c->datetime) {
+					return $c;
+				} else {
+					die "Bad lexical form for xsd:dateTime: '$value'";
+				}
 			}
 			$self->log->warn("Cast expression unimplemented for $datatype: " . Dumper($expr));
 		} elsif ($expr->isa('Attean::ValueExpression')) {
@@ -1297,7 +1333,7 @@ hash of already-seen results.
 
 =cut
 
-package Attean::Plan::HashDistinct 0.026 {
+package Attean::Plan::HashDistinct 0.027 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1325,7 +1361,7 @@ filtering out sequential duplicates.
 
 =cut
 
-package Attean::Plan::Unique 0.026 {
+package Attean::Plan::Unique 0.027 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1360,7 +1396,7 @@ number of results ("offset") and limiting the total number of returned results
 
 =cut
 
-package Attean::Plan::Slice 0.026 {
+package Attean::Plan::Slice 0.027 {
 	use Moo;
 	use Types::Standard qw(Int);
 	use namespace::clean;
@@ -1401,7 +1437,7 @@ of variable bindings in each result.
 
 =cut
 
-package Attean::Plan::Project 0.026 {
+package Attean::Plan::Project 0.027 {
 	use Moo;
 	with 'Attean::API::BindingSubstitutionPlan', 'Attean::API::UnaryQueryTree';
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1478,7 +1514,7 @@ sorting is applied.
 
 =cut
 
-package Attean::Plan::OrderBy 0.026 {
+package Attean::Plan::OrderBy 0.027 {
 	use Moo;
 	use Types::Standard qw(HashRef ArrayRef InstanceOf Bool Str);
 	use namespace::clean;
@@ -1548,7 +1584,7 @@ Evaluates a SPARQL query against a remote endpoint.
 
 =cut
 
-package Attean::Plan::Service 0.026 {
+package Attean::Plan::Service 0.027 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf Bool Str);
 	use namespace::clean;
@@ -1580,7 +1616,7 @@ Returns a constant set of results.
 
 =cut
 
-package Attean::Plan::Table 0.026 {
+package Attean::Plan::Table 0.027 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1645,7 +1681,7 @@ L<Attean::ListIterator>, the size of that iterator will be used.
 
 =cut
 
-package Attean::Plan::Iterator 0.026 {
+package Attean::Plan::Iterator 0.027 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf Int);
 	use namespace::clean;
@@ -1709,7 +1745,7 @@ package Attean::Plan::Iterator 0.026 {
 
 =cut
 
-package Attean::Plan::ALPPath 0.026 {
+package Attean::Plan::ALPPath 0.027 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1861,7 +1897,7 @@ package Attean::Plan::ALPPath 0.026 {
 	}
 }
 
-package Attean::Plan::ZeroOrOnePath 0.026 {
+package Attean::Plan::ZeroOrOnePath 0.027 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1960,7 +1996,7 @@ results were produced by evaluating the sub-plan.
 
 =cut
 
-package Attean::Plan::Exists 0.026 {
+package Attean::Plan::Exists 0.027 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1990,7 +2026,7 @@ package Attean::Plan::Exists 0.026 {
 
 =cut
 
-package Attean::Plan::Aggregate 0.026 {
+package Attean::Plan::Aggregate 0.027 {
 	use Moo;
 	use Encode;
 	use Data::UUID;
@@ -2177,7 +2213,7 @@ package Attean::Plan::Aggregate 0.026 {
 			# result in an empty result <http://answers.semanticweb.com/questions/17410/semantics-of-sparql-aggregates>
 			
 			my @results;
-			unless (scalar(@group_keys)) {
+			if (scalar(@group_keys) == 0 and scalar(@groups) == 0) {
 				push(@group_keys, '');
 				$row_groups{''}			= [];
 				$group_templates{''}	= {};
@@ -2219,7 +2255,7 @@ package Attean::Plan::Aggregate 0.026 {
 	}
 }
 
-package Attean::Plan::Sequence 0.026 {
+package Attean::Plan::Sequence 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2244,7 +2280,7 @@ package Attean::Plan::Sequence 0.026 {
 	}
 }
 
-package Attean::Plan::Clear 0.026 {
+package Attean::Plan::Clear 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2281,7 +2317,7 @@ package Attean::Plan::Clear 0.026 {
 	}
 }
 
-package Attean::Plan::Drop 0.026 {
+package Attean::Plan::Drop 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2316,7 +2352,7 @@ package Attean::Plan::Drop 0.026 {
 	}
 }
 
-package Attean::Plan::TripleTemplateToModelQuadMethod 0.026 {
+package Attean::Plan::TripleTemplateToModelQuadMethod 0.027 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf Str ArrayRef HashRef);
@@ -2392,7 +2428,7 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.026 {
 	}
 }
 
-package Attean::Plan::Load 0.026 {
+package Attean::Plan::Load 0.027 {
 	use Moo;
 	use Encode;
 	use LWP::UserAgent;
@@ -2463,7 +2499,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams.
+Copyright (c) 2014--2020 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

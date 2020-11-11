@@ -2,8 +2,8 @@ NAME
     PMVersions::Util - Utilities related to pmversions.ini
 
 VERSION
-    This document describes version 0.001 of PMVersions::Util (from Perl
-    distribution PMVersions-Util), released on 2018-06-07.
+    This document describes version 0.002 of PMVersions::Util (from Perl
+    distribution PMVersions-Util), released on 2020-11-11.
 
 SYNOPSIS
     In ~/pmversions.ini:
@@ -30,8 +30,8 @@ FUNCTIONS
 
     Read pmversions.ini and return a hash of module names and versions. If
     $path is not specified, will look at "PMVERSIONS_PATH" environment
-    variable, or defaults to ~/pmversions.ini. Will die if file cannot be
-    read or parsed.
+    variable, or defaults to ~/pmversions.ini. Will warn if file does not
+    exist. Will die if file cannot be read or parsed.
 
   version_from_pmversions
     Usage:
@@ -42,6 +42,9 @@ FUNCTIONS
     "read_pmversions" only the first time; after that, the contents of the
     file is cached in a hash variable so the pmversions file is only read
     and parsed once.
+
+    Will return undef if file does not exist or version for $mod is not set
+    in the pmversions file.
 
 ENVIRONMENT
   PMVERSIONS_PATH
@@ -68,7 +71,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

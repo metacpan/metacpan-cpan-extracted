@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Type::Params qw/compile_named_oo compile/;
 use Types::Standard qw/CodeRef/;
@@ -38,7 +38,7 @@ Compiled::Params::OO - compiled params object oriented.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

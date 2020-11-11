@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.010006';
+	$Types::Standard::VERSION   = '1.012000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -243,6 +243,7 @@ my $_str = $meta->$add_core_type({
 	inlined    => sub {
 		"defined($_[1]) and do { ref(\\$_[1]) eq 'SCALAR' or ref(\\(my \$val = $_[1])) eq 'SCALAR' }"
 	},
+	sorter     => sub { $_[0] cmp $_[1] }
 });
 
 my $_laxnum = $meta->add_type({
@@ -252,11 +253,12 @@ my $_laxnum = $meta->add_type({
 	inlined    => sub {
 		$maybe_load_modules->(
 			qw/ Scalar::Util /,
-			'Scalar::Util'->VERSION('1.18') # RT 132426
+			'Scalar::Util'->VERSION ge '1.18' # RT 132426
 				? "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])"
 				: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
 		);
 	},
+	sorter     => sub { $_[0] <=> $_[1] }
 });
 
 my $_strictnum = $meta->add_type({
@@ -283,6 +285,7 @@ my $_strictnum = $meta->add_type({
 			(?:[Ee](?:[+-]?[0-9]+))?          # matches E1 or e1 or e-1 or e+1 etc
 		\z/x ); '
 	},
+	sorter     => sub { $_[0] <=> $_[1] }
 });
 
 my $_num = $meta->add_type({
@@ -477,7 +480,7 @@ $meta->$add_core_type({
 		return $meta->get_type('Maybe') unless @_;
 		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
+		Types::TypeTiny::is_TypeTiny($param)
 			or _croak("Parameter to Maybe[`a] expected to be a type constraint; got $param");
 		
 		my $param_compiled_check = $param->compiled_check;
@@ -563,7 +566,7 @@ my $_Optional = $meta->add_type({
 		return $meta->get_type('Optional') unless @_;
 		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
+		Types::TypeTiny::is_TypeTiny($param)
 			or _croak("Parameter to Optional[`a] expected to be a type constraint; got $param");
 		
 		sub { $param->check($_[0]) }
@@ -665,7 +668,7 @@ $meta->add_type({
 		return $meta->get_type('Overload') unless @_;
 		
 		my @operations = map {
-			Types::TypeTiny::StringLike->check($_)
+			Types::TypeTiny::is_StringLike($_)
 				? "$_"
 				: _croak("Parameters to Overload[`a] expected to be a strings; got $_");
 		} @_;
@@ -743,9 +746,9 @@ $meta->add_type({
 	{
 		my $self  = shift;
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		unless (Types::TypeTiny::TypeTiny->check($param))
+		unless (Types::TypeTiny::is_TypeTiny($param))
 		{
-			Types::TypeTiny::StringLike->check($param)
+			Types::TypeTiny::is_StringLike($param)
 				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
 			require B;
 			return sprintf("%s[%s]", $self, B::perlstring($param));
@@ -763,7 +766,7 @@ $meta->add_type({
 		return $meta->get_type('InstanceOf') unless @_;
 		require Type::Tiny::Class;
 		my @classes = map {
-			Types::TypeTiny::TypeTiny->check($_)
+			Types::TypeTiny::is_TypeTiny($_)
 				? $_
 				: "Type::Tiny::Class"->new(class => $_, display_name => sprintf('InstanceOf[%s]', B::perlstring($_)))
 		} @_;
@@ -786,7 +789,7 @@ $meta->add_type({
 		require B;
 		require Type::Tiny::Role;
 		my @roles = map {
-			Types::TypeTiny::TypeTiny->check($_)
+			Types::TypeTiny::is_TypeTiny($_)
 				? $_
 				: "Type::Tiny::Role"->new(role => $_, display_name => sprintf('ConsumerOf[%s]', B::perlstring($_)))
 		} @_;
@@ -819,11 +822,20 @@ $meta->add_type({
 	parent     => $_str,
 	constraint_generator => sub {
 		return $meta->get_type('Enum') unless @_;
+		my $coercion;
+		if ( ref($_[0]) and ref($_[0]) eq 'SCALAR' ) {
+			$coercion = ${ +shift };
+		}
+		elsif ( ref($_[0]) && ! blessed($_[0])
+		or      blessed($_[0]) && $_[0]->isa('Type::Coercion') ) {
+			$coercion = shift;
+		}
 		require B;
 		require Type::Tiny::Enum;
 		return "Type::Tiny::Enum"->new(
 			values       => \@_,
 			display_name => sprintf('Enum[%s]', join q[,], map B::perlstring($_), @_),
+			$coercion ? ( coercion => $coercion ) : (),
 		);
 	},
 });
@@ -843,7 +855,7 @@ $meta->add_coercion({
 	type_constraint    => $_str,
 	coercion_generator => sub {
 		my ($self, $target, $sep) = @_;
-		Types::TypeTiny::StringLike->check($sep)
+		Types::TypeTiny::is_StringLike($sep)
 			or _croak("Parameter to Join[`a] expected to be a string; got $sep");
 		require B;
 		$sep = B::perlstring($sep);
@@ -1379,7 +1391,21 @@ B<< Enum[`a] >>
 
 As per MooX::Types::MooseLike::Base:
 
-   has size => (is => "ro", isa => Enum[qw( S M L XL XXL )]);
+   has size => (
+      is     => "ro",
+      isa    => Enum[qw( S M L XL XXL )],
+   );
+
+You can enable coercion by passing C<< \1 >> before the list of values.
+
+   has size => (
+      is     => "ro",
+      isa    => Enum[ \1, qw( S M L XL XXL ) ],
+      coerce => 1,
+   );
+
+This will use the C<closest_match> method in L<Type::Tiny::Enum> to
+coerce closely matching strings.
 
 =item *
 

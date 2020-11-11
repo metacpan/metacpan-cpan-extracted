@@ -6,10 +6,13 @@ use feature ':5.'.substr($], 3, 2);
 use Carp;
 use Try::Tiny;
 use Time::HiRes qw(time);
+use Const::Fast;
 use App::SimpleBackuper::BackupDB;
 use App::SimpleBackuper::_format;
 use App::SimpleBackuper::_BlockDelete;
 use App::SimpleBackuper::_BlocksInfo;
+
+const my $SIZE_OF_TOP_FILES => 10;
 
 sub _proc_uid_gid($$$) {
 	my($uid, $gid, $uids_gids) = @_;
@@ -51,13 +54,14 @@ sub Backup {
 	foreach (@$backups) {
 		my $id = $backups->unpack($_)->{id};
 		$state->{last_backup_id} = $id if ! $state->{last_backup_id} or $state->{last_backup_id} < $id;
-		
 	}
 	#print "last backup id $state->{last_backup_id}, ";
 	foreach (@$files) {
 		my $file = $files->unpack($_);
 		$state->{last_file_id} = $file->{id} if ! $state->{last_file_id} or $state->{last_file_id} < $file->{id};
-		$state->{bytes_in_last_backup} += $file->{versions}->[-1]->{size} if $file->{versions} and @{ $file->{versions} };
+		if($file->{versions} and @{ $file->{versions} } and $file->{versions}->[-1]->{backup_id_max} == $state->{last_backup_id}) {
+			$state->{bytes_in_last_backup} += $file->{versions}->[-1]->{size};
+		}
 	}
 	#print "last file id $state->{last_file_id}, ";
 	foreach (@$blocks) {
@@ -264,6 +268,8 @@ sub _file_proc {
 		}
 	}
 	
+	$state->{bytes_processed} += $file->{versions}->[-1]->{size} if @{ $file->{versions} };
+	
 	my %version = (
 		backup_id_min	=> $state->{last_backup_id},
 		backup_id_max	=> $state->{last_backup_id},
@@ -276,8 +282,6 @@ sub _file_proc {
 		symlink_to		=> undef,
 		parts			=> [],
 	);
-	
-	$state->{bytes_processed} += $version{size};
 	
 	if(S_ISDIR $stat[2]) {
 		print ", is directory.\n" if $options->{verbose};
@@ -549,17 +553,21 @@ sub _file_proc {
 
 	
 	$state->{longest_files} ||= [];
-	if(@{ $state->{longest_files} } < 5 or $state->{longest_files}->[-1]->{time} < $file_time_spent) {
+	if(	@{ $state->{longest_files} } < $SIZE_OF_TOP_FILES
+		or $state->{longest_files}->[-1]->{time} < $file_time_spent
+	) {
 		@{ $state->{longest_files} } = sort {$b->{time} <=> $a->{time}} (@{ $state->{longest_files} }, {time => $file_time_spent, path => $task->[0]});
-		splice @{ $state->{longest_files} }, 5;
+		splice @{ $state->{longest_files} }, $SIZE_OF_TOP_FILES;
 	}
 	
 	if($file_weight_spent) {
 		$state->{heaviweightest_files} ||= [];
-		if(@{ $state->{heaviweightest_files} } < 5 or $state->{heaviweightest_files}->[-1]->{weight} < $file_weight_spent) {
+		if(	@{ $state->{heaviweightest_files} } < $SIZE_OF_TOP_FILES
+			or $state->{heaviweightest_files}->[-1]->{weight} < $file_weight_spent
+		) {
 			@{ $state->{heaviweightest_files} } = sort {$b->{weight} <=> $a->{weight}}
 				(@{ $state->{heaviweightest_files} }, {weight => $file_weight_spent, path => $task->[0]});
-			splice @{ $state->{heaviweightest_files} }, 5;
+			splice @{ $state->{heaviweightest_files} }, $SIZE_OF_TOP_FILES;
 		}
 	}
 	

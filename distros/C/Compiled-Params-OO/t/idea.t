@@ -32,6 +32,7 @@ my $validate = cpo(
 my $args = $validate->new_pdf->(name => 'testing');
 
 my $expected = {
+	'~~caller' => 'Compiled::Params::OO::cpo',
 	name => 'testing',
 	page_size => 'A4',
 	pages => [],

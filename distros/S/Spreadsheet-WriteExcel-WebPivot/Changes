@@ -1,0 +1,11 @@
+Revision history for Perl module Spreadsheet::WriteExcel::WebPivot
+
+0.02 2020-11-02 JANITOR
+    - Fixed the dist name so it doesn't clash with Spreadsheet-WriteExcel
+    - Renamed FakeDBI to be Spreadsheet::WriteExcel::WebPivot::FakeDBI
+    - Switched to DistZilla
+    - Removed tabs from WebPivot.pm
+
+0.01 2005-08-12	NATHANL
+    - first release to CPAN
+

@@ -7,7 +7,7 @@ use Test::More;
 use English qw(-no_match_vars);
 
 if ( not $ENV{AUTHOR_TESTING} ) {
-    my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
     plan( skip_all => $msg );
 }
 

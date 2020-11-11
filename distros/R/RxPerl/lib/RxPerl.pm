@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.0.2";
+our $VERSION = "v6.0.3";
 
 1;
 __END__
@@ -344,7 +344,9 @@ L<https://rxjs.dev/api/operators/delay>
 Works like rxjs's "delay", except the parameter is in seconds instead of ms.
 
     # (pause 11 seconds) 0, 1, 2, 3, ...
-    rx_interval(1)->pipe( op_delay(10) )->subscribe($observer);
+    rx_interval(1)->pipe(
+        op_delay(10)
+    )->subscribe($observer);
 
 =item op_distinct_until_changed
 
@@ -527,7 +529,7 @@ L<https://rxjs.dev/api/operators/retry>
         rx_of(10, 20, 30),
         rx_throw_error('foo'),
     )->pipe(
-        op_repeat(2),
+        op_retry(2),
     )->subscribe($observer);
 
 =item op_sample_time

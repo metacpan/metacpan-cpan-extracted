@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Filename::Audio - Audio filename
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Regexp::Pattern::Filename::Audio (from Perl distribution
-    Regexp-Pattern-Filename-Audio), released on 2020-04-01.
+    Regexp-Pattern-Filename-Audio), released on 2020-05-31.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -22,11 +22,13 @@ PATTERNS
 
         No extension.
 
-         "foo" =~ re("Filename::Audio::filename_audio");  # doesn't match
+         "foo" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
 
         Not an extension.
 
-         "mp3" =~ re("Filename::Audio::filename_audio");  # doesn't match
+         "mp3" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
+
+        Example #3.
 
          "foo.mp3" =~ re("Filename::Audio::filename_audio");  # matches
 
@@ -36,9 +38,11 @@ PATTERNS
 
         Regex is anchored.
 
-         "foo.mp3 is the file" =~ re("Filename::Audio::filename_audio");  # doesn't match
+         "foo.mp3 is the file" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
 
-         "foo.mp4" =~ re("Filename::Audio::filename_audio");  # doesn't match
+        Example #6.
+
+         "foo.mp4" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -57,9 +61,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Filename::Audio
+
     Regexp::Pattern
 
-    Filename::Audio
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

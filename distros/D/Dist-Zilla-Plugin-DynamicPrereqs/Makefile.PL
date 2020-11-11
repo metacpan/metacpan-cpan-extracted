@@ -16,10 +16,8 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Specify dynamic (user-side) prerequisites for your distribution",
   "AUTHOR" => "Karen Etheridge <ether\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "CPAN::Meta::Requirements" => "2.120620",
     "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06",
-    "Module::Metadata" => 0
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Dist-Zilla-Plugin-DynamicPrereqs",
   "LICENSE" => "perl",
@@ -63,7 +61,7 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.038",
+  "VERSION" => "0.039",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -106,9 +104,6 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
-requires('Dist::Zilla', '5.008') if has_module('Dist::Zilla', '5.007');
-
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
@@ -125,40 +120,4 @@ WriteMakefile(%WriteMakefileArgs);
 package
 MY;
 use File::ShareDir::Install qw(postamble);
-}
-
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
-sub _add_prereq {
-  my ($mm_key, $module, $version_or_range) = @_;
-  $version_or_range ||= 0;
-  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
-    if exists $WriteMakefileArgs{$mm_key}{$module}
-      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
-      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$mm_key}{$module}) -- need to do a sane metamerge!"
-    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
-        and $FallbackPrereqs{$module} ne $version_or_range;
-  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
-  return;
-}
-
-sub has_module {
-  my ($module, $version_or_range) = @_;
-  require Module::Metadata;
-  my $mmd = Module::Metadata->new_from_module($module);
-  return undef if not $mmd;
-  return $mmd->version($module) if not defined $version_or_range;
-
-  require CPAN::Meta::Requirements;
-  my $req = CPAN::Meta::Requirements->new;
-  $req->add_string_requirement($module => $version_or_range);
-  return 1 if $req->accepts_module($module => $mmd->version($module));
-  return 0;
-}
-
-sub requires { goto &runtime_requires }
-
-sub runtime_requires {
-  my ($module, $version_or_range) = @_;
-  _add_prereq(PREREQ_PM => $module, $version_or_range);
 }

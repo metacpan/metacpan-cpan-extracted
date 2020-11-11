@@ -7,7 +7,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(camelize class_to_path decamelize);
 use Mojolicious;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has description => 'Generate Mojolicious plugin directory structure for application';
 has usage => sub { shift->extract_usage };
@@ -24,7 +24,7 @@ sub run {
 
   # Test
   my $testname    = decamelize $class;
-  my @test_params = ({ name => $name });
+  my @test_params = ({ class => $class, name => $name });
   $self->render_to_rel_file('test', "t/$testname.t", @test_params);
 }
 
@@ -41,7 +41,7 @@ Mojolicious::Command::Author::generate::localplugin - Plugin generator command
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,7 @@ use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-plugin '<%= $name %>';
+plugin '<%= $class %>';
 
 get '/' => sub {
   my $c = shift;

@@ -168,7 +168,7 @@ sub _proc_file {
 	}
 	
 	
-	if(! @stat or $stat[2] != $version->{mode}) {
+	if((! @stat or $stat[2] != $version->{mode}) and ! S_ISLNK $version->{mode}) {
 		printf "\tin backup it has mode %o but on FS - %o.\n", $version->{mode}, $stat[2] // 0 if $options->{verbose};
 		if($options->{write}) {
 			chmod($version->{mode}, $fs_path) or die sprintf("Can't chmod %s to %o: %s", $fs_path, $version->{mode}, $!);
@@ -185,7 +185,7 @@ sub _proc_file {
 		map { $state->{db}->{uids_gids}->unpack($_) }
 		@{ $state->{db}->{uids_gids} }
 		;
-	if($fs_user ne $db_user or $fs_group ne $db_group) {
+	if(($fs_user ne $db_user or $fs_group ne $db_group) and ! S_ISLNK $version->{mode}) {
 		print "\tin backup it owned by $db_user:$db_group but on FS - by $fs_user:$fs_group.\n" if $options->{verbose};
 		chown scalar(getpwnam $db_user), scalar getgrnam($db_group), $fs_path if $options->{write};
 	}

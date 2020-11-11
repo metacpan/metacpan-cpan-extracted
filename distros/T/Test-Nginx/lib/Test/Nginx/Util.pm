@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use base 'Exporter';
 
@@ -174,6 +174,40 @@ sub gen_rand_str {
     return $s;
 }
 
+sub gen_rand_port (;$$) {
+    my ($tries, $used_ports) = @_;
+
+    $tries //= 1000;
+    $used_ports //= {};
+
+    my $rand_port;
+
+    for (my $i = 0; $i < $tries; $i++) {
+        my $port = int(rand 63550) + 1985;
+
+        next if $used_ports->{$port};
+
+        my $sock = IO::Socket::INET->new(
+            LocalAddr => $ServerAddr,
+            LocalPort => $port,
+            Proto => 'tcp',
+            Timeout => 0.1,
+        );
+
+        if (defined $sock) {
+            $sock->close();
+            $rand_port = $port;
+            last;
+        }
+
+        if ($Verbose) {
+            warn "Try again, port $port is already in use: $@\n";
+        }
+    }
+
+    return $rand_port;
+}
+
 sub no_long_string () {
     $NoLongString = 1;
 }
@@ -260,33 +294,12 @@ our $TestNginxSleep         = $ENV{TEST_NGINX_SLEEP} || 0.015;
 our $BuildSlaveName         = $ENV{TEST_NGINX_BUILDSLAVE};
 our $ForceRestartOnTest     = (defined $ENV{TEST_NGINX_FORCE_RESTART_ON_TEST})
                                ? $ENV{TEST_NGINX_FORCE_RESTART_ON_TEST} : 1;
+srand $$;
 
 if ($Randomize) {
-    srand $$;
-
-    undef $ServerPort;
-
     my $tries = 1000;
-    for (my $i = 0; $i < $tries; $i++) {
-        my $port = int(rand 60000) + 1025;
 
-        my $sock = IO::Socket::INET->new(
-            LocalAddr => $ServerAddr,
-            LocalPort => $port,
-            Proto => 'tcp',
-            Timeout => 0.1,
-        );
-
-        if (defined $sock) {
-            $sock->close();
-            $ServerPort = $port;
-            last;
-        }
-
-        if ($Verbose) {
-            warn "Try again, port $port is already in use: $@\n";
-        }
-    }
+    $ServerPort = gen_rand_port $tries;
 
     if (!defined $ServerPort) {
         bail_out "Cannot find an available listening port number after $tries attempts.\n";
@@ -783,8 +796,8 @@ sub setup_server_root ($) {
         bail_out "Failed to do mkdir $ConfDir\n";
 }
 
-sub write_user_files ($) {
-    my $block = shift;
+sub write_user_files ($$) {
+    my ($block, $rand_ports) = @_;
 
     my $name = $block->name;
 
@@ -843,7 +856,7 @@ sub write_user_files ($) {
                 }
             }
 
-            $body = expand_env_in_text($body);
+            $body = expand_env_in_text($body, $name, $rand_ports);
 
             open my $out, ">$path" or
                 bail_out "$name - Cannot open $path for writing: $!\n";
@@ -861,9 +874,10 @@ sub write_user_files ($) {
     }
 }
 
-sub write_config_file ($$) {
-    my ($block, $config) = @_;
+sub write_config_file ($$$) {
+    my ($block, $config, $rand_ports) = @_;
 
+    my $name = $block->name;
     my $http_config = $block->http_config;
     my $main_config = $block->main_config;
     my $post_main_config = $block->post_main_config;
@@ -880,7 +894,7 @@ sub write_config_file ($$) {
         master_off();
     }
 
-    $http_config = expand_env_in_text($http_config);
+    $http_config = expand_env_in_text($http_config, $name, $rand_ports);
 
     if (!defined $config) {
         $config = '';
@@ -918,13 +932,13 @@ sub write_config_file ($$) {
         }
     }
 
-    $main_config = expand_env_in_text($main_config);
+    $main_config = expand_env_in_text($main_config, $name, $rand_ports);
 
     if (!defined $post_main_config) {
         $post_main_config = '';
     }
 
-    $post_main_config = expand_env_in_text($post_main_config);
+    $post_main_config = expand_env_in_text($post_main_config, $name, $rand_ports);
 
     if ($CheckLeak || $Benchmark) {
         $LogLevel = 'warn';
@@ -1224,18 +1238,44 @@ sub parse_headers ($) {
     return \%headers;
 }
 
-sub expand_env_in_text ($) {
-    my $text = shift;
+sub expand_env_in_text ($$$) {
+    my ($text, $name, $rand_ports) = @_;
 
     if (!defined $text) {
         return;
     }
 
+    my $used_ports = {
+        $ServerPort => 1,
+        map { $_ => 1 } values %$rand_ports
+    };
+
     $text =~ s/\$(TEST_NGINX_[_A-Z0-9]+)/
-        if (!defined $ENV{$1}) {
-            bail_out "No environment $1 defined.\n";
+        my $expanded_env;
+
+        if ($1 =~ m{^(TEST_NGINX_RAND_PORT_[0-9]+)$}) {
+            if (!defined $rand_ports->{$1}) {
+                my $rand_port = gen_rand_port 1000, $used_ports;
+
+                if (!defined $rand_port) {
+                    bail_out "$name - Cannot find an available listening port number for $1.\n";
+                }
+
+                $rand_ports->{$1} = $rand_port;
+                $used_ports->{$rand_port} = 1;
+                $expanded_env = $rand_port;
+
+            } else {
+                $expanded_env = $rand_ports->{$1};
+            }
+        } else {
+            if (!defined $ENV{$1}) {
+                bail_out "$name - No environment $1 defined.\n";
+            }
+            $expanded_env = $ENV{$1};
         }
-        $ENV{$1}/eg;
+        $expanded_env;
+    /eg;
 
     $text;
 }
@@ -1319,9 +1359,11 @@ sub run_test ($) {
         undef $FirstTime;
     }
 
+    my $rand_ports = {};
+
     my $config = $block->config;
 
-    $config = expand_env_in_text($config);
+    $config = expand_env_in_text($config, $name, $rand_ports);
 
     my $dry_run = 0;
     my $should_restart = 1;
@@ -1634,8 +1676,8 @@ sub run_test ($) {
                     }
 
                     setup_server_root($first_time);
-                    write_user_files($block);
-                    write_config_file($block, $config);
+                    write_user_files($block, $rand_ports);
+                    write_config_file($block, $config, $rand_ports);
 
                     if ($Verbose) {
                         warn "sending USR1 signal to $pid.\n";
@@ -1712,8 +1754,8 @@ start_nginx:
 
             #warn "*** Restarting the nginx server...\n";
             setup_server_root($first_time);
-            write_user_files($block);
-            write_config_file($block, $config);
+            write_user_files($block, $rand_ports);
+            write_config_file($block, $config, $rand_ports);
             #warn "nginx binary: $NginxBinary";
             if (!can_run($NginxBinary)) {
                 bail_out("$name - Cannot find the nginx executable in the PATH environment");
@@ -2403,7 +2445,7 @@ request:
         }
 
         if ($i > 1) {
-            write_user_files($block);
+            write_user_files($block, $rand_ports);
         }
 
         if ($should_skip && defined $tests_to_skip) {
@@ -2488,7 +2530,7 @@ request:
             my $i = 0;
 retry:
             if (is_running($pid)) {
-                write_config_file($block, $config);
+                write_config_file($block, $config, $rand_ports);
 
                 if ($Verbose) {
                     warn "sending QUIT signal to $pid";

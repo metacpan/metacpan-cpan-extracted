@@ -1,14 +1,16 @@
 package Test::Sah;
 
-use 5.010;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-01'; # DATE
+our $DIST = 'Test-Sah'; # DIST
+our $VERSION = '0.020'; # VERSION
+
 use strict;
 use warnings;
 #use Log::Any '$log';
 
 use Data::Sah qw(gen_validator);
 use Test::Builder;
-
-our $VERSION = '0.01'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -43,10 +45,11 @@ sub is_invalid {
 1;
 # ABSTRACT: Test data against Sah schema
 
-
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -54,7 +57,7 @@ Test::Sah - Test data against Sah schema
 
 =head1 VERSION
 
-version 0.01
+This document describes version 0.020 of Test::Sah (from Perl distribution Test-Sah), released on 2020-03-01.
 
 =head1 SYNOPSIS
 
@@ -82,22 +85,39 @@ Test that C<$data> validates to C<$schema>.
 
 Test that C<$data> does not validate to C<$schema>.
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Test-Sah>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Test-Sah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 SEE ALSO
 
-L<Sah>
+L<Test::Sah::Schema> to test Sah schema modules.
 
 L<Data::Sah>
 
+L<Sah>
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steven Haryanto.
+This software is copyright (c) 2020, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

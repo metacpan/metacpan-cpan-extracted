@@ -3,15 +3,15 @@ package Jacode;
 #
 # Jacode - Perl program for Japanese character code conversion
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.23';
+$VERSION = '2.13.4.24';
 $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use vars qw($AUTOLOAD);
 
 sub AUTOLOAD {

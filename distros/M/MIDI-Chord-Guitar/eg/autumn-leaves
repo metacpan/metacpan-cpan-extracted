@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Chord::Guitar;
+use MIDI::Util;
+
+my $score = MIDI::Util::setup_score(patch => 24);
+
+my $mcg = MIDI::Chord::Guitar->new;
+
+# Progression: iv7–VII7–IIImaj7–VImaj7–iiø7–V7–i
+
+for my $spec (
+    [qw(C3  m7   2)],
+    [qw(F3  7    4)],
+    [qw(Bb2 maj7 3)],
+    [qw(Eb3 maj7 2)],
+    [qw(A3  dim7 0)],
+    [qw(D3  7    4)],
+    [qw(G2  m    1)],
+) {
+    my $chord = $mcg->transform(@$spec);
+    $score->n('qn', $chord->[0]);
+    $score->n('dhn', @{$chord}[1 .. $#$chord]);
+}
+
+$score->write_score("$0.mid");

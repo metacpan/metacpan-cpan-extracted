@@ -1,19 +1,10 @@
-_build/auto_features
-_build/build_params
-_build/cleanup
-_build/config_data
-_build/features
-_build/magicnum
-_build/notes
-_build/prereqs
-_build/runtime_params
-Build
 Build.PL
 CHANGES
+CONTRIBUTING
 lib/Data/DFA.pm
-MANIFEST			This list of files
-MANIFEST.SKIP
+MANIFEST
 README
+README.md
 test.pl
 META.yml
 META.json

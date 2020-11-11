@@ -2,14 +2,26 @@ NAME
     WordList::Tables - Wordlist from a column of table from Tables::* module
 
 VERSION
-    This document describes version 0.001 of WordList::Tables (from Perl
-    distribution WordList-Tables), released on 2020-06-01.
+    This document describes version 0.003 of WordList::Tables (from Perl
+    distribution WordList-Tables), released on 2020-11-10.
 
 SYNOPSIS
      use WordList::Tables;
 
      my $wl = WordList::Tables->new(table => 'Locale::US::States', column => 'name');
      say $wl->first_word; # Alaska
+
+    On the command-line, using the wordlist CLI:
+
+     % wordlist -w Tables=table,Locale::US::States,column,name
+     Alaska
+     Alabama
+     ...
+
+     % wordlist -w Tables=table,Locale::US::States,column,code
+     AK
+     AL
+     ...
 
 DESCRIPTION
     This is a dynamic, parameterized wordlist to get list of words from a
@@ -20,8 +32,7 @@ HOMEPAGE
     <https://metacpan.org/release/WordList-Tables>.
 
 SOURCE
-    Source repository is at
-    <https://github.com/perlancar/perl-WordList-Tables>.
+    Source repository is at <https://github.com/repos/perl-WordList-Tables>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

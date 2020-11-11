@@ -3,8 +3,8 @@ NAME
     Exchange (static version)
 
 VERSION
-    This document describes version 20181129.0.0 of Finance::SE::IDX::Static
-    (from Perl distribution Finance-SE-IDX-Static), released on 2018-11-29.
+    This document describes version 20201028.0.1 of Finance::SE::IDX::Static
+    (from Perl distribution Finance-SE-IDX-Static), released on 2020-11-03.
 
 SYNOPSIS
     Use like you would use Finance::SE::IDX.
@@ -45,7 +45,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

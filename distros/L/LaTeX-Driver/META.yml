@@ -1,7 +1,7 @@
 ---
 abstract: 'Latex driver'
 author:
-  - 'Chris Travers <chris.travers@gmail.com>  (current maintainer)'
+  - 'Erik Huelsmann  <erik@efficito.com>  (current maintainer)'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::More: '0.88'
@@ -27,13 +27,15 @@ requires:
   Exception::Class: 0
   File::Slurp: 0
   File::Spec: 0
+  File::Temp: '0.23'
   File::pushd: 0
   Getopt::Long: 0
   IO::File: 0
+  Log::Any: 0
   Readonly: 0
   parent: 0
   perl: 5.8.5
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Template-Toolkit-Latex/LaTeX-Driver.git
-version: 1.1.1
+version: 1.2.0

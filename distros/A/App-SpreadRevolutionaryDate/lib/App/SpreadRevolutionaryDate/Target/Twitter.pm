@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Twitter;
-$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.28';
+$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.29';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Twitter.
 
 use Moose;
@@ -68,6 +68,9 @@ sub spread {
   my ($self, $msg, $test) = @_;
   $test //= 0;
 
+  # Multiline message
+  $msg =~ s/\\n/\n/g;
+
   if ($test) {
     $msg = __("Spread on Twitter: ") . $msg;
 
@@ -108,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Twitter - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 METHODS
 

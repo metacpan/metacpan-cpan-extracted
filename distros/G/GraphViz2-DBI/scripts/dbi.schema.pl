@@ -7,15 +7,9 @@ use strict;
 use warnings;
 
 use DBI;
-
 use DBIx::Admin::TableInfo;
-
 use GraphViz2;
 use GraphViz2::DBI;
-
-use Log::Handler;
-
-# ---------------
 
 if (! $ENV{DBI_DSN})
 {
@@ -26,24 +20,11 @@ if (! $ENV{DBI_DSN})
 	exit 1;
 }
 
-my($logger) = Log::Handler -> new;
-
-$logger -> add
-	(
-	 screen =>
-	 {
-		 maxlevel       => 'debug',
-		 message_layout => '%m',
-		 minlevel       => 'error',
-	 }
-	);
-
 my($graph) = GraphViz2 -> new
 	(
 	 edge   => {color => 'grey'},
 	 global => {directed => 1},
 	 graph  => {rankdir => 'TB'},
-	 logger => $logger,
 	 node   => {color => 'blue', shape => 'oval'},
 	);
 my($attr)              = {};

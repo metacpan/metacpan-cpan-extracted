@@ -1,4 +1,24 @@
+0.0926 2020-11-06
+  - add SPVM::new_byte_array_unsigned, SPVM::new_short_array_unsigned, SPVM::new_int_array_unsigned, SPVM::new_long_array_unsigned
+0.0925 2020-11-05
+  - [revert]SPVM::Hash->newa is rename to new, and original new is renamed to new_empty
+    because SPVM::Hash->new(["foo" => SPVM::Int->new(4)]) is not good interface from Perl code.
+    I feel the following is more good code because Perl code and SPVM code is exactly same.
+      my $hash = SPVM::Hash->new;
+      $hash->set_int(5);
+  - add SPVM::Hash method
+    set_byte, set_short, set_int, set_long, set_float, set_double, get_byte, get_short, get_int, get_long, get_float, get_double
+  - SPVM::Hash->max_load_factor field become private
+  - SPVM::Hash->set_max_load_factor method is removed
+  - SPVM::Hash->load_factor method become private
+  - SPVM::Hash->new_opt method become private
+  - SPVM::Hash->murmur_hash become private
+  - remove SPVM::Hash newa method to avoid complexity bugs in object type conversion
+  - SPVM::StringBuffer->new_opt recieve SPVM::Hash object as options
+  - SPVM::Hash->keys return the string object itself instead of the copies because string become immutable in latest release
+  - remove SPVM::Hash->each method because I feel internal iterator is not good.
 0.0924 2020-10-16
+  - fix echange api string return value bug
   - add real string type. before this relese runtime string type is same as byte[] type, but in this release string type is string type in also runtime
   - implicite conversion from byte[] to string become occur compile error
   - type conversion from byte[] to string become copy instead of reference copy

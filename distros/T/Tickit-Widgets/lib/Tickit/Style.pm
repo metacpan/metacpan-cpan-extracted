@@ -3,6 +3,8 @@
 #
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
+use Object::Pad 0.27;
+
 package Tickit::Style;
 
 use strict;
@@ -128,6 +130,15 @@ identifier.
    <Enter>: activate;
  }
 
+A special widget type name of C<*> can also be used to provide style blocks
+that will apply (at lower priority) to any type of widget. Typically these
+would be used along with classes or tags, to set application-wide styles.
+
+ *:error {
+   bg: "red";
+   fg: "hi-white";
+ }
+
 =head2 How Style is Determined
 
 The full set of style definitions applied to one named class of one widget
@@ -244,7 +255,8 @@ sub _ref_tagset
 {
    my ( $type, $class ) = @_;
 
-   $TAGSETS_BY_TYPE_CLASS{$type} or croak "$type is not a styled Widget type";
+   $type eq "*" or $TAGSETS_BY_TYPE_CLASS{$type} or
+      croak "$type is not a styled Widget type";
 
    $class = "" if !defined $class;
    return $TAGSETS_BY_TYPE_CLASS{$type}{$class} ||= Tickit::Style::_Tagset->new;
@@ -463,7 +475,7 @@ sub on_style_load
    push @ON_STYLE_LOAD, $code;
 }
 
-package # hide from indexer
+class # hide from indexer
    Tickit::Style::_Tagset;
 
 use Struct::Dumb;
@@ -472,22 +484,20 @@ use Struct::Dumb;
 # tags
 struct Keyset => [qw( tags style )];
 
-sub new
+has @_keysets;
+
+BUILD
 {
-   my $class = shift;
-   return bless [], $class;
+   @_keysets = @_;
 }
 
-sub clone
+method clone
 {
-   my $proto = shift;
-   return bless [ map { Keyset( $_->tags, { %{$_->style} } ) }
-                      @$proto ], ref $proto;
+   return __PACKAGE__->new( map { Keyset( $_->tags, { %{$_->style} } ) } @_keysets );
 }
 
-sub add
+method add
 {
-   my $self = shift;
    my ( $key, $value ) = @_;
 
    my %tags;
@@ -496,9 +506,8 @@ sub add
    $self->merge_with_tags( \%tags, { $key => $value } );
 }
 
-sub merge
+method merge
 {
-   my $self = shift;
    my ( $other ) = @_;
 
    foreach my $keyset ( $other->keysets ) {
@@ -506,16 +515,15 @@ sub merge
    }
 }
 
-sub merge_with_tags
+method merge_with_tags
 {
-   my $self = shift;
    my ( $tags, $style ) = @_;
 
    my $keyset = Keyset( $tags, $style );
-   @$self = ( $keyset ) and return if !@$self;
+   @_keysets = ( $keyset ) and return if !@_keysets;
 
    # First see if we have to merge an existing one
-   KEYSET: foreach my $keyset ( @$self ) {
+   KEYSET: foreach my $keyset ( @_keysets ) {
       $keyset->tags->{$_} or next KEYSET for keys %$tags;
       $tags->{$_} or next KEYSET for keys %{ $keyset->tags };
 
@@ -529,13 +537,12 @@ sub merge_with_tags
 
    # Keep sorted, most tags first
    # TODO: this might be doable more efficiently but we don't care for now
-   @$self = sort { scalar keys %{ $b->tags } <=> scalar keys %{ $a->tags } } ( @$self, $keyset );
+   @_keysets = sort { scalar keys %{ $b->tags } <=> scalar keys %{ $a->tags } } ( @_keysets, $keyset );
 }
 
-sub keysets
+method keysets
 {
-   my $self = shift;
-   return @$self;
+   return @_keysets;
 }
 
 0x55AA;

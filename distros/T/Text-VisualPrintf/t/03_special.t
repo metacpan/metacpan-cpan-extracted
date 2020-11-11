@@ -48,7 +48,7 @@ is( Text::VisualPrintf::sprintf("$longseq(%5s)", "壱"),
 	'5x5 binary pattern format.');
 }
 
-for my $i (1..253) {
+for my $i (1..252) {
     my $allseq = join '', (map { pack("C", $_) } 1 .. $i);
     $allseq =~ s///g;
     is( Text::VisualPrintf::sprintf($allseq =~ s/%/%%/gr . "(%5s)", "壱"),
@@ -57,7 +57,7 @@ for my $i (1..253) {
 }
 
  TODO:
-for my $i (254..255) {
+for my $i (253..255) {
     local $TODO = "Too many ASCII ($i)";
     my $allseq = join '', (map { pack("C", $_) } 1 .. $i);
     is( Text::VisualPrintf::sprintf($allseq =~ s/%/%%/gr . "(%5s)", "壱"),
@@ -65,7 +65,7 @@ for my $i (254..255) {
 	"Too many ASCII format ($i)");
 }
 
-for my $i (1..252) {
+for my $i (1..251) {
     my $allseq = join '', (map { pack("C", $_) } 1 .. $i);
     is( Text::VisualPrintf::sprintf($allseq =~ s/%/%%/gr . "(%.0s)(%5s)", "壱", "弐"),
 	"$allseq()(   弐)",
@@ -76,7 +76,7 @@ for my $i (1..252) {
 # At least 3 uniq characters are necessary to process 0-width result.
 # Wrong parameter is used if only 2-characters are available.
 # Give up the process if < 2.
-for my $i (253..255) {
+for my $i (252..255) {
     local $TODO = "Too many ASCII ($i)";
     my $allseq = join '', (map { pack("C", $_) } 1 .. $i);
     is( Text::VisualPrintf::sprintf($allseq =~ s/%/%%/gr . "(%.0s)(%5s)", "壱", "弐"),

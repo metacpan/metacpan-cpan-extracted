@@ -1,9 +1,9 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2009-2019, Roland van Ipenburg
-package HTML::Hyphenate v1.1.3;
+# Copyright (C) 2009-2020, Roland van Ipenburg
+package HTML::Hyphenate v1.1.4;
 use Moose;
 use utf8;
-use 5.014000;
+use 5.016000;
 
 use charnames qw(:full);
 
@@ -19,6 +19,7 @@ Readonly::Scalar my $DOT          => q{.};
 Readonly::Scalar my $SOFT_HYPHEN  => qq{\N{SOFT HYPHEN}};
 Readonly::Scalar my $CLASS_JOINER => q{, .};                # for CSS classnames
 Readonly::Scalar my $ONE_LEVEL_UP => -1;
+Readonly::Scalar my $DOCTYPE      => q{<!DOCTYPE html>};
 
 Readonly::Hash my %DEFAULT => (
     'MIN_LENGTH' => 10,
@@ -44,18 +45,30 @@ Readonly::Hash my %LOG => (
     'LOOKING_UP'    => q{Looking up for %d class(es)},
     'HTML_METHOD'   => q{Using HTML passed to method '%s'},
     'HTML_PROPERTY' => q{Using HTML property '%s'},
-    'HTML_UNDEF'    => q{HTML to hyphenate is undefined},
-    'NO_LANG'       => q{No language defined for '%s'},
     'NOT_HYPHEN'    => q{No pattern found for '%s'},
     'REGISTER'      => q{Registering TeX::Hyphen object for label '%s'},
 );
 ## use critic
 
-Log::Log4perl->easy_init($ERROR);
+Log::Log4perl->easy_init( { 'level' => $ERROR, 'utf8' => 1 } );
 my $log = get_logger();
 
 ## no critic qw(ProhibitHashBarewords ProhibitCallsToUnexportedSubs ProhibitCallsToUndeclaredSubs)
-has html  => ( is => 'rw', isa => 'Str' );
+has html     => ( is => 'rw', isa => 'Str' );
+after 'html' => sub {
+    my ( $self, $html ) = @_;
+    if ( defined $html ) {
+## no critic qw(ProhibitUnusedCapture)
+        if ( $self->html =~ m{^(?<doctype>\s*\Q$DOCTYPE\E)(?<html>.*)}gismx ) {
+## use critic
+            $self->html( ${+}{html} );
+            $self->_doctype( ${+}{doctype} );
+        }
+        else {
+            $self->_doctype();
+        }
+    }
+};
 has style => ( is => 'rw', isa => 'Str' );
 has min_length =>
   ( is => 'rw', isa => 'Int', default => $DEFAULT{'MIN_LENGTH'} );
@@ -71,6 +84,7 @@ has classes_excluded =>
 
 has _hyphenators => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 has _lang        => ( is => 'rw', isa => 'Str' );
+has _doctype     => ( is => 'rw', isa => 'Str' );
 has _dom         => ( is => 'rw', isa => 'Mojo::DOM' );
 ## use critic
 
@@ -92,19 +106,22 @@ sub hyphenated {
     else {
         $log->debug( sprintf $LOG{'HTML_PROPERTY'}, $self->html );
     }
-    if ( defined $self->html ) {
-        $self->_reset_dom;
-        $self->_dom->parse( $self->html );
-        $self->_traverse_dom( $self->_dom->root );
-        return $self->_clean_html();
-    }
-    $log->warn( $LOG{'HTML_UNDEF'} );
-    return;
+    $self->_reset_dom;
+    $self->_dom->parse( $self->html );
+    $self->_traverse_dom( $self->_dom->root );
+    return $self->_clean_html();
 }
 
 sub register_tex_hyphen {
     my ( $self, $label, $tex ) = @_;
-    if ( defined $label && $tex->isa('TeX::Hyphen') ) {
+    if (
+        defined $label
+## no critic qw(ProhibitCallsToUndeclaredSubs)
+        && blessed $tex
+## use critic
+        && $tex->isa('TeX::Hyphen')
+      )
+    {
         my $cache = $self->_hyphenators;
         $log->debug( sprintf $LOG{'REGISTER'}, $label );
         ${$cache}{$label} = $tex;
@@ -144,6 +161,9 @@ sub _clean_html {
     my ($self) = @_;
     my $html = $self->_dom->to_string();
     $self->_reset_dom;
+    if ( defined $self->_doctype ) {
+        $html = $self->_doctype . $html;
+    }
     return $html;
 }
 
@@ -156,25 +176,19 @@ sub _hyphen {
 
 sub _hyphen_word {
     my ( $self, $word ) = @_;
-    if ( defined $self->_lang ) {
-        if ( defined $self->_hyphenators->{ $self->_lang } ) {
-            $log->debug( sprintf $LOG{'HYPHEN_WORD'},
-                $word,
-                $self->_hyphenators->{ $self->_lang }->visualize($word) );
-            my $number = 0;
-            foreach my $pos (
-                $self->_hyphenators->{ $self->_lang }->hyphenate($word) )
-            {
-                substr $word, $pos + $number, 0, $SOFT_HYPHEN;
-                $number += length $SOFT_HYPHEN;
-            }
-        }
-        else {
-            $log->warn( sprintf $LOG{'NOT_HYPHEN'}, $self->_lang );
+    if ( defined $self->_hyphenators->{ $self->_lang } ) {
+        $log->debug( sprintf $LOG{'HYPHEN_WORD'},
+            $word, $self->_hyphenators->{ $self->_lang }->visualize($word) );
+        my $number = 0;
+        foreach
+          my $pos ( $self->_hyphenators->{ $self->_lang }->hyphenate($word) )
+        {
+            substr $word, $pos + $number, 0, $SOFT_HYPHEN;
+            $number += length $SOFT_HYPHEN;
         }
     }
     else {
-        $log->warn( sprintf $LOG{'NO_LANG'}, $word );
+        $log->warn( sprintf $LOG{'NOT_HYPHEN'}, $self->_lang );
     }
     return $word;
 }
@@ -256,7 +270,6 @@ sub _get_nearest_ancestor_level_by_classname {
         }
     }
     return $level;
-
 }
 
 sub _reset_dom {
@@ -280,7 +293,7 @@ HTML::Hyphenate - insert soft hyphens into HTML.
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version v1.1.3.
+This document describes HTML::Hyphenate version v1.1.4.
 
 =head1 SYNOPSIS
 
@@ -377,7 +390,7 @@ The output is generated by L<Mojo::DOM|Mojo::DOM>.
 
 =over 4
 
-=item * Perl 5.14 
+=item * Perl 5.16 
 
 =item * L<Moose|Moose>
 
@@ -445,11 +458,11 @@ https://rt.cpan.org/Dist/Display.html?Queue=HTML-Hyphenate>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009-2019, Roland van Ipenburg
+Copyright (C) 2009-2020, Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

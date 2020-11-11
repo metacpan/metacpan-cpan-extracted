@@ -26,6 +26,23 @@ All changes are made by Mark Overmeer, unless stated otherwise.
 # . change in ::Module of detection of constants which need autogeneration
 # . charset of locale only via nl_langinfo(CODESET)
 
+version 1.02: Tue 10 Nov 16:45:33 CET 2020
+
+	Fixes:
+	- glob test fails when run as root. Patched by [Felipe Gasper]
+
+version 1.01: Tue 10 Nov 13:38:16 CET 2020
+
+	Improvements:
+	- more float constants treated as strings [cpantesters]
+	- apparently strptime not supported on FreeBSD [cpantesters]
+	  (although manual page exists)
+	- also on netbsd only one confstr
+
+	Fixes:
+	- version confusion between 1.00 as tagged on GitHUB and the
+	  1.00 released via CPAN.
+
 version 1.00: Tue  5 May 14:49:33 CEST 2020
 
 FreeBSD has no _PC_LINK_MAX (t/62pathconf.t)

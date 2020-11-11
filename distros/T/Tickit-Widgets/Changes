@@ -1,5 +1,15 @@
 Revision history for Tickit-Widgets
 
+0.31    2020-11-02
+        [CHANGES]
+         * Use Object::Pad to implement the individual Tickit::Widget::*
+           subclasses
+         * Accept a wildcard type in stylesheets to apply a common style to
+           all widgets
+         * Allow ->add-like methods on container widgets to take per-child
+           opts
+         * Render [brackets] on a button if it has linetype=none
+
 0.30    2020-04-02
         [CHANGES]
          * Ignore mouse wheel events on T:W:Button

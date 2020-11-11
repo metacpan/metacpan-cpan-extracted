@@ -25,7 +25,7 @@ Anything. Absolutely anything.
 
 =item *
 
-B<< ArrayLike >> in L<Types::TypeTiny>
+B<< ArrayLike >> I<< [parameterizable] >> in L<Types::TypeTiny>
 
 Arrayrefs and objects overloading arrayfication.
 
@@ -91,6 +91,12 @@ A string from an allowed set of strings.
 
 =item *
 
+B<< _ForeignTypeConstraint >> in L<Types::TypeTiny>
+
+A coderef or an object which Type::Tiny knows how to convert into a Type::Tiny instance. (Yes, the name of this type starts with an underscore.)
+
+=item *
+
 B<< FileHandle >> in L<Types::Standard>
 
 A reference where Scalar::Util::openhandle returns true, or a blessed object in the IO::Handle class.
@@ -103,7 +109,7 @@ Globrefs
 
 =item *
 
-B<< HashLike >> in L<Types::TypeTiny>
+B<< HashLike >> I<< [parameterizable] >> in L<Types::TypeTiny>
 
 Hashrefs and objects overloading hashrefification.
 
@@ -141,7 +147,7 @@ An integer within a particular numeric range.
 
 B<< Item >> in L<Types::Standard>
 
-Any single item; effectively the same as Any.
+Any single item; effectively the same as B<Any>.
 
 =item *
 
@@ -213,7 +219,7 @@ A string with more than 0 characters.
 
 B<< Num >> in L<Types::Standard>
 
-The same as LaxNum or StrictNum depending on environment.
+The same as B<LaxNum> or B<StrictNum> depending on environment.
 
 =item *
 
@@ -237,7 +243,7 @@ A blessed object.
 
 B<< Optional >> I<< [parameterizable] >> in L<Types::Standard>
 
-Used in conjunction with Dict, Tuple, or CycleTuple.
+Used in conjunction with B<Dict>, B<Tuple>, or B<CycleTuple>.
 
 =item *
 

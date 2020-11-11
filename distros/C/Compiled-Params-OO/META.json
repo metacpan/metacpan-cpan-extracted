@@ -3,7 +3,7 @@
    "author" : [
       "lnation <email@lnation.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "0"
          }
       },
       "runtime" : {
@@ -40,11 +41,24 @@
       "test" : {
          "requires" : {
             "Test::More" : "0",
-            "Type::Tiny" : "1.010001"
+            "Type::Tiny" : "1.012000"
          }
       }
    },
+   "provides" : {
+      "Compiled::Params::OO" : {
+         "file" : "lib/Compiled/Params/OO.pm",
+         "version" : "0.05"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.04",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Compiled-Params-OO.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Compiled-Params-OO"
+      }
+   },
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,6 +1,10 @@
 Release history for Markdown::Table
 ===================================
 
+0.04  2020-10-28 17:55:00
+
+  * fix handling of empty cells in markdown parsing
+
 0.03  2020-09-29 17:53:00
 
   * fix example in synopsis (thanks to Shawn who submitted a bug report by email)

@@ -1,0 +1,556 @@
+NAME
+    Zydeco::Lite::App - use Zydeco::Lite to quickly develop command-line apps
+
+SYNOPSIS
+    In `consumer.pl`:
+
+      #! perl
+  
+      use strict;
+      use warnings;
+      use Zydeco::Lite::App;
+      use Types::Standard -types;
+  
+      app 'MyApp' => sub {
+    
+        command 'Eat' => sub {
+      
+          constant documentation => 'Consume some food.';
+      
+          arg 'foods' => (
+            type          => ArrayRef[Str],
+            documentation => 'A list of foods.',
+          );
+      
+          run {
+            my ( $self, $foods ) = ( shift, @_ );
+            $self->info( "Eating $_." ) for @$foods;
+            return 0;
+          };
+        };
+    
+        command 'Drink' => sub {
+      
+          constant documentation => 'Consume some drinks.';
+      
+          arg 'drinks' => (
+            type          => ArrayRef[Str],
+            documentation => 'A list of drinks.',
+          );
+      
+          run {
+            my ( $self, $drinks ) = ( shift, @_ );
+            $self->info( "Drinking $_." ) for @$drinks;
+            return 0;
+          };
+        };
+      };
+  
+      'MyApp'->execute( @ARGV );
+
+    At the command line:
+
+      $ ./consumer.pl help eat
+      usage: consumer.pl eat [<foods>...]
+  
+      Consume some food.
+  
+      Flags:
+        --help  Show context-sensitive help.
+  
+      Args:
+        [<foods>]  A list of foods.
+
+      $ ./consumer.pl eat pizza chocolate
+      Eating pizza.
+      Eating chocolate.
+
+DESCRIPTION
+    Zydeco::Lite::App extends Zydeco::Lite to redefine the `app` keyword to
+    build command-line apps, and add `command`, `arg`, `flag`, and `run`
+    keywords.
+
+    It assumes your command-line app will have a single level of subcommands,
+    like many version control and package management tools often do. (You type
+    `git add filename.pl`, not `git filename.pl`. The `add` part is the
+    subcommand.)
+
+    It will handle @ARGV processing, loading config files, and IO for you.
+
+  `app`
+    The `app` keyword exported by Zydeco::Lite::App is a wrapper for the `app`
+    keyword provided by Zydeco::Lite which performs additional processing for
+    the `command` keyword to associate commands with applications, and adds
+    the Zydeco::Lite::App::Trait::Application role (a.k.a. the App trait) to
+    the package it defines.
+
+      # Named application:
+  
+      app "Local::MyApp", sub {
+        ...;   # definition of app
+      }
+  
+      "Local::MyApp"->execute( @ARGV );
+
+      # Anonymous application:
+  
+      my $app = app sub {
+        ...;   # definition of app
+      };
+  
+      $app->execute( @ARGV );
+
+    An anonymous application will actually have a package name, but it will be
+    an automatically generated string of numbers, letters, and punctuation
+    which you shouldn't rely on being the same from one run to another.
+
+    Within the coderef passed to `app`, you can define roles, classes, and
+    commands.
+
+    The package defined by `app` will do the App trait.
+
+   The App Trait
+    `commands`
+        The `commands` method lists the app's subcommands. Subcommands will
+        each be a package, typically with a package name that uses the app's
+        package name as a prefix. So your "add" subcommand might have a
+        package name "Local::MyApp::Add" and your "add-recursive" subcommand
+        might be called "Local::MyApp::Add::Recursive".
+
+        The `commands` method will return these packages minus the prefix, so
+        calling `'Local::MyApp'->commands` would return a list of strings
+        including "Add" and "Add::Recursive".
+
+        The App trait requires your app package to implement this method, but
+        the `app` keyword will provide this method for you, so you don't
+        typially need to worry about implementing it yourself.
+
+    `execute`
+        The `execute` method is the powerhouse of your app. It takes a list of
+        command-line parameters, processes them, loads any config files,
+        figures out which subcommand to run, dispatches to that, and exits.
+
+        The App trait implements this method for you and you should probably
+        not override it.
+
+    `execute_no_subcommand`
+        In the case where `execute` cannot figure out what subcommand to
+        dispatch to, `execute_no_subcommand` is called.
+
+        The App trait implements this method for you. The default behaviour is
+        to call `execute` again, passing it "--help". You can override this
+        behaviour though, if some other behaviour would be more useful.
+
+    `stdio`
+        Most of the methods in the App trait are okay to be called as either
+        class methods or instance methods.
+
+          "Local::MyApp"->execute( @ARGV );
+          bless( {}, "Local::MyApp" )->execute( @ARGV );
+
+        `stdio` is for calling on an instance though, and will return an
+        instance if you call it as a class method. The arguments set the
+        filehandles used by the app for input, output, and error messages.
+
+          my $app = "Local::MyApp"->stdio( $in_fh, $out_fh, $err_fh );
+          $app->execite( @ARGV );
+
+    `stdin`, `stdout`, `stderr`
+        Accessors which return the handles set by `stdio`. If no filehandles
+        have been given, or called as a class method, return STDIN, STDOUT,
+        and STDERR.
+
+    `readline`
+        A method for reading input.
+
+        `$app->readline()` is a shortcut for `$app->stdin->readline()` but
+        also calls `chomp` on the result.
+
+    `print`, `debug`, `usage`, `info`, `warn`, `error`, `fatal`, `success`
+        Methods for printing output.
+
+        All off them automatically append new lines.
+
+        `print` writes lines to `$app->stdout`.
+
+        `debug` writes lines to `$app->stderr` but only if `$app->debug_mode`
+        returns true.
+
+        `usage` writes lines to `$app->stderr` and then exits with exit code
+        1.
+
+        `info` writes lines in blue text to `$app->stderr`.
+
+        `warn` writes lines in yellow text to `$app->stderr`.
+
+        `error` writes lines in red text to `$app->stderr`.
+
+        `fatal` writes lines in red text to `$app->stderr` and then exits with
+        exit code 254.
+
+        `success` writes lines in green text to `$app->stderr`.
+
+        Any of these methods can be overridden in your app if you prefer
+        different colours or different behaviour.
+
+    `debug_mode`
+        This method returns false by default.
+
+        You can override it to return true, or do something like this:
+
+          app "Local::MyApp" => sub {
+            ...;
+    
+            method "debug_mode" => sub {
+              return $ENV{MYAPP_DEBUG} || 0;
+            };
+          };
+
+    `config_file`
+        Returns the empty list by default.
+
+        If you override it to return a list of filenames (not full path names,
+        just simple filenames like "myapp.json"), your app will use these
+        filenames to find configuration settings.
+
+    `find_config`
+        If `config_file` returns a non-empty list, this method will check the
+        current working directory, a user-specific config directory
+        (`~/.config/` on Linux/Unix, another operating systems will vary), and
+        a system-wide config directory (`/etc/` on Linux/Unix), and return a
+        list of config files found in those directories as Path::Tiny objects.
+
+    `read_config`
+        If given a list of Path::Tiny objects, will read each file as a config
+        file and attempt to merge the results into a single hashref, which it
+        will return.
+
+        If an empty list is given, will call `find_config` to get a list of
+        Path::Tiny objects.
+
+        This allows your system-wide config in `/etc/myapp.json` to be
+        overridden by user-specific `~/.config/myapp.json` and a local
+        `./myapp.json`.
+
+        You should rarely need to call this manually. (The `execute` method
+        will call it as needed and pass any relevant configuration to the
+        subcommand that it dispatches to.) It may sometimes be useful to
+        override it if you need to support a different way of merging
+        configuration data from multiple files, or if you need to be able to
+        read configuration data from a non-file source.
+
+    `read_single_config`
+        Helper method called by `read_config`.
+
+        Determines config file type by the last part of the filename.
+        Understands JSON, INI, YAML, and TOML, and will assume TOML if the
+        file type cannot be determined from its name.
+
+        Config::Tiny and YAML::XS or YAML::PP are required for reading those
+        file types, but are not included in Zydeco::Lite::App's list of
+        dependencies. TOML is the generally recommended file format for apps
+        created with this module.
+
+        This method may be useful to override if you need to be able to handle
+        other file types.
+
+    `kingpin`
+        Returns a Getopt::Kingpin object populated with everything necessary
+        to perform command-line processing for this app.
+
+        You will rarely need to call this manually or override it.
+
+    `exit`
+        Passed an integer, exits with that exit code.
+
+        You may want to override this if you wish to perform some cleanup on
+        exit.
+
+  `command`
+    The `command` keyword is used to define a subcommand for your app. An app
+    should have one or more subcommands. It is a wrapper for the `class`
+    keyword exported by Zydeco::Lite.
+
+    The `command` keyword adds the Zydeco::Lite::App::Trait::Command role
+    (a.k.a. the Command trait) to the class it defines.
+
+    Commands may have zero or more args and flags. Args are (roughly speaking)
+    positional parameters, passed to the command's `execute` method, while
+    flags are named arguments passed the the command's constructor.
+
+   The Command Trait
+    `command_name`
+        The Command trait requires your class to implement the `command_name`
+        method. However, the `command` keyword will provide a default
+        implementation for you if you have not. The default implementation
+        uses the class name of the command (minus its app prefix), lowercases
+        it, and replaces "::" with "-".
+
+        So given the example:
+
+          app "MyApp::Local", sub {
+            command "Add::Recursive", sub {
+              run { ... };
+            };
+          };
+
+        The package name of the command will be
+        "MyApp::Local::Add::Recursive", and the command name will be
+        "add-recursive".
+
+    `documentation`
+        This method is called to get a brief one-line description of the
+        command.
+
+          app "MyApp::Local", sub {
+            command "Add::Recursive", sub {
+      
+              method "documentation" => sub {
+                return "Adds a directory recursively.";
+              };
+      
+              run { ... };
+            };
+          };
+
+        You may prefer to use `constant` to define this method in your command
+        class.
+
+          app "MyApp::Local", sub {
+            command "Add::Recursive", sub {
+      
+              constant "documentation" => "Adds a directory recursively.";
+      
+              run { ... };
+            };
+          };
+
+        See Zydeco::Lite for more information on the `method` and `constant`
+        keywords.
+
+    `execute`
+        Each subcommand is required to implement an `execute` method.
+
+          app "MyApp::Local", sub {
+            command "Add::Recursive", sub {
+      
+              method "execute" => sub {
+                ...;
+              };
+            };
+          };
+
+        The subcommand's `execute` method is called by the app's `execute`
+        method. It is passed the subcommand object ($self) followed by any
+        command-line arguments that were given, which may have been coerced.
+        (See "arg".)
+
+        It should return the application's exit code; usually 0 for a
+        successful execution, and an integer from 1 to 255 if unsuccessful.
+
+        The `run` keyword provides a helpful shortcut for defining the
+        `execute` method. (See "run".)
+
+    `app`
+        Returns the app as an object or package name.
+
+          app "MyApp::Local", sub {
+            command "Add::Recursive", sub {
+      
+              method "execute" => sub {
+                my ( $self, @args ) = ( shift, @_ );
+                ...;
+                $self->app->success( "Done!" );
+                $self->app->exit( 0 );
+              };
+            };
+          };
+
+        The `print`, `debug`, `info`, `warn`, `error`, `fatal`, `usage`,
+        `success`, and `readline` methods are delegated to `app`, so
+        `$self->app->success(...)` can just be written as
+        `$self->success(...)`.
+
+    `config`
+        Returns the config section as a hashref for this subcommand only.
+
+        So for example, if myapp.json had:
+
+          {
+            "globals": { "foo": 1, "bar": 2 },
+            "bumpf": { "bar": 3, "bat": 999 },
+            "quuux": { "bar": 4, "baz": 5 }
+          }
+
+        Then the Quuux command would see the following config:
+
+          {
+            "foo" => 1,
+            "bar" => 4,
+            "baz" => 5,
+          }
+
+        The `globals` section in a config is special and gets copied to all
+        commands.
+
+    `kingpin`
+        Utility method used by the app's `kingpin` method to add a
+        Getopt::Kingpin::Command object for processing this subcommand's
+        arguments. You are unlikely to need to override this method or call it
+        directly.
+
+  `arg`
+    Defines a command-line argument for a subcommand.
+
+      use Zydeco::Lite::App;
+      use Types::Path::Tiny -types;
+  
+      app "Local::MyApp" => sub {
+        command "Add" => sub {
+      
+          arg 'filename' => ( type => File, required => 1 );
+      
+          run {
+            my ( $self, $file ) = ( shift, @_ );
+            ...;
+          };
+        };
+      };
+
+    Arguments are ordered and are passed on the command line like follows:
+
+      $ ./myapp.pl add myfile.txt
+
+    The `arg` keyword acts a lot like Zydeco::Lite's `has` keyword.
+
+    It supports the following options for an argument:
+
+    `type`
+        The type constraint for the argument. The following types (from
+        Types::Standard and Types::Path::Tiny) are supported: Int, Num, Str,
+        File, Dir, Path, ArrayRef[Int], ArrayRef[Num], ArrayRef[Str],
+        ArrayRef[File], ArrayRef[Dir], ArrayRef[Path], HashRef[Int],
+        HashRef[Num], HashRef[Str], HashRef[File], HashRef[Dir],
+        HashRef[Path], as well as any custom type constraint which can be
+        coerced from strings.
+
+        HashRef types are passed on the command line like:
+
+          ./myapp.pl somecommand key1=value1 key2=value2
+
+    `kingpin_type`
+        In cases where `type` is a custom type constraint and
+        Zydeco::Lite::App cannot figure out what to do with it, you can set
+        `kingpin_type` to be one of the above supported types to act as a hint
+        about how to process it.
+
+    `required`
+        A boolean indicating whether the argument is required. (Optional
+        otherwise.) Optional arguments may be better as a "flag".
+
+    `documentation`
+        A one-line description of the argument.
+
+    `placeholder`
+        A string to use as a placeholder value for the argument in help text.
+
+    `default`
+        A non-reference default value for the argument, or a coderef that when
+        called will generate a default value (which may be a reference).
+
+    `env`
+        An environment variable which will override the default value if it is
+        given.
+
+    Arguments don't need to be defined directly within a command. It is
+    possible for a command to "inherit" arguments from a role or parent class,
+    but this is usually undesirable as it may lead to their order being hard
+    to predict.
+
+  `flag`
+    Flags are command-line options which are passed as `--someopt` on the
+    command line.
+
+      use Zydeco::Lite::App;
+      use Types::Path::Tiny -types;
+
+      app "Local::MyApp" => sub {
+        command "Add" => sub {
+    
+          arg 'filename' => ( type => File, required => 1 );
+      
+          flag 'logfile' => (
+            init_arg => 'log',
+            type     => File,
+            handles  => { 'append_log' => 'append' },
+            default  => sub { Path::Tiny::path('log.txt') },
+          );
+      
+          run {
+            my ( $self, $file ) = ( shift, @_ );
+            $self->append_log( "Starting work...\n" );
+            ...;
+          };
+        };
+      };
+
+    This would be called as:
+
+      ./myapp.pl add --log=log2.txt filename.txt
+
+    The `flag` keyword is a wrapper around the `has` keyword, so supports all
+    the options supported by `has` such as `predicate`, `handles`, etc. It
+    also supports all the options described for "arg" such as `env` and
+    `placeholder`. Additionally there is a `short` option, allowing for short,
+    single-letter flag aliases:
+
+      flag 'logfile' => (
+        init_arg => 'log',
+        type     => File,
+        short    => 'L',
+      );
+
+    Instead of being initialized using command-line arguments, flags can also
+    be initialized in the application's config file. Flags given on the
+    command line override flags in the config files; flags given in config
+    files override those given by environment variables; environment variables
+    override defaults.
+
+    Like args, flags can be defined in a parent class or a role. It can be
+    helpful to define common flags in a role.
+
+  `run`
+    The `run` keyword just defines a method called "execute". The following
+    are equivalent:
+
+      run { ... };
+      method 'execute' => sub { ... };
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco-Lite-App>.
+
+SEE ALSO
+    This module extends Zydeco::Lite to add support for rapid development of
+    command-line apps.
+
+    Z::App is a shortcut for importing this module plus a collection of others
+    that might be useful to you, including type constraint libraries, strict,
+    warnings, etc.
+
+    Getopt::Kingpin is used for processing command-line arguments.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

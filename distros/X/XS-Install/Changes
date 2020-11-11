@@ -1,3 +1,7 @@
+1.2.21   30.10.2020
+           - remove unneeded warn on lock unlinking, as it is non-informative
+           - fix for CMake INTERFACE_LIBRARY targets
+           - fix force_load for MacOSX when no .c files input
 1.2.20   12.10.2020
            - CMAKE_OPTIONS to pass additional options to CMake
            - remove Alien::cmake3 requirement until the feature is used by certain module

@@ -31,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-SymMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-symmethod>;
@@ -91,6 +91,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-SymMethod-0.004.tar.gz>;
 	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Sub-SymMethod-0.005"^^xsd:string;
+	dc:issued            "2020-10-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix dynamic config logic which would in some circumstances require a version of Sub::Name as a prerequisite which hasn't even been released yet.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-SymMethod-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

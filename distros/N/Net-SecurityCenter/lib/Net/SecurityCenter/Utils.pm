@@ -9,7 +9,7 @@ use Time::Piece;
 use Data::Dumper ();
 use Exporter qw(import);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 our @EXPORT_OK = qw(
     sc_check_params
@@ -23,11 +23,13 @@ our @EXPORT_OK = qw(
     sc_method_usage
     sc_schedule
 
-    decamelize
     dumper
     trim
     deprecated
     cpe_decode
+    file_slurp
+    config_parse_line
+    config_parser
 );
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -59,12 +61,6 @@ our $NESSUS_SCANNER_STATUS = {
 
 #-------------------------------------------------------------------------------
 # COMMON UTILS
-#-------------------------------------------------------------------------------
-
-sub decamelize {
-    return join( '_', map {lc} grep {length} split /([A-Z]{1}[^A-Z]*)/, shift );
-}
-
 #-------------------------------------------------------------------------------
 
 sub dumper {
@@ -358,6 +354,7 @@ sub sc_normalize_hash {
         lastScan
         lastUnauthRun
         lastAuthRun
+        time
     );
 
     my @seconds_fields = qw(

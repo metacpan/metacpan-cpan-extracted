@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -9,7 +9,7 @@ use File::Slurp qw{ read_file write_file };
 use IO::Uncompress::Gunzip;
 use MIME::Base64;
 use Term::ANSIColor qw{ :constants };
-use XML::LibXML;
+use XML::LibXML 2.0202;
 our @VALIDATOR_PROFILES = qw{ SVG_1.2_BIMI SVG_1.2_PS Tiny-1.2 };
 
 extends 'Mail::BIMI::Base';
@@ -73,6 +73,13 @@ sub data_maybe_compressed($self) {
   return $self->data;
 }
 
+
+sub data_uncompressed_normalized($self) {
+  my $data = $self->data_uncompressed;
+  $data =~ s/\r\n?/\n/g;
+  return $data;
+}
+
 sub _build_data_xml($self) {
   my $xml;
   my $data = $self->data_uncompressed;
@@ -92,7 +99,7 @@ sub _build_data_xml($self) {
 }
 
 sub _build_parser($self) {
-  state $parser = XML::LibXML::RelaxNG->new( string => $self->get_data_from_file($self->validator_profile.'.rng'));
+  state $parser = XML::LibXML::RelaxNG->new( string => $self->get_data_from_file($self->validator_profile.'.rng'), no_network => 1 );
   return $parser;
 }
 
@@ -204,7 +211,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -286,6 +293,10 @@ is=rw
 
 Human readable summary of where this indicator was retrieved from
 
+=head2 warnings
+
+is=rw
+
 =head1 CONSUMES
 
 =over 4
@@ -323,6 +334,10 @@ Maximum permitted HTTP fetch
 =head2 I<data_maybe_compressed()>
 
 Synonym for data; returns the data in a maybe compressed format
+
+=head2 I<data_uncompressed_normalized()>
+
+Returns the uncompressed data with normalized line endings
 
 =head2 I<finish()>
 

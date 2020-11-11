@@ -1,5 +1,11 @@
 Revision history for Net-Kalk
 
-2.01    2020-09-05
+0.01    2020
         First version
 
+2.01    2020 09 05
+        First distributed version
+
+2.06    2020 11 05
+        new format for sort summary included functions
+        new options for sort function

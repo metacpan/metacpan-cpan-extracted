@@ -1,3 +1,10 @@
+0.05 2020-10-30
+    * make this module work with perl <= 5.16.3
+
+0.04 2020-10-27
+    * fix after behaviour change introduced by
+      dependency upgrade (Regexp::Grammars 1.056 > 1.057)
+
 0.03 2020-10-20
     * customizable string_delimiters
 

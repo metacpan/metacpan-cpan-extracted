@@ -36,11 +36,7 @@
             "Const::Fast" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "Crypt::Rijndael" : "0",
-            "Digest::SHA" : "0",
-            "JSON::PP" : "0",
-            "MIME::Base64" : "0",
             "Net::SFTP::Foreign" : "0",
-            "POSIX" : "0",
             "Text::Glob" : "0",
             "Try::Tiny" : "0",
             "perl" : "5.014"
@@ -60,6 +56,6 @@
          "web" : "https://github.com/dmitry-novozhilov/simple-backuper"
       }
    },
-   "version" : "v0.2.9",
+   "version" : "v0.2.13",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

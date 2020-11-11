@@ -15,7 +15,7 @@ in Makefile.PL
     
 in your C test files
 
-    #include <catch.hpp>
+    #include <catch2/catch.hpp>
     ...
     
 =head1 DESCRIPTION

@@ -18,6 +18,7 @@ use lib "$FindBin::Bin/lib";
 
 use parent (
     'TestHTTPBase',
+    'TestHTTPCpanelMixin',
     'TestHTTPTinyMixin',
 );
 
@@ -65,7 +66,7 @@ sub test_fail_because_tls : Tests(1) {
             ),
         ),
         'expected error object',
-    );
+    ) or diag explain $err;
 
     return;
 }

@@ -1,10 +1,10 @@
-.directory
 Build.PL
-CONTRIBUTING.md
+CHANGES
+CONTRIBUTING
 lib/Data/Table/Text.pm
-MANIFEST      This list of files
+MANIFEST
+README
+README.md
 test.pl
 META.yml
 META.json
-CHANGES
-README

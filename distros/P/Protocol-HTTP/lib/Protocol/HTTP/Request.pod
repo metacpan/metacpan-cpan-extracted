@@ -38,7 +38,7 @@ Protocol::HTTP::Request - HTTP request class
 
     # uploading as multipart/form-data
     my $req = Protocol::HTTP::Request->new({
-        form => [field1 => 'value1', field2 => 'value2'],
+        form => [field1 => 'value1', field2 => ['filename.pdf' => $pdf_content, 'application/pdf']],
     });
 
     my $req = Protocol::HTTP::Request->new({
@@ -193,6 +193,11 @@ Possible values for form C<encoding>:
 =item ENCODING_URL
 
 =back
+
+There is no perl API for form files B<streaming>, i.e. uploading large files.
+With the existing API all form files have to be available upfront, i.e. be in
+memory. As the file streaming capabilities require I/O, they should be available
+in the L<Protocol::HTTP> derivatives, e.g. in L<UniEvent::HTTP>.
 
 =head1 FUNCTIONS
 

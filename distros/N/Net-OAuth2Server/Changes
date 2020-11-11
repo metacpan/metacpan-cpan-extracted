@@ -1,5 +1,15 @@
 Revision history for Net-OAuth2Server
 
+0.003 Sun 01 Nov 2020
+	- Ability to control grant constructor parameters and required parameters
+	  separately from each other in token requests
+	- Separate methods that can be called again later for each validation check
+	  performed by the request constructor
+	- Better method names:
+		- with_error → set_error
+		- required_confidental → confidential_parameters
+	- Switch to role-based design
+
 0.002 Sat 01 Aug 2020
 	- Correct matching of the required request body content type.
 	- Improved error handling and surfacing

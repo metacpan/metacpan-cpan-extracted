@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Fields;
 
 # ABSTRACT: Specify columns
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0105';
+our $VERSION = '0.0107';
 
 use Carp qw/croak/;
 use List::Util qw/uniq/;
@@ -323,7 +323,7 @@ DBIx::Class::Smooth::Fields - Specify columns
 
 =head1 VERSION
 
-Version 0.0105, released 2020-09-20.
+Version 0.0107, released 2020-10-28.
 
 =head1 SYNOPSIS
 

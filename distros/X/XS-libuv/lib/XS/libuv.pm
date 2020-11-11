@@ -1,7 +1,7 @@
 package XS::libuv;
 use 5.012;
 
-our $VERSION = "1.35.0.4";
+our $VERSION = "1.35.0.5";
 
 use XS::Loader;
 

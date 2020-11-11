@@ -57,21 +57,21 @@ Condorcet vs IRV Methods determine if the Condorcet Winner needed votes from the
 
 To determine if there was a violation the ballots of one or more choices are redacted, with later choice on those ballots removed.
 
-With these methods it is also possible to allow a tolerance for Later Harm. 
+With these methods it is also possible to allow a tolerance for Later Harm.
 
 =head3 Double Redaction
 
-The Double Redaction method (default) measures the later harm effect between a Condorcet Winner and the IRV Winner. 
+The Double Redaction method (default) measures the later harm effect between a Condorcet Winner and the IRV Winner.
 
-Considering the Margin of the Condorcet Winner over the IRV Winner and the number of votes needed by the Condorcet Winner from the IRV winner as measures of Preference for the Condorcet Winner and of Later Harm, it is also possible to establish a Later Harm Tolerance Threshold. 
+Considering the Margin of the Condorcet Winner over the IRV Winner and the number of votes needed by the Condorcet Winner from the IRV winner as measures of Preference for the Condorcet Winner and of Later Harm, it is also possible to establish a Later Harm Tolerance Threshold.
 
-The Relaxed Later Harm option will select the Condorcet Winner when their margin of victory over the IRV Winner is greater than the number of later votes they need from the IRV Winner to be a Condorcet Winner. Although not presently implemented a different ratio or percentage could be used. 
+The Relaxed Later Harm option will select the Condorcet Winner when their margin of victory over the IRV Winner is greater than the number of later votes they need from the IRV Winner to be a Condorcet Winner. Although not presently implemented a different ratio or percentage could be used.
 
-Because in most cases where the IRV and Condorcet winners are different there are Later Harm effects, without relaxed this method will almost always confirm the IRV winner. 
+Because in most cases where the IRV and Condorcet winners are different there are Later Harm effects, without relaxed this method will almost always confirm the IRV winner.
 
 =head3 Simple (Single Redaction)
 
-This variation only redacts the ballots that choose the IRV Winner as their first choice. This gives the voters confidence that if their first choice wins by the later harm safe method, that their vote will not be used against that choice. 
+This variation only redacts the ballots that choose the IRV Winner as their first choice. This gives the voters confidence that if their first choice wins by the later harm safe method, that their vote will not be used against that choice.
 
 The simplest form is:
 
@@ -85,15 +85,19 @@ Unfortunately, this simplest form, in cases where more than one choice defeats t
 
 The form implemented by Vote::Count is:
 
-    1. Determine both the IRV and Condorcet Winner. If they are the same, elect that choice. If there is no Condorcet Winner, elect the IRV Winner.
+=over
 
-    2. Treating the ballots cast with the IRV Winner as their first choice as ballots cast for only the IRV Winner determine the Condorcet Winner.
+1. Determine both the IRV and Condorcet Winner. If they are the same, elect that choice. If there is no Condorcet Winner, elect the IRV Winner.
 
-    3. If there is a Condorcet Winner, elect the first Condorcet Winner, if there is none, elect the IRV Winner. (The redaction cannot make the IRV Winner a Condorcet Winner if it isn't already one).
+2. Treating the ballots cast with the IRV Winner as their first choice as ballots cast for only the IRV Winner determine the Condorcet Winner.
+
+3. If there is a Condorcet Winner, elect the first Condorcet Winner, if there is none, elect the IRV Winner. (The redaction cannot make the IRV Winner a Condorcet Winner if it isn't already one).
+
+=cut
 
 =head1 Criteria
 
-The double redaction version is later harm safe if the relaxed option is not used. The simple version later harm protects first choice votes only, it also does not protect the first Condorcet Winner's votes at all. 
+The double redaction version is later harm safe if the relaxed option is not used. The simple version later harm protects first choice votes only, it also does not protect the first Condorcet Winner's votes at all.
 
 =head2 Simplicity
 

@@ -8,13 +8,13 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.52';
+our $VERSION = '1.53';
 
 use Carp;
 use DateTime::Duration;
 use DateTime::Helpers;
 use DateTime::Locale 1.06;
-use DateTime::TimeZone 2.02;
+use DateTime::TimeZone 2.44;
 use DateTime::Types;
 use POSIX qw( floor fmod );
 use Params::ValidationCompiler 0.26 qw( validation_for );
@@ -955,6 +955,21 @@ sub hms {
 
 sub iso8601 { $_[0]->datetime('T') }
 
+sub rfc3339 {
+    my $self = shift;
+
+    return $self->datetime('T')
+        if $self->{tz}->is_floating;
+
+    my $secs = $self->offset;
+    my $offset
+        = $secs
+        ? DateTime::TimeZone->offset_as_string( $secs, q{:} )
+        : 'Z';
+
+    return $self->datetime('T') . $offset;
+}
+
 sub datetime {
     my ( $self, $sep ) = @_;
     $sep = 'T' unless defined $sep;
@@ -1117,8 +1132,8 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         'H' => sub { sprintf( '%02d', $_[0]->hour ) },
         'I' => sub { sprintf( '%02d', $_[0]->hour_12 ) },
         'j' => sub { sprintf( '%03d', $_[0]->day_of_year ) },
-        'k' => sub { sprintf( '%2d', $_[0]->hour ) },
-        'l' => sub { sprintf( '%2d', $_[0]->hour_12 ) },
+        'k' => sub { sprintf( '%2d',  $_[0]->hour ) },
+        'l' => sub { sprintf( '%2d',  $_[0]->hour_12 ) },
         'm' => sub { sprintf( '%02d', $_[0]->month ) },
         'M' => sub { sprintf( '%02d', $_[0]->minute ) },
         'n' => sub {"\n"},                     # should this be OS-sensitive?
@@ -1223,8 +1238,8 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         qr/(Y+)/ =>
             sub { $_[0]->_zero_padded_number( $1, $_[0]->week_year() ) },
 
-        qr/QQQQ/ => 'quarter_name',
-        qr/QQQ/  => 'quarter_abbr',
+        qr/QQQQ/  => 'quarter_name',
+        qr/QQQ/   => 'quarter_abbr',
         qr/(QQ?)/ =>
             sub { $_[0]->_zero_padded_number( $1, $_[0]->quarter() ) },
 
@@ -1325,18 +1340,13 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         # The LDML spec is not 100% clear on how to truncate this field, but
         # this way seems as good as anything.
         qr/(S+)/ => sub { $_[0]->_format_nanosecs( length($1) ) },
-        qr/A+/ =>
+        qr/A+/   =>
             sub { ( $_[0]->{local_rd_secs} * 1000 ) + $_[0]->millisecond() },
 
         qr/zzzz/   => sub { $_[0]->time_zone_long_name() },
         qr/z{1,3}/ => sub { $_[0]->time_zone_short_name() },
         qr/ZZZZZ/  => sub {
-            substr(
-                my $z
-                    = DateTime::TimeZone->offset_as_string( $_[0]->offset() ),
-                -2, 0, ':'
-            );
-            $z;
+            DateTime::TimeZone->offset_as_string( $_[0]->offset(), q{:} );
         },
         qr/ZZZZ/ => sub {
             $_[0]->time_zone_short_name()
@@ -2363,7 +2373,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.52
+version 1.53
 
 =head1 SYNOPSIS
 
@@ -3011,6 +3021,17 @@ This method is also available as C<< $dt->iso8601() >>, but it's not really a
 very good ISO8601 format, as it lacks a time zone.  If called as
 C<< $dt->iso8601() >> you cannot change the separator, as ISO8601 specifies
 that "T" must be used to separate them.
+
+=head3 $dt->rfc3339
+
+This formats a datetime in RFC3339 format. This is the same as C<<
+$dt->datetime >> with an added offset at the end of the string except if the
+time zone is the floating time zone.
+
+If the offset is '+00:00' then this is represented as 'Z'. Otherwise the
+offset is formatted with a leading sign (+/-) and a colon separate numeric
+offset with hours and minutes. If the offset has a non-zero seconds component,
+that is also included.
 
 =head3 $dt->stringify()
 
@@ -4628,7 +4649,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 

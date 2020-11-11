@@ -18,6 +18,7 @@ lib/Getopt/Kingpin/Type/ExistingFile.pm
 lib/Getopt/Kingpin/Type/ExistingFileOrDir.pm
 lib/Getopt/Kingpin/Type/File.pm
 lib/Getopt/Kingpin/Type/Int.pm
+lib/Getopt/Kingpin/Type/Num.pm
 lib/Getopt/Kingpin/Type/String.pm
 minil.toml
 t/00_compile.t
@@ -48,5 +49,8 @@ t/24_user_type.t
 t/25_parse.t
 t/26_repeatable.t
 t/27_new.t
+t/28_num.t
+t/29_hash.t
+t/30_hidden.t
 META.yml
 MANIFEST

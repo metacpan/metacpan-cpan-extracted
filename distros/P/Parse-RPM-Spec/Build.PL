@@ -11,12 +11,23 @@ my $build = Module::Build->new(
         },
         build_requires     => {
                 'Test::More'          => 0,
+                'Test::Exception'     => 0,
         },
         build_recommends   => {
                 'Test::Pod'           => 0,
                 'Test::Pod::Coverage' => 0,
         },
         create_makefile_pl => 'traditional',
+        meta_merge => {
+                'meta-spec' => { version => 2 },
+                resources => {
+                        repository => {
+                               type => 'git',
+                               url  => 'git://github.com/davorg/parse-rpm-spec.git',
+                               web  => 'https://github.com/davorg/parse-rpm-spec',
+                        },
+                },
+        },
 );
 
 $build->create_build_script;

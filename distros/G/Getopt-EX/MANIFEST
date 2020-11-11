@@ -21,6 +21,7 @@ t/03_mode.t
 t/04_long.t
 t/05_colorlabel.t
 t/06_numbers.t
+t/07_arglist.t
 t/home/lib/App/example/example_test.pm
 t/home/lib/App/example/mode_function.pm
 t/home/lib/App/example/mode_wildcard.pm

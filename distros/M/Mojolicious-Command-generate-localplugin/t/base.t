@@ -35,6 +35,18 @@ ok -e $plugin->rel_file(
   'class exists';
 ok -e $plugin->rel_file('t/my_plugin.t'), 'test exists';
 
+{
+  note "Subtest: Run tests for MyPlugin";
+
+  open my $fh, '-|', $^X => -I, $plugin->rel_file('lib'),
+    $plugin->rel_file('t/my_plugin.t')
+    or fail "Failed to open test: $!";
+  print "    $_" while readline $fh;
+  close $fh or fail "Failed to close test handle: $!";
+
+  is $?, 0, "Ran tests for MyPlugin";
+}
+
 chdir $cwd;
 
 done_testing();

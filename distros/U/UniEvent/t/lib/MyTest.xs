@@ -1,5 +1,9 @@
-#include "test.h"
+#include <panda/unievent.h>
+#include <panda/unievent/test/AsyncTest.h>
 #include <xs/unievent.h>
+
+using namespace panda;
+using namespace panda::unievent;
 
 MODULE = MyTest                PACKAGE = MyTest
 PROTOTYPES: DISABLE
@@ -18,16 +22,6 @@ void close_socket (int fd) {
 }
 
 void core_dump () { abort(); }
-
-bool variate_ssl (bool val = false) {
-    if (items) variation.ssl = val;
-    RETVAL = variation.ssl;
-}
-
-bool variate_buf (bool val = false) {
-    if (items) variation.buf = val;
-    RETVAL = variation.buf;
-}
 
 void set_loop_callback_with_mortal (LoopSP loop, xs::Sub cb) {
     loop->delay([=]{

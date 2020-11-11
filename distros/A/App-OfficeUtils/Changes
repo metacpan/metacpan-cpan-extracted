@@ -1,3 +1,13 @@
+0.005   2020-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [removed] Remove officess2csv and recommend users to use
+	  Spreadsheet::Read's xls2csv instead. HMBRAND kindly pointed out to me
+	  that Spreadsheet::XLSX is buggy and unmaintained and should not be
+	  used, and his xls2csv tool from Spreadsheet::Read already handles
+	  converting .xls/.xlsx/.ods (including multisheet support) to CSV
+	  files.
+
+
 0.004   2020-10-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: xls2csv.

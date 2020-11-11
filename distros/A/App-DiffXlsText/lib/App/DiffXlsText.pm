@@ -1,9 +1,9 @@
 package App::DiffXlsText;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-26'; # DATE
+our $DATE = '2020-10-27'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as two directories of CSV files
@@ -20,7 +20,7 @@ App::DiffXlsText - Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) 
 
 =head1 VERSION
 
-This document describes version 0.001 of App::DiffXlsText (from Perl distribution App-DiffXlsText), released on 2020-10-26.
+This document describes version 0.003 of App::DiffXlsText (from Perl distribution App-DiffXlsText), released on 2020-10-27.
 
 =head1 SYNOPSIS
 

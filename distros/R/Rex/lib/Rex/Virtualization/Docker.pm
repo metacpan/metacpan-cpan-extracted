@@ -49,10 +49,11 @@ With this module you can manage Docker.
 
 package Rex::Virtualization::Docker;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Rex::Virtualization::Base;
 use base qw(Rex::Virtualization::Base);

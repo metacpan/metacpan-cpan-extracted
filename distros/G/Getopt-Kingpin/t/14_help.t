@@ -314,6 +314,77 @@ Flags:
     is $stdout, $expected;
 };
 
+subtest 'default3' => sub {
+    local @ARGV;
+    push @ARGV, qw(--help);
+
+    my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
+    my $name = $kingpin->flag('name', 'Set name.')->default(sub{ "default name" })->string();
+
+    my $expected = sprintf <<'...', basename($0);
+usage: %s [<flags>]
+
+Flags:
+  --help       Show context-sensitive help.
+  --name=NAME  Set name.
+
+...
+
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
+};
+
+subtest 'default4' => sub {
+    { package Local::Overloaded; use overload '&{}' => sub { $_[0][0] } };
+    local @ARGV;
+    push @ARGV, qw(--help);
+
+    my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
+    my $name = $kingpin->flag('name', 'Set name.')->default(bless [sub{ "default name" }], 'Local::Overloaded')->string();
+
+    my $expected = sprintf <<'...', basename($0);
+usage: %s [<flags>]
+
+Flags:
+  --help       Show context-sensitive help.
+  --name=NAME  Set name.
+
+...
+
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
+};
+
+subtest 'default5' => sub {
+    require Path::Tiny;
+    local @ARGV;
+    push @ARGV, qw(--help);
+
+    my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
+    my $name = $kingpin->flag('input', 'Set input.')->default(Path::Tiny::path('Build.PL'))->file();
+
+    my $expected = sprintf <<'...', basename($0);
+usage: %s [<flags>]
+
+Flags:
+  --help              Show context-sensitive help.
+  --input="Build.PL"  Set input.
+
+...
+
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $stdout, $expected;
+};
+
 subtest 'place holder' => sub {
     local @ARGV;
     push @ARGV, qw(--help);

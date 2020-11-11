@@ -9,6 +9,7 @@ t::TestUtils->import();
 SKIP: {
   skip_interactive();
 
+  use blib;
   require IO::Pager;
   require IO::Pager::Buffered;
   {

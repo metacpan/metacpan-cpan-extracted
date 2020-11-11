@@ -32,8 +32,8 @@ You can install simple-backuper from CPAN (perl packages repository) or directly
 
 - `git clone https://github.com/dmitry-novozhilov/simple-backuper.git`
 - `cd simple-backuper`
-- `make`
 - `perl Makefile.pl`
+- `make`
 - `sudo make install`
 
 Required libraries you can install from your distro package manager:

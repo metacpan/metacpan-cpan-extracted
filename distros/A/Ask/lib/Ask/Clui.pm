@@ -5,7 +5,7 @@ use warnings;
 package Ask::Clui;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.015';
 
 use Moo;
 use Term::Clui 1.65 ();
@@ -19,7 +19,7 @@ sub BUILD {
 }
 
 sub is_usable {
-	my ($self) = @_;
+	my ( $self ) = @_;
 	-t STDIN and -t STDOUT;
 }
 
@@ -56,7 +56,7 @@ sub entry {
 		return Term::Clui::ask_password( $opts{text} );
 	}
 	
-	return Term::Clui::ask( $opts{text}, $opts{default}||'' );
+	return Term::Clui::ask( $opts{text}, $opts{default} || '' );
 }
 
 sub question {
@@ -73,13 +73,13 @@ my $_choices = sub {
 sub single_choice {
 	my ( $self, %opts ) = ( shift, @_ );
 	local $ENV{CLUI_DIR} = 'OFF';
-	scalar Term::Clui::choose( $opts{text}, $_choices->($opts{choices}) );
+	scalar Term::Clui::choose( $opts{text}, $_choices->( $opts{choices} ) );
 }
 
 sub multiple_choice {
 	my ( $self, %opts ) = ( shift, @_ );
 	local $ENV{CLUI_DIR} = 'OFF';
-	Term::Clui::choose( $opts{text}, $_choices->($opts{choices}) );
+	Term::Clui::choose( $opts{text}, $_choices->( $opts{choices} ) );
 }
 
 sub file_selection {
@@ -113,10 +113,10 @@ sub file_selection {
 			$self->info( text => 'Enter another file, or leave blank to finish.' );
 			redo FILE;
 		}
-	};
+	} #/ FILE:
 	
 	$opts{multiple} ? @chosen : $chosen[0];
-}
+} #/ sub file_selection
 
 1;
 
@@ -164,4 +164,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

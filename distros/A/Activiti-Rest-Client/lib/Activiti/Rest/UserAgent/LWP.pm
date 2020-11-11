@@ -17,7 +17,8 @@ sub _build_ua {
   my $self = $_[0];
   my $ua = LWP::UserAgent->new(
     cookie_jar => {},
-    timeout => $self->timeout()
+    timeout => $self->timeout(),
+    keep_alive => $self->keep_alive()
   );
   if(is_string($ENV{LWP_TRACE})){
     $ua->add_handler("request_send",  sub { print STDERR shift->as_string; return });

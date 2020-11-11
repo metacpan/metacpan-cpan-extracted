@@ -22,4 +22,4 @@ sub userinfo_claims {
 	) );
 }
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';

@@ -31,6 +31,7 @@
       "develop" : {
          "requires" : {
             "Getopt::Long::Descriptive" : "0",
+            "PDL" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
@@ -42,7 +43,8 @@
       "runtime" : {
          "recommends" : {
             "Chart::Kaleido::Plotly" : "0.005",
-            "Devel::IPerl" : "0.009"
+            "Devel::IPerl" : "0.009",
+            "PDL" : "0"
          },
          "requires" : {
             "Chart::Kaleido::Plotly" : "0.005",
@@ -75,7 +77,6 @@
       },
       "test" : {
          "requires" : {
-            "PDL" : "0",
             "Test::Exception" : "0",
             "Test::File::ShareDir" : "0",
             "Test::More" : "0",
@@ -95,7 +96,7 @@
          "web" : "https://github.com/pablrod/p5-Chart-Plotly"
       }
    },
-   "version" : "0.040",
+   "version" : "0.041",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "Stephan Loyd <stephanloyd9@gmail.com>",

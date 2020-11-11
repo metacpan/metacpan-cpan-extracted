@@ -1,9 +1,9 @@
 package Getopt::Long::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-27'; # DATE
+our $DATE = '2020-10-27'; # DATE
 our $DIST = 'Getopt-Long-Util'; # DIST
-our $VERSION = '0.891'; # VERSION
+our $VERSION = '0.892'; # VERSION
 
 use 5.010001;
 use strict;
@@ -90,22 +90,26 @@ sub parse_getopt_long_opt_spec {
                    (?:
                        :
                        (?P<opttype>[siof])
-                       (?P<desttype>|[%@])
+                       (?P<desttype>|[%@])?
                    ) |
                    (?:
                        :
-                       (?P<optnum>\d+)
-                       (?P<desttype>|[%@])
-                   )
+                       (?P<optnum>-?\d+)
+                       (?P<desttype>|[%@])?
+                   ) |
                    (?:
                        :
                        (?P<optplus>\+)
-                       (?P<desttype>|[%@])
+                       (?P<desttype>|[%@])?
                    )
                )?
                \z/x
                    or return undef;
     my %res = %+;
+
+    if (defined $res{optnum}) {
+        $res{type} = 'i';
+    }
 
     if ($res{aliases}) {
         my @als;
@@ -388,7 +392,7 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.891 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2020-04-27.
+This document describes version 0.892 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2020-10-27.
 
 =head1 FUNCTIONS
 

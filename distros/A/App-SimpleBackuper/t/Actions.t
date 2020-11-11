@@ -16,6 +16,8 @@ use App::SimpleBackuper::Restore;
 
 it 'most common workflow' => sub {
 	
+	open(STDOUT, '>&', STDERR) or die $!;
+	
 	make_path('/tmp/simple-backuper-test/src', '/tmp/simple-backuper-test/storage');
 	unlink('/tmp/simple-backuper-test/dst/a.file', '/tmp/simple-backuper-test/src/b.file', '/tmp/simple-backuper-test/db', '/tmp/simple-backuper-test/dst');
 	open(my $fh, '>', '/tmp/simple-backuper-test/src/a.file') or die "Can't write test file: $!";

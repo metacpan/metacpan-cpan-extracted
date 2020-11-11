@@ -7,6 +7,147 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.012000	2020-10-28
+
+ [ Documentation ]
+ - Update NEWS file.
+
+1.011_011	2020-10-16
+
+ [ Test Suite ]
+ - Bugs in old versions of Return::Type prevent integration tests from
+   passing on Perl 5.8.x; those tests now require Return::Type 0.007 or
+   above.
+ - More tests for Type::Coercion::FromMoose.
+
+ [ Packaging ]
+ - If the EXTENDED_TESTING environment variable is true, Perl 5.8.9 or
+   above is being used, and either Type::Tiny's version contains '_' or
+   testing is running on Travis CI, then Makefile.PL will add extra testing
+   dependencies.
+
+ [ Other ]
+ - Remove unnecessary BEGIN block in Eval::TypeTiny.
+
+1.011_010	2020-10-16
+
+ - Simple useful coercions from Str for Type::Tiny::Enum (and
+   Types::Standard::Enum).
+
+1.011_009	2020-10-09
+
+ [ Documentation ]
+ - Add _ForeignTypeConstraint to AllTypes.pod.
+
+ [ Test Suite ]
+ - Add tests for _ForeignTypeConstraint.
+ - Improve test coverage by adding tests for various esoteric parts of the
+   distribution and edge cases.
+
+ [ Other ]
+ - More efficient use of Type::Tiny::XS by Types::TypeTiny.
+ - Refactoring of Types::TypeTiny.
+ - Where various parts of Type::Tiny internally use type constraints to
+   check values, prefer is_* and assert_* functions over method calls.
+
+1.011_008	2020-10-07
+
+ [ Documentation ]
+ - Some minor tidyups and updates to Type::Tiny::Manual.
+
+ [ Test Suite ]
+ - Better tests for the placeholder type constraints created by
+   Type::Library -declare flag.
+ - Test integration with Type::Nano as an example of a generic
+   non-Type::Tiny type constraint class.
+ - Test that $type->() works with subclasses that override the
+   assert_return method.
+ - Write tests for some internal undocumented methods.
+
+ [ Other ]
+ - Added: Type::Utils::assert() function.
+
+1.011_007	2020-10-06
+
+ [ Bug Fixes ]
+ - ArgsObject inlining was closing over a coderef in a way that didn't work
+   on archaic versions of Perl. Resolve by calling the coderef outside the
+   closure.
+
+1.011_006	2020-10-02
+
+ [ Documentation ]
+ - Include JSONCapable type example.
+
+ [ Test Suite ]
+ - Improved test coverage for Type::Library.
+ - Improved test coverage for Type::Params.
+ - Improved test coverage for Type::Registry.
+ - Improved test coverage for Type::Tiny::Union.
+ - Improved tests for Type::Utils::is().
+ - Various tests for garbage collection using Devel::Refcount.
+
+ [ Other ]
+ - Added: Type::Params now exports an ArgsObject type constraint.
+ - Test::TypeTiny's should_pass and should_fail exercise type constraints
+   in even more ways in EXTENDED_TESTING mode.
+
+1.011_005	2020-09-30
+
+ - Added: Type::Library import now supports -extends and -utils flags.
+ - Type::Library -base import flag now marks the caller package as loaded
+   in %INC.
+
+1.011_004	2020-09-30
+
+ [ Bug Fixes ]
+ - Make predeclared type constraints work better for Zydeco.
+
+ [ Documentation ]
+ - Document that ArrayLike and HashLike are now parameterizable.
+
+ [ Test Suite ]
+ - Make test suite work better with App::Yath.
+
+1.011_003	2020-09-25
+
+ [ Bug Fixes ]
+ - Old versions of Data::Dumper would sometimes die when dumping certain
+   overloaded objects. Type::Tiny::_dd() now catches this in an eval {}.
+ - Types::Standard would sometimes complain about very old versions of
+   Scalar::Util.
+
+ [ Other ]
+ - ArrayLike and HashLike are now parameterizable, though the
+   implementation for the parameterized version is in pure Perl, not XS.
+ - Type::Tiny::Enum better caches regexps.
+ - Updated: ArrayLike, HashLike, CodeLike, and StringLike type constraints
+   can use XS if Type::Tiny::XS 0.022 is installed.
+
+1.011_002	2020-09-22
+
+ - Added: Type::Utils now exports an `is` function but it needs to be
+   requested explicitly.
+
+1.011_001	2020-09-21
+
+ [ Documentation ]
+ - Update the NEWS file.
+
+ [ Other ]
+ - Added: Add new list processing functions to Type::Tiny.
+
+1.011_000	2020-09-15
+
+ [ Documentation ]
+ - Describe deficiencies of is_* functions for parameterized types.
+   Fixes RT#132918.
+   <https://rt.cpan.org/Public/Bug/Display.html?id=132918>
+
+ [ Other ]
+ - Type::Tiny::Enum now generates faster regexps to validate enums. (Code
+   stolen from Regexp::Trie.)
+
 1.010006	2020-09-04
 
  [ Bug Fixes ]
@@ -42,7 +183,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Fixes RT#132419.
    Hauke D++
    Sandor Patocs++
-   <https://rt.cpan.org/Ticket/Display.html?id=132419>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=132419>
  - Workaround RT#121957 by avoiding attempting to XSify Enum type
    constraints with more than 50 possible strings.
    Fixes RT#121957.
@@ -59,7 +200,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    defined, like Type::Tiny::XS.
    Fixes RT#132583.
    Szymon Nieznański++
-   <https://rt.cpan.org/Ticket/Display.html?id=132583>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=132583>
  - Fix for Type::Tiny->can called as a class method.
    Meredith Howard++
    <https://github.com/tobyink/p5-type-tiny/pull/57>
@@ -78,12 +219,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Fixes RT#132455.
    Graham Knop++
    Karen Etheridge++
-   <https://rt.cpan.org/Ticket/Display.html?id=132455>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=132455>
  - If Scalar::Util was below 1.18, the LaxNum type from Types::Standard
    would accept blobs as being numbers. This is now fixed.
    Fixes RT#132426.
    Graham Knop++
-   <https://rt.cpan.org/Ticket/Display.html?id=132426>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=132426>
 
 1.010001	2020-03-16
 
@@ -98,7 +239,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ Documentation ]
  - Correct documentation of slurpy with compile_named.
    Fixes RT#131720.
-   <https://rt.cpan.org/Ticket/Display.html?id=131720>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=131720>
 
  [ Packaging ]
  - Package as stable.
@@ -108,7 +249,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ Bug Fixes ]
  - Fix importing multiple type libraries into a type registry at once.
    Fixes RT#131744.
-   <https://rt.cpan.org/Ticket/Display.html?id=131744>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=131744>
 
  [ Documentation ]
  - Fix typo in documentation of `my_methods`.
@@ -365,7 +506,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ Bug Fixes ]
  - Strip underscores in version numbers for dev releases.
    Fixes RT#125839.
-   <https://rt.cpan.org/Ticket/Display.html?id=125839>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=125839>
  - Type::Params will now keep a reference to all type constraints passed to
    it; this may use more memory in some cases, but will improve exceptions
    thrown.
@@ -374,7 +515,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Type::Tiny better mimics the Moose::Meta::TypeConstraint::Parameterized
    API, adding `parameterized_from` and `has_parameterized_from` methods.
    Fixes RT#114915.
-   <https://rt.cpan.org/Ticket/Display.html?id=114915>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=114915>
  - Type::Tiny::Enum will now avoid triggering a Type::Tiny::XS bug
    involving hyphens in strings.
    Fixes RT#129729.
@@ -463,7 +604,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - The `values` attribute of Type::Tiny::Enum now preserves order.
    Fixes RT#129650.
    Daniel Schröer++
-   <https://rt.cpan.org/Ticket/Display.html?id=129650>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=129650>
  - Tidy up Type::Tiny namespace a little by fully-referencing some
    functions instead of importing them.
  - Tweaks to Type::Tiny and Type::Coercion to avoid unnecessarily loading
@@ -509,7 +650,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Skip one particular test on old versions of Moo because it relies on a
    feature introduced in Moo 1.004000.
    Fixes RT#125948.
-   <https://rt.cpan.org/Ticket/Display.html?id=125948>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=125948>
 
 1.004001	2018-07-28
 
@@ -518,7 +659,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    skipped as internal by Error::TypeTiny, as it was mistakenly removed in
    1.003_008.
    Fixes RT#125942.
-   <https://rt.cpan.org/Ticket/Display.html?id=125942>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=125942>
 
  [ Documentation ]
  - Correct release date of 1.004000 in change log.
@@ -635,13 +776,13 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ Documentation ]
  - Type::Tiny::Manual::Coercions improvements.
    Fixes RT#122305.
-   <https://rt.cpan.org/Ticket/Display.html?id=122305>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=122305>
 
  [ Other ]
  - Added: Allow type libraries to mark certain type constraints as
    deprecated.
    Fixes RT#124728.
-   <https://rt.cpan.org/Ticket/Display.html?id=124728>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=124728>
 
 1.003_004	2018-06-12
 
@@ -650,7 +791,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Fixes RT#124067.
    Andreas J König++
    Slaven Rezić++
-   <https://rt.cpan.org/Ticket/Display.html?id=124067>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=124067>
 
 1.003_003	2018-06-10
 
@@ -677,14 +818,14 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    unless Type::Tiny::XS >= 0.014.
  - Looser definition of FileHandle in Types::Standard.
    Fixes RT#121762.
-   <https://rt.cpan.org/Ticket/Display.html?id=121762>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=121762>
 
 1.003_000	2018-05-20
 
  [ Bug Fixes ]
  - Compatibility with constants and with CV-in-stash optimisation.
    Fixes RT#123408.
-   <https://rt.cpan.org/Ticket/Display.html?id=123408>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=123408>
 
  [ Documentation ]
  - Add a new CONTRIBUTING.pod file.
@@ -702,7 +843,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't
    exist yet).
    Fixes RT#121981.
-   <https://rt.cpan.org/Ticket/Display.html?id=121981>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=121981>
 
  [ Other ]
  - Added: Allow Type::Coercion's add_type_coercion to accept a
@@ -726,7 +867,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't
    exist yet).
    Fixes RT#121981.
-   <https://rt.cpan.org/Ticket/Display.html?id=121981>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=121981>
 
 1.002000	2017-06-01
 
@@ -745,7 +886,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Fixes RT#121764.
    Aran Clary Deltac++
    Graham Knop++
-   <https://rt.cpan.org/Ticket/Display.html?id=121764>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=121764>
 
 1.001_014	2017-05-19
 
@@ -760,7 +901,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Perl 5.8.x.
    Fixes RT#101582.
    André Walker++
-   <https://rt.cpan.org/Ticket/Display.html?id=101582>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=101582>
    <https://github.com/tobyink/p5-type-tiny/pull/16>
  - StrMatch changes in previous release broke the ability to check type
    equality between two parameterized StrMatch types under some
@@ -834,7 +975,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Allow Type::Tiny's `constraint` parameter to be a string of Perl code.
  - Localize $SIG{__DIE__} in Type::Registry.
    Fixes RT#100780.
-   <https://rt.cpan.org/Ticket/Display.html?id=100780>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=100780>
 
 1.001_005	2017-04-19
 
@@ -872,7 +1013,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Attempting ArrayRef[Int, Int] or similar now throws an exception.
    Fixes RT#105299.
    Thomas Sibley++
-   <https://rt.cpan.org/Ticket/Display.html?id=105299>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=105299>
 
 1.001_003	2017-02-02
 
@@ -885,7 +1026,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    ScalarRef, and Map type constraints.
    Fixes RT#99312.
    Marcel Timmerman++
-   <https://rt.cpan.org/Ticket/Display.html?id=99312>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=99312>
  - Inlined version of Types::Standard::Int should check that the value is
    not a reference.
 
@@ -910,12 +1051,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix for Type::Registry::DWIM.
    Fixes RT#98458.
    Marcel Montes++
-   <https://rt.cpan.org/Ticket/Display.html?id=98458>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=98458>
  - Fix issues with coercions and native attribute traits with some oldish
    versions of Moose on oldish versions of Perl.
    Fixes RT#98159.
    Peter Flanigan++
-   <https://rt.cpan.org/Ticket/Display.html?id=98159>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=98159>
 
  [ Documentation ]
  - Updated NEWS file.
@@ -944,7 +1085,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix escaping within q{...} in a test case.
    Fixes RT#114386.
    Karen Etheridge++
-   <https://rt.cpan.org/Ticket/Display.html?id=114386>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=114386>
 
 1.000005	2014-10-25
 
@@ -953,7 +1094,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    ScalarRef, and Map type constraints.
    Fixes RT#99312.
    Marcel Timmerman++
-   <https://rt.cpan.org/Ticket/Display.html?id=99312>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=99312>
 
  [ Test Suite ]
  - Fix annoying warning message in test suite with recent versions of
@@ -965,12 +1106,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix for Type::Registry::DWIM.
    Fixes RT#98458.
    Marcel Montes++
-   <https://rt.cpan.org/Ticket/Display.html?id=98458>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=98458>
  - Fix issues with coercions and native attribute traits with some oldish
    versions of Moose on oldish versions of Perl.
    Fixes RT#98159.
    Peter Flanigan++
-   <https://rt.cpan.org/Ticket/Display.html?id=98159>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=98159>
 
 1.000003	2014-08-28
 
@@ -979,7 +1120,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    inlineable and non-inlineable optional values.
    Fixes RT#98362.
    Gianni Ceccarelli++
-   <https://rt.cpan.org/Ticket/Display.html?id=98362>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=98362>
 
 1.000002	2014-08-18
 
@@ -1298,7 +1439,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    Types::Standard documentation.
    Fixes RT#96379.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=96379>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=96379>
 
  [ Documentation ]
  - Include benchmark/example of Type::Params versus Scalar::Validation.
@@ -1600,7 +1741,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    which uses namespace::autoclean.
    Fixes RT#91468.
    David Steinbrunner++
-   <https://rt.cpan.org/Ticket/Display.html?id=91468>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=91468>
  - Make parameterized Dict and Map type constraints work with Moose native
    hash attribute trait.
    Jason R Mash++
@@ -1625,7 +1766,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    coercions, not just types.
    Fixes RT#91153.
    Jason R Mash++
-   <https://rt.cpan.org/Ticket/Display.html?id=91153>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=91153>
 
 0.033_03	2013-11-26
 
@@ -1633,14 +1774,14 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix bug in Type::Params::multisig with regard to slurpy parameters.
    Fixes RT#90865.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=90865>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=90865>
 
  [ Documentation ]
  - Make Error::TypeTiny::Assertion's explain method act more according to
    documentation.
    Fixes RT#90867.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=90867>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=90867>
 
  [ Packaging ]
  - Recommend Sub::Name in META.json.
@@ -1700,7 +1841,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Added: Deep coercions for Maybe[`a].
    Fixes RT#89936.
    Brendan Byrd++
-   <https://rt.cpan.org/Ticket/Display.html?id=89936>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89936>
 
 0.031_02	2013-11-03
 
@@ -1715,7 +1856,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Differentiate Tuple[] vs Tuple, and Dict[] vs Dict.
    Fixes RT#89696.
    Benct Philip Jonsson++
-   <https://rt.cpan.org/Ticket/Display.html?id=89696>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89696>
 
  [ Documentation ]
  - Improved documentation for Types::TypeTiny.
@@ -1744,17 +1885,17 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix validate_explain error messages in Type::Tiny::Union.
    Fixes RT#89279.
    Brendan Byrd++
-   <https://rt.cpan.org/Ticket/Display.html?id=89279>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89279>
 
  [ Other ]
  - $Type::Tiny::DD can be set numerically.
    Fixes RT#89251.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=89251>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89251>
  - Improve error messages under Moo.
    Fixes RT#89234.
    Graham Knop++
-   <https://rt.cpan.org/Ticket/Display.html?id=89234>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89234>
 
 0.029_03	2013-10-17
 
@@ -1773,7 +1914,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Renamed the Type::Exception modules to Error::TypeTiny.
    Fixes RT#89280.
    Brendan Byrd++
-   <https://rt.cpan.org/Ticket/Display.html?id=89280>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89280>
 
  [ Documentation ]
  - Fix typos in documentation of Error::TypeTiny package variables.
@@ -1783,7 +1924,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    dumper coderef.
    Fixes RT#89251.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=89251>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=89251>
  - Type::Tiny::Enum type constraints are now subtypes of
    Types::Standard::Str; not Types::Standard::Defined.
    David Golden++
@@ -1802,7 +1943,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    constructor, but cannot!
    Fixes RT#88655.
    Brendan Byrd++
-   <https://rt.cpan.org/Ticket/Display.html?id=88655>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=88655>
  - Updated NEWS file.
 
 0.027_09	2013-09-20
@@ -1823,7 +1964,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix typo in Type::Utils for coerce=>1 --> coercion=>1.
    Fixes RT#88798.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=88798>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=88798>
  - Fix typo in changelog for previous developer release.
  - Type::Exception::Assertion changes from 0.027_05 are now conditional
    upon Perl version; only take effect on Perl 5.8+; they just weren't
@@ -1944,7 +2085,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    them each in turn.
    Fixes RT#88291.
    Diab Jerius++
-   <https://rt.cpan.org/Ticket/Display.html?id=88291>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=88291>
 
 0.025_01	2013-09-02
 
@@ -1953,7 +2094,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    elements as if they were present but undef.
    Fixes RT#88277.
    Steven Lee++
-   <https://rt.cpan.org/Ticket/Display.html?id=88277>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=88277>
 
  [ Documentation ]
  - Document the internals of Exporter::TypeTiny.
@@ -1981,7 +2122,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    paramaters.
    Fixes RT#88064.
    Brendan Byrd++
-   <https://rt.cpan.org/Ticket/Display.html?id=88064>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=88064>
  - Stop considering the empty string to be a valid package name.
 
  [ Test Suite ]
@@ -1998,12 +2139,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    compile some coderefs.
    Fixes RT#87846.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=87846>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=87846>
  - Improve ugly type assertion failure messages when given structures of
    nested references.
    Fixes RT#87999.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=87999>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=87999>
 
  [ Other ]
  - Added: Type::Registry now has an `add_type` method, for adding a single
@@ -2037,7 +2178,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix Types::Standard::Dict differentiating between undef and not exists.
    Fixes RT#87443.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=87443>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=87443>
 
  [ Packaging ]
  - Add dependency on Exporter 5.57 for older versions of Perl.
@@ -2103,7 +2244,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    and Type::Tiny::Manual::Libraries.
    Fixes RT#86892.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=86892>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86892>
 
  [ Other ]
  - Updated: Eval::TypeTiny now supports lexical subs under Perl 5.18.
@@ -2133,12 +2274,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    hand-written inlining.
    Fixes RT#86893.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=86893>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86893>
  - Mention in Type::Tiny::Manual::Libraries that the `extends` function is
    no longer exported by default; update example code.
    Fixes RT#86813.
    Pierre Masci++
-   <https://rt.cpan.org/Ticket/Display.html?id=86813>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86813>
    <https://github.com/tobyink/p5-type-tiny/pull/2>
 
  [ Other ]
@@ -2147,7 +2288,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    which is treated as the inlined parent type constraint.
    Fixes RT#86891.
    Tim Bunce++
-   <https://rt.cpan.org/Ticket/Display.html?id=86891>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86891>
 
 0.015_03	2013-07-08
 
@@ -2218,7 +2359,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - B::SPECIAL-related fix.
    Fixes RT#86383.
    Peter Flanigan++
-   <https://rt.cpan.org/Ticket/Display.html?id=86383>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86383>
  - Unions of Type::Tiny and Mouse::Meta::TypeConstraints now work properly.
    This makes Type::Tiny and MouseX::Types play nice together (much like
    Type::Tiny already plays nice with MooseX::Types).
@@ -2363,7 +2504,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
    classes that inherit from Moo classes.
    Fixes RT#86172.
    Peter Flanigan++
-   <https://rt.cpan.org/Ticket/Display.html?id=86172>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=86172>
 
  [ Test Suite ]
  - Bundle test for interaction between constraints, coercions, and Moose
@@ -2417,7 +2558,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Overloading of `$type eq $type` now works in Perl 5.8.
    Fixes RT#85895.
    Vyacheslav Matyukhin++
-   <https://rt.cpan.org/Ticket/Display.html?id=85895>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=85895>
  - The combination of Dict, Optional and coercions seems to have been
    broken in certain circumstances.
    Fixes RT#86001.

@@ -3,7 +3,7 @@ NAME
     vlan info
 
 VERSION
-    Version 0.01
+    Version 0.02
 
 SYNOPSIS
       use Net::SNMP;
@@ -106,9 +106,10 @@ PRIVATE METHODS
 
   _fetch_vm_membership_tbl_entries($session)
     Fetch selected rows from vmMembershipTable during object initialization.
+    The table maybe empty if there is no switch port in access mode.
 
   _vm_membership_tbl_entries_cb($session)
-    The callback for _fetch_vm_membership_tbl_entries
+    The callback for _fetch_vm_membership_tbl_entries.
 
 REQUIREMENTS
     Net::SNMP, Net::SNMP::Mixin

@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::DietersCrazyTempSweep;
 #ABSTRACT: Dieter's crazy temperature sweep
-$Lab::XPRESS::Sweep::DietersCrazyTempSweep::VERSION = '3.722';
+$Lab::XPRESS::Sweep::DietersCrazyTempSweep::VERSION = '3.730';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -119,7 +119,7 @@ Lab::XPRESS::Sweep::DietersCrazyTempSweep - Dieter's crazy temperature sweep
 
 =head1 VERSION
 
-version 3.722
+version 3.730
 
 =head1 COPYRIGHT AND LICENSE
 

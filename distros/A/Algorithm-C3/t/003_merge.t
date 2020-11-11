@@ -1,13 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 1;
 
-BEGIN {
-    use_ok('Algorithm::C3');
-}
+use Algorithm::C3;
 
 =pod
 
@@ -23,27 +19,27 @@ class C(D,F): pass
 class B(E,D): pass
 class A(B,C): pass
 
-                           6
-                          ---
-Level 3                  | O |
-                       /  ---  \
-                      /    |    \
-                     /     |     \
-                    /      |      \
-                  ---     ---    ---
-Level 2        2 | E | 4 | D |  | F | 5
-                  ---     ---    ---
-                   \      / \     /
-                    \    /   \   /
-                     \  /     \ /
-                      ---     ---
-Level 1            1 | B |   | C | 3
-                      ---     ---
-                       \       /
-                        \     /
-                          ---
-Level 0                0 | A |
-                          ---
+                               6
+                              ---
+    Level 3                  | O |
+                           /  ---  \
+                          /    |    \
+                         /     |     \
+                        /      |      \
+                      ---     ---    ---
+    Level 2        2 | E | 4 | D |  | F | 5
+                      ---     ---    ---
+                       \      / \     /
+                        \    /   \   /
+                         \  /     \ /
+                          ---     ---
+    Level 1            1 | B |   | C | 3
+                          ---     ---
+                           \       /
+                            \     /
+                              ---
+    Level 0                0 | A |
+                              ---
 
 >>> A.mro()
 (<class '__main__.A'>, <class '__main__.B'>, <class '__main__.E'>,
@@ -54,32 +50,32 @@ Level 0                0 | A |
 
 {
     package Test::O;
-    
+
     sub supers {
         no strict 'refs';
         @{$_[0] . '::ISA'};
     }
-    
+
     package Test::F;
-    use base 'Test::O';
-    
+    our @ISA = qw(Test::O);
+
     package Test::E;
-    use base 'Test::O';
-        
+    our @ISA = qw(Test::O);
+
     package Test::D;
-    use base 'Test::O';    
-        
+    our @ISA = qw(Test::O);
+
     package Test::C;
-    use base ('Test::D', 'Test::F');
-    
+    our @ISA = qw(Test::D Test::F);
+
     package Test::B;
-    use base ('Test::E', 'Test::D');
-        
+    our @ISA = qw(Test::E Test::D);
+
     package Test::A;
-    use base ('Test::B', 'Test::C');
+    our @ISA = qw(Test::B Test::C);
 }
 
 is_deeply(
     [ Algorithm::C3::merge('Test::A', 'supers') ],
     [ qw(Test::A Test::B Test::E Test::C Test::D Test::F Test::O) ],
-    '... got the right C3 merge order for Test::A');      
+    '... got the right C3 merge order for Test::A');

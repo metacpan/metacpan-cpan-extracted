@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.010006';
+	$Type::Tiny::VERSION     = '1.012000';
 	$Type::Tiny::XS_VERSION  = '0.016';
 }
 
@@ -372,9 +372,13 @@ sub _dd
 		local $Data::Dumper::Terse    = 1;
 		local $Data::Dumper::Sortkeys = 1;
 		local $Data::Dumper::Maxdepth = 2;
-		my $str = Data::Dumper::Dumper($value);
-		$str = substr($str, 0, $N - 12).'...'.substr($str, -1, 1)
-			if length($str) >= $N;
+		my $str;
+		eval {
+			$str = Data::Dumper::Dumper($value);
+			$str = substr($str, 0, $N - 12).'...'.substr($str, -1, 1)
+				if length($str) >= $N;
+			1;
+		} or do { $str = 'which cannot be dumped' };
 		"Reference $str";
 	}
 }
@@ -406,6 +410,7 @@ sub moose_type               { $_[0]{moose_type}     ||= $_[0]->_build_moose_typ
 sub mouse_type               { $_[0]{mouse_type}     ||= $_[0]->_build_mouse_type }
 sub deep_explanation         { $_[0]{deep_explanation} }
 sub my_methods               { $_[0]{my_methods}     ||= $_[0]->_build_my_methods }
+sub sorter                   { $_[0]{sorter} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -416,6 +421,7 @@ sub has_coercion_generator   { exists $_[0]{coercion_generator} }
 sub has_parameters           { exists $_[0]{parameters} }
 sub has_message              { defined $_[0]{message} }
 sub has_deep_explanation     { exists $_[0]{deep_explanation} }
+sub has_sorter               { exists $_[0]{sorter} }
 
 sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default_message }
 
@@ -950,7 +956,7 @@ sub is_parameterized
 	my %seen;
 	sub ____make_key {
 		join ',', map {
-			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', defined($_->{uniq}) ? $_->{uniq} : '____CANNOT_KEY____') :
+			Types::TypeTiny::is_TypeTiny($_)     ? sprintf('$Type::Tiny::ALL_TYPES{%d}', defined($_->{uniq}) ? $_->{uniq} : '____CANNOT_KEY____') :
 			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]',   ____make_key(@$_)) } :
 			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}',   ____make_key(%$_)) } :
 			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('\\(%s)', ____make_key($$_)) } :
@@ -982,7 +988,7 @@ sub is_parameterized
 		
 		my ($constraint, $compiled) = $self->constraint_generator->(@_);
 		
-		if (Types::TypeTiny::TypeTiny->check($constraint))
+		if (Types::TypeTiny::is_TypeTiny($constraint))
 		{
 			$P = $constraint;
 		}
@@ -1002,11 +1008,15 @@ sub is_parameterized
 			
 			$P = $self->create_child_type(%options);
 			
-			my $coercion;
-			$coercion = $self->coercion_generator->($self, $P, @_)
-				if $self->has_coercion_generator;
-			$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
-				if $coercion;
+			if ( $self->has_coercion_generator ) {
+				my @args = @_;
+				$P->{_build_coercion} = sub {
+					my $coercion = shift;
+					my $built    = $self->coercion_generator->($self, $P, @args);
+					$coercion->add_type_coercions( @{$built->type_coercion_map} ) if $built;
+					$coercion->freeze;
+				};
+			}
 		}
 		
 		if (defined $key)
@@ -1015,7 +1025,7 @@ sub is_parameterized
 			Scalar::Util::weaken($param_cache{$key});
 		}
 		
-		$P->coercion->freeze;
+		$P->coercion->freeze unless $self->has_coercion_generator;
 		
 		return $P;
 	}
@@ -1192,7 +1202,7 @@ sub minus_coercions
 	my $self = shift;
 	
 	my $new = $self->_clone;
-	my @not = grep Types::TypeTiny::TypeTiny->check($_), $self->_process_coercion_list($new, @_);
+	my @not = grep Types::TypeTiny::is_TypeTiny($_), $self->_process_coercion_list($new, @_);
 	
 	my @keep;
 	my $c = $self->coercion->type_coercion_map;
@@ -1305,6 +1315,13 @@ sub can
 			require Type::Tiny::ConstrainedObject;
 			return Type::Tiny::ConstrainedObject->can($_[0]);
 		}
+		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
+			if ( $_[0] eq $util ) {
+				$self->{'_util'}{$util} ||= eval { $self->_build_util($util) };
+				return unless $self->{'_util'}{$util};
+				return sub { my $s = shift; $s->{'_util'}{$util}(@_) };
+			}
+		}
 	}
 	
 	return;
@@ -1335,6 +1352,11 @@ sub AUTOLOAD
 			no strict 'refs';
 			goto \&{"Type::Tiny::ConstrainedObject::$m"};
 		}
+		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
+			if ( $m eq $util ) {
+				return ( $self->{'_util'}{$util} ||= $self->_build_util($util) )->( @_ );
+			}
+		}
 	}
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
@@ -1355,6 +1377,94 @@ sub _has_xsub
 	require B;
 	!!B::svref_2object( shift->compiled_check )->XSUB;
 }
+
+sub _build_util {
+	my ($self, $func) = @_;
+	Scalar::Util::weaken( my $type = $self );
+	
+	if ( $func eq 'grep' || $func eq 'first' || $func eq 'any' || $func eq 'all' || $func eq 'assert_any' || $func eq 'assert_all' ) {
+		my ($inline, $compiled);
+		
+		if ( $self->can_be_inlined ) {
+			$inline = $self->inline_check('$_');
+		}
+		else {
+			$compiled = $self->compiled_check;
+			$inline   = '$compiled->($_)';
+		}
+		
+		if ( $func eq 'grep' ) {
+			return eval "sub { grep { $inline } \@_ }";
+		}
+		elsif ( $func eq 'first' ) {
+			return eval "sub { for (\@_) { return \$_ if ($inline) }; undef; }";
+		}
+		elsif ( $func eq 'any' ) {
+			return eval "sub { for (\@_) { return !!1 if ($inline) }; !!0; }";
+		}
+		elsif ( $func eq 'assert_any' ) {
+			my $qname = B::perlstring( $self->name );
+			return eval "sub { for (\@_) { return \@_ if ($inline) }; Type::Tiny::_failed_check(\$type, $qname, \@_ ? \$_[-1] : undef); }";
+		}
+		elsif ( $func eq 'all' ) {
+			return eval "sub { for (\@_) { return !!0 unless ($inline) }; !!1; }";
+		}
+		elsif ( $func eq 'assert_all' ) {
+			my $qname = B::perlstring( $self->name );
+			return eval "sub { my \$idx = 0; for (\@_) { Type::Tiny::_failed_check(\$type, $qname, \$_, varname => sprintf('\$_[%d]', \$idx)) unless ($inline); ++\$idx }; \@_; }";
+		}
+	}
+
+	if ( $func eq 'map' ) {
+		my ($inline, $compiled);
+		my $c = $self->_assert_coercion;
+		
+		if ( $c->can_be_inlined ) {
+			$inline = $c->inline_coercion('$_');
+		}
+		else {
+			$compiled = $c->compiled_coercion;
+			$inline   = '$compiled->($_)';
+		}
+		
+		return eval "sub { map { $inline } \@_ }";
+	}
+
+	if ( $func eq 'sort' || $func eq 'rsort' ) {
+		my ($inline, $compiled);
+		
+		my $ptype = $self->find_parent(sub { $_->has_sorter });
+		_croak "No sorter for this type constraint" unless $ptype;
+		
+		my $sorter = $ptype->sorter;
+		
+		# Schwarzian transformation
+		if ( ref($sorter) eq 'ARRAY' ) {
+			my $sort_key;
+			( $sorter, $sort_key ) = @$sorter;
+			
+			if ( $func eq 'sort' ) {
+				return eval "our (\$a, \$b); sub { map \$_->[0], sort { \$sorter->(\$a->[1],\$b->[1]) } map [\$_,\$sort_key->(\$_)], \@_ }";
+			}
+			elsif ( $func eq 'rsort' ) {
+				return eval "our (\$a, \$b); sub { map \$_->[0], sort { \$sorter->(\$b->[1],\$a->[1]) } map [\$_,\$sort_key->(\$_)], \@_ }";
+			}
+		}
+		
+		# Simple sort
+		else {
+			if ( $func eq 'sort' ) {
+				return eval "our (\$a, \$b); sub { sort { \$sorter->(\$a,\$b) } \@_ }";
+			}
+			elsif ( $func eq 'rsort' ) {
+				return eval "our (\$a, \$b); sub { sort { \$sorter->(\$b,\$a) } \@_ }";
+			}
+		}
+	}
+
+	die "Unknown function: $func";
+}
+
 
 sub of                         { shift->parameterize(@_) }
 sub where                      { shift->create_child_type(constraint => @_) }
@@ -1599,6 +1709,18 @@ You may pass C<< coercion => 1 >> to the constructor to inherit coercions
 from the constraint's parent. (This requires the parent constraint to have
 a coercion.)
 
+=item C<< sorter >>
+
+A coderef which can be passed two values conforming to this type constraint
+and returns -1, 0, or 1 to put them in order. Alternatively an arrayref
+containing a pair of coderefs — a sorter and a pre-processor for the
+Schwarzian transform. Optional.
+
+The idea is to allow for:
+
+  @sorted = Int->sort( 2, 1, 11 );    # => 1, 2, 11
+  @sorted = Str->sort( 2, 1, 11 );    # => 1, 11, 2 
+
 =item C<< my_methods >>
 
 Experimental hashref of additional methods that can be called on the type
@@ -1722,7 +1844,7 @@ constraint. They are each tightly associated with a particular attribute.
 
 =over
 
-=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>
+=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>, C<has_sorter>
 
 Simple Moose-style predicate methods indicating the presence or
 absence of an attribute.
@@ -1990,6 +2112,71 @@ about treating the empty string as a numeric value).
 
 =back
 
+=head3 List processing methods
+
+=over
+
+=item C<< grep(@list) >>
+
+Filters a list to return just the items that pass the type check.
+
+  @integers = Int->grep(@list);
+
+=item C<< first(@list) >>
+
+Filters the list to return the first item on the list that passes
+the type check, or undef if none do.
+
+  $first_lady = Woman->first(@people);
+
+=item C<< map(@list) >>
+
+Coerces a list of items. Only works on types which have a coercion.
+
+  @truths = Bool->map(@list);
+
+=item C<< sort(@list) >>
+
+Sorts a list of items according to the type's preferred sorting mechanism,
+or if the type doesn't have a sorter coderef, uses the parent type. If no
+ancestor type constraint has a sorter, throws an exception. The C<Str>,
+C<StrictNum>, C<LaxNum>, and C<Enum> type constraints include sorters.
+
+  @sorted_numbers = Num->sort( Num->grep(@list) );
+
+=item C<< rsort(@list) >>
+
+Like C<sort> but backwards.
+
+=item C<< any(@list) >>
+
+Returns true if any of the list match the type.
+
+  if ( Int->any(@numbers) ) {
+    say "there was at least one integer";
+  }
+
+=item C<< all(@list) >>
+
+Returns true if all of the list match the type.
+
+  if ( Int->all(@numbers) ) {
+    say "they were all integers";
+  }
+
+=item C<< assert_any(@list) >>
+
+Like C<any> but instead of returning a boolean, returns the entire original
+list if any item on it matches the type, and dies if none does.
+
+=item C<< assert_all(@list) >>
+
+Like C<all> but instead of returning a boolean, returns the original list if
+all items on it match the type, but dies as soon as it finds one that does
+not.
+
+=back
+
 =head3 Inlining methods
 
 =for stopwords uated
@@ -2219,7 +2406,7 @@ L<Mouse::Meta::TypeConstraint>.
 L<Type::Params>.
 
 L<Type::Tiny on GitHub|https://github.com/tobyink/p5-type-tiny>,
-L<Type::Tiny on Travis-CI|https://travis-ci.org/tobyink/p5-type-tiny>,
+L<Type::Tiny on Travis-CI|https://travis-ci.com/tobyink/p5-type-tiny>,
 L<Type::Tiny on AppVeyor|https://ci.appveyor.com/project/tobyink/p5-type-tiny>,
 L<Type::Tiny on Codecov|https://codecov.io/gh/tobyink/p5-type-tiny>,
 L<Type::Tiny on Coveralls|https://coveralls.io/github/tobyink/p5-type-tiny>.

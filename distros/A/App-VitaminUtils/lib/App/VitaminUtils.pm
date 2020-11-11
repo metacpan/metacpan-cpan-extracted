@@ -1,9 +1,9 @@
 package App::VitaminUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-04'; # DATE
+our $DATE = '2020-11-03'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,6 +49,11 @@ sub convert_vitamin_a_unit {
 
     Physics::Unit::InitUnit(
         ['mcg'], '0.001 mg',
+        ['mcg-all-trans-retinol'], '1 mcg',
+        ['mcg-dietary-all-trans-beta-carotene'],            '0.083333333 mcg', # 1/12
+        ['mcg-alpha-carotene'],                             '0.041666667 mcg', # 1/24
+        ['mcg-beta-cryptoxanthin'],                         '0.041666667 mcg', # 1/24
+        ['mcg-all-trans-beta-carotene-as-food-supplement'], '0.5 mcg',
         ['IU', 'iu'], '0.3 microgram',
         ['IU-retinol', 'iu-retinol'], '0.3 microgram',
         ['IU-beta-carotene', 'iu-beta-carotene'], '0.6 microgram',
@@ -63,7 +68,16 @@ sub convert_vitamin_a_unit {
         return [200, "OK", $new_amount];
     } else {
         my @rows;
-        for my $u ('mg', 'IU-retinol', 'IU-beta-carotene') {
+        for my $u (
+            'mg', 'mcg',
+            'mcg-all-trans-retinol',
+            'mcg-dietary-all-trans-beta-carotene',
+            'mcg-alpha-carotene',
+            'mcg-beta-cryptoxanthin',
+            'mcg-all-trans-beta-carotene-as-food-supplement',
+            'IU',
+            'IU-retinol',
+            'IU-beta-carotene') {
             push @rows, {
                 unit => $u,
                 amount => $quantity->convert($u),
@@ -140,7 +154,13 @@ sub convert_vitamin_e_unit {
     require Physics::Unit;
 
     Physics::Unit::InitUnit(
-        #['mcg'], '0.001 mg',
+        ['mcg'], '0.001 mg',
+        ['mg-alpha-tocopherol-equivalent', 'mcg-alpha-TE'], '1 mg',
+        ['mg-rrr-alpha-tocopherol'], '1 mg',
+        ['mg-rrr-alpha-tocopherol'], '1 mg',
+        ['mg-beta-tocopherol'], '0.5 mg',
+        ['mg-gamma-tocopherol'], '0.1 mg',
+        ['mg-alpha-tocotrienol'], '0.30 mg',
         ['IU', 'iu'], '0.67 mg',
         ['IU-natural', 'iu-natural'], '0.67 mg',
         ['IU-synthetic', 'iu-synthetic'], '0.9 mg',
@@ -155,7 +175,18 @@ sub convert_vitamin_e_unit {
         return [200, "OK", $new_amount];
     } else {
         my @rows;
-        for my $u ('mg', 'IU-natural', 'IU-synthetic') {
+        for my $u (
+            'mg',
+            'mcg',
+            'mg-alpha-tocopherol-equivalent',
+            'mg-rrr-alpha-tocopherol',
+            'mg-rrr-alpha-tocopherol',
+            'mg-beta-tocopherol',
+            'mg-gamma-tocopherol',
+            'mg-alpha-tocotrienol',
+            'IU',
+            'IU-natural',
+            'IU-synthetic') {
             push @rows, {
                 unit => $u,
                 amount => $quantity->convert($u),
@@ -180,7 +211,7 @@ App::VitaminUtils - Utilities related to vitamins
 
 =head1 VERSION
 
-This document describes version 0.001 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2020-04-04.
+This document describes version 0.002 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2020-11-03.
 
 =head1 DESCRIPTION
 
@@ -218,26 +249,44 @@ Examples:
 Result:
 
  [
-   { amount => 0.001, unit => "mg" },
-   { amount => 3.33333333333333, unit => "IU-retinol" },
-   { amount => 1.66666666666667, unit => "IU-beta-carotene" },
+   200,
+   "OK",
+   [
+     { amount => 0.001, unit => "mg" },
+     { amount => 1, unit => "mcg" },
+     { amount => 1, unit => "mcg-all-trans-retinol" },
+     {
+       amount => 12.000000048,
+       unit   => "mcg-dietary-all-trans-beta-carotene",
+     },
+     { amount => 23.999999808, unit => "mcg-alpha-carotene" },
+     { amount => 23.999999808, unit => "mcg-beta-cryptoxanthin" },
+     {
+       amount => 2,
+       unit   => "mcg-all-trans-beta-carotene-as-food-supplement",
+     },
+     { amount => 3.33333333333333, unit => "IU" },
+     { amount => 3.33333333333333, unit => "IU-retinol" },
+     { amount => 1.66666666666667, unit => "IU-beta-carotene" },
+   ],
+   {},
  ]
 
 =item * Convert from mcg to IU (retinol):
 
- convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU"); # -> 5000
+ convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU"); # -> [200, "OK", 5000, {}]
 
 =item * Convert from mcg to IU (retinol):
 
- convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU-retinol"); # -> 5000
+ convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU-retinol"); # -> [200, "OK", 5000, {}]
 
 =item * Convert from mcg to IU (beta-carotene):
 
- convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU-beta-carotene"); # -> 2500
+ convert_vitamin_a_unit(quantity => "1500 mcg", to_unit => "IU-beta-carotene"); # -> [200, "OK", 2500, {}]
 
 =item * Convert from IU to mg:
 
- convert_vitamin_a_unit(quantity => "5000 IU", to_unit => "mg"); # -> 1.5
+ convert_vitamin_a_unit(quantity => "5000 IU", to_unit => "mg"); # -> [200, "OK", 1.5, {}]
 
 =back
 
@@ -288,18 +337,23 @@ Examples:
 Result:
 
  [
-   { amount => 1, unit => "mcg" },
-   { amount => 0.001, unit => "mg" },
-   { amount => 40, unit => "IU" },
+   200,
+   "OK",
+   [
+     { amount => 1, unit => "mcg" },
+     { amount => 0.001, unit => "mg" },
+     { amount => 40, unit => "IU" },
+   ],
+   {},
  ]
 
 =item * Convert from mcg to IU:
 
- convert_vitamin_d_unit(quantity => "2 mcg", to_unit => "IU"); # -> 80
+ convert_vitamin_d_unit(quantity => "2 mcg", to_unit => "IU"); # -> [200, "OK", 80, {}]
 
 =item * Convert from IU to mg:
 
- convert_vitamin_d_unit(quantity => "5000 IU", to_unit => "mg"); # -> 0.125
+ convert_vitamin_d_unit(quantity => "5000 IU", to_unit => "mg"); # -> [200, "OK", 0.125, {}]
 
 =back
 
@@ -350,26 +404,39 @@ Examples:
 Result:
 
  [
-   { amount => 1, unit => "mg" },
-   { amount => 1.49253731343284, unit => "IU-natural" },
-   { amount => 1.11111111111111, unit => "IU-synthetic" },
+   200,
+   "OK",
+   [
+     { amount => 1, unit => "mg" },
+     { amount => 1000, unit => "mcg" },
+     { amount => 1, unit => "mg-alpha-tocopherol-equivalent" },
+     { amount => 1, unit => "mg-rrr-alpha-tocopherol" },
+     { amount => 1, unit => "mg-rrr-alpha-tocopherol" },
+     { amount => 2, unit => "mg-beta-tocopherol" },
+     { amount => 10, unit => "mg-gamma-tocopherol" },
+     { amount => 3.33333333333333, unit => "mg-alpha-tocotrienol" },
+     { amount => 1.49253731343284, unit => "IU" },
+     { amount => 1.49253731343284, unit => "IU-natural" },
+     { amount => 1.11111111111111, unit => "IU-synthetic" },
+   ],
+   {},
  ]
 
 =item * Convert from mg to IU (d-alpha-tocopherolE<sol>natural vitamin E):
 
- convert_vitamin_e_unit(quantity => "67 mg", to_unit => "IU"); # -> 100
+ convert_vitamin_e_unit(quantity => "67 mg", to_unit => "IU"); # -> [200, "OK", 100, {}]
 
 =item * Convert from mg to IU (d-alpha-tocopherolE<sol>natural vitamin E):
 
- convert_vitamin_e_unit(quantity => "67 mg", to_unit => "IU-natural"); # -> 100
+ convert_vitamin_e_unit(quantity => "67 mg", to_unit => "IU-natural"); # -> [200, "OK", 100, {}]
 
 =item * Convert from mg to IU (dl-alpha-tocopherolE<sol>synthetic vitamin E):
 
- convert_vitamin_e_unit(quantity => "90 mg", to_unit => "IU-synthetic"); # -> 100
+ convert_vitamin_e_unit(quantity => "90 mg", to_unit => "IU-synthetic"); # -> [200, "OK", 100, {}]
 
 =item * Convert from IU to mg:
 
- convert_vitamin_e_unit(quantity => "400 IU", to_unit => "mg"); # -> 268
+ convert_vitamin_e_unit(quantity => "400 IU", to_unit => "mg"); # -> [200, "OK", 268, {}]
 
 =back
 

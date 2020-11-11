@@ -18,11 +18,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::Reciva;
 
-	my $station = new StreamFinder::Reciva(<url>);
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $station = new StreamFinder::Reciva($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
 

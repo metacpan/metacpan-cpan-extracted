@@ -80,7 +80,7 @@ if (%{$table{WIDGET}} || %{$table{COMMAND}} || %{$table{IMAGE}})
    {
     while (<SRC>)
      {
-      my ($kind,$Widget,$list) =  /^(WIDGET|COMMAND|IMAGE)\(\("(\w+)",(("[^"]*",)*)NULL\)\)$/;
+      my ($kind,$Widget,$list) = m/^(WIDGET|COMMAND|IMAGE)\(\("(\w+)",(("[^"]*",)*)NULL\)\)$/;
       if (defined $Widget)
        {
         if (!defined ${$table{$kind}}{$Widget})

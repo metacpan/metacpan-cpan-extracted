@@ -1,12 +1,12 @@
 package UniEvent;
 use 5.012;
 use Export::XS();
-use Net::SockAddr();
+use XS::libunievent();
 
 use UE;
 BEGIN { *UE:: = *UniEvent:: }
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.1.0';
 
 XS::Loader::load();
 

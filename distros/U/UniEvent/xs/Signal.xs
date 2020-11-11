@@ -33,6 +33,7 @@ BOOT {
     xs::exp::autoexport(stash);
     
     xs::at_perl_destroy([]() { cbn.on_signal = nullptr; });
+    unievent::register_perl_class(Signal::TYPE, stash);
 }
 
 Signal* Signal::new (LoopSP loop = {}) {

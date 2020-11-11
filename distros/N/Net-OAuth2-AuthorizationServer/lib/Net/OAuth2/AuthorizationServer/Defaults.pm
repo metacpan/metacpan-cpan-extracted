@@ -117,6 +117,10 @@ sub verify_token_and_scope {
         $access_token = $refresh_token;
     }
 
+    # we must have some form of token to continue
+    return ( 0, 'invalid_request' )
+        if ( ! $access_token && ! $refresh_token );
+
     return $self->verify_access_token(
         %args,
         access_token     => $access_token,

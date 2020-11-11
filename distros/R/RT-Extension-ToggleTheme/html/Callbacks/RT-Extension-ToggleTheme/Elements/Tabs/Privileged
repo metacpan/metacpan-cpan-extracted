@@ -1,0 +1,13 @@
+<%init>
+# Only show theme toggle for either of the elevator themes light/dark
+if ( RT->Config->Get('WebDefaultStylesheet', $session{CurrentUser}) =~ /elevator-/ ) {
+    my $theme = RT->Config->Get('WebDefaultStylesheet', $session{CurrentUser}) =~ /-dark$/ ? 'fa-sun' : 'fa-moon';
+    my $toggle = Menu->child(
+      toggle => title => 'toggle_theme',
+      raw_html => qq[<a href="javascript:" id="theme_toggle"><span id="theme_toggle_icon" class="].qq[fas $theme"></span></a>],
+      sort_order => 100
+    );
+}
+</%init>
+<%args>
+</%args>

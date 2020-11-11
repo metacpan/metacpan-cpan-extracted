@@ -1,3 +1,14 @@
+2020-11-04  Dave Cross <dave@perlhacks.com>
+
+        * Version 1.0.2
+        * Add Test::Exception to prereqs
+
+2020-11-03  Dave Cross <dave@perlhacks.com>
+
+        * Version 1.0.1
+        * Improved tests
+        * Added links to Github repo
+
 2017-06-23  Dave Cross <dave@perlhacks.com>
 
 	* lib/Parse/RPM/Spec.pm: Removed extra whitespace

@@ -9,14 +9,20 @@ my $b = Module::Build->new
   requires      =>
    {'Carp'             =>0,
     'Data::Dump'       =>0,
-    'Data::Table::Text'              => 20200418,
-    'Data::NFA'                      => 20200623,
+    'Data::Table::Text'              => 20201029,
+    'Data::NFA'                      => 20201030,
     'Test2::API'       =>0,
     'Test::More'       =>0,
    },
   configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,
   perl          => '5.26.0',
+  meta_merge =>
+   {resources =>
+     {repository => 'https://github.com/philiprbrenan/DataDFA',
+      bugtracker => 'https://github.com/philiprbrenan/DataDFA/issues'
+     }
+   },
  );
 
 $b->create_build_script();

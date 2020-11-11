@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Install the C libxml2 library on your system
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 
@@ -24,7 +24,7 @@ Alien::Libxml2 - Install the C libxml2 library on your system
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ In your Makefile.PL:
  WriteMakefile(
    Alien::Base::Wrapper->new('Alien::Libxml2')->mm_args2(
      # MakeMaker args
-     NAME => 'Kafka::Librd',
+     NAME => 'My::XS',
      ...
    ),
  );

@@ -8,3 +8,5 @@ example/DB/Default.pm
 example/DB/Pg.pm
 example/DB/Oracle.pm
 t/base.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

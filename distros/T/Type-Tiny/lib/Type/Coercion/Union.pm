@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::Union::VERSION   = '1.010006';
+	$Type::Coercion::Union::VERSION   = '1.012000';
 }
 
 $Type::Coercion::Union::VERSION =~ tr/_//d;
@@ -40,7 +40,7 @@ sub type_coercion_map
 {
 	my $self = shift;
 	
-	Types::TypeTiny::TypeTiny->assert_valid(my $type = $self->type_constraint);
+	Types::TypeTiny::assert_TypeTiny(my $type = $self->type_constraint);
 	$type->isa('Type::Tiny::Union')
 		or _croak "Type::Coercion::Union must be used in conjunction with Type::Tiny::Union";
 	
@@ -76,7 +76,7 @@ sub can_be_inlined
 {
 	my $self = shift;
 	
-	Types::TypeTiny::TypeTiny->assert_valid(my $type = $self->type_constraint);
+	Types::TypeTiny::assert_TypeTiny(my $type = $self->type_constraint);
 	
 	for my $tc (@$type)
 	{

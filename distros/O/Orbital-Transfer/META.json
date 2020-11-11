@@ -1,0 +1,91 @@
+{
+   "abstract" : "Software project manager",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Orbital-Transfer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.013002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLI::Osprey" : "0",
+            "Capture::Tiny" : "0",
+            "Clone" : "0",
+            "Env" : "0",
+            "File::Copy" : "0",
+            "File::Which" : "0",
+            "File::chdir" : "0",
+            "FindBin" : "0",
+            "Function::Parameters" : "0",
+            "IO::Async::Function" : "0",
+            "IO::Async::Loop" : "0",
+            "IO::Async::Timer::Periodic" : "0",
+            "IPC::System::Simple" : "0",
+            "Import::Into" : "0",
+            "List::AllUtils" : "0",
+            "Modern::Perl" : "0",
+            "Module::Util" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::Role::CloneSet" : "0",
+            "MooX::TypeTiny" : "0",
+            "Moose" : "2.2005",
+            "Mu" : "0",
+            "Mu::Role" : "0",
+            "Object::Util" : "0",
+            "Path::Tiny" : "0",
+            "Return::Type" : "0",
+            "Term::ProgressBar" : "0",
+            "Try::Tiny" : "0",
+            "Type::Libraries" : "0",
+            "Type::Library" : "0.008",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "0",
+            "Types::TypeTiny" : "0",
+            "Types::URI" : "0",
+            "YAML" : "0",
+            "YAML::XS" : "0",
+            "aliased" : "0",
+            "autodie" : "0",
+            "custom::failures" : "0",
+            "perl" : "5.013002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "perl" : "5.013002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/orbital-transfer/p5-Orbital-Transfer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/orbital-transfer/p5-Orbital-Transfer.git",
+         "web" : "https://github.com/orbital-transfer/p5-Orbital-Transfer"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

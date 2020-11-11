@@ -73,4 +73,4 @@ sub chdir {
 
 __DATA__
 
-option --chdir -M__PACKAGE__::chdir(DIR=$<shift>)
+option --chdir -M__PACKAGE__::chdir(PATH=$<shift>)

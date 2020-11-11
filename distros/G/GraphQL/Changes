@@ -1,3 +1,13 @@
+0.44 2020-11-09
+- Allow serialising already-blessed bools (#30) - thanks @ccakes
+
+0.43 2020-11-07
+- mutations now guaranteed to be executed in order - thanks @ccakes for prompt
+
+0.42 2020-11-07
+- List needed a perl_to_graphql method - thanks @schoeer for report
+- so did InputObject
+
 0.41 2020-08-05
 - Scalar types now correctly handle null values
 

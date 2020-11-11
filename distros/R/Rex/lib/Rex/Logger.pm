@@ -30,10 +30,11 @@ This module is the logging module. You can define custom logformats.
 
 package Rex::Logger;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 #use Rex;
 

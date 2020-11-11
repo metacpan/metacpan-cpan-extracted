@@ -10,7 +10,7 @@ use XSLoader;
 
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version 0.77; our $VERSION = version->declare('v1.0.1');
+use version 0.77; our $VERSION = version->declare('v1.0.2');
 
 our %TRUE;
 
@@ -184,7 +184,7 @@ L<true::VERSION>, which has the same version as C<true.pm>.
 
 =head1 VERSION
 
-1.0.1
+1.0.2
 
 =head1 SEE ALSO
 
@@ -208,9 +208,9 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2010-2019 by chocolateboy.
+Copyright (c) 2010-2020 by chocolateboy.
 
 This library is free software; you can redistribute it and/or modify it under the
-terms of the L<Artistic License 2.0|http://www.opensource.org/licenses/artistic-license-2.0.php>.
+terms of the L<Artistic License 2.0|https://www.opensource.org/licenses/artistic-license-2.0.php>.
 
 =cut

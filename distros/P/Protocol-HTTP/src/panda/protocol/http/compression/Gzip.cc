@@ -99,7 +99,6 @@ std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
     stream.avail_out = static_cast<uInt>(acc.capacity());
     stream.avail_in = static_cast<uInt>(piece.size());
     stream.next_in = (Bytef*)(piece.data());
-    size_t consumed_bytes = 0;
 
     std::error_code errc;
     auto consume_buff = [&](bool final){
@@ -110,7 +109,6 @@ std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
 
         acc.length(acc.capacity() - stream.avail_out);
         body.parts.emplace_back(std::move(acc));
-        consumed_bytes += (piece.size() - stream.avail_in);
         if (!final) {
             acc.clear();
             acc.reserve(piece.size() * RX_BUFF_SCALE);
@@ -125,9 +123,9 @@ std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
         int r = ::inflate(&stream, Z_SYNC_FLUSH);
         switch (r) {
         case Z_STREAM_END:
-            if (!consume_buff(true)) { break; }
-            if (consumed_bytes != piece.size()) { errc = Error::uncompression_failure; }
-            else                                { rx_done = true; }
+            if (!consume_buff(true))  { break; }
+            if (stream.avail_in != 0) { errc = Error::uncompression_failure; }
+            else                      { rx_done = true; }
             enough = true;
             break;
         case Z_OK:

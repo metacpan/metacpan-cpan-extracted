@@ -8,7 +8,7 @@ package Object::Pad;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp;
 
@@ -54,11 +54,21 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
 
 =head1 DESCRIPTION
 
-B<WARNING> This is an experimental proof-of-concept. Please don't actually
-use this in production unless you are crazy :)
-
 This module provides a simple syntax for creating object classes, which uses
 private variables that look like lexicals as object member fields.
+
+B<WARNING> This module is still very experimental. The parts that currently
+exist do seem to work reliably but much of the design is still evolving, and
+many features and have yet to be implemented. I don't yet guarantee I won't
+have to change existing details in order to continue its development. Feel
+free to try it out in experimental or newly-developed code, but don't complain
+if a later version is incompatible with your current code and you'll have to
+change it.
+
+That all said, please do get in contact if you find the module overall useful.
+The more feedback you provide in terms of what features you are using, what
+you find works, and what doesn't, will help the ongoing development and
+hopefully eventual stability of the design. See the L<FEEDBACK> section.
 
 =head2 Automatic Construction
 
@@ -671,11 +681,6 @@ These points are more about this particular module's implementation:
 
 =item *
 
-Implement roles, including required method checking and the ability to have
-private slots.
-
-=item *
-
 Consider multiple inheritence of subclassing, if that is still considered
 useful after adding roles.
 
@@ -707,6 +712,24 @@ L<Syntax::Keyword::Dynamically> instead:
 =back
 
 =cut
+
+=head1 FEEDBACK
+
+The following resources are useful forms of providing feedback, especially in
+the form of reports of what you find good or bad about the module, requests
+for new features, questions on best practice, etc...
+
+=over 4
+
+=item *
+
+The RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Object-Pad>.
+
+=item *
+
+The C<#cor> IRC channel on C<irc.perl.org>.
+
+=back
 
 =head1 AUTHOR
 

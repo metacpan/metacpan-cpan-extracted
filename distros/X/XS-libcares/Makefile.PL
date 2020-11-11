@@ -17,6 +17,7 @@ die "FATAL: could not make libcares' Makefile\n" if $result != 0;
 
 my $libs = '';
 $libs .= ' -lrt' if $^O eq 'linux'; # for older linux
+$libs .= ' -lresolv' if $^O eq 'darwin';
 
 my %params = (
     NAME               => 'XS::libcares',

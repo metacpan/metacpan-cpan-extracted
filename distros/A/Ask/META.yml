@@ -25,49 +25,49 @@ optional_features: {}
 provides:
   Ask:
     file: lib/Ask.pm
-    version: '0.012'
+    version: '0.015'
   Ask::API:
     file: lib/Ask/API.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Callback:
     file: lib/Ask/Callback.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Caroline:
     file: lib/Ask/Caroline.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Clui:
     file: lib/Ask/Clui.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Fallback:
     file: lib/Ask/Fallback.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Functions:
     file: lib/Ask/Functions.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Gtk:
     file: lib/Ask/Gtk.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Prima:
     file: lib/Ask/Prima.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Question:
     file: lib/Ask/Question.pm
-    version: '0.012'
+    version: '0.015'
   Ask::STDIO:
     file: lib/Ask/STDIO.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Tk:
     file: lib/Ask/Tk.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Wx:
     file: lib/Ask/Wx.pm
-    version: '0.012'
+    version: '0.015'
   Ask::Zenity:
     file: lib/Ask/Zenity.pm
-    version: '0.012'
+    version: '0.015'
   AskX::AutoLang:
     file: lib/AskX/AutoLang.pm
-    version: '0.012'
+    version: '0.015'
 recommends:
   Caroline: '0'
   File::Which: '0'
@@ -92,7 +92,7 @@ resources:
   homepage: https://metacpan.org/release/Ask
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-ask.git
-version: '0.012'
+version: '0.015'
 x_contributors:
   - 'Graham Knop (HAARG) <haarg@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

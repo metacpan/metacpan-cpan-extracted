@@ -14,7 +14,7 @@ use URPM::Resolve;
 use URPM::Signature;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = 'v5.122';
+our $VERSION = 'v5.123';
 
 URPM->bootstrap($VERSION);
 
@@ -293,7 +293,7 @@ URPM - Manipulate RPM files and headers
     });
 
     # loading and parsing a synthesis file
-    my $urpm = new URPM;
+    my $urpm = URPM->new;
     $urpm->parse_synthesis("synthesis.sample.cz");
     $urpm->traverse(sub {
 	# retrieve all packages from the dependency list

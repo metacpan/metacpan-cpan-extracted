@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Cert;
 # ABSTRACT: Class to model a VMC Cert
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -147,7 +147,7 @@ Mail::BIMI::VMC::Cert - Class to model a VMC Cert
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -224,6 +224,10 @@ Index of cert which validated this cert
 is=rw
 
 Crypt::OpenSSL::Verify object for the Certificate
+
+=head2 warnings
+
+is=rw
 
 =head2 x509_object
 

@@ -6,6 +6,7 @@ use Test::More;
 use Test::Deep;
 use Test2::IPC;
 use Test::Catch;
+use Net::SSLeay;
 use Test::Exception;
 
 XS::Loader::load('MyTest');
@@ -17,14 +18,31 @@ my $have_time_hires = eval "require Time::HiRes; 1;";
 my $last_time_mark;
 my %used_mtimes;
 
+{
+    package Panda::W::Logger;
+    use parent 'XLog::Logger';
+
+    sub log_format {
+        my ($self, $msg, $level, $module, $file, $line, $func, $formatter) = @_;
+        $file = substr($file, rindex($file, '/'));
+        $module = substr($module, rindex($module, '::')+2);
+        my $code = "$module$file:$line";
+        my $res = sprintf '%-32s %s', $code, $msg;
+        say $res;
+    }
+}
+
+
+
 init();
 
 sub init {
     if ($ENV{LOGGER}) {
-        require XLog;
-        XLog::set_logger(sub { say $_[1] });
-        XLog::set_level(XLog::VERBOSE_DEBUG());
-        XLog::set_level(XLog::INFO(), "UniEvent::SSL");
+	XLog::set_logger(Panda::W::Logger->new);
+	XLog::set_level(XLog::WARNING);
+
+        XLog::set_level(XLog::DEBUG, "UniEvent");
+        XLog::set_level(XLog::DEBUG, "UniEvent::Resolver");
     }    
     
     # for file tests
@@ -42,7 +60,7 @@ sub import {
     my $caller = caller();
     foreach my $sym_name (qw/
         linux freebsd win32 darwin winWSL netbsd openbsd dragonfly
-        is cmp_deeply ok done_testing skip isnt time_mark check_mark pass fail cmp_ok like isa_ok unlike diag plan variate variate_catch
+        is cmp_deeply ok done_testing skip isnt time_mark check_mark pass fail cmp_ok like isa_ok unlike diag plan
         var pipe create_file create_dir move change_file_mtime change_file unlink_file remove_dir subtest new_ok dies_ok catch_run any
     /) {
         no strict 'refs';
@@ -71,41 +89,6 @@ sub check_mark {
     cmp_ok($delta, '>=', $approx*0.8, $msg);
 }
 
-sub variate {
-    my $sub = pop;
-    my @names = reverse @_ or return;
-    
-    state $valvars = {
-        ssl => [0,1],
-        buf => [0,1],
-    };
-    
-    my ($code, $end) = ('') x 2;
-    $code .= "foreach my \$${_}_val (\@{\$valvars->{$_}}) {\n" for @names;
-    $code .= "variate_$_(\$${_}_val);\n" for @names;
-    my $stname = 'variation '.join(', ', map {"$_=\$${_}_val"} @names);
-    $code .= qq#subtest "$stname" => \$sub;\n#;
-    $code .= "}" x @names;
-    
-    eval $code;
-    die $@ if $@;
-}
-
-sub variate_catch {
-    my ($catch_name, @names) = @_;
-    variate(@names, sub {
-        my $add = '';
-        foreach my $name (@names) {
-            $add .= "[v-$name]" if MyTest->can("variate_$name")->();
-        }
-        SKIP: {
-            skip "variation ssl+buf may break many tests, set VARIATE_SSL_BUF=1 if you really want"
-                if variate_ssl() && variate_buf() && !$ENV{VARIATE_SSL_BUF};
-            catch_run($catch_name.$add);
-        }
-    });
-}
-
 sub var ($) { return "$rdir/$_[0]" }
 
 sub pipe ($) {
@@ -114,6 +97,80 @@ sub pipe ($) {
     } else {
         return var "pipe_$_[0]";
     }
+}
+
+sub get_ssl_ctx {
+    my $SERV_CERT = "t/cert/ca.pem";
+    my $serv_ctx = Net::SSLeay::CTX_new();
+    Net::SSLeay::CTX_use_certificate_file($serv_ctx, $SERV_CERT, &Net::SSLeay::FILETYPE_PEM) or sslerr();
+    Net::SSLeay::CTX_use_PrivateKey_file($serv_ctx, "t/cert/ca.key", &Net::SSLeay::FILETYPE_PEM) or sslerr();
+    Net::SSLeay::CTX_check_private_key($serv_ctx) or die Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error);
+    return $serv_ctx unless wantarray();
+    
+    my $client_ctx = Net::SSLeay::CTX_new();
+    Net::SSLeay::CTX_load_verify_locations($client_ctx, $SERV_CERT, '') or die "something went wrong";
+    
+    return ($serv_ctx, $client_ctx);
+}
+
+sub make_basic_server {
+    my ($loop, $sa) = @_;
+    $sa = Net::SockAddr::Inet4->new("127.0.0.1", 0) unless $sa;
+    my $server = UE::Tcp->new($loop);
+    $server->bind_addr($sa);
+    $server->listen(1);
+    return $server;
+}
+
+sub make_ssl_server {
+    my ($loop, $sa) = @_;
+    my $server = make_basic_server($loop, $sa);
+    $server->use_ssl(get_ssl_ctx());
+    return $server;
+}
+
+sub make_server {
+    my ($loop, $sa) = @_;
+    $sa = Net::SockAddr::Inet4->new("127.0.0.1", 0) unless $sa;
+    my $server = UE::Tcp->new($loop);
+    $server->bind_addr($sa);
+    #if (variation.ssl) server->use_ssl(get_ssl_ctx());
+    $server->listen(10000);
+    return $server;
+}
+
+sub make_client {
+    my $loop = shift;
+    my $client = UE::Tcp->new($loop, AF_INET);
+    #if (variation.ssl) client->use_ssl();
+    #if (variation.buf) {
+    #    client->recv_buffer_size(1);
+    #    client->send_buffer_size(1);
+    #}
+    return $client;
+}
+
+sub make_tcp_pair {
+    my ($loop, $sa) = @_;
+    my $ret = {};
+    $ret->{server} = make_server($loop, $sa);
+    $ret->{client} = make_client($loop);
+    $ret->{client}->connect_addr($ret->{server}->sockaddr);
+    return $ret;
+}
+
+sub make_p2p {
+    my ($loop, $sa) = @_;
+    my $ret = make_tcp_pair($loop, $sa);
+    $ret->{server}->connection_callback(sub {
+        my (undef, $sconn, $err) = @_;
+        die $err if $err;
+        $ret->{sconn} = $sconn;
+        $loop->stop();
+    });
+    $loop->run();
+    die unless $ret->{sconn};
+    return $ret;
 }
 
 END { # clean up after file tests

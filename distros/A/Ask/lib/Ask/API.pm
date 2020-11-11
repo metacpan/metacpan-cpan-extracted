@@ -2,166 +2,166 @@ use 5.008008;
 use strict;
 use warnings;
 
-{
-	package Ask::API;
-	
-	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.012';
-	
-	use Moo::Role;
-	use Path::Tiny 'path';
-	
-	requires 'entry';  # get a string of text
-	requires 'info';   # display a string of text
-	
-	sub _lang_support {
-		my $self = shift;
-		require Lingua::Boolean::Tiny;
-		"Lingua::Boolean::Tiny"->new(@_);
-	}
-	
-	sub is_usable {
-		my ($self) = @_;
-		return 1;
-	}
-	
-	sub quality {
-		return 50;
-	}
-	
-	sub warning {
-		my ($self, %o) = @_;
-		$o{text} = "WARNING: $o{text}";
-		return $self->info(%o);
-	}
+package Ask::API;
 
-	sub error {
-		my ($self, %o) = @_;
-		$o{text} = "ERROR: $o{text}";
-		return $self->info(%o);
-	}
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.015';
 
-	sub question {
-		my ($self, %o) = @_;
-				
-		my $response = $self->entry(text => $o{text});
-		my $lang     = $self->_lang_support($o{lang});
-		$lang->boolean($response);
-	}
-	
-	sub file_selection {
-		my ( $self, %opts ) = ( shift, @_ );
-		
-		$opts{text} ||= 'Enter file name';
-		
-		my @chosen;
-		
-		FILE: {
-			my $got = $self->entry( text => $opts{text} );
-			
-			if ( not length $got ) {
-				last FILE if $opts{multiple};
-				redo FILE;
-			}
-			
-			$got = path $got;
-			
-			if ( $opts{existing} and not $got->exists ) {
-				$self->error( text => 'Does not exist.' );
-				redo FILE;
-			}
-			
-			if ( $opts{directory} and not $got->is_dir ) {
-				$self->error( text => 'Is not a directory.' );
-				redo FILE;
-			}
-			
-			push @chosen, $got;
-			
-			if ( $opts{multiple} ) {
-				$self->info( text => 'Enter another file, or leave blank to finish.' );
-				redo FILE;
-			}
-		};
-		
-		$opts{multiple} ? @chosen : $chosen[0];
-	}
-	
-	my $format_choices = sub {
-		my ($self, $choices) = @_;
-		join q[, ], map { sprintf('"%s" (%s)', @$_) } @$choices;
-	};
-	
-	my $filter_chosen = sub {
-		my ($self, $choices, $response) = @_;
-		my $valid   = {}; $valid->{$_->[0]}++ for @$choices;
-		my @choices = ($response =~ /\w+/g);
-		return(
-			[ grep  $valid->{$_}, @choices ],
-			[ grep !$valid->{$_}, @choices ],
-		);
-	};
-	
-	sub multiple_choice {
-		my ($self, %o) = @_;
-		my $choices = $self->$format_choices($o{choices});
-		
-		my ($allowed, $disallowed, $repeat);
-		
-		for (;;) {
-			my $response = $self->entry(
-				text       => "$o{text}. Choices: $choices. (Separate multiple choices with white space.)",
-				entry_text => $repeat || '',
-			);
-			($allowed, $disallowed) = $self->$filter_chosen($o{choices}, $response);
-			if (@$disallowed) {
-				my $d = join q[, ], @$disallowed;
-				$self->error(
-					text => "Not valid: $d. Please try again.",
-				);
-				$repeat = join q[ ], @$allowed;
-			}
-			else {
-				last;
-			}
-		}
-		
-		return @$allowed;
-	}
+use Moo::Role;
+use Path::Tiny 'path';
 
-	sub single_choice {
-		my ($self, %o) = @_;
-		my $choices = $self->$format_choices($o{choices});
-		
-		my ($allowed, $disallowed, $repeat);
-		
-		for (;;) {
-			my $response = $self->entry(
-				text       => "$o{text}. Choices: $choices. (Choose one.)",
-				entry_text => $repeat || '',
-			);
-			($allowed, $disallowed) = $self->$filter_chosen($o{choices}, $response);
-			if (@$disallowed) {
-				my $d = join q[, ], @$disallowed;
-				$self->error(
-					text => "Not valid: $d. Please try again.",
-				);
-				$repeat = $allowed->[0];
-			}
-			elsif (@$allowed != 1) {
-				$self->error(
-					text => "Not valid: choose one.",
-				);
-				$repeat = $allowed->[0];
-			}
-			else {
-				last;
-			}
-		}
-		
-		return $allowed->[0];
-	}
+requires 'entry';    # get a string of text
+requires 'info';     # display a string of text
+
+sub _lang_support {
+	my $self = shift;
+	require Lingua::Boolean::Tiny;
+	"Lingua::Boolean::Tiny"->new( @_ );
 }
+
+sub is_usable {
+	my ( $self ) = @_;
+	return 1;
+}
+
+sub quality {
+	return 50;
+}
+
+sub warning {
+	my ( $self, %o ) = @_;
+	$o{text} = "WARNING: $o{text}";
+	return $self->info( %o );
+}
+
+sub error {
+	my ( $self, %o ) = @_;
+	$o{text} = "ERROR: $o{text}";
+	return $self->info( %o );
+}
+
+sub question {
+	my ( $self, %o ) = @_;
+	
+	my $response = $self->entry( text => $o{text} );
+	my $lang     = $self->_lang_support( $o{lang} );
+	$lang->boolean( $response );
+}
+
+sub file_selection {
+	my ( $self, %opts ) = ( shift, @_ );
+	
+	$opts{text} ||= 'Enter file name';
+	
+	my @chosen;
+	
+	FILE: {
+		my $got = $self->entry( text => $opts{text} );
+		
+		if ( not length $got ) {
+			last FILE if $opts{multiple};
+			redo FILE;
+		}
+		
+		$got = path $got;
+		
+		if ( $opts{existing} and not $got->exists ) {
+			$self->error( text => 'Does not exist.' );
+			redo FILE;
+		}
+		
+		if ( $opts{directory} and not $got->is_dir ) {
+			$self->error( text => 'Is not a directory.' );
+			redo FILE;
+		}
+		
+		push @chosen, $got;
+		
+		if ( $opts{multiple} ) {
+			$self->info( text => 'Enter another file, or leave blank to finish.' );
+			redo FILE;
+		}
+	} #/ FILE:
+	
+	$opts{multiple} ? @chosen : $chosen[0];
+} #/ sub file_selection
+
+my $format_choices = sub {
+	my ( $self, $choices ) = @_;
+	join q[, ], map { sprintf( '"%s" (%s)', @$_ ) } @$choices;
+};
+
+my $filter_chosen = sub {
+	my ( $self, $choices, $response ) = @_;
+	my $valid = {};
+	$valid->{ $_->[0] }++ for @$choices;
+	my @choices = ( $response =~ /\w+/g );
+	return (
+		[ grep $valid->{$_},  @choices ],
+		[ grep !$valid->{$_}, @choices ],
+	);
+};
+
+sub multiple_choice {
+	my ( $self, %o ) = @_;
+	my $choices = $self->$format_choices( $o{choices} );
+	
+	my ( $allowed, $disallowed, $repeat );
+	
+	for ( ; ; ) {
+		my $response = $self->entry(
+			text =>
+				"$o{text}. Choices: $choices. (Separate multiple choices with white space.)",
+			entry_text => $repeat || '',
+		);
+		( $allowed, $disallowed ) = $self->$filter_chosen( $o{choices}, $response );
+		if ( @$disallowed ) {
+			my $d = join q[, ], @$disallowed;
+			$self->error(
+				text => "Not valid: $d. Please try again.",
+			);
+			$repeat = join q[ ], @$allowed;
+		}
+		else {
+			last;
+		}
+	} #/ for ( ; ; )
+	
+	return @$allowed;
+} #/ sub multiple_choice
+
+sub single_choice {
+	my ( $self, %o ) = @_;
+	my $choices = $self->$format_choices( $o{choices} );
+	
+	my ( $allowed, $disallowed, $repeat );
+	
+	for ( ; ; ) {
+		my $response = $self->entry(
+			text       => "$o{text}. Choices: $choices. (Choose one.)",
+			entry_text => $repeat || '',
+		);
+		( $allowed, $disallowed ) = $self->$filter_chosen( $o{choices}, $response );
+		if ( @$disallowed ) {
+			my $d = join q[, ], @$disallowed;
+			$self->error(
+				text => "Not valid: $d. Please try again.",
+			);
+			$repeat = $allowed->[0];
+		}
+		elsif ( @$allowed != 1 ) {
+			$self->error(
+				text => "Not valid: choose one.",
+			);
+			$repeat = $allowed->[0];
+		}
+		else {
+			last;
+		}
+	} #/ for ( ; ; )
+	
+	return $allowed->[0];
+} #/ sub single_choice
 
 1;
 
@@ -238,4 +238,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

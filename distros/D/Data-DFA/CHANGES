@@ -3,6 +3,7 @@
 2020.06.21 (a*|b+) was accepting "a b", now it does not - required fix to Data::NFA as well
 2020.06.23 Added &loops
 2020.06.27 Added: &parseDtdElementAST, &Data::DFA::Parser::fail
-
 2020.07.05 Added &univalent
 2020.07.05 Added optional observer to &parser
+2020-10-30 Now available on GitHub at: https://github.com/philiprbrenan/DataDFA
+           Please create a pull request from a cloned copy.

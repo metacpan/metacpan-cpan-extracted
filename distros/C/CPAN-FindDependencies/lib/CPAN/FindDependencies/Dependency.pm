@@ -1,12 +1,13 @@
-# $Id: Dependency.pm,v 1.8 2007/12/13 15:16:03 drhyde Exp $
-#!perl -w
 package CPAN::FindDependencies::Dependency;
 
+require CPAN::FindDependencies;
+
 use strict;
+use warnings;
 
 use vars qw($VERSION);
 
-$VERSION = '2.1';
+$VERSION = '3.04';
 
 =head1 NAME
 
@@ -48,7 +49,7 @@ The name of the distribution containing the module
 =cut
 
 sub distribution {
-    $_[0]->{p}->package($_[0]->name())->distribution()->prefix();
+    $_[0]->{distribution}->prefix();
 }
 
 =head2 version

@@ -1,5 +1,5 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.052';
+$Util::Medley::List::VERSION = '0.053';
 #########################################################################################
 
 use v5.16;
@@ -18,7 +18,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =cut
 
@@ -256,6 +256,48 @@ multi method differ (ArrayRef $list1,
 				     Bool 	  $sort = 1) {
 
 	return $self->differ(list1 => $list1, list2 => $list2, sort => $sort);
+}
+
+=head2 isArray
+
+Checks if the scalar value passed in is an array.
+
+=over
+
+=item usage:
+
+  $bool = $util->isArray(\@a);
+
+  $bool = $util->listToMap(ref => \@a);
+   
+=item args:
+
+=over
+
+=item ref [Any]
+
+The scalar value you wish to check.
+
+=back
+
+=back
+ 
+=cut
+
+multi method isArray (Any :$ref!) {
+    
+    if (defined $ref) {
+        if (ref($ref) eq 'ARRAY') {
+            return 1;	
+        }	
+    }	
+    
+    return 0;
+}
+
+multi method isArray (Any $ref!) {
+    
+    return $self->isArray(ref => $ref);	
 }
 
 =head2 listToMap

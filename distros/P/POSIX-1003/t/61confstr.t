@@ -29,8 +29,8 @@ ok(!defined $path4);
 
 use POSIX::1003::Confstr qw(confstr_names);
 my @names = confstr_names;
-if($^O eq 'openbsd')
-{   # there is only 1 name defined in openbsd
+if($^O =~ /^(?:net|open)bsd/)
+{   # there is only 1 name defined on some BSDs
     cmp_ok(scalar @names, '>=', 1, @names." names on $^O");
 }
 else

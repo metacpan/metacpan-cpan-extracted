@@ -8,7 +8,7 @@
 # initial - 0.1296. checkout: 0.083, optimized: 0.064 with each command a sub
 
 package Dita::PCD;
-our $VERSION = 20191231;
+our $VERSION = 20201103;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -540,7 +540,7 @@ sub transformDitaWithPcd($$$)                                                   
            }
          }
 
-        #lll "$d in $if at $df line $di";
+# lll "$d in $if at $df line $di";
         $stats{passed}{$df}{$di}++;
         $stats{passedFile}{$df}{$di}{$if}++;
        }->();
@@ -639,7 +639,7 @@ sub pleaseChangeDitaString($$%)                                                 
 sub pcdDitaTags
  {qw(abstract alt anchorref annotation-xml apiname apply area author b bind body   bodydiv brand bvar category cause cerror change-completed change-historylist   change-item change-organization change-person change-request-id   change-request-reference change-request-system change-revisionid   change-started change-summary chdesc chdeschd chhead choice choices   choicetable choption choptionhd chrow ci cite closereqs cmd cmdname cn   codeblock codeph component conbody conbodydiv concept condition consequence   context coords copyrholder copyright critdates csymbol data data-about dd   ddhd declare degree delim desc dita ditavalmeta ditavalref div dl dlentry   dlhead domainofapplication draft-comment dt dthd dvrKeyscopePrefix   dvrKeyscopeSuffix dvrResourcePrefix dvrResourceSuffix entry equation-block   equation-figure equation-inline equation-number example exportanchors featnum   fig figgroup filepath fn foreign fragment fragref glossAbbreviation   glossAcronym glossAlt glossBody glossdef glossentry glossgroup glossProperty   glossref glossScopeNote glossShortForm glossSurfaceForm glossSymbol   glossSynonym glossterm glossUsage groupchoice groupcomp groupseq   hazardstatement hazardsymbol howtoavoid i image imagemap index-base index-see   index-see-also index-sort-as indexterm info interval itemgroup keydef keyword   keywords kwd lambda li line-through lines link linkinfo linklist linkpool   linktext list logbase lowlimit lq maction map mapref markupname math mathml   matrix matrixrow menclose menucascade merror messagepanel metadata mfenced   mfrac mi mlabeledtr mlongdiv mmultiscripts mn mo momentabout mover mpadded   mphantom mroot mrow ms mscarries mscarry msgblock msgnum msgph msgroup msqrt   msrow mstack mstyle msub msubsup msup mtable mtd mtext mtr munder munderover navtitle note numcharref object ol oper option otherwise overline p parameterentity parml parmname pd ph piece piecewise platform plentry postreq pre prelreqs prereq prodinfo prodname prognum prolog propdesc propdeschd properties property prophead proptype proptypehd propvalue propvaluehd pt   publisher q refbody refbodydiv reference refsyn related-links relcell   relcolspec relheader reln relrow reltable remedy repsep reqconds reqpers   required-cleanup resourceid responsibleParty result row safety screen   searchtitle section sectiondiv semantics sep series set shape shortcut   shortdesc simpletable sl sli sort-as source spares sparesli stentry step   stepresult steps steps-informal steps-unordered stepsection   steptroubleshooting stepxmp sthead strow sub substep substeps sup supeqli   supequip supplies supplyli svg-container synblk synnote synph syntaxdiagram   systemoutput table task taskbody tasktroubleshooting tbody term text   textentity tgroup thead title titlealts tm topic topicgroup topichead   topicmeta topicref topicset topicsetref troublebody troubleshooting   troubleSolution tt tutorialinfo typeofhazard u uicontrol ul unknown uplimit   userinput var varname vector vrmlist wintitle xmlatt xmlelement xmlnsname  xmlpi xref)}
 
-sub pcdUnitaryMethods{qw(addAttr addFirst addFirstAsText addLabels addLast addLastAsText addNext addNextAsText addPrev addPrevAsText addSingleChild addWrapWith an ancestry ap apn approxLocation at atOrBelow atStringContentMatches atText atTop attrAt attrCount attrValueAt attrsNone bitsNodeTextBlank breakIn breakInBackwards breakInForwards breakOut breakOutChild c cText change changeAttr changeAttrValue changeAttributeValue changeKids changeOrDeleteAttr changeOrDeleteAttrValue changeText changeTextToSpace checkParentage checkParser closestLocation concatenateSiblings containsSingleText contentAfter contentAfterAsTags contentAfterAsTags2 contentAsTags contentAsTags2 contentBefore contentBeforeAsTags contentBeforeAsTags2 context copyAttrsFromParent copyAttrsToParent count countAttrNames countAttrNamesAndValues countAttrNamesOnTagExcluding countAttrValues countLabels countNonEmptyTags countOutputClasses countReport countTagNames countTags countTexts countWords createGuidId cut cutFirst cutIfEmpty cutLast cutNext cutPrev deleteAttr deleteAttrs deleteAttrsInTree deleteContent deleteLabels depth depthProfile ditaAddColSpecToTGroup ditaAddPadEntriesToTGroupRows ditaConvertConceptToReference ditaConvertConceptToSection ditaConvertConceptToTask ditaConvertDlToUl ditaConvertFromHtmlDl ditaConvertOlToSubSteps ditaConvertReferenceToConcept ditaConvertReferenceToTask ditaConvertSectionToConcept ditaConvertSectionToReference ditaConvertSectionToTask ditaConvertSimpleTableToTable ditaConvertSubStepsToSteps ditaConvertTopicToTask ditaConvertUlToSubSteps ditaCouldConvertConceptToTask ditaCutTopicmetaFromAClassificationMap ditaExpandAllConRefs ditaFixTGroupColSpec ditaListToChoices ditaListToSteps ditaListToStepsUnordered ditaListToSubSteps ditaListToTable ditaMaximumNumberOfEntriesInATGroupRow ditaMergeLists ditaMergeListsOnce ditaNumberOfColumnsInRow ditaObviousChanges ditaParagraphToNote ditaPrettyPrintWithHeaders ditaRemoveTGroupTrailingEmptyEntries ditaReplaceAnyConref ditaReplaceAnyConrefIdeallyWithMatchingTag ditaReplaceAnyConrefInContext ditaRoot ditaStepsToChoices ditaStepsToList ditaSyntaxDiagramFromDocBookCmdSynopsis ditaSyntaxDiagramToBasicRepresentation ditaTGroupStatistics ditaTopicHeaders ditaWrapWithPUnderConbody ditaXrefs divideHtmlDocumentIntoSections downWhileFirst downWhileHasSingleChild downWhileLast dupPutNext dupPutNextN dupPutPrev expandIncludes extendSectionToNextSection findByForestNumber findById findByNumber findByNumbers first firstBy firstContextOf firstDown firstIn firstInIndex firstNot firstOf firstSibling firstText firstTextMatches firstUntil firstUntilText firstWhile firstn fixEntryColSpan fixEntryRowSpan fixTGroup fixTable forestNumberTrees formatOxygenMessage getLabels getNodeAs getSectionHeadingLevel giveEveryIdAGuid go goFish hasContent hasSingleChild hasSingleChildText hasSingleChildToDepth height help howFar howFarAbove howFarBelow howFirst howLast howOnlyChild htmlHeadersToSections htmlTableToDita index indexIds invert invertFirst invertLast isADitaMap isAllBlankText isBlankText isEmpty isFirst isFirstN isFirstText isFirstToDepth isLast isLastN isLastText isLastToDepth isNotFirst isNotLast isOnlyChild isOnlyChildBlankText isOnlyChildN isOnlyChildText isOnlyChildToDepth isText joinWithText jsonString labelsInTree last lastBy lastContextOf lastDown lastIn lastInIndex lastNot lastOf lastSibling lastText lastTextMatches lastUntil lastUntilText lastWhile lastn lineLocation location matchNodesByRepresentation matchTree matchesFirst matchesLast matchesNext matchesPrev matchesText mergeDuplicateChildWithParent mergeLikeElements mergeLikeNext mergeLikePrev mergeOnlyChildLikeNext mergeOnlyChildLikePrev mergeOnlyChildLikePrevLast moveEndLast moveFirst moveLast moveSelectionAfter moveSelectionBefore moveSelectionFirst moveSelectionLast moveStartFirst next nextIn nextN nextOn nextText nextTextMatches nextUntil nextWhile nextn not numberNode numberTree numberTreesJustIds over over2 overAllTags overFirstTags overLastTags parentage path pathString position present prettyString prettyStringCDATA prettyStringContent prettyStringContentNumbered prettyStringDitaHeaders prettyStringEnd prettyStringNumbered prev prevIn prevN prevOn prevText prevTextMatches prevUntil prevWhile prevn printAttributes printAttributesExtendingIdsWithLabels printAttributesHtml printAttributesReplacingIdsWithLabels printNode printNodeAsSingleton printStack propagate putContentAfter putContentBefore putCutOutFirst putCutOutLast putCutOutNext putCutOutPrev putFirstAsComment putFirstAsText putFirstRequiredCleanUp putLastAsComment putLastAsText putLastRequiredCleanUp putNextAsComment putNextAsText putNextFirstCut putNextFirstCut2 putNextRequiredCleanUp putNodeAs putPrevAsComment putPrevAsText putPrevLastCut putPrevLastCut2 putPrevRequiredCleanUp putSiblingsAfterParent putSiblingsBeforeParent putSiblingsFirst putSiblingsLast putTextFirst putTextLast putTextNext putTextPrev putUpNextCut putUpNextCut2 putUpPrevCut putUpPrevCut2 renameAttr renameAttrValue renameAttrXtr reorder replaceContentWithText replaceWithBlank replaceWithRequiredCleanUp replaceWithText reportNode reportNodeAttributes reportNodeContext requiredCleanUp set setAttr setDepthProfile setRepresentationAsTagsAndText setRepresentationAsText setSelectionEnd setSelectionStart splitAfter splitAndWrapFromStart splitAndWrapToEnd splitBefore splitParentAfter splitParentBefore sss string stringContent stringContentOrText stringMd5Sum stringNode stringQuoted stringTagsAndText stringText structureAdjacentSectionsByLevel swapFirstSibling swapLastSibling swapNext swapPrev swapTagWithParent tocNumbers top unwrap unwrapContentsKeepingText unwrapOnlyChild unwrapParentOfOnlyChild unwrapParentsWithSingleChild unwrapSingleParentsOfSection up upThru upUntil upUntilFirst upUntilIsOnlyChild upUntilLast upWhile upWhileFirst upWhileIsOnlyChild upWhileLast upn wordStyles wrapContentWith wrapContentWithDup wrapDown wrapFirstN wrapFromFirst wrapFromFirstOrLastIn wrapLastN wrapNext wrapNextN wrapPrev wrapPrevN wrapRuns wrapSiblingsAfter wrapSiblingsBefore wrapToLast wrapToLastOrFirstIn wrapUp wrapWith wrapWithAll wrapWithDup wrapWithN writeCompressedFile zipDown zipDownOnce)}
+sub pcdUnitaryMethods{qw(addAttr addFirst addFirstAsText addLabels addLast addLastAsText addNext addNextAsText addPrev addPrevAsText addSingleChild addWrapWith an ancestry ap apn approxLocation at atOrBelow atStringContentMatches atText atTop attrAt attrCount attrValueAt attrsNone bitsNodeTextBlank breakIn breakInBackwards breakInForwards breakOut breakOutChild c cText change changeAttr changeAttrValue changeAttributeValue changeKids changeOrDeleteAttr changeOrDeleteAttrValue changeText changeTextToSpace checkParentage checkParser closestLocation concatenateSiblings containsSingleText contentAfter contentAfterAsTags contentAfterAsTags2 contentAsTags contentAsTags2 contentBefore contentBeforeAsTags contentBeforeAsTags2 context copyAttrsFromParent copyAttrsToParent count countAttrNames countAttrNamesAndValues countAttrNamesOnTagExcluding countAttrValues countLabels countNonEmptyTags countOutputClasses countReport countTagNames countTags countTexts countWords createGuidId cut cutFirst cutIfEmpty cutLast cutNext cutPrev deleteAttr deleteAttrs deleteAttrsInTree deleteContent deleteLabels depth depthProfile ditaAddColSpecToTGroup ditaAddPadEntriesToTGroupRows ditaConvertConceptToReference ditaConvertConceptToSection ditaConvertConceptToTask ditaConvertDlToUl ditaConvertFromHtmlDl ditaConvertOlToSubSteps ditaConvertReferenceToConcept ditaConvertReferenceToTask ditaConvertSectionToConcept ditaConvertSectionToReference ditaConvertSectionToTask ditaConvertSimpleTableToTable ditaConvertSubStepsToSteps ditaConvertTopicToTask ditaConvertUlToSubSteps ditaCouldConvertConceptToTask ditaCutTopicmetaFromAClassificationMap ditaExpandAllConRefs ditaFixTGroupColSpec ditaListToChoices ditaListToSteps ditaListToStepsUnordered ditaListToSubSteps ditaListToTable ditaMaximumNumberOfEntriesInATGroupRow ditaMergeLists ditaMergeListsOnce ditaNumberOfColumnsInRow ditaObviousChanges ditaParagraphToNote ditaPrettyPrintWithHeaders ditaRemoveTGroupTrailingEmptyEntries ditaReplaceAnyConref ditaReplaceAnyConrefIdeallyWithMatchingTag ditaReplaceAnyConrefInContext ditaRoot ditaStepsToChoices ditaStepsToList ditaSyntaxDiagramFromDocBookCmdSynopsis ditaSyntaxDiagramToBasicRepresentation ditaTGroupStatistics ditaTopicHeaders ditaWrapWithPUnderConbody ditaXrefs divideHtmlDocumentIntoSections downWhileFirst downWhileHasSingleChild downWhileLast dupPutNext dupPutNextN dupPutPrev expandIncludes extendSectionToNextSection findByForestNumber findById findByNumber findByNumbers first firstBy firstContextOf firstDown firstIn firstInIndex firstIs firstNot firstOf firstSibling firstText firstTextMatches firstUntil firstUntilText firstWhile firstn fixEntryColSpan fixEntryRowSpan fixTGroup fixTable forestNumberTrees formatOxygenMessage getLabels getNodeAs getSectionHeadingLevel giveEveryIdAGuid go goFish hasContent hasSingleChild hasSingleChildText hasSingleChildToDepth height help howFar howFarAbove howFarBelow howFirst howLast howOnlyChild htmlHeadersToSections htmlTableToDita index indexIds invert invertFirst invertLast isADitaMap isAllBlankText isBlankText isEmpty isFirst isFirstN isFirstText isFirstToDepth isLast isLastN isLastText isLastToDepth isNotFirst isNotLast isOnlyChild isOnlyChildBlankText isOnlyChildN isOnlyChildText isOnlyChildToDepth isText joinWithText jsonString labelsInTree last lastBy lastContextOf lastDown lastIn lastInIndex lastIs lastNot lastOf lastSibling lastText lastTextMatches lastUntil lastUntilText lastWhile lastn lineLocation location matchNodesByRepresentation matchTree matchesFirst matchesLast matchesNext matchesPrev matchesText mergeDuplicateChildWithParent mergeLikeElements mergeLikeNext mergeLikePrev mergeOnlyChildLikeNext mergeOnlyChildLikePrev mergeOnlyChildLikePrevLast moveEndLast moveFirst moveLast moveSelectionAfter moveSelectionBefore moveSelectionFirst moveSelectionLast moveStartFirst next nextIn nextIs nextN nextOn nextText nextTextMatches nextUntil nextWhile nextn not numberNode numberTree numberTreesJustIds over over2 overAllTags overFirstTags overLastTags parentage path pathString position present prettyString prettyStringCDATA prettyStringContent prettyStringContentNumbered prettyStringDitaHeaders prettyStringEnd prettyStringNumbered prev prevIn prevIs prevN prevOn prevText prevTextMatches prevUntil prevWhile prevn printAttributes printAttributesExtendingIdsWithLabels printAttributesHtml printAttributesReplacingIdsWithLabels printNode printNodeAsSingleton printStack propagate putContentAfter putContentBefore putCutOutFirst putCutOutLast putCutOutNext putCutOutPrev putFirstAsComment putFirstAsText putFirstRequiredCleanUp putLastAsComment putLastAsText putLastRequiredCleanUp putNextAsComment putNextAsText putNextFirstCut putNextFirstCut2 putNextRequiredCleanUp putNodeAs putPrevAsComment putPrevAsText putPrevLastCut putPrevLastCut2 putPrevRequiredCleanUp putSiblingsAfterParent putSiblingsBeforeParent putSiblingsFirst putSiblingsLast putTextFirst putTextLast putTextNext putTextPrev putUpNextCut putUpNextCut2 putUpPrevCut putUpPrevCut2 renameAttr renameAttrValue renameAttrXtr reorder replaceContentWithText replaceWithBlank replaceWithRequiredCleanUp replaceWithText reportNode reportNodeAttributes reportNodeContext requiredCleanUp set setAttr setDepthProfile setRepresentationAsTagsAndText setRepresentationAsText setSelectionEnd setSelectionStart splitAfter splitAndWrapFromStart splitAndWrapToEnd splitBefore splitParentAfter splitParentBefore sss string stringAsMd5Sum stringContent stringContentOrText stringNode stringQuoted stringTagsAndText stringText structureAdjacentSectionsByLevel swapFirstSibling swapLastSibling swapNext swapPrev swapTagWithParent tocNumbers top unwrap unwrapContentsKeepingText unwrapOnlyChild unwrapParentOfOnlyChild unwrapParentsWithSingleChild unwrapSingleParentsOfSection up upThru upUntil upUntilFirst upUntilIsOnlyChild upUntilLast upWhile upWhileFirst upWhileIsOnlyChild upWhileLast upn wordStyles wrapContentWith wrapContentWithDup wrapDown wrapFirstN wrapFromFirst wrapFromFirstOrLastIn wrapLastN wrapNext wrapNextN wrapPrev wrapPrevN wrapRuns wrapSiblingsAfter wrapSiblingsBefore wrapToLast wrapToLastOrFirstIn wrapUp wrapWith wrapWithAll wrapWithDup wrapWithN writeCompressedFile zipDown zipDownOnce)}
 
 sub pcdRowActions
  {qw(delete repeat copy cut after before)
@@ -960,7 +960,7 @@ And the following output L<Xml|https://en.wikipedia.org/wiki/XML> in B<out/1.dit
     </b>
   </a>
 
-The L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> commands available are those documented in: L<Data::Edit::Xml|https://metacpan.org/pod/Data::Edit::Xml>.
+The L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> commands available are those documented in: L<Data::Edit::Xml|https://metacpan.org/pod/Data::Edit::Xml>.
 
 Each block of commands is applied to each node of the parse tree produced by
 L<Data::Edit::Xml|https://metacpan.org/pod/Data::Edit::Xml>. If the block completes successfully the description line at the head of
@@ -976,7 +976,7 @@ block starts making changes to the parse tree.
 Implementation of the Please Change Dita Language.
 
 
-Version 20191231.
+Version 20201030.
 
 
 The following sections describe the methods in each functional area of this
@@ -986,9 +986,9 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Please Change Dita
 
-Edit L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> using directives written in  L<Dita::PCD|https://metacpan.org/pod/Dita::PCD>. An introduction to L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> can be found at: L<PCD|https://philiprbrenan.github.io/data_edit_xml_edit_commands.html>.
+Edit L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> using directives written in  L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD>. An introduction to L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> can be found at: L<PCD|https://philiprbrenan.github.io/data_edit_xml_edit_commands.html>.
 
-=head2 parseUrlRepresentationOfPcd($)
+=head2 parseUrlRepresentationOfPcd($url)
 
 Parse the url representation of a parse tree.
 
@@ -998,7 +998,7 @@ Parse the url representation of a parse tree.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $testUrl =
      {q(001_action)    => q(),
       q(001_rowType1)  => q(comment),
@@ -1015,26 +1015,28 @@ B<Example:>
       q(003_context_1) => q(ph),
       q(003_context_2) => q(title),
       q(003_context_3) => q()};
-  
-    my $parseTree = 𝗽𝗮𝗿𝘀𝗲𝗨𝗿𝗹𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻𝗢𝗳𝗣𝗰𝗱($testUrl);
-  
+
+
+    my $parseTree = parseUrlRepresentationOfPcd($testUrl);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok representPcdParseTreeAsText($parseTree) eq <<END;
   # Sample Pcd file
-  
+
   sf-111 unwrap ph under title
     unwrap ph title
   END
    }
-  
+
 
 This method can be imported via:
 
   use Dita::PCD qw(parseUrlRepresentationOfPcd)
 
 
-=head2 compilePcdFile($)
+=head2 compilePcdFile($if)
 
-Compile the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+Compile the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
      Parameter  Description
   1  $if        Input file
@@ -1042,20 +1044,81 @@ Compile the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives
 B<Example:>
 
 
-    if (1) {                                                                          
-  
-  if (1) {                                                                           
+      my $in  = temporaryFolder;
+      my $out = temporaryFolder;
+
+      my $inXml = <<END;
+  <a>
+    <b>
+      <c>
+        <d/>
+      </c>
+    </b>
+    <B>
+      <c>
+        <d/>
+      </c>
+    </B>
+  </a>
+  END
+
+      my $outXml = <<END;
+  <a>
+    <b>
+      <c>
+        <D/>
+      </c>
+      <c>
+        <d/>
+      </c>
+    </b>
+  </a>
+  END
+
+      writeFile(fpe($in, qw(1 dita)), $inXml);
+
+      my $inFile = writeFile(fpe($in, qw(test pcd)), <<END);
+  Change d under c under b to D
+    change D d c b
+
+  Change B to b
+    change b B
+
+  Merge two adjacent b
+    mlp b
+  END
+
+      pleaseChangeDita(in=>$in, out=>$out);
+
+      ok readFile(fpe($out, qw(1 dita))) eq $outXml;
+
+
+      my $blocks = compilePcdFile($inFile);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok dump(compilePcdFiles($in)) eq dump($blocks);
+
+      for(1..1)
+       {my $x = Data::Edit::Xml::new($inXml);
+
+        transformDitaWithPcdOptimized(q(), $x, $blocks);
+
+        ok -p $x eq $outXml;
+       }
+
+      clearFolder($_, 1e2) for $in, $out;
+
     my $in = temporaryFolder;
-  
+
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-  
+
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-  
+
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1085,15 +1148,14 @@ B<Example:>
                 }, "DitaPcdMethod"),
               ],
      }, "DitaPCDParseTree");
-   }
-  
+
 
 This method can be imported via:
 
   use Dita::PCD qw(compilePcdFile)
 
 
-=head2 compilePcdFiles(@)
+=head2 compilePcdFiles(@in)
 
 Locate and compile the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files in the specified folder B<@in>.
 
@@ -1103,20 +1165,81 @@ Locate and compile the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2
 B<Example:>
 
 
-    if (1) {                                                                          
-  
-  if (1) {                                                                           
+      my $in  = temporaryFolder;
+      my $out = temporaryFolder;
+
+      my $inXml = <<END;
+  <a>
+    <b>
+      <c>
+        <d/>
+      </c>
+    </b>
+    <B>
+      <c>
+        <d/>
+      </c>
+    </B>
+  </a>
+  END
+
+      my $outXml = <<END;
+  <a>
+    <b>
+      <c>
+        <D/>
+      </c>
+      <c>
+        <d/>
+      </c>
+    </b>
+  </a>
+  END
+
+      writeFile(fpe($in, qw(1 dita)), $inXml);
+
+      my $inFile = writeFile(fpe($in, qw(test pcd)), <<END);
+  Change d under c under b to D
+    change D d c b
+
+  Change B to b
+    change b B
+
+  Merge two adjacent b
+    mlp b
+  END
+
+      pleaseChangeDita(in=>$in, out=>$out);
+
+      ok readFile(fpe($out, qw(1 dita))) eq $outXml;
+
+      my $blocks = compilePcdFile($inFile);
+
+
+      ok dump(compilePcdFiles($in)) eq dump($blocks);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      for(1..1)
+       {my $x = Data::Edit::Xml::new($inXml);
+
+        transformDitaWithPcdOptimized(q(), $x, $blocks);
+
+        ok -p $x eq $outXml;
+       }
+
+      clearFolder($_, 1e2) for $in, $out;
+
     my $in = temporaryFolder;
-  
+
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-  
+
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-  
+
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1146,17 +1269,16 @@ B<Example:>
                 }, "DitaPcdMethod"),
               ],
      }, "DitaPCDParseTree");
-   }
-  
+
 
 This method can be imported via:
 
   use Dita::PCD qw(compilePcdFiles)
 
 
-=head2 transformDitaWithPcd($$$)
+=head2 transformDitaWithPcd($if, $x, $blocks)
 
-Transform the contents of file B<$if> represented as a parse tree B<$x> by applying the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives in B<$blocks>.
+Transform the contents of file B<$if> represented as a parse tree B<$x> by applying the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives in B<$blocks>.
 
      Parameter  Description
   1  $if        Input file
@@ -1166,20 +1288,79 @@ Transform the contents of file B<$if> represented as a parse tree B<$x> by apply
 B<Example:>
 
 
-    if (1) {                                                                          
-  
-  if (1) {                                                                           
+      my $in  = temporaryFolder;
+      my $out = temporaryFolder;
+
+      my $inXml = <<END;
+  <a>
+    <b>
+      <c>
+        <d/>
+      </c>
+    </b>
+    <B>
+      <c>
+        <d/>
+      </c>
+    </B>
+  </a>
+  END
+
+      my $outXml = <<END;
+  <a>
+    <b>
+      <c>
+        <D/>
+      </c>
+      <c>
+        <d/>
+      </c>
+    </b>
+  </a>
+  END
+
+      writeFile(fpe($in, qw(1 dita)), $inXml);
+
+      my $inFile = writeFile(fpe($in, qw(test pcd)), <<END);
+  Change d under c under b to D
+    change D d c b
+
+  Change B to b
+    change b B
+
+  Merge two adjacent b
+    mlp b
+  END
+
+      pleaseChangeDita(in=>$in, out=>$out);
+
+      ok readFile(fpe($out, qw(1 dita))) eq $outXml;
+
+      my $blocks = compilePcdFile($inFile);
+
+      ok dump(compilePcdFiles($in)) eq dump($blocks);
+
+      for(1..1)
+       {my $x = Data::Edit::Xml::new($inXml);
+
+        transformDitaWithPcdOptimized(q(), $x, $blocks);
+
+        ok -p $x eq $outXml;
+       }
+
+      clearFolder($_, 1e2) for $in, $out;
+
     my $in = temporaryFolder;
-  
+
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-  
+
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-  
+
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1209,17 +1390,16 @@ B<Example:>
                 }, "DitaPcdMethod"),
               ],
      }, "DitaPCDParseTree");
-   }
-  
+
 
 This method can be imported via:
 
   use Dita::PCD qw(transformDitaWithPcd)
 
 
-=head2 transformDitaWithPcdOptimized($$$)
+=head2 transformDitaWithPcdOptimized($if, $x, $blocks)
 
-Transform the specified parse tree B<$x> by applying the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directive B<$blocks> without any reporting to speed up execution.
+Transform the specified parse tree B<$x> by applying the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directive B<$blocks> without any reporting to speed up execution.
 
      Parameter  Description
   1  $if        Input file
@@ -1229,17 +1409,79 @@ Transform the specified parse tree B<$x> by applying the specified L<Dita::PCD|h
 B<Example:>
 
 
-    if (1) {                                                                          
-  
+      my $in  = temporaryFolder;
+      my $out = temporaryFolder;
+
+      my $inXml = <<END;
+  <a>
+    <b>
+      <c>
+        <d/>
+      </c>
+    </b>
+    <B>
+      <c>
+        <d/>
+      </c>
+    </B>
+  </a>
+  END
+
+      my $outXml = <<END;
+  <a>
+    <b>
+      <c>
+        <D/>
+      </c>
+      <c>
+        <d/>
+      </c>
+    </b>
+  </a>
+  END
+
+      writeFile(fpe($in, qw(1 dita)), $inXml);
+
+      my $inFile = writeFile(fpe($in, qw(test pcd)), <<END);
+  Change d under c under b to D
+    change D d c b
+
+  Change B to b
+    change b B
+
+  Merge two adjacent b
+    mlp b
+  END
+
+      pleaseChangeDita(in=>$in, out=>$out);
+
+      ok readFile(fpe($out, qw(1 dita))) eq $outXml;
+
+      my $blocks = compilePcdFile($inFile);
+
+      ok dump(compilePcdFiles($in)) eq dump($blocks);
+
+      for(1..1)
+       {my $x = Data::Edit::Xml::new($inXml);
+
+
+        transformDitaWithPcdOptimized(q(), $x, $blocks);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+        ok -p $x eq $outXml;
+       }
+
+      clearFolder($_, 1e2) for $in, $out;
+
 
 This method can be imported via:
 
   use Dita::PCD qw(transformDitaWithPcdOptimized)
 
 
-=head2 pleaseChangeDita(%)
+=head2 pleaseChangeDita(%options)
 
-Transform L[dita] files as specified by the directives in L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> files.
+Transform L[dita] files as specified by the directives in L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> files.
 
      Parameter  Description
   1  %options   Execution options
@@ -1247,20 +1489,81 @@ Transform L[dita] files as specified by the directives in L<Dita::PCD|https://me
 B<Example:>
 
 
-    if (1) {                                                                          
-  
-  if (1) {                                                                           
+      my $in  = temporaryFolder;
+      my $out = temporaryFolder;
+
+      my $inXml = <<END;
+  <a>
+    <b>
+      <c>
+        <d/>
+      </c>
+    </b>
+    <B>
+      <c>
+        <d/>
+      </c>
+    </B>
+  </a>
+  END
+
+      my $outXml = <<END;
+  <a>
+    <b>
+      <c>
+        <D/>
+      </c>
+      <c>
+        <d/>
+      </c>
+    </b>
+  </a>
+  END
+
+      writeFile(fpe($in, qw(1 dita)), $inXml);
+
+      my $inFile = writeFile(fpe($in, qw(test pcd)), <<END);
+  Change d under c under b to D
+    change D d c b
+
+  Change B to b
+    change b B
+
+  Merge two adjacent b
+    mlp b
+  END
+
+
+      pleaseChangeDita(in=>$in, out=>$out);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok readFile(fpe($out, qw(1 dita))) eq $outXml;
+
+      my $blocks = compilePcdFile($inFile);
+
+      ok dump(compilePcdFiles($in)) eq dump($blocks);
+
+      for(1..1)
+       {my $x = Data::Edit::Xml::new($inXml);
+
+        transformDitaWithPcdOptimized(q(), $x, $blocks);
+
+        ok -p $x eq $outXml;
+       }
+
+      clearFolder($_, 1e2) for $in, $out;
+
     my $in = temporaryFolder;
-  
+
     my $f = owf(fpe($in, qw(test pcd)), <<END);
   # Sample Pcd file
   sf-111 unwrap ph under title
     unwrap2 ph2 title
   END
-  
+
     my $p = parsePcdFile($f);
     delete $p->{inputFile};
-  
+
     is_deeply $p, bless({
     errors => [],
     rows   => [
@@ -1290,15 +1593,14 @@ B<Example:>
                 }, "DitaPcdMethod"),
               ],
      }, "DitaPCDParseTree");
-   }
-  
+
 
 This method can be imported via:
 
   use Dita::PCD qw(pleaseChangeDita)
 
 
-=head2 pleaseChangeDitaString($$%)
+=head2 pleaseChangeDitaString($xml, $pcd, %options)
 
 Apply a pcd string to an xml string and return the resulting string
 
@@ -1310,9 +1612,11 @@ Apply a pcd string to an xml string and return the resulting string
 B<Example:>
 
 
-  ok 𝗽𝗹𝗲𝗮𝘀𝗲𝗖𝗵𝗮𝗻𝗴𝗲𝗗𝗶𝘁𝗮𝗦𝘁𝗿𝗶𝗻𝗴(q(<a><b>C</b></a>), qq(Unwrap
-  unwrap b))->string eq qq(<a>C</a>);  
-  
+
+  ok pleaseChangeDitaString(q(<a><b>C</b></a>), qq(Unwrap
+  unwrap b))->string eq qq(<a>C</a>);    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 This method can be imported via:
 
@@ -1331,7 +1635,9 @@ Description of a comment
 =head3 Output fields
 
 
-B<comment> - Comment text
+=head4 comment
+
+Comment text
 
 
 
@@ -1346,69 +1652,71 @@ Description
 =head3 Output fields
 
 
-B<description> - Description text
+=head4 description
+
+Description text
 
 
 
 =head1 Private Methods
 
-=head2 ditaPcdBase($)
+=head2 ditaPcdBase($rowType)
 
 Base of various objects used by the editor
 
      Parameter  Description
   1  $rowType   Row type
 
-=head2 newDitaPcdComment(%)
+=head2 newDitaPcdComment(%options)
 
 Create a new comment
 
      Parameter  Description
   1  %options   Attributes
 
-=head2 newDitaPcdDescription(%)
+=head2 newDitaPcdDescription(%options)
 
 Create a new description
 
      Parameter  Description
   1  %options   Attributes
 
-=head2 newDitaPcdMethod(%)
+=head2 newDitaPcdMethod(%options)
 
 Create a new Method
 
      Parameter  Description
   1  %options   Attributes
 
-=head2 newDitaPcdParseTree(%)
+=head2 newDitaPcdParseTree(%options)
 
 Create a new Parse Tree
 
      Parameter  Description
   1  %options   Attributes
 
-=head2 parsePcdString($)
+=head2 parsePcdString($string)
 
-Parse the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$string> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+Parse the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$string> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
      Parameter  Description
   1  $string    String of PCD directives
 
-=head2 parsePcdFile($)
+=head2 parsePcdFile($if)
 
-Parse the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+Parse the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
      Parameter  Description
   1  $if        Input file
 
-=head2 editPcdParseTree($)
+=head2 editPcdParseTree($parseTree)
 
 Validate a B<$parseTree>
 
      Parameter   Description
   1  $parseTree  Parse tree
 
-=head2 makeDataList($@)
+=head2 makeDataList($name, @values)
 
 Create a data list
 
@@ -1416,43 +1724,43 @@ Create a data list
   1  $name      Name
   2  @values    Values
 
-=head2 representPcdParseTreeAsHtml($)
+=head2 representPcdParseTreeAsHtml($parseTree)
 
-Parse the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+Parse the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
      Parameter   Description
   1  $parseTree  Parse tree
 
-=head2 printPcdHtml($)
+=head2 printPcdHtml($string)
 
-Print a PCD using L<html|https://en.wikipedia.org/wiki/HTML>
+Print a PCD using L<HTML|https://en.wikipedia.org/wiki/HTML>
 
      Parameter  Description
   1  $string    Pcd as a string
 
-=head2 representPcdParseTreeAsText($)
+=head2 representPcdParseTreeAsText($parseTree)
 
 Print a parse tree as text
 
      Parameter   Description
   1  $parseTree  Parse tree
 
-=head2 compilePcdString($$)
+=head2 compilePcdString($string, $file)
 
-Compile the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives in the supplied B<$string> optionally associated with B<$file>.
+Compile the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives in the supplied B<$string> optionally associated with B<$file>.
 
      Parameter  Description
   1  $string    Input string
   2  $file      Optional name of file associated with string
 
-=head2 formatHtml($)
+=head2 formatHtml($string)
 
 Replace <> by &lt; &gt; to make example html displayable
 
      Parameter  Description
   1  $string    String
 
-=head2 printPcdExamplesHtml($$)
+=head2 printPcdExamplesHtml($mod, $formatter)
 
 Print the PCD examples found in the module description of Data::Edit::Xml.
 
@@ -1464,11 +1772,11 @@ Print the PCD examples found in the module description of Data::Edit::Xml.
 =head1 Index
 
 
-1 L<compilePcdFile|/compilePcdFile> - Compile the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+1 L<compilePcdFile|/compilePcdFile> - Compile the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
 2 L<compilePcdFiles|/compilePcdFiles> - Locate and compile the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files in the specified folder B<@in>.
 
-3 L<compilePcdString|/compilePcdString> - Compile the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives in the supplied B<$string> optionally associated with B<$file>.
+3 L<compilePcdString|/compilePcdString> - Compile the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives in the supplied B<$string> optionally associated with B<$file>.
 
 4 L<ditaPcdBase|/ditaPcdBase> - Base of various objects used by the editor
 
@@ -1486,27 +1794,27 @@ Print the PCD examples found in the module description of Data::Edit::Xml.
 
 11 L<newDitaPcdParseTree|/newDitaPcdParseTree> - Create a new Parse Tree
 
-12 L<parsePcdFile|/parsePcdFile> - Parse the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+12 L<parsePcdFile|/parsePcdFile> - Parse the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
-13 L<parsePcdString|/parsePcdString> - Parse the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$string> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+13 L<parsePcdString|/parsePcdString> - Parse the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$string> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
 14 L<parseUrlRepresentationOfPcd|/parseUrlRepresentationOfPcd> - Parse the url representation of a parse tree.
 
-15 L<pleaseChangeDita|/pleaseChangeDita> - Transform L[dita] files as specified by the directives in L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> files.
+15 L<pleaseChangeDita|/pleaseChangeDita> - Transform L[dita] files as specified by the directives in L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> files.
 
 16 L<pleaseChangeDitaString|/pleaseChangeDitaString> - Apply a pcd string to an xml string and return the resulting string
 
 17 L<printPcdExamplesHtml|/printPcdExamplesHtml> - Print the PCD examples found in the module description of Data::Edit::Xml.
 
-18 L<printPcdHtml|/printPcdHtml> - Print a PCD using L<html|https://en.wikipedia.org/wiki/HTML>
+18 L<printPcdHtml|/printPcdHtml> - Print a PCD using L<HTML|https://en.wikipedia.org/wiki/HTML>
 
-19 L<representPcdParseTreeAsHtml|/representPcdParseTreeAsHtml> - Parse the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
+19 L<representPcdParseTreeAsHtml|/representPcdParseTreeAsHtml> - Parse the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives B<$file> specifying changes to be made to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> files.
 
 20 L<representPcdParseTreeAsText|/representPcdParseTreeAsText> - Print a parse tree as text
 
-21 L<transformDitaWithPcd|/transformDitaWithPcd> - Transform the contents of file B<$if> represented as a parse tree B<$x> by applying the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directives in B<$blocks>.
+21 L<transformDitaWithPcd|/transformDitaWithPcd> - Transform the contents of file B<$if> represented as a parse tree B<$x> by applying the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directives in B<$blocks>.
 
-22 L<transformDitaWithPcdOptimized|/transformDitaWithPcdOptimized> - Transform the specified parse tree B<$x> by applying the specified L<Dita::PCD|https://metacpan.org/pod/Dita::PCD> directive B<$blocks> without any reporting to speed up execution.
+22 L<transformDitaWithPcdOptimized|/transformDitaWithPcdOptimized> - Transform the specified parse tree B<$x> by applying the specified L<Dita::Pcd|https://metacpan.org/pod/Dita::PCD> directive B<$blocks> without any reporting to speed up execution.
 
 
 
@@ -1594,7 +1902,6 @@ if ($^O !~ m(bsd|linux)i)
 
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
   if ((caller(1))[0]//'Dita::PCD') eq "Dita::PCD";
-
 
 if (1)
  {my $startTime = time;

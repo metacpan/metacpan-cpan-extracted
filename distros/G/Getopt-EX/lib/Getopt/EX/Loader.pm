@@ -183,7 +183,7 @@ sub parseopt {
 	    if ($obj->{IGNORE_NO_MODULE} and $@ =~ /need to install the (\w+::)*$mod/) {
 		return undef;
 	    } else {
-		die;
+		die "Can't load module \"$mod\".\n";
 	    }
 	} else {
 	    die $@;

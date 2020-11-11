@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/rurban/Cpanel-JSON-XS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Cpanel-JSON-XS
-version: '4.24'
+version: '4.25'
 x_contributors:
   - 'Ashley Willis <ashleyw@cpan.org>'
   - 'Chip Salzenberg <chip@pobox.com>'

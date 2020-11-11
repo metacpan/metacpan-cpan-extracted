@@ -19,6 +19,7 @@ lib/cPanel/APIClient/Authn/Username.pm
 lib/cPanel/APIClient/Pending.pm
 lib/cPanel/APIClient/Request/HTTPBase.pm
 lib/cPanel/APIClient/Request/UAPI.pm
+lib/cPanel/APIClient/Request/UAPIFromWHM1.pm
 lib/cPanel/APIClient/Request/WHM1.pm
 lib/cPanel/APIClient/Response.pm
 lib/cPanel/APIClient/Response/UAPI.pm
@@ -40,6 +41,7 @@ lib/cPanel/APIClient/Utils/HTTPResponse.pm
 lib/cPanel/APIClient/Utils/HTTPSession.pm
 lib/cPanel/APIClient/Utils/JSON.pm
 lib/cPanel/APIClient/X.pm
+lib/cPanel/APIClient/X/API.pm
 lib/cPanel/APIClient/X/Base.pm
 lib/cPanel/APIClient/X/CommandFailed.pm
 lib/cPanel/APIClient/X/HTTP.pm
@@ -52,6 +54,7 @@ t/lib/MockCpsrvd/cpanel.pm
 t/lib/MockCpsrvd/whm.pm
 t/lib/TestBase.pm
 t/lib/TestHTTPBase.pm
+t/lib/TestHTTPCpanelMixin.pm
 t/lib/TestHTTPTinyMixin.pm
 t/lib/TestHTTPUAPIMixin.pm
 t/lib/TestHTTPWHM1Mixin.pm

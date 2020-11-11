@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.585 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.586 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2020-10-07.
+    2020-10-28.
 
 SYNOPSIS
     In list_countries.pl:
@@ -209,6 +209,11 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   case_insensitive_comparison => *bool* (default: 1)
+
+        Decide whether generated function will perform case-insensitive
+        comparison (e.g. for FIELD.is).
 
     *   case_insensitive_search => *bool* (default: 1)
 

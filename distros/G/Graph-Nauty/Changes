@@ -1,3 +1,7 @@
+0.3.4 2020-10-29
+
+    - Fixed segfaults caused by empty graphs given to are_isomorphic().
+
 0.3.3 2020-09-16
 
     - Fixed issue with treating edge vertices of one color as the same.

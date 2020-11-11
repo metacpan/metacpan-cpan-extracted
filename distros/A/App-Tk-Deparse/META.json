@@ -4,7 +4,7 @@
       "Gabor Szabo <szabgab@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Browser::Open" : "0",
+            "Capture::Tiny" : "0",
             "Cpanel::JSON::XS" : "0",
             "File::HomeDir" : "0",
             "Path::Tiny" : "0",
@@ -52,9 +53,9 @@
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/szabgab/App-Tk-Deparse.git",
-         "web" : "https://github.com/szabgab/App-Tk-Deparse.com"
+         "web" : "https://github.com/szabgab/App-Tk-Deparse"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

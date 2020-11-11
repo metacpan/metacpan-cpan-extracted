@@ -4,6 +4,31 @@ using namespace xs;
 using namespace panda::unievent;
 using panda::string_view;
 
+namespace xs {
+namespace unievent {
+
+static std::map<HandleType, SV*>& registered_perl_classes() {
+    static std::map<HandleType, SV*> inst;
+    return inst;
+}
+
+Sv handle_perl_class(const HandleType& type) {
+    auto i = registered_perl_classes().find(type);
+    if (i == registered_perl_classes().end()) return Stash{};
+    else return i->second;
+}
+
+void register_perl_class(const HandleType& t, const Stash& st) {
+    auto i = registered_perl_classes().find(t);
+    if (i != registered_perl_classes().end() && st != i->second) {
+        panda::string err = panda::string("Handle type ") + t.name + "is already registered as " + st.name();
+        throw std::logic_error(std::string(err.data(), err.length()));
+    }
+    registered_perl_classes().insert({t, st});
+}
+
+}}
+
 MODULE = UniEvent::Handle                PACKAGE = UniEvent::Handle
 PROTOTYPES: DISABLE
 

@@ -137,6 +137,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
         CHECK(req->compression.type == Compression::GZIP);
         REQUIRE(req->body.to_string() == body_sample);
     }
+
     SECTION("chunked & gzipped") {
         const char * body_raw[] = {
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel eros sit amet ex gravida tempor sit amet sit amet nisi. Sed ultrices, enim mattis sagittis tincidunt, tortor quam fermentum lectus, vitae mattis felis diam quis lorem. Suspendisse facilisis lorem dui, porta consectetur velit consectetur ac. Maecenas libero justo, porta in finibus vitae, blandit sed felis. Donec aliquam, leo eget ultrices tincidunt, purus ante ornare ipsum, sit amet auctor nunc ligula id nisi. Praesent sit amet sapien eget orci porta accumsan. Ut sed tortor ligula. Aliquam odio dolor, volutpat vitae elit eget, aliquet accumsan nisl. In ac placerat ligula.",
@@ -160,8 +161,36 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
         auto result = p.parse(data);
         CHECK(result.state == State::done);
         CHECK(result.error.value() == 0);
+        CHECK(result.request->body.to_string() == body_concat);
         CHECK(req->compression.type == Compression::GZIP);
         REQUIRE(req->body.to_string() == body_concat);
+
+        SECTION("make it piece by piece") {
+            auto req = Request::Builder().method(Method::POST).chunked().compress(Compression::GZIP).build();
+            auto content = req->to_string();
+            for(auto& it : body_raw) {
+                auto c = req->make_chunk(string(it));
+                for(auto& it : c) {  content += string(it); }
+            }
+            auto c = req->final_chunk();
+            for(auto& it : c) {  content += string(it); }
+
+            auto result = p.parse(content);
+            CHECK(result.state == State::done);
+            CHECK(result.request->body.to_string() == body_concat);
+        }
+
+        SECTION("make it as final piece") {
+            auto req = Request::Builder().method(Method::POST).chunked().compress(Compression::GZIP).build();
+            auto content = req->to_string();
+            string body_str;
+            for(auto& it : body_raw) { body_str += string(it); }
+            auto chunk = req->final_chunk(body_str);
+            for(auto& it : chunk) content += string(it);
+            auto result = p.parse(content);
+            CHECK(result.state == State::done);
+            CHECK(result.request->body.to_string() == body_concat);
+        }
     }
 }
 

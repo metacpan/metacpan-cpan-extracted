@@ -1,0 +1,6 @@
+.*\.o
+.*\.bs
+XPA.c
+MYMETA\..*
+blib
+Makefile$

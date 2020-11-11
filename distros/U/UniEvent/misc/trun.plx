@@ -15,7 +15,8 @@ if ($vars[0] and $vars[0] =~ /^\d+$/) {
 alarm(0);
 
 if ($ENV{LOGGER}) {
-    XLog::set_logger(sub { say $_[1] });
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_format("%f:%l: %m");
     XLog::set_level(XLog::DEBUG, "UniEvent");
     XLog::set_level(XLog::INFO, "UniEvent::SSL");
 }

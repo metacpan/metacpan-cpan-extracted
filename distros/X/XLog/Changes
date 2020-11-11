@@ -1,3 +1,5 @@
+1.0.2  30.10.2020
+           - add support for root perl module
 1.0.1  09.10.2020
            - add log level to logger subs params
            - add "format" param to multi logger ctor

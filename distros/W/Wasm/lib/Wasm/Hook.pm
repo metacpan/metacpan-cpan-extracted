@@ -10,7 +10,7 @@ use Path::Tiny qw( path );
 use Scalar::Util qw( refaddr );
 
 # ABSTRACT: Automatically load WebAssembly modules without a Perl wrapper
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 sub _hook
@@ -67,7 +67,7 @@ Wasm::Hook - Automatically load WebAssembly modules without a Perl wrapper
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

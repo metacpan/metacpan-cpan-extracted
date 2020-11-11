@@ -1,5 +1,11 @@
 Revision history for CLI-Driver
 
+0.68 - removed circular dependency on Util::Medley
+
+0.67 - modified error message in CLI::Driver::Action::do()
+ 
+0.66 - fixed #129062: Undeclared dependency on namespace::autoclean
+
 0.65 - added feature to allow invocation through a hash of values rather
        than @ARGV
        

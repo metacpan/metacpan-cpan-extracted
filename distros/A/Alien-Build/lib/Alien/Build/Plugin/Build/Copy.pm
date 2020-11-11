@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Copy plugin for Alien::Build
-our $VERSION = '2.33'; # VERSION
+our $VERSION = '2.37'; # VERSION
 
 
 sub init
@@ -47,7 +47,7 @@ Alien::Build::Plugin::Build::Copy - Copy plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.33
+version 2.37
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ with the appropriate logic in your L<alienfile>.
    # alien dist on a platform that doesn't use it.
    requires 'Alien::Build::Plugin::Build::Copy';
  };
-
+ 
  build {
    ...
    if($^O eq 'linux')

@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check);
 use Moo::Role;
 
-our $VERSION = "1.071";
+our $VERSION = "1.072";
 
 has url => (
   is => 'ro',

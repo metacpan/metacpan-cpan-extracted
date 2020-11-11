@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
 
-package Tickit::WidgetRole;
+package Tickit::WidgetRole 0.51;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.51';
 
 use Carp;
 
@@ -31,3 +29,5 @@ sub import
    no strict 'refs';
    *{"${pkg}::$_"} = subname $_ => $subs->{$_} for keys %$subs;
 }
+
+0x55AA;

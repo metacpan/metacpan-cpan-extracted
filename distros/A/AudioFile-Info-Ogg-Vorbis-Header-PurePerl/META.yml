@@ -18,7 +18,7 @@ provides:
     file: lib/AudioFile/Info/Build.pm
   AudioFile::Info::Ogg::Vorbis::Header::PurePerl:
     file: lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm
-    version: v1.5.2
+    version: v1.5.3
 requires:
   AudioFile::Info: '0'
   Ogg::Vorbis::Header::PurePerl: '0'
@@ -26,5 +26,6 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.5.2
+  repository: git://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl.git
+version: v1.5.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

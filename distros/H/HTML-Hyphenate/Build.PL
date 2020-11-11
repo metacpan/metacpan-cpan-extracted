@@ -4,9 +4,9 @@ use Module::Build;
 Module::Build->new(
     module_name => 'HTML::Hyphenate',
     license     => 'perl',
-    dist_author => 'Roland van Ipenburg <ipenburg@xs4all.nl>',
+    dist_author => 'Roland van Ipenburg <roland@rolandvanipenburg.com>',
     requires    => {
-        'perl'                 => '5.14.0',
+        'perl'                 => '5.16.0',
         'Moose'                => 0,
         'Mojolicious'          => 6.0,
         'Log::Log4perl'        => 0,
@@ -16,10 +16,12 @@ Module::Build->new(
         'TeX::Hyphen::Pattern' => 0.100,
     },
     build_requires => {
-        'Test::More'       => 0.86,
-        'Test::NoWarnings' => 0,
+        'Module::Build'        => 0,
     },
-    test_requires => {
+    test_requires  => {
+        'Test::Compile'        => 0,
+        'Test::More'           => 0.86,
+        'Test::NoWarnings'     => 0,
         'Test::Pod'            => 1.00,
         'Test::Pod::Coverage'  => 1.00,
         'Test::TestCoverage'   => 0.08,
@@ -31,7 +33,8 @@ Module::Build->new(
     sign         => 1,
     meta_merge   => {
         resources => {
-            repository => 'https://github.com/ipenburg/HTML-Hyphenate'
+            repository =>
+              'https://bitbucket.org/rolandvanipenburg/html-hyphenate'
         }
     },
 )->create_build_script;

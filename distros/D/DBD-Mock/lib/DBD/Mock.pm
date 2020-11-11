@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.57';
+our $VERSION = '1.58';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -1422,6 +1422,66 @@ the C<last_insert_id>.
         },
     };
 
+=item Result Set Custom Attributes
+
+If you're mocking a database driver that has it's own custom attributes
+attached to its statement handles then you can use the result sets
+C<prepare_attributes> and C<execute_attributes> options.
+
+The C<prepare_attributes> option takes a hashref that maps statement handle
+attribute names to their values.  The attributes are set at the point that
+the statement is prepared.
+
+    $dbh->{mock_add_resultset} = {
+        sql => 'SELECT foo FROM bar',
+        prepare_attributes => {
+            sqlite_unprepared_statements => '   ',
+        },
+        results => [[ 'foo' ], [ 10 ]]
+    };
+
+
+The C<execute_attributes> option also takes a hashref that maps statement
+handle attribute names to their values, however these will only be set when the
+statement is executed.
+
+    $dbh->{mock_add_resultset} = {
+        sql => 'SELECT foo FROM bar',
+        execute_attributes => {
+            syb_result_type => 1,
+        },
+        results => [[ 'foo' ], [ 10 ]]
+    };
+
+If an attribute is also present in the C<prepare_attributes> option then the
+C<prepare_attributes> version will take precedence up to the point the
+statement handle is executed, at which point the C<execute_attributes> version
+will take precedence.
+
+It is also possible to set C<execute_attributes> from a result set's callback
+by returning them under the C<execute_attributes> key in your callback's
+response.
+
+    $dbh->{mock_add_resultset} = {
+        sql => 'SELECT baz FROM qux',
+        callback => sub {
+            my @bound_params = @_;
+
+            my %result = (
+                fields => [ 'baz'],
+                rows => [],
+                execute_attributes => {
+                    foo => 'bar'
+                },
+            );
+
+            return %result;
+        }
+    };
+
+If a result set has an C<execute_attributes> option and a callback that also
+returns an C<execute_attributes> key then the callback's C<execute_attributes>
+value will take precedence.
 
 =back
 
@@ -1498,6 +1558,9 @@ C<mock_can_execute>, and C<mock_can_fetch> features.
 
 =item Thanks to Bernhard Graf for multiple patches fixing a range of issues
 and adding a new I<One Shot Failure> feature to C<mock_add_resultset>.
+
+=item Thanks to Erik Huelsmann for testing the new result set custom attributes
+feature.
 
 =back
 

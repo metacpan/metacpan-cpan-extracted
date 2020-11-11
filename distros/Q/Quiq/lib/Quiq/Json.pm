@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.188';
+our $VERSION = '1.191';
 
 use Quiq::Unindent;
 use Scalar::Util ();
@@ -737,7 +737,7 @@ sub key {
 
 =head1 VERSION
 
-1.188
+1.191
 
 =head1 AUTHOR
 

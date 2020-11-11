@@ -105,5 +105,18 @@ subtest 'file with default' => sub {
     is ref $path->value, "Path::Tiny";
 };
 
+subtest 'file with blessed default' => sub {
+    local @ARGV;
+    require Path::Tiny;
+
+    my $kingpin = Getopt::Kingpin->new();
+    my $path = $kingpin->flag("path", "")->default(Path::Tiny::path("Build.PL"))->file();
+
+    $kingpin->parse;
+
+    is $path, "Build.PL";
+    is ref $path->value, "Path::Tiny";
+};
+
 done_testing;
 

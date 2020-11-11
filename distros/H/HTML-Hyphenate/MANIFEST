@@ -1,3 +1,4 @@
+.travis.yml
 bin/hyphenate_html
 Build.PL
 Changes
@@ -17,6 +18,7 @@ t/02_classes.t
 t/03_lang.t
 t/04_register.t
 t/05_svg.t
+t/06_doctype.t
 t/09_pod.t
 t/10_pod-coverage.t
 t/11_test-coverage.t

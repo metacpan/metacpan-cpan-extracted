@@ -80,22 +80,25 @@ subtest substring => sub {
 };
 
 subtest datetime => sub {
-    my $datetime = DateTime->new(year => 2020, month => 8, day => 2, hour => 12, minute => 22, second => 32, time_zone => 'UTC');
+    my $datetime = DateTime->new(year => 2020, month => 8, day => 20, hour => 12, minute => 32, second => 42, time_zone => 'UTC');
 
-    my $got = Country->filter(created_date_time__gt => $datetime)->count;
+    my $got = Country->filter(created_date_time => $datetime)->count;
+    is $got, 1, 'flatten datetime eq';
+
+    $got = Country->filter(created_date_time__gt => $datetime)->count;
     is $got, 1, 'flatten datetime gt';
 
-    $got = Country->filter(created_date_time__lt => $datetime)->count;
-    is $got, 0, 'flatten datetime lt';
+    $got = Country->filter(created_date_time__lte => $datetime)->count;
+    is $got, 1, 'flatten datetime lte';
 
     $got = Country->filter(created_date_time__year => 2020)->count;
-    is $got, 1, 'lookup year, exists';
+    is $got, 2, 'lookup year, exists';
 
     $got = Country->filter(created_date_time__year => 2019)->count;
     is $got, 0, 'lookup year, not exists';
 
     $got = Country->filter(created_date_time__year__gt => 2019)->count;
-    is $got, 1, 'lookup year gt, exists';
+    is $got, 2, 'lookup year gt, exists';
 
     my $filter = Country->search({}, {
         '+select' => [{ year => 'me.created_date_time', -as => 'created_year' }],

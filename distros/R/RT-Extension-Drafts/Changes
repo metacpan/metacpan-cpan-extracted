@@ -1,5 +1,8 @@
 Revision history for RT-Extension-Drafts
 
+0.04    Mon, 09 Nov 2020 15:40:15 +0100
+        Add missing fr translation for autosave feature
+
 0.03    Mon, 26 Mar 2018 16:43:27 +0200
         Add periodic autosave feature (thanks to GIBUS@cpan.org)
 

@@ -105,6 +105,11 @@ static char * features[] = {
 	nil
 };
 
+static char * mime[] = {
+	"image/png",
+	NULL
+};
+
 static char * loadOutput[] = {
 	"background",
 	"gamma",
@@ -182,7 +187,8 @@ static ImgCodecInfo codec_info = {
 #endif
 	,
 	pngbpp, /* save types */
-	loadOutput
+	loadOutput,
+	mime
 };
 
 static double default_screen_gamma = 2.2;
@@ -1494,7 +1500,7 @@ write_tRNS(PImgSaveFileInstance fi)
 	int trns_n = 0;
 	Color color = (Color) 0;
 	int   index = 0;
-	Bool has_color, has_index;
+	Bool has_color = false, has_index = false;
 	int color_weight = 0, index_weight = 0;
 	SaveRec * s = ( SaveRec *) fi-> instance;
 	PIcon i = ( PIcon) fi-> object;

@@ -63,8 +63,8 @@ void FileOutput::do_write () {
     fsreq = Fs::write(fd, bufs.front(), -1, [this](const auto& err, const auto&) {
         bufsz -= bufs.front().length();
         bufs.pop_front();
-        handle_write(err);
-        if (bufs.size()) do_write();
+        this->handle_write(err);
+        if (bufs.size()) this->do_write();
     }, loop);
 }
 

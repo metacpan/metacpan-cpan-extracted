@@ -10,7 +10,8 @@ for the game Six Degrees of Kevin Bacon.
 REQUIREMENTS
 
 I have developed this module for use with Perl 5.6.1 and above.
-Other than that, it has no external dependencies.
+It requires Scalar::Util, which became part of the Perl core in
+Perl 5.7.3.
 
 SAMPLES
 
@@ -30,7 +31,7 @@ To install this module, run the following commands:
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 Pete Krawczyk
+Copyright (C) 2005-2020 Peter Krawczyk
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

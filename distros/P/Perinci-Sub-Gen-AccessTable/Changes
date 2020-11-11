@@ -1,3 +1,8 @@
+0.586   2020-10-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: case_insensitive_comparison.
+
+
 0.585   2020-10-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Also use Data::Sah::Resolve in filters. Data::Sah::Resolve has been

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode;
-$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.28';
+$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.29';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Freenode.
 
 use Moose;
@@ -80,6 +80,9 @@ around BUILDARGS => sub {
 sub spread {
   my ($self, $msg) = @_;
 
+  # Multiline message
+  $msg =~ s/\\n/\n/g;
+
   $self->obj->msg($msg);
   $self->obj->run;
   POE::Kernel->run();
@@ -108,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Freenode - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 METHODS
 

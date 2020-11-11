@@ -14,14 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-OfficeUtils",
   "EXE_FILES" => [
-    "script/doc2txt",
-    "script/xls2csv"
+    "script/doc2txt"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::OfficeUtils",
   "PREREQ_PM" => {
-    "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -34,10 +32,6 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::filename" => 0,
-    "Sah::Schema::pathname" => 0,
-    "Sah::Schema::true" => 0,
-    "Spreadsheet::XLSX" => 0,
-    "Text::CSV_XS" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -47,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,7 +49,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -71,11 +64,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::filename" => 0,
-  "Sah::Schema::pathname" => 0,
-  "Sah::Schema::true" => 0,
-  "Spreadsheet::XLSX" => 0,
   "Test::More" => 0,
-  "Text::CSV_XS" => 0,
   "strict" => 0,
   "warnings" => 0
 );

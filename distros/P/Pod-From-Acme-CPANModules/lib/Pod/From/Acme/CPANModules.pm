@@ -1,9 +1,9 @@
 package Pod::From::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-30'; # DATE
+our $DATE = '2020-10-19'; # DATE
 our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -90,14 +90,14 @@ sub gen_pod_from_acme_cpanmodules {
                     if $ent->{alternate_modules} && @{ $ent->{alternate_modules} };
             }
             $pod .= "=back\n\n";
-            $res->{pod}{'INCLUDED MODULES'} .= $pod;
+            $res->{pod}{'MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE'} .= $pod;
         }
 
         {
             require Acme::CPANModulesUtil::FeatureMatrix;
             my $fres = Acme::CPANModulesUtil::FeatureMatrix::draw_feature_matrix(_list => $list);
             last if $fres->[0] != 200;
-            $res->{pod}{'FEATURE COMPARISON MATRIX'} = $fres->[2];
+            $res->{pod}{'FEATURE COMPARISON MATRIX OF MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE'} = $fres->[2];
         }
 
     }
@@ -120,7 +120,7 @@ Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::* module
 
 =head1 VERSION
 
-This document describes version 0.004 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2020-04-30.
+This document describes version 0.006 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2020-10-19.
 
 =head1 SYNOPSIS
 

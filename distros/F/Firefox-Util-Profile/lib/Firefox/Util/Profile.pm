@@ -1,9 +1,9 @@
 package Firefox::Util::Profile;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-11-02'; # DATE
 our $DIST = 'Firefox-Util-Profile'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,12 +15,15 @@ our @EXPORT_OK = qw(list_firefox_profiles);
 
 our %SPEC;
 
+# TODO: allow selecting local Firefox installation
+
 $SPEC{list_firefox_profiles} = {
     v => 1.1,
     summary => 'List available Firefox profiles',
     description => <<'_',
 
-This utility will read ~/.mozilla/firefox/profiles.ini and extracts the list of
+This utility will read ~/.mozilla/firefox/profiles.ini (or
+%APPDATA%\\Mozilla\\Firefox\\profiles.ini on Windows) and extracts the list of
 profiles.
 
 _
@@ -37,7 +40,7 @@ sub list_firefox_profiles {
 
     my %args = @_;
 
-    my $ff_dir   = "$ENV{HOME}/.mozilla/firefox";
+    my $ff_dir   = $^O eq 'MSWin32' ? "$ENV{APPDATA}/Mozilla/Firefox" : "$ENV{HOME}/.mozilla/firefox";
     my $ini_path = "$ff_dir/profiles.ini";
     unless (-f $ini_path) {
         return [412, "Cannot find $ini_path"];
@@ -124,7 +127,7 @@ Firefox::Util::Profile - Given a Firefox profile name, return its directory
 
 =head1 VERSION
 
-This document describes version 0.004 of Firefox::Util::Profile (from Perl distribution Firefox-Util-Profile), released on 2020-05-24.
+This document describes version 0.005 of Firefox::Util::Profile (from Perl distribution Firefox-Util-Profile), released on 2020-11-02.
 
 =head1 SYNOPSIS
 
@@ -166,7 +169,8 @@ Usage:
 
 List available Firefox profiles.
 
-This utility will read ~/.mozilla/firefox/profiles.ini and extracts the list of
+This utility will read ~/.mozilla/firefox/profiles.ini (or
+%APPDATA%\Mozilla\Firefox\profiles.ini on Windows) and extracts the list of
 profiles.
 
 This function is not exported by default, but exportable.

@@ -4,7 +4,7 @@
       "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,11 +29,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Scalar::Util" : "1"
+         }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "0.82"
          }
       }
    },
@@ -45,6 +47,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-Matrix"
       }
    },
-   "version" : "0.91",
+   "version" : "0.92",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

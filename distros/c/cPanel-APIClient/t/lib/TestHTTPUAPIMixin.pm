@@ -11,26 +11,14 @@ use strict;
 use warnings;
 use autodie;
 
-use parent 'Test::Class';
+use parent (
+    'TestHTTPCpanelMixin',
+    'Test::Class',
+);
 
 use Test::More;
 use Test::Deep;
 use Test::Fatal;
-
-use constant _CP_REQUIRE => (
-    'MockCpsrvd::cpanel',
-);
-
-sub _set_up_servers : Tests(startup) {
-    my ($self) = @_;
-
-    my $server = MockCpsrvd::cpanel->new();
-    $cPanel::APIClient::Service::cpanel::_PORT = $server->get_port();
-
-    push @{ $self->{'_servers'} }, $server;
-
-    return;
-}
 
 sub no_answer_uapi : Tests(1) {
     my ($self) = shift;
@@ -145,8 +133,8 @@ sub simple_with_token : Tests(2) {
         all(
             methods(
                 [ isa => 'cPanel::APIClient::Response::UAPI' ] => bool(1),
-                succeeded                                      => 1,
-                get_data                                       => {
+                succeeded => 1,
+                get_data  => {
                     content => q<>,
                     method  => 'POST',
                     uri     => '/execute/Email/list_forwarders',
@@ -192,8 +180,8 @@ sub simple_with_password_and_tfa_token : Tests(4) {
             service => 'cpanel',
 
             credentials => {
-                username => 'johnny',
-                password => 'mysecret',
+                username  => 'johnny',
+                password  => 'mysecret',
                 tfa_token => 'mytfa',
             },
         );
@@ -205,8 +193,8 @@ sub simple_with_password_and_tfa_token : Tests(4) {
             all(
                 methods(
                     [ isa => 'cPanel::APIClient::Response::UAPI' ] => bool(1),
-                    succeeded                                      => 1,
-                    get_data                                       => {
+                    succeeded => 1,
+                    get_data  => {
                         content => q<>,
                         method  => 'POST',
                         uri     => '/cpses123123123/execute/Email/list_forwarders',
@@ -229,7 +217,7 @@ sub simple_with_password_and_tfa_token : Tests(4) {
             superhashof(
                 {
                     'Content-Type' => 'application/x-www-form-urlencoded',
-                    Cookie => ignore(),
+                    Cookie         => ignore(),
                 }
             ),
             'headers',
@@ -247,7 +235,7 @@ sub simple_with_password_and_tfa_token : Tests(4) {
         );
 
         $cookies[1] =~ s<\Alogin=><> or die "bad login cookie: $cookies[1]";
-        my $login  = URI::Escape::uri_unescape( $cookies[1] );
+        my $login = URI::Escape::uri_unescape( $cookies[1] );
         my @params = split m<&>, $login;
 
         cmp_bag(
@@ -284,8 +272,8 @@ sub simple_with_password : Tests(2) {
         all(
             methods(
                 [ isa => 'cPanel::APIClient::Response::UAPI' ] => bool(1),
-                succeeded                                      => 1,
-                get_data                                       => {
+                succeeded => 1,
+                get_data  => {
                     content => q<>,
                     method  => 'POST',
                     uri     => '/execute/Email/list_forwarders',
@@ -342,7 +330,7 @@ sub with_payload : Tests(2) {
     );
 
     my $content = $got->get_data()->{'content'};
-    my @pieces  = split m<&>, $content, -1;
+    my @pieces = split m<&>, $content, -1;
 
     cmp_bag(
         \@pieces,

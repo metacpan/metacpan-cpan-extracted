@@ -9,7 +9,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 BEGIN {
   # this is for new package format

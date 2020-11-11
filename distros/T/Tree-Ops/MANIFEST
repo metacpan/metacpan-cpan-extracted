@@ -1,8 +1,10 @@
 Build.PL
 CHANGES
+CONTRIBUTING
 lib/Tree/Ops.pm
-MANIFEST      This list of files
-META.json
-META.yml
+MANIFEST
 README
+README.md
 test.pl
+META.yml
+META.json

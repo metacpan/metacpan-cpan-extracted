@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.14
+    version 0.15
 
 SYNOPSIS
 
@@ -19,8 +19,12 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This Alien provides wasmtime a runtime for Wasm (Web Assembly). It's
-    intended to be used by FFI (not XS) to build Wasm bindings for Perl.
+    NOTE: If you want to call WebAssembly from Perl you want to use Wasm or
+    Wasm::Wasmtime instead.
+
+    This Alien provides wasmtime a library runtime for Wasm (WebAssembly).
+    It's intended to be used by FFI (not XS) to build Wasm bindings for
+    Perl.
 
 METHODS
 

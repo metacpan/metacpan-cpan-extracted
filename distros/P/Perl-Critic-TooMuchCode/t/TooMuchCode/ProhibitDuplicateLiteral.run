@@ -1,20 +1,38 @@
-## name trivial
+## name Cases with no violations
 ## failures 0
 ## cut
 
 print 42;
 print 43;
+print "Forty two";
+print "Forty three";
 
-## name simple
+## name trivial case of duplicate strings
 ## failures 1
 ## cut
 
 print "Forty two";
 print "Forty two";
 
-## name With different quote.
+## name Strings with different different quote.
 ## failures 1
 ## cut
 
 say 'Forty two';
 say "Forty two";
+
+## name trivial case of duplicate numbers
+## failures 1
+## cut
+
+my $n = 42;
+print 42;
+
+## name trivial case of duplicate numbers
+## failures 1
+## cut
+
+my $o = foo() ? 1 : 0;
+my $two = 1 + 1 + 0;
+my $n = 42;
+print 42;

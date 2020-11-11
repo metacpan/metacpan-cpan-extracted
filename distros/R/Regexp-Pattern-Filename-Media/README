@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Filename::Media - Media (image/audio/video) filename
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Regexp::Pattern::Filename::Media (from Perl distribution
-    Regexp-Pattern-Filename-Media), released on 2020-04-01.
+    Regexp-Pattern-Filename-Media), released on 2020-05-31.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -22,15 +22,21 @@ PATTERNS
 
         No extension.
 
-         "foo" =~ re("Filename::Media::filename_media");  # doesn't match
+         "foo" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
 
         Not an extension.
 
-         "mp4" =~ re("Filename::Media::filename_media");  # doesn't match
+         "mp4" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
+
+        Example #3.
 
          "foo.jpg" =~ re("Filename::Media::filename_media");  # matches
 
+        Example #4.
+
          "foo.mp3" =~ re("Filename::Media::filename_media");  # matches
+
+        Example #5.
 
          "foo.mp4" =~ re("Filename::Media::filename_media");  # matches
 
@@ -40,9 +46,11 @@ PATTERNS
 
         Regex is anchored.
 
-         "foo.MKV is the file" =~ re("Filename::Media::filename_media");  # doesn't match
+         "foo.MKV is the file" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
 
-         "foo.txt" =~ re("Filename::Media::filename_media");  # doesn't match
+        Example #8.
+
+         "foo.txt" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -61,9 +69,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Filename::Media
+
     Regexp::Pattern
 
-    Filename::Media
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

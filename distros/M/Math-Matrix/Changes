@@ -1,3 +1,8 @@
+0.92 2020-11-02
+
+ * Add a larged amount of new methods. Improve existing methods. Fix
+   overloading. This will close most of the remaining CPAN RT tickets.
+
 0.91 2020-08-09
 
  * Ensure a recent version of Math::Complex in the test files that use that

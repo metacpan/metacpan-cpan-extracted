@@ -19,16 +19,16 @@ END {
     for (qw{PT-EN.tmx PT-EN.tmx-EN PT-EN.tmx-PT server.cnf}) {
         unlink "t/$_" if -f "t/$_";
     }
-    remove_tree "t/_" if -d "t/_";
+#    remove_tree "t/_" if -d "t/_";
 }
 
 
 capture { `$^X scripts/nat-pair2tmx t/input/PT-tok PT t/input/EN-tok EN > t/PT-EN.tmx` };
-ok -f 't/PT-EN.tmx';
+ok(-f 't/PT-EN.tmx', "TMX is there");
 
 capture { `$^X scripts/nat-tmx2pair t/PT-EN.tmx` };
-ok -f 't/PT-EN.tmx-EN';
-ok -f 't/PT-EN.tmx-PT';
+ok(-f 't/PT-EN.tmx-EN', "SPLIT EN PART is there");
+ok(-f 't/PT-EN.tmx-PT', "SPLIT PT PART is there");
 
 ok similar('t/input/EN-tok' => 't/PT-EN.tmx-EN');
 ok similar('t/input/PT-tok' => 't/PT-EN.tmx-PT');

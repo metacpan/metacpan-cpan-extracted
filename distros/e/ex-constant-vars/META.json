@@ -4,7 +4,7 @@
       "Casey Tweten <ctweten@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,13 +37,18 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/neilb/ex-constant-vars",
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-janitor/ex-constant-vars/issues"
+      },
+      "homepage" : "https://github.com/cpan-janitor/ex-constant-vars",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/neilb/ex-constant-vars.git",
-         "web" : "https://github.com/neilb/ex-constant-vars"
+         "url" : "https://github.com/cpan-janitor/ex-constant-vars.git",
+         "web" : "https://github.com/cpan-janitor/ex-constant-vars"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24"
 }
 

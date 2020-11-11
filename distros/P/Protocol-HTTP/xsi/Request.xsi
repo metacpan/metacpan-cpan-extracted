@@ -36,7 +36,10 @@ BOOT {
 
 RequestSP Request::new (Hash params = Hash()) {
     RETVAL = new XSRequest();
-    if (params) fill(RETVAL, params);
+    if (params) {
+        fill(RETVAL, params);
+        fill_form(RETVAL, params["form"]);
+    }
 }
 
 int Request::method_raw (SV* newval = NULL) {

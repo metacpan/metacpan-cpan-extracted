@@ -60,7 +60,7 @@ subtest 'Legacy syntax' => sub {
                 min_sth => $dbh->prepare('SELECT 1'),
             );
         },
-        qr/Range calculations requires/,
+        qr/Range calculations require/,
         'constructor dies with min_sth + no max_sth',
     );
 };
@@ -70,14 +70,14 @@ subtest 'Errors' => sub {
         dies {
             DBIx::BatchChunker->new;
         },
-        qr/Range calculations requires/,
+        qr/Range calculations require/,
         'constructor dies with no parameters'
     );
     like(
         dies {
             DBIx::BatchChunker->construct_and_execute;
         },
-        qr/Range calculations requires/,
+        qr/Range calculations require/,
         'construct_and_execute dies with no parameters',
     );
 
@@ -89,7 +89,7 @@ subtest 'Errors' => sub {
                 stmt          => 'SELECT 1',
             );
         },
-        qr/Range calculations requires/,
+        qr/Range calculations require/,
         'constructor dies with min_stmt + no max_stmt',
     );
     like(

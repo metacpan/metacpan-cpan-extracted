@@ -180,4 +180,28 @@ EOF
     );
 }
 
+{
+    my $code = "\t<- tab";
+    my $text = <<"EOF";
+```
+$code
+```
+EOF
+
+    my $expect = [
+        {
+            type     => 'code_block',
+            code     => $code,
+            language => undef,
+        },
+    ];
+
+    parse_ok(
+        { dialects => 'GitHub' },
+        $text,
+        $expect,
+        'fenced code block with a tab in it',
+    );
+}
+
 done_testing();

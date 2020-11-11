@@ -72,6 +72,7 @@ my $newest_tag;
     $pipe -> reader(@args);
     my @tags = ();
     while (defined(my $tag = <$pipe>)) {
+        next unless $tag =~ /^v?\d/;
         $tag =~ s/\s+\z//;
         push @tags, $tag;
     }

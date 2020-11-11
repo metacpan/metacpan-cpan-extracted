@@ -1,18 +1,23 @@
-0.040   2018-09-08 (PERLANCAR)
+0.041   2020-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix regex to extract github username and repo name.
+
+
+0.040   2018-09-08  Released-By: PERLANCAR
 
 	- [bugfix] Fix checking of GitHub URL in .git/config.
 
 
-0.03     2014-08-26 (PERLANCAR)
+0.03     2014-08-26  Released-By: PERLANCAR
 
          - Rename dist again (drop the Author- part).
 
 
-0.02     2014-08-26 (PERLANCAR)
+0.02     2014-08-26  Released-By: PERLANCAR
 
          - Rename dist.
 
 
-0.01     2013-11-05 (SHARYANTO)
+0.01     2013-11-05  Released-By: SHARYANTO
 
          - First release.

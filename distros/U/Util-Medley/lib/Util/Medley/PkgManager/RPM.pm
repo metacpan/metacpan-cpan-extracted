@@ -1,5 +1,5 @@
 package Util::Medley::PkgManager::RPM;
-$Util::Medley::PkgManager::RPM::VERSION = '0.052';
+$Util::Medley::PkgManager::RPM::VERSION = '0.053';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -16,7 +16,7 @@ Util::Medley::PkgManager::RPM - Class for interacting with RPM
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =cut
 

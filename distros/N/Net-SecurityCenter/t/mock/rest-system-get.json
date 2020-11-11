@@ -43,7 +43,7 @@
 				]
 			}
 		],
-		"version" : "5.0.0",
+		"version" : "5.13.0",
 		"buildID" : "201302011056",
 		"banner" : "THIS IS A DEVELOPMENT RELEASE ONLY!\n\nDue to the nature of this release you can NOT upgrade this installation to a supported, GA release. All data will be lost and a fresh install or upgrade from an earlier, supported installation will be required.\n\n",
 		"releaseID" : "201302011056",

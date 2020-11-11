@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: githooks.pl
+# ABSTRACT: Git::Hooks driver script
 
 use strict;
 use warnings;
@@ -15,11 +16,11 @@ __END__
 
 =head1 NAME
 
-githooks.pl
+githooks.pl - Git::Hooks driver script
 
 =head1 VERSION
 
-version 2.13.0
+version 2.14.0
 
 =head1 AUTHOR
 

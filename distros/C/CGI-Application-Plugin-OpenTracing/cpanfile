@@ -2,7 +2,6 @@ requires        'OpenTracing::GlobalTracer';
 requires        'OpenTracing::Implementation', 'v0.31.0';
 requires        'HTTP::Headers';
 requires        'HTTP::Status';
-requires        'Sub::Name';
 requires        "Syntax::Feature::Maybe";
 requires        'Time::HiRes';
 

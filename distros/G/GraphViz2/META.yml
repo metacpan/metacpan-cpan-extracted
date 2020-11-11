@@ -4,7 +4,7 @@ author:
   - 'Ron Savage <ron@savage.net.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '1.001002'
+  Test::More: '0.88'
   Test::Snapshot: '0.06'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,13 +22,14 @@ no_index:
 requires:
   Data::Section::Simple: '0.02'
   File::Which: '1.21'
+  Graph: '0.9706'
   IPC::Run3: '0.048'
   Moo: '2.001001'
   Types::Standard: '1.000005'
-  perl: '5.010001'
+  perl: '5.008008'
 resources:
   bugtracker: https://github.com/graphviz-perl/GraphViz2/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphviz-perl/GraphViz2.git
-version: '2.58'
+version: '2.61'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

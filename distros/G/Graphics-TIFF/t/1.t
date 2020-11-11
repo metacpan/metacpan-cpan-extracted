@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use Graphics::TIFF ':all';
-use Test::More tests => 43;
+use Test::More tests => 49;
 use Test::Deep;
 BEGIN { use_ok('Graphics::TIFF') }
 
@@ -174,6 +174,31 @@ SKIP: {
     @values = $tif->GetFieldDefaulted(TIFFTAG_EXTRASAMPLES);
     is_deeply( \@values, [EXTRASAMPLE_UNASSALPHA],
         'GetFieldDefaulted TIFFTAG_EXTRASAMPLES' );
+
+    $tif->Close;
+}
+
+#########################
+
+eval "use Image::Magick";
+SKIP: {
+    skip 'Image::Magick not installed', 6 if $@;
+
+    my $image = Image::Magick->new;
+    $image->Read('rose:');
+    $image->Set( density => '72x72', type => 'palette', depth => 2 );
+    $image->Write('test.tif');
+    my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+
+    my @values = $tif->GetField(TIFFTAG_COLORMAP);
+    is $#{ $values[0] }, 255, 'GetField TIFFTAG_COLORMAP r';
+    is $#{ $values[1] }, 255, 'GetField TIFFTAG_COLORMAP g';
+    is $#{ $values[2] }, 255, 'GetField TIFFTAG_COLORMAP b';
+
+    @values = $tif->GetFieldDefaulted(TIFFTAG_COLORMAP);
+    is $#{ $values[0] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP r';
+    is $#{ $values[1] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP g';
+    is $#{ $values[2] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP b';
 
     $tif->Close;
 }

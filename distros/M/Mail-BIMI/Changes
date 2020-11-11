@@ -1,3 +1,13 @@
+2.20201102.2 2020-11-02 UTC
+  - Do not load external entities when validating SVG
+    Requires XML::LibXML 2.0202
+
+2.20201027.2 2020-10-27 UTC
+  - If the BIMI Assertion record returns a CNAME then follow it
+  - Do not require a VMC to have a .pem extension
+  - Allow for EOL differences in Indicator comparison
+  - Allow warnings to be reported
+
 2.20201020.2 2020-10-20 UTC
   - Better error for an invalid VMC extension
   - Better attributes for requested vs retrieved domain/selector

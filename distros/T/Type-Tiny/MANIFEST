@@ -19,6 +19,7 @@ examples/benchmarking/benchmark-named-param-validation.pl
 examples/benchmarking/benchmark-param-validation.pl
 examples/benchmarking/versus-scalar-validation.pl
 examples/datetime-coercions.pl
+examples/jsoncapable.pl
 examples/nonempty.pl
 examples/page-numbers.pl
 inc/Test/Fatal.pm
@@ -119,6 +120,7 @@ t/20-unit/Type-Coercion/parameterized.t
 t/20-unit/Type-Coercion/smartmatch.t
 t/20-unit/Type-Coercion/typetiny-constructor.t
 t/20-unit/Type-Library/assert.t
+t/20-unit/Type-Library/declared-types.t
 t/20-unit/Type-Library/deprecation.t
 t/20-unit/Type-Library/errors.t
 t/20-unit/Type-Library/import-params.t
@@ -154,6 +156,7 @@ t/20-unit/Type-Registry/methods.t
 t/20-unit/Type-Registry/moosextypes.t
 t/20-unit/Type-Registry/mousextypes.t
 t/20-unit/Type-Registry/parent.t
+t/20-unit/Type-Registry/refcount.t
 t/20-unit/Type-Tiny-Class/basic.t
 t/20-unit/Type-Tiny-Class/errors.t
 t/20-unit/Type-Tiny-Class/plus-constructors.t
@@ -164,6 +167,7 @@ t/20-unit/Type-Tiny-Duck/errors.t
 t/20-unit/Type-Tiny-Enum/basic.t
 t/20-unit/Type-Tiny-Enum/cmp.t
 t/20-unit/Type-Tiny-Enum/errors.t
+t/20-unit/Type-Tiny-Enum/sorter.t
 t/20-unit/Type-Tiny-Intersection/basic.t
 t/20-unit/Type-Tiny-Intersection/cmp.t
 t/20-unit/Type-Tiny-Intersection/constrainedobject.t
@@ -185,8 +189,10 @@ t/20-unit/Type-Tiny/constraint-strings.t
 t/20-unit/Type-Tiny/deprecation.t
 t/20-unit/Type-Tiny/esoteric.t
 t/20-unit/Type-Tiny/inline-assert.t
+t/20-unit/Type-Tiny/list-methods.t
 t/20-unit/Type-Tiny/my-methods.t
 t/20-unit/Type-Tiny/parameterization.t
+t/20-unit/Type-Tiny/refcount.t
 t/20-unit/Type-Tiny/shortcuts.t
 t/20-unit/Type-Tiny/smartmatch.t
 t/20-unit/Type-Tiny/syntax.t
@@ -196,6 +202,7 @@ t/20-unit/Type-Utils/classifier.t
 t/20-unit/Type-Utils/dwim-both.t
 t/20-unit/Type-Utils/dwim-moose.t
 t/20-unit/Type-Utils/dwim-mouse.t
+t/20-unit/Type-Utils/is.t
 t/20-unit/Type-Utils/match-on-type.t
 t/20-unit/Type-Utils/warnings.t
 t/20-unit/Types-Common-Numeric/basic.t
@@ -275,6 +282,7 @@ t/21-types/SimpleStr.t
 t/21-types/SingleDigit.t
 t/21-types/Str.t
 t/21-types/StrLength.t
+t/21-types/StrMatch-more.t
 t/21-types/StrMatch.t
 t/21-types/StrictNum.t
 t/21-types/StringLike.t
@@ -286,6 +294,7 @@ t/21-types/Undef.t
 t/21-types/UpperCaseSimpleStr.t
 t/21-types/UpperCaseStr.t
 t/21-types/Value.t
+t/21-types/_ForeignTypeConstraint.t
 t/30-integration/Class-InsideOut/basic.t
 t/30-integration/Exporter-Tiny/basic.t
 t/30-integration/Exporter-Tiny/installer.t
@@ -327,6 +336,7 @@ t/30-integration/Sub-Quote/unquote-coercions.t
 t/30-integration/Sub-Quote/unquote-constraints.t
 t/30-integration/Switcheroo/basic.t
 t/30-integration/Type-Tie/basic.t
+t/30-integration/Type-Tie/type-nano.t
 t/30-integration/Types-ReadOnly/basic.t
 t/30-integration/Validation-Class-Simple/archaic.t
 t/30-integration/Validation-Class-Simple/basic.t
@@ -361,7 +371,6 @@ t/40-regression/ttxs-gh1.t
 t/98-param-eg-from-docs.t
 t/99-moose-std-types-test.t
 t/README
-t/TODO
 t/lib/BiggerLib.pm
 t/lib/DemoLib.pm
 t/mk-test-manifest.pl

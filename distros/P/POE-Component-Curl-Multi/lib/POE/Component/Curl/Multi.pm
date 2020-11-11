@@ -1,5 +1,5 @@
 package POE::Component::Curl::Multi;
-$POE::Component::Curl::Multi::VERSION = '0.14';
+$POE::Component::Curl::Multi::VERSION = '0.16';
 #ABSTRACT: a fast HTTP POE component
 
 use strict;
@@ -372,7 +372,7 @@ POE::Component::Curl::Multi - a fast HTTP POE component
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -675,7 +675,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Chris Williams, Michael S. Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
+This software is copyright (c) 2020 by Chris Williams, Michael S. Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

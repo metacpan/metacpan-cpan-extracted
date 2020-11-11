@@ -1,49 +1,57 @@
 {
    "abstract" : "enables your script to \"be modern\"",
    "author" : [
-      "SÃ¸ren Lund <slu@cpan.org>"
+      "SÃ¸ren Lund <soren@lund.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
-      "gpl_1"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-Be-Modern",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Loaded" : 0,
-            "Test::More" : 0
+            "Module::Loaded" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.38",
-            "Software::License" : 0
+            "Software::License" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Filter::Util::Call" : 0,
-            "Modern::Perl" : 0
+            "Filter::Util::Call" : "0",
+            "Modern::Perl" : "0"
          }
       }
    },
    "provides" : {
       "Acme::Be::Modern" : {
          "file" : "lib/Acme/Be/Modern.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/soren/Acme-Be-Modern/issues"
+      },
       "license" : [
          "http://www.gnu.org/licenses/gpl-3.0.txt"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/soren/Acme-Be-Modern/"
+      }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

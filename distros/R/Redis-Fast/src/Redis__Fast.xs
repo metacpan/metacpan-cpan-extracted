@@ -38,7 +38,7 @@ typedef struct redis_fast_s {
     int port;
     char* path;
     char* error;
-    int reconnect;
+    double reconnect;
     int every;
     int debug;
     double cnx_timeout;
@@ -401,7 +401,7 @@ static void Redis__Fast_connect(Redis__Fast self) {
         }
         gettimeofday(&end, NULL);
         elapsed_time = (end.tv_sec-start.tv_sec) + 1E-6 * (end.tv_usec-start.tv_usec);
-        DEBUG_MSG("elasped time:%f, reconnect:%d", elapsed_time, self->reconnect);
+        DEBUG_MSG("elasped time:%f, reconnect:%lf", elapsed_time, self->reconnect);
         if( elapsed_time > self->reconnect) {
             if(self->path) {
                 snprintf(self->error, MAX_ERROR_SIZE, "Could not connect to Redis server at %s", self->path);
@@ -420,7 +420,7 @@ static void Redis__Fast_connect(Redis__Fast self) {
 
 static void Redis__Fast_reconnect(Redis__Fast self) {
     DEBUG_MSG("%s", "start");
-    if(self->is_connected && !self->ac && self->reconnect) {
+    if(self->is_connected && !self->ac && self->reconnect > 0) {
         DEBUG_MSG("%s", "connection not found. reconnect");
         Redis__Fast_connect(self);
     }
@@ -446,7 +446,7 @@ static redis_fast_reply_t Redis__Fast_decode_reply(Redis__Fast self, redisReply*
         res.result = sv_2mortal(newSViv(reply->integer));
         break;
     case REDIS_REPLY_NIL:
-        res.result = sv_2mortal(newSV(0));
+        res.result = &PL_sv_undef;
         break;
 
     case REDIS_REPLY_ARRAY: {
@@ -511,7 +511,7 @@ static int Redis__Fast_call_reconnect_on_error(Redis__Fast self, redis_fast_repl
         ENTER;
         SAVETMPS;
 
-        sv_ret = ret.result ? ret.result : sv_2mortal(newSV(0));
+        sv_ret = ret.result ? ret.result : &PL_sv_undef;
         sv_err = ret.error;
         sv_cmd = sv_2mortal(newSVpvn((const char*)command_name, command_length));
 
@@ -550,7 +550,7 @@ static void Redis__Fast_sync_reply_cb(redisAsyncContext* c, void* reply, void* p
             cbt->ret = Redis__Fast_decode_reply(self, (redisReply*)reply, cbt->collect_errors);
         }
     } else if(c->c.flags & REDIS_FREEING) {
-        DEBUG_MSG("%s", "redis feeing");
+        DEBUG_MSG("%s", "redis freeing");
         Safefree(cbt);
     } else {
         DEBUG_MSG("connect error: %s", c->errstr);
@@ -569,7 +569,6 @@ static void Redis__Fast_async_reply_cb(redisAsyncContext* c, void* reply, void* 
 
         {
             redis_fast_reply_t result;
-            SV* sv_undef;
 
             dSP;
 
@@ -582,9 +581,8 @@ static void Redis__Fast_async_reply_cb(redisAsyncContext* c, void* reply, void* 
                 result = Redis__Fast_decode_reply(self, (redisReply*)reply, cbt->collect_errors);
             }
 
-            sv_undef = sv_2mortal(newSV(0));
-            if(result.result == NULL) result.result = sv_undef;
-            if(result.error == NULL) result.error = sv_undef;
+            if(result.result == NULL) result.result = &PL_sv_undef;
+            if(result.error == NULL) result.error = &PL_sv_undef;
 
             PUSHMARK(SP);
             XPUSHs(result.result);
@@ -627,7 +625,6 @@ static void Redis__Fast_subscribe_cb(redisAsyncContext* c, void* reply, void* pr
     Redis__Fast self = (Redis__Fast)c->data;
     redis_fast_subscribe_cb_t *cbt = (redis_fast_subscribe_cb_t*)privdata;
     redisReply* r = (redisReply*)reply;
-    SV* sv_undef;
 
     DEBUG_MSG("%s", "start");
     if(!cbt) {
@@ -660,9 +657,8 @@ static void Redis__Fast_subscribe_cb(redisAsyncContext* c, void* reply, void* pr
             self->proccess_sub_count++;
         }
 
-        sv_undef = sv_2mortal(newSV(0));
-        if(res.result == NULL) res.result = sv_undef;
-        if(res.error == NULL) res.error = sv_undef;
+        if(res.result == NULL) res.result = &PL_sv_undef;
+        if(res.error == NULL) res.error = &PL_sv_undef;
 
         PUSHMARK(SP);
         XPUSHs(res.result);
@@ -779,7 +775,7 @@ static redis_fast_reply_t  Redis__Fast_run_cmd(Redis__Fast self, int collect_err
                 );
             DEBUG_MSG("%s", "waiting response");
             res = _wait_all_responses(self);
-            if(res == WAIT_FOR_EVENT_OK && !self->need_reconnect) {
+            if(res == WAIT_FOR_EVENT_OK && self->need_reconnect == 0) {
                 int _need_reconnect = 0;
                 if (1 < cnt - i) {
                     _need_reconnect = Redis__Fast_call_reconnect_on_error(
@@ -801,7 +797,10 @@ static redis_fast_reply_t  Redis__Fast_run_cmd(Redis__Fast self, int collect_err
             if( res == WAIT_FOR_EVENT_READ_TIMEOUT ) break;
 
             if(self->flags & (FLAG_INSIDE_TRANSACTION | FLAG_INSIDE_WATCH)) {
-                croak("reconnect disabled inside transaction or watch");
+                char *msg = "reconnect disabled inside transaction or watch";
+                DEBUG_MSG("error: %s", msg);
+                ret.error = sv_2mortal(newSVpvn(msg, strlen(msg)));
+                return ret;
             }
 
             Redis__Fast_reconnect(self);
@@ -813,10 +812,15 @@ static redis_fast_reply_t  Redis__Fast_run_cmd(Redis__Fast self, int collect_err
         if(res == WAIT_FOR_EVENT_READ_TIMEOUT || res == WAIT_FOR_EVENT_WRITE_TIMEOUT) {
             snprintf(self->error, MAX_ERROR_SIZE, "Error while reading from Redis server: %s", strerror(EAGAIN));
             errno = EAGAIN;
-            croak("%s", self->error);
+            DEBUG_MSG("error: %s", self->error);
+            ret.error = sv_2mortal(newSVpvn(self->error, strlen(self->error)));
+            return ret;
         }
         if(!self->ac) {
-            croak("Not connected to any server");
+            char *msg = "Not connected to any server";
+            DEBUG_MSG("error: %s", msg);
+            ret.error = sv_2mortal(newSVpvn(msg, strlen(msg)));
+            return ret;
         }
     }
     DEBUG_MSG("Finish %s", argv[0]);
@@ -834,10 +838,10 @@ static redis_fast_reply_t Redis__Fast_info_custom_decode(Redis__Fast self, redis
     if(reply->type == REDIS_REPLY_STRING ||
        reply->type == REDIS_REPLY_STATUS) {
 
-        HV* hv = (HV*)sv_2mortal((SV*)newHV());
+        HV* hv = newHV();
         char* str = reply->str;
         size_t len = reply->len;
-        res.result = newRV_inc((SV*)hv);
+        res.result = sv_2mortal(newRV_noinc((SV*)hv));
 
         while(len != 0) {
             const char* line = (char*)memchr(str, '\r', len);
@@ -854,8 +858,8 @@ static redis_fast_reply_t Redis__Fast_info_custom_decode(Redis__Fast self, redis
                 SV** ret;
                 size_t keylen;
                 keylen = sep - str;
-                val = newSVpvn(sep + 1, linelen - keylen - 1);
-                ret = hv_store(hv, str, keylen, val, 0);
+                val = sv_2mortal(newSVpvn(sep + 1, linelen - keylen - 1));
+                ret = hv_store(hv, str, keylen, SvREFCNT_inc(val), 0);
                 if (ret == NULL) {
                     SvREFCNT_dec(val);
                     croak("failed to hv_store");
@@ -896,8 +900,8 @@ CODE:
 OUTPUT:
     RETVAL
 
-int
-__set_reconnect(Redis::Fast self, int val)
+double
+__set_reconnect(Redis::Fast self, double val)
 CODE:
 {
     RETVAL = self->reconnect = val;
@@ -906,7 +910,7 @@ OUTPUT:
     RETVAL
 
 
-int
+double
 __get_reconnect(Redis::Fast self)
 CODE:
 {
@@ -1293,8 +1297,8 @@ CODE:
     Safefree(argv);
     Safefree(argvlen);
 
-    ST(0) = ret.result ? ret.result : sv_2mortal(newSV(0));
-    ST(1) = ret.error ? ret.error : sv_2mortal(newSV(0));
+    ST(0) = ret.result ? ret.result : &PL_sv_undef;
+    ST(1) = ret.error ? ret.error : &PL_sv_undef;
     XSRETURN(2);
 }
 
@@ -1371,8 +1375,8 @@ CODE:
     Safefree(argv);
     Safefree(argvlen);
 
-    ST(0) = ret.result ? ret.result : sv_2mortal(newSV(0));
-    ST(1) = ret.error ? ret.error : sv_2mortal(newSV(0));
+    ST(0) = ret.result ? ret.result : &PL_sv_undef;
+    ST(1) = ret.error ? ret.error : &PL_sv_undef;
     XSRETURN(2);
 }
 
@@ -1411,8 +1415,8 @@ CODE:
     Safefree(argv);
     Safefree(argvlen);
 
-    ST(0) = ret.result ? ret.result : sv_2mortal(newSV(0));
-    ST(1) = ret.error ? ret.error : sv_2mortal(newSV(0));
+    ST(0) = ret.result ? ret.result : &PL_sv_undef;
+    ST(1) = ret.error ? ret.error : &PL_sv_undef;
     XSRETURN(2);
 }
 

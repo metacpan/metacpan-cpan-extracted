@@ -1,21 +1,16 @@
-# <? read_starfish_conf(); &generate_header; !>
-#+
 # file: AuthRegister.pm
-# CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and Registration in Perl
-# (c) 2012-18 Vlado Keselj http://web.cs.dal.ca/~vlado
-# $Date: $
-# $Id: $
-#-
+# CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and
+#   Registration in Perl
+# (c) 2012-20 Vlado Keselj http://vlado.ca
 
 package CGI::AuthRegister;
 use strict;
-#<? &generate_standard_vars !>
-#+
 use vars qw($NAME $ABSTRACT $VERSION);
 $NAME     = 'AuthRegister';
-$ABSTRACT = 'AuthRegister Module for Simple CGI Authentication and Registration in Perl';
-$VERSION  = '1.1';
-#-
+$ABSTRACT = 'AuthRegister Module for Simple CGI Authentication and '.
+  'Registration in Perl';
+$VERSION  = '1.402'; # Last update: 2020-11-09
+
 use CGI qw(:standard);
 # Useful diagnostics:
 # use CGI qw(:standard :Carp -debug);
@@ -33,14 +28,15 @@ use vars qw(@ISA @EXPORT);
   analyze_cookie header_delete_cookie header_session_cookie
   import_dir_and_config login logout
   require_https require_login run_cas send_email_reminder
-  get_user get_user_by_userid set_new_session store_log
+  get_user get_user_by_userid send_email_to_admin
+  set_new_session store_log
  );
 
 use vars qw( $AddAuthenticatedUser
   $DBdir $DBusers $DBpwd $DBsessions $DBusersCas $DBpwdCas
   $DBsessionsCas $DBcasTokens $DebugLevel
-  $Email_from $Email_bcc $Error $ErrorInternal
-  $GenCasPageCustom $LogReport
+  $Email_admin $Email_from $Email_bcc $Error $ErrorInternal
+  $GenCasPageCustom $Header $LogReport
   $LDAPuse $LDAPserver $LDAPdn $LDAPaddUsers $LinkForgotpwd
   $Sendmail $Session $SessionId $SiteId $SiteName $Ticket
   $User $UserEmail $UserId $SendLogs $SecretSalt);
@@ -57,6 +53,7 @@ $DBcasTokens = 'cas-tokens.db'; # CAS Tokens
 # $Error = ''; # Appended error messages, OK to be sent to user
 # $ErrorInternal = ''; # Appended internal error messages, intended
                        # for administrator
+# $Header         # Keeps the latest prepared HTTP header, if not printed
 # $LogReport = '';  # Collecting some important log events if needed
 $SecretSalt = &random_name; # Secret salt for generating secrets (e.g. tokens)
 # $Session   = '';  # Session data structure
@@ -174,16 +171,23 @@ sub run_cas {
       $page=~ s/<!--!hiddenfields-->/$h\n$&/;
       $h = "<input type=\"hidden\" name=\"stoken\" value=\"$stoken\">";
       $page=~ s/<!--!hiddenfields-->/$h\n$&/;
-      $page =~ s/(<input class="inputButton" value=)"Login"/$1"Proceed_Back"/;
+      $page =~ s/(<input class="inputButton" value=)"Login"/$1"Proceed"/;
       my $r = &encodeuri($redirect_uri);
       $page =~ s/(<form id="login_form" action=)"\?login"/$1"$r"/;
     } else { $page =~ s/<input class="inputButton".*?>//s; }
-    print $page; exit;
+    print $page;
+    # Log out user so that they have to login every time they use the service
+    logout();
+    exit;
   };
   ### End of helper functions
   
   # Check redirect_uri
-  if ($redirect_uri ne '' && $redirect_uri !~ /^https:\/\/(\w|[-.~\/])+/i) {
+  if ($redirect_uri ne '' &&
+      $redirect_uri !~ /^https:\/\/(\w|[-.~\/])+/i &&
+      $redirect_uri !~ /^http:\/\/(\w|[-.~\/:])+/i  ## This is temporary for a student project
+                                                   ## It is probably is too relaxed.
+     ) {
     my $page = &gen_cas_page;
     my $h = 'redirect_uri Error!';
     my $t = "URI of the requesting site is not in an acceptable format:<br>\n".
@@ -343,9 +347,13 @@ sub require_login {
 # parameters:
 #   -return_status=>1  rather than exiting on failure, return status
 #         return status values: 'logged out', 1, 'not logged in' 'login failed'
+#         If we want that user gets a suggestion to use CAS to login, then
+#         this option should not be used.
 #
+#   -header_no_print=> do not print header on success, but keep in $Header
 sub _require_login_using_cas {
   my %args = @_; my $casurl = $args{-cas};
+  my $header_no_print = $args{-header_no_print};
   my $retStatus;
   $retStatus = $args{-return_status} if exists($args{-return_status});
   my $title = "Login Page for Site: $SiteId";
@@ -360,12 +368,16 @@ sub _require_login_using_cas {
     if ($retStatus) { return 'logged out' }
     print $HTMLstart, "<p>You are logged out.\n", $LoginMsg; exit; }
 
-  if ($SessionId ne '') { print header(); return 1; }
+  if ($SessionId ne '') {
+    my $header = header();
+    if ($header_no_print) { $Header=$header; return 1; }
+    print $header; return 1; }
 
   my $request_type = param('request_type');
-  if ($request_type ne 'Proceed_Back') {
-    print header(); if ($retStatus) { return 'not logged in' }
-    print $HTMLstart, $LoginMsg; exit; }
+  if ($request_type ne 'Proceed') {
+    if ($retStatus) { print header(); return 'not logged in' }
+    print CGI::redirect(-uri=>$casurl_r);
+    exit; }
   my $username = param('username'); my $stoken = param('stoken');
   if ($username eq '' or $stoken eq '') {
     print header(); if ($retStatus) { return 'not logged in' }
@@ -389,14 +401,14 @@ sub _require_login_using_cas {
       "HTTP POST error message: ".$resp->message."\n";
   }
   if ($result ne 'ok') {
-    $Error.="ERR-384:verify failed, result=($result) casurl=($casurl)\n";
+    $Error.="ERR-401:verify failed, result=($result) casurl=($casurl)\n";
     print header(); $LogReport.=$Error; &store_log;
     if ($retStatus) { return 'login failed'; }
     print $HTMLstart, "Unsuccessful login!\n"; exit; }
   my $u = ($AddAuthenticatedUser ? &get_user_by_userid_or_add($username) :
 	   &get_user_unique('userid', $username));
   if ($u eq '') {
-    $Error.="382-ERR: no userid ($username)\n";
+    $Error.="408-ERR: no userid ($username)\n";
     $LogReport.=$Error; &store_log;
     print header(); if ($retStatus) { return 'login failed'; }
     print $HTMLstart, "Unsuccessful login!\n"; &store_log; exit; }
@@ -562,9 +574,9 @@ sub login {
 sub _login_ldap_add {
   my $userid = shift; my $password = shift;
   if (!&password_check_ldap($userid, $password)) {
-    $Error.="539-ERR:Invalid password for LDAP\n"; return ''; }
+    $Error.="570-ERR:Invalid password for LDAP\n"; return ''; }
   my $u = &get_user_by_userid_or_add($userid);
-  if ($u eq '') { $Error.="541-ERR:\n"; &store_log; return; }
+  if ($u eq '') { $Error.="572-ERR:\n"; &store_log; return; }
   $User = $u;
   # Randomize more salt
   $SecretSalt = md5_base64("$SecretSalt $password");
@@ -578,7 +590,7 @@ sub set_new_session {
   my $email = $u->{email};
   my $userid = $u->{userid};
   if ($email !~ /@/ && $userid !~ /\w/) {
-    $Error .= "555-ERR: No email nor userid\n"; return '';  }
+    $Error .= "586-ERR: No email nor userid\n"; return '';  }
   my $sDir = "$DBdir/$DBsessions";
   if (!-d $sDir && !&check_db_files) { return ''; }
 
@@ -595,8 +607,11 @@ sub set_new_session {
   my $sessionrecord = "SessionId:$SessionId\nTicket:$Ticket\n";
   $sessionrecord.="email:$email\n" if $email ne '';
   $sessionrecord.="userid:$userid\n" if $userid ne '';
-  putfile("$sDir/$SessionId/session.info", $sessionrecord);
+  my $sessioninfofile = "$sDir/$SessionId/session.info";
+  putfile($sessioninfofile, $sessionrecord);
   $UserEmail = $email; $UserId = $userid; $User = $u;
+  $Session = &read_db_record("file=$sessioninfofile");
+  die unless ref($Session);
   return $SessionId;
 }
 
@@ -617,7 +632,10 @@ sub password_check_ldap {
   my $username = shift; my $password = shift;
   $username =~ s/[^a-zA-Z0-9._+=-]//g;
   if ($username eq '' or $LDAPserver eq '' or $LDAPdn eq '') { return '' }
-  use Net::LDAP;
+  #use Net::LDAP;
+  eval "require Net::LDAP;";
+  if ($@) { $Error.="643-ERR: Net::LDAP module required for LDAP ".
+    "functionality\n"; return ''; }
   my $dn = "uid=$username,$LDAPdn";
   my $ldap = Net::LDAP->new("ldaps://$LDAPserver") or die "$@";
   my $mesg = $ldap->bind($dn, password => $password);
@@ -821,13 +839,13 @@ sub get_user {
   my $k = shift; my $v = shift;
   my $db_ref = &read_users_db;
   if (ref($db_ref) ne 'ARRAY') {
-    $Error.="644-ERR: Could not get users data (file system problem?)";
+    $Error.="AuthERR-836: Could not get users data (file system problem?)\n";
     return $User='';
   }
   my @db = @{ $db_ref };
   for my $r (@db)
   { if (exists($r->{$k}) && $v eq $r->{$k}) { return $User=$r } }
-  $Error.="650-ERR: no user with key=($k) v=($v)\n"; return $User='';
+  $Error.="AuthERR-842: no user with key=($k) v=($v)\n"; return $User='';
 }
 
 sub get_user_by_email {
@@ -879,7 +897,7 @@ sub get_user_unique {
     $Error.= "676-ERR: double user key ($k:$v)\n"; return '';
   }
   return $User=$u unless $u eq '';
-  $Error.="866-ERR: no user with key ($k:$v)\n"; return '';
+  $Error.="894-ERR: no user with key ($k:$v)\n"; return '';
 }
 
 sub check_db_files {
@@ -963,6 +981,7 @@ sub read_db {
       else { $record = $arg; $arg = ''; }
       my $r = {};
       while ($record) {
+	if ($record =~ /^#.*\n?/) { $record=$'; next; }
         while ($record =~ /^(.*)(\\\n|\n[ \t]+)(.*)/)
 	{ $record = "$1 $3$'" }
         $record =~ /^([^\n:]*):(.*)\n/ or die;
@@ -1059,7 +1078,103 @@ sub unlock_mkdir {
 sub gen_cas_page {
   my $ret;
 #<? my $c = getfile('cas-template/cas.html');
-# echo "\$ret=<<'EOT';\n${c}EOT"; !>
+# echo "\$ret=<<'EOT';\n${c}EOT"; !>#+
+$ret=<<'EOT';
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><title>CAS - Central Authentication Service</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="Description" content="CAS - Central Authentication Service">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="cas-all.css" type="text/css" media="screen">
+<link rel="stylesheet" href="cas-mobile.css"
+ media="handheld, only screen and (max-device-width: 480px)" type="text/css">
+
+<script type="text/javascript" language="javascript">
+// <![CDATA[
+function searchFocus(){document.getElementById('username').focus();}
+// ]]>
+</script>
+
+<style type="text/css">
+/* <![CDATA[ */
+.formInput { float: left; }
+/* ]]> */
+</style>
+</head>
+
+<body onload="searchFocus();">
+<div id="pagebox"> <div id="headerBox">
+<h1>CAS <span class="hideInMobile">&ndash; Central Authentication
+    </span>Service</h1></div>
+
+<div id="content"><div id="content-left">
+
+<form id="login_form" action="?login" method="post">
+<table id="form-layout" cellspacing="0" cellpadding="5" border="0">
+<tbody><tr><td width="" valign="top" align="left">&nbsp;</td>
+ <td width="" valign="top" align="left">
+ <h1><!--37-->Login Required
+ </h1><p class="sans"><!--38-->CAS Authentication
+</p></td></tr>
+
+<!--!username--><tr><td width="" valign="top" align="left">
+<p class="formLabel">UserID:</p></td>
+<td width="" valign="top" align="left">
+<input id="username" name="username" class="formInput" tabindex="1"
+ size="20" autocomplete="off" type="text">
+</td></tr>
+
+<!--!password-->
+<tr><td width="" valign="top" align="left">
+<p class="formLabel">Password:</p></td>
+<td width="" valign="top" align="left">
+<input id="password" name="password" class="formInput" tabindex="2"
+ value="" size="20" autocomplete="off" type="password">
+</td></tr>
+
+<tr><td width="" valign="top" align="left">&nbsp;</td>
+<td width="" valign="top" align="left">
+<!--!hiddenfields-->
+<input class="inputButton" value="Login" type="submit"
+ name="request_type"></td></tr>
+
+<tr class="hideInMobile"><td width="" valign="top" align="left">
+ &nbsp;</td><td width="" valign="top" align="left">
+ <h2>Please note</h2><p class="sans"><!--60-->
+ Before entering your userid and password, verify that the URL
+ for this page begins with:
+ <strong>_THIS_URL_</strong></p>
+ <p class="sans">
+ To protect your privacy, quit your web browser when you
+ are done accessing services that require authentication.
+ </p></td></tr>
+<!--/lastrow-->
+</tbody></table>
+</form></div>
+
+<div id="content-right">
+<ul class="plain">
+<!--!#forgot <li><a href="?rt=forgotpwd" target="_blank">Forgot your password?</a></li>-->
+<!--!# <li class="disabled">CAS Login</li>-->
+<!--!#logout <li><a href="?logout">CAS Logout</a></li>-->
+<!--!# <li><a href="?help">Help with CAS</a></li>-->
+<!--!# <li><span class="hideInMobile">-->
+<!--!# <a href="?feeback" target="_blank">Feedback</a></span></li>-->
+</ul>
+
+<span class="hideInMobile">
+<ul class="plain-serif"><li>
+<!--!# <a href="?forgotpwd" target="_blank">Forgot your password?</a></li>-->
+<!--!# <li><a href="?changepwd" target="_blank">Changing your password</a></li>-->
+</ul>
+</span><!--/hideInMobile-->
+
+</div><!--content-right-->
+<div style="clear:both;"></div></div></div>
+</body></html>
+EOT#-
 #+
 $ret=<<'EOT';
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -1197,7 +1312,162 @@ sub deliver {
   if ($par eq 'cas-all.css') {
     print "Content-Type: text/css; charset=UTF-8\n\n".
 #<? my $c = getfile('cas-template/cas-all.css');
-# echo "<<'EOT';\n${c}EOT\n;"; !>
+# echo "<<'EOT';\n${c}EOT\n;"; !>#+
+<<'EOT';
+body {
+ background-color: #D1AF55; /*#76A9DC;*/
+ color: #444;
+ font-family: "Times New Roman", Times, serif;
+ margin: 30px;
+ padding: 5px;
+}
+
+a:link    { text-decoration: none; }
+a:visited { text-decoration: none; }
+a:active  { text-decoration: none; }
+a:hover   { text-decoration: underline; }
+.hide	  { display: none; }
+
+.shadow {
+ box-shadow: 5px 5px 5px #ccc;
+ -moz-box-shadow: 5px 5px 5px #ccc;
+ -webkit-box-shadow: 5px 5px 5px #ccc;
+}
+
+#pagebox {
+ background: #fff;
+ border: 1px solid #000;
+ box-shadow: 10px 10px 10px #444;
+ -moz-box-shadow: 10px 10px 10px #444;
+ -webkit-box-shadow: 10px 10px 20px #444;
+ margin: 0px auto;
+ width: 788px;
+ height: 491px;
+}
+
+#headerBox {
+ background: #A17F25;
+ border-bottom: 1px solid #916F15;
+ border-left: 1px solid  #916F15;
+ border-right: 1px solid  #916F15;
+ border-top: 1px solid  #916F15;
+ clear: both;
+ height: 82px;
+ width: 786px;
+ text-align:center;
+ color: #ffffff;
+}
+
+#content-left {
+ background: #fff;
+ border-right: 1px solid #0F4D92;
+ clear: both;
+ float: left;
+ height: 377px;
+ margin: 0px;
+ padding: 15px;
+ width: 530px;
+}
+
+#content-right {
+ background: #fafae8;
+ border: 0px;
+ float: right;
+ height: 377px;
+ margin: 0px;
+ padding: 15px;
+ width: 197px;
+}
+
+#content-left h1 {
+ font-family: "Times New Roman", Times, serif;
+ font-size: 20px;
+ font-weight: normal;
+ margin: 0px 0px 5px 0px;
+}
+
+#content-left h2 {
+ font-family: "Times New Roman", Times, serif;
+ font-size: 20px;
+ font-weight: normal;
+ margin: 5px 0px 5px 0px;
+}
+
+#content-left p.formLabel {
+ color: #5F5F5F;
+ font-family: "Times New Roman", Times, serif;
+ font-size: 16px;
+ font-weight: normal;
+ margin: 6px 0px 0px 0px;
+ text-align: right;
+}
+	
+#content-left p.sans {
+ color: #5F5F5F;
+ font-family: Verdana, Arial, Helvetica, sans;
+ font-size: 11px;
+ font-weight: normal;
+ line-height: 1.7em;
+ margin: 5px 0px 5px 0px;
+}
+	
+#content-left p.sansURL {
+ color: #4e6d98;
+ font-family: Verdana, Arial, Helvetica, sans;
+ font-size: 11px;
+ font-weight: normal;
+ line-height: 1em;
+ margin: 15px 0px 5px 0px;
+}
+
+#content ul.plain, ul.plain a { 
+ color: #1A3E6F; 
+ font-family: Verdana, Geneva, Arial, sans-serif;
+ font-size: 14px;
+ line-height: 1.5em;
+ list-style: none;
+ margin: .4em 0em .2em 0em;
+ padding: 0em 0em 0em 0em;
+ text-indent: 0em;
+}
+	
+#content ul.plain li, ul.plain li a {
+ padding-bottom: 0.8em;
+}
+	
+#content ul.plain li.disabled {
+ color: #bbb;
+}
+	
+	
+#content ul.plain-serif, ul.plain-serif a { 
+ color: #1A3E6F; 
+ font-family: "Times New Roman", Times, serif;
+ font-size: 14px;
+ line-height: 1.2em;
+ list-style: none;
+ margin: 30px 0px 0px 0px;
+ padding: 0px 0px 0px 0px;
+ text-indent: 0em;
+}
+	
+#content ul.plain-serif li, ul.plain-serif li a {
+ padding-bottom: 0.8em;
+}
+	
+#content ol { 
+ font-family: Verdana, Arial, Helvetica, sans;
+ font-size: 11px;
+ font-weight: normal;
+ line-height: 1.8em;
+ margin: 0px 0px 0px 20px;
+ padding: 0px 0px 0px 0px;
+ text-indent: 0em;
+}
+	
+#content ol li, ol li a { padding-bottom: 0.8em; }
+EOT
+;#-
 #+
 <<'EOT';
 body {
@@ -1359,7 +1629,149 @@ EOT
   elsif ($par eq 'cas-mobile.css') {
     print "Content-Type: text/css; charset=UTF-8\n\n".
 #<? my $c = getfile('cas-template/cas-mobile.css');
-# echo "<<'EOT';\n${c}EOT\n;"; !>
+# echo "<<'EOT';\n${c}EOT\n;"; !>#+
+<<'EOT';
+body {
+ background-color: #fff;
+ color: #444;
+ font-family: "Times New Roman", Times, serif;
+ margin:  0px;
+ padding: 0px;
+}
+
+a:link    { text-decoration: none; }
+a:visited { text-decoration: none; }
+a:active  { text-decoration: none; }
+a:hover   { text-decoration: underline; }
+.hide	  { display: none; }
+.hideInMobile { display: none; }
+
+#pagebox {
+ border: 0px;
+ background: #fff;
+ margin: 0px;
+ width: auto;
+ height: auto;
+ box-shadow: none;
+ -moz-box-shadow: none;
+ -webkit-box-shadow: none;
+}
+	
+#headerBox {
+ border: 0px;
+ background: #A17F25;
+ overflow: hidden;
+ width: auto;
+ height: auto;
+}
+
+#headerBox h1 { font-size: 14pt; }
+
+#content-left {
+ background: #fff;
+ border: 0px;
+ margin: 0px;
+ padding: 15px;
+ width: auto;
+ height: auto;
+ float: none;
+}
+	
+#content-right {
+ background: #fff;
+ border: 0px;
+ width: auto;
+ height: auto;
+ float: none;
+ margin-left: 85px;
+}
+
+#form-layout { width: auto; }
+
+#login_form input {
+ background: #f8f8f8;
+ border: 1px solid  #aaa;
+ color: #555;
+ font-family: Verdana, Arial, Helvetica, sans;
+ font-weight: normal;
+ margin: 0px 0px 0px 0px;
+ font-size: 16px;
+ padding: 5px;
+}
+	
+#login_form input.inputButton {
+ background: #F5F091; 
+ border: 1px solid #aaa;
+ color: #555;
+ font-family: Georgia, "Times New Roman", Times, serif;
+ font-weight: normal;
+ margin: 10px 0px 10px 0px;
+ font-size: 18px;
+}
+
+#login_form input.formInput {
+ width: 170px;
+ float: none;
+}
+
+h1.mobileTitle { display: none;	}
+	
+#content-left h1 {
+ color: #883F0A;
+ font-family: Georgia, "Times New Roman", Times, serif;
+ font-weight: bold;
+ margin: 0px 0px 5px 0px;
+ font-size: 19px;
+}
+	
+#content-left h2 { display: none; }
+#content-left p.sans { display: none; }	
+#content-left p.sansURL { display: none; }
+#content-left p.mobile-tight { margin: 0; }
+
+#content ul.plain, ul.plain a { 
+ color: #1A3E6F; 
+ font-family: Verdana, Geneva, Arial, sans-serif;
+ line-height: 1.3em;
+ list-style: none;
+ margin: .4em 0em .2em 0em;
+ padding: 0em 0em 0em 0em;
+ text-indent: 0em;
+ font-size: 14px;
+}
+	
+#content ul.plain li, ul.plain li a {
+ padding-bottom: 0.8em;
+}
+	
+#content ul.plain li.disabled {
+ color: #bbb;
+}
+
+#content ul.plain-serif, ul.plain-serif a { 
+ display: none;
+}
+	
+#content ul.plain-serif li, ul.plain-serif li a {
+ padding-bottom: 0.8em;
+}
+	
+#content ol { 
+ color: #5F5F5F;
+ font-family: Verdana, Arial, Helvetica, sans;
+ font-size: 11px;
+ font-weight: normal;
+ line-height: 1.8em;
+ margin: 0px 0px 0px 20px;
+ padding: 0px 0px 0px 0px;
+ text-indent: 0em;
+}
+
+#content ol li, ol li a {
+ padding-bottom: 0.8em;
+}
+EOT
+;#-
 #+
 <<'EOT';
 body {
@@ -1645,14 +2057,34 @@ designed with the assumption that the CGI programs run with user uid.
 
 =head1 PREDEFINED VARIABLES
 
+=head2 $CGI::AuthRegister::AddAuthenticatedUser
+
+If true, a user authenticated via CAS and not in the client record,
+is added to the client record.
+
+=head2 $CGI::AuthRegister::DebugLevel
+
+=head2 $CGI::AuthRegister::Email_admin
+
 =head2 $CGI::AuthRegister::Email_bcc
 
 For example,
 
-  $CGI::AuthRegister::Email_bcc = 'Vlado Keselj <vlado+ar@cs.dal.ca>';
+  $CGI::AuthRegister::Email_bcc = 'Vlado Keselj <vlado+bcc@dnlp.cad>';
 
 If nonempty, causes BCC copies of the emails to be sent to this address.
-This is typically an administrator's address.
+This is typically an administrator's address.  If Email_admin is empty and
+Email_bcc is not, then Email_bcc is used as Email_admin.
+
+=head2 $CGI::AuthRegister::Email_from
+
+Example:
+  $CGI::AuthRegister::Email_from = $CGI::AuthRegister::SiteId
+      . ' <vlado@dnlp.ca>;
+
+=head2 $CGI::AuthRegister::SendLogs
+
+If true, the log entries will be sent by email to the admin.
 
 =head1 FUNCTIONS
 

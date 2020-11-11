@@ -3,10 +3,11 @@
 use strict;
 use warnings;
 
-use Indent::Utils qw(string_len);
+use Indent::Utils qw(remove_last_ws);
 
-# Print string length.
-print string_len("\tab\t")."\n";
+my $input = 'a   ';
+remove_last_ws(\$input);
+print "$input|\n";
 
 # Output:
-# 18
+# a|

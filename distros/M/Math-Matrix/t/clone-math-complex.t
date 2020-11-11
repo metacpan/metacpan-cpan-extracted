@@ -12,10 +12,10 @@ my $min_math_complex_ver = 1.57;
 eval "use Math::Complex $min_math_complex_ver";
 plan skip_all => "Math::Complex $min_math_complex_ver required" if $@;
 
-plan tests => 22;
-
 use lib 't/lib';
 use Math::Matrix::Complex;
+
+plan tests => 22;
 
 my $xdata = [[1, 2, 3], [4, 5, 6]];
 
@@ -36,8 +36,8 @@ my ($nrow, $ncol) = $x -> size();
 
 # Modify the new object, and verify that the original matrix is unmodified.
 
-for (my $i = 0 ; $i < $nrow ; ++$i) {
-    for (my $j = 0 ; $j < $ncol ; ++$j) {
+for my $i (0 .. $nrow - 1) {
+    for my $j (0 .. $ncol - 1) {
         is(ref($y->[$i][$j]), 'Math::Complex',
            "\$y->[$i][$j] is a Math::Complex");
         my $oldval = $x->[$i][$j];

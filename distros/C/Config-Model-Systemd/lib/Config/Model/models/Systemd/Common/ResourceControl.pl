@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -46,8 +46,8 @@ executed by systemd are listed in
 L<systemd.exec(5)>.
 Those options complement options listed here.
 
-See the New
-Control Group Interfaces for an introduction on how to make
+See the L<New
+Control Group Interfaces|https://www.freedesktop.org/wiki/Software/systemd/ControlGroupInterface/> for an introduction on how to make
 use of resource control APIs from programs.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
@@ -79,7 +79,7 @@ L<systemd-system.conf(5)>.',
         'description' => 'Assign the specified CPU time weight to the processes executed, if the unified control group hierarchy
 is used on the system. These options take an integer value and control the C<cpu.weight>
 control group attribute. The allowed range is 1 to 10000. Defaults to 100. For details about this control
-group attribute, see cgroup-v2.txt and sched-design-CFS.txt.
+group attribute, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
 The available CPU time is split up among all units within one slice relative to their CPU time weight.
 
 While C<StartupCPUWeight> only applies to the startup phase of the system,
@@ -99,7 +99,7 @@ These settings replace C<CPUShares> and C<StartupCPUShares>.',
         'description' => 'Assign the specified CPU time weight to the processes executed, if the unified control group hierarchy
 is used on the system. These options take an integer value and control the C<cpu.weight>
 control group attribute. The allowed range is 1 to 10000. Defaults to 100. For details about this control
-group attribute, see cgroup-v2.txt and sched-design-CFS.txt.
+group attribute, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
 The available CPU time is split up among all units within one slice relative to their CPU time weight.
 
 While C<StartupCPUWeight> only applies to the startup phase of the system,
@@ -120,7 +120,7 @@ These settings replace C<CPUShares> and C<StartupCPUShares>.',
 "%". The percentage specifies how much CPU time the unit shall get at maximum, relative to the total CPU time
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
-C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see cgroup-v2.txt and sched-bwc.txt.
+C<cpu.cfs_quota_us> on legacy. For details about these control group attributes, see L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and L<sched-bwc.txt|https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt>.
 
 Example: C<CPUQuota=20%> ensures that the executed processes will never get more than
 20% CPU time on one CPU.',
@@ -137,8 +137,8 @@ Setting C<CPUQuotaPeriodSec> to an empty value resets it to the default.
 
 This controls the second field of C<cpu.max> attribute on the unified control group hierarchy
 and C<cpu.cfs_period_us> on legacy. For details about these control group attributes, see
-cgroup-v2.txt and
-sched-design-CFS.txt.
+L<Control Groups v2|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html> and
+L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
 
 Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in periods of 10ms.',
         'type' => 'leaf',
@@ -198,7 +198,7 @@ percentage value may be specified, which is taken relative to the installed phys
 system. If assigned the special value C<infinity>, all available memory is protected, which may be
 useful in order to always inherit all of the protection afforded by ancestors.
 This controls the C<memory.min> control group attribute. For details about this
-control group attribute, see cgroup-v2.txt.
+control group attribute, see L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.
@@ -221,7 +221,7 @@ percentage value may be specified, which is taken relative to the installed phys
 system. If assigned the special value C<infinity>, all available memory is protected, which may be
 useful in order to always inherit all of the protection afforded by ancestors.
 This controls the C<memory.low> control group attribute. For details about this
-control group attribute, see cgroup-v2.txt.
+control group attribute, see L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.
@@ -244,7 +244,7 @@ percentage value may be specified, which is taken relative to the installed phys
 system. If assigned the
 special value C<infinity>, no memory throttling is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
-cgroup-v2.txt.
+L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.',
@@ -263,7 +263,7 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 percentage value may be specified, which is taken relative to the installed physical memory on the system. If
 assigned the special value C<infinity>, no memory limit is applied. This controls the
 C<memory.max> control group attribute. For details about this control group attribute, see
-cgroup-v2.txt.
+L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 This setting replaces C<MemoryLimit>.',
         'type' => 'leaf',
@@ -277,7 +277,7 @@ Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the spec
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
 special value C<infinity>, no swap limit is applied. This controls the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
-see cgroup-v2.txt.
+see L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.',
@@ -312,10 +312,9 @@ tasks accounted for the unit (see above) stays below a specific limit. This eith
 of tasks or a percentage value that is taken relative to the configured maximum number of tasks on the
 system.  If assigned the special value C<infinity>, no tasks limit is applied. This controls
 the C<pids.max> control group attribute. For details about this control group attribute, see
-pids.txt.
+L<Process Number Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/pids.html>.
 
-The
-system default for this setting may be controlled with
+The system default for this setting may be controlled with
 C<DefaultTasksMax> in
 L<systemd-system.conf(5)>.',
         'type' => 'leaf',
@@ -344,8 +343,9 @@ C<BlockIO> or C<StartupBlockIO>.',
         'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the default block
 I/O weight. This controls the C<io.weight> control group attribute, which defaults to
-100. For details about this control group attribute, see cgroup-v2.txt.  The available I/O
-bandwidth is split up among all units within one slice relative to their block I/O weight.
+100. For details about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
+The available I/O bandwidth is split up among all units within one slice relative to their block
+I/O weight.
 
 While C<StartupIOWeight> only applies
 to the startup phase of the system,
@@ -364,8 +364,9 @@ and disable settings prefixed with C<BlockIO> or C<StartupBlockIO>.',
         'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the default block
 I/O weight. This controls the C<io.weight> control group attribute, which defaults to
-100. For details about this control group attribute, see cgroup-v2.txt.  The available I/O
-bandwidth is split up among all units within one slice relative to their block I/O weight.
+100. For details about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
+The available I/O bandwidth is split up among all units within one slice relative to their block
+I/O weight.
 
 While C<StartupIOWeight> only applies
 to the startup phase of the system,
@@ -387,10 +388,18 @@ the device specific weight value, between 1 and 10000. (Example: C</dev/sda 1000
 path may be specified as path to a block device node or as any other file, in which case the backing block
 device of the file system of the file is determined. This controls the C<io.weight> control
 group attribute, which defaults to 100. Use this option multiple times to set weights for multiple devices.
-For details about this control group attribute, see cgroup-v2.txt.
+For details about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
 
 This setting replaces C<BlockIODeviceWeight> and disables settings prefixed with
-C<BlockIO> or C<StartupBlockIO>.',
+C<BlockIO> or C<StartupBlockIO>.
+
+The specified device node should reference a block device that has an I/O scheduler
+associated, i.e. should not refer to partition or loopback block devices, but to the originating,
+physical device. When a path to a regular file or directory is specified it is attempted to
+discover the correct originating device backing the file system of the specified path. This works
+correctly only for simpler cases, where the file system is directly placed on a partition or
+physical block device, or where simple 1:1 encryption using dm-crypt/LUKS is used. This discovery
+does not cover complex storage and in particular RAID and volume management storage devices.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -405,11 +414,13 @@ system of the file is used. If the bandwidth is suffixed with K, M, G, or T, the
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
-about this control group attribute, see cgroup-v2.txt.
+about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
 
 These settings replace C<BlockIOReadBandwidth> and
 C<BlockIOWriteBandwidth> and disable settings prefixed with C<BlockIO> or
-C<StartupBlockIO>.',
+C<StartupBlockIO>.
+
+Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -424,11 +435,13 @@ system of the file is used. If the bandwidth is suffixed with K, M, G, or T, the
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For details
-about this control group attribute, see cgroup-v2.txt.
+about this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
 
 These settings replace C<BlockIOReadBandwidth> and
 C<BlockIOWriteBandwidth> and disable settings prefixed with C<BlockIO> or
-C<StartupBlockIO>.',
+C<StartupBlockIO>.
+
+Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -443,10 +456,12 @@ used. If the IOPS is suffixed with K, M, G, or T, the specified IOPS is parsed a
 GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1K"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
-this control group attribute, see cgroup-v2.txt.
+this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
 
 These settings are supported only if the unified control group hierarchy is used and disable settings
-prefixed with C<BlockIO> or C<StartupBlockIO>.',
+prefixed with C<BlockIO> or C<StartupBlockIO>.
+
+Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -461,10 +476,12 @@ used. If the IOPS is suffixed with K, M, G, or T, the specified IOPS is parsed a
 GigaIOPS, or TeraIOPS, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1K"). This controls the C<io.max> control
 group attributes. Use this option multiple times to set IOPS limits for multiple devices. For details about
-this control group attribute, see cgroup-v2.txt.
+this control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
 
 These settings are supported only if the unified control group hierarchy is used and disable settings
-prefixed with C<BlockIO> or C<StartupBlockIO>.',
+prefixed with C<BlockIO> or C<StartupBlockIO>.
+
+Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -476,11 +493,13 @@ the device specific latency target. (Example: "/dev/sda 25ms"). The file path ma
 as path to a block device node or as any other file, in which case the backing block device of the file
 system of the file is determined. This controls the C<io.latency> control group
 attribute. Use this option multiple times to set latency target for multiple devices. For details about this
-control group attribute, see cgroup-v2.txt.
+control group attribute, see L<IO Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#io-interface-files>.
 
 Implies C<IOAccounting=yes>.
 
-These settings are supported only if the unified control group hierarchy is used.',
+These settings are supported only if the unified control group hierarchy is used.
+
+Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -509,35 +528,36 @@ L<systemd-system.conf(5)>.",
       },
       'IPAddressAllow',
       {
-        'description' => "Turn on address range network traffic filtering for IP packets sent and received over
-C<AF_INET> and C<AF_INET6> sockets.  Both directives take a
+        'description' => "Turn on network traffic filtering for IP packets sent and received over
+C<AF_INET> and C<AF_INET6> sockets. Both directives take a
 space separated list of IPv4 or IPv6 addresses, each optionally suffixed with an address prefix
-length in bits (separated by a C</> character). If the latter is omitted, the
-address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128
-for IPv6).
+length in bits after a C</> character. If the suffix is omitted, the address is
+considered a host address, i.e. the filter covers the whole address (32 bits for IPv4, 128 bits for
+IPv6).
 
 The access lists configured with this option are applied to all sockets created by processes
 of this unit (or in the case of socket units, associated with it). The lists are implicitly
 combined with any lists configured for any of the parent slice units this unit might be a member
-of. By default all access lists are empty. Both ingress and egress traffic is filtered by these
+of. By default both access lists are empty. Both ingress and egress traffic is filtered by these
 settings. In case of ingress traffic the source IP address is checked against these access lists,
-in case of egress traffic the destination IP address is checked. When configured the lists are
-enforced as follows:
+in case of egress traffic the destination IP address is checked. The following rules are applied in
+turn:
 
-In order to implement a whitelisting IP firewall, it is recommended to use a
-C<IPAddressDeny>C<any> setting on an upper-level slice unit (such as the
-root slice C<-.slice> or the slice containing all system services
+In order to implement an allow-listing IP firewall, it is recommended to use a
+C<IPAddressDeny>C<any> setting on an upper-level slice unit
+(such as the root slice C<-.slice> or the slice containing all system services
 C<system.slice> \x{2013} see
-L<systemd.special(7)> for
-details on these slice units), plus individual per-service C<IPAddressAllow> lines
-permitting network access to relevant services, and only them.
+L<systemd.special(7)>
+for details on these slice units), plus individual per-service C<IPAddressAllow>
+lines permitting network access to relevant services, and only them.
 
-Note that for socket-activated services, the IP access list configured on the socket unit applies to
-all sockets associated with it directly, but not to any sockets created by the ultimately activated services
-for it. Conversely, the IP access list configured for the service is not applied to any sockets passed into
-the service via socket activation. Thus, it is usually a good idea, to replicate the IP access lists on both
-the socket and the service unit, however it often makes sense to maintain one list more open and the other
-one more restricted, depending on the usecase.
+Note that for socket-activated services, the IP access list configured on the socket unit
+applies to all sockets associated with it directly, but not to any sockets created by the
+ultimately activated services for it. Conversely, the IP access list configured for the service is
+not applied to any sockets passed into the service via socket activation. Thus, it is usually a
+good idea to replicate the IP access lists on both the socket and the service unit. Nevertheless,
+it may make sense to maintain one list more open and the other one more restricted, depending on
+the usecase.
 
 If these settings are used multiple times in the same unit the specified lists are combined. If an
 empty string is assigned to these settings the specific access list is reset and all previous settings undone.
@@ -554,35 +574,36 @@ them for IP security.",
       },
       'IPAddressDeny',
       {
-        'description' => "Turn on address range network traffic filtering for IP packets sent and received over
-C<AF_INET> and C<AF_INET6> sockets.  Both directives take a
+        'description' => "Turn on network traffic filtering for IP packets sent and received over
+C<AF_INET> and C<AF_INET6> sockets. Both directives take a
 space separated list of IPv4 or IPv6 addresses, each optionally suffixed with an address prefix
-length in bits (separated by a C</> character). If the latter is omitted, the
-address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128
-for IPv6).
+length in bits after a C</> character. If the suffix is omitted, the address is
+considered a host address, i.e. the filter covers the whole address (32 bits for IPv4, 128 bits for
+IPv6).
 
 The access lists configured with this option are applied to all sockets created by processes
 of this unit (or in the case of socket units, associated with it). The lists are implicitly
 combined with any lists configured for any of the parent slice units this unit might be a member
-of. By default all access lists are empty. Both ingress and egress traffic is filtered by these
+of. By default both access lists are empty. Both ingress and egress traffic is filtered by these
 settings. In case of ingress traffic the source IP address is checked against these access lists,
-in case of egress traffic the destination IP address is checked. When configured the lists are
-enforced as follows:
+in case of egress traffic the destination IP address is checked. The following rules are applied in
+turn:
 
-In order to implement a whitelisting IP firewall, it is recommended to use a
-C<IPAddressDeny>C<any> setting on an upper-level slice unit (such as the
-root slice C<-.slice> or the slice containing all system services
+In order to implement an allow-listing IP firewall, it is recommended to use a
+C<IPAddressDeny>C<any> setting on an upper-level slice unit
+(such as the root slice C<-.slice> or the slice containing all system services
 C<system.slice> \x{2013} see
-L<systemd.special(7)> for
-details on these slice units), plus individual per-service C<IPAddressAllow> lines
-permitting network access to relevant services, and only them.
+L<systemd.special(7)>
+for details on these slice units), plus individual per-service C<IPAddressAllow>
+lines permitting network access to relevant services, and only them.
 
-Note that for socket-activated services, the IP access list configured on the socket unit applies to
-all sockets associated with it directly, but not to any sockets created by the ultimately activated services
-for it. Conversely, the IP access list configured for the service is not applied to any sockets passed into
-the service via socket activation. Thus, it is usually a good idea, to replicate the IP access lists on both
-the socket and the service unit, however it often makes sense to maintain one list more open and the other
-one more restricted, depending on the usecase.
+Note that for socket-activated services, the IP access list configured on the socket unit
+applies to all sockets associated with it directly, but not to any sockets created by the
+ultimately activated services for it. Conversely, the IP access list configured for the service is
+not applied to any sockets passed into the service via socket activation. Thus, it is usually a
+good idea to replicate the IP access lists on both the socket and the service unit. Nevertheless,
+it may make sense to maintain one list more open and the other one more restricted, depending on
+the usecase.
 
 If these settings are used multiple times in the same unit the specified lists are combined. If an
 empty string is assigned to these settings the specific access list is reset and all previous settings undone.
@@ -667,13 +688,13 @@ C<w>, C<m> to control reading,
 writing, or creation of the specific device node(s) by the unit
 (mknod), respectively. On cgroup-v1 this controls the
 C<devices.allow> control group attribute. For details about this control group
-attribute, see devices.txt. On
-cgroup-v2 this functionality is implemented using eBPF filtering.
+attribute, see L<Device Whitelist Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/devices.html>.
+In the unified cgroup hierarchy this functionality is implemented using eBPF filtering.
 
 The device node specifier is either a path to a device node in the file system, starting with
 C</dev/>, or a string starting with either C<char-> or
 C<block-> followed by a device group name, as listed in
-C</proc/devices>. The latter is useful to whitelist all current and future
+C</proc/devices>. The latter is useful to allow-list all current and future
 devices belonging to a specific device group at once. The device group is matched according to
 filename globbing rules, you may hence use the C<*> and C<?>
 wildcards. (Note that such globbing wildcards are not available for device node path
@@ -687,14 +708,18 @@ SCSI block device. C<char-pts> and C<char-alsa> are specifiers for
 all pseudo TTYs and all ALSA sound devices, respectively. C<char-cpu/*> is a
 specifier matching all CPU related device groups.
 
-Note that whitelists defined this way should only reference device groups which are
+Note that allow lists defined this way should only reference device groups which are
 resolvable at the time the unit is started. Any device groups not resolvable then are not added to
-the device whitelist. In order to work around this limitation, consider extending service units
-with an ExecStartPre=/sbin/modprobe\x{2026} line that loads the necessary
-kernel module implementing the device group if missing. Example:
+the device allow list. In order to work around this limitation, consider extending service units
+with a pair of After=modprobe\@xyz.service and
+Wants=modprobe\@xyz.service lines that load the necessary kernel module
+implementing the device group if missing.
+Example:
     \x{2026}
+    [Unit]
+    Wants=modprobe\@loop.service
+    After=modprobe\@loop.service
     [Service]
-    ExecStartPre=-/sbin/modprobe -abq loop
     DeviceAllow=block-loop
     DeviceAllow=/dev/loop-control
     \x{2026}
@@ -761,14 +786,12 @@ Note that controller delegation to less privileged code is only safe on the unif
 hierarchy. Accordingly, access to the specified controllers will not be granted to unprivileged services on
 the legacy hierarchy, even when requested.
 
-The following controller names may be specified: C<cpu>, C<cpuacct>,
-C<io>, C<blkio>, C<memory>, C<devices>,
-C<pids>. Not all of these controllers are available on all kernels however, and some are
+Not all of these controllers are available on all kernels however, and some are
 specific to the unified hierarchy while others are specific to the legacy hierarchy. Also note that the
 kernel might support further controllers, which aren\'t covered here yet as delegation is either not supported
 at all for them or not defined cleanly.
 
-For further details on the delegation model consult Control Group APIs and Delegation.',
+For further details on the delegation model consult L<Control Group APIs and Delegation|https://systemd.io/CGROUP_DELEGATION>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -785,10 +808,7 @@ by systemd.
 Multiple controllers may be specified, separated by spaces. You may also pass
 C<DisableControllers> multiple times, in which case each new instance adds another controller
 to disable. Passing C<DisableControllers> by itself with no controller name present resets
-the disabled controller list.
-
-Valid controllers are C<cpu>, C<cpuacct>, C<io>,
-C<blkio>, C<memory>, C<devices>, and C<pids>.',
+the disabled controller list.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -796,7 +816,7 @@ C<blkio>, C<memory>, C<devices>, and C<pids>.',
       {
         'description' => 'Assign the specified CPU time share weight to the processes executed. These options take an integer
 value and control the C<cpu.shares> control group attribute. The allowed range is 2 to
-262144. Defaults to 1024. For details about this control group attribute, see sched-design-CFS.txt.
+262144. Defaults to 1024. For details about this control group attribute, see L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
 The available CPU time is split up among all units within one slice relative to their CPU time share
 weight.
 
@@ -819,7 +839,7 @@ C<StartupCPUWeight> instead.',
       {
         'description' => 'Assign the specified CPU time share weight to the processes executed. These options take an integer
 value and control the C<cpu.shares> control group attribute. The allowed range is 2 to
-262144. Defaults to 1024. For details about this control group attribute, see sched-design-CFS.txt.
+262144. Defaults to 1024. For details about this control group attribute, see L<CFS Scheduler|https://www.kernel.org/doc/html/latest/scheduler/sched-design-CFS.html>.
 The available CPU time is split up among all units within one slice relative to their CPU time share
 weight.
 
@@ -847,7 +867,7 @@ Terabytes (with the base 1024), respectively. Alternatively, a percentage value 
 taken relative to the installed physical memory on the system. If assigned the special value
 C<infinity>, no memory limit is applied. This controls the
 C<memory.limit_in_bytes> control group attribute. For details about this control group
-attribute, see memory.txt.
+attribute, see L<Memory Resource Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/memory.html>.
 
 Implies C<MemoryAccounting=yes>.
 
@@ -877,7 +897,7 @@ This setting is deprecated. Use C<IOAccounting> instead.',
         'description' => 'Set the default overall block I/O weight for the executed processes, if the legacy control
 group hierarchy is used on the system. Takes a single weight value (between 10 and 1000) to set the default
 block I/O weight. This controls the C<blkio.weight> control group attribute, which defaults to
-500. For details about this control group attribute, see blkio-controller.txt.
+500. For details about this control group attribute, see L<Block IO Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/blkio-controller.html>.
 The available I/O bandwidth is split up among all units within one slice relative to their block I/O
 weight.
 
@@ -901,7 +921,7 @@ instead.',
         'description' => 'Set the default overall block I/O weight for the executed processes, if the legacy control
 group hierarchy is used on the system. Takes a single weight value (between 10 and 1000) to set the default
 block I/O weight. This controls the C<blkio.weight> control group attribute, which defaults to
-500. For details about this control group attribute, see blkio-controller.txt.
+500. For details about this control group attribute, see L<Block IO Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/blkio-controller.html>.
 The available I/O bandwidth is split up among all units within one slice relative to their block I/O
 weight.
 
@@ -928,7 +948,7 @@ the device specific weight value, between 10 and 1000. (Example: "/dev/sda 500")
 specified as path to a block device node or as any other file, in which case the backing block device of the
 file system of the file is determined. This controls the C<blkio.weight_device> control group
 attribute, which defaults to 1000. Use this option multiple times to set weights for multiple devices. For
-details about this control group attribute, see blkio-controller.txt.
+details about this control group attribute, see L<Block IO Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/blkio-controller.html>.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -948,7 +968,7 @@ Gigabytes, or Terabytes, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the
 C<blkio.throttle.read_bps_device> and C<blkio.throttle.write_bps_device>
 control group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For
-details about these control group attributes, see blkio-controller.txt.
+details about these control group attributes, see L<Block IO Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/blkio-controller.html>.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -969,7 +989,7 @@ Gigabytes, or Terabytes, respectively, to the base of 1000. (Example:
 "/dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M"). This controls the
 C<blkio.throttle.read_bps_device> and C<blkio.throttle.write_bps_device>
 control group attributes. Use this option multiple times to set bandwidth limits for multiple devices. For
-details about these control group attributes, see blkio-controller.txt.
+details about these control group attributes, see L<Block IO Controller|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/blkio-controller.html>.
 
 Implies
 C<BlockIOAccounting=yes>.
@@ -980,7 +1000,7 @@ C<IOWriteBandwidthMax> instead.',
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 244 doc',
+    'generated_by' => 'parse-man.pl from systemd 246 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

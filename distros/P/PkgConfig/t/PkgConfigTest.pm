@@ -4,12 +4,10 @@ use strict;
 use warnings;
 use Config;
 use Test::More;
-use File::Basename;
 use Data::Dumper;
 use File::Spec;
 use File::Basename qw(fileparse);
 use Config;
-use Cwd qw( cwd chdir );
 use FindBin ();
 use Exporter;
 our @ISA = qw( Exporter );
@@ -49,7 +47,10 @@ $SCRIPT = $FindBin::Bin . "/../lib/PkgConfig.pm"
 
 sub run_common {
     my @args = @_;
-    (my $ret = qx($^X $SCRIPT --env-only @args))
+    my $pkg_config = join ' ',
+                     map { /\s/ ? "\"$_\"" : $_ }
+                     ($^X, $SCRIPT);
+    (my $ret = qx($pkg_config --env-only @args))
         =~ s/(?:^\s+)|($?:\s+$)//g;
     $RV = $?;
     $S = $ret;

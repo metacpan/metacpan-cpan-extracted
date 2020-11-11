@@ -1,4 +1,7 @@
-use Test::More tests => 1;
+use strict;
+use warnings;
+
+use Test::More;
 
 use Template;
 
@@ -24,3 +27,6 @@ my $result;
 $tt->process(\$t, { file => 't/test.rpm' }, \$result)
   or die $tt->error;
 is($result, $out);
+
+done_testing();
+

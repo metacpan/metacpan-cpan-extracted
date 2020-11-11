@@ -1,7 +1,10 @@
 Build.PL
-CONTRIBUTING.md
+CHANGES
+CONTRIBUTING
 lib/Data/Edit/Xml.pm
-MANIFEST			This list of files
+MANIFEST
+README
+README.md
 test.pl
 META.yml
 META.json

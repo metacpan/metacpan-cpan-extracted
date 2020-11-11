@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App;
-$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.4.1';
+$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.6.0';
 use 5.014;
 use Moo;
 
@@ -65,7 +65,7 @@ implemented as a class to solve the Black Hole solitaire.
 
 =head1 VERSION
 
-version 0.4.1
+version 0.6.0
 
 =head1 SYNOPSIS
 

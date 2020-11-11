@@ -1,4 +1,5 @@
 use strict;
+use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::PkgConfig;
 
@@ -68,7 +69,7 @@ if (-e '/etc/mageia-release' && $cfg{modversion} =~ /4\.(11|9)\./) {
 if (! -e '/etc/mageia-release' && -e '/etc/redhat-release' && $cfg{modversion} =~ /4.11/) {
    $workaround = '-DPATCHED_RH';
 }
-my $ccflags = join(' ', '-Wall -Wextra -fno-strict-aliasing', $cfg{cflags}, "-DRPM_VERSON=$cfg{modversion}", $workaround);
+my $ccflags = join(' ', '-Wall -Wextra -fno-strict-aliasing', $Config{ccflags}, $cfg{cflags}, "-DRPM_VERSON=$cfg{modversion}", $workaround);
 
 print "Found RPM version $cfg{modversion} (compiling with flags: $ccflags)\n";
 

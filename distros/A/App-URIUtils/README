@@ -1,0 +1,55 @@
+NAME
+    App::URIUtils - Utilities related to URI/URL
+
+VERSION
+    This document describes version 0.001 of App::URIUtils (from Perl
+    distribution App-URIUtils), released on 2020-10-30.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   parse-url
+
+FUNCTIONS
+  parse_url
+    Usage:
+
+     parse_url(%args) -> any
+
+    Parse URL string into a hash of information.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   base => *str*
+
+    *   url* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-URIUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-URIUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-URIUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

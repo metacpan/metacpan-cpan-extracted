@@ -4,7 +4,13 @@ use strict;
 use warnings;
 
 use Test::More;
-plan tests => 1;
+
+if ( $^O =~ m!^(solaris|nto)$! ) {
+  plan skip_all => 'Problems on Solaris and QNX with this test';
+}
+else {
+  plan tests => 1;
+}
 
 use IO::Pty ();
 

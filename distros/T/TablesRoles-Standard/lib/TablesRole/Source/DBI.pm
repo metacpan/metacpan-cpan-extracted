@@ -1,14 +1,15 @@
 package TablesRole::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2020-11-10'; # DATE
 our $DIST = 'TablesRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
 use Role::Tiny::With;
 with 'TablesRole::Spec::Basic';
+with 'TablesRole::Util::CSV';
 
 sub new {
     my ($class, %args) = @_;
@@ -73,24 +74,6 @@ sub new {
     }, $class;
 }
 
-sub as_csv {
-    require Text::CSV_XS;
-    my $self = shift;
-
-    $self->{csv_parser} //= Text::CSV_XS->new({binary=>1});
-    my $csv = $self->{csv_parser};
-
-    my $res = "";
-    $csv->combine($self->get_column_names);
-    $res .= $csv->string . "\n";
-    $self->reset_iterator;
-    while (my $row = $self->get_row_arrayref) {
-        $csv->combine(@$row);
-        $res .= $csv->string . "\n";
-    }
-    $res;
-}
-
 sub get_column_count {
     my $self = shift;
     $self->{sth}{NUM_OF_FIELDS};
@@ -138,7 +121,7 @@ TablesRole::Source::DBI - Role to access table data from DBI
 
 =head1 VERSION
 
-This document describes version 0.003 of TablesRole::Source::DBI (from Perl distribution TablesRoles-Standard), released on 2020-06-01.
+This document describes version 0.006 of TablesRole::Source::DBI (from Perl distribution TablesRoles-Standard), released on 2020-11-10.
 
 =head1 DESCRIPTION
 

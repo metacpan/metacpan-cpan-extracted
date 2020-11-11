@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Sankey::Link::Concentrationscales;
 use Chart::Plotly::Trace::Sankey::Link::Hoverlabel;
 use Chart::Plotly::Trace::Sankey::Link::Line;
 
-our $VERSION = '0.040';    # VERSION
+our $VERSION = '0.041';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace sankey.
 
@@ -135,7 +135,7 @@ Chart::Plotly::Trace::Sankey::Link - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: BIMI object
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -184,7 +184,6 @@ sub _build_result($self) {
       MULTIPLE_AUTHORITIES
       MULTIPLE_LOCATIONS
       INVALID_TRANSPORT_A
-      INVALID_EXTENSION_A
       INVALID_TRANSPORT_L
       SPF_PLUS_ALL
       SVG_FETCH_ERROR
@@ -260,7 +259,7 @@ Mail::BIMI - BIMI object
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -376,6 +375,10 @@ Mail::BIMI::Result object
 is=ro
 
 time of retrieval - useful in testing
+
+=head2 warnings
+
+is=rw
 
 =head1 CONSUMES
 

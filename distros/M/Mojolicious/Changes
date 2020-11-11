@@ -1,4 +1,15 @@
 
+8.65  2020-11-10
+  - Added generate dockerfile command. (tianon)
+  - Improved cookbook with container deployment recipe.
+  - Improved security of secure_compare function in Mojo::Util. (robrwo)
+  - Fixed all generated code to consistently use a *::Sandbox class, instead of *::SandBox.
+
+8.64  2020-11-01
+  - Replaced prettify.js with highlight.js. (zakame)
+  - Fixed a bug in Mojo::DOM where the tree root would be checked for all pseudo-classes.
+  - Fixed a redefined subroutine warning in eval command. (elmar)
+
 8.63  2020-10-11
   - Improved Mojo::IOLoop::Subprocess to ensure a clean exit even if something unexpected happens in the forked
     process.
@@ -38,7 +49,7 @@
 8.54  2020-06-14
   - Added EXPERIMENTAL support for :scope and :has pseudo-classes to Mojo::DOM::CSS. (Eckankar, kraih)
   - Fixed a bug in Mojo::DOM where select and ruby elements were parsed incorrectly.
-  - Fixed a but in Mojo::UserAgent::Transactor that prevented compression settings to be inherited across redirects.
+  - Fixed a bug in Mojo::UserAgent::Transactor that prevented compression settings to be inherited across redirects.
   - Fixed a bug where Mojolicious templates could not use the continue Perl keyword.
 
 8.53  2020-06-09

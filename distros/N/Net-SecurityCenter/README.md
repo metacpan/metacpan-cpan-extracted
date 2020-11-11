@@ -8,7 +8,7 @@
 use Net::SecurityCenter;
 my $sc = Net::SecurityCenter('sc.example.org') or die "Error: $@";
 
-$sc->login('secman', 'password');
+$sc->login(username => 'secman', password => 's3cr3t');
 
 if ($sc->error) {
   print "Failed login: " . $sc->error;

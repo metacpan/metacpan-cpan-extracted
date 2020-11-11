@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::install 6.015;
+package Dist::Zilla::App::Command::install 6.017;
 # ABSTRACT: install your dist
 
 use Dist::Zilla::App -command;
@@ -70,7 +70,7 @@ Dist::Zilla::App::Command::install - install your dist
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,9 @@
 package App::DuplicateFilesUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-28'; # DATE
+our $DATE = '2020-06-01'; # DATE
 our $DIST = 'App-DuplicateFilesUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,7 @@ $SPEC{show_duplicate_files} = {
 
 This is actually a shortcut for:
 
-    % uniq-files -a --count --show-size --group-by-digest -R .
+    % uniq-files -a --show-count --show-size --group-by-digest -R .
 
 Sample output:
 
@@ -68,6 +68,15 @@ Sample output:
     | ./tmp/IMG_3430-(93).JPG      | 2190379 | 2     |
     +------------------------------+---------+-------+
 
+You can then delete or move the duplicates manually, if you want. But there's
+also <prog:move-duplicate-files-to> to automatically move all the duplicates
+(but one, for each set) to a directory of your choice.
+
+To perform other actions on the duplicate copies, for example delete them, you
+can use <prog:uniq-files> directly e.g. (in bash):
+
+    % uniq-files -R -D * | while read f; do rm "$p"; done
+
 _
     args => {
     },
@@ -91,8 +100,8 @@ $SPEC{move_duplicate_files_to} = {
     summary => 'Move duplicate files (except one copy) to a directory',
     description => <<'_',
 
-Moving is currently done using Perl's `rename()`, so files cannot be moved
-across filesystems.
+This utility will find all duplicate sets of files and move all of the
+duplicates (except one) for each set to a directory of your choosing.
 
 See also: <prog:show-duplicate-files> which lets you manually select which
 copies of the duplicate sets you want to move/delete.
@@ -137,7 +146,7 @@ sub move_duplicate_files_to {
         report_unique => 0,
         report_duplicate => 3,
         recurse => 1, files => ['.'],
-        count => 1,
+        show_count => 1,
     );
     return [500, "Can't uniq_files: $res->[0] - $res->[1]"] unless $res->[0] == 200;
 
@@ -148,8 +157,9 @@ sub move_duplicate_files_to {
         if ($args{-dry_run}) {
             log_info "[DRY-RUN] Moving duplicate file %s to %s ...", $src, $dest;
         } else {
+            require File::Copy;
             log_info "Moving duplicate file %s to %s ...", $src, $dest;
-            rename $src, $dest or do {
+            File::Copy::move($src, $dest) or do {
                 log_error "Failed moving %s to %s: %s", $src, $dest, $!;
             };
         }
@@ -173,7 +183,7 @@ App::DuplicateFilesUtils - CLI utilities related to duplicate files
 
 =head1 VERSION
 
-This document describes version 0.002 of App::DuplicateFilesUtils (from Perl distribution App-DuplicateFilesUtils), released on 2020-05-28.
+This document describes version 0.004 of App::DuplicateFilesUtils (from Perl distribution App-DuplicateFilesUtils), released on 2020-06-01.
 
 =head1 DESCRIPTION
 
@@ -198,8 +208,8 @@ Usage:
 
 Move duplicate files (except one copy) to a directory.
 
-Moving is currently done using Perl's C<rename()>, so files cannot be moved
-across filesystems.
+This utility will find all duplicate sets of files and move all of the
+duplicates (except one) for each set to a directory of your choosing.
 
 See also: L<show-duplicate-files> which lets you manually select which
 copies of the duplicate sets you want to move/delete.
@@ -253,7 +263,7 @@ Show duplicate files.
 
 This is actually a shortcut for:
 
- % uniq-files -a --count --show-size --group-by-digest -R .
+ % uniq-files -a --show-count --show-size --group-by-digest -R .
 
 Sample output:
 
@@ -296,6 +306,15 @@ Sample output:
  | ./20160420/IMG_3430-(93).JPG | 2190379 | 2     |
  | ./tmp/IMG_3430-(93).JPG      | 2190379 | 2     |
  +------------------------------+---------+-------+
+
+You can then delete or move the duplicates manually, if you want. But there's
+also L<move-duplicate-files-to> to automatically move all the duplicates
+(but one, for each set) to a directory of your choice.
+
+To perform other actions on the duplicate copies, for example delete them, you
+can use L<uniq-files> directly e.g. (in bash):
+
+ % uniq-files -R -D * | while read f; do rm "$p"; done
 
 This function is not exported.
 

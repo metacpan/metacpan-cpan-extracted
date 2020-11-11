@@ -1,0 +1,99 @@
+NAME
+
+    Device::Chip::AD9833 - chip driver for AD9833
+
+SYNOPSIS
+
+       use Device::Chip::AD9833;
+    
+       my $chip = Device::Chip::AD9833->new;
+       $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+       $chip->init->get;
+    
+       my $freq = 440; # in Hz
+       $chip->write_FREQ0( ( $freq << 28 ) / 25E6 ); # presuming 25MHz reference
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to an Analog
+    Devices AD9833 attached to a computer via an SPI adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented with as async return Future instances.
+
+ init
+
+       async method init();
+
+    Resets the chip to a working configuration, including setting the B28
+    bit appropriately for the way this module writes the frequency
+    registers.
+
+    This method must be called before setting the frequency using
+    "write_FREQ0" or "write_FREQ1".
+
+ read_config
+
+       async method read_config();
+
+    Returns a HASH reference containing the current chip configuration.
+    Note that since the chip does not support querying the configuration,
+    this is just an in-memory copy maintained by the object instance,
+    updated by calls to "change_config".
+
+    The hash will contain the following named fields, all booleans.
+
+       B28
+       HLB
+       FSELECT
+       PSELECT
+       SLEEP1
+       SLEEP12
+       OPBITEN
+       DIV2
+       MODE
+
+    In addition, a new value wave will be created combining the current
+    settings of MODE, OPBITEN and DIV2 to explain the waveform generated
+
+       wave => "sine" | "triangle" | "square" | "square/2"
+
+ change_config
+
+       async method change_config(%changes);
+
+    Writes updates to the chip configuration. Takes named arguments of the
+    same form as returned by "read_config", including the synthesized wave
+    setting.
+
+ write_FREQ0
+
+ write_FREQ1
+
+       async method write_FREQ0($freq);
+       async method write_FREQ1($freq);
+
+    Writes the FREQ0 or FREQ1 frequency control register. $freq should be a
+    28bit integer value.
+
+ write_PHASE0
+
+ write_PHASE1
+
+       async method write_PHASE0($phase);
+       async method write_PHASE1($phase);
+
+    Writes the PHASE0 or PHASE1 phase control register. $phase should be a
+    12bit integer value.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

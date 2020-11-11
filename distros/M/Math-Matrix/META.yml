@@ -3,11 +3,11 @@ abstract: unknown
 author:
   - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-  Test::More: '0.94'
+  Test::More: '0.82'
 configure_requires:
   ExtUtils::MakeMaker: '6.58'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,8 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  Scalar::Util: '1'
 resources:
   repository: https://github.com/pjacklam/p5-Math-Matrix.git
-version: '0.91'
+version: '0.92'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

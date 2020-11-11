@@ -7,14 +7,14 @@ use warnings;
 
 use Carp 'croak';
 use Daemon::Device;
-use IO::Socket;
+use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
 use Date::Format 'time2str';
 use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.26'; # VERSION
 
 sub new {
     my $class = shift;
@@ -59,10 +59,11 @@ sub run {
     my $self     = shift;
     my $commands = \@_;
 
-    $self->{socket} = ( ( $self->{connect}{ssl} ) ? 'IO::Socket::SSL' : 'IO::Socket::INET' )->new(
+    $self->{socket} = ( ( $self->{connect}{ssl} ) ? 'IO::Socket::SSL' : 'IO::Socket::IP' )->new(
         PeerAddr        => $self->{connect}{server},
         PeerPort        => $self->{connect}{port},
         Proto           => 'tcp',
+        Family          => ( $self->{connect}{ipv6} ? AF_INET6 : AF_INET ),
         Type            => SOCK_STREAM,
         SSL_verify_mode => SSL_VERIFY_NONE,
     ) or die $!;
@@ -679,7 +680,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)
@@ -713,6 +714,7 @@ version 1.25
             name   => 'Yet Another IRC Bot',
             join   => [ '#test', '#perl' ],
             ssl    => 0,
+            ipv6   => 0,
         },
         plugins => [
             ':core',
@@ -804,6 +806,7 @@ set or added to through other methods off the instantiated object.
             name   => 'Yet Another IRC Bot',
             join   => [ '#test', '#perl' ],
             ssl    => 0,
+            ipv6   => 0,
         },
         plugins => [],
         vars    => {},
@@ -812,7 +815,8 @@ set or added to through other methods off the instantiated object.
 C<spawn> will default to 2. Under C<connect>, C<port> will default to 6667.
 C<join> can be either a string or an arrayref of strings representing channels
 to join after connnecting. C<ssl> is a true/false setting for whether to
-connect to the server over SSL.
+connect to the server over SSL. C<ipv6> is also true/false setting for whether
+to forcibly connect to the server over IPv6.
 
 Read more about plugins below for more information about C<plugins> and C<vars>.
 Consult L<Daemon::Device> and L<Daemon::Control> for more details about C<spawn>
@@ -1342,15 +1346,7 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC>
 
 =item *
 
@@ -1376,7 +1372,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

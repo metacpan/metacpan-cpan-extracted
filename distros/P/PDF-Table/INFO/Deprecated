@@ -1,0 +1,92 @@
+A list of DEPRECATED names and interfaces in PDF::Table. In most cases, these
+are names that have been changed for simplification and consistency. The old
+names will not be kept around forever, and will be removed AT LEAST two
+(2) years after notice is given here. Where possible, when using the old names,
+a warning notice will be given in a release at least six (6) months before the
+old name is removed from the code.
+
+It would behoove you to make a quick check of "INFO/Deprecated" at each release,
+so that you don't end up getting caught flat-footed by the removal of a name, 
+and have to scurry to update your code! Anything added to the deprecated list
+should also show up in "Changes", giving you a "heads up".
+
+At some point in the near future, before warning or error messages are given,
+the examples and the t tests will be updated to use the new forms.
+
+In order of scheduled removal date:
+
+font_color        entry in global args, *_prop properties
+   This has been renamed to 'fg_color', as it is the text (foreground) color.
+   'font_color' is scheduled to be removed after November 2022.
+
+font_color_odd    entry in global args, *_prop properties
+   This has been renamed to 'fg_color_odd', as it is the text (foreground) 
+   color (for odd-numbered rows). 
+   'font_color_odd' is scheduled to be removed after November 2022.
+
+font_color_even   entry in global args, *_prop properties
+   This has been renamed to 'fg_color_even', as it is the text (foreground) 
+   color (for even-numbered rows). 
+   'font_color_even' is scheduled to be removed after November 2022.
+
+background_color   entry in global args, *_prop properties
+   This has been renamed to 'bg_color', as it is the cell (background) color 
+   (for all rows). 
+   'background_color' is scheduled to be removed after November 2022.
+
+background_color_odd   entry in global args, *_prop properties
+   This has been renamed to 'bg_color_odd', as it is the cell (background) 
+   color (for odd-numbered rows). 
+   'background_color_odd' is scheduled to be removed after November 2022.
+
+background_color_even   entry in global args, *_prop properties
+   This has been renamed to 'bg_color_even', as it is the cell (background) 
+   color (for even-numbered rows). 
+   'background_color_even' is scheduled to be removed after November 2022.
+
+font_underline  entry in global args, *_prop properties
+   This has been renamed to just 'underline', as it really isn't related to
+   the font in use. 
+   'font_underline' is scheduled to be removed after November 2022.
+
+start_y  entry in global args, *_prop properties
+   This has been renamed to just 'y'.  
+   'start_y' is scheduled to be removed after November 2022.
+
+start_h  entry in global args, *_prop properties
+   This has been renamed to just 'h'.  
+   'start_h' is scheduled to be removed after November 2022.
+
+lead   entry in global args, *_prop properties
+   This has been renamed to 'leading' (the printer's term), pronounced
+   'ledding'. 
+   'lead' is scheduled to be removed after November 2022.
+
+row_height   entry in global args, *_prop properties
+   This has been renamed to 'min_rh'.
+   'row_height' is scheduled to be removed after November 2022.
+
+border   entry in global args
+   This has been renamed to 'border_w'.
+   'border' is scheduled to be removed after November 2022.
+
+horizontal_borders   entry in global args
+   This has been renamed to 'h_border_w'.
+   'horizontal_borders' is scheduled to be removed after November 2022.
+
+vertical_borders   entry in global args
+   This has been renamed to 'v_border_w'.
+   'vertical_borders' is scheduled to be removed after November 2022.
+
+border_color   entry in global args
+   This has been renamed to 'border_c'.
+   'border_color' is scheduled to be removed after November 2022.
+
+leading '-' on setting names (hash key, e.g., '-next_h') will no longer be 
+  allowed after November 2022. Please update your programs to no longer use 
+  setting names with a leading dash or hyphen.
+
+*** If I have missed any deprecated interfaces, please let me know! ***
+
+======= Deprecated items that have already been removed =====================
+

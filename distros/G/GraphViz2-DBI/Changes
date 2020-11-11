@@ -1,3 +1,11 @@
+2.52 2020-11-05
+- update tests for GraphViz2 2.60
+
+2.51 2020-10-31
+- use combine_node_and_port => 0 from GraphViz2 2.58, new record API
+- stop using special cases and heuristics for FKs, just use DBI
+- zap "name" arg to create, databases don't have a "root"
+
 2.50 2020-10-11
 - fix bad logger default
 

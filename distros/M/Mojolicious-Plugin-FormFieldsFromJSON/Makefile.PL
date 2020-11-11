@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mojolicious::Plugin::FormFieldsFromJSON",
   "PREREQ_PM" => {
+    "Mojo::File" => 0,
     "Mojolicious" => "5.67"
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t t/fields/*.t t/validation/*.t"
   }
@@ -27,6 +28,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Mojo::File" => 0,
   "Mojolicious" => "5.67"
 );
 

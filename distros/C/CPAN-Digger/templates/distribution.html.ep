@@ -1,0 +1,24 @@
+% layout 'main', title => $dist->{distribution};
+
+<h1><%= $dist->{distribution} %></h1>
+
+<table>
+    <tr><td>Release</td><td><a href="https://metacpan.org/release/<%= $dist->{distribution} %>"><%= $dist->{distribution} %></a></td></tr>
+    <tr><td>Author</td><td><a href="https://metacpan.org/author/<%= $dist->{author} %>"><%= $dist->{author} %></a></td></tr>
+    <tr><td>VCS</td><td>
+        <% if ($dist->{vcs_url}) { %>
+            <a href="<%= $dist->{vcs_url} %>"><%= $dist->{vcs_name} %></a>
+        <% } else { %>
+        No link to VCS found.
+        <% } %>
+        </td></tr>
+</table>
+
+
+<h2>All the fields</h2>
+<table>
+<% for my $key (sort keys %$dist) { %>
+   <tr><td><%= $key %></td><td><%= $dist->{$key} %></td></tr>
+<% } %>
+</table>
+

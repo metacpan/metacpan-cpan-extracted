@@ -1,3 +1,16 @@
+0.06 2020-11-03T14:27:09+01:00
+ - Fix test for development version of Data::Printer.
+
+0.05 2020-11-02T13:54:26+01:00
+ - Fix test »REMOTE_ADDR "127.0.0.1" (dualvar: 127),« on FreeBSD.
+
+0.04 2020-10-30T14:19:02+01:00
+ - Fix test (psgi.errors has different values).
+
+0.03 2020-10-29T16:05:46+01:00
+ - Add test.
+ - Change bugtracker to github.
+
 0.02 2020-08-07T20:03:40+02:00
  - Add examples/ dir to META.yml.
  - Fix test dependencies.

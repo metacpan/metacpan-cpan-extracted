@@ -5,7 +5,7 @@ use warnings;
 use base 'Template::Plugin';
 use XML::Feed;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 sub new {
   my ($class, $context, $filename) = @_;

@@ -6,6 +6,28 @@ Home page:    <https://metacpan.org/release/Ask>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Ask>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.015	2020-11-09
+
+ - Added: Ask->instance.
+ - Ask::Question's backend attribute now accepts a coderef as a value, and
+   defaults to Ask->instance.
+
+0.014	2020-11-06
+
+ [ Bug Fixes ]
+ - Ask::Question should be able to cope with missing text attribute.
+
+0.013	2020-11-06
+
+ [ Bug Fixes ]
+ - Fix warning when default for Ask::Question is a string.
+
+ [ Documentation ]
+ - Show functional style in SYNOPSIS.
+
+ [ Other ]
+ - Tidy up code using Perl::Tidy.
+
 0.012	2020-10-26
 
  - Added: Ask->backends method.

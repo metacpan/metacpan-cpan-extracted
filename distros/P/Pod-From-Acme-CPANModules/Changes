@@ -1,3 +1,16 @@
+0.006   2020-10-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix typo.
+
+
+0.005   2020-09-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename generated POD sections: Included Modules -> Modules
+	  Included In This Acme::CPANModules Module, Feature Comparison
+	  Matrix -> Feature Comparison Matrix Of Modules Included In This
+	  Acme::CPANModules Module.
+
+
 0.004   2020-04-30  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

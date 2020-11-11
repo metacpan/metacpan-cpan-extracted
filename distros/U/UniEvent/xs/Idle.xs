@@ -24,6 +24,7 @@ BOOT {
     stash.inherit("UniEvent::Handle");
     stash.add_const_sub("TYPE", Simple(Idle::TYPE.name));
     xs::at_perl_destroy([]() { cbn.on_idle = nullptr; });
+    unievent::register_perl_class(Idle::TYPE, stash);
 }
 
 Idle* Idle::new (LoopSP loop = {}) {

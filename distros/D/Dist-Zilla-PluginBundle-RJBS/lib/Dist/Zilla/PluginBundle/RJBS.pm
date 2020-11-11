@@ -1,9 +1,12 @@
 package Dist::Zilla::PluginBundle::RJBS;
 # ABSTRACT: BeLike::RJBS when you build your dists
-$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.010';
+$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.012';
 use Moose;
 use Dist::Zilla 2.100922; # TestRelease
-with 'Dist::Zilla::Role::PluginBundle::Easy';
+with
+    'Dist::Zilla::Role::PluginBundle::Easy',
+    'Dist::Zilla::Role::PluginBundle::PluginRemover' => { -version => '0.103' },
+    'Dist::Zilla::Role::PluginBundle::Config::Slicer';
 
 #pod =head1 DESCRIPTION
 #pod
@@ -47,6 +50,9 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 #pod
 #pod If the C<github_issues> argument is given, and true, the F<META.*> files will
 #pod point to GitHub issues for the dist's bugtracker.
+#pod
+#pod This bundle makes use of L<Dist::Zilla::Role::PluginBundle::PluginRemover> and
+#pod L<Dist::Zilla::Role::PluginBundle::Config::Slicer> to allow further customization.
 #pod
 #pod =cut
 
@@ -157,6 +163,7 @@ sub configure {
       $self->add_plugins([
         'Git::NextVersion' => {
           version_regexp => '^([0-9]+\.[0-9]+)$',
+          version_by_branch => 1,
         }
       ]);
     }
@@ -201,7 +208,7 @@ sub configure {
 
   $self->add_plugins(
     [ GithubMeta => {
-      remote => [ qw(github origin) ],
+      remote => [ qw(github) ],
       issues => $self->github_issues,
       (length $self->homepage ? (homepage => $self->homepage) : ()),
     } ],
@@ -211,7 +218,6 @@ sub configure {
     tag_format => '%v',
     remotes_must_exist => 0,
     push_to    => [
-      'origin :',
       'github :',
     ],
   });
@@ -235,7 +241,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.010
+version 5.012
 
 =head1 DESCRIPTION
 
@@ -280,19 +286,32 @@ C<manual_version> argument is given, AutoVersion is omitted.
 If the C<github_issues> argument is given, and true, the F<META.*> files will
 point to GitHub issues for the dist's bugtracker.
 
+This bundle makes use of L<Dist::Zilla::Role::PluginBundle::PluginRemover> and
+L<Dist::Zilla::Role::PluginBundle::Config::Slicer> to allow further customization.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge
+=for stopwords Karen Etheridge Ricardo SIGNES
+
+=over 4
+
+=item *
 
 Karen Etheridge <ether@cpan.org>
 
+=item *
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2020 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,6 +9,7 @@ use Test2::Tools::Compare;
 use Test2::Tools::Exception;
 use Test2::Tools::Explain;
 
+use List::Util   qw( max );
 use POSIX        qw( ceil );
 use Scalar::Util qw( looks_like_number );
 use Time::HiRes  qw( time sleep );
@@ -27,8 +28,10 @@ my $track1_count = $track_rs->count;
 
 my $dbh = $schema->storage->dbh;
 
+$Data::Dumper::Maxdepth = 1;
+
 subtest 'Active DBI Processing (+ sleep)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Can't exactly make it an "active" statement
     my $sth = $dbh->prepare('SELECT ?, ?');
@@ -53,7 +56,12 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
     # mode, but we can tweak the $dbh.
     $batch_chunker->dbi_connector->{_dbh}{Callbacks} = {
         ChildCallbacks => {
-            execute => sub { $calls++; return },  # DBI callback cannot return anything
+            execute => sub {
+                my ($sth, $start, $end) = @_;
+                $max_end = max($max_end, $end);
+                $calls++;
+                return;    # DBI callback cannot return anything
+            },
         },
     };
 
@@ -70,13 +78,19 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
     $batch_chunker->execute;
     my $total_time = time - $start_time;
     cmp_ok($calls,      '==', $multiplier_range,       'Right number of calls');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id,  'Final chunk ends at max_id');
     cmp_ok($total_time, '>=', $multiplier_range * 0.1, 'Slept ok');
     cmp_ok($total_time, '<',  $multiplier_range * 0.5, 'Did not oversleep');
+
+    # Remove the callback completely
+    my $dbh = $batch_chunker->dbi_connector->{_dbh};
+    delete $dbh->{Callbacks}{ChildCallbacks}{execute};
+    delete $dbh->{Callbacks}{ChildCallbacks};
+    delete $dbh->{Callbacks};
 };
 
 subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
-    my $calls     = 0;
-    my $max_range = 0;
+    my ($calls, $max_end, $max_range) = (0, 0, 0);
 
     # Constructor
     my $legacy_warning;
@@ -93,9 +107,11 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
             isa_ok($sth, ['DBI::st'], '$sth');
             $calls++;
 
-            my $ls     = $bc->_loop_state;
-            my $range  = $ls->{end} - $ls->{start} + 1;
-            $max_range = $range if $range > $max_range;
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            my $range  = $ls->end - $ls->start + 1;
+            $max_range = max($max_range, $range);
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
@@ -118,12 +134,13 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls,      '<', $multiplier_range, 'Fewer coderef calls than normal');
-    cmp_ok($max_range,  '>', $CHUNK_SIZE,       'Expanded chunk at least once');
+    cmp_ok($calls,      '<',  $multiplier_range,      'Fewer coderef calls than normal');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+    cmp_ok($max_range,  '>',  $CHUNK_SIZE,            'Expanded chunk at least once');
 };
 
 subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $legacy_warning;
@@ -146,8 +163,11 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
             }, '$row + keys');
             $calls++;
 
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
             if ($BATCHCHUNK_TEST_DEBUG) {
-                note explain $bc->_loop_state;
+                note explain $ls;
                 note explain $row;
             }
         },
@@ -165,12 +185,12 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $track1_count, 'Right number of calls');
+    cmp_ok($calls,   '==', $track1_count,          'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'DIY Processing (+ min_chunk_percent)' => sub {
-    my $calls = 0;
-    my $max_range = 0;
+    my ($calls, $max_end, $max_range) = (0, 0, 0);
 
     # Constructor
     my $legacy_warning;
@@ -187,9 +207,11 @@ subtest 'DIY Processing (+ min_chunk_percent)' => sub {
             ok(looks_like_number $end,    '$end   is a number');
             $calls++;
 
-            my $ls     = $bc->_loop_state;
-            my $range  = $ls->{end} - $ls->{start} + 1;
-            $max_range = $range if $range > $max_range;
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            my $range  = $ls->end - $ls->start + 1;
+            $max_range = max($max_range, $range);
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
@@ -212,8 +234,9 @@ subtest 'DIY Processing (+ min_chunk_percent)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls,      '<', $multiplier_range, 'Fewer coderef calls than normal');
-    cmp_ok($max_range,  '>', $CHUNK_SIZE,       'Expanded chunk at least once');
+    cmp_ok($calls,      '<',  $multiplier_range,      'Fewer coderef calls than normal');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+    cmp_ok($max_range,  '>',  $CHUNK_SIZE,            'Expanded chunk at least once');
 };
 
 ############################################################

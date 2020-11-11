@@ -9,6 +9,7 @@ use Test2::Tools::Compare;
 use Test2::Tools::Exception;
 use Test2::Tools::Explain;
 
+use List::Util   qw( max );
 use POSIX        qw( ceil );
 use Scalar::Util qw( looks_like_number );
 use Time::HiRes  qw( time sleep );
@@ -43,8 +44,10 @@ my $dbh = $schema->storage->dbh;
 my @connect_info = @{ $schema->storage->connect_info };
 my $conn = DBIx::Connector::Retry->new( connect_info => \@connect_info );
 
+$Data::Dumper::Maxdepth = 1;
+
 subtest 'Active DBI Processing (+ sleep)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -62,7 +65,12 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
     # Can't exactly make 'stmt' an "active" statement, but we can add a callback
     $conn->dbh->{Callbacks} = {
         ChildCallbacks => {
-            execute => sub { $calls++; return },  # DBI callback cannot return anything
+            execute => sub {
+                my ($sth, $start, $end) = @_;
+                $max_end = max($max_end, $end);
+                $calls++;
+                return;    # DBI callback cannot return anything
+            },
         },
     };
 
@@ -79,13 +87,19 @@ subtest 'Active DBI Processing (+ sleep)' => sub {
     $batch_chunker->execute;
     my $total_time = time - $start_time;
     cmp_ok($calls,      '==', $multiplier_range,       'Right number of calls');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id,  'Final chunk ends at max_id');
     cmp_ok($total_time, '>=', $multiplier_range * 0.1, 'Slept ok');
     cmp_ok($total_time, '<',  $multiplier_range * 0.5, 'Did not oversleep');
+
+    # Remove the callback completely
+    my $dbh = $conn->dbh;
+    delete $dbh->{Callbacks}{ChildCallbacks}{execute};
+    delete $dbh->{Callbacks}{ChildCallbacks};
+    delete $dbh->{Callbacks};
 };
 
 subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
-    my $calls     = 0;
-    my $max_range = 0;
+    my ($calls, $max_end, $max_range) = (0, 0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -101,9 +115,11 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
             isa_ok($sth, ['DBI::st'], '$sth');
             $calls++;
 
-            my $ls     = $bc->_loop_state;
-            my $range  = $ls->{end} - $ls->{start} + 1;
-            $max_range = $range if $range > $max_range;
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            my $range  = $ls->end - $ls->start + 1;
+            $max_range = max($max_range, $range);
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
@@ -124,12 +140,13 @@ subtest 'Query DBI Processing (+ min_chunk_percent)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls,      '<', $multiplier_range, 'Fewer coderef calls than normal');
-    cmp_ok($max_range,  '>', $CHUNK_SIZE,       'Expanded chunk at least once');
+    cmp_ok($calls,      '<',  $multiplier_range,      'Fewer coderef calls than normal');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+    cmp_ok($max_range,  '>',  $CHUNK_SIZE,            'Expanded chunk at least once');
 };
 
 subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -152,8 +169,11 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
             }, '$row + keys');
             $calls++;
 
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
             if ($BATCHCHUNK_TEST_DEBUG) {
-                note explain $bc->_loop_state;
+                note explain $ls;
                 note explain $row;
             }
         },
@@ -169,12 +189,12 @@ subtest 'Query DBI Processing + single_row (+ rsc)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $track1_count, 'Right number of calls');
+    cmp_ok($calls,   '==', $track1_count,          'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'DIY Processing (+ min_chunk_percent)' => sub {
-    my $calls = 0;
-    my $max_range = 0;
+    my ($calls, $max_end, $max_range) = (0, 0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -190,9 +210,11 @@ subtest 'DIY Processing (+ min_chunk_percent)' => sub {
             ok(looks_like_number $end,    '$end   is a number');
             $calls++;
 
-            my $ls     = $bc->_loop_state;
-            my $range  = $ls->{end} - $ls->{start} + 1;
-            $max_range = $range if $range > $max_range;
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $end);
+
+            my $range  = $ls->end - $ls->start + 1;
+            $max_range = max($max_range, $range);
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
@@ -213,12 +235,46 @@ subtest 'DIY Processing (+ min_chunk_percent)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls,      '<', $multiplier_range, 'Fewer coderef calls than normal');
-    cmp_ok($max_range,  '>', $CHUNK_SIZE,       'Expanded chunk at least once');
+    cmp_ok($calls,      '<',  $multiplier_range,      'Fewer coderef calls than normal');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+    cmp_ok($max_range,  '>',  $CHUNK_SIZE,            'Expanded chunk at least once');
+};
+
+subtest 'DIY Processing (manual range calculations)' => sub {
+    my ($calls, $max_end) = (0, 0);
+
+    # Constructor
+    my $batch_chunker = DBIx::BatchChunker->new(
+        chunk_size => $CHUNK_SIZE,
+
+        coderef    => sub {
+            my ($bc, $start, $end) = @_;
+            ok(looks_like_number $start,  '$start is a number');
+            ok(looks_like_number $end,    '$end   is a number');
+            $calls++;
+
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $end);
+
+            note explain $ls if $BATCHCHUNK_TEST_DEBUG;
+        },
+
+        target_time => 0,
+    );
+    $batch_chunker->min_id(4);
+    $batch_chunker->max_id(70);
+
+    my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
+    my $multiplier_range = ceil($range / $CHUNK_SIZE);
+
+    # Process
+    $batch_chunker->execute;
+    cmp_ok($calls,   '==', $multiplier_range,      'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'Retry testing' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -237,6 +293,8 @@ subtest 'Retry testing' => sub {
     $conn->dbh->{Callbacks} = {
         ChildCallbacks => {
             execute => sub {
+                my ($sth, $start, $end) = @_;
+                $max_end = max($max_end, $end);
                 $calls++;
                 die "Don't wanna execute right now" if $calls % 3;  # fail 2/3rds of the calls
                 return;  # DBI callback cannot return anything
@@ -254,11 +312,12 @@ subtest 'Retry testing' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $multiplier_range * 3, 'Right number of calls');
+    cmp_ok($calls,   '==', $multiplier_range * 3,  'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'Retry testing + single_rows' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -279,8 +338,11 @@ subtest 'Retry testing + single_rows' => sub {
             }, '$row + keys');
             $calls++;
 
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
             if ($BATCHCHUNK_TEST_DEBUG) {
-                note explain $bc->_loop_state;
+                note explain $ls;
                 note explain $row;
             }
 
@@ -303,7 +365,63 @@ subtest 'Retry testing + single_rows' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '>=', $rightish_calls, 'Rightish number of calls');
+    cmp_ok($calls,   '>=', $rightish_calls,        'Rightish number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+};
+
+subtest 'Chunk resizing with non-unique IDs' => sub {
+    my ($calls, $max_end) = (0, 0);
+
+    # Constructor
+    my $batch_chunker = DBIx::BatchChunker->new(
+        chunk_size => $CHUNK_SIZE,
+
+        dbi_connector => $conn,
+        id_name    => 'cd',
+        min_stmt   => 'SELECT MIN(cd) FROM track',
+        max_stmt   => 'SELECT MAX(cd) FROM track',
+        count_stmt => 'SELECT COUNT(*) FROM track WHERE cd BETWEEN ? AND ?',
+        stmt       => 'SELECT ?, ?',
+
+        target_time => 0,
+        sleep       => 0.1,
+    );
+
+    # Can't exactly make 'stmt' an "active" statement, but we can add a callback
+    $conn->dbh->{Callbacks} = {
+        ChildCallbacks => {
+            execute => sub {
+                my ($sth, $start, $end) = @_;
+                $max_end = max($max_end, $end);
+                $calls++;
+                return
+            },  # DBI callback cannot return anything
+        },
+    };
+
+    # Calculate
+    ok($batch_chunker->calculate_ranges, 'calculate_ranges ok');
+    ok($batch_chunker->min_id,           'min_id ok');
+    ok($batch_chunker->max_id,           'max_id ok');
+
+    my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
+    my $multiplier_range = ceil($range / $CHUNK_SIZE);
+
+    # Process
+    my $start_time = time;
+    $batch_chunker->execute;
+    my $total_time = time - $start_time;
+
+    cmp_ok($calls,      '>=', $multiplier_range,       'Rightish number of calls');
+    cmp_ok($max_end,    '==', $batch_chunker->max_id,  'Final chunk ends at max_id');
+    cmp_ok($total_time, '>=', $multiplier_range * 0.1, 'Slept ok');
+    cmp_ok($total_time, '<',  $multiplier_range * 0.5, 'Did not oversleep');
+
+    # Remove the callback completely
+    my $dbh = $conn->dbh;
+    delete $dbh->{Callbacks}{ChildCallbacks}{execute};
+    delete $dbh->{Callbacks}{ChildCallbacks};
+    delete $dbh->{Callbacks};
 };
 
 ############################################################

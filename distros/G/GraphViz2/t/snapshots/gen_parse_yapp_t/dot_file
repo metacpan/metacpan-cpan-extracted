@@ -2,14 +2,14 @@
  graph [ concentrate="1" rankdir="TB" ]
  node [ color="blue" shape="oval" ]
  edge [ color="grey" ]
- "$start" -> "input"
- "exp" -> "exp"
- "input" -> "input"
- "input" -> "line"
- "line" -> "exp"
- "$start" [ label="<port1> $start|<port2> input $end \\n" shape="Mrecord" ]
- "exp" [ label="<port1> exp|<port2> NUM \\nVAR \\nVAR \'=\' exp \\nexp \'+\' exp \\nexp \'-\' exp \\nexp \'*\' exp \\nexp \'/\' exp \\n\'-\' exp \\nexp \'^\' exp \\n\'(\' exp \')\' \\n" shape="Mrecord" ]
- "input" [ label="<port1> input|<port2> (empty) \\ninput line \\n" shape="Mrecord" ]
- "line" [ label="<port1> line|<port2> \'\\n\' \\nexp \'\\n\' \\nerror \'\\n\' \\n" shape="Mrecord" ]
+ "$start" [ label="<port1> $start|{<port2> input\\ $end\\l}" shape="Mrecord" ]
+ "$start" -> "input":"port1"
+ "exp" [ label="<port1> exp|{<port2> NUM\\l|<port3> VAR\\l|<port4> VAR\\ \'=\'\\ exp\\l|<port5> exp\\ \'+\'\\ exp\\l|<port6> exp\\ \'-\'\\ exp\\l|<port7> exp\\ \'*\'\\ exp\\l|<port8> exp\\ \'/\'\\ exp\\l|<port9> \'-\'\\ exp\\l|<port10> exp\\ \'^\'\\ exp\\l|<port11> \'(\'\\ exp\\ \')\'\\l}" shape="Mrecord" ]
+ "exp" -> "exp":"port1"
+ "input" [ label="<port1> input|{<port2> (empty)\\l|<port3> input\\ line\\l}" shape="Mrecord" ]
+ "input" -> "input":"port1"
+ "input" -> "line":"port1"
+ "line" [ label="<port1> line|{<port2> \'\\\\n\'\\l|<port3> exp\\ \'\\\\n\'\\l|<port4> error\\ \'\\\\n\'\\l}" shape="Mrecord" ]
+ "line" -> "exp":"port1"
 }
 '

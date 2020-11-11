@@ -30,6 +30,11 @@ ok $response = request( '/test_render?template=non_existant_template' ), 'Reques
 is 403, $response->code, '... fails';
 is $response->content, 'file error - non_existant_template.tt: not found', '... with the expected content';
 
+BEGIN { $num_tests += 3 }
+ok $response = request( "/test_args/broken/or/not" ), 'Request with args';
+ok $response->is_success, '... succeeds';
+is $response->content, 'No argument from me', '... with the expected content';
+
 my $have_encoding = MyApp->can('encoding') && MyApp->can('clear_encoding');
 
 BEGIN { $num_tests += 4 }

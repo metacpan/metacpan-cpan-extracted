@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
 
-package Tickit::Style::Parser;
+use Object::Pad 0.09;
 
-use strict;
-use warnings;
-use base qw( Parser::MGC );
-
-our $VERSION = '0.51';
+package Tickit::Style::Parser 0.51;
+class Tickit::Style::Parser
+   extends Parser::MGC;
 
 use Struct::Dumb;
 
@@ -19,24 +17,21 @@ use constant pattern_ident => qr/[A-Z0-9_-]+/i;
 # Allow #-style line comments
 use constant pattern_comment => qr/#.*\n/;
 
-sub parse
+method parse
 {
-   my $self = shift;
    $self->sequence_of( \&parse_def );
 }
 
-sub token_typename
+method token_typename
 {
-   my $self = shift;
-   $self->generic_token( typename => qr/(?:${\pattern_ident}::)*${\pattern_ident}/ );
+   # Also accept the generic "*" wildcard
+   $self->generic_token( typename => qr/(?:${\pattern_ident}::)*${\pattern_ident}|\*/ );
 }
 
 struct Definition => [qw( type class tags style )];
 
-sub parse_def
+method parse_def
 {
-   my $self = shift;
-
    my $type = $self->token_typename;
    $self->commit;
 
@@ -94,9 +89,8 @@ sub parse_def
    return Definition( $type, $class, \%tags, \%style );
 }
 
-sub token_boolean
+method token_boolean
 {
-   my $self = shift;
    return $self->token_kw(qw( true false )) eq "true";
 }
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::AfterMint 6.015;
+package Dist::Zilla::Role::AfterMint 6.017;
 # ABSTRACT: something that runs after minting is mostly complete
 
 use Moose::Role;
@@ -32,7 +32,7 @@ Dist::Zilla::Role::AfterMint - something that runs after minting is mostly compl
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 DESCRIPTION
 

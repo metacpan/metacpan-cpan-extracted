@@ -1,5 +1,14 @@
 Revision history for Perl extension Text-VisualPrintf
 
+3.11 2020-11-04T07:38:20Z
+
+    - Support backspaces.
+
+3.10 2020-10-27T09:00:17Z
+
+    - Change character range used for replacement.
+    - Introduce "visible", "max" and "ordered" parameter.
+
 3.09 2020-10-23T06:15:14Z
 
     - Cut off the string replacement part into Transform.pm.

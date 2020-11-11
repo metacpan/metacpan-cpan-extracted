@@ -1,9 +1,9 @@
 package App::FirefoxMultiAccountContainersUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-21'; # DATE
+our $DATE = '2020-11-02'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -123,13 +123,7 @@ sub _complete_container {
 
 $SPEC{firefox_mua_list_containers} = {
     v => 1.1,
-    summary => "Sort Firefox Multi-Account Containers add-on's containers",
-    description => <<'_',
-
-At the time of this writing, the UI does not provide a way to sort the
-containers. Thus this utility.
-
-_
+    summary => "List Firefox Multi-Account Containers add-on's containers",
     args => {
         %arg0_profile,
     },
@@ -240,8 +234,8 @@ $SPEC{firefox_mua_sort_containers} = {
     summary => "Sort Firefox Multi-Account Containers add-on's containers",
     description => <<'_',
 
-At the time of this writing, the UI does not provide a way to sort the
-containers. Thus this utility.
+At the time of this writing, the UI of the Firefox Multi-Account Containers
+add-on does not provide a way to sort the containers. Thus this utility.
 
 _
     args => {
@@ -273,7 +267,9 @@ sub firefox_mua_sort_containers {
     my $json = $res->[2]{content};
     $json->{identities} = [
         sort {
-            $sort_sub eq 'by_perl_code' ? $cmp->($a, $b) : $cmp->($a->{name}, $b->{name})
+            my $a_name = defined$a->{name} ? $a->{name} : do { my $name = lc $a->{l10nID}; $name =~ s/^usercontext//; $name =~ s/\.label$//; $name };
+            my $b_name = defined$b->{name} ? $b->{name} : do { my $name = lc $b->{l10nID}; $name =~ s/^usercontext//; $name =~ s/\.label$//; $name };
+            $sort_sub eq 'by_perl_code' ? $cmp->($a, $b) : $cmp->($a_name, $b_name)
         }  @{ $json->{identities} }
     ];
 
@@ -295,13 +291,13 @@ $SPEC{firefox_container} = {
     description => <<'_',
 
 This utility opens a new firefox tab in a specific multi-account container. This
-requires the Firefox Multi-Account Container, as well as another container
+requires the Firefox Multi-Account Containers add-on, as well as another add-on
 called "Open external links in a container",
 <https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
 
-The way it works, because add-on currently does not have hooks to the CLI, is
-via a custom protocol handler. For example, if you want to open
-`http://www.example.com/` in a container called `mycontainer`, you ask Firefox
+The way it works, because add-ons currently do not have hooks to the CLI, is via
+a custom protocol handler. For example, if you want to open
+<http://www.example.com/> in a container called `mycontainer`, you ask Firefox
 to open this URL:
 
     ext+container:name=mycontainer&url=http://www.example.com/
@@ -380,7 +376,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.010 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-09-21.
+This document describes version 0.011 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-11-02.
 
 =head1 SYNOPSIS
 
@@ -433,13 +429,13 @@ Examples:
 =back
 
 This utility opens a new firefox tab in a specific multi-account container. This
-requires the Firefox Multi-Account Container, as well as another container
+requires the Firefox Multi-Account Containers add-on, as well as another add-on
 called "Open external links in a container",
 L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
 
-The way it works, because add-on currently does not have hooks to the CLI, is
-via a custom protocol handler. For example, if you want to open
-CL<http://www.example.com/> in a container called C<mycontainer>, you ask Firefox
+The way it works, because add-ons currently do not have hooks to the CLI, is via
+a custom protocol handler. For example, if you want to open
+L<http://www.example.com/> in a container called C<mycontainer>, you ask Firefox
 to open this URL:
 
  ext+container:name=mycontainer&url=http://www.example.com/
@@ -480,10 +476,7 @@ Usage:
 
  firefox_mua_list_containers(%args) -> [status, msg, payload, meta]
 
-Sort Firefox Multi-Account Containers add-on's containers.
-
-At the time of this writing, the UI does not provide a way to sort the
-containers. Thus this utility.
+List Firefox Multi-Account Containers add-on's containers.
 
 This function is not exported.
 
@@ -593,8 +586,8 @@ Usage:
 
 Sort Firefox Multi-Account Containers add-on's containers.
 
-At the time of this writing, the UI does not provide a way to sort the
-containers. Thus this utility.
+At the time of this writing, the UI of the Firefox Multi-Account Containers
+add-on does not provide a way to sort the containers. Thus this utility.
 
 This function is not exported.
 
@@ -657,9 +650,6 @@ feature.
 
 =head1 SEE ALSO
 
-"Firefox Multi-Account Containers" add-on,
-L<https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/>
-
 "Open external links in a container" add-on,
 L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/> (repo
 at L<https://github.com/honsiorovskyi/open-url-in-container/>). The add-on also
@@ -670,9 +660,6 @@ launcher script.
 
 Some other CLI utilities related to Firefox: L<App::FirefoxUtils>,
 L<App::DumpFirefoxHistory>.
-
-
-L<open-browser>.
 
 =head1 AUTHOR
 

@@ -1,18 +1,15 @@
 use strict; use warnings;
 
-use Test::More tests => 27;
+use Test::More tests => 34;
 
 use Graph::Directed;
 use Graph::Undirected;
 
 my $g0 = Graph::Directed->new;
 
-$g0->add_edge(qw(a b));
-$g0->add_edge(qw(a c));
-$g0->add_edge(qw(b d));
-$g0->add_edge(qw(b e));
-$g0->add_edge(qw(c f));
-$g0->add_edge(qw(c g));
+my @E = ([qw(a b)], [qw(a c)], [qw(b d)], [qw(b e)], [qw(c f)], [qw(c g)]);
+
+$g0->add_edge(@$_) for @E;
 
 my $da0 = $g0->subgraph_by_radius('a', 0);
 my $da1 = $g0->subgraph_by_radius('a', 1);
@@ -33,6 +30,25 @@ is($db0, "b");
 is($db1, "b-d,b-e");
 is($db2, "b-d,b-e");
 is($db3, "b-d,b-e");
+
+{
+  my $gh = Graph->new(hypervertexed => 1);
+  $gh->add_vertex(@$_) for (
+      ['a'], [qw(a c)], [qw(a b c)], [qw(a c e)], [qw(a c d)], [],
+  );
+  $gh->add_edge('a', 'b');
+  $gh->add_edge('c', 'd');
+  is $gh, "a-b,c-d,[],[a b c],[a c d],[a c e],[a c],[a],[b],[c],[d],[e]";
+}
+
+for ({}, {countvertexed => 1}, {hypervertexed => 1}) {
+  my $gr = Graph::Directed->new(%$_);
+  $gr->add_edge(@$_) for @E;
+  $gr->rename_vertex('b', 'b1');
+  is $gr->subgraph_by_radius('a', 3), "a-b1,a-c,b1-d,b1-e,c-f,c-g";
+  $gr->rename_vertices(sub { uc $_[0] });
+  is $gr->subgraph_by_radius('A', 3), "A-B1,A-C,B1-D,B1-E,C-F,C-G";
+}
 
 my $g1 = Graph::Undirected->new;
 

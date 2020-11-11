@@ -9,9 +9,8 @@ WriteMakefile(
   MIN_PERL_VERSION => 5.010001,
   NAME => 'GraphViz2::DBI',
   PREREQ_PM => {
-    'GraphViz2' => '2.48',
+    'GraphViz2' => '2.60',
     'DBIx::Admin::TableInfo' => '3.00',
-    'Lingua::EN::PluralToSingular' => '0.14',
     'Moo' => '2.001001',
   },
   TEST_REQUIRES => {

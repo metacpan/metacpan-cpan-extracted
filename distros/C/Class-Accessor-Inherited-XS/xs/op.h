@@ -29,21 +29,17 @@ XSPROTO(CAIXS_entersub_wrapper) {
     accessor_cb_pair_t(&CAIXS_entersub_wrapper<type, opts>, &CAIXS_accessor<type, opts>)
 
 /* catchy place, don't forget to add new types here */
-#define ACCESSOR_MAP_SIZE 16
+#define ACCESSOR_MAP_SIZE 12
 static accessor_cb_pair_t accessor_map[ACCESSOR_MAP_SIZE] = {
     AMAP_ENTRY(Inherited, IsReadonly),
-    AMAP_ENTRY(Inherited, IsWeak),
     AMAP_ENTRY(Inherited, None),
     AMAP_ENTRY(InheritedCb, None),
     AMAP_ENTRY(InheritedCbNamed, None),
     AMAP_ENTRY(PrivateClass, IsReadonly),
-    AMAP_ENTRY(PrivateClass, IsWeak),
     AMAP_ENTRY(PrivateClass,None),
     AMAP_ENTRY(LazyClass, IsReadonly),
-    AMAP_ENTRY(LazyClass, IsWeak),
     AMAP_ENTRY(LazyClass, None),
     AMAP_ENTRY(ObjectOnly, IsReadonly),
-    AMAP_ENTRY(ObjectOnly, IsWeak),
     AMAP_ENTRY(ObjectOnly, None),
     AMAP_ENTRY(Constructor, None),
     accessor_cb_pair_t(NULL, NULL), /* sentinel */

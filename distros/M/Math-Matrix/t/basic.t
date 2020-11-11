@@ -20,12 +20,12 @@ print "ok 1\n";
 # of the test code):
 
 srand(time);
-$A = new Math::Matrix ([rand,rand,rand],
-                       [rand,rand,rand],
-                       [rand,rand,rand]);
+$A = Math::Matrix -> new([[rand,rand,rand],
+                          [rand,rand,rand],
+                          [rand,rand,rand]]);
 $A->print("A random Matrix A");
 print "ok 2\n";
-$v = new Math::Matrix ([rand,rand,rand]);
+$v = Math::Matrix -> new([[rand,rand,rand]]);
 $v->print("A random vector v");
 print "ok 3\n";
 $M = $A->concat($v->transpose);

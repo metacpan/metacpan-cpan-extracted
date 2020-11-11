@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQL - SPARQL 1.1 Parser.
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQL version 0.026.
+This document describes AtteanX::Parser::SPARQL version 0.027.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ L<Attean::API::AbbreviatingParser>.
 
 =cut
 
-package AtteanX::Parser::SPARQL 0.026;
+package AtteanX::Parser::SPARQL 0.027;
 
 use strict;
 use warnings;
@@ -2023,7 +2023,7 @@ sub _FunctionCall {
 	
 	my @args	= $self->_ArgList;
 
-	if ($iri->value =~ m<^http://www[.]w3[.]org/2001/XMLSchema#(?:integer|decimal|float|double)$>) {
+	if ($iri->value =~ m<^http://www[.]w3[.]org/2001/XMLSchema#(?:integer|decimal|float|double|boolean|string|dateTime)$>) {
 		my $expr	= Attean::CastExpression->new( children => \@args, datatype => $iri );
 		$self->_add_stack( $expr );
 	} else {
@@ -3064,7 +3064,7 @@ sub _IRIrefOrFunction {
 	if ($self->_ArgList_test) {
 		my ($iri)	= splice(@{ $self->{_stack} });
 		my @args	= $self->_ArgList;
-		if ($iri->value =~ m<^http://www[.]w3[.]org/2001/XMLSchema#(?:integer|decimal|float|double)$>) {
+		if ($iri->value =~ m<^http://www[.]w3[.]org/2001/XMLSchema#(?:integer|decimal|float|double|boolean|string|dateTime)$>) {
 			my $expr	= Attean::CastExpression->new( children => \@args, datatype => $iri );
 			$self->_add_stack( $expr );
 		} else {
@@ -3699,7 +3699,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams.
+Copyright (c) 2014--2020 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

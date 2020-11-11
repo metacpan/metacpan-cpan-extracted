@@ -2,39 +2,37 @@ use 5.008008;
 use strict;
 use warnings;
 
-{
-	package Ask::Callback;
-	
-	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.012';
-	
-	use Moo;
-	use namespace::autoclean;
-	
-	with 'Ask::API';
-	
-	has input_callback  => (is => 'ro', required => 1);
-	has output_callback => (is => 'ro', required => 1);
+package Ask::Callback;
 
-	sub is_usable {
-		my ($self) = @_;
-		ref $self->output_callback eq 'CODE' and
-		ref $self->input_callback  eq 'CODE';
-	}
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.015';
 
-	sub quality {
-		return 0;
-	}
+use Moo;
+use namespace::autoclean;
 
-	sub entry {
-		my ($self) = @_;
-		return $self->input_callback->();
-	}
+with 'Ask::API';
 
-	sub info {
-		my ($self, %o) = @_;
-		return $self->output_callback->($o{text});
-	}
+has input_callback  => ( is => 'ro', required => 1 );
+has output_callback => ( is => 'ro', required => 1 );
+
+sub is_usable {
+	my ( $self ) = @_;
+	ref $self->output_callback eq 'CODE'
+		and ref $self->input_callback eq 'CODE';
+}
+
+sub quality {
+	return 0;
+}
+
+sub entry {
+	my ( $self ) = @_;
+	return $self->input_callback->();
+}
+
+sub info {
+	my ( $self, %o ) = @_;
+	return $self->output_callback->( $o{text} );
 }
 
 1;
@@ -86,4 +84,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

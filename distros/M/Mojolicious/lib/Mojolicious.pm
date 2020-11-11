@@ -58,7 +58,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.63';
+our $VERSION  = '8.65';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -744,11 +744,11 @@ Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licen
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
-=head2 prettify.js
+=head2 highlight.js
 
-  Copyright (C) 2006, 2013 Google Inc..
+  Copyright (C) 2006, Ivan Sagalaev.
 
-Licensed under the Apache License, Version 2.0 L<http://www.apache.org/licenses/LICENSE-2.0>.
+Licensed under the BSD License, L<https://github.com/highlightjs/highlight.js/blob/master/LICENSE>.
 
 =head1 CODE NAMES
 
@@ -799,8 +799,6 @@ Current voting members of the core team in alphabetical order:
 
 =over 2
 
-CandyAngel, C<candyangel@mojolicious.org>
-
 Christopher Rasch-Olsen Raa, C<christopher@mojolicious.org>
 
 Dan Book, C<grinnz@mojolicious.org>
@@ -818,6 +816,8 @@ The following members of the core team are currently on hiatus:
 =over 2
 
 Abhijit Menon-Sen, C<ams@cpan.org>
+
+CandyAngel, C<candyangel@mojolicious.org>
 
 Glen Hinkle, C<tempire@cpan.org>
 
@@ -930,6 +930,8 @@ Dominique Dumont
 Dotan Dimet
 
 Douglas Christopher Wilson
+
+Elmar S. Heeb
 
 Ettore Di Giacinto
 
@@ -1070,6 +1072,8 @@ Richard Elberger
 Rick Delaney
 
 Robert Hicks
+
+Robert Rothenberg
 
 Robin Lee
 

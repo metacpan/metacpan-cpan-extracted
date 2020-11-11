@@ -1,3 +1,24 @@
+0.006   2020-11-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle first row is empty.
+
+
+0.005   2020-11-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Tables::Test::Dynamic, TablesRole::Source::Iterator.
+
+	- Refactor TablesRole::Source::DBI's as_csv() to TablesRole::Util::CSV.
+
+
+0.004   2020-11-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles: TablesRole::Util::Basic, TablesRole::Util::Random.
+
+	- [bugfix] Remove whitespace in sample CSV data because by default
+	  Text::CSV_XS doesn't allow whitespace unless allow_whitespace=>1
+	  option is given.
+
+
 0.003   2020-06-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump File::Temp prereq version to 0.2307 (change EX_LOCK default

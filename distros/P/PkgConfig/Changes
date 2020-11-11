@@ -1,5 +1,10 @@
 Revision history for PkgConfig
 
+0.25026 2020-11-11 03:32:17 -0700
+  - Handle spaces in Perl and PkgConfig.pm path (gh#47, gh#52)
+  - Fixed bug where --print-errors and --silence-errors were backwards,
+    and the default was wrong (gh#53, gh#54, SLAFFAN++)
+
 0.24026 2020-07-19 06:17:28 -0600
   - Fixed path on FreeBSD to use te modern defaults (gh#49, tomhukins++)
 

@@ -5,7 +5,7 @@ author:
 build_requires:
   File::Slurper: '0'
   File::Spec: '0'
-  File::Temp: '0'
+  File::Temp: '0.2307'
   File::chdir: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-UniqFiles
   homepage: https://metacpan.org/release/App-UniqFiles
   repository: git://github.com/perlancar/perl-App-UniqFiles.git
-version: '0.131'
+version: '0.132'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

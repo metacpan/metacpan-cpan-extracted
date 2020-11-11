@@ -17,7 +17,7 @@
 # Boston, MA 02111-1307, USA.
 
 package Lingua::NATools::Corpus;
-our $VERSION = '0.7.10';
+our $VERSION = '0.7.12';
 use 5.006;
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ sub free {
 
 package Lingua::NATools::Corpus::Iterator;
 
-our $VERSION = '0.7.10';
+our $VERSION = '0.7.12';
 
 sub new {
     my ($class, $corpusObject) = @_;

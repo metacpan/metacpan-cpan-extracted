@@ -1,7 +1,12 @@
 Revision history for TAP-DOM
 
+0.92      2020-11-09
+        - introduce 'severity' level to represent the combination of
+          ok/notok and todo/skip as one ordinal number.
+        - more complete information in non-test lines (plan, pragma)
+
 0.91      2020-06-30
-        - INCOMPATIBILITY WARNING ===
+        - === INCOMPATIBILITY WARNING ===
 
           This release contains several changes towards a more
           consistent data handling. For casual users nothing
@@ -34,7 +39,7 @@ Revision history for TAP-DOM
         - new option 'put_dangling_kv_data_under_lazy_plan' to
           fix a gap when 'disable_global_kv_data' is set.
 
-        - new option 'trim_fieldvalues' to tirm trailing whitespace
+        - new option 'trim_fieldvalues' to trim trailing whitespace
           from document_data/kv_data fields
 
         - new option 'dontignorelines' (HIGHLY EXPERIMENTAL!) to

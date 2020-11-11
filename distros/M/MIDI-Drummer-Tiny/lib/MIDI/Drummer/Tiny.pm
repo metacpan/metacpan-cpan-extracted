@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1700';
+our $VERSION = '0.1801';
 
 use Math::Bezier;
 use MIDI::Simple;
@@ -27,11 +27,14 @@ sub BUILD {
 
     $self->score->set_tempo( int( 60_000_000 / $self->bpm ) );
 
+    $self->score->control_change($self->channel, 91, $self->reverb);
+
     $self->set_time_sig;
 }
 
 
 has kit       => ( is => 'ro', default => sub { 0 } );
+has reverb    => ( is => 'ro', default => sub { 63 } );
 has channel   => ( is => 'ro', default => sub { 9 } );
 has volume    => ( is => 'ro', default => sub { 100 } );
 has bpm       => ( is => 'ro', default => sub { 120 } );
@@ -378,7 +381,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1700
+version 0.1801
 
 =head1 SYNOPSIS
 
@@ -390,6 +393,7 @@ version 0.1700
     volume    => 100,
     signature => '5/4',
     bars      => 8,
+    reverb    => 0,
     kit       => 25, # TR-808 if using GM Level 2
     #kick  => 'n36', # Override default patch
     #snare => 'n40', # "
@@ -407,7 +411,8 @@ version 0.1700
 
  $d->flam($d->quarter, $d->snare);
  $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
- $d->note($d->eighth, $d->crash1);
+ $d->note($d->sixteenth, $d->crash1);
+ $d->accent_note(127, $d->sixteenth, $d->crash2);
 
  # Alternate kick and snare
  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
@@ -432,11 +437,12 @@ Default: C<MIDI-Drummer.mid>
 
 Default: C<MIDI::Simple-E<gt>new_score>
 
-=head3 kit
+=head2 kit
 
-Default: C<1> (standard)
+Default: C<1> (Standard)
 
-If you are going to play the MIDI file with a "General MIDI Level 2" soundfont, you can change kits.
+If you are going to play the MIDI file with a "General MIDI Level 2"
+soundfont, you can change kits.
 
    8: Room
   16: Power
@@ -446,6 +452,10 @@ If you are going to play the MIDI file with a "General MIDI Level 2" soundfont, 
   32: Jazz
   40: Brush
   48: Orchestra
+
+=head2 reverb
+
+Default: C<63>
 
 =head2 channel
 
@@ -700,6 +710,8 @@ L<Moo>
 L<Music::Duration>
 
 L<https://en.wikipedia.org/wiki/General_MIDI#Percussion>
+
+L<https://en.wikipedia.org/wiki/General_MIDI_Level_2#Drum_sounds>
 
 =head1 AUTHOR
 

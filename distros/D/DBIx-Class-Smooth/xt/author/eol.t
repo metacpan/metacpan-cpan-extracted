@@ -11,6 +11,7 @@ my @files = (
     'lib/DBIx/Class/Smooth/Fields.pm',
     'lib/DBIx/Class/Smooth/FilterItem.pm',
     'lib/DBIx/Class/Smooth/Flatten/DateTime.pm',
+    'lib/DBIx/Class/Smooth/Functions.pm',
     'lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/AddColumn.pm',
     'lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/Join.pm',
     'lib/DBIx/Class/Smooth/Helper/ResultSet/Shortcut/OrderByCollation.pm',
@@ -50,6 +51,7 @@ my @files = (
     't/02-schema-helper-row-definition.t',
     't/03-q.t',
     't/04-filter.t',
+    't/05-functions.t',
     't/etc/test_fixtures.pl',
     't/lib/TestFor/DBIx/Class/Smooth/Schema.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/Result.pm',
@@ -58,11 +60,13 @@ my @files = (
     't/lib/TestFor/DBIx/Class/Smooth/Schema/Result/BookAuthor.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/Result/Country.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/Result/Edition.pm',
+    't/lib/TestFor/DBIx/Class/Smooth/Schema/Result/Publisher.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultBase.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultSet.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultSet/Author.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultSet/Book.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultSet/Country.pm',
+    't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultSet/Publisher.pm',
     't/lib/TestFor/DBIx/Class/Smooth/Schema/ResultSetBase.pm'
 );
 

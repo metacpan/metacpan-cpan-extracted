@@ -1,3 +1,9 @@
+2.004 2020-11-06
+- identify default target better
+
+2.003 2020-11-01
+- optional new param InDir to be "current dir"
+
 2.002 2020-08-17
 - get_target renamed to correct "has_target"
 

@@ -6,11 +6,12 @@
 
 package Rex::Interface::Shell::Tcsh;
 
+use 5.010001;
 use strict;
 use warnings;
 use Rex::Interface::Shell::Csh;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use base qw(Rex::Interface::Shell::Csh);
 

@@ -1,0 +1,95 @@
+{
+   "abstract" : "use Zydeco::Lite to quickly develop command-line apps",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Zydeco-Lite-App",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Tiny" : "0",
+            "YAML::PP" : "0",
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "Getopt::Kingpin" : "0.10",
+            "JSON::PP" : "0",
+            "Perl::OSType" : "0",
+            "TOML::Parser" : "0",
+            "Term::ANSIColor" : "0",
+            "Z" : "0.007",
+            "Zydeco::Lite" : "0.083",
+            "indirect" : "0",
+            "parent" : "0",
+            "perl" : "5.010001"
+         },
+         "suggests" : {
+            "JSON::MaybeXS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Z::App" : {
+         "file" : "lib/Z/App.pm",
+         "version" : "0.001"
+      },
+      "Zydeco::Lite::App" : {
+         "file" : "lib/Zydeco/Lite/App.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Zydeco-Lite-App"
+      },
+      "homepage" : "https://metacpan.org/release/Zydeco-Lite-App",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-zydeco-lite-app.git",
+         "web" : "https://github.com/tobyink/p5-zydeco-lite-app"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Zydeco-Lite-App/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

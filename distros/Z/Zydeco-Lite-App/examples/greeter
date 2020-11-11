@@ -1,0 +1,74 @@
+#! perl
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+use Z::App;
+
+my $app = app sub {
+	
+	constant description => "Greet the world, or just one person.";
+	constant config_file => 'greeting.toml';
+	
+	role "CommonFlags" => sub {
+		
+		arg "addressee" => (
+			type          => Str,
+			default       => "world",
+			documentation => "Target of greeting.",
+		);
+	};
+	
+	role "OutputMaybeToFile" => sub {
+		
+		requires qw( print );
+		
+		flag "file" => (
+			type          => Path,
+			predicate     => true,
+			documentation => "Optional destination for greeting."
+		);
+		
+		method "do_output" => sub {
+			my ( $self, $str ) = ( shift, @_ );
+			
+			if ( $self->has_file ) {
+				$self->file->spew_utf8( $str );
+			}
+			else {
+				$self->print( $str );
+			}
+			
+			return;
+		};
+	};
+	
+	role "CommonBehaviour" => sub {
+		
+		with "OutputMaybeToFile";
+		
+		requires qw( greeting do_output );
+		
+		run {
+			my ( $self, $addressee ) = ( shift, @_ );
+			my $str = sprintf( '%s, %s!', $self->greeting, $addressee );
+			$self->do_output( $str );
+			return 0;
+		};
+	};
+	
+	command "Hello" => sub {
+		
+		with "CommonFlags", "CommonBehaviour";
+		
+		constant description => "Greet somebody or something.";
+		
+		flag "greeting" => (
+			type          => Str,
+			default       => "Hello",
+			documentation => "A greeting string like 'Hello'.",
+			short         => 'G',
+		);		
+	};
+
+};
+
+$app->execute( @ARGV );

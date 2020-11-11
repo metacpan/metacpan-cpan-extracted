@@ -53,7 +53,7 @@
          "requires" : {
             "File::Slurper" : "0",
             "File::Spec" : "0",
-            "File::Temp" : "0",
+            "File::Temp" : "0.2307",
             "File::chdir" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-App-UniqFiles"
       }
    },
-   "version" : "0.131",
+   "version" : "0.132",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

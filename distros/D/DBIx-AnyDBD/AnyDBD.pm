@@ -5,7 +5,7 @@ use DBI;
 use strict;
 use vars qw/$AUTOLOAD $VERSION/;
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 sub new {
     my $class = shift;
@@ -408,12 +408,11 @@ the DBIx::AnyDBD object.  In this case you should temporarily set
 This module is free software, and you may distribute it under the same 
 terms as Perl itself.
 
-=head1 SUPPORT
+=head1 AUTHOR
 
-Commercial support for this module is available on a pay per incident
-basis from Fastnet Software Ltd. Contact matt@sergeant.org for further
-details. Alternatively join the DBI-Users mailing list, where I'll help
-you out for free!
+Matt Sergeant, C<< <matt@sergeant.org> >>
+
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 SEE ALSO
 

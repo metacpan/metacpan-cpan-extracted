@@ -4,12 +4,13 @@
 #include "Compression.h"
 #include "panda/string.h"
 #include "../Body.h"
+#include <panda/refcnt.h>
 
 namespace panda { namespace protocol { namespace http { namespace compression {
 
 enum class Mode { none = 0, compress, uncompress };
 
-struct Compressor {
+struct Compressor: Refcnt {
     static const constexpr std::size_t RX_BUFF_SCALE = 10;
     static const constexpr std::size_t TX_CHUNK_SCALE = 5;
 
@@ -36,7 +37,7 @@ protected:
 };
 
 using CompressorFactory = Compressor*(*)();
-using CompressorPtr = std::unique_ptr<Compressor>;
+using CompressorPtr = iptr<Compressor>;
 
 bool register_factory(Compression::Type compression, const CompressorFactory& factory);
 CompressorPtr instantiate(Compression::Type compression) noexcept;

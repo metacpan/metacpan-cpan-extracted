@@ -1,13 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 1;
 
-BEGIN {
-    use_ok('Algorithm::C3');
-}
+use Algorithm::C3;
 
 =pod
 
@@ -16,7 +12,7 @@ example taken from: L<http://gauss.gwydiondylan.org/books/drm/drm_50.html>
          Object
            ^
            |
-        LifeForm 
+        LifeForm
          ^    ^
         /      \
    Sentient    BiPedal
@@ -36,30 +32,30 @@ example taken from: L<http://gauss.gwydiondylan.org/books/drm/drm_50.html>
 =cut
 
 {
-    package Object;    
-    
+    package Object;
+
     sub my_ISA {
         no strict 'refs';
         @{$_[0] . '::ISA'};
-    }    
-    
+    }
+
     package LifeForm;
-    use base 'Object';
-    
+    our @ISA = qw(Object);
+
     package Sentient;
-    use base 'LifeForm';
-    
+    our @ISA = qw(LifeForm);
+
     package BiPedal;
-    use base 'LifeForm';
-    
+    our @ISA = qw(LifeForm);
+
     package Intelligent;
-    use base 'Sentient';
-    
+    our @ISA = qw(Sentient);
+
     package Humanoid;
-    use base 'BiPedal';
-    
+    our @ISA = qw(BiPedal);
+
     package Vulcan;
-    use base ('Intelligent', 'Humanoid');
+    our @ISA = qw(Intelligent Humanoid);
 }
 
 is_deeply(

@@ -1,3 +1,6 @@
+1.0.2     30.10.2020
+           - stream-stream bugfix
+           - stream::write API change (compatible)
 1.0.1     12.10.2020
            - streamer-stream test fix
            - require Alien::cmake3 to build

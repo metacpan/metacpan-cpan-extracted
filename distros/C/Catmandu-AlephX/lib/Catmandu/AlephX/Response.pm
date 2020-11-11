@@ -7,7 +7,7 @@ use Exporter qw(import);
 our @EXPORT_OK=qw(get_children xpath);
 our %EXPORT_TAGS = (all=>[@EXPORT_OK]);
 
-our $VERSION = "1.071";
+our $VERSION = "1.072";
 
 =head1 NAME
 

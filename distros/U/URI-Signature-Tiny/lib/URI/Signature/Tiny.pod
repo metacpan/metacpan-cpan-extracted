@@ -1,0 +1,156 @@
+=pod
+
+=encoding UTF-8
+
+=for comment vim: et sw=2 ts=2 sts=2
+
+=head1 NAME
+
+URI::Signature::Tiny - Mint and verify server-signed URIs
+
+=head1 SYNOPSIS
+
+ use URI;
+ use URI::Signature::Tiny;
+ 
+ my $notary = URI::Signature::Tiny->new(
+   secret     => $secret,
+   after_sign => sub {
+     my ( $uri, $sig ) = @_;
+     $uri->query_form({ $uri->query_form, s => $sig });
+     $uri;
+   },
+   before_verify => sub {
+     my ( $uri ) = @_;
+     my %f = $uri->query_form;
+     my $sig = delete $f{'s'};
+     $uri = $uri->clone; # important
+     $uri->query_form( \%f );
+     ( $uri, ref $sig ? '' : $sig );
+   },
+ );
+ 
+ my $signed_uri = $notary->sign( URI->new( 'http://example.com/foo?bar=baz#pagetop' ) );
+ 
+ my $ok = $notary->verify( $signed_uri );
+
+=head1 DESCRIPTION
+
+This is a minimal helper to generate URLs that you can later verify to not have
+been modified, so that you can trust security-relevant values such as user IDs.
+This is useful e.g. for a passwort reset link that the user should not be able
+to edit to log in as someone else.
+
+=head1 METHODS
+
+=over 2
+
+=item C<new>
+
+Construct and return an instance of this class.
+Takes a list of key/value pairs specifying configuration options:
+
+=over 2
+
+=item C<secret>
+
+A message authentication code (MAC) value,
+which needs to have cryptographically sufficient entropy.
+
+B<Required>.
+
+=item C<after_sign>
+
+A callback that defines how to incorporate the signature into a fresh URI.
+See L</C<sign>> for details.
+
+Defaults to a placeholder that croaks.
+
+=item C<before_verify>
+
+A callback that defines how to remove the signature from a signed URI.
+See L</C<verify>> for details.
+
+Defaults to a placeholder that croaks.
+
+=item C<sort_params>
+
+Whether to sort query parameters (if any) before computing the signature.
+
+Defaults to true.
+
+=item C<function>
+
+The function that will be called to compute the signature,
+which should have the same signature as the HMAC functions from L<Digest::SHA>:
+the (normalised) URI and the secret will be its first and second arguments.
+
+Defaults to
+L<C<\&Digest::SHA::hmac_sha256_base64>|Digest::SHA/hmac_sha256_base64>.
+
+You might also use this just to post-process the HMAC value, any way you wish:
+
+ sub { substr &Digest::SHA::hmac_sha512224_base64, 0, 10 }
+
+=item C<recode_base64>
+
+Whether to apply substitutions to turn the return value of the L</C<function>>
+from regular C<base64> encoding into C<base64url>.
+
+Defaults to true.
+
+=back
+
+=item C<signature>
+
+Compute and return the signature for the URI
+which is passed as the only argument.
+
+The only way that the URI value might be modified here is
+to sort the query parameters if requested by L</C<sort_params>>.
+
+=item C<sign>
+
+Takes a fresh URI and returns the same URI with the signature added to it.
+Specifically it returns whatever the L</C<after_sign>> callback returns,
+which gets called with the fresh URI and its signature as arguments.
+
+=item C<verify>
+
+Takes a signed URI and checks whether it matches its signature.
+It passes its arguments to the L</C<after_sign>> callback,
+which must return two values:
+the bare URI with the signature stripped off, and the signature.
+
+=back
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<URL::Signature>
+
+=item *
+
+L<RFCE<nbsp>2104, I<HMAC: Keyed-Hashing for Message Authentication>|https://tools.ietf.org/html/rfc2104>
+
+=item *
+
+L<RFCE<nbsp>4648, I<The Base16, Base32, and Base64 Data Encodings>, section 5., I<Base 64 Encoding with URL and Filename Safe Alphabet>|https://tools.ietf.org/html/rfc4648#section-5>
+
+=back
+
+=head1 AUTHOR
+
+Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

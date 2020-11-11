@@ -1,11 +1,3 @@
-# <? read_starfish_conf(); &generate_header; !>
-#+
-# file: MANIFEST
-# CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and Registration in Perl
-# (c) 2012-18 Vlado Keselj http://web.cs.dal.ca/~vlado
-# $Date: $
-# $Id: $
-#-
 README
 MANIFEST
 META.yml
@@ -14,10 +6,7 @@ Changes
 Makefile.PL
 starfish.conf
 test.pl
-#<? echo "$ModuleNameBase.pm" !>
-#+
 AuthRegister.pm
-#-
 examples/1/index.cgi
 examples/2/index.cgi
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,13 +1,20 @@
 /* vi: set ft=c inde=: */
 
 #ifndef av_count
-#  define av_count(av)           (av_top_index(av) + 1)
+#  define av_count(av)           (AvFILL(av) + 1)
 #endif
 
 #if HAVE_PERL_VERSION(5, 22, 0)
 #  define PadnameIsNULL(pn)  (!(pn))
 #else
 #  define PadnameIsNULL(pn)  (!(pn) || (pn) == &PL_sv_undef)
+#endif
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define PadnameOUTER_off(pn)  (PadnameFLAGS(pn) &= ~PADNAMEt_OUTER)
+#else
+   /* PadnameOUTER is really the SvFAKE flag */
+#  define PadnameOUTER_off(pn)  SvFAKE_off(pn)
 #endif
 
 #define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)

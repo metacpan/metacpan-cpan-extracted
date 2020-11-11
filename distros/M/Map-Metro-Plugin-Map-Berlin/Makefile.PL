@@ -1,5 +1,5 @@
 use strict;
-use 5.016000; # because Map::Metro requires this version
+use 5.010000; # because Map::Metro requires this version
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 

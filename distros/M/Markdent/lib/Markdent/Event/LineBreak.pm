@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -29,7 +29,7 @@ Markdent::Event::LineBreak - An event for a line break
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

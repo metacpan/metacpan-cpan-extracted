@@ -9,7 +9,7 @@ BEGIN
 
   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-  $VERSION = '1.25';
+  $VERSION = '1.26';
   $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
   require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
 
@@ -88,8 +88,18 @@ Tk::MMutil::TkExtMakefile(
     },
 	'CONFIGURE_REQUIRES' => {
 		"ExtUtils::MakeMaker" => 6.52,
-		Tk::MMtry => 0,
-        Tk::MMutil => 0,
+		"Tk::MMtry" => 0,
+		"Tk::MMutil" => 0,
+	},
+	'META_MERGE' => {
+		"meta-spec" => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url => 'https://github.com/asb-capfan/Tk-TableMatrix.git',
+				web => 'https://github.com/asb-capfan/Tk-TableMatrix',
+			},
+		},
 	},
     @macro
    );
@@ -142,7 +152,7 @@ sub needs_Test
  my $code = 0;
  while (<TFILE>)
   {
-   last if ($code = /^\s*(use|require)\s+Test\b/);
+   last if ($code = m/^\s*(use|require)\s+Test\b/);
   }
  close(TFILE);
  warn "Skipping test $file needs 'Test.pm':$_" if $code;

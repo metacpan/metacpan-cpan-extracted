@@ -21,7 +21,7 @@ got - A tool to make it easier to manage multiple code repositories using differ
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ version 1.337
 C<got> is a script to make it easier to manage all the version controlled
 repositories you have on all the computers you use. It can operate on all,
 some, or just one repo at a time, to both check the status of the repo (up to
-date, pending changes, dirty, etc.) and sync it with any upstream master.
+date, pending changes, dirty, etc.) and sync it with any upstream remote.
 
 got also supports forking a GitHub repo and adding it to the list of managed
 repositories.

@@ -1,0 +1,37 @@
+---
+abstract: 'Package for manipulating hashes via dot path notation.'
+author:
+  - 'John Gravatt <gravattj@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Util::Medley::List: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-DotPath
+requires:
+  Alt::Devel::CallParser::ButWorking: '0'
+  Data::Printer: '0'
+  Hash::Merge: '0'
+  Kavorka: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Util::Medley: '0.053'
+  Util::Medley::Hash: '0'
+  Util::Medley::Roles::Attributes::Hash: '0'
+  Util::Medley::Roles::Attributes::List: '0'
+  Util::Medley::Roles::Attributes::Logger: '0'
+  Util::Medley::Roles::Attributes::String: '0'
+  namespace::autoclean: '0'
+resources:
+  repository: https://github.com/gravattj/Hash-DotPath-perl.git
+version: '0.004'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

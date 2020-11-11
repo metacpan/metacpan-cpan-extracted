@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.002';
+our $VERSION = '3.004';
 
 =head1 NAME
 
@@ -254,7 +254,15 @@ Applies configuration parameters - currently supports:
 
 =item * C<opentracing>
 
+=item * C<protocol> - either 'resp2' or 'resp3', default is autodetect
+
+=item * C<hashrefs> - RESP3 (Redis 6.0+) supports more data types, currently the only difference this
+makes to us is that it now supports hashrefs for key/value pairs. This is disabled by default to ensure
+compatibility across newer+older versions.
+
 =back
+
+Note that enabling C<hashrefs> will cause connections to fail if the server does not support RESP3.
 
 =cut
 
@@ -271,9 +279,12 @@ sub configure {
         on_disconnect
         client_name
         opentracing
+        protocol
+        hashrefs
     )) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
+    die 'invalid protocol requested: ' . $self->{protocol} if defined $self->{protocol} and not $self->{protocol} =~ /^resp[23]$/;
 
     # Be more lenient with the URI parameter, since it's tedious to
     # need the redis:// prefix every time... after all, what else
@@ -296,6 +307,8 @@ sub configure {
         $self->{host} //= $uri->host;
         $self->{port} //= $uri->port;
     }
+
+    die 'hashref support requires RESP3 (Redis version 6+)' if defined $self->{protocol} and $self->{protocol} eq 'resp2' and $self->{hashrefs};
     $self->next::method(%args)
 }
 
@@ -398,7 +411,7 @@ sub connect : method {
         my ($sock) = @_;
         $self->{endpoint} = join ':', $sock->peerhost, $sock->peerport;
         $self->{local_endpoint} = join ':', $sock->sockhost, $sock->sockport;
-        my $proto = $self->protocol;
+        my $proto = $self->wire_protocol;
         my $stream = IO::Async::Stream->new(
             handle              => $sock,
             read_len            => $self->stream_read_len,
@@ -421,6 +434,9 @@ sub connect : method {
         );
 
         try {
+            # Pretend we tried and failed if the old version was specifically requested
+            die 'ERR unknown command' if $self->{protocol} and $self->{protocol} eq 'resp2';
+
             # Try issuing a HELLO to detect RESP3 or above
             await $self->hello(
                 3, defined($auth) ? (
@@ -429,7 +445,11 @@ sub connect : method {
                     qw(SETNAME), $self->client_name
                 ) : ()
             );
+            $log->tracef('RESP3 detected');
             $self->{protocol_level} = 'resp3';
+
+            $proto->{hashrefs} = $self->{hashrefs};
+            $proto->{protocol} = $self->{protocol_level};
         } catch {
             # If we had an auth failure or invalid client name, all bets are off:
             # immediately raise those back to the caller
@@ -437,6 +457,11 @@ sub connect : method {
 
             $log->tracef('Older Redis version detected, dropping back to RESP2 protocol');
             $self->{protocol_level} = 'resp2';
+
+            die 'extended data structures require RESP3 (Redis version 6+)' if $self->{hashrefs};
+
+            $proto->{hashrefs} = $self->{hashrefs};
+            $proto->{protocol} = $self->{protocol_level};
 
             await $self->auth($auth) if defined $auth;
             await $self->client_setname($self->client_name) if defined $self->client_name;
@@ -860,7 +885,7 @@ sub next_in_pipeline {
         my $cmd = join ' ', @{$next->[0]};
         $log->tracef("Have free space in pipeline, sending %s", $cmd);
         push @{$self->{pending}}, [ $cmd, $next->[1] ];
-        my $data = $self->protocol->encode_from_client(@{$next->[0]});
+        my $data = $self->wire_protocol->encode_from_client(@{$next->[0]});
         $self->stream->write($data);
     }
     # Ensure last ->write is in void context
@@ -1051,7 +1076,7 @@ sub execute_command {
             push @{$self->{awaiting_pipeline}}, [ \@cmd, $f ];
             return $f;
         }
-        my $data = $self->protocol->encode_from_client(@cmd);
+        my $data = $self->wire_protocol->encode_from_client(@cmd);
         return $self->stream->write($data)->on_ready($f) if $is_sub_command;
 
         # Void-context write allows IaStream to combine multiple writes on the same connection.
@@ -1098,21 +1123,22 @@ sub future {
     return $self->loop->new_future(@_);
 }
 
-=head2 protocol
+=head2 wire_protocol
 
 Returns the L<Net::Async::Redis::Protocol> instance used for
 encoding and decoding messages.
 
 =cut
 
-sub protocol {
+sub wire_protocol {
     my ($self) = @_;
-    $self->{protocol} ||= do {
+    $self->{wire_protocol} ||= do {
         require Net::Async::Redis::Protocol;
         Net::Async::Redis::Protocol->new(
-            handler => $self->curry::weak::on_message,
-            pubsub  => $self->curry::weak::handle_pubsub_message,
-            error   => $self->curry::weak::on_error_message,
+            handler  => $self->curry::weak::on_message,
+            pubsub   => $self->curry::weak::handle_pubsub_message,
+            error    => $self->curry::weak::on_error_message,
+            protocol => $self->{protocol_level} || 'resp3',
         )
     };
 }

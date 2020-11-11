@@ -1,0 +1,58 @@
+{
+   "abstract" : "Mojolicious Plugin to send mail through Email::Mailer.",
+   "author" : [
+      "Luc Didry <ldidry@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-EmailMailer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Mailer" : "1.15",
+            "Email::Sender" : "1.300034",
+            "Hash::Merge" : "0",
+            "MIME::Words" : "0",
+            "Mojolicious" : "8.36",
+            "Try::Tiny" : "0.30",
+            "perl" : "5.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://framagit.org/luc/mojolicious-plugin-emailmailer/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://framagit.org/luc/mojolicious-plugin-emailmailer.git",
+         "web" : "https://framagit.org/luc/mojolicious-plugin-emailmailer"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

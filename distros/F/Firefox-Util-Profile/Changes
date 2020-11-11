@@ -1,3 +1,8 @@
+0.005   2020-11-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Support Windows.
+
+
 0.004   2020-05-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Add routine: get_firefox_profile_dir().

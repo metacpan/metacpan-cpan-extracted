@@ -28,7 +28,7 @@ BEGIN {
 	}
 }
 
-BEGIN {
+{
 	sub IMPLEMENTATION_DEVEL_LEXALIAS   () { 'Devel::LexAlias' }
 	sub IMPLEMENTATION_PADWALKER        () { 'PadWalker' }
 	sub IMPLEMENTATION_TIE              () { 'tie' }
@@ -36,10 +36,11 @@ BEGIN {
 	
 	my $implementation;
 	sub ALIAS_IMPLEMENTATION () {
-		$implementation ||= do {
-			do   { $] ge '5.022'           } ? IMPLEMENTATION_NATIVE :
-			eval { require Devel::LexAlias } ? IMPLEMENTATION_DEVEL_LEXALIAS :
-			eval { require PadWalker       } ? IMPLEMENTATION_PADWALKER      : IMPLEMENTATION_TIE
+		# uncoverable subroutine
+		$implementation ||= do {                                                                  # uncoverable statement
+			do   { $] ge '5.022'           } ? IMPLEMENTATION_NATIVE :                             # uncoverable statement
+			eval { require Devel::LexAlias } ? IMPLEMENTATION_DEVEL_LEXALIAS :                     # uncoverable statement
+			eval { require PadWalker       } ? IMPLEMENTATION_PADWALKER      : IMPLEMENTATION_TIE  # uncoverable statement
 		};
 	}
 	
@@ -49,11 +50,11 @@ BEGIN {
 }
 
 BEGIN {
-	*_EXTENDED_TESTING = ($ENV{EXTENDED_TESTING}) ? sub(){!!1} : sub(){!!0};
+	*_EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub(){!!1} : sub(){!!0};
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.010006';
+our $VERSION   = '1.012000';
 our @EXPORT    = qw( eval_closure );
 our @EXPORT_OK = qw(
 	HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION

@@ -30,9 +30,9 @@ ok( $pdf->match( [ [qw(font 1 12)], [qw(font 1 12)], [qw(font 1 12)] ] ),
 #Check default text placement
 ok(
     $pdf->match(
-        [ [qw(translate 10 688)],  [qw(text foo)] ],
-        [ [qw(translate 110 688)], [qw(text bar)] ],
-        [ [qw(translate 210 688)], [qw(text baz)] ],
+        [ [qw(translate 12 686)],  [qw(text foo)] ],
+        [ [qw(translate 112 686)], [qw(text bar)] ],
+        [ [qw(translate 212 686)], [qw(text baz)] ],
     ),
     'default text placement in one row'
 ) or note explain $pdf;

@@ -5,7 +5,7 @@ use warnings;
 package Ask::Prima;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.015';
 
 use Moo;
 use Prima 1.59 ();
@@ -26,7 +26,7 @@ has application => (
 
 sub is_usable {
 	my ( $self ) = ( shift );
-	return !! $ENV{'DISPLAY'};
+	return !!$ENV{'DISPLAY'};
 }
 
 sub entry {
@@ -41,13 +41,13 @@ sub entry {
 	);
 	
 	return $return;
-}
+} #/ sub entry
 
 sub info {
 	my ( $self, %opts ) = ( shift, @_ );
-
+	
 	$self->application;
-
+	
 	Prima::MsgBox::message_box(
 		$opts{title} || 'Info',
 		$opts{text},
@@ -55,13 +55,13 @@ sub info {
 	);
 	
 	return;
-}
+} #/ sub info
 
 sub warning {
 	my ( $self, %opts ) = ( shift, @_ );
-
+	
 	$self->application;
-
+	
 	Prima::MsgBox::message_box(
 		$opts{title} || 'Warning',
 		$opts{text},
@@ -69,13 +69,13 @@ sub warning {
 	);
 	
 	return;
-}
+} #/ sub warning
 
 sub error {
 	my ( $self, %opts ) = ( shift, @_ );
-
+	
 	$self->application;
-
+	
 	Prima::MsgBox::message_box(
 		$opts{title} || 'Error',
 		$opts{text},
@@ -83,11 +83,11 @@ sub error {
 	);
 	
 	return;
-}
+} #/ sub error
 
 sub question {
 	my ( $self, %opts ) = ( shift, @_ );
-
+	
 	$self->application;
 	
 	my $return;
@@ -97,11 +97,13 @@ sub question {
 		$opts{text},
 		mb::Yes | mb::No | mb::Question,
 		buttons => {
-			mb::Yes, {
+			mb::Yes,
+			{
 				text    => $opts{ok_label} || 'Yes',
 				onClick => sub { $return = 1 },
 			},
-			mb::No, {
+			mb::No,
+			{
 				text    => $opts{cancel_label} || 'No',
 				onClick => sub { $return = 0 },
 			},
@@ -109,7 +111,7 @@ sub question {
 	);
 	
 	return $return;
-}
+} #/ sub question
 
 sub file_selection {
 	my ( $self, %opts ) = ( shift, @_ );
@@ -130,39 +132,40 @@ sub file_selection {
 				}
 				$self->question( text => "Select another directory?" ) or last;
 			}
-			return map path($_), @dirs;
-		}
+			return map path( $_ ), @dirs;
+		} #/ if ( $opts{multiple} )
 		else {
 			$dl = 'Prima::Dialog::ChDirDialog'->new;
 			if ( $dl->execute ) {
 				return path( $dl->directory );
 			}
 		}
-	}
+	} #/ if ( $opts{directory} )
 	else {
-		my $class = $opts{save}
+		my $class =
+			$opts{save}
 			? 'Prima::Dialog::SaveDialog'
 			: 'Prima::Dialog::FileDialog';
-		
+			
 		my %dlopts = (
 			system        => 1,
 			showDotFiles  => 1,
-			fileMustExist => 0 + !!$opts{existing},
-			multiSelect   => 0 + !!$opts{multiple},
+			fileMustExist => 0+ !!$opts{existing},
+			multiSelect   => 0+ !!$opts{multiple},
 		);
 		if ( $opts{default} ) {
-			$dlopts{fileName} = $opts{multiple} ? $opts{default} : [$opts{default}];
+			$dlopts{fileName} = $opts{multiple} ? $opts{default} : [ $opts{default} ];
 		}
 		
 		$dl = $class->new( %dlopts );
 		
 		if ( $dl->execute ) {
-			return map path($_), $dl->fileName;
+			return map path( $_ ), $dl->fileName;
 		}
-	}
+	} #/ else [ if ( $opts{directory} )]
 	
 	$opts{multiple} ? @{ $opts{default} or [] } : $opts{default};
-}
+} #/ sub file_selection
 
 1;
 
@@ -206,4 +209,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

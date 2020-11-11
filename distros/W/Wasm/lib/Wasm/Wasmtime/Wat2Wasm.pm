@@ -7,7 +7,7 @@ use Wasm::Wasmtime::FFI;
 use base qw( Exporter );
 
 # ABSTRACT: Convert WebAssembly Text to Wasm
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 our @EXPORT = qw( wat2wasm );
@@ -46,7 +46,7 @@ Wasm::Wasmtime::Wat2Wasm - Convert WebAssembly Text to Wasm
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,7 @@
+Revision history for RT-Extension-ToggleTheme
+
+0.02 10-30-2020
+ - Remove patch that was added to RT-5.0.1
+
+0.01 08-28-2020
+ - Initial version

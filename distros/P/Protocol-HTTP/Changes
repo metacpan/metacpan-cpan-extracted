@@ -1,3 +1,7 @@
+1.0.10   30.10.2020
+           - bugfix: chunked data streaming correctly supports compression
+           - bugfix: gzip uncompression
+           - multipart/form-data: allow to define filename and content/type
 1.0.9    25.06.2020
            - $request->method_str now returns stringified effective method
            - fix compilation issues on *BSD

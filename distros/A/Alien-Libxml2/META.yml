@@ -3,15 +3,15 @@ abstract: 'Install the C libxml2 library on your system'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Alien::Build: '0.32'
+  Alien::Build: '2.37'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
   Test2::V0: '0.000060'
   Test::Alien: '0'
   perl: '5.006'
 configure_requires:
-  Alien::Build: '2.12'
-  Alien::Build::MM: '2.12'
+  Alien::Build: '2.37'
+  Alien::Build::MM: '2.37'
   Alien::Build::Plugin::Build::SearchDep: '0.35'
   Alien::Build::Plugin::Prefer::BadVersion: '1.05'
   Alien::Build::Plugin::Probe::Vcpkg: '0'
@@ -19,23 +19,23 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-Libxml2
 requires:
-  Alien::Base: '2.12'
+  Alien::Base: '2.37'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/Perl5-Alien/Alien-Libxml2/issues
+  bugtracker: https://github.com/PerlAlien/Alien-Libxml2/issues
   homepage: https://metacpan.org/pod/Alien::Libxml2
-  repository: git://github.com/Perl5-Alien/Alien-Libxml2.git
-version: '0.16'
+  repository: git://github.com/PerlAlien/Alien-Libxml2.git
+version: '0.17'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.30'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
   requires:
     share:
       Archive::Tar: '0'
@@ -50,7 +50,7 @@ x_alienfile:
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Shlomi Fish (shlomif)'
-x_generated_by_perl: v5.31.10
+x_generated_by_perl: v5.33.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

@@ -1,3 +1,15 @@
+2020-11-05  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.4.2
+
+  * Catch up on five years of fixes
+
+  * Better tests
+
+  * Code tidying
+
+  * Better version of Build.pm
+
 2015-07-18  Dave Cross <dave@dave.org.uk>
 
   * .gitignore, .travis.yml: Adde .gitignore and .travis.yml

@@ -771,6 +771,8 @@ CM(Idle)
 CM(MenuItemMeasure)
 #define cmMenuItemPaint  0x0000002E                /* menu item custom paint */
 CM(MenuItemPaint)
+#define cmClipboard      0x0000002F                /* called on X11 to precise type of data to be pasted */
+CM(Clipboard)
 
 #define cmMenuCmd        0x00000050                /* interactive menu command */
 CM(MenuCmd)
@@ -2424,7 +2426,7 @@ apc_kbd_get_state( Handle self);
 typedef struct {
 	Handle image;
 	Byte * data;
-	STRLEN length;
+	IV length;
 } ClipboardDataRec, *PClipboardDataRec;
 
 extern PList
@@ -2795,7 +2797,8 @@ typedef enum {
 	ropDstAlpha           = 0x2000000,
 	ropDstAlphaShift      = 16,
 	ropConstantAlpha      = 0x3000000,
-	ropPremultiply        = 0x4000000
+	ropPremultiply        = 0x4000000,
+	ropConstantColor      = 0x8000000
 } ROP;
 
 
@@ -2821,7 +2824,7 @@ ROP(HardLight) ROP(SoftLight) ROP(Difference) ROP(Exclusion)
 ROP(SrcAlpha) ROP(SrcAlphaShift)
 ROP(DstAlpha) ROP(DstAlphaShift)
 ROP(PorterDuffMask) ROP(ConstantAlpha) ROP(AlphaCopy)
-ROP(Premultiply)
+ROP(Premultiply) ROP(ConstantColor)
 END_TABLE(rop,UV)
 #undef ROP
 
@@ -3965,7 +3968,7 @@ extern char*
 apc_get_user_name( void);
 
 extern PList
-apc_getdir( const char *dirname);
+apc_getdir( const char *dirname, Bool is_utf8);
 
 extern Bool
 apc_dl_export(char *path);

@@ -2,8 +2,8 @@ NAME
     Getopt::Long::Util - Utilities for Getopt::Long
 
 VERSION
-    This document describes version 0.891 of Getopt::Long::Util (from Perl
-    distribution Getopt-Long-Util), released on 2020-04-27.
+    This document describes version 0.892 of Getopt::Long::Util (from Perl
+    distribution Getopt-Long-Util), released on 2020-10-27.
 
 FUNCTIONS
   detect_getopt_long_script

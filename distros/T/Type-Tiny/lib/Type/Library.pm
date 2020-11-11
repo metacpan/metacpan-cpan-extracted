@@ -6,15 +6,15 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '1.010006';
+	$Type::Library::VERSION   = '1.012000';
 }
 
 $Type::Library::VERSION =~ tr/_//d;
 
 use Eval::TypeTiny qw< eval_closure >;
 use Scalar::Util qw< blessed refaddr >;
-use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
+use Type::Tiny ();
+use Types::TypeTiny ();
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -43,10 +43,27 @@ sub _exporter_validate_opts
 {
 	my $class = shift;
 	
-	no strict "refs";
-	my $into  = $_[0]{into};
-	push @{"$into\::ISA"}, $class if $_[0]{base};
+	my $into = $_[0]{into};
 	
+	if ( $_[0]{base} || $_[0]{extends} and !ref $into ) {
+		no strict "refs";
+		push @{"$into\::ISA"}, $class;
+		( my $file = $into ) =~ s{::}{/}g;
+		$INC{"$file.pm"} ||= __FILE__;
+	}
+	
+	if ( $_[0]{utils} ) {
+		require Type::Utils;
+		'Type::Utils'->import({ into => $into }, '-default');
+	}
+	
+	if ( $_[0]{extends} and !ref $into ) {
+		require Type::Utils;
+		my $wrapper = eval "sub { package $into; &Type::Utils::extends; }";
+		my @libs = @{ ref($_[0]{extends}) ? $_[0]{extends} : ($_[0]{extends} ? [$_[0]{extends}] : []) };
+		$wrapper->(@libs);
+	}
+
 	return $class->SUPER::_exporter_validate_opts(@_);
 }
 
@@ -308,8 +325,8 @@ sub add_type
 	
 	my $type =
 		ref($_[0]) =~ /^Type::Tiny\b/  ? $_[0] :
-		blessed($_[0])                 ? to_TypeTiny($_[0]) :
-		ref($_[0]) eq q(HASH)          ? "Type::Tiny"->new(library => $class, %{$_[0]}) :
+		blessed($_[0])                 ? Types::TypeTiny::to_TypeTiny($_[0]) :
+		ref($_[0]) eq q(HASH)          ? 'Type::Tiny'->new(library => $class, %{$_[0]}) :
 		"Type::Tiny"->new(library => $class, @_);
 	my $name = $type->{name};
 	

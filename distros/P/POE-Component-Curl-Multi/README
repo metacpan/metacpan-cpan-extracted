@@ -1,3 +1,11 @@
+NAME
+
+    POE::Component::Curl::Multi - a fast HTTP POE component
+
+VERSION
+
+    version 0.16
+
 SYNOPSIS
 
       use strict;
@@ -282,4 +290,16 @@ SEE ALSO
     AnyEvent::Curl::Multi
 
     POE::Component::Client::HTTP
+
+AUTHOR
+
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Chris Williams, Michael S.
+    Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

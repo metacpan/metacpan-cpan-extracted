@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/VitaminUtils/convert_vitamin_a_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-04'; # DATE
+our $DATE = '2020-11-03'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,26 +39,35 @@ convert-vitamin-a-unit - Convert a vitamin A quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.001 of convert-vitamin-a-unit (from Perl distribution App-VitaminUtils), released on 2020-04-04.
+This document describes version 0.002 of convert-vitamin-a-unit (from Perl distribution App-VitaminUtils), released on 2020-11-03.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % convert-vitamin-a-unit [options] <quantity> [to_unit]
+ % convert-vitamin-a-unit [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [--view-result[=program]] <quantity>
+     [to_unit]
 
 Examples:
 
 Show all possible conversions:
 
  % convert-vitamin-a-unit mcg
- +------------------+------------------+
- | amount           | unit             |
- +------------------+------------------+
- | 0.001            | mg               |
- | 3.33333333333333 | IU-retinol       |
- | 1.66666666666667 | IU-beta-carotene |
- +------------------+------------------+
+ +------------------+------------------------------------------------+
+ | amount           | unit                                           |
+ +------------------+------------------------------------------------+
+ | 0.001            | mg                                             |
+ | 1                | mcg                                            |
+ | 1                | mcg-all-trans-retinol                          |
+ | 12.000000048     | mcg-dietary-all-trans-beta-carotene            |
+ | 23.999999808     | mcg-alpha-carotene                             |
+ | 23.999999808     | mcg-beta-cryptoxanthin                         |
+ | 2                | mcg-all-trans-beta-carotene-as-food-supplement |
+ | 3.33333333333333 | IU                                             |
+ | 3.33333333333333 | IU-retinol                                     |
+ | 1.66666666666667 | IU-beta-carotene                               |
+ +------------------+------------------------------------------------+
 
 Convert from mcg to IU (retinol):
 
@@ -138,6 +147,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

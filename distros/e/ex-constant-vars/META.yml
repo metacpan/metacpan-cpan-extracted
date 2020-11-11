@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/neilb/ex-constant-vars
-  repository: https://github.com/neilb/ex-constant-vars.git
-version: '0.06'
+  bugtracker: https://github.com/cpan-janitor/ex-constant-vars/issues
+  homepage: https://github.com/cpan-janitor/ex-constant-vars
+  repository: https://github.com/cpan-janitor/ex-constant-vars.git
+version: '0.07'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

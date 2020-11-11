@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+# cal2html - generate HTML from a calendar schedule
+# Part of the Calendar::Schedule module package
+use Calendar::Schedule qw/:all/;
+my $TTable = Calendar::Schedule->new();
+
+# Check for command-line options
+my @tmp; for $a (@ARGV) {
+  if ($a =~ /^--ColLabel=/) { $TTable->{ColLabel} = $'; }
+  else { push @tmp, $a; } }
+@ARGV = @tmp;
+
+while (<>) { $TTable->add_entries($_); }
+$TTable->set_first_week('now');
+print "<html><body>\n<p>\n" . $TTable->generate_table();
+
+exit 0;
+__END__ # Documentation
+
+=head1 NAME
+
+cal2html - generate HTML from a calendar schedule
+
+=head1 SYNOPSIS
+
+ $ cal2html  # to process standard input into standard output
+ $ cal2html --ColLabel='weekday %w' cal-file > cal.html
+
+=head1 DESCRIPTION
+
+The command C<cal2html> is a part of C<Calendar::Schedule> Perl package.
+It reads calendar schedule specification from the standard input, or given
+files, and produces an HTML table with the events.
+
+=cut

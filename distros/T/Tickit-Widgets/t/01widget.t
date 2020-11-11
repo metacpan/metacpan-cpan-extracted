@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -47,12 +47,12 @@ is_oneref( $widget, '$widget has refcount 1 at EOF' );
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.08;
+class TestWidget extends Tickit::Widget {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use base qw( Tickit::Widget );
-use constant WIDGET_PEN_FROM_STYLE => 1;
+   method render_to_rb {}
 
-sub render_to_rb {}
-
-sub lines { $lines }
-sub cols  { $cols }
+   method lines { $lines }
+   method cols  { $cols }
+}

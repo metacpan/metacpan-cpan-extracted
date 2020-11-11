@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2020.1101
+	- data changes
+	  - S45 + S9 to BER T1-2
+	  - Flughafen Schoenefeld was renamed to BER T5
+	  - U55 does not exist anymore
+
 2019.1215
 	- data changes:
 	  - S75 now to Warschauer Str.

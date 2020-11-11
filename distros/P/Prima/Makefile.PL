@@ -57,6 +57,7 @@ use vars qw(
 	%ALL_PM_INSTALL
 	%ALL_MAN_INSTALL
 	%MODVERSIONS
+	$PKGCONFIG
 );
 
 use vars qw(
@@ -459,6 +460,7 @@ sub setup_environment
 	} else {
 		$cygwin_fake_Slib = '';
 	}
+	$PKGCONFIG = 'pkg-config';
 }
 
 sub qtilde
@@ -1152,9 +1154,13 @@ DLERR
 
 sub setup_pkgconfig
 {
-	my $v = `pkg-config --version`;
-	chomp $v;
 	printlog "Checking for pkg-config... ";
+	my $v = `pkg-config --version`;
+	if ( $Win32 && $? ) {
+		$v = `pkg-config.bat --version`;
+		$PKGCONFIG = 'pkg-config.bat';
+	}
+	chomp $v;
 	unless ($v =~ /^[\d\.]+$/) {
 		printlog "no\n";
 		return;
@@ -1162,7 +1168,7 @@ sub setup_pkgconfig
 
 	# is your cygwin's pkg-config shading over old strawberry?
 	if ( $Win32 && $flavor =~ /^sb/ && $DEFINES{PERL_PATCHLEVEL} < 20) {
-		$v = `pkg-config --real-version 2>&1`;
+		$v = `$PKGCONFIG --real-version 2>&1`;
 		if ( $? ) {
 			printlog "no, it's cygwin's\n";
 			$END .= <<MIXED;
@@ -1182,9 +1188,9 @@ MIXED
 		printlog "trying PKG_CONFIG_PATH=$xquartz_pkgconfig_path... ";
 		my $add_path;
 		null_output;
-		if ( system "pkg-config --exists x11" ) {
+		if ( system "$PKGCONFIG --exists x11" ) {
 			local $ENV{PKG_CONFIG_PATH} = $xquartz_pkgconfig_path;
-			$add_path = 1 unless system "pkg-config --exists x11";
+			$add_path = 1 unless system "$PKGCONFIG --exists x11";
 		}
 		restore_output;
 		if ($add_path) {
@@ -1204,14 +1210,14 @@ sub pkgconfig
 	printlog "Checking for $package using pkg-config...";
 	null_output;
 
-	if ( system "pkg-config --exists $package" ) {
+	if ( system "$PKGCONFIG --exists $package" ) {
 		restore_output;
 		printlog "no\n";
 		return 0;
 	}
 	restore_output;
 
-	my $modversion  = `pkg-config --modversion $package`;
+	my $modversion  = `$PKGCONFIG --modversion $package`;
 	chomp $modversion;
 	$MODVERSIONS{$package} = $modversion;
 	printlog "$modversion\n";
@@ -1219,7 +1225,7 @@ sub pkgconfig
 	my %h;
 
 	%h = map { $_ => 1 } @INCPATH;
-	my $inc  = `pkg-config --cflags-only-I $package`;
+	my $inc  = `$PKGCONFIG --cflags-only-I $package`;
 	if ( $? != 0 ) { # package has error?
 		printlog "misconfigured\n";
 		return 0;
@@ -1231,7 +1237,7 @@ sub pkgconfig
 	}
 
 	%h = map { $_ => 1 } @LIBS;
-	my $libs    = `pkg-config --libs-only-l $package`;
+	my $libs    = `$PKGCONFIG --libs-only-l $package`;
 	if ( $? != 0 ) {
 		   printlog "misconfigured\n";
 		   return 0;
@@ -1243,7 +1249,7 @@ sub pkgconfig
 	}
 
 	%h = map { $_ => 1 } @LIBPATH;
-	my $libpath    = `pkg-config --libs-only-L $package`;
+	my $libpath    = `$PKGCONFIG --libs-only-L $package`;
 	if ( $? != 0 ) {
 		   printlog "misconfigured\n";
 		   return 0;
@@ -1527,6 +1533,9 @@ WARN:
 	$END .= <<BIDI;
 
 ** Warning: fribidi is needed for bidirectional text.
+Prima compiled without fribidi will not be able
+to handle right-to-left text, f.ex. Arabic or Hebrew.
+Consider fixing your installation.
 
 BIDI
 }
@@ -1562,7 +1571,7 @@ sub setup_gtk
 	}
 
 	if ( $use_gtk3 && pkgconfig('gtk+-3.0')) {
-		my $version = `pkg-config --modversion gtk+-3.0`;
+		my $version = `$PKGCONFIG --modversion gtk+-3.0`;
 		printlog "Checking if can compile and link with gtk3... ";
 		my $minversion = 9;
 		unless ( $version =~ m/^3\.(\d+)/ && $1 > $minversion ) {
@@ -1572,7 +1581,7 @@ sub setup_gtk
 		$use_gtk2 = 0;
 	}
 	if ( $use_gtk2 && pkgconfig('gtk+-2.0')) {
-		my $version = `pkg-config --modversion gtk+-2.0`;
+		my $version = `$PKGCONFIG --modversion gtk+-2.0`;
 		printlog "Checking if can compile and link with gtk2... ";
 		my $minversion = 7;
 		unless ( $version =~ m/^2\.(\d+)/ && $1 > $minversion ) {
@@ -1633,7 +1642,13 @@ sub setup_xlibs
 
 	setup_xft() if $cmd_options{WITH_XFT};
 	setup_harfbuzz() if $cmd_options{WITH_HARFBUZZ};
+	$END .= <<NO_HARFBUZZ unless $DEFINES{WITH_HARFBUZZ};
 
+** Warning: Prima compiled without harfbuzz will not be able
+to render proper ligatured text, f.ex. Arabic, Hindi, Tibetan etc etc.
+Consider fixing your installation.
+
+NO_HARFBUZZ
 	$cmd_options{WITH_ICONV} = 0 unless $cmd_options{WITH_XFT}; # iconv is used for xft only
 	setup_iconv() if $cmd_options{WITH_ICONV};
 	setup_gtk() if $cmd_options{WITH_GTK2} || $cmd_options{WITH_GTK3};

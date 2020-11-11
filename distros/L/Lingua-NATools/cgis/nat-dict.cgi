@@ -21,7 +21,7 @@
 use POSIX qw(locale_h);
 use URI::Escape;
 
-setlocale(LC_CTYPE, "pt_PT");
+setlocale(LC_CTYPE, "pt_PT.UTF-8");
 
 use warnings;
 

@@ -50,7 +50,7 @@ my @methods	= (
 
 foreach my $tuple ( @methods ) {
         my ($sub, $data) = @$tuple;
-	my $subname = $data->{subname} // $sub;
+	my $subname = GraphViz2::_dor($data->{subname}, $sub);
 	can_ok( $GraphViz2, $subname );
 	ok
 		$GraphViz2->$subname( @{ $data->{args} || [] } ),

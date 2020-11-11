@@ -15,7 +15,7 @@ enum class Opcode : uint8_t {
 namespace CloseCode {
 
 enum CloseCode : uint16_t {
-    NO_ERROR = 0,
+    NOERR = 0,
 
     DONE             = 1000,
     AWAY             = 1001,

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.45;
+package Future::AsyncAwait::Awaitable 0.46;
 
 use v5.14;
 use warnings;
@@ -150,11 +150,11 @@ are unspecified.
 
    $f->AWAIT_ON_READY( $code )
 
-=head2 AWAIT_ON_CANCEL
+=head2 AWAIT_CHAIN_CANCEL
 
 Attach a future instance to be cancelled when another one is cancelled.
 
-   $f1->AWAIT_ON_CANCEL( $f2 )
+   $f1->AWAIT_CHAIN_CANCEL( $f2 )
 
 When C<$f1> is cancelled, then C<$f2> is cancelled. There is no link from
 C<$f2> back to C<$f1> - whenever C<$f2> changes state here, nothing special
@@ -163,11 +163,20 @@ happens to C<$f1>.
 An implementation that does not support cancellation can simply ignore this
 method.
 
-   sub AWAIT_ON_CANCEL { }
+   sub AWAIT_CHAIN_CANCEL { }
 
-A newer version of this API specification will rename this to
-C<AWAIT_CHAIN_CANCEL>, so it is a good idea to alias the method under both
-names for now.
+An older version of this API specification named this C<AWAIT_ON_CANCEL>, but
+that name will be repurposed for attaching code blocks in a later version.
+
+=head2 AWAIT_ON_CANCEL
+
+A later version of this specification will repurpose this method name, but for
+now it performs the L</AWAIT_CHAIN_CANCEL> behaviour.
+
+An implementation that does not support cancellation can simply ignore this
+method.
+
+   sub AWAIT_ON_CANCEL { }
 
 =cut
 

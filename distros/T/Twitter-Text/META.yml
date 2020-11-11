@@ -1,0 +1,51 @@
+---
+abstract: 'Perl implementation of the twitter-text parsing library'
+author:
+  - 'utgwkk <utagawakiki@gmail.com>'
+build_requires:
+  Test2::Plugin::GitHub::Actions::AnnotateFailedTest: '0'
+  Test2::V0: '0'
+  Test::More: '0.98'
+  Unicode::GCString: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Twitter-Text
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Twitter::Text:
+    file: lib/Twitter/Text.pm
+    version: '0.04'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Share: '0'
+  JSON::XS: '0'
+  List::Util: '0'
+  List::UtilsBy: '0'
+  Net::IDN::Encode: '0'
+  Path::Tiny: '0'
+  Unicode::Normalize: '0'
+  YAML::PP: '0'
+  perl: '5.014001'
+resources:
+  bugtracker: https://github.com/utgwkk/Twitter-Text/issues
+  homepage: https://github.com/utgwkk/Twitter-Text
+  repository: git://github.com/utgwkk/Twitter-Text.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

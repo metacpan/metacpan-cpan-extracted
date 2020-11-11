@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '1.010006';
+	$Types::Common::String::VERSION   = '1.012000';
 }
 
 $Types::Common::String::VERSION =~ tr/_//d;
@@ -157,7 +157,7 @@ $meta->add_type(
 		return $meta->get_type('StrLength') unless @_;
 		
 		my ($min, $max) = @_;
-		Types::Standard::Int->check($_)
+		Types::Standard::is_Int($_)
 			|| Types::Standard::_croak("Parameters for StrLength[`min, `max] expected to be integers; got $_")
 			for @_;
 		

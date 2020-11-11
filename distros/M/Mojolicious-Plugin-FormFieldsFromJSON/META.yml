@@ -15,19 +15,23 @@ name: Mojolicious-Plugin-FormFieldsFromJSON
 provides:
   Mojolicious::Plugin::FormFieldsFromJSON:
     file: lib/Mojolicious/Plugin/FormFieldsFromJSON.pm
-    version: '1.01'
+    version: '1.02'
 requires:
+  Mojo::File: '0'
   Mojolicious: '5.67'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON
   repository: http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'Csizmar Roland <csizmar.roland@mithrandir.hu>'
+  - 'Håkon Hægland <hakon.hagland@gmail.com>'
   - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
+  - 'Lubos Kolouch <lubos@kolouch.net>'
   - 'Mario Minati <mario.minati@minati.de>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Onufriev Anton <a.onyfriev@sports.ru>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'

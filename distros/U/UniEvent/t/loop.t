@@ -1,7 +1,6 @@
 use 5.016;
 use warnings;
 use lib 't/lib'; use MyTest;
-catch_run('[loop]');
 
 subtest 'basic' => sub {
     my $loop = UniEvent::Loop->new();

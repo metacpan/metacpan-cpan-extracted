@@ -3,9 +3,9 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.010 of
+    This document describes version 0.011 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2020-09-21.
+    App-FirefoxMultiAccountContainersUtils), released on 2020-11-02.
 
 SYNOPSIS
 DESCRIPTION
@@ -47,13 +47,13 @@ FUNCTIONS
          firefox_container( container => "mycontainer");
 
     This utility opens a new firefox tab in a specific multi-account
-    container. This requires the Firefox Multi-Account Container, as well as
-    another container called "Open external links in a container",
+    container. This requires the Firefox Multi-Account Containers add-on, as
+    well as another add-on called "Open external links in a container",
     <https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
 
-    The way it works, because add-on currently does not have hooks to the
+    The way it works, because add-ons currently do not have hooks to the
     CLI, is via a custom protocol handler. For example, if you want to open
-    C<http://www.example.com/> in a container called "mycontainer", you ask
+    <http://www.example.com/> in a container called "mycontainer", you ask
     Firefox to open this URL:
 
      ext+container:name=mycontainer&url=http://www.example.com/
@@ -86,10 +86,7 @@ FUNCTIONS
 
      firefox_mua_list_containers(%args) -> [status, msg, payload, meta]
 
-    Sort Firefox Multi-Account Containers add-on's containers.
-
-    At the time of this writing, the UI does not provide a way to sort the
-    containers. Thus this utility.
+    List Firefox Multi-Account Containers add-on's containers.
 
     This function is not exported.
 
@@ -177,8 +174,9 @@ FUNCTIONS
 
     Sort Firefox Multi-Account Containers add-on's containers.
 
-    At the time of this writing, the UI does not provide a way to sort the
-    containers. Thus this utility.
+    At the time of this writing, the UI of the Firefox Multi-Account
+    Containers add-on does not provide a way to sort the containers. Thus
+    this utility.
 
     This function is not exported.
 
@@ -231,10 +229,6 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    "Firefox Multi-Account Containers" add-on,
-    <https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers
-    />
-
     "Open external links in a container" add-on,
     <https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>
     (repo at <https://github.com/honsiorovskyi/open-url-in-container/>). The
@@ -245,8 +239,6 @@ SEE ALSO
 
     Some other CLI utilities related to Firefox: App::FirefoxUtils,
     App::DumpFirefoxHistory.
-
-    open-browser.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

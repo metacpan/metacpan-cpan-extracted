@@ -3,20 +3,11 @@
 use strict;
 use warnings;
 
-use Indent::Data;
+use Indent::Utils qw(remove_ws);
 
-# Indent::Data object.
-my $i = Indent::Data->new(
-       'line_size' => '10',
-       'next_indent' => '  ',
-       'output_separator' => "|\n",
-);
-
-# Print indented text.
-print $i->indent('text text text text text text')."|\n";
+my $input = '   a   ';
+remove_ws(\$input);
+print "$input|\n";
 
 # Output:
-# text text |
-#   text tex|
-#   t text t|
-#   ext|
+# a|

@@ -36,6 +36,8 @@ file.
 
 	use StreamFinder;
 
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
 	my $station = new StreamFinder($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
@@ -104,16 +106,16 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder accepts a valid radio station or video URL on supported websites 
-and returns the actual stream URL(s), title, and cover art icon for that 
-station / podcast / video.  The purpose is that one needs one of these URLs 
-in order to have the option to stream the station / video in one's own choice 
-of media player software rather than using their web browser and accepting 
-flash, ads, javascript, cookies, trackers, web-bugs, and other 
+StreamFinder accepts a webpage URL for a valid radio station, video, or podcast 
+URL on supported websites and returns the actual stream URL(s), title, and cover 
+art icon for that station / podcast / video.  The purpose is that one needs one 
+of these URLs in order to have the option to stream the station / video in one's 
+own choice of media player software rather than using their web browser and 
+accepting flash, ads, javascript, cookies, trackers, web-bugs, and other 
 crapware associated with that method of play.  The author uses his own 
 custom all-purpose media player called "Fauxdacious" (his custom hacked 
 version of the open-source "Audacious" audio player).  "Fauxdacious" 
-(L<https://wildstar84.wordpress.com/fauxdacious/> incorporates this module to 
+(L<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this module to 
 decode and play streams, along with their titles / station names, and station 
 / podcast / video icons! 
 
@@ -124,12 +126,11 @@ B<SYNOPSIS> section above, save it to an executable text file, ie.
 I<StreamFinder.pl> and run it from the command line with a supported streaming 
 site URL as the argument.  You can then edit it to tailor it to your needs.
 
-The currently-supported websites are:  banned.video 
-(L<StreamFinder::BannedVideo>), bitchute.com (L<StreamFinder::Bitchute>, 
-blogger.com (L<StreamFinder::Blogger>), brighteon.com (L<StreamFinder::Brighteon>), 
-iheartradio.com (L<StreamFinder::IHeartRadio>), podcasts.apple.com 
-(L<StreamFinder::Apple>), radio.net (L<StreamFinder::RadioNet>), 
-radionomy.com (L<StreamFinder::Radionomy>), reciva.com (L<StreamFinder::Reciva>), 
+The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple>), 
+bitchute.com (L<StreamFinder::Bitchute>, blogger.com (L<StreamFinder::Blogger>), 
+brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
+iheartradio.com (L<StreamFinder::IHeartRadio>), radio.net (L<StreamFinder::RadioNet>), 
+reciva.com (L<StreamFinder::Reciva>), sermonaudio.com (L<StreamFinder::SermonAudio>)
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
 and (youtube.com, et. al and other sites that youtube-dl supports) 
@@ -141,9 +142,7 @@ Facebook as a "rogue app. login" and will cause them to LOCK your account
 and FORCE you to change your password the next time you log in 
 to Facebook!
 
-NOTE:  Radionomy appears to be defunct.
-
-NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, Bitchute, and BannedVideo, 
+NOTE:  For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, 
 etc. the "station" object actually refers to a specific video or podcast, but 
 functions the same way.
 
@@ -183,8 +182,9 @@ code above), and send it to me (That's what I do)!
 
 =item B<new>(I<url> [, I<options> ])
 
-Accepts a URL and creates and returns a new station object, or 
-I<undef> if the URL is not a valid station or no streams are found.
+Accepts a URL and creates and returns a new station, video, or 
+podcast object, or I<undef> if the URL is not a valid station or 
+no streams are found.
 
 NOTE:  Depending on the type of site being queried, the "station 
 object" can be either a streaming station, a video, or a podcast, 
@@ -192,9 +192,9 @@ but works the same way (method calls, arguments, etc.).
 
 NOTE:  A full URL must be specified here, but if using any of the 
 subpackage modules directly instead, then either a full URL OR just 
-the station / video's site ID may be used!  Reason being that this 
-function parses the full URL to determine which subpackage (site) 
-module to use.
+the station / video / podcast's site ID may be used!  Reason being 
+that this function parses the full URL to determine which subpackage 
+(site) module to use.
 
 I<options> can vary depending on the type of site that is 
 being queried.  One option common to all sites is I<-debug>, which 
@@ -264,13 +264,14 @@ Returns a two-element array consisting of the extension (ie. "png",
 local storage for use by your preferred media player.
 
 NOTE:  If no "banner image" (usually a larger image) is found, 
-the "icon image" data will be returned.
+the "icon image" data, if any, will be returned.
 
 =item $station->B<getType>()
 
-Returns the station's type (I<submodule-name>).  
-(one of:  "Apple", "BannedVideo", "IHeartRadio", "RadioNet", 
-"Radionomy", "Reciva", "Tunein", "Youtube" or "Vimeo" - 
+Returns the station / podcast / video's type (I<submodule-name>).  
+(one of:  "Apple", "BitChute", "Blogger", "Brighteon", "Castbox", 
+"IHeartRadio", "RadioNet", "Reciva", "SermonAudio", "Spreaker", 
+"Tunein", "Youtube" or "Vimeo" - 
 depending on the sight that matched the URL.
 
 =back
@@ -409,15 +410,15 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.32';
+our $VERSION = '1.35';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Apple Bitchute Blogger Brighteon IHeartRadio
-		RadioNet Radionomy Reciva Tunein Vimeo Spreaker Youtube));
+my @supported_mods = (qw(Apple Bitchute Blogger Brighteon Castbox IHeartRadio
+		RadioNet Reciva SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
 
@@ -442,30 +443,32 @@ sub new
 #	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 	if ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 		return new StreamFinder::IHeartRadio($url, @args);
-	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.com\/#) {  #NOTE:ALSO USES youtube-dl!
+	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Tunein($url, @args);
 	} elsif ($haveit{'RadioNet'} && $url =~ m#\bradio\.net\/#) {
 		return new StreamFinder::RadioNet($url, @args);
-	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
-		return new StreamFinder::Radionomy($url, @args);
+#	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
+#		return new StreamFinder::Radionomy($url, @args);
 	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
 		return new StreamFinder::Reciva($url, @args);
 	} elsif ($haveit{'Brighteon'} && $url =~ m#\bbrighteon\.com\/#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Brighteon($url, @args);
-	} elsif ($haveit{'Vimeo'} && $url =~ m#\bvimeo\.com\/#) {  #NOTE:ALSO USES youtube-dl!
+	} elsif ($haveit{'Vimeo'} && $url =~ m#\bvimeo\.#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Vimeo($url, @args);
 	} elsif ($haveit{'Apple'} && $url =~ m#\b(?:podcasts?|music)\.apple\.com\/#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Apple($url, @args);
-	} elsif ($haveit{'Spreaker'} && $url =~ m#\.spreaker\.com\/#) {
+	} elsif ($haveit{'Spreaker'} && $url =~ m#\.spreaker\.#) {
 		return new StreamFinder::Spreaker($url, @args);
 #	} elsif ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {  #REMOVED SUPPORT AS FB NOW LOCKS YOUR ACCOUNT & FORCES PASSWORD CHANGE!
 #		return new StreamFinder::Facebook($url, @args);
-#	} elsif ($haveit{'Youtube'} && $url =~ m#\b(?:youtube|youtu|yt)\.\/#) {
-#		return new StreamFinder::Youtube($url, @args);
-	} elsif ($haveit{'Bitchute'} && $url =~ m#www\.bitchute\.com\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'Bitchute'} && $url =~ m#\.bitchute\.#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Bitchute($url, @args);
-	} elsif ($haveit{'Blogger'} && $url =~ m#www\.blogger\.com\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'Blogger'} && $url =~ m#\.blogger\.#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Blogger($url, @args);
+	} elsif ($haveit{'Castbox'} && $url =~ m#\bcastbox\.\w+\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		return new StreamFinder::Castbox($url, @args);
+	} elsif ($haveit{'SermonAudio'} && $url =~ m#\.sermonaudio\.com\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		return new StreamFinder::SermonAudio($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Youtube($url, @args);
 	} else {

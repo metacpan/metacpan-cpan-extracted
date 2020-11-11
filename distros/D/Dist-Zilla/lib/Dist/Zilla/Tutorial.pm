@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::Tutorial 6.015;
+package Dist::Zilla::Tutorial 6.017;
 # ABSTRACT: how to use this "Dist::Zilla" thing
 
 use Carp ();
@@ -148,7 +148,7 @@ Dist::Zilla::Tutorial - how to use this "Dist::Zilla" thing
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 SYNOPSIS
 

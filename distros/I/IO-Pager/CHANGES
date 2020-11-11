@@ -1,5 +1,45 @@
 Revision history for Perl extension IO::Pager.
 
+2.10    Nov
+	::Perl Alter tp local script installation for parallel make. RT#133651
+
+	::Perl Add basic Windows support. RT#133663
+
+	::Perl Add TOPT environment variable to tp.
+
+	::Perl Enable scrollbar in interactive test 16.
+
+2.01	Nov 02 2020
+	::Perl Fixed bug that left terminal in unclean state if exit at EOF
+	was enabled.
+
+	::Perl Fixed jump to end of file shortcut to show last line on bottom
+	of screen instead of top to provide more context.
+
+	::Perl Made scrollbar interactive using xterm control sequences.
+
+	::Perl Added scroll wheel support using xterm control sequences.
+
+2.00	Nov 01 2020
+	Fix interactive tests 7 and 16 in bogus environments w/o PAGER. RT#13330
+
+	Add tp to local script installation. RT#133651
+
+	::Perl Add suport for visible scrollbar. RT#133652
+
+	::Perl Rename prompt() to status(), I18N{prompt} to I18N{minihelp},
+	       and I18N{status} to I18N{prompt}
+
+	::Perl Fix long lines in absence of Text::Wrap
+
+	::Perl Consolidate dialog()
+
+	::Perl Add ability to open file interactively
+
+	::Perl Prevent jumping to invalid bookmark
+
+	::Perl Fix tp -j
+
 1.03    Jun 13 2020
 	Fix destruction warnings in Buffered
 

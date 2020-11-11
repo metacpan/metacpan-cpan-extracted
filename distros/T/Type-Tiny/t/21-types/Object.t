@@ -38,6 +38,14 @@ is(exception { Object->inline_check(q/$xyz/) }, undef, "Inlining Object doesn't 
 ok(!Object->has_coercion, "Object doesn't have a coercion");
 ok(!Object->is_parameterizable, "Object isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,
@@ -107,6 +115,35 @@ while (@tests) {
 		fail("expected '$expect'?!");
 	}
 }
+
+#
+# with_attribute_values
+#
+
+{
+	package Local::Person;
+	sub new {
+		my $class = shift;
+		my %args  = (@_==1) ? %{$_[0]} : @_;
+		bless \%args, $class;
+	}
+	sub name   { shift->{name}   }
+	sub gender { shift->{gender} }
+}
+
+ok( Object->can('with_attribute_values') );
+
+my $Man = Object->with_attribute_values(
+	gender => Types::Standard::Enum['m']
+);
+
+my $alice = 'Local::Person'->new( name => 'Alice', gender => 'f' );
+my $bob   = 'Local::Person'->new( name => 'Bob',   gender => 'm' );
+
+should_pass($alice, Object);
+should_pass($bob,   Object);
+should_fail($alice, $Man);
+should_pass($bob,   $Man);
 
 done_testing;
 

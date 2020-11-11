@@ -5,11 +5,11 @@ use strict;
 
 use Carp;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -45,15 +45,13 @@ sub list {
     my $raw      = delete( $params->{'raw'} );
     my $scanners = $self->client->get( '/scanner', $params );
 
-    if ( !$scanners ) {
-        return;
-    }
+    return if ( !$scanners );
 
     if ($raw) {
-        return $scanners;
+        return wantarray ? @{$scanners} : $scanners;
     }
 
-    return sc_normalize_array($scanners);
+    return wantarray ? @{ sc_normalize_array($scanners) } : sc_normalize_array($scanners);
 
 }
 

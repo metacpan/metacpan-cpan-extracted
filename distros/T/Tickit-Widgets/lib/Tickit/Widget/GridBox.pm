@@ -3,14 +3,15 @@
 #
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::GridBox;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::ContainerWidget );
+package Tickit::Widget::GridBox 0.31;
+class Tickit::Widget::GridBox
+   extends Tickit::ContainerWidget;
+
+use experimental 'postderef';
+
 use Tickit::Style;
-
-our $VERSION = '0.30';
 
 use Carp;
 
@@ -102,20 +103,24 @@ This is now discouraged in favour of the L</append_row> method.
 
 =cut
 
-sub new
-{
+sub BUILDARGS {
    my $class = shift;
    my %args = @_;
 
    exists $args{$_} and $args{style}{$_} = delete $args{$_} for qw( row_spacing col_spacing );
 
-   my $self = $class->SUPER::new( %args );
+   return $class->SUPER::BUILDARGS( %args );
+}
 
-   $self->{grid} = [];
-   $self->{max_col} = -1;
+has @_grid;
+has $_max_col = -1;
+
+BUILD
+{
+   my %args = @_;
 
    if( my $children = $args{children} ) {
-      Carp::carp( "The 'children' constructor argument to $class is discouraged; use ->append_row instead" );
+      Carp::carp( "The 'children' constructor argument to ${\ref $self} is discouraged; use ->append_row instead" );
 
       foreach my $row ( 0 .. $#$children ) {
          foreach my $col ( 0 .. $#{ $children->[$row] } ) {
@@ -123,54 +128,46 @@ sub new
          }
       }
    }
-
-   return $self;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $row_spacing = $self->get_style_values( "row_spacing" );
-   my $max_row = $#{$self->{grid}};
-   my $max_col = $self->{max_col};
+   my $max_row = $#_grid;
    return ( sum( map {
          my $r = $_;
          max map {
             my $c = $_;
-            my $child = $self->{grid}[$r][$c];
+            my $child = $_grid[$r][$c];
             $child ? $child->requested_lines : 0;
-         } 0 .. $max_col
+         } 0 .. $_max_col
       } 0 .. $max_row ) ) +
       $row_spacing * $max_row;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $col_spacing = $self->get_style_values( "col_spacing" );
-   my $max_row = $#{$self->{grid}};
-   my $max_col = $self->{max_col};
+   my $max_row = $#_grid;
    return ( sum( map {
          my $c = $_;
          max map {
             my $r = $_;
-            my $child = $self->{grid}[$r][$c];
+            my $child = $_grid[$r][$c];
             $child ? $child->requested_cols : 0;
          } 0 .. $max_row
-      } 0 .. $max_col ) ) +
-      $col_spacing * $max_col;
+      } 0 .. $_max_col ) ) +
+      $col_spacing * $_max_col;
 }
 
-sub children
+method children
 {
-   my $self = shift;
-   my $grid = $self->{grid};
    map {
       my $r = $_;
       map {
-         $grid->[$r][$_] ? ( $grid->[$r][$_] ) : ()
-      } 0 .. $self->{max_col}
-   } 0.. $#$grid;
+         $_grid[$r][$_] ? ( $_grid[$r][$_] ) : ()
+      } 0 .. $_max_col
+   } 0.. $#_grid;
 }
 
 =head1 METHODS
@@ -189,16 +186,14 @@ Returns the number of rows or columns in the grid.
 
 =cut
 
-sub rowcount
+method rowcount
 {
-   my $self = shift;
-   return scalar @{ $self->{grid} }
+   return scalar @_grid;
 }
 
-sub colcount
+method colcount
 {
-   my $self = shift;
-   return $self->{max_col} + 1;
+   return $_max_col + 1;
 }
 
 =head2 add
@@ -226,18 +221,17 @@ used to distribute space to that column or row.
 
 =cut
 
-sub add
+method add
 {
-   my $self = shift;
    my ( $row, $col, $child, %opts ) = @_;
 
-   if( my $old_child = $self->{grid}[$row][$col] ) {
+   if( my $old_child = $_grid[$row][$col] ) {
       $self->SUPER::remove( $old_child );
    }
 
-   $self->{max_col} = $col if $col > $self->{max_col};
+   $_max_col = $col if $col > $_max_col;
 
-   $self->{grid}[$row][$col] = $child;
+   $_grid[$row][$col] = $child;
    $self->SUPER::add( $child,
       col_expand => $opts{col_expand} || 0,
       row_expand => $opts{row_expand} || 0,
@@ -253,39 +247,36 @@ this was the last child widget in the given row or column.
 
 =cut
 
-sub remove
+method remove
 {
-   my $self = shift;
    my ( $row, $col ) = @_;
 
-   my $grid = $self->{grid};
-
-   my $child = $grid->[$row][$col];
-   undef $grid->[$row][$col];
+   my $child = $_grid[$row][$col];
+   undef $_grid[$row][$col];
 
    # Tidy up the row
    my $max_col = 0;
-   foreach my $col ( reverse 0 .. $#{ $grid->[$row] } ) {
-      next if !defined $grid->[$row][$col];
+   foreach my $col ( reverse 0 .. $#{ $_grid[$row] } ) {
+      next if !defined $_grid[$row][$col];
 
       $max_col = $col+1;
       last;
    }
 
-   splice @{ $grid->[$row] }, $max_col;
+   splice $_grid[$row]->@*, $max_col;
 
    # Tidy up the grid
    my $max_row = 0;
-   foreach my $row ( reverse 0 .. $#$grid ) {
-      next if !defined $grid->[$row] or !@{ $grid->[$row] };
+   foreach my $row ( reverse 0 .. $#_grid ) {
+      next if !defined $_grid[$row] or !$_grid[$row]->@*;
 
       $max_row = $row+1;
       last;
    }
 
-   splice @$grid, $max_row;
+   splice @_grid, $max_row;
 
-   $self->{max_col} = max map { $_ ? $#$_ : 0 } @$grid;
+   $_max_col = max map { $_ ? $#$_ : 0 } @_grid;
 
    my $childrect = $child->window ? $child->window->rect : undef;
 
@@ -304,13 +295,12 @@ cell, returns C<undef>.
 
 =cut
 
-sub get
+method get
 {
-   my $self = shift;
    my ( $row, $col ) = @_;
 
-   return undef if $row >= @{ $self->{grid} };
-   return $self->{grid}[$row][$col];
+   return undef if $row >= @_grid;
+   return $_grid[$row][$col];
 }
 
 =head2 get_row
@@ -325,16 +315,14 @@ Convenient shortcut to call C<get> on an entire row or column of the grid.
 
 =cut
 
-sub get_row
+method get_row
 {
-   my $self = shift;
    my ( $row ) = @_;
    return map { $self->get( $row, $_ ) } 0 .. $self->colcount - 1;
 }
 
-sub get_col
+method get_col
 {
-   my $self = shift;
    my ( $col ) = @_;
    return map { $self->get( $_, $col ) } 0 .. $self->rowcount - 1;
 }
@@ -348,19 +336,22 @@ down. Any child widgets in the referenced array will be set on the cells of
 the new row, at an column corresponding to its index in the array. A child of
 C<undef> will be skipped over.
 
+Each element of the list should either be a widget object reference directly,
+or an unblessed hash reference containing additional options. (See
+L<Tickit::Widget/split_widget_opts>).
+
 =cut
 
-sub insert_row
+method insert_row
 {
-   my $self = shift;
    my ( $row, $children ) = @_;
 
-   splice @{ $self->{grid} }, $row, 0, [];
+   splice @_grid, $row, 0, [];
 
    foreach my $col ( 0 .. $#$children ) {
-      next unless my $child = $children->[$col];
+      next unless my $arg = $children->[$col];
 
-      $self->add( $row, $col, $child ); # No options
+      $self->add( $row, $col, Tickit::Widget::split_widget_opts $arg );
    }
 
    return $self;
@@ -375,22 +366,22 @@ the right. Any child widgets in the referenced array will be set on the cells
 of the new column, at a row corresponding to its index in the array. A child
 of C<undef> will be skipped over.
 
+Each child is specified as for C<insert_row>.
+
 =cut
 
-sub insert_col
+method insert_col
 {
-   my $self = shift;
    my ( $col, $children ) = @_;
 
-   my $grid = $self->{grid};
-   $self->{max_col}++;
+   $_max_col++;
 
    foreach my $row ( 0 .. max( $self->rowcount, scalar @$children ) - 1 ) {
-      splice @{ $grid->[$row] //= [ ( undef ) x $col ] }, $col, 0, ( undef );
+      splice @{ $_grid[$row] //= [ ( undef ) x $col ] }, $col, 0, ( undef );
 
-      next unless my $child = $children->[$row];
+      next unless my $arg = $children->[$row];
 
-      $self->add( $row, $col, $child ); # No options
+      $self->add( $row, $col, Tickit::Widget::split_widget_opts $arg );
    }
 
    return $self;
@@ -404,9 +395,8 @@ Shortcut to inserting a new row after the end of the current grid.
 
 =cut
 
-sub append_row
+method append_row
 {
-   my $self = shift;
    return $self->insert_row( $self->rowcount, @_ );
 }
 
@@ -429,9 +419,8 @@ which is now discouraged.
 
 =cut
 
-sub append_col
+method append_col
 {
-   my $self = shift;
    return $self->insert_col( $self->colcount, @_ );
 }
 
@@ -443,14 +432,13 @@ Deletes a row of the grid by moving the existing rows after it higher up.
 
 =cut
 
-sub delete_row
+method delete_row
 {
-   my $self = shift;
    my ( $row ) = @_;
 
    $self->remove( $row, $_ ) for 0 .. $self->colcount - 1;
 
-   splice @{ $self->{grid} }, $row, 1, ();
+   splice @_grid, $row, 1, ();
    $self->children_changed;
 }
 
@@ -463,21 +451,19 @@ left.
 
 =cut
 
-sub delete_col
+method delete_col
 {
-   my $self = shift;
    my ( $col ) = @_;
 
    $self->remove( $_, $col ) for 0 .. $self->rowcount - 1;
 
-   splice @{ $self->{grid}[$_] }, $col, 1, () for 0 .. $self->rowcount - 1;
-   $self->{max_col}--;
+   splice $_grid[$_]->@*, $col, 1, () for 0 .. $self->rowcount - 1;
+   $_max_col--;
    $self->children_changed;
 }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
    my $win = $self->window or return;
 
    my @row_buckets;
@@ -495,7 +481,7 @@ sub reshape
       my $expand = 0;
 
       foreach my $col ( 0 .. $max_col ) {
-         my $child = $self->{grid}[$row][$col] or next;
+         my $child = $_grid[$row][$col] or next;
 
          $base   = max $base, $child->requested_lines;
          $expand = max $expand, $self->child_opts( $child )->{row_expand};
@@ -515,7 +501,7 @@ sub reshape
       my $expand = 0;
 
       foreach my $row ( 0 .. $max_row ) {
-         my $child = $self->{grid}[$row][$col] or next;
+         my $child = $_grid[$row][$col] or next;
 
          $base   = max $base, $child->requested_cols;
          $expand = max $expand, $self->child_opts( $child )->{col_expand};
@@ -543,7 +529,7 @@ sub reshape
 
    foreach my $row ( 0 .. $max_row ) {
       foreach my $col ( 0 .. $max_col ) {
-         my $child = $self->{grid}[$row][$col] or next;
+         my $child = $_grid[$row][$col] or next;
 
          # Don't try to use zero-sized rows or cols
          next unless $rows[$row][1] and $cols[$col][1];
@@ -561,9 +547,8 @@ sub reshape
    }
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->eraserect( $rect );

@@ -1,16 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::ContainerWidget;
+package Tickit::ContainerWidget 0.52;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.010; # //
 use base qw( Tickit::Widget );
-
-our $VERSION = '0.53';
 
 use Carp;
 

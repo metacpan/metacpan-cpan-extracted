@@ -1,8 +1,13 @@
 use strict;
 use warnings;
 use Test::More tests => 1;
+use File::Temp qw[tempdir];
 use POE::Component::SmokeBox::Dists;
 use Cwd;
+
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+my $cwd = getcwd; END { chdir $cwd }
+chdir $tmpdir;
 
 $ENV{PERL5_SMOKEBOX_DIR} = cwd();
 

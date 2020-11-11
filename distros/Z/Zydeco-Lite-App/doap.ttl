@@ -1,0 +1,53 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco-Lite-App/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "YAML::XS"^^doap-deps:CpanId ], [ doap-deps:on "YAML::PP"^^doap-deps:CpanId ], [ doap-deps:on "Config::Tiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Z 0.007"^^doap-deps:CpanId ], [ doap-deps:on "Zydeco::Lite 0.083"^^doap-deps:CpanId ], [
+		doap-deps:on "Getopt::Kingpin 0.10"^^doap-deps:CpanId;
+	], [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "Perl::OSType"^^doap-deps:CpanId ], [ doap-deps:on "Term::ANSIColor"^^doap-deps:CpanId ], [ doap-deps:on "TOML::Parser"^^doap-deps:CpanId ], [ doap-deps:on "JSON::PP"^^doap-deps:CpanId ], [ doap-deps:on "indirect"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "JSON::MaybeXS"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco-Lite-App>;
+	doap:created         "2020-10-12"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Zydeco-Lite-App>;
+	doap:homepage        <https://metacpan.org/release/Zydeco-Lite-App>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Zydeco-Lite-App";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Zydeco-Lite-App/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-zydeco-lite-app>;
+	];
+	doap:shortdesc       "use Zydeco::Lite to quickly develop command-line apps".
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco-Lite-App/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Zydeco-Lite-App-0.001"^^xsd:string;
+	dc:issued            "2020-11-08"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-Lite-App-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

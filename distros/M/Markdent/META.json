@@ -4,7 +4,7 @@
       "Dave Rolsky <autarch@urth.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -108,335 +108,335 @@
    "provides" : {
       "Markdent" : {
          "file" : "lib/Markdent.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::CLI" : {
          "file" : "lib/Markdent/CLI.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::CapturedEvents" : {
          "file" : "lib/Markdent/CapturedEvents.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::CheckedOutput" : {
          "file" : "lib/Markdent/CheckedOutput.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Dialect::GitHub::BlockParser" : {
          "file" : "lib/Markdent/Dialect/GitHub/BlockParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Dialect::GitHub::SpanParser" : {
          "file" : "lib/Markdent/Dialect/GitHub/SpanParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Dialect::Theory::BlockParser" : {
          "file" : "lib/Markdent/Dialect/Theory/BlockParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Dialect::Theory::SpanParser" : {
          "file" : "lib/Markdent/Dialect/Theory/SpanParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::AutoLink" : {
          "file" : "lib/Markdent/Event/AutoLink.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::CodeBlock" : {
          "file" : "lib/Markdent/Event/CodeBlock.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndBlockquote" : {
          "file" : "lib/Markdent/Event/EndBlockquote.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndCode" : {
          "file" : "lib/Markdent/Event/EndCode.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndDocument" : {
          "file" : "lib/Markdent/Event/EndDocument.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndEmphasis" : {
          "file" : "lib/Markdent/Event/EndEmphasis.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndHTMLTag" : {
          "file" : "lib/Markdent/Event/EndHTMLTag.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndHeader" : {
          "file" : "lib/Markdent/Event/EndHeader.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndLink" : {
          "file" : "lib/Markdent/Event/EndLink.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndListItem" : {
          "file" : "lib/Markdent/Event/EndListItem.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndOrderedList" : {
          "file" : "lib/Markdent/Event/EndOrderedList.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndParagraph" : {
          "file" : "lib/Markdent/Event/EndParagraph.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndStrong" : {
          "file" : "lib/Markdent/Event/EndStrong.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndTable" : {
          "file" : "lib/Markdent/Event/EndTable.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndTableBody" : {
          "file" : "lib/Markdent/Event/EndTableBody.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndTableCell" : {
          "file" : "lib/Markdent/Event/EndTableCell.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndTableHeader" : {
          "file" : "lib/Markdent/Event/EndTableHeader.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndTableRow" : {
          "file" : "lib/Markdent/Event/EndTableRow.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::EndUnorderedList" : {
          "file" : "lib/Markdent/Event/EndUnorderedList.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::HTMLBlock" : {
          "file" : "lib/Markdent/Event/HTMLBlock.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::HTMLComment" : {
          "file" : "lib/Markdent/Event/HTMLComment.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::HTMLCommentBlock" : {
          "file" : "lib/Markdent/Event/HTMLCommentBlock.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::HTMLEntity" : {
          "file" : "lib/Markdent/Event/HTMLEntity.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::HTMLTag" : {
          "file" : "lib/Markdent/Event/HTMLTag.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::HorizontalRule" : {
          "file" : "lib/Markdent/Event/HorizontalRule.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::Image" : {
          "file" : "lib/Markdent/Event/Image.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::LineBreak" : {
          "file" : "lib/Markdent/Event/LineBreak.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::Preformatted" : {
          "file" : "lib/Markdent/Event/Preformatted.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartBlockquote" : {
          "file" : "lib/Markdent/Event/StartBlockquote.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartCode" : {
          "file" : "lib/Markdent/Event/StartCode.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartDocument" : {
          "file" : "lib/Markdent/Event/StartDocument.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartEmphasis" : {
          "file" : "lib/Markdent/Event/StartEmphasis.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartHTMLTag" : {
          "file" : "lib/Markdent/Event/StartHTMLTag.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartHeader" : {
          "file" : "lib/Markdent/Event/StartHeader.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartLink" : {
          "file" : "lib/Markdent/Event/StartLink.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartListItem" : {
          "file" : "lib/Markdent/Event/StartListItem.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartOrderedList" : {
          "file" : "lib/Markdent/Event/StartOrderedList.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartParagraph" : {
          "file" : "lib/Markdent/Event/StartParagraph.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartStrong" : {
          "file" : "lib/Markdent/Event/StartStrong.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartTable" : {
          "file" : "lib/Markdent/Event/StartTable.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartTableBody" : {
          "file" : "lib/Markdent/Event/StartTableBody.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartTableCell" : {
          "file" : "lib/Markdent/Event/StartTableCell.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartTableHeader" : {
          "file" : "lib/Markdent/Event/StartTableHeader.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartTableRow" : {
          "file" : "lib/Markdent/Event/StartTableRow.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::StartUnorderedList" : {
          "file" : "lib/Markdent/Event/StartUnorderedList.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Event::Text" : {
          "file" : "lib/Markdent/Event/Text.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::CaptureEvents" : {
          "file" : "lib/Markdent/Handler/CaptureEvents.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::HTMLFilter" : {
          "file" : "lib/Markdent/Handler/HTMLFilter.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::HTMLStream::Document" : {
          "file" : "lib/Markdent/Handler/HTMLStream/Document.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::HTMLStream::Fragment" : {
          "file" : "lib/Markdent/Handler/HTMLStream/Fragment.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::MinimalTree" : {
          "file" : "lib/Markdent/Handler/MinimalTree.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::Multiplexer" : {
          "file" : "lib/Markdent/Handler/Multiplexer.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Handler::Null" : {
          "file" : "lib/Markdent/Handler/Null.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Parser" : {
          "file" : "lib/Markdent/Parser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Parser::BlockParser" : {
          "file" : "lib/Markdent/Parser/BlockParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Parser::SpanParser" : {
          "file" : "lib/Markdent/Parser/SpanParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Regexes" : {
          "file" : "lib/Markdent/Regexes.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::AnyParser" : {
          "file" : "lib/Markdent/Role/AnyParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::BalancedEvent" : {
          "file" : "lib/Markdent/Role/BalancedEvent.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::BlockParser" : {
          "file" : "lib/Markdent/Role/BlockParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::DebugPrinter" : {
          "file" : "lib/Markdent/Role/DebugPrinter.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::Dialect::BlockParser" : {
          "file" : "lib/Markdent/Role/Dialect/BlockParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::Dialect::SpanParser" : {
          "file" : "lib/Markdent/Role/Dialect/SpanParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::Event" : {
          "file" : "lib/Markdent/Role/Event.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::EventAsText" : {
          "file" : "lib/Markdent/Role/EventAsText.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::EventsAsMethods" : {
          "file" : "lib/Markdent/Role/EventsAsMethods.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::FilterHandler" : {
          "file" : "lib/Markdent/Role/FilterHandler.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::HTMLStream" : {
          "file" : "lib/Markdent/Role/HTMLStream.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::Handler" : {
          "file" : "lib/Markdent/Role/Handler.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::Simple" : {
          "file" : "lib/Markdent/Role/Simple.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Role::SpanParser" : {
          "file" : "lib/Markdent/Role/SpanParser.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Simple::Document" : {
          "file" : "lib/Markdent/Simple/Document.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Simple::Fragment" : {
          "file" : "lib/Markdent/Simple/Fragment.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Types" : {
          "file" : "lib/Markdent/Types.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Markdent::Types::Internal" : {
          "file" : "lib/Markdent/Types/Internal.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       }
    },
    "release_status" : "stable",
@@ -451,7 +451,7 @@
          "web" : "https://github.com/houseabsolute/Markdent"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -481,32 +481,32 @@
                }
             },
             "name" : "@DROLSKY/Git::GatherDir",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@DROLSKY/ManifestSkip",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@DROLSKY/License",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@DROLSKY/ExecDir",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@DROLSKY/ShareDir",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@DROLSKY/Manifest",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckVersionIncrement",
@@ -516,17 +516,17 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@DROLSKY/TestRelease",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@DROLSKY/ConfirmRelease",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@DROLSKY/UploadToCPAN",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
@@ -547,7 +547,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@DROLSKY/AutoPrereqs",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -572,7 +572,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@DROLSKY/MetaResources",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -582,7 +582,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.015"
+                        "version" : "6.017"
                      }
                   ],
                   "include_underscores" : 0
@@ -609,22 +609,22 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@DROLSKY/MetaConfig",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@DROLSKY/MetaJSON",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@DROLSKY/MetaYAML",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@DROLSKY/NextRelease",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -635,7 +635,7 @@
                }
             },
             "name" : "@DROLSKY/Test::More with Test2",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -646,7 +646,7 @@
                }
             },
             "name" : "@DROLSKY/Modules for use with tidyall",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -657,7 +657,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -761,7 +761,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@DROLSKY/PodSyntaxTests",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::RunExtraTests",
@@ -771,7 +771,7 @@
                }
             },
             "name" : "@DROLSKY/DROLSKY::RunExtraTests",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::MojibakeTests",
@@ -837,7 +837,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@DROLSKY/Test::ReportPrereqs",
-            "version" : "0.027"
+            "version" : "0.028"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Version",
@@ -847,7 +847,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Contributors",
             "name" : "@DROLSKY/DROLSKY::Contributors",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -1019,7 +1019,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::WeaverConfig",
             "name" : "@DROLSKY/DROLSKY::WeaverConfig",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1085,12 +1085,12 @@
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "@DROLSKY/CPANFile",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
             "name" : "@DROLSKY/DROLSKY::License",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -1127,7 +1127,7 @@
                }
             },
             "name" : "@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::EnsureChangesHasContent",
@@ -1137,7 +1137,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::TidyAll",
             "name" : "@DROLSKY/DROLSKY::TidyAll",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1165,14 +1165,15 @@
                }
             },
             "name" : "@DROLSKY/Git::Check",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%V%n%n%c"
+                  "commit_msg" : "v%V%n%n%c",
+                  "signoff" : 0
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -1197,7 +1198,7 @@
                }
             },
             "name" : "@DROLSKY/Commit generated files",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1206,7 +1207,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.37",
+                  "tag" : "v0.38",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -1219,7 +1220,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Tag",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1236,7 +1237,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Push",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -1258,7 +1259,8 @@
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "Bump version after release"
+                  "commit_msg" : "Bump version after release",
+                  "signoff" : 0
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -1279,7 +1281,7 @@
                }
             },
             "name" : "@DROLSKY/Commit version bump",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1296,25 +1298,25 @@
                }
             },
             "name" : "@DROLSKY/Push version bump",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::MakeMaker",
             "config" : {
                "Dist::Zilla::Plugin::MakeMaker" : {
                   "make_path" : "make",
-                  "version" : "6.015"
+                  "version" : "6.017"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
                   "version" : "0.48"
                },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 24,
-                  "version" : "6.015"
+                  "version" : "6.017"
                }
             },
             "name" : "@DROLSKY/DROLSKY::MakeMaker",
-            "version" : "1.08"
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -1325,62 +1327,62 @@
                }
             },
             "name" : "DevelopRequires",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.015"
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.015"
+            "version" : "6.017"
          }
       ],
       "zilla" : {
@@ -1388,7 +1390,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.015"
+         "version" : "6.017"
       }
    },
    "x_authority" : "cpan:DROLSKY",

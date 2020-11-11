@@ -9,7 +9,7 @@ WriteMakefile(
     LICENSE           => 'perl',
     PREREQ_PM         => {
         Compress::Zlib => 2,
-
+        Data::Dump     => 0
     }, 
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/PostScript/PPD.pm', # retrieve abstract from module

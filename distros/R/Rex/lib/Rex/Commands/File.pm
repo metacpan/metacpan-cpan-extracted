@@ -59,11 +59,12 @@ With this module you can manipulate files.
 
 package Rex::Commands::File;
 
+use 5.010001;
 use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;

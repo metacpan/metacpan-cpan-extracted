@@ -3,77 +3,15 @@ NAME
     .odt, .xls, .xlsx, .ods, etc)
 
 VERSION
-    This document describes version 0.004 of App::OfficeUtils (from Perl
-    distribution App-OfficeUtils), released on 2020-10-26.
+    This document describes version 0.005 of App::OfficeUtils (from Perl
+    distribution App-OfficeUtils), released on 2020-10-27.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
     *   doc2txt
 
-    *   xls2csv
-
 FUNCTIONS
-  officess2csv
-    Usage:
-
-     officess2csv(%args) -> [status, msg, payload, meta]
-
-    Convert Office spreadsheet format file (.ods, .xls, .xlsx) to one or
-    more CSV files.
-
-    This utility uses Spreadsheet::XLSX to extract cell values of worksheets
-    and put them in one or more CSV file(s). If spreadsheet format is not
-    .xlsx (e.g. .ods or .xls), it will be converted to .xlsx first using
-    Libreoffice (headless mode).
-
-    You can select one or more worksheets to export. If unspecified, the
-    default is the first worksheet only. If you specify more than one
-    worksheets, you need to specify output *directory* instead of *output*
-    file.
-
-    This function is not exported.
-
-    Arguments ('*' denotes required arguments):
-
-    *   all_worksheets => *true*
-
-        Convert all worksheets in the workbook.
-
-    *   always_dir => *bool*
-
-        Assume output_file_or_dir is a directory even though there is only
-        one worksheet.
-
-    *   input_file* => *filename*
-
-        Path to input file.
-
-    *   libreoffice_path => *filename*
-
-    *   output_file_or_dir* => *pathname*
-
-        Path to output file or directory.
-
-        If not specified, will output to stdout.
-
-    *   overwrite => *bool*
-
-    *   worksheets => *array[str]*
-
-        Select which worksheet(s) to convert.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
   officewp2txt
     Usage:
 
@@ -127,9 +65,10 @@ FUNCTIONS
 
     Return value: (any)
 
-ENVIRONMENT
-  DEBUG
-    If set to true, will not clean up temporary directories.
+FAQ
+  Where is officess2* (e.g. officess2csv)?
+    To convert a spreadsheet to CSV, you can use xls2csv from
+    Spreadsheet::Read.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -148,6 +87,8 @@ BUGS
 
 SEE ALSO
     App::MSOfficeUtils, App::LibreOfficeUtils
+
+    Spreadsheet::Read
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2020-04-19'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2020-11-11'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -9,6 +9,9 @@ our $VERSION = '0.014'; # VERSION
 # END IFUNBUILT
 
 our $DEBUG = defined($ENV{LOG_GER_APP_DEBUG}) ? $ENV{LOG_GER_APP_DEBUG} : 0;
+
+# last import args
+our @IMPORT_ARGS;
 
 sub _set_level {
     my $name = shift;
@@ -80,6 +83,7 @@ sub import {
     require Log::ger;
     require Log::ger::Util;
 
+    my $extra_conf = delete $args{extra_conf};
     my $level_arg = delete $args{level};
     my $default_level_arg = delete $args{default_level};
 
@@ -109,6 +113,7 @@ sub import {
     # configuration for Log::ger::Output::Composite
     my %conf = (
         outputs => {},
+        %{ $extra_conf // {} },
     );
 
     # add Screen
@@ -141,8 +146,9 @@ sub import {
         my $file_dir  = delete $args{file_dir};
         unless (defined $file_dir) {
             require PERLANCAR::File::HomeDir;
-            $file_dir = $> ? PERLANCAR::File::HomeDir::get_my_home_dir() :
-                (-d "/var/log" ? "/var/log" : "/");
+            $file_dir = $> || $^O eq 'MSWin32' ?
+                PERLANCAR::File::HomeDir::get_my_home_dir() :
+                  (-d "/var/log" ? "/var/log" : "/");
         }
 
         last if $0 eq '-';
@@ -181,12 +187,21 @@ sub import {
     }
 
     if (my $outputs = delete $args{outputs}) {
-        $conf{outputs}{$_} = $outputs->{$_}
-            for keys %{$outputs->{$_}};
+        for my $o (sort keys %$outputs) {
+            if ($conf{outputs}{$o}) {
+                warn "[lga] OVERWRITING output '$o' using output from 'outputs' argument\n" if $DEBUG;
+            } else {
+                warn "[lga] Adding output '$o' from 'outputs' argument\n" if $DEBUG;
+            }
+            $conf{outputs}{$o} = $outputs->{$o};
+        }
     }
 
     die "Unknown argument(s): ".join(", ", sort keys %args)
         if keys %args;
+
+    # save, for those who want to check or modify
+    @IMPORT_ARGS = @_;
 
     require Log::ger::Output;
     Log::ger::Output->set('Composite', %conf);
@@ -207,7 +222,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.014
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -347,8 +362,29 @@ presence of modules like L<HTTP::Daemon>, L<Proc::Daemon>, etc.
 
 =item * outputs
 
-hash. Specify extra outputs. Will be passed to L<Log::ger::Output::Composite>
-configuration.
+hash. Specify extra outputs. Will be added to L<Log::ger::Output::Composite>'s
+C<outputs> configuration.
+
+Example:
+
+ outputs => {
+     DirWriteRotate => {
+         conf => {dir=>'/home/ujang/log', max_size=>10_000},
+         level => 'off',
+         category_level => {Dump => 'info'},
+     },
+ },
+
+=item * extra_conf
+
+Hash. Specify extra configuration, will be added to
+L<Log::ger::Output::Composite>'s configuration.
+
+Example:
+
+ extra_conf => {
+     category_level => {Dump => 'off'},
+ },
 
 =back
 
@@ -358,6 +394,11 @@ configuration.
 
 Default is false. If set to true, will show more details about how log level,
 etc is set.
+
+=head2 @IMPORT_ARGS
+
+Will be set with the last aguments passed to import(), for informational
+purposes.
 
 =head1 ENVIRONMENT
 
@@ -373,7 +414,7 @@ log. Normally, timestamps will only be added to the file log.
 =head2 LOG_ADD_MEMORY_INFO
 
 Boolean. Default to false. If set to true, will add memory info to log (see
-C<_{vmtime}> in L<Log::ger::Layout::Pattern>).
+C<%_{vmtime}> pattern in L<Log::ger::Layout::Pattern>).
 
 =head2 LOG_LEVEL
 

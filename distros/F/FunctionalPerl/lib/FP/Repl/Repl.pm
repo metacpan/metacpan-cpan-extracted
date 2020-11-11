@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2004-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2004-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -118,7 +118,7 @@ use Chj::xtmpfile;
 use Chj::xperlfunc qw(xexec);
 use Chj::xopen qw(fh_to_fh perhaps_xopen_read);
 use POSIX;
-use Chj::xhome qw(xeffectiveuserhome);
+use Chj::xhome qw(xhome);
 use Chj::singlequote 'singlequote';
 use FP::HashSet qw(hashset_union);
 use FP::Hash qw(hash_xref);
@@ -146,7 +146,7 @@ sub xone_nonwhitespace {
 }
 
 
-my $HOME=xeffectiveuserhome;
+my $HOME= xhome;
 our $maybe_historypath= "$HOME/.fp-repl_history";
 our $maybe_settingspath= "$HOME/.fp-repl_settings";
 our $maxHistLen= 100;
@@ -816,6 +816,22 @@ sub _completion_function {
     }
 }
 
+our $clear_history = do {
+    my $did= 0;
+    sub {
+        my ($term)= @_;
+        # Term::ReadLine::Perl does not have clear_history, so, wrap
+        # it. ->can doesn't work either (lazy loading?), so:
+        eval {
+            $term->clear_history;
+            1
+        } || do {
+            warn $@."install Term::ReadLine::Gnu if you can"
+                unless $did++;
+        }
+    }
+};
+
 our ($maybe_input, $maybe_output); # dynamic parametrization of
                                    # filehandles
 
@@ -847,11 +863,22 @@ sub run {
     };
 
     my $oldsigint= $SIG{INT};
-    # It seems this is the only way to make signal handlers work in
-    # both perl 5.6 and 5.8:
-    sigaction SIGINT,
-      new POSIX::SigAction __PACKAGE__.'::__signalhandler'
-        or die "Error setting SIGINT handler: $!\n";
+    eval {
+        local $SIG{__DIE__};
+        # It seems this is the only way to make signal handlers work in
+        # both perl 5.6 and 5.8:
+        sigaction SIGINT,
+            new POSIX::SigAction __PACKAGE__.'::__signalhandler'
+            or die "Error setting SIGINT handler: $!\n";
+        1
+    } || do {
+        if ($^O eq 'MSWin32') {
+            # XX will that work?
+            $SIG{INT}= \&__signalhandler;
+        } else {
+            warn "could not set up signal handler: $@ ";
+        }
+    };
 
     {
         local $SIG{__DIE__};
@@ -896,7 +923,7 @@ sub run {
         if (defined $$self[Maybe_historypath]) {
             # clean history of C based object before we re-add the
             # saved one:
-            $term->clear_history;
+            $clear_history->($term);
             if (open my $hist, "<", $$self[Maybe_historypath]){
                 @history= <$hist>;
                 close $hist;
@@ -1256,7 +1283,7 @@ sub run {
 
     # restore previous history, if any
     if ($current_history) {
-        $term->clear_history;
+        $clear_history->($term);
         for (@$current_history) {
             chomp;
             $term->addhistory($_);

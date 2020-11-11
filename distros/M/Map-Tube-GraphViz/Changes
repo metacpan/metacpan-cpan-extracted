@@ -1,3 +1,26 @@
+0.07 2020-11-03T14:04:34+01:00
+ [Common]
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite SEE ALSO section to new style.
+ - Rewrite to use AUTHOR tests.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years to 2020.
+
+ [Map::Tube::GraphViz]
+ - Add 'callback_node_id' parameter.
+ - Update to new GraphViz2 module version 2.59 (changed API).
+
+ [Map::Tube::GraphViz::Utils]
+ - Add example section to doc.
+ - Add cycling of colors instead error (Thanks Gisbert W. Selke - #103076).
+ - Add tests for color_line() subroutine.
+ - Fix subroutine name in SYNOPSIS section.
+ - Fix to Map::Tube::Line with required id.
+
 0.06 2015-02-24T08:09:07+01:00
  [Map::Tube::GraphViz]
  - Add EXAMPLE4 section in doc and examples/ex4.pl.

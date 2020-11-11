@@ -1,5 +1,5 @@
 package Parallel::ForkManager::Segmented;
-$Parallel::ForkManager::Segmented::VERSION = '0.10.0';
+$Parallel::ForkManager::Segmented::VERSION = '0.10.1';
 use strict;
 use warnings;
 use 5.014;
@@ -58,7 +58,7 @@ segments of items.
 
 =head1 VERSION
 
-version 0.10.0
+version 0.10.1
 
 =head1 SYNOPSIS
 
@@ -198,15 +198,18 @@ Example:
 
 =head1 SEE ALSO
 
-=over 4
+L<Parallel::ForkManager> is the underlying module that this module is based
+on.
 
-=item * L<Parallel::ForkManager>
+L<Parallel::Map::Segmented> provides a mostly compatibly API with L<Parallel::ForkManager::Segmented>
+only based on L<Parallel::Map> (by MSTROUT) and L<IO::Async::Function> (by PEVANS). L<IO::Async> provides
+a less snowflake approach. Thanks guys!
 
-=item * L<IO::Async::Function> - a less snowflake approach.
+L<Parallel::ForkManager::Segmented::Base> is the base class of L<Parallel::Map::Segmented>
+and L<Parallel::ForkManager::Segmented> to avoid L<DRY ("Don't repeat yourself")|https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>.
 
-=item * L<https://perl-begin.org/uses/multitasking/>
-
-=back
+L<https://perl-begin.org/uses/multitasking/> is a page about multitasking in Perl rounding up
+the usual suspects.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

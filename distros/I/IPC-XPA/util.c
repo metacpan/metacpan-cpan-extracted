@@ -50,7 +50,7 @@ hash2str( HV* hash )
     n++;
     len += keylen + SvCUR(val);
   }
-	  
+
   len +=   n		/* '=' */
          + n-1		/* ',' */
          + 1;		/* EOS */
@@ -64,7 +64,7 @@ hash2str( HV* hash )
   {
     STRLEN cur;
     char *pv;
-	    
+
     strcpy(ptr, key);
     ptr += keylen;
     *ptr++ = '=';
@@ -90,16 +90,16 @@ cdata2hash_Get( char *buf, int len, char *name, char *message )
   SV *ref;
   /* create hash which will contain buf, name, message */
   HV *hash = newHV();
-	
+
   /* buf may be big, so try to get perl to use it directly */
   sv = NEWSV(0,0);
   sv_usepvn( sv, buf, len );
   if ( NULL == hv_store( hash, "buf", 3, sv, 0 ) )
     croak( "error storing length for response\n" );
-	
+
   if ( NULL == hv_store( hash, "name", 4, newSVpv( name, 0 ), 0 ) )
     croak( "error storing name for response\n" );
-		   	 
+
   if ( message )
   {
     if ( NULL == hv_store( hash, "message", 7, newSVpv( message, 0 ), 0 ) )
@@ -115,10 +115,10 @@ cdata2hash_Set( char *name, char *message )
 {
   /* create hash which will contain name, message */
   HV *hash = newHV();
-	
+
   if ( NULL == hv_store( hash, "name", 4, newSVpv( name, 0 ), 0 ) )
     croak( "error storing name for response\n" );
-		   	 
+
   if ( message )
   {
     if ( NULL == hv_store( hash, "message", 7, newSVpv( message, 0 ), 0 ) )
@@ -133,10 +133,10 @@ cdata2hash_Lookup( char *class, char *name, char *method, char *info )
 {
   /* create hash which will contain name, message */
   HV *hash = newHV();
-	
+
   if ( NULL == hv_store( hash, "name", 4, newSVpv(name,0), 0 ) )
     croak( "error storing name for response\n" );
-		   	 
+
   if ( NULL == hv_store( hash, "class", 5, newSVpv(class,0), 0 ) )
     croak( "error storing class for response\n" );
 

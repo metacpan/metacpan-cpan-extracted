@@ -3,3 +3,5 @@ Revision history for JSON-Conditional
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.05    2020/10/27
+        - Update the Makefile meta information.

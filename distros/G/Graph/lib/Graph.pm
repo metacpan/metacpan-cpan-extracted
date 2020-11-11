@@ -3,9 +3,6 @@ package Graph;
 use strict;
 use warnings;
 
-# Need to get my head around all those redefines! -NEILB
-no warnings 'redefine';
-
 BEGIN {
     if (0) { # SET THIS TO ZERO FOR TESTING AND RELEASES!
 	$SIG{__DIE__ } = \&__carp_confess;
@@ -16,13 +13,14 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9706';
+our $VERSION = '0.9708';
 
 require 5.006; # Weak references are absolutely required.
 
 my $can_deep_copy_Storable;
 sub _can_deep_copy_Storable () {
     return $can_deep_copy_Storable if defined $can_deep_copy_Storable;
+    return $can_deep_copy_Storable = 0 if $] < 5.010; # no :load tag Safe 5.8
     eval {
         require Storable;
         require B::Deparse;
@@ -96,20 +94,21 @@ use Graph::Attribute array => _A, map => 'graph';
 
 sub _COMPAT02 () { 0x00000001 }
 
+sub _stringify_vertex {
+    return "$_[0]" unless ref($_[0]) eq 'ARRAY';
+    "[" . join(" ", @{ $_[0] }) . "]";
+}
+
 sub stringify {
     my $g = shift;
     my $u = $g->is_undirected;
     my $e = $u ? '=' : '-';
     my @e =
 	map {
-	    my @v =
-		map {
-		    ref($_) eq 'ARRAY' ? "[" . join(" ", @$_) . "]" : "$_"
-		}
-	    @$_;
+	    my @v = map _stringify_vertex($_), @$_;
 	    join($e, $u ? sort { "$a" cmp "$b" } @v : @v) } $g->edges05;
     my @s = sort { "$a" cmp "$b" } @e;
-    push @s, sort { "$a" cmp "$b" } $g->isolated_vertices;
+    push @s, sort { "$a" cmp "$b" } map _stringify_vertex($_), $g->isolated_vertices;
     join(",", @s);
 }
 
@@ -487,7 +486,7 @@ sub _add_edge {
 	    push @e, $V->[ _s ]->{ $v };
 	}
     } else {
-	my $h = $g->[ _V ]->_is_HYPER;
+	my $h = $V->_is_HYPER;
 	for my $v ( @_ ) {
 	    my @v = ref $v eq 'ARRAY' && $h ? @$v : $v;
 	    $g->add_vertex( @v ) unless $V->has_path( @v );
@@ -531,7 +530,7 @@ sub _vertex_ids {
 	    push @e, $V->[ _s ]->{ $v };
 	}
     } else {
-	my $h = $g->[ _V ]->_is_HYPER;
+	my $h = $V->_is_HYPER;
 	for my $v ( @_ ) {
 	    my @v = ref $v eq 'ARRAY' && $h ? @$v : $v;
 	    return () unless $V->has_path( @v );
@@ -1712,6 +1711,29 @@ sub add_edges {
     return $g;
 }
 
+sub rename_vertex {
+    my $g = shift;
+    $g->[ $_ ]->rename_path(@_) for _V, _E;
+    return $g;
+}
+
+sub rename_vertices {
+    my ($g, $code) = @_;
+    my %seen;
+    for ($g->vertices) {
+        my $from;
+        if (ref) {
+            next if @$_ > 1;
+            ($from) = @$_;
+        } else {
+            $from = $_;
+        }
+        next if $seen{$from}++;
+        $g->rename_vertex($from, $code->($from));
+    }
+    return $g;
+}
+
 ###
 # More constructors.
 #
@@ -1744,7 +1766,7 @@ sub copy {
 sub _deep_copy_Storable {
     my $g = shift;
     require Safe;   # For deep_copy().
-    my $safe = new Safe;
+    my $safe = Safe->new;
     $safe->permit(qw/:load/);
     local $Storable::Deparse = 1;
     local $Storable::Eval = sub { $safe->reval($_[0]) };

@@ -1,3 +1,10 @@
+0.132   2020-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible change] For consistency, rename --count to --show-count.
+	  --count is still supported as alias; but if you use the function from
+	  Perl you still have to change 'count' argument to 'show_acount'.
+
+
 0.131   2020-05-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Support multiple digest algorithms (--algorithm, --digest-args (-A)).

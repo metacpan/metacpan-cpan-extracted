@@ -5,3 +5,15 @@
 sub inc { $_[0] + 1 }
 sub dec { $_[0] - 1 }
 sub inc { 1 + $_[0] }
+
+## TODO Multiple packages in the same Doc.
+## failures 0
+## cut
+
+package Here;
+sub inc { $_[0] + 1 }
+sub dec { $_[0] - 1 }
+
+package There {
+    sub inc { 1 + $_[0] }
+};

@@ -6,10 +6,11 @@
 
 package Rex::Group;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Rex::Logger;
 
@@ -17,7 +18,7 @@ use attributes;
 use Rex::Group::Entry::Server;
 
 use vars qw(%groups);
-use List::MoreUtils 0.416 qw(uniq);
+use List::Util 1.45 qw(uniq);
 use Data::Dumper;
 
 sub new {

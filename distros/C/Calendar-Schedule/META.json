@@ -1,7 +1,7 @@
 {
    "abstract" : "manage calendar schedules",
    "author" : [
-      "Vlado Keselj web.cs.dal.ca/~vlado"
+      "Vlado Keselj vlado@dnlp.ca http://vlado.ca"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
@@ -42,5 +42,5 @@
          "web" : "https://github.com/vkeselj/calendar-schedule"
       }
    },
-   "version" : "1.13"
+   "version" : "1.19"
 }

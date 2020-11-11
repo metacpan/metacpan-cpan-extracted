@@ -16,8 +16,7 @@ sub from_listing($$);
 # Maybe someone uses cross-compilation
 my $system = lc ($ENV{OSNAME} || $^O);
 
-my %float_as_string = map +($_ => 1),
-    qw/DBL_MAX FLT_MAX HUGE_VAL LDBL_MAX/;
+my %float_as_string = map +($_ => 1), qw/FLT_MAX HUGE_VAL/;
 
 my ( %sc, %cs, %posix, %math, %pc, %ul, %rl, %events, %sig
    , %fdio, %fsys, %errno, %fcntl, %socket, %locale, %osconsts
@@ -93,7 +92,7 @@ sub dump_table($$$)
     {   my $klen = length $const;
 
         my $store;
-        if($float_as_string{$const})
+        if($const =~ /^(?:DBL_|LDBL_|FLT_)/ || $float_as_string{$const})
         {   $store = <<_FLOAT;
 sprintf(float_string, "%g", $const);
 (void)hv_store($table, "$const", $klen, newSVpv(float_string, 0), 0);

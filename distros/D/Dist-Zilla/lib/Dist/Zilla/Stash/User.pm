@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::User 6.015;
+package Dist::Zilla::Stash::User 6.017;
 # ABSTRACT: a stash of user name and email
 
 use Moose;
@@ -38,7 +38,7 @@ Dist::Zilla::Stash::User - a stash of user name and email
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 AUTHOR
 

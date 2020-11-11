@@ -8,7 +8,7 @@ package Net::LibAsyncNS;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -19,28 +19,28 @@ C<Net::LibAsyncNS> - a Perl wrapper around F<libasyncns>
 
 =head1 SYNOPSIS
 
- use Net::LibAsyncNS;
- use Socket qw( SOCK_RAW );
+   use Net::LibAsyncNS;
+   use Socket qw( SOCK_RAW );
 
- my $asyncns = Net::LibAsyncNS->new( 1 );
+   my $asyncns = Net::LibAsyncNS->new( 1 );
 
- # By specifying this socktype hint, we only get one result per address family
- my %hints = ( socktype => SOCK_RAW );
+   # By specifying this socktype hint, we only get one result per address family
+   my %hints = ( socktype => SOCK_RAW );
 
- my $query = $asyncns->getaddrinfo( "localhost", undef, \%hints );
+   my $query = $asyncns->getaddrinfo( "localhost", undef, \%hints );
 
- while( $asyncns->getnqueries ) {
-    $asyncns->wait( 1 );
+   while( $asyncns->getnqueries ) {
+      $asyncns->wait( 1 );
 
-    if( $query->isdone ) {
-       my ( $err, @res ) = $asyncns->getaddrinfo_done( $query );
-       die "getaddrinfo - $err" if $err;
+      if( $query->isdone ) {
+         my ( $err, @res ) = $asyncns->getaddrinfo_done( $query );
+         die "getaddrinfo - $err" if $err;
 
-       foreach my $res ( @res ) {
-          printf "family=%d, addr=%v02x\n", $res->{family}, $res->{addr};
-       }
-    }
- }
+         foreach my $res ( @res ) {
+            printf "family=%d, addr=%v02x\n", $res->{family}, $res->{addr};
+         }
+      }
+   }
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,9 @@ not demonstrate this; see the EXAMPLES section below for one that does.
 
 =cut
 
-=head2 $asyncns = Net::LibAsyncNS->new( $n_proc )
+=head2 new
+
+   $asyncns = Net::LibAsyncNS->new( $n_proc )
 
 Construct a new C<Net::LibAsyncNS> object. It will be initialised with
 C<$n_proc> processes or threads to handle nameserver lookups.
@@ -77,13 +79,17 @@ C<$n_proc> processes or threads to handle nameserver lookups.
 # The following documents the various XS-implemented methods in LibAsyncNS.xs in
 # the same order
 
-=head2 $fd = $asyncns->fd
+=head2 fd
+
+   $fd = $asyncns->fd
 
 Returns a file descriptor number to poll for readability on.
 
 =cut
 
-=head2 $handle = $asyncns->new_handle_for_fd
+=head2 new_handle_for_fd
+
+   $handle = $asyncns->new_handle_for_fd
 
 Returns a new C<IO::Handle> object wrapping the underlying file descriptor.
 Note that the handle is I<not> cached; a new object is created each time this
@@ -98,7 +104,9 @@ sub new_handle_for_fd
    return IO::Handle->new->fdopen( $self->fd, "<" );
 }
 
-=head2 $success = $asyncns->wait( $block )
+=head2 wait
+
+   $success = $asyncns->wait( $block )
 
 Wait for more queries to be ready. If C<$block> is true, this method will
 block until at least one query is ready, if false it will process any pending
@@ -107,13 +115,17 @@ if an IO error happened; C<$!> will be set in this case.
 
 =cut
 
-=head2 $n = $asyncns->getnqueries
+=head2 getnqueries
+
+   $n = $asyncns->getnqueries
 
 Return the number of outstanding queries.
 
 =cut
 
-=head2 $q = $asyncns->getaddrinfo( $host, $service, $hints )
+=head2 getaddrinfo
+
+   $q = $asyncns->getaddrinfo( $host, $service, $hints )
 
 Starts an asynchronous C<getaddrinfo> resolution on the given C<$host> and
 C<$service> names. If provided, C<$hints> should be a HASH reference where the
@@ -133,7 +145,9 @@ following keys are recognised:
 
 =cut
 
-=head2 ( $err, @res ) = $asyncns->getaddrinfo_done( $q )
+=head2 getaddrinfo_done
+
+   ( $err, @res ) = $asyncns->getaddrinfo_done( $q )
 
 Finishes a C<getaddrinfo> resolution, returning an error code, and a list of
 results. Each result will be a HASH reference containing the following keys:
@@ -160,7 +174,9 @@ If requested, the canonical hostname for this address
 
 =cut
 
-=head2 $q = $asyncns->getnameinfo( $addr, $flags, $wanthost, $wantserv )
+=head2 getnameinfo
+
+   $q = $asyncns->getnameinfo( $addr, $flags, $wanthost, $wantserv )
 
 Starts an asynchronous C<getnameinfo> resolution on the given address. The
 C<$wanthost> and C<$wantserv> booleans indicate if the hostname or service
@@ -168,39 +184,53 @@ name are required.
 
 =cut
 
-=head2 ( $err, $host, $service ) = $asyncns->getnameinfo_done( $q )
+=head2 getnameinfo_done
+
+   ( $err, $host, $service ) = $asyncns->getnameinfo_done( $q )
 
 Finishes a C<getnameinfo> resolution, returning an error code, the hostname
 and service name, if requested.
 
 =cut
 
-=head2 $q = $asyncns->res_query( $dname, $class, $type )
+=head2 res_query
 
-=head2 $q = $asyncns->res_search( $dname, $class, $type )
+=head2 res_search
+
+   $q = $asyncns->res_query( $dname, $class, $type )
+
+   $q = $asyncns->res_search( $dname, $class, $type )
 
 Starts an asynchronous C<res_query> or C<res_search> resolution on the given
 domain name, class and type.
 
-=head2 $answer = $asyncns->res_done( $q )
+=head2 res_done
+
+   $answer = $asyncns->res_done( $q )
 
 Finishes a C<res_query> or C<res_search> resolution, returning the answer in a
 packed string, or C<undef> if it fails. If it fails C<$!> will contain the
 error details.
 
-=head2 $done = $asyncns->isdone( $q )
+=head2 isdone
+
+   $done = $asyncns->isdone( $q )
 
 Returns true if the given query is ready.
 
 =cut
 
-=head2 $q = $asyncns->getnext
+=head2 getnext
+
+   $q = $asyncns->getnext
 
 Returns the next query object that is completed, or C<undef> if none are ready
 yet. This will only yet be valid after calling the C<wait> method at least
 once.
 
-=head2 $asyncns->cancel( $q )
+=head2 cancel
+
+   $asyncns->cancel( $q )
 
 Cancels a currently outstanding query. After this is called, the query in
 C<$q> should not be further accessed, as memory associated with it will have
@@ -208,14 +238,18 @@ been reclaimed.
 
 =cut
 
-=head2 $asyncns->setuserdata( $q, $data )
+=head2 setuserdata
+
+   $asyncns->setuserdata( $q, $data )
 
 Stores an arbitrary Perl scalar with the query. It can later be retrieved
 using C<getuserdata>.
 
 =cut
 
-=head2 $data = $asyncns->getuserdata( $q )
+=head2 getuserdata
+
+   $data = $asyncns->getuserdata( $q )
 
 Returns the Perl scalar previously stored with the query, or C<undef> if no
 value has yet been set.
@@ -228,30 +262,30 @@ The following constants are provided by L<Net::LibAsyncNS::Constants>.
 
 Flags for C<getaddrinfo>:
 
- AI_PASSIVE
- AI_CANONNAME
- AI_NUMERICHOST
- AI_NUMERICSERV
+   AI_PASSIVE
+   AI_CANONNAME
+   AI_NUMERICHOST
+   AI_NUMERICSERV
 
 Error values:
 
- EAI_BADFLAGS
- EAI_NONAME
- EAI_AGAIN
- EAI_FAIL
- EAI_NODATA
- EAI_FAMILY
- EAI_SERVICE
- EAI_SOCKTYPE
- EAI_ADDRFAMILY
- EAI_MEMORY
+   EAI_BADFLAGS
+   EAI_NONAME
+   EAI_AGAIN
+   EAI_FAIL
+   EAI_NODATA
+   EAI_FAMILY
+   EAI_SERVICE
+   EAI_SOCKTYPE
+   EAI_ADDRFAMILY
+   EAI_MEMORY
 
 Flags for C<getnameinfo>:
 
- NI_NUMERICHOST
- NI_NUMERICSERV
- NI_NAMEREQD
- NI_DGRAM
+   NI_NUMERICHOST
+   NI_NUMERICSERV
+   NI_NAMEREQD
+   NI_DGRAM
 
 =cut
 
@@ -262,17 +296,25 @@ C<getaddrinfo> and C<getnameinfo>.
 
 =cut
 
-=head2 $asyncns = $query->asyncns
+=head2 asyncns
+
+   $asyncns = $query->asyncns
 
 Returns the underlying C<Net::LibAsyncNS> object backing the query
 
 =cut
 
-=head2 $done = $query->isdone
+=head2 isdone
 
-=head2 $query->setuserdata( $data )
+   $done = $query->isdone
 
-=head2 $data = $query->getuserdata
+=head2 setuserdata
+
+   $query->setuserdata( $data )
+
+=head2 getuserdata
+
+   $data = $query->getuserdata
 
 Shortcuts to the equivalent method on the underlying C<Net::LibAsyncNS> object
 
@@ -305,34 +347,34 @@ queries to complete, the C<getnext> method can be used. Per-query context data
 can be stored in the query itself by using the C<setuserdata> and
 C<getuserdata> accessors.
 
- use Net::LibAsyncNS;
- use Socket qw( SOCK_RAW );
+   use Net::LibAsyncNS;
+   use Socket qw( SOCK_RAW );
 
- my $asyncns = Net::LibAsyncNS->new( 1 );
+   my $asyncns = Net::LibAsyncNS->new( 1 );
 
- my %hints = ( socktype => SOCK_RAW );
- my @hosts = qw( some hostnames here );
+   my %hints = ( socktype => SOCK_RAW );
+   my @hosts = qw( some hostnames here );
 
- foreach my $host ( @hosts ) {
-    my $query = $asyncns->getaddrinfo( $host, undef, \%hints );
-    $query->setuserdata( $host );
- }
+   foreach my $host ( @hosts ) {
+      my $query = $asyncns->getaddrinfo( $host, undef, \%hints );
+      $query->setuserdata( $host );
+   }
 
- while( $asyncns->getnqueries ) {
-    $asyncns->wait( 1 ) or die "asyncns_wait: $!";
+   while( $asyncns->getnqueries ) {
+      $asyncns->wait( 1 ) or die "asyncns_wait: $!";
 
-    while( my $query = $asyncns->getnext ) {
-       my ( $err, @res ) = $asyncns->getaddrinfo_done( $query );
-       my $host = $query->getuserdata;
+      while( my $query = $asyncns->getnext ) {
+         my ( $err, @res ) = $asyncns->getaddrinfo_done( $query );
+         my $host = $query->getuserdata;
 
-       print "$host - $err\n" and next if $err;
+         print "$host - $err\n" and next if $err;
 
-       foreach my $res ( @res ) {
-          printf "%s is: family=%d, addr=%v02x\n", 
-             $host, $res->{family}, $res->{addr};
-       }
-    }
- }
+         foreach my $res ( @res ) {
+            printf "%s is: family=%d, addr=%v02x\n", 
+               $host, $res->{family}, $res->{addr};
+         }
+      }
+   }
 
 In this example, the per-query data stored by C<setuserdata> is just the
 hostname, but any Perl scalar may be stored, such as a HASH ref containing
@@ -349,42 +391,42 @@ become readable, and to call C<< $asyncns->wait( 0 ) >> when it is.
 The following example shows integration with a simple C<IO::Poll>-based
 program.
 
- use IO::Poll;
- use Net::LibAsyncNS;
- use Socket qw( SOCK_RAW );
+   use IO::Poll;
+   use Net::LibAsyncNS;
+   use Socket qw( SOCK_RAW );
 
- my $asyncns = Net::LibAsyncNS->new( 1 );
- my %hints = ( socktype => SOCK_RAW );
+   my $asyncns = Net::LibAsyncNS->new( 1 );
+   my %hints = ( socktype => SOCK_RAW );
 
- my @hosts = qw( some hostnames here );
+   my @hosts = qw( some hostnames here );
 
- foreach my $host ( @hosts ) {
-    my $query = $asyncns->getaddrinfo( $host, undef, \%hints );
-    $query->setuserdata( $host );
- }
+   foreach my $host ( @hosts ) {
+      my $query = $asyncns->getaddrinfo( $host, undef, \%hints );
+      $query->setuserdata( $host );
+   }
 
- my $asyncns_handle = $asyncns->new_handle_for_fd;
+   my $asyncns_handle = $asyncns->new_handle_for_fd;
 
- my $poll = IO::Poll->new;
- $poll->mask( $asyncns_handle => POLLIN );
+   my $poll = IO::Poll->new;
+   $poll->mask( $asyncns_handle => POLLIN );
 
- while( $asyncns->getnqueries ) {
-    defined $poll->poll or die "poll() - $!";
+   while( $asyncns->getnqueries ) {
+      defined $poll->poll or die "poll() - $!";
 
-    if( $poll->events( $asyncns_handle ) ) {
-       while( my $query = $asyncns->getnext ) {
-          my ( $err, @res ) = $asyncns->getaddrinfo_done( $query );
-          my $host = $query->getuserdata;
+      if( $poll->events( $asyncns_handle ) ) {
+         while( my $query = $asyncns->getnext ) {
+            my ( $err, @res ) = $asyncns->getaddrinfo_done( $query );
+            my $host = $query->getuserdata;
 
-          print "$host - $err\n" and next if $err;
+            print "$host - $err\n" and next if $err;
 
-          foreach my $res ( @res ) {
-             printf "%s is: family=%d, addr=%v02x\n", 
-                $host, $res->{family}, $res->{addr};
-          }
-       }
-    }
- }
+            foreach my $res ( @res ) {
+               printf "%s is: family=%d, addr=%v02x\n", 
+                  $host, $res->{family}, $res->{addr};
+            }
+         }
+      }
+   }
 
 =head1 SEE ALSO
 

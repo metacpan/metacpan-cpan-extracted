@@ -11,4 +11,4 @@ sub contains_all { my $self = shift; exists $self->{ $_ } or  return 0 for @_; 1
 sub add          { my $self = shift; $self->{ $_ } = 1 for &_words; $self }
 sub subtract     { my $self = shift; delete @$self{ &_words }; $self }
 sub restrict     { my $self = shift; my %copy = %$self; delete @copy{ &_words }; delete @$self{ keys %copy }; $self }
-our $VERSION = '0.002';
+our $VERSION = '0.003';

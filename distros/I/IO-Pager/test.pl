@@ -4,6 +4,8 @@ use warnings;
 exit 0 unless scalar(@ARGV) && ($ARGV[0] eq 'interactive');
 
 undef($ENV{LESS});
+undef($ENV{PAGER});
+$ENV{PERL5OPT} = '-Mblib';
 
 my @fail;
 for (sort glob "t/*interactive.t") {

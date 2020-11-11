@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -178,28 +178,27 @@ my @n_widgets = map { TestWidget->new } 0 .. 3;
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.09;
 
-use base qw( Tickit::Widget );
-use constant WIDGET_PEN_FROM_STYLE => 1;
+class TestWidget extends Tickit::Widget {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub render_to_rb {}
+   use constant KEYPRESSES_FROM_STYLE => 1;
 
-sub lines { 1 }
-sub cols  { 5 }
+   method render_to_rb {}
 
-sub CAN_FOCUS { shift->{CAN_FOCUS} }
+   method lines { 1 }
+   method cols  { 5 }
 
-use constant KEYPRESSES_FROM_STYLE => 1;
+   method CAN_FOCUS { $self->{CAN_FOCUS} }
+}
 
-package TestContainer;
+class TestContainer extends Tickit::Widget::HBox {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use base qw( Tickit::Widget::HBox );
-
-use constant WIDGET_PEN_FROM_STYLE => 1;
-
-use Tickit::Style -copy;
-BEGIN {
-   style_definition ":focus-child" =>
-      fg => 1;
+   use Tickit::Style -copy;
+   BEGIN {
+      style_definition ":focus-child" =>
+         fg => 1;
+   }
 }

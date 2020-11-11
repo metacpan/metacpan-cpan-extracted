@@ -1,6 +1,7 @@
 package Graph::AdjacencyMap;
 
 use strict;
+use warnings;
 
 require Exporter;
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
@@ -465,6 +466,10 @@ Set the path by @ids.
 =item set_path_by_multi_id
 
 Set the path in the Map by the multi id.
+
+=item rename_path($from, $to)
+
+Rename the path.
 
 =back
 

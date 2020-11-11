@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More tests => 11;
+use Config; 
 
 use lib 't/lib'; # Needed for 'make test' from project dirs
 use TestData qw();
@@ -13,29 +14,30 @@ BEGIN {
 }
 my ($col_widths);
 ($col_widths, undef) = PDF::Table::CalcColumnWidths(
-	[
-		{ min_w => 50, max_w => 50 },
-		{ min_w => 50, max_w => 50 },
-		{ min_w => 50, max_w => 50 },
-		{ min_w => 50, max_w => 50 },
-	], 400);
+        400,
+	[  50,  50,  50,  50 ],
+	[ 200, 200, 200, 200 ]
+);
 
 is_deeply( $col_widths, [ 100, 100, 100, 100 ], 'CalcColumnWidths - even');
 
 ($col_widths, undef) = PDF::Table::CalcColumnWidths(
-	[
-		{ min_w => 41, max_w => 51 },
-		{ min_w => 58, max_w => 600 },
-		{ min_w => 48, max_w => 48 },
-	], 400);
+	400,
+	[ 41,  58,  48 ],
+	[ 51, 600,  48 ]
+);
 
-is_deeply( $col_widths, [ 51, 301, 48 ], 'CalcColumnWidths - uneven');
+if ($Config{uselongdouble}) {
+  is_deeply( $col_widths, [ 51, 300.758439703998205, 48 ], 'CalcColumnWidths - uneven');
+} else {
+  is_deeply( $col_widths, [ 51, 300.758439703998, 48 ], 'CalcColumnWidths - uneven');
+}
 
 ($col_widths, undef) = PDF::Table::CalcColumnWidths(
-	[
-		{ min_w => 50, max_w => 50 },
-		{ min_w => undef, max_w => 50 },
-	], 400);
+	400,
+	[ 50,     0 ],  # undef min_w value
+	[ 50,    50 ]
+);
 
 is_deeply( $col_widths, [ 200, 200 ], 'CalcColumnWidths - undef');
 
@@ -76,16 +78,16 @@ $tab->table($pdf, $page, [@data], @required,
 );
 
 ok($pdf->match(
-      [[qw(translate 10 738)],[qw(text foo)]],
-      [[qw(translate 110 738)],[qw(text bar)]],
-      [[qw(translate 210 738)],[qw(text baz)]],
-), 'text position');
+      [[qw(translate 12 736)],[qw(text foo)]],
+      [[qw(translate 112 736)],[qw(text bar)]],
+      [[qw(translate 212 736)],[qw(text baz)]],
+), 'text position') or note explain $pdf;
 
 ok($pdf->match(
-      [[qw(rect 10 738 100 12)],[qw(fillcolor gray)]],
-      [[qw(rect 110 738 100 12)],[qw(fillcolor red)]],
-      [[qw(rect 210 738 100 12)],[qw(fillcolor blue)]],
-), 'default header fillcolor');
+      [[qw(rect 10 731 100 19)],[qw(fillcolor gray)]],
+      [[qw(rect 110 731 100 19)],[qw(fillcolor red)]],
+      [[qw(rect 210 731 100 19)],[qw(fillcolor blue)]],
+), 'default header fillcolor') or note explain $pdf;
 
 ok($pdf->match(
       [[qw(gfx)],[qw(strokecolor black)],[qw(linewidth 1)]],
@@ -107,10 +109,10 @@ $tab->table($pdf, $page, [@data], @required,
 );
 
 ok($pdf->match(
-      [[qw(translate 52.5 738)],[qw(text foo)]],
-      [[qw(translate 152.5 738)],[qw(text bar)]],
-      [[qw(translate 295 738)],[qw(text baz)]],
-), 'justify right and center');
+      [[qw(translate 60 736)],[qw(text_center foo)]],
+      [[qw(translate 160 736)],[qw(text_center bar)]],
+      [[qw(translate 308 736)],[qw(text_right baz)]],
+), 'justify right and center') or note explain $pdf;
 
 ok(!$pdf->match(
       [[qw(gfx)],[qw(strokecolor black)],[qw(linewidth 0)]],
@@ -136,7 +138,7 @@ $tab->table($pdf, $page, [@data], @required,
       ],
 );
 
-ok(1,'fake test because the one below is not working and must be fixed');
+ok(1,'Skip test because the one below is not working and must be fixed');
 #ok($pdf->match(
 #      [[qw(page)]],
 #      [[qw(rect 10 714 20 12)],[qw(fillcolor blue)]],

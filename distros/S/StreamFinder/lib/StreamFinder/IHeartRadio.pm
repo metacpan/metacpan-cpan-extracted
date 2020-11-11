@@ -18,11 +18,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::IHeartRadio;
 
-	my $station = new StreamFinder::IHeartRadio(<url>, -keep => 
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $station = new StreamFinder::IHeartRadio($ARGV[0], -keep => 
 			{'secure_shoutcast', 'secure', 'any'}, -skip => 'rtmp');
 
 	die "Invalid URL or no streams found!\n"  unless ($station);

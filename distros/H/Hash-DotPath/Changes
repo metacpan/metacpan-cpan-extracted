@@ -1,0 +1,53 @@
+==================================================
+Changes from 2019-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2020-11-03 18:36:41 +0000
+------------------------------------------
+
+  Change: aa808e5b1bb9ecd85f1c9c704ad79dfe6e7596fb
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-03 12:36:30 +0000
+
+    modified integer vivification to default to array instead of hash 
+
+------------------------------------------
+version 0.003 at 2020-11-03 14:34:22 +0000
+------------------------------------------
+
+  Change: e2398315513c9a7c827452878d91abd9a2327857
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-03 08:34:22 +0000
+
+    added github repo info 
+
+------------------------------------------
+version 0.002 at 2020-10-30 18:06:34 +0000
+------------------------------------------
+
+  Change: 5ee12f9b3e18f143cc88558d3debecaf4502546b
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-30 13:06:34 +0000
+
+    indicate minimum version for dependency Util::Medley 
+
+------------------------------------------
+version 0.001 at 2020-10-30 17:58:19 +0000
+------------------------------------------
+
+  Change: 91f9bd72d57c02854b6dbdb2f2b5ff4f7672bae5
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-30 12:58:19 +0000
+
+    fixed POD errors 
+
+  Change: ff62b5c131a2e8dd5e7871add0d5b47eb1ff9916
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-30 12:55:40 +0000
+
+    first commit 
+
+================
+End of releases.
+================

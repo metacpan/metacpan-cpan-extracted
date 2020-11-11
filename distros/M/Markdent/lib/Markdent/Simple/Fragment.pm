@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Markdent::Handler::HTMLStream::Fragment;
 use Markdent::Parser;
@@ -66,7 +66,7 @@ Markdent::Simple::Fragment - Convert Markdown to an HTML Fragment
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -91,9 +91,20 @@ Creates a new Markdent::Simple::Fragment object.
 
 =head2 $mdf->markdown_to_html( markdown => $markdown )
 
-This method turns Markdown into HTML.
+This method turns Markdown into HTML. It accepts the following parameters:
 
-You can also provide an optional "dialects" parameter.
+=over 4
+
+=item * markdown
+
+This is the markdown to pass. This argument is required.
+
+=item * dialects
+
+This can either be a single string or an array ref of strings containing the
+class names of dialects. This parameter is optional.
+
+=back
 
 =head1 ROLES
 

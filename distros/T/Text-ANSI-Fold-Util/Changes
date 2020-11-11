@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+0.04 2020-11-04T06:46:34Z
+
+    - Update to use Text::ANSI::Fold 2.02 to support backspaces.
+
 0.03 2020-10-22T02:02:12Z
 
     - Update ansi_expand() to optimize line-head tabs.

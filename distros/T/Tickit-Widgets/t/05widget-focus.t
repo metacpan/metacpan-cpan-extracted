@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -44,30 +44,29 @@ is_termlog( [ GOTO(1,2) ],
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.09;
+class TestWidget extends Tickit::Widget {
+   use Tickit::Style;
 
-use base qw( Tickit::Widget );
-use Tickit::Style;
+   BEGIN {
+      style_definition ':focus' =>
+         b => 1;
+   }
 
-BEGIN {
-   style_definition ':focus' =>
-      b => 1;
-}
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use constant WIDGET_PEN_FROM_STYLE => 1;
+   use constant CAN_FOCUS => 1;
 
-use constant CAN_FOCUS => 1;
+   method render_to_rb {}
 
-sub render_to_rb {}
+   method lines  { 1 }
+   method cols   { 1 }
 
-sub lines  { 1 }
-sub cols   { 1 }
+   method window_gained
+   {
+      my ( $win ) = @_;
+      $self->SUPER::window_gained( @_ );
 
-sub window_gained
-{
-   my $self = shift;
-   my ( $win ) = @_;
-   $self->SUPER::window_gained( @_ );
-
-   $win->cursor_at( 0, 2 );
+      $win->cursor_at( 0, 2 );
+   }
 }

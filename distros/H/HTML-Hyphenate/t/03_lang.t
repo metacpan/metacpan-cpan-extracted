@@ -261,6 +261,11 @@ my @fragments = (
 '<p lang="zu-za">Su­pe­rca­li­fra­gi­li­sti­ce­xpia­li­do­cious</p>',
         'lang zu-za'
     ],
+    [
+'<html xml:lang="zu-za">Supercalifragilisticexpialidocious</html>',
+'<html xml:lang="zu-za">Su­pe­rca­li­fra­gi­li­sti­ce­xpia­li­do­cious</html>',
+        'xml:lang zu-za'
+    ],
 );
 
 my @utf8_fragments = (

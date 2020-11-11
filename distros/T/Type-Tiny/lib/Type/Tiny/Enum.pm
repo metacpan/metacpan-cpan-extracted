@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.010006';
+	$Type::Tiny::Enum::VERSION   = '1.012000';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
@@ -41,10 +41,22 @@ sub new
 	$opts{unique_values}  = [sort keys %tmp];
 	
 	my $xs_encoding = _xs_encoding($opts{unique_values});
-	if (defined $xs_encoding)
-	{
+	if (defined $xs_encoding) {
 		my $xsub = Type::Tiny::XS::get_coderef_for($xs_encoding);
 		$opts{compiled_type_constraint} = $xsub if $xsub;
+	}
+	
+	if ( defined $opts{coercion} and !ref $opts{coercion} and 1 eq $opts{coercion} ) {
+		delete $opts{coercion};
+		$opts{_build_coercion} = sub {
+			require Types::Standard;
+			my $c = shift;
+			my $t = $c->type_constraint;
+			$c->add_type_coercions(
+				Types::Standard::Str(),
+				sub { $t->closest_match( @_ ? $_[0] : $_ ) }
+			);
+		};
 	}
 	
 	return $proto->SUPER::new(%opts);
@@ -64,7 +76,12 @@ sub _build_display_name
 
 {
 	my $new_xs;
-
+	
+	#
+	# Note the fallback code for older Type::Tiny::XS cannot be tested as
+	# part of the coverage tests because they use the latest Type::Tiny::XS.
+	#
+	
 	sub _xs_encoding
 	{
 		my $unique_values = shift;
@@ -79,12 +96,10 @@ sub _build_display_name
 			require B;
 			return sprintf("Enum[%s]", join(",", map B::perlstring($_), @$unique_values));
 		}
-		else {
-			# We can't encode anything other than straight word-chars or it'll break
-			# Type::Parser.
-			return undef if grep /\W/, @$unique_values;
-			return sprintf("Enum[%s]", join(",", @$unique_values));
-		}
+		else {                                                       # uncoverable statement
+			return undef if grep /\W/, @$unique_values;               # uncoverable statement
+			return sprintf("Enum[%s]", join(",", @$unique_values));   # uncoverable statement
+		}                                                            # uncoverable statement
 	}
 }
 
@@ -94,8 +109,7 @@ sub _build_display_name
 	{
 		my $self = shift;
 		
-		my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
-		$regexp = '(?!)' unless @{$self->unique_values};
+		my $regexp = $self->_regexp;
 		return $cached{$regexp} if $cached{$regexp};
 		my $coderef = ($cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} });
 		Scalar::Util::weaken($cached{$regexp});
@@ -108,13 +122,18 @@ sub _build_display_name
 	sub _build_compiled_check
 	{
 		my $self = shift;
-		my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
-		$regexp = '(?!)' unless @{$self->unique_values};
+		my $regexp  = $self->_regexp;
 		return $cached{$regexp} if $cached{$regexp};
 		my $coderef = ($cached{$regexp} = $self->SUPER::_build_compiled_check(@_));
 		Scalar::Util::weaken($cached{$regexp});
 		return $coderef;
 	}
+}
+
+sub _regexp
+{
+	my $self = shift;
+	$self->{_regexp} ||= 'Type::Tiny::Enum::_Trie'->handle($self->unique_values);
 }
 
 sub as_regexp
@@ -126,9 +145,7 @@ sub as_regexp
 		_croak("Unknown regexp flags: '$flags'; only 'i' currently accepted; stopped");
 	}
 	
-	my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
-	$regexp = '(?!)' unless @{$self->unique_values};
-	
+	my $regexp = $self->_regexp;
 	$flags ? qr/\A(?:$regexp)\z/i : qr/\A(?:$regexp)\z/;
 }
 
@@ -147,7 +164,7 @@ sub inline_check
 		return "$xsub\($_[0]\)" if $xsub && !$Type::Tiny::AvoidCallbacks;
 	}
 	
-	my $regexp = join "|", map quotemeta, @{$self->unique_values};
+	my $regexp = $self->_regexp;
 	my $code = $_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
@@ -209,6 +226,79 @@ sub validate_explain
 	];
 }
 
+sub has_sorter {
+	!!1;
+}
+
+sub _enum_order_hash {
+	my $self = shift;
+	my %hash;
+	my $i = 0;
+	for my $value (@{ $self->values }) {
+		next if exists $hash{$value};
+		$hash{$value} = $i++;
+	}
+	return %hash;
+}
+
+sub sorter {
+	my $self = shift;
+	my %hash = $self->_enum_order_hash;
+	return [
+		sub { $_[0] <=> $_[1] },
+		sub { exists($hash{$_[0]}) ? $hash{$_[0]} : 2_100_000_000 },
+	];
+}
+
+my $canon;
+sub closest_match {
+	require Types::Standard;
+	
+	my ( $self, $given ) = ( shift, @_ );
+
+	return unless Types::Standard::is_Str $given;
+	
+	return $given if $self->check($given);
+
+	$canon ||= eval(
+		$] lt '5.016'
+			? q< sub { ( my $var = lc($_[0]) ) =~ s/(^\s+)|(\s+$)//g; $var } >
+			: q< sub { CORE::fc($_[0]) =~ s/(^\s+)|(\s+$)//gr; } >
+	);
+	
+	$self->{_lookups} ||= do {
+		my %lookups;
+		for ( @{ $self->values } ) {
+			my $key = $canon->($_);
+			next if exists $lookups{$key};
+			$lookups{$key} = $_;
+		}
+		\%lookups;
+	};
+	
+	my $cgiven = $canon->( $given );
+	return $self->{_lookups}{$cgiven}
+		if $self->{_lookups}{$cgiven};
+	
+	my $best;
+	VALUE: for my $possible ( @{ $self->values } ) {
+		my $stem = substr( $possible, 0, length $cgiven );
+		if ( $cgiven eq $canon->( $stem ) ) {
+			if ( defined($best) and length($best) >= length($possible) ) {
+				next VALUE;
+			}
+			$best = $possible;
+		}
+	}
+	
+	return $best if defined $best;
+	
+	return $self->values->[$given]
+		if Types::Standard::is_Int $given;
+	
+	return $given;
+}
+
 push @Type::Tiny::CMP, sub {
 	my $A = shift->find_constraining_type;
 	my $B = shift->find_constraining_type;
@@ -235,6 +325,53 @@ push @Type::Tiny::CMP, sub {
 	
 	return Type::Tiny::CMP_UNKNOWN;
 };
+
+package # stolen from Regexp::Trie
+	Type::Tiny::Enum::_Trie;
+sub new { bless {} => shift }
+sub add {
+	my $self = shift;
+	my $str  = shift;
+	my $ref  = $self;
+	for my $char (split //, $str){
+		$ref->{$char} ||= {};
+		$ref = $ref->{$char};
+	}
+	$ref->{''} = 1; # { '' => 1 } as terminator
+	$self;
+}
+sub _regexp {
+	my $self = shift;
+	return if $self->{''} and scalar keys %$self == 1; # terminator
+	my (@alt, @cc);
+	my $q = 0;
+	for my $char (sort keys %$self){
+		my $qchar = quotemeta $char;
+		if (ref $self->{$char}){
+			if (defined (my $recurse = _regexp($self->{$char}))){
+				push @alt, $qchar . $recurse;
+			}else{
+				push @cc, $qchar;
+			}
+		}else{
+			$q = 1;
+		}
+	}
+	my $cconly = !@alt;
+	@cc and push @alt, @cc == 1 ? $cc[0] : '['. join('', @cc). ']';
+	my $result = @alt == 1 ? $alt[0] : '(?:' . join('|', @alt) . ')';
+	$q and $result = $cconly ? "$result?" : "(?:$result)?";
+	return $result;
+}
+sub handle {
+	my $class = shift;
+	my ($vals) = @_;
+	return '(?!)' unless @$vals;
+	my $self = $class->new;
+	$self->add($_) for @$vals;
+	$self->_regexp;
+}
+
 
 1;
 
@@ -289,6 +426,11 @@ constructor.
 The list of C<values> but sorted and with duplicates removed. This cannot
 be passed to the constructor.
 
+=item C<coercion>
+
+If C<< coercion => 1 >> is passed to the constructor, the type will have a
+coercion using the C<closest_match> method.
+
 =back
 
 =head2 Methods
@@ -315,6 +457,29 @@ checking each string against
   my @valid_tokens = grep /$re/, @all_tokens;
 
 You can get a case-insensitive regexp using C<< $enum->as_regexp('i') >>.
+
+=item C<closet_match>
+
+Returns the closest match in the enum for a string.
+
+  my $enum = Type::Tiny::Enum->new(
+    value => [ qw( foo bar baz quux ) ],
+  );
+  
+  say $enum->closest_match("FO");   # ==> foo
+
+It will try to find an exact match first, fall back to a case-insensitive
+match, if it still can't find one, will try to find a head substring match,
+and finally, if given an integer, will use that as an index.
+
+  my $enum = Type::Tiny::Enum->new(
+    value => [ qw( foo bar baz quux ) ],
+  );
+  
+  say $enum->closest_match(  0 );  # ==> foo
+  say $enum->closest_match(  1 );  # ==> bar
+  say $enum->closest_match(  2 );  # ==> baz
+  say $enum->closest_match( -1 );  # ==> quux
 
 =back
 

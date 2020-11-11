@@ -4,37 +4,46 @@
       "Stevan Little <stevan@iinteractive.com>",
       "Brandon L. Black <blblack@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Algorithm-C3",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.47"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0.01",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.47"
          }
       }
    },
@@ -44,11 +53,16 @@
          "mailto" : "bug-Algorithm-C3@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-C3"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.shadowcat.co.uk/gitmo/Algorithm-C3.git",
-         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/Algorithm-C3.git"
+         "url" : "https://github.com/moose/Algorithm-C3.git",
+         "web" : "https://github.com/moose/Algorithm-C3"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.05",
+   "x_static_install" : 1
 }

@@ -3,14 +3,13 @@
 #
 #  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::HBox;
+use Object::Pad 0.09;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget::LinearBox );
+package Tickit::Widget::HBox 0.49;
+class Tickit::Widget::HBox
+   extends Tickit::Widget::LinearBox;
+
 use Tickit::Style;
-
-our $VERSION = '0.48';
 
 use List::Util qw( sum max );
 
@@ -73,37 +72,32 @@ style_reshape_keys qw( spacing );
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub lines
+method lines
 {
-   my $self = shift;
    return max( 1, map { $_->requested_lines } $self->children );
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $spacing = $self->get_style_values( "spacing" );
    return ( sum( map { $_->requested_cols } $self->children ) || 1 ) +
           $spacing * ( $self->children - 1 );
 }
 
-sub get_total_quota
+method get_total_quota
 {
-   my $self = shift;
    my ( $window ) = @_;
    return $window->cols;
 }
 
-sub get_child_base
+method get_child_base
 {
-   my $self = shift;
    my ( $child ) = @_;
    return $child->requested_cols;
 }
 
-sub set_child_window
+method set_child_window
 {
-   my $self = shift;
    my ( $child, $left, $cols, $window ) = @_;
 
    if( $window and $cols ) {

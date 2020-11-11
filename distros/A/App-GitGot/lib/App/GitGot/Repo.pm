@@ -1,6 +1,6 @@
 package App::GitGot::Repo;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Repo::VERSION = '1.337';
+$App::GitGot::Repo::VERSION = '1.339';
 # ABSTRACT: Base repository objects
 use 5.014;
 
@@ -137,7 +137,7 @@ App::GitGot::Repo - Base repository objects
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 ATTRIBUTES
 

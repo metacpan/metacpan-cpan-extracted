@@ -25,7 +25,7 @@ optional_features: {}
 provides:
   Z:
     file: lib/Z.pm
-    version: '0.007'
+    version: '0.008'
 recommends:
   JSON::MaybeXS: '0'
   PerlX::Maybe::XS: '0'
@@ -55,5 +55,5 @@ resources:
   homepage: https://metacpan.org/release/Z
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-z.git
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

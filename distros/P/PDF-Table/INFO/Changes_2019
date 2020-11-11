@@ -1,0 +1,262 @@
+(see Changes for later changes)
+
+Version 0.11.0 Colspan feature by domm
+
+Version 0.10.0 Introduces underlined text in cells
+
+Version 0.9.13 Fixed issue #33 - Desislav Kamenov
+
+Version 0.9.12 - hotfix for failing tests - Desislav Kamenov
+
+Version 0.9.11 Changes by contributors on GitHub - Keith Carangelo, Mohammad S Anwar
+
+3264342 Added cell_render_hook subroutine to create hyperlinks
+0fb2e57 Fixed broken link to Rick Measham's tutorial.
+8361ec3 Fixed new_page_func valid setting
+38610ec Header alignment default should be column alignment
+e3ec184 Added parameter checking in the method table(). - Added unit test t/table.t script.
+a73e67f Proposed fix to the CPANTS error as below: - Added standard unit test for MANIFEST file (t/manifest.t). - Removed MYMETA.json, MYMETA.yml and Makefile (auto generated files) - Added entry "t/manifest.t" to the MANIFEST file. - Updated MANIFEST.SKIP file.
+
+Version 0.9.10 Changes by contributors on GitHub - azawawi, joenio
+
+6fab323 Modernize hashbang #! to be more perlbrew friendly
+58c36df Add relative link to Changes file
+efaf173 Simple installation/development commmands
+cfbcf48 More README.md simplification
+a7889bc Fix README.md
+43c2182 Fix warning: Useless use of greediness modifier '?' in regex
+db4bc44 Fix #17, page parameter should be optional
+f93ed16 "utf8" pragma solves issue with characters rendered wrong
+e69524e fix script that test issue #15
+5d5628f avoid warnind about use of greediness modifier
+
+Version 0.9.8/9
+
+Added MANIFEST.SKIP and fixed a broken build with 0.9.8
+Added some utility methods to new()
+
+Version 0.9.7 - for a detailed log and changed files visit GitHub
+
+Added a few initialisation methods to the help new() and later on accomodate static initialisation within table() textblock()
+
+Repackaged to fix Issue #16
+
+Version 0.9.7 - for a detailed log and changed files visit GitHub
+
+Reviewed and updated README
+
+Huge POD rewrite
+
+Adding a small script that generates HTML from POD and applies CSS from CPAN. Useful for reviewing the POD before release.
+
+Added a test for POD validation
+
+Added an example file that can test GitHub Issues #8, #9, #10
+
+GitHub [Issue #9] [Issue #10]  Fixed cell_props applied to a different row when 'Repeat Headers' is enabled
+
+Introduced column_numbers variable to avoid using $record in a broader scope. Further improvement needed.
+
+Header row height is copied to each new page when 'Repeat Headers' is enabled
+
+Fixed messing up row height when repeat headers is enabled due to access by array index vs shift/unshift
+
+Fixed row height for rows with text blocks
+
+Headers_props variable has been wrongly initialised with 0 causing a copy of the first data row even when header props are not passed as parameter
+
+Added initialisation of header props justify param so that column and cell properties are not affecting the default value.
+
+Fixed an issue with messing up row properties when repeating the header row on each page.
+
+Examples have been formatted.
+
+One new example added (header.pl) for demonstrating how header row can be added to multiple pages.
+
+No need to export variables. Added one more test.
+
+Removed pad_w and pad_h local variable as useless
+
+Fixed typo causing a bug with row_height param.
+Added example file for row_height. To be used for writing a test.
+
+Added POD for row_height param
+
+Row counting should not be skipped if it is first row.
+
+Added one more test(duplicates existing) but only to have base.
+
+Extracted PDF::API2 Mock as a separate package.
+Created New test with the very basics.
+Create a new package that will hold predefined data for tests so it can be reused.
+
+Fixed a variable that masks earlier declaration.
+
+Fixed Issue #4 - Row height is calculated correctly depending on font size.
+Some variables are renamed to more meaningful.
+Row counting is done in a new way with single counter that is used for column and cell props retrieval.
+
+Row height is now calculated for each row based on maximum font size from all cells.
+Refactored some variable names and unified row counting during column size calculation phase.
+
+Fixed doc details in POD
+
+Cosmetic changes
+
+Decreased indent and reduced if body.
+For easier review, diff with whitespace changes disabled.
+
+Added github url in readme
+
+
+Version 0.9.6
+----------------------------
+Fixed typo in POD. Closes #71816
+Thanks to Gregor Herrmann
+
+Small code refactoring.
+
+Added patch for infinite loop fix. Closes #77376
+Thanks to John Bazik
+
+Added patch for header justification. Closes #77566
+Thanks to James Lance
+
+Added horizontal_borders, vertical_borders params to table(). Closes #79883
+Thanks to Eric Johnson
+
+Version 0.9.5 - 18.Oct.2011
+----------------------------
+MANIFEST was missing sample pdf file.
+
+Accidently left alternative code for infinite loop fix commented out.
+Fixed.  Added a test for that.
+
+
+Version 0.9.4 - 17.Oct.2011
+----------------------------
+Don't bump row count when row spans a page.  Closes #67401.
+
+Fixed bug: don't call text_block if record width is exactly cell width.
+
+Fixed bug in text_block: bottom is (top - height), not (baseline - height).
+
+Example script typo fixed.  Closes #55133.
+
+Don't set up strokes when border is 0.  Apparently breaks Acrobat.
+Closes #40705 and #55137.
+
+Changed print warnings to carp.  Closes #38007.
+
+Added center justification for columns and cells.  Tests, too.
+Closes #37924.
+
+Fixed infinite loop caused by uninitialized $2.  Thanks to Petri Kaurinkoski.
+Closes #34017.
+
+Fixed perl warning if $col_prop->{min_w} is undef.  Thanks to
+Matthias Pitzl (NEPOS).  Closes #30720.
+
+Fixed default header background color bug, closes #28542.
+
+Added mock PDF::API2 packages to test script and added tests.
+
+Improve column width calculations so wider content gets wider columns.
+Added column width test.  Thanks to Barrie Slaymaker (RBS).  Closes #26158.
+
+
+Version 0.9.3 - 27.12.2006
+----------------------------
+Added backward compatibility and now again params with '-' front are supported.
+  Both params with '-'and without are valid and can be even mixed together.
+  I excuse for changing the interface before.
+
+Added cell_props parameter wich can define properties for a single cell as specified by user.
+Thanks for cell_props patch to Bodo Bauer.
+
+Removed Version requirement of Perl 5.8.7 and only version ot 5.6.0 is required.
+Thanks to Jonas Pasche for reporting it.
+
+Updated examples/sample1.pl file to try the capabilities of the module immidiately after download.
+
+Documentation Update.
+
+Fixed bug with interpreting \n as special char but not as newline.
+Thanks to Jonas Pasche for reporting it.
+	(reminder: text with \n must be enclosed in double quotes i.e. "text\nnewline" )
+
+Fixed documentation inacuracy for text_block(). It is called as $pdftable->text_block() of course.
+Thanks to Jonas Pasche for reporting it.
+
+Fixed bug with first_line overlaping with former paragraph last line.
+Thanks to Jonas Pasche for reporting it and contributing a patch.
+
+
+Version 0.9.2 - 02.Oct.2006
+----------------------------
+Fixed bug with 'col_props->bg_color' overiding 'header_props->bg_color'
+Thanks to Giulio Di Giuliomaria
+
+Fixed some documentation inacuracys.
+Added some new documentation.
+
+'column_props->width' parameter changed to 'min_w'
+
+Added example script to instantly test the module when downloaded.
+See 'examples' into the tar.gz archive.
+
+Version 0.9.1 - 18.Sep.2006
+----------------------------
+Removed Debug Message "Created New Page"
+
+Fixed bug with not working header row bg_color parameter
+
+Thanks to Bodo Bauer for submiting the patch.
+
+
+Version 0.9 - 14.Sep.2006
+----------------------------
+Fixed 'fontsize' bug at line 234 to font_size and parameter is working correctly
+
+Changed all parameters not to start with '-'
+So now '-start_h' becomes only 'start_h'
+
+Changed default font encoding form latin1 to UTF8
+
+Added Default Values for next_h next_y parameters
+
+Added Minimum value check for x y start_h start_y
+
+Optimization for min row height calculations
+
+Added 'new_page_func parameter'. This is should be a reference to function which is called every time when a new page needs to be created so the table can span.See online manual for more info how to use it.
+
+Added Check if any text in sub text_block before spliting the parameter.
+
+Fixed bug with infinite loop when spanning to a new page.
+
+Splitting long words to parts because of breaking table cels
+
+Parameter in text_block() 'parspace'  space before block start (paragraph).
+So the first line will start and height $ybase $parspace. So is every next paragraph into the block.
+
+Undocumented Parameter in text_block() 'indent'    indent of every line
+Undocumented Parameter in text_block() 'flindent'  indent of first line
+Undocumented Parameter in text_block() 'fpindent'  indent of first paragraph
+
+The Above parameters are excluding each other in the following order: parspace,flindent,fpindent,indent 
+The one that is found first and has valid value is beeing used
+
+Added Header Row support with repeat on every new page and different layout than the other rows
+
+Parameter 'w' for table is not optional any more (could change)
+
+Changed table width calculation and now module tries to use as much space as it is given but not more than it.
+
+Default values for many options
+
+Better source formatting
+
+Fixed incorect y position returned from text_block()
+
+Others that i dont remeber.

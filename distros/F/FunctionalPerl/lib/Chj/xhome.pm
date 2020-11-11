@@ -21,21 +21,24 @@ Get the user's home directory in a safe manner.
 
 =item xHOME ()
 
-just the $HOME env var, dieing if not set, and also checked against a
-couple assertments
+Just the $HOME env var, dieing if not set, and also checked against a
+couple assertments.
 
 =item xeffectiveuserhome ()
 
-just the getpwuid setting
+Just the getpwuid setting. Throws unimplemented exception on Windows
+(Raspberry, not Cygwin Perl).
 
 =item xsafehome ()
 
-always take xeffectiveuserhome, but is asserting that HOME is the same
-if set
+Always take xeffectiveuserhome (unless on Windows, in which case this
+is currently the same as xhome), but is asserting that HOME is the
+same if set.
 
 =item xhome ()
 
-take HOME if set (with assertments), otherwise xeffectiveuserhome
+Tries $ENV{HOME} then glob "~" if exists (with assertments), otherwise
+xeffectiveuserhome.
 
 =back
 
@@ -57,19 +60,35 @@ package Chj::xhome;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-sub xHOME () {
-    defined (my $home=$ENV{HOME})
-      or die "environment variable HOME is not set";
+# use File::HomeDir qw(home);
+
+# But File::HomeDir is not installed with either Cygwin or Strawberry
+# Perl. Also, HomeDir's `home` returns undef for non-existing paths.
+
+sub xcheck_home {
+    my ($home)= @_;
     length ($home)
       or die "environment variable HOME is the empty string";
     $home
       or die "environment variable HOME is false";
-    $home=~ m|^/|
-      or die "environment variable HOME does not start with a slash: '$home'";
+    if ($^O eq 'MSWin32') {
+        $home=~ m|^[a-z]+:|i # XX correct letter syntax?
+            or die "environment variable HOME does not start with a drive designator: '$home'";
+    } else {
+        $home=~ m|^/|
+            or die "environment variable HOME does not start with a slash: '$home'";
+    }
+}
+
+sub xHOME () {
+    defined (my $home=$ENV{HOME})
+        or die "environment variable HOME is not set";
+    xcheck_home $home;
     $home
 }
 
 sub xeffectiveuserhome () {
+    # (Don't bother about caching, premature opt & dangerous.)
     my $uid= $>;
     my ($name,$passwd,$_uid,$gid,
         $quota,$comment,$gcos,$dir,$shell,$expire)
@@ -79,22 +98,55 @@ sub xeffectiveuserhome () {
 }
 
 sub xsafehome () {
-    my $effectiveuserhome= xeffectiveuserhome;
-    if (my $e= $ENV{HOME}) {
-        $e eq $effectiveuserhome
-          or die "HOME environment variable is set to something other ".
-            "than the effective user home: '$e' vs. '$effectiveuserhome'";
+    if ($^O eq 'MSWin32') {
+        # XX or how to look it up on Windows again? If implemented, update pod.
+        xhome()
+    } else {
+        my $effectiveuserhome= xeffectiveuserhome;
+        if (my $e= $ENV{HOME}) {
+            $e eq $effectiveuserhome
+              or die "HOME environment variable is set to something other ".
+                "than the effective user home: '$e' vs. '$effectiveuserhome'";
+        }
+        $effectiveuserhome
     }
-    $effectiveuserhome
 }
 
-sub xhome () {
-    if ($ENV{HOME}) {
-        xHOME
+
+our $warned = 0;
+
+sub xchecked_home ($$) {
+    my ($home, $what)= @_;
+    xcheck_home $home;
+    if (-d $home) {
+        $home
     } else {
-        # what about setting $ENV{HOME} in this case?
-        xeffectiveuserhome
+        warn "$what: dir '$home' does not exist, falling back to getpwuid"
+            unless $warned++;
+        undef
     }
+}
+
+sub maybe_HOME {
+    if (my $home= $ENV{HOME}) {
+        xchecked_home $home, '$ENV{HOME}'
+    } else {
+        undef
+    }
+}
+
+sub maybe_globhome {
+    my ($home)= glob "~";
+    if (defined $home) {
+        xchecked_home $home, "glob '~'";
+    } else {
+        undef
+    }
+}
+
+
+sub xhome () {
+    maybe_HOME() // maybe_globhome() // xeffectiveuserhome()
 }
 
 

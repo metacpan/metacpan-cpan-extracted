@@ -10,6 +10,10 @@
 #  define PadnameIsNULL(pn)  (!(pn) || (pn) == &PL_sv_undef)
 #endif
 
+#ifndef hv_deletes
+#  define hv_deletes(hv, skey, flags)  hv_delete((hv), ("" skey ""), (sizeof(skey) - 1), flags)
+#endif
+
 #define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)
 static char *S_save_strndup(pTHX_ char *s, STRLEN l)
 {

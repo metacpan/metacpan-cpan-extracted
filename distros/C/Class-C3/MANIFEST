@@ -28,8 +28,10 @@ t/35_next_method_in_anon.t
 t/36_next_goto.t
 t/37_mro_warn.t
 t/40_no_xs.t
+t/lib/HideModule.pm
 xt/pod.t
 xt/pod_coverage.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

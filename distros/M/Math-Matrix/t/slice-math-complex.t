@@ -1,9 +1,5 @@
 #!perl
 
-# Test when each element is a numerical object. This is to verify that each
-# element in the returned matrix is a different object than the corresponding
-# object in the invocand matrix.
-
 use strict;
 use warnings;
 
@@ -16,13 +12,13 @@ my $min_math_complex_ver = 1.57;
 eval "use Math::Complex $min_math_complex_ver";
 plan skip_all => "Math::Complex $min_math_complex_ver required" if $@;
 
-plan tests => 19;
-
 use lib 't/lib';
 use Math::Matrix::Complex;
 
-my $orig = [[ 11 .. 19 ],
-            [ 21 .. 29 ]];
+plan tests => 19;
+
+my $orig = [[11 .. 19],
+            [21 .. 29]];
 
 # Create an object.
 
@@ -36,8 +32,8 @@ is(ref($B), 'Math::Matrix::Complex', '$B is a Math::Matrix::Complex');
 
 # Modify the new object, and verify that the original matrix is unmodified.
 
-for (my $i = 0 ; $i < 2 ; ++$i) {
-    for (my $jB = 0 ; $jB < @colidx ; ++$jB) {
+for my $i (0 .. 1) {
+    for my $jB (0 .. @colidx - 1) {
         my $j = $colidx[$jB];
         is(ref($B->[$i][$jB]), 'Math::Complex',
            "\$B->[$i][$jB] is a Math::Complex");

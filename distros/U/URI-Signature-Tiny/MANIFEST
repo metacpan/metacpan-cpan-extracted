@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+Makefile.PL
+README
+boilerplate.pl
+lib/URI/Signature/Tiny.pm
+lib/URI/Signature/Tiny.pod
+t/basic.t
+t/synopsis.t

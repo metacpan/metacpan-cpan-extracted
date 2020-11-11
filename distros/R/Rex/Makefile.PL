@@ -50,6 +50,7 @@ my %WriteMakefileArgs = (
     "Devel::Caller" => 0,
     "Digest::HMAC_SHA1" => 0,
     "Digest::MD5" => 0,
+    "English" => 0,
     "Exporter" => 0,
     "Fcntl" => 0,
     "File::Basename" => 0,
@@ -67,8 +68,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
-    "List::MoreUtils" => "0.416",
-    "List::Util" => 0,
+    "List::Util" => "1.45",
     "MIME::Base64" => 0,
     "Net::OpenSSH::ShellQuoter" => 0,
     "POSIX" => 0,
@@ -108,7 +108,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.13.0",
+  "VERSION" => "1.13.1",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }
@@ -123,6 +123,7 @@ my %FallbackPrereqs = (
   "Devel::Caller" => 0,
   "Digest::HMAC_SHA1" => 0,
   "Digest::MD5" => 0,
+  "English" => 0,
   "Exporter" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
@@ -142,8 +143,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
-  "List::MoreUtils" => "0.416",
-  "List::Util" => 0,
+  "List::Util" => "1.45",
   "MIME::Base64" => 0,
   "Net::OpenSSH::ShellQuoter" => 0,
   "POSIX" => 0,
@@ -180,7 +180,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
 requires('IPC::Shareable')
   if has_module('IPC::Shareable')
     || prompt('install Support custom output formatters? [y/N]', 'N') =~ /^y/i;
@@ -221,7 +221,7 @@ MY;
 use File::ShareDir::Install qw(postamble);
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;
@@ -229,7 +229,7 @@ sub _add_prereq {
     if exists $WriteMakefileArgs{$mm_key}{$module}
       and $WriteMakefileArgs{$mm_key}{$module} ne '0'
       and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$mm_key}{$module}) -- need to do a sane metamerge!"
+  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$module}) -- need to do a sane metamerge!"
     if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
         and $FallbackPrereqs{$module} ne $version_or_range;
   $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;

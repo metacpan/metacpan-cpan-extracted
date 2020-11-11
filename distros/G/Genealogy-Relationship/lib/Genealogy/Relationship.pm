@@ -28,7 +28,7 @@ Genealogy::Relationship - calculate the relationship between two people
 
 =head1 DESCRIPTION
 
-This module makes it easto calculate the relationship between two people.
+This module makes it easy to calculate the relationship between two people.
 
 If you have a set of objects modelling your family tree, then you will
 be able to use this module to get a description of the relationship between
@@ -103,7 +103,7 @@ use Types::Standard qw[Str HashRef];
 use List::Util qw[first];
 use List::MoreUtils qw[firstidx];
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 has parent_field_name => (
   is => 'ro',
@@ -260,7 +260,7 @@ perl(1)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018, Magnum Solutions Ltd.  All Rights Reserved.
+Copyright (C) 2018-2020, Magnum Solutions Ltd.  All Rights Reserved.
 
 This script is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

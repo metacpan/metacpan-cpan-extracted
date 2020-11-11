@@ -53,7 +53,7 @@ void crypt_mask (char* str, size_t len, uint32_t mask, uint64_t bytes_received) 
 }
 
 static std::map<uint16_t, string> close_messages = {
-    {CloseCode::NO_ERROR         , "no error"},
+    {CloseCode::NOERR            , "no error"},
     {CloseCode::DONE             , "Done"},
     {CloseCode::AWAY             , "Away"},
     {CloseCode::PROTOCOL_ERROR   , "WS Protocol Error"},

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ no_index:
 provides:
   PkgConfig:
     file: lib/PkgConfig.pm
-    version: '0.24026'
+    version: '0.25026'
 requires:
   Test::More: '0.94'
   perl: '5.006000'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/PerlPkgConfig/perl-PkgConfig/issues
   homepage: https://metacpan.org/pod/PkgConfig
   repository: https://github.com/PerlPkgConfig/perl-PkgConfig.git
-version: '0.24026'
+version: '0.25026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

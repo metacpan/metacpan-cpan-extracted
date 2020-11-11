@@ -3,16 +3,14 @@
 #
 #  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Button;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::Widget::Button 0.31;
+class Tickit::Widget::Button
+   extends Tickit::Widget;
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_DOUBLE LINE_THICK );
-
-our $VERSION = '0.30';
 
 use Tickit::Utils qw( textwidth );
 
@@ -135,34 +133,29 @@ Optional. Callback function to invoke when the button is clicked.
 
 =cut
 
-sub new
+has $_label;
+has $_on_click;
+
+BUILD
 {
-   my $class = shift;
    my %params = @_;
 
-   my $self = $class->SUPER::new( %params );
-
-   $self->set_label( $params{label} ) if defined $params{label};
-   $self->set_on_click( $params{on_click} ) if $params{on_click};
+   $_label = $params{label} if defined $params{label};
+   $_on_click = $params{on_click} if $params{on_click};
 
    $self->set_align ( $params{align}  // 0.5 );
    $self->set_valign( $params{valign} // 0.5 );
-
-   return $self;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $has_border = ( $self->get_style_values( "linetype" ) ) ne "none";
    return 1 + 2*$has_border;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
-   my $has_border = ( $self->get_style_values( "linetype" ) ) ne "none";
-   return 4 + textwidth( $self->label ) + 2*$has_border;
+   return 4 + textwidth( $self->label ) + 2;
 }
 
 =head1 ACCESSORS
@@ -175,10 +168,7 @@ sub cols
 
 =cut
 
-sub label
-{
-   return shift->{label}
-}
+method label { $_label }
 
 =head2 set_label
 
@@ -188,10 +178,9 @@ Return or set the text to display in the button area.
 
 =cut
 
-sub set_label
+method set_label
 {
-   my $self = shift;
-   ( $self->{label} ) = @_;
+   ( $_label ) = @_;
    $self->redraw;
 }
 
@@ -201,11 +190,7 @@ sub set_label
 
 =cut
 
-sub on_click
-{
-   my $self = shift;
-   return $self->{on_click};
-}
+method on_click { $_on_click }
 
 =head2 set_on_click
 
@@ -217,10 +202,9 @@ Return or set the CODE reference to be called when the button area is clicked.
 
 =cut
 
-sub set_on_click
+method set_on_click
 {
-   my $self = shift;
-   ( $self->{on_click} ) = @_;
+   ( $_on_click ) = @_;
 }
 
 =head2 click
@@ -233,17 +217,15 @@ via other parts of code.
 
 =cut
 
-sub click
+method click
 {
-   my $self = shift;
-   $self->{on_click}->( $self );
+   $_on_click->( $self );
 }
 
 # Activation by key should "flash" the button briefly on the screen as a
 # visual feedback
-sub key_click
+method key_click
 {
-   my $self = shift;
    $self->click;
    if( my $window = $self->window ) {
       $self->set_style_tag( active => 1 );
@@ -252,9 +234,8 @@ sub key_click
    return 1;
 }
 
-sub _activate
+method _activate
 {
-   my $self = shift;
    my ( $active ) = @_;
    $self->{active} = $active;
    $self->set_style_tag( active => $active );
@@ -284,10 +265,8 @@ the button area. See also L<Tickit::WidgetRole::Alignable>.
 use Tickit::WidgetRole::Alignable name => "align",  style => "h";
 use Tickit::WidgetRole::Alignable name => "valign", style => "v";
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $win = $self->window or return;
    my $lines = $win->lines;
    my $cols  = $win->cols;
@@ -306,9 +285,8 @@ sub reshape
    $win->cursor_at( $self->{label_line}, $self->{label_col} );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my $win = $self->window or return;
@@ -337,6 +315,8 @@ sub render_to_rb
       foreach my $line ( $rect->linerange( 0, $lines-1 ) ) {
          $rb->erase_at( $line, 0, $cols );
       }
+      $rb->text_at( $self->{label_line}, 0,       "[" );
+      $rb->text_at( $self->{label_line}, $cols-1, "]" );
    }
 
    $rb->text_at( $self->{label_line}, $self->{label_col} - 2, $marker_left );
@@ -345,9 +325,8 @@ sub render_to_rb
    $rb->text_at( $self->{label_line}, $self->{label_col}, $self->label );
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    my $type = $args->type;

@@ -1,28 +1,31 @@
 NAME
+
     POE::Component::SmokeBox::Dists - Search for CPAN distributions by
     cpanid or distribution name
 
 VERSION
-    version 1.08
+
+    version 1.10
 
 SYNOPSIS
+
       use strict;
       use warnings;
-
+    
       use POE;
       use POE::Component::SmokeBox::Dists;
-
+    
       my $search = '^BINGOS$';
-
+    
       POE::Session->create(
         package_states => [
                 'main' => [qw(_start _results)],
         ],
       );
-
+    
       $poe_kernel->run();
       exit 0;
-
+    
       sub _start {
         POE::Component::SmokeBox::Dists->author(
           event => '_results',
@@ -30,113 +33,124 @@ SYNOPSIS
         );
         return;
       }
-
+    
       sub _results {
         my $ref = $_[ARG0];
-
+    
         return if $ref->{error}; # Oh dear there was an error
-
+    
         print $_, "\n" for @{ $ref->{dists} };
-
+    
         return;
       }
 
 DESCRIPTION
+
     POE::Component::SmokeBox::Dists is a POE component that provides
     non-blocking CPAN distribution searches. It is a wrapper around
-    File::Fetch for "02packages.details.txt.gz" file retrieval, IO::Zlib for
+    File::Fetch for 02packages.details.txt.gz file retrieval, IO::Zlib for
     extraction and CPAN::DistnameInfo for parsing the packages data.
 
     Given either author ( ie. CPAN ID ) or distribution search criteria,
     expressed as a regular expression, it will return to a requesting
     session all the CPAN distributions that match that pattern.
 
-    The component will retrieve the "02packages.details.txt.gz" file to the
-    ".smokebox" directory. If that file already exists, a newer version will
+    The component will retrieve the 02packages.details.txt.gz file to the
+    .smokebox directory. If that file already exists, a newer version will
     only be retrieved if the file is older than 6 hours. Specifying the
-    "force" parameter overrides this behaviour.
+    force parameter overrides this behaviour.
 
-    The "02packages.details.txt.gz" is extracted and a CPAN::DistnameInfo
+    The 02packages.details.txt.gz is extracted and a CPAN::DistnameInfo
     object built in order to run the search criteria. This process can take
     a little bit of time.
 
 CONSTRUCTORS
+
     There are a number of constructors:
 
     You may also set arbitary keys to pass arbitary data along with your
     request. These must be prefixed with an underscore _.
 
-    "author"
-        Initiates an author search. Takes a number of parameters:
+    author
 
-          'event', the name of the event to return results to, mandatory;
-          'search', a regex pattern to match CPAN IDs against, mandatory;
-          'session', specify an alternative session to send results to;
-          'force', force the poco to refresh the packages file regardless of age;
-          'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
-          'url', the CPAN mirror url to use, defaults to a built-in list;
+      Initiates an author search. Takes a number of parameters:
 
-    "distro"
-        Initiates a distribution search. Takes a number of parameters:
+        'event', the name of the event to return results to, mandatory;
+        'search', a regex pattern to match CPAN IDs against, mandatory;
+        'session', specify an alternative session to send results to;
+        'force', force the poco to refresh the packages file regardless of age;
+        'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
+        'url', the CPAN mirror url to use, defaults to a built-in list;
 
-          'event', the name of the event to return results to, mandatory;
-          'search', a regex pattern to match distributions against, mandatory;
-          'session', specify an alternative session to send results to;
-          'force', force the poco to refresh the packages file regardless of age;
-          'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
-          'url', the CPAN mirror url to use, defaults to a built-in list;
+    distro
 
-    "phalanx"
-        Initiates a search for the Phalanx "100" distributions. Takes a
-        number of parameters:
+      Initiates a distribution search. Takes a number of parameters:
 
-          'event', the name of the event to return results to, mandatory;
-          'session', specify an alternative session to send results to;
-          'force', force the poco to refresh the packages file regardless of age;
-          'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
-          'url', the CPAN mirror url to use, defaults to a built-in list;
+        'event', the name of the event to return results to, mandatory;
+        'search', a regex pattern to match distributions against, mandatory;
+        'session', specify an alternative session to send results to;
+        'force', force the poco to refresh the packages file regardless of age;
+        'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
+        'url', the CPAN mirror url to use, defaults to a built-in list;
 
-    "random"
-        Initiates a search for a random 100 CPAN distributions. Takes a
-        number of parameters:
+    phalanx
 
-          'event', the name of the event to return results to, mandatory;
-          'session', specify an alternative session to send results to;
-          'force', force the poco to refresh the packages file regardless of age;
-          'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
-          'url', the CPAN mirror url to use, defaults to a built-in list;
+      Initiates a search for the Phalanx "100" distributions. Takes a
+      number of parameters:
 
-    In all the constructors, "session" is only required if the component is
-    not spawned from within an existing POE::Session or you wish the results
-    event to be sent to an alternative existing POE::Session.
+        'event', the name of the event to return results to, mandatory;
+        'session', specify an alternative session to send results to;
+        'force', force the poco to refresh the packages file regardless of age;
+        'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
+        'url', the CPAN mirror url to use, defaults to a built-in list;
+
+    random
+
+      Initiates a search for a random 100 CPAN distributions. Takes a
+      number of parameters:
+
+        'event', the name of the event to return results to, mandatory;
+        'session', specify an alternative session to send results to;
+        'force', force the poco to refresh the packages file regardless of age;
+        'pkg_time', in seconds before the poco refreshes the packages file, defaults to 6 hours;
+        'url', the CPAN mirror url to use, defaults to a built-in list;
+
+    In all the constructors, session is only required if the component is
+    not spawned from within an existing POE::Session or you wish the
+    results event to be sent to an alternative existing POE::Session.
 
 OUTPUT EVENT
+
     Once the component has finished, retrieving, extracting and processing
     an event will be sent.
 
-    "ARG0" will be a hashref, with the following data:
+    ARG0 will be a hashref, with the following data:
 
       'dists', an arrayref consisting of prefixed distributions;
       'error', only present if something went wrong with any of the stages;
 
 ENVIRONMENT
-    The component uses the ".smokebox" directory to stash the
-    "02packages.details.txt.gz" file.
+
+    The component uses the .smokebox directory to stash the
+    02packages.details.txt.gz file.
 
     This is usually located in the current user's home directory. Setting
-    the environment variable "PERL5_SMOKEBOX_DIR" will effect where the
-    ".smokebox" directory is located.
+    the environment variable PERL5_SMOKEBOX_DIR will effect where the
+    .smokebox directory is located.
 
 SEE ALSO
+
     CPAN::DistnameInfo
 
-    <http://qa.perl.org/phalanx>
+    http://qa.perl.org/phalanx
 
 AUTHOR
+
     Chris Williams <chris@bingosnet.co.uk>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Chris Williams.
+
+    This software is copyright (c) 2020 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

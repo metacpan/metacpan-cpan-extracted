@@ -1,6 +1,6 @@
 package MsOffice::Word::Surgeon::Change;
-use feature 'state';
 use Moose;
+use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
 use Carp                           qw(croak);
 use POSIX                          qw(strftime);
@@ -12,16 +12,16 @@ subtype 'Date_ISO',
   where   {/\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2})?Z?/},
   message {"$_ is not a date in ISO format yyyy-mm-ddThh:mm:ss"};
 
-
+has 'rev_id'      => (is => 'ro', isa => 'Num', required => 1);
 has 'to_delete'   => (is => 'ro', isa => 'Str');
 has 'to_insert'   => (is => 'ro', isa => 'Str');
-has 'author'      => (is => 'ro', isa => 'Str'               );
+has 'author'      => (is => 'ro', isa => 'Str', default => 'Word::Surgeon');
 has 'date'        => (is => 'ro', isa => 'Date_ISO', default =>
                         sub {strftime "%Y-%m-%dT%H:%M:%SZ", localtime});
 has 'run'         => (is => 'ro', isa => 'MsOffice::Word::Surgeon::Run');
 has 'xml_before'  => (is => 'ro', isa => 'Str');
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 sub BUILD {
   my $self = shift;
@@ -34,30 +34,28 @@ sub BUILD {
 sub as_xml {
   my ($self) = @_;
 
-  state $rev_id = 0;
-  $rev_id++;
-
+  my $rev_id    = $self->rev_id;
   my $date      = $self->date;
   my $author    = $self->author;
   my $props     = $self->run && $self->run->props
-                  ? "<w:rPr>" . $self->run->props . "</w:rPr>"
+    ? "<w:rPr>" . $self->run->props . "</w:rPr>"
                   : "";
-  my $xml = "";
+  my $xml       = "";
 
-  if ($self->to_delete) {
-    my $space_attr = maybe_preserve_spaces($self->to_delete);
+  if (my $to_delete = $self->to_delete) {
+    my $space_attr = maybe_preserve_spaces($to_delete);
     $xml .= qq{<w:del w:id="$rev_id" w:author="$author" w:date="$date">}
             . qq{<w:r>$props}
-                 . qq{<w:delText$space_attr>}.$self->to_delete.qq{</w:delText>}
+                 . qq{<w:delText$space_attr>$to_delete</w:delText>}
             . qq{</w:r>}
           . qq{</w:del>};
   }
-  if ($self->to_insert) {
-    my $space_attr = maybe_preserve_spaces($self->to_insert);
+  if (my $to_insert = $self->to_insert) {
+    my $space_attr = maybe_preserve_spaces($to_insert);
     $xml .= qq{<w:ins w:id="$rev_id" w:author="$author" w:date="$date">}
             . qq{<w:r>$props}
               . ($self->xml_before // '')
-              . qq{<w:t$space_attr>}.$self->to_insert.qq{</w:t>}
+              . qq{<w:t$space_attr>$to_insert</w:t>}
             . qq{</w:r>}
           . qq{</w:ins>};
   }
@@ -83,7 +81,9 @@ See that method for a description of the API.
 
 =head1 INTERNALS
 
-Each call generates a fresh revision id, inserted as C<w:id> attribute to the
+The constructor requires an integer C<rev_id> argument.
+The C<rev_id> is fed by the surgeon object which generates a fresh value at each call.
+This is inserted as C<w:id> attribute to the
 C<< <w:del> >> and C<< <w:ins> >> nodes -- but it doesn't seem to be used for
 any purpose by MsWord.
 

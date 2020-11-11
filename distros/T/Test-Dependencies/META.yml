@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-Test-Dependencies/issues
   repository: https://github.com/ehuelsmann/perl-Test-Dependencies.git
-version: '0.29'
+version: '0.30'
 x_contributors:
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Nick Morrott <knowledgejunkie@gmail.com>'

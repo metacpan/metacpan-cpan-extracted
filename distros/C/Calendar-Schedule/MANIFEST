@@ -5,8 +5,12 @@ Makefile.PL        # Makefile generator
 META.yml           # Meta-information
 LICENSE
 Schedule.pm        # Main module
+bin/cal2html       # a CLI program
 t/test-lib.pl	   # Helpful testing functions
 t/01.t             # Test case 01
 t/01-example1      # Test input
 t/01-example1.html # Test expected output
+t/02.t             # Test case 02, CLI cal2html
+t/02-calendar      # Test 02 input
+t/02-calendar.html # Test 02 output
 META.json                                Module JSON meta-data (added by MakeMaker)

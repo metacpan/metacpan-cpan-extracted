@@ -11,10 +11,16 @@ use Moo;
 use IPC::Run3; # For run3().
 use Types::Standard qw/Any ArrayRef HasMethods HashRef Int Str/;
 
-our $VERSION = '2.58';
+our $VERSION = '2.61';
 
 my $DATA_SECTION = get_data_section; # load once
 my $DEFAULT_COMBINE = 1; # default for combine_node_and_port
+my %CONTEXT_QUOTING = (
+	label => '\\{\\}\\|<>\\s"',
+	label_legacy => '"',
+);
+my %PORT_QUOTING = map +($_ => sprintf "%%%02x", ord $_), qw(% \\ : " { } | < >);
+my $PORT_QUOTE_CHARS = join '', '[', (map quotemeta, sort keys %PORT_QUOTING), ']';
 
 has command =>
 (
@@ -169,7 +175,7 @@ sub _build_valid_output_format {
 	+{ map +($_ => undef), split /\s+/, $stderr };
 }
 
-# -----------------------------------------------
+sub _dor { return $_[0] if defined $_[0]; $_[1] } # //
 
 sub BUILD
 {
@@ -177,16 +183,16 @@ sub BUILD
 	my($globals) = $self -> global;
 	my($global)  =
 	{
-		combine_node_and_port	=> $$globals{combine_node_and_port} // $DEFAULT_COMBINE,
+		combine_node_and_port	=> _dor($$globals{combine_node_and_port}, $DEFAULT_COMBINE),
 		directed		=> $$globals{directed} ? 'digraph' : 'graph',
 		driver			=> $$globals{driver} || scalar(which('dot')),
 		format			=> $$globals{format} ||	'svg',
 		im_format		=> $$globals{im_format} || 'cmapx',
 		label			=> $$globals{directed} ? '->' : '--',
-		name			=> $$globals{name} // 'Perl',
+		name			=> _dor($$globals{name}, 'Perl'),
 		record_shape	=> ($$globals{record_shape} && $$globals{record_shape} =~ /^(M?record)$/) ? $1 : 'Mrecord',
-		strict			=> $$globals{strict} //  0,
-		timeout			=> $$globals{timeout} // 10,
+		strict			=> _dor($$globals{strict},  0),
+		timeout			=> _dor($$globals{timeout}, 10),
 	};
 	my($im_metas)	= $self -> im_meta;
 	my($im_meta)	=
@@ -235,7 +241,7 @@ sub BUILD
 
 sub _edge_name_port {
 	my ($self, $name) = @_;
-	$name //= '';
+	$name = _dor($name, '');
 	# Remove :port:compass, if any, from name.
 	# But beware Perl-style node names like 'A::Class'.
 	my @field = split /(:(?!:))/, $name;
@@ -254,9 +260,9 @@ sub _edge_name_port {
 sub add_edge
 {
 	my($self, %arg) = @_;
-	my $from    = delete $arg{from} // '';
-	my $to      = delete $arg{to} // '';
-	my $label   = $arg{label} // '';
+	my $from    = _dor(delete $arg{from}, '');
+	my $to      = _dor(delete $arg{to}, '');
+	my $label   = _dor($arg{label}, '');
 	$label      =~ s/^\s*(<)\n?/$1/;
 	$label      =~ s/\n?(>)\s*$/$1/;
 	$arg{label} = $label if (defined $arg{label});
@@ -269,8 +275,8 @@ sub add_edge
 		my $port = '';
 		if ($self->global->{combine_node_and_port}) {
 			($name, $port) = $self->_edge_name_port($name);
-		} elsif (exists $arg{$argname}) {
-			$port = ':' . delete $arg{$argname};
+		} elsif (defined(my $value = delete $arg{$argname})) {
+			$port = join ':', '', map qq{"$_"}, map escape_port($_), ref $value ? @$value : $value;
 		}
 		push @nodes, [ $name, $port ];
 		next if (my $nh = $self->node_hash)->{$name};
@@ -312,27 +318,27 @@ sub _compile_record {
 		$text = "{$text}" if $add_braces;
 	} elsif (ref $item eq 'HASH') {
 		my $port = $item->{port} || 0;
-		$text = escape_some_chars($item->{text} // '', $quote_more);
+		$text = escape_some_chars(_dor($item->{text}, ''), $CONTEXT_QUOTING{$quote_more ? 'label' : 'label_legacy'});
 		if ($port) {
-			$port =~ s/^\s*<?/</;
-			$port =~ s/>?\s*$/>/;
-			$text = $text;
-			$text = "$port $text";
+			$port =~ s/^\s*<?//;
+			$port =~ s/>?\s*$//;
+			$port = escape_port($port);
+			$text = "<$port> $text";
 		}
 	} else {
-		$text = "<port".++$port_count."> " . escape_some_chars($item, $quote_more);
+		$text = "<port".++$port_count."> " . escape_some_chars($item, $CONTEXT_QUOTING{$quote_more ? 'label' : 'label_legacy'});
 	}
 	($port_count, $text);
 }
 
 sub add_node {
 	my ($self, %arg) = @_;
-	my $name = delete $arg{name} // '';
+	my $name = _dor(delete $arg{name}, '');
 	$self->validate_params('node', \%arg);
 	my $node                  = $self->node_hash;
 	%arg                      = (%{$$node{$name}{attributes} || {}}, %arg);
 	$$node{$name}{attributes} = \%arg;
-	my $label                 = $arg{label} // '';
+	my $label                 = _dor($arg{label}, '');
 	$label                    =~ s/^\s*(<)\n?/$1/;
 	$label                    =~ s/\n?(>)\s*$/$1/;
 	$arg{label}               = $label if defined $arg{label};
@@ -343,7 +349,7 @@ sub add_node {
 	} elsif ($arg{shape} && ( ($arg{shape} =~ /M?record/) || ( ($arg{shape} =~ /(?:none|plaintext)/) && ($label =~ /^</) ) ) ) {
 		# Do not escape anything.
 	} elsif ($label) {
-		$arg{label} = escape_some_chars($arg{label});
+		$arg{label} = escape_some_chars($arg{label}, $CONTEXT_QUOTING{label_legacy});
 	}
 	my $dot = $self->stringify_attributes(qq|"$name"|, \%arg);
 	push @{ $self->command }, _indent($dot, $self->scope);
@@ -421,8 +427,14 @@ sub default_subgraph
 
 } # End of default_subgraph.
 
+sub escape_port {
+	my ($s) = @_;
+	$s =~ s/($PORT_QUOTE_CHARS)/$PORT_QUOTING{$1}/g;
+	$s;
+}
+
 sub escape_some_chars {
-	my ($s, $quote_more) = @_;
+	my ($s, $quote_chars) = @_;
 	my @s        = split(//, $s);
 	my $label    = '';
 	for my $i (0 .. $#s) {
@@ -433,7 +445,7 @@ sub escape_some_chars {
 			if (substr($s, 0, 1) ne '<') {
 				$maybe = 1; # It's not a HTML label
 			}
-		} elsif ($quote_more and $s[$i] =~ /[\{\}\|<>"]/) {
+		} elsif ($quote_chars and $s[$i] =~ /[$quote_chars]/) {
 			$maybe = 1;
 		}
 		# Escape if not escaped.
@@ -587,7 +599,7 @@ sub stringify_attributes {
 	# Add double-quotes around anything (e.g. labels) which does not look like HTML.
 	my @pairs;
 	for my $key (sort keys %$option) {
-		my $text = $$option{$key} // '';
+		my $text = _dor($$option{$key}, '');
 		$text =~ s/^\s+(<)/$1/;
 		$text =~ s/(>)\s+$/$1/;
 		$text = qq|"$text"| if $text !~ /^<.+>$/s;
@@ -607,6 +619,36 @@ sub validate_params
 	return $self;
 
 } # End of validate_params.
+
+sub from_graph {
+	my ($self, $g) = @_;
+	die "from_graph: '$g' not a Graph" if !$g->isa('Graph');
+	my %g_attrs = %{ $g->get_graph_attribute('graphviz') || {} };
+	my $global = { directed => $g->is_directed, %{delete $g_attrs{global}||{}} };
+	my $groups = delete $g_attrs{groups} || [];
+	if (ref $self) {
+		for (sort keys %g_attrs) {
+			my $method = "default_$_";
+			$self->$method(%{ $g_attrs{$_} });
+		}
+	} else {
+		$self = $self->new(global => $global, %g_attrs);
+	}
+	for my $group (@$groups) {
+		$self->push_subgraph(%{ $group->{attributes} || {} });
+		$self->add_node(name => $_) for @{ $group->{nodes} || [] };
+		$self->pop_subgraph;
+	}
+	for my $v (sort $g->vertices) {
+		my $attrs = $g->get_vertex_attribute($v, 'graphviz') || {};
+		$self->add_node(name => $v, %$attrs) if keys %$attrs;
+		for my $e (sort {$a->[1] cmp $b->[1]} $g->edges_from($v)) {
+			my $e_a = $g->get_edge_attribute(@$e, 'graphviz')||{};
+			$self->add_edge(from => $v, to => $e->[1], %$e_a);
+		}
+	}
+	$self;
+}
 
 # -----------------------------------------------
 
@@ -751,8 +793,10 @@ treatment of double-colons).
 
 When the option is false, any name may be given to nodes, and edges can
 be created between them. To specify ports, give the additional parameter
-of C<tailport> or C<headport>. Also, C<add_node>'s treatment of labels
-is more DWIM, with C<{> etc being transparently quoted.
+of C<tailport> or C<headport>. To specify a compass point in addition,
+give array-refs with two values for these parameters. Also, C<add_node>'s
+treatment of labels is more DWIM, with C<{> etc being transparently
+quoted.
 
 =head4 directed => $Boolean
 
@@ -934,6 +978,56 @@ These are then copied manually into the source code of L<GraphViz2>, meaning any
 L<Graphviz|http://www.graphviz.org/> web site, it's a trivial matter to update the lists stored within this module.
 
 See L<GraphViz2/Scripts Shipped with this Module>.
+
+=head2 Alternate constructor and object method
+
+=head3 from_graph
+
+	my $gv = GraphViz2->from_graph($g);
+
+	# alternatively
+	my $gv = GraphViz2->new;
+	$gv->from_graph($g);
+
+	# for handy debugging of arbitrary graphs:
+	GraphViz2->from_graph($g)->run(format => 'svg', output_file => 'output.svg');
+
+Takes a L<Graph> object. This module will figure out various defaults from it,
+including whether it is directed or not.
+
+Will also use any node-, edge-, and graph-level attributes named
+C<graphviz> as a hash-ref for setting attributes on the corresponding
+entities in the constructed GraphViz2 object. These will override the
+figured-out defaults referred to above.
+
+Will only set the C<global> attribute if called as a constructor. This
+will be dropped from any passed-in graph-level C<graphviz> attribute
+when called as an object method.
+
+A special graph-level attribute (under C<graphviz>) called C<groups> will
+be given further special meaning: it is an array-ref of hash-refs. Those
+will have keys, used to create subgraphs:
+
+=over
+
+=item * attributes
+
+Hash-ref of arguments to supply to C<push_subgraph> for this subgraph.
+
+=item * nodes
+
+Array-ref of node names to put in this subgraph.
+
+=back
+
+Example:
+
+	$g->set_graph_attribute(graphviz => {
+		groups => [
+			{nodes => [1, 2], attributes => {subgraph=>{rank => 'same'}}},
+		],
+		# other graph-level attributes...
+	});
 
 =head1 Attribute Scope
 
@@ -1147,11 +1241,6 @@ Here, [] indicate optional parameters.
 Add a edge from 1 node to another.
 
 $from_node_name and $to_node_name default to ''.
-
-If either of these node names is unknown, add_node(name => $node_name) is called automatically. The lack of
-attributes in this call means such nodes are created with the default set of attributes, and that may not
-be what you want. To avoid this, you have to call add_node(...) yourself, with the appropriate attributes,
-before calling add_edge(...).
 
 %hash is any edge attributes accepted as
 L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.

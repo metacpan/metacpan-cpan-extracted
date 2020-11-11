@@ -1,3 +1,6 @@
+0.041 2020-11-01 20:00:00+0000
+  - Fix test without ORCA installed
+  - PDL is now suggested instead of required
 0.040 2020-10-18 15:00:00+0000
   - Add support for Chart::Kaleido image export
   - Add Chart::Plotly::Image to abstract image export backend (Kaleido and Orca) using Kaleido first if available

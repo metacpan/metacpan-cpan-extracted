@@ -5,50 +5,91 @@ use DateTime::TimeZone;
 
 use Test::More;
 
-is(
-    DateTime::TimeZone::offset_as_string(0), '+0000',
-    'offset_as_string does the right thing on 0'
-);
-is(
-    DateTime::TimeZone::offset_as_string(3600), '+0100',
-    'offset_as_string works on positive whole hours'
-);
-is(
-    DateTime::TimeZone::offset_as_string(-3600), '-0100',
-    'offset_as_string works on negative whole hours'
-);
-is(
-    DateTime::TimeZone::offset_as_string(5400), '+0130',
-    'offset_as_string works on positive half hours'
-);
-is(
-    DateTime::TimeZone::offset_as_string(-5400), '-0130',
-    'offset_as_string works on negative half hours'
-);
-is(
-    DateTime::TimeZone::offset_as_string(20700), '+0545',
-    'offset_as_string works on positive 15min zones'
-);
-is(
-    DateTime::TimeZone::offset_as_string(-20700), '-0545',
-    'offset_as_string works on negative 15min zones'
-);
-is(
-    DateTime::TimeZone::offset_as_string(359999), '+995959',
-    'offset_as_string max value'
-);
-is(
-    DateTime::TimeZone::offset_as_string(-359999), '-995959',
-    'offset_as_string min value'
-);
-is(
-    DateTime::TimeZone::offset_as_string(360000), undef,
-    'offset_as_string exceeded max value'
-);
-is(
-    DateTime::TimeZone::offset_as_string(-360000), undef,
-    'offset_as_string exceeded min value'
-);
+subtest 'no separator', sub {
+    is(
+        DateTime::TimeZone::offset_as_string(0), '+0000',
+        'offset_as_string does the right thing on 0'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(3600), '+0100',
+        'offset_as_string works on positive whole hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(-3600), '-0100',
+        'offset_as_string works on negative whole hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(5400), '+0130',
+        'offset_as_string works on positive half hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(-5400), '-0130',
+        'offset_as_string works on negative half hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(20700), '+0545',
+        'offset_as_string works on positive 15min zones'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(-20700), '-0545',
+        'offset_as_string works on negative 15min zones'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(359999), '+995959',
+        'offset_as_string max value'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(-359999), '-995959',
+        'offset_as_string min value'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(360000), undef,
+        'offset_as_string exceeded max value'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string(-360000), undef,
+        'offset_as_string exceeded min value'
+    );
+};
+
+subtest 'with separator', sub {
+    is(
+        DateTime::TimeZone::offset_as_string( 0, q{:} ), '+00:00',
+        'offset_as_string does the right thing on 0'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( 3600, q{:} ), '+01:00',
+        'offset_as_string works on positive whole hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( -3600, q{:} ), '-01:00',
+        'offset_as_string works on negative whole hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( 5400, q{:} ), '+01:30',
+        'offset_as_string works on positive half hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( -5400, q{:} ), '-01:30',
+        'offset_as_string works on negative half hours'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( 20700, q{:} ), '+05:45',
+        'offset_as_string works on positive 15min zones'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( -20700, q{:} ), '-05:45',
+        'offset_as_string works on negative 15min zones'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( 359999, q{:} ), '+99:59:59',
+        'offset_as_string max value'
+    );
+    is(
+        DateTime::TimeZone::offset_as_string( -359999, q{:} ), '-99:59:59',
+        'offset_as_string min value'
+    );
+};
 
 my @offset_seconds = qw(
     0

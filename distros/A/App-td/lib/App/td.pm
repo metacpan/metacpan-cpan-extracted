@@ -1,9 +1,9 @@
 package App::td;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-29'; # DATE
+our $DATE = '2020-11-08'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -22,6 +22,7 @@ our %actions = (
     'as-csv' => {summary=>'Convert table data to CSV'},
     'avg-row' => {summary=>'Append an average row'},
     'avg' => {summary=>'Return average of all numeric columns'},
+    'cat' => {summary=>'Pass table data'},
     'colcount-row' => {summary=>'Append a row containing number of columns'},
     'colcount' => {summary=>'Count number of columns'},
     'colnames' => {summary=>'Return only the row containing column names'},
@@ -81,27 +82,53 @@ sub _get_td_obj {
     require Data::Check::Structure;
 
     my $input = shift;
-    my ($input_form, $input_obj);
-    if (ref($input->[2]) eq 'HASH') {
-        $input_form = 'hash';
-        require TableData::Object::hash;
-        $input_obj = TableData::Object::hash->new($input->[2]);
-    } elsif (Data::Check::Structure::is_aos($input->[2])) {
-        $input_form = 'aos';
-        require TableData::Object::aos;
-        $input_obj = TableData::Object::aos->new($input->[2]);
-    } elsif (Data::Check::Structure::is_aoaos($input->[2])) {
-        $input_form = 'aoaos';
-        my $spec = _get_table_spec_from_envres($input);
-        require TableData::Object::aoaos;
-        $input_obj = TableData::Object::aoaos->new($input->[2], $spec);
-    } elsif (Data::Check::Structure::is_aohos($input->[2])) {
-        $input_form = 'aohos';
-        my $spec = _get_table_spec_from_envres($input);
-        require TableData::Object::aohos;
-        $input_obj = TableData::Object::aohos->new($input->[2], $spec);
-    }
-    ($input_form, $input_obj);
+    my ($input_form, $input_obj, $input_form_err);
+
+  CHECK_STRUCT: {
+        if (Data::Check::Structure::is_aohos($input->[2])) {
+            $input_form = 'aohos';
+            my $spec = _get_table_spec_from_envres($input);
+            require TableData::Object::aohos;
+            $input_obj = TableData::Object::aohos->new($input->[2], $spec);
+            last CHECK_STRUCT;
+        } else {
+            $input_form_err ||= $Data::Check::Structure::errstr;
+        }
+
+        if (Data::Check::Structure::is_aoaos($input->[2])) {
+            $input_form = 'aoaos';
+            my $spec = _get_table_spec_from_envres($input);
+            require TableData::Object::aoaos;
+            $input_obj = TableData::Object::aoaos->new($input->[2], $spec);
+            last CHECK_STRUCT;
+        } else {
+            $input_form_err ||= $Data::Check::Structure::errstr;
+        }
+
+        if (Data::Check::Structure::is_aos($input->[2])) {
+            $input_form = 'aos';
+            require TableData::Object::aos;
+            $input_obj = TableData::Object::aos->new($input->[2]);
+            last CHECK_STRUCT;
+        } else {
+            $input_form_err ||= $Data::Check::Structure::errstr;
+        }
+
+        if (Data::Check::Structure::is_hos($input->[2])) {
+            $input_form = 'hos';
+            require TableData::Object::hash;
+            $input_obj = TableData::Object::hash->new($input->[2]);
+            last CHECK_STRUCT;
+        } else {
+            $input_form_err ||= $Data::Check::Structure::errstr;
+        }
+
+        my $form = ref($input->[2]);
+        $form ||= "scalar";
+        $input_form_err ||= "not aoaos/aohos/aos/hos ($form)";
+    } # CHECK
+
+    ($input_form, $input_obj, $input_form_err);
 }
 
 $SPEC{td} = {
@@ -146,6 +173,9 @@ Next, you can use these actions:
 
  # Convert table data (which might be hash, aos, or aoaos) to aohos form
  % list-files -l --json | td as-aohos
+
+ # Display table data on the browser using datatables (to allow interactive sorting and filtering)
+ % osnames -l | td cat --format html+datatables
 
  # Convert table data to CSV
  % list-files -l --json | td as-csv
@@ -316,7 +346,7 @@ sub td {
     my $action = $args{action};
     my $argv   = $args{argv};
 
-    my ($input, $input_form, $input_obj);
+    my ($input, $input_form, $input_obj, $input_form_err);
   GET_INPUT:
     {
         last unless $actions{$action}{req_input} // 1;
@@ -336,8 +366,8 @@ sub td {
         }
 
         # detect table form
-        ($input_form, $input_obj) = _get_td_obj($input);
-        return [400, "Input is not table data, please feed a hash/aos/aoaos/aohos"]
+        ($input_form, $input_obj, $input_form_err) = _get_td_obj($input);
+        return [400, "Input is not table data: $input_form_err"]
             unless $input_form;
     } # GET_INPUT
 
@@ -350,6 +380,12 @@ sub td {
             } else {
                 $output = [200, "OK", [sort keys %actions]];
             }
+            last;
+        }
+
+        if ($action eq 'cat') {
+            my $cols = $input_obj->cols_by_idx;
+            $output = [200, "OK", $input_obj->{data}, {'table.fields'=>$cols}];
             last;
         }
 
@@ -730,7 +766,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.100 of App::td (from Perl distribution App-td), released on 2020-05-29.
+This document describes version 0.101 of App::td (from Perl distribution App-td), released on 2020-11-08.
 
 =head1 FUNCTIONS
 
@@ -780,6 +816,9 @@ Next, you can use these actions:
 
  # Convert table data (which might be hash, aos, or aoaos) to aohos form
  % list-files -l --json | td as-aohos
+
+ # Display table data on the browser using datatables (to allow interactive sorting and filtering)
+ % osnames -l | td cat --format html+datatables
 
  # Convert table data to CSV
  % list-files -l --json | td as-csv

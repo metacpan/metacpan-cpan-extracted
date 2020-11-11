@@ -1,9 +1,10 @@
 Build.PL
 CHANGES
-CONTRIBUTING.md
+CONTRIBUTING
 lib/Dita/PCD.pm
-MANIFEST			This list of files
+MANIFEST
 README
+README.md
 test.pl
 META.yml
 META.json

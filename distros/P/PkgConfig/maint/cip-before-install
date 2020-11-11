@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -ex
+
+cip exec cpanm -n Capture::Tiny
+cip exec perl gen_multi_tests.pl

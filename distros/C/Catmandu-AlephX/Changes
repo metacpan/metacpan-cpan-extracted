@@ -1,5 +1,8 @@
 Revision history for Catmandu::AlephX
 
+1.072  2020-10-30 09:24:45 CET
+   - _validate_web_response checks for content_type (http status codes always wrong??)
+
 1.071  2019-10-08 08:55:09 CEST
    - Added some implicit dependencies, thanks to Mohammad S Anwar
 

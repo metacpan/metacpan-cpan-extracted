@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.57
+    version 2.58
 
 SYNOPSIS
 
@@ -163,6 +163,18 @@ OPTIONS
 
     if set to true, then include a link to the travis build page in the
     readme.
+
+ travis_com
+
+    If set to true use travis-ci.com instead of travis-ci.org.
+
+ travis_base
+
+    Base URL for travis-ci.
+
+ travis_image_base
+
+    Base URL for the travis-ci status button.
 
  appveyor
 

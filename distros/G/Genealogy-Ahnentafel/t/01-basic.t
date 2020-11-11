@@ -1,7 +1,10 @@
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Exception;
 
-BEGIN { use_ok 'Genealogy::Ahnentafel' };
+BEGIN { use_ok 'Genealogy::Ahnentafel' }
 
 my @gender_tests = qw[dummy Unknown Male Female Male Female Male Female];
 
@@ -39,13 +42,13 @@ for (qw[1 4 7 14 81 123]) {
   ok(ahnen($_), "$_ is a valid Ahnentafel");
 }
 
-my @generation_tests = (
+my @generation_tests2 = (
   [ 1, 1, 1, 1, 1 ],
   [ 2, 2, 1, 3, '' ],
   [ 127, 64, '', 127, 1],
 );
 
-foreach (@generation_tests) {
+foreach (@generation_tests2) {
   my $ahnen = ahnen($_->[0]);
   is($ahnen->first_in_generation, $_->[1], "First in generation for $_->[0]");
   is($ahnen->is_first_in_generation, $_->[2], "Is first in generation for $_->[0]");

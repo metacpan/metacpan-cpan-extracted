@@ -1,0 +1,13 @@
+Revision history for Perl extension Package::Role::ini.
+
+0.02 2020-11-09
+  - Updated lib/Package/Role/ini.pm
+    - Renamed internal method to external methods
+      - _ini_file_default => ini_file_default
+      - _ini_file_default_extension => ini_file_default_extension
+    - Fixed ini_path method storage hashkey
+    - Updated ini_file_default_extension to not require prefixed "."
+    - Updated ini_file_default_extension to support undef for no extension
+
+0.01 2020-10-07
+  - original version

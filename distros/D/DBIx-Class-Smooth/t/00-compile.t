@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 36 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 37 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'DBIx/Class/Smooth.pm',
     'DBIx/Class/Smooth/Fields.pm',
     'DBIx/Class/Smooth/FilterItem.pm',
     'DBIx/Class/Smooth/Flatten/DateTime.pm',
+    'DBIx/Class/Smooth/Functions.pm',
     'DBIx/Class/Smooth/Helper/ResultSet/Shortcut/AddColumn.pm',
     'DBIx/Class/Smooth/Helper/ResultSet/Shortcut/Join.pm',
     'DBIx/Class/Smooth/Helper/ResultSet/Shortcut/OrderByCollation.pm',

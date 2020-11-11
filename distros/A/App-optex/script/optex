@@ -28,8 +28,7 @@ B<optex> I<options> [ -l | -m ] ...
 =cut
 
 
-use 5.014;
-use strict;
+use v5.14;
 use warnings;
 
 use utf8;
@@ -73,7 +72,7 @@ my $config_file = $ENV{$env_CONFIG} || "$config_dir/config.toml";
 ##
 my $config = sub {
     my $file = shift;
-    my $fh = new IO::File $file, "<:encoding(UTF-8)" or return {};
+    my $fh = IO::File->new($file, "<:encoding(UTF-8)") or return {};
     my $toml = do { local $/; <$fh> };
     my($data, $err) = from_toml $toml;
     die "$file: $err\n" unless $data;
@@ -97,9 +96,10 @@ my %nomodule = do {
 ## setup Getopt::EX
 ##
 require Getopt::EX::Loader;
-$rcloader = new Getopt::EX::Loader
-    BASECLASS => [ '', 'App::optex' ],
-    IGNORE_NO_MODULE => 1;
+$rcloader = Getopt::EX::Loader->new(
+    BASECLASS => [ '', 'App::optex', 'Getopt::EX' ],
+    IGNORE_NO_MODULE => 1,
+    );
 
 load_rc("$config_dir/default.rc");
 
@@ -196,6 +196,9 @@ warn "$abs_name: exec $exec_name @ARGV\n" if $debug;
 ##
 my $status = system $exec_name, @ARGV;
 
+close STDOUT;
+close STDERR;
+
 exit($exit_code // ( $status >> 8 ));
 
 ######################################################################
@@ -226,8 +229,9 @@ sub remove_path {
 sub self_option {
     my $argv = shift;
 
-    local $rcloader = new Getopt::EX::Loader
-	BASECLASS => [ '', 'App::optex' ];
+    local $rcloader = Getopt::EX::Loader->new(
+	BASECLASS => [ '', 'App::optex', 'Getopt::EX' ],
+	);
     $rcloader->load(FILE => "$config_dir/$abs_name.rc");
     $rcloader->deal_with($argv);
 
@@ -282,7 +286,7 @@ sub self_option {
 
 sub _symlink {
     my($argv, $op) = @_;
-    -d $bin_dir or die "Directory $bin_dir does not exists.\n";
+    -d $bin_dir or die "Directory $bin_dir does not exist.\n";
 
     my @target = @$argv;
     for my $target (@target) {
@@ -417,13 +421,16 @@ sub prepend_path {
 }
 
 sub show_modules {
-    my $path = @_ ? shift : \@mod_path;
+    my $path = @_ ? shift : [
+	@mod_path,
+	grep { -d } map { "$_/App/optex" } @INC,
+	];
     print "MODULES:\n";
     for my $path (@$path) {
 	my($name) = $path =~ m:([^/]+)$:;
 	my @module = do {
 #	    grep { not /\bdefault\.pm$/ }
-	    glob "$path/*.pm";
+	    glob "$path/[a-z0-9]*.pm";
 	};
 	next unless @module;
 	print "    $path\n";
@@ -865,7 +872,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2019 Kazumasa Utashiro
+Copyright 2017-2020 Kazumasa Utashiro
 
 
 =cut

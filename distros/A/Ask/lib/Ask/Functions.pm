@@ -2,32 +2,30 @@ use 5.008008;
 use strict;
 use warnings;
 
-{
-	package Ask::Functions;
+package Ask::Functions;
+
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.015';
+
+use Exporter::Shiny qw(
+	info warning error entry question file_selection
+	single_choice multiple_choice
+);
+
+sub _exporter_validate_opts {
+	my ( $class, $opts ) = @_;
 	
-	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.012';
-	
-	use Exporter::Shiny qw(
-		info warning error entry question file_selection
-		single_choice multiple_choice
-	);
-	
-	sub _exporter_validate_opts {
-		my ( $class, $opts ) = @_;
-		
-		$opts->{'backend'} ||= do { require Ask; 'Ask'->detect };
-		$opts->{'backend'}->is_usable or die;
-	}
-	
-	for my $f ( our @EXPORT_OK ) {
-		no strict 'refs';
-		*{"_generate_$f"} = sub {
-			my ( $class, $name, $args, $opts ) = @_;
-			my $backend = $opts->{'backend'};
-			return sub { $backend->$f( @_ % 2 ? ( text => @_ ) : @_ ) };
-		};
-	}
+	$opts->{'backend'} ||= do { require Ask; 'Ask'->detect };
+	$opts->{'backend'}->is_usable or die;
+}
+
+for my $f ( our @EXPORT_OK ) {
+	no strict 'refs';
+	*{"_generate_$f"} = sub {
+		my ( $class, $name, $args, $opts ) = @_;
+		my $backend = $opts->{'backend'};
+		return sub { $backend->$f( @_ % 2 ? ( text => @_ ) : @_ ) };
+	};
 }
 
 1;
@@ -79,4 +77,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

@@ -10,7 +10,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -101,6 +101,7 @@ Indent - Class for indent handling.
 =head1 SYNOPSIS
 
  use Indent;
+
  my $indent = Indent->new(%parameters);
  $indent->add([$cur_indent]);
  my $string = $indent->get;
@@ -109,12 +110,13 @@ Indent - Class for indent handling.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new($option =E<gt> $value)>
+ my $indent = Indent->new(%parameters);
 
-This is a class method, the constructor for Indent. Options are passed
-as keyword value pairs. Recognized options are:
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -131,25 +133,38 @@ as keyword value pairs. Recognized options are:
 
 =back
 
-=item C<add([$cur_indent])>
+=head2 C<add>
 
- Method for adding $cur_indent, if defined, or 'next_indent'.
+ $indent->add([$cur_indent]);
 
-=item C<get()>
+Method for adding C<$cur_indent>, if defined, or 'next_indent'.
 
- Get actual indent string.
- Returns string.
+Returns undef.
 
-=item C<remove([$cur_indent])>
+=head2 C<get>
 
- Method for removing $cur_indent, if defined, or 'next_indent'. Only if
- is removable.
+ my $string = $indent->get;
 
-=item C<reset([$reset_value])>
+Get actual indent string.
 
- Resets internal indent string to $reset_value or ''.
+Returns string.
 
-=back
+=head2 C<remove>
+
+ $indent->remove([$cur_indent]);
+
+Method for removing C<$cur_indent>, if defined, or 'next_indent'. Only if
+is removable.
+
+Returns undef.
+
+=head2 C<reset>
+
+ $indent->reset([$reset_value]);
+
+Resets internal indent string to C<$reset_value> or ''.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -237,7 +252,7 @@ Class for word indenting.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Indent>
+L<https://github.com/michal-josef-spacek/Indent>
 
 =head1 AUTHOR
 
@@ -247,12 +262,13 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut
 

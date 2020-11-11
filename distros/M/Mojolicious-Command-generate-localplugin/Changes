@@ -1,24 +1,28 @@
 History for Mojolicious-Command-generate-localplugin
 ====================================================
 
+0.06   2020-11-09 11:48:00
+
+  * Make generated tests pass (PR#3, thanks to Andrew Fresh)
+
 0.05   2019-02-11 08:38:00
 
-       * fix module name in pod
-       * set path of main module in dist.ini
+  * fix module name in pod
+  * set path of main module in dist.ini
 
 0.04   2019-02-11 07:41:00
 
-       * re-release dist as previous run failed
+  * re-release dist as previous run failed
 
 0.03   2019-02-11 07:13:00
 
-       * remove unneeded code
-       * add tests
+  * remove unneeded code
+  * add tests
 
 0.02   2018-10-25 09:28:00
 
-       * Changes for Mojolicious 8
+  * Changes for Mojolicious 8
 
 0.01   2018-04-26 21:41:00
 
-       * initial release
+  * initial release

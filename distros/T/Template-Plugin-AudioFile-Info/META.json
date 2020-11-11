@@ -4,13 +4,13 @@
       "Dave Cross, E<lt>dave@dave.org.ukE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Template-Plugin-AudioFile-Info",
    "prereqs" : {
@@ -30,15 +30,20 @@
    "provides" : {
       "Template::Plugin::AudioFile::Info" : {
          "file" : "lib/Template/Plugin/AudioFile/Info.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/template-plugin-audiofile-info.git",
+         "web" : "https://github.com/davorg/template-plugin-audiofile-info"
+      }
    },
-   "version" : "v2.0.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v2.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

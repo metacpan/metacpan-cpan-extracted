@@ -1,4 +1,5 @@
 #include "streamer.h"
+#include <panda/unievent/streamer/File.h>
 #include <panda/unievent/streamer/Stream.h>
 
 #define TEST(name) TEST_CASE("streamer-stream: " name, "[streamer-stream]")
@@ -93,4 +94,39 @@ TEST("normal output") {
     test.run();
 
     CHECK((res == string(200000, 'x')));
+}
+
+TEST("file in stream out with busy buffer") {
+    AsyncTest test(3000, 1);
+    auto p = make_p2p(test.loop);
+    string file = "tests/streamer/file.txt";
+    auto i = new FileInput(file, 10000);
+    auto o = new StreamOutput(p.sconn);
+    StreamerSP s = new Streamer(i, o, 100000, test.loop);
+
+    s->start();
+
+    int count = 0;
+    p.client->read_event.add([&count](auto&, auto& data, auto& err) {
+        if (err) throw err;
+        count += data.length();
+    });
+
+    p.client->eof_event.add([&](auto&) {
+        test.loop->stop();
+    });
+
+    s->finish_event.add([&](auto& err) {
+        CHECK(!err);
+        test.happens();
+        p.sconn->disconnect();
+    });
+
+    string ku = "ku-ku";
+    p.sconn->write(ku);
+
+    test.run();
+
+    auto res = Fs::stat(file).value();
+    CHECK(count == res.size + ku.length());
 }

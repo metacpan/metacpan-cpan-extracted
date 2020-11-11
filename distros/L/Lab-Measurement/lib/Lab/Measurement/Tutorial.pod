@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.722
+version 3.730
 
 =head1 How to read the documentation
 
@@ -739,6 +739,22 @@ have unique names. Instead we use C<hard_copy_suffix>:
      hard_copy_suffix => '_VI',
  );
 
+=head3 Refresh type 'block' for 2D plots
+
+By default, 2D plots will be refreshed after every new point that is appended
+to the datafile. For C<pm3d> plots, the default is to refresh after every new
+block/line of data. When using C<datafile_dim = 2> with a 2D plot, as shown
+above, it is often useful to refresh only after each finished block:
+
+ $datafile->add_plot(
+    ...
+    refresh => 'block',
+ );
+
+As more and more data points are contained in a plot, refreshing the plot
+becomes slower. Without the C<< refresh => 'block' >> this would lead to a
+increasing delay of the measurement.
+
 =head3 Refresh interval
 
 We can set a mininum type between redraws of the live plot. This becomes handy
@@ -1037,7 +1053,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2016       Andreas K. Huettel, Simon Reinhardt
             2017       Andreas K. Huettel
             2018       Andreas K. Huettel, Simon Reinhardt
-            2019       Simon Reinhardt
+            2019-2020  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

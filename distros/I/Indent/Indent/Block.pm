@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -156,16 +156,20 @@ __END__
 =head1 SYNOPSIS
 
  use Indent::Block;
- my $i = Indent::Block->new(%parameters);
- print $i->indent($data, [$act_indent, $non_indent]);
+
+ my $obj = Indent::Block->new(%parameters);
+ my $string = $obj->indent($data, [$act_indent, $non_indent]);
+ my @data = $obj->indent($data, [$act_indent, $non_indent]);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Indent::Block->new(%parameters);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -192,14 +196,21 @@ __END__
 
 =back
 
-=item C<indent($data_ar, [$act_indent, $non_indent])>
+=head2 C<indent>
 
- Indent method.
- - $data_ar - Reference to array with strings to indent.
- - $act_indent - String to actual indent.
- - $non_indent - Flag, that says 'no-indent' for current time.
+ my $string = $obj->indent($data, [$act_indent, $non_indent]);
 
-=back
+or
+
+ my @data = $obj->indent($data, [$act_indent, $non_indent]);
+
+Indent method.
+
+ - C<$data_ar> - Reference to array with strings to indent.
+ - C<$act_indent> - String to actual indent.
+ - C<$non_indent> - Flag, that says 'no-indent' for current time.
+
+Returns string to print or array of data to print.
 
 =head1 ERRORS
 
@@ -265,7 +276,7 @@ Class for word indenting.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Indent>
+L<https://github.com/michal-josef-spacek/Indent>
 
 =head1 AUTHOR
 
@@ -275,11 +286,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

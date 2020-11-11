@@ -58,7 +58,7 @@
    "provides" : {
       "Sub::SymMethod" : {
          "file" : "lib/Sub/SymMethod.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/project"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

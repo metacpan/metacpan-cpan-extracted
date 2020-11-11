@@ -1,5 +1,5 @@
 package Parqus;
-$Parqus::VERSION = '0.03';
+$Parqus::VERSION = '0.05';
 use Moo;
 use namespace::autoclean;
 use Regexp::Grammars;
@@ -29,7 +29,7 @@ has keywords => (
 has value_regex => (
     is  => 'lazy',
     isa => sub {
-        "$_[0] is not a Regexp!"
+        die"$_[0] is not a Regexp!"
           unless ref $_[0] eq 'Regexp';
     },
     default => sub { qr![\w-]+!xms },
@@ -48,7 +48,7 @@ has parser => (
     is       => 'lazy',
     init_arg => undef,
     isa      => sub {
-        "$_[0] is not a Regexp!"
+        die "$_[0] is not a Regexp!"
           unless ref $_[0] eq 'Regexp';
     },
 );
@@ -59,19 +59,21 @@ sub _build_parser {
     my %keywords          = %{ $self->keywords };
     my $value_regex       = $self->value_regex;
     my @string_delimiters = @{ $self->string_delimiters };
-    return eval q{qr/
+    return eval q{
+                  use re 'eval'; # for perl <= 5.16.3
+                  qr/
                     <timeout: 2>
                     ^
-                    \s*
+                    <.ws>
                     <[query]>*
-                    \s*
+                    <.ws>
                     $
                     <rule: query>
                         <item>|<item><query>
                     <rule: item>
                         <keyvalue>|<value>
                     <rule: keyvalue>
-                        <key>:<value>?
+                        <key>:<.ws><value>?
                     <rule: key>
                         <%keywords>
                     <rule: delim>
@@ -133,7 +135,7 @@ Parqus - parse a search query string
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

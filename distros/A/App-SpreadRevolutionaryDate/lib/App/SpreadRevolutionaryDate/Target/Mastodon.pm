@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Mastodon;
-$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.28';
+$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.29';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Mastodon.
 
 use Moose;
@@ -66,6 +66,9 @@ sub spread {
   my ($self, $msg, $test) = @_;
   $test //= 0;
 
+  # Multiline message
+  $msg =~ s/\\n/\n/g;
+
   if ($test) {
     $msg = __("Spread on Mastodon: ") . $msg;
 
@@ -106,7 +109,7 @@ App::SpreadRevolutionaryDate::Target::Mastodon - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 METHODS
 

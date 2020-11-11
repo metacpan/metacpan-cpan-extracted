@@ -1,0 +1,238 @@
+=head1 NAME
+
+UniEvent::Loop - waits and dispatches events for active handlers
+
+=head1 SYNOPSIS
+
+    my $loop = UniEvent::Loop->new;
+    say "current unix epoch: ", $loop->now, " (milliseconds)";
+    $loop->delay(sub { say "executed before polling I/O" });
+    my $t = UniEvent::Timer->new($loop);
+    $t->once(0.05, sub { say "on_timer" });
+    $loop->run;  # exists as soon as there is nothing to do
+
+=head1 DESCRIPTION
+
+The event loop is the central part of functionality. It takes
+care of polling for i/o and scheduling callbacks to be run
+based on different sources of events.
+
+Contrary to L<AnyEvent> and L<EV>, where there is only one
+event loop instance (singleton), with L<UniEvent> it is possible
+to have many independent loops. The most close to the <AnyEvent>
+approach is, probably, the B<default loop> in <UniEvent>;
+when a new handle (I/O event listener) is created, if the
+C<$loop> parameter is ommited (or it is C<undef>ined), then
+the default loop is used.
+
+Event loops are B<independent> each from other. That means,
+for example, if there are two loop instances,
+
+  my $loop_1 = UniEvent::Loop->new;
+  my $loop_2 = UniEvent::Loop->new;
+  ...;
+  $loop_1->run;
+
+Only handles from C<$loop_1> will be polled for I/O.
+
+Another noteable difference from the L<AnyEvent> is that L<UniEvent>
+event loop is B<not reenterant> and leads to undefined behaviour.
+E.g.
+
+    my $cv = AE::cv;
+    ...
+    my $t = AE::timer 0.1, 0, sub {
+        say $cv->recv; # implicitely runs loop nested iteration
+    };
+    ...
+
+cannot be done with L<UniEvent>; however, to our opinion the AE-approach
+in that case should be discouraged in production code, as it possibly
+leads to dead locks (or live locks), and might be allowed in tests only.
+
+It is possible, however, to have something similar, i.e. switch from
+async mode, in synchronous within the scope of some function, e.g.
+
+    my $app_loop = UniEvent::Loop->new;
+    my $t = UniEvent::Timer->new($app_loop);
+    $t->once(0.05, sub {
+       my $inner_loop = UniEvent::Loop->new;
+       ... # add new handles
+       $inner_loop->run;
+    });
+    $app_loop->run;
+
+It should be noted that loop cannot be changed in handles, that's why
+it is possible to specify it in handle constructor only.
+
+=head1 FUNCTIONS
+
+=head2 global_loop()
+
+=head2 global()
+
+Returns global loop, which is a "per application singleton", i.e. it is
+the same loop instance for B<all application threads>. It is rarely used
+from pure Perl, however can be used when something is happening on
+different threads using C++.
+
+The loop is not thread safe, and it is application developer responsibility
+to manager synchronization.
+
+=head2 default_loop()
+
+=head2 default()
+
+Returns per thread loop singleton. For many cases, when event loop parameter
+is ommited, the default loop is used.
+
+=head1 METHODS
+
+=head2 new([$backend = undef])
+
+Constructs new event loop object using the specified backend. If
+the C<$backend> is C<undef> then the default backend is used,
+which is currently the L<UniEvent::Backend::UV>.
+
+=head2 is_default()
+
+Returns C<true> if the loop instance is the default loop (for the current thead).
+
+=head2 is_global()
+
+Returns C<true> if the loop instance is the application global loop.
+
+=head2 alive()
+
+Returns C<true> if there are active handles or requests in the loop.
+
+=head2 now()
+
+Return the current timestamp I<in milliseconds>. The value is cached for each
+event loop tick. The timestamp is monotonically increased at arbitrary
+point of time.
+
+=head2 update_time()
+
+Updates cached "now" value for the loop. It is useful, if in a callback or
+handle there is a time-sensitive blocking I/O operation, where it is undesirable
+to let the following callbacks have outdated "now" value.
+
+=head2 run()
+
+Runs the event loop until there are no more active and referenced handles or requests.
+Returns C<true> if the loop was stopped and there are more active requests or
+handles.
+
+This is not reenterant method.
+
+=head2 run_once()
+
+Polls for I/O once and blocks if there are no pending callbacks. Returns C<true>
+if more pending callbacks are expected, i.e. they will be invoked upon the next
+C<run_once> invocation.
+
+This is not reenterant method.
+
+=head2 run_nowait()
+
+Polls for I/O once and does not blocks if there are no pending callbacks. Returns
+C<true> if pending callbacks are expected, i.e. they will be invoked upon the next
+C<run_nowait> invocation.
+
+This is not reenterant method.
+
+=head2 stop()
+
+Stop the event loop, causing C<run> to end as soon as possible. This will happen not
+sooner than the next loop iteration. If this function was called before blocking for
+i/o, the loop won't block for i/o on this iteration.
+
+=head2 handles()
+
+Returns array of handles, associated with the loop.
+
+=head2 delay($callback)
+
+This is a convenient one-shot callback, which will be invoked "a little bit later",
+similar to L<UniEvent::Idle>. "A little bit later" is somewhat unspecified, but
+normally it is on the next loop iteration; although, it might be invoked don't
+waiting the next iteration.
+
+In non-void context it returns the delay cancellation guard. In void context the
+provided callback is non-cancellable.
+
+The callback can be cancelled either via C<undef>'ing C<$guard> or via calling
+the C<cancel_delay>.
+
+    my $guard = $loop->delay(sub { say 'hello' });
+    $guard = undef if ($some_condition);
+    $loop->run;
+
+=head2 cancel_delay($delay_guard)
+
+Cancels previously set delay.
+
+=head2 fork_event()
+
+Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
+can be assigned with. The callbacks will be invoked after C<fork(2)>
+syscall in the child process.
+
+The C++ interface is:
+
+    void(const LoopSP&);
+
+i.e. the callback returns nothing and as an argument takes event loop
+instance.
+
+Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
+interface.
+
+After the fork it reinitializes event loop and its handlers. The
+method might be not available on some platforms (e.g. Windows) or have
+specifics in behaviour (e.g. FsEvent on Mac OS X).
+
+You need to call the method in child process after fork only if it is planned
+to continue use the event loop instance. The assigned callbacks will be invoked
+before C<Loop::run>.
+
+This method is still considered B<unstable and experimental>, so it is desirable
+spawn a new loop in a child process rather than reusing the old one from a
+parent process.
+
+=head2 start_debug_tracer($callback)
+
+This is debug assistant function. The C<$callback> is always invoked upon new
+handle binding to the loop. It is expected that the C<$callback> will return
+a scalar, which will be linked with the new handle. Later it can be examined
+via the C<watch_active_trace> method.
+
+The scalar can be arbitrary value, however, it is be the most useful if
+it is stacktrace, generated by modules like C<Exception::Backtrace>
+or C<Devel::Trace>.
+
+=head2 watch_active_trace($callback)
+
+Examines each active non-weakened handle for the attached scalar (backtrace).
+Meant to be used with C<start_debug_tracer>. Example:
+
+    $loop->start_debug_tracer(sub { Exception::Backtrace::create_backtrace() });
+    ...;
+    # somewhere inside any handler callback
+    $loop->watch_active_trace(sub {
+        my ($handle, $trace) = @_;
+        say "$handle ", $trace->to_string;
+    });
+    ...;
+    $loop->run;
+
+=head1 REFERENCES
+
+L<UniEvent::Handle>
+
+L<UniEvent::Idle>
+
+L<XS::Framework::CallbackDispatcher>
+
+=cut

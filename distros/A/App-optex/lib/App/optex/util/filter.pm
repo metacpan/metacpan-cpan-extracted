@@ -6,6 +6,7 @@ use warnings;
 use Carp;
 use utf8;
 use Encode;
+use open IO => 'utf8', ':std';
 use Data::Dumper;
 
 my($mod, $argv);
@@ -13,9 +14,6 @@ my($mod, $argv);
 sub initialize {
     ($mod, $argv) = @_;
 }
-
-binmode STDIN,  ":encoding(utf8)";
-binmode STDOUT, ":encoding(utf8)";
 
 =head1 NAME
 
@@ -40,9 +38,18 @@ B<optex> I<command> -Mutil::I<filter> [ options ]
 Set input/output filter command.  If the command start by C<&>, module
 function is called instead.
 
+=item B<--pf> I<&function>
+
+Set pre-fork filter function.  This function is called before
+executing the target command process, and expected to return text
+data, that will be poured into target process's STDIN.  This allows
+you to share information between pre-fork and output filter processes.
+
 =item B<--isub> I<function>
 
 =item B<--osub> I<function>
+
+=item B<--psub> I<function>
 
 Set input/output function.  Tis is shortcut for B<--if> B<&>I<function>.
 
@@ -90,6 +97,12 @@ I<count> also has string "3".
 sub io_filter (&@) {
     my $sub = shift;
     my %opt = @_;
+    local @ARGV;
+    if ($opt{PREFORK}) {
+	my $stdin = $sub->();
+	$sub = sub { print $stdin };
+	$opt{STDIN} = 1;
+    }
     my $pid = do {
 	if    ($opt{STDIN})  { open STDIN,  '-|' }
 	elsif ($opt{STDOUT}) { open STDOUT, '|-' }
@@ -100,17 +113,16 @@ sub io_filter (&@) {
     if ($opt{STDERR}) {
 	open STDOUT, '>&', \*STDERR or die "dup: $!";
     }
-    binmode STDOUT, ':encoding(utf8)';
-    binmode STDERR, ':encoding(utf8)';
-    local @ARGV;
     $sub->();
+    close STDOUT;
+    close STDERR;
     exit 0;
 }
 
 sub set {
     my %opt = @_;
-    for my $io (qw(STDIN STDOUT STDERR)) {
-	my $filter = $opt{$io} // next;
+    for my $io (qw(PREFORK STDIN STDOUT STDERR)) {
+	my $filter = delete $opt{$io} // next;
 	if ($filter =~ s/^&//) {
 	    if ($filter !~ /::/) {
 		$filter = join '::', __PACKAGE__, $filter;
@@ -123,12 +135,21 @@ sub set {
 	    io_filter { exec $filter or die "exec: $!\n" } $io => 1;
 	}
     }
+    %opt and die "Unknown parameter: " . Dumper \%opt;
     ();
 }
 	
 =item B<set>()
 
 Set input/output filter.
+
+=cut
+
+######################################################################
+
+=item B<rev_line>()
+
+Reverse output.
 
 =cut
 
@@ -287,10 +308,12 @@ mode function
 option --if &set(STDIN=$<shift>)
 option --of &set(STDOUT=$<shift>)
 option --ef &set(STDERR=$<shift>)
+option --pf &set(PREFORK=$<shift>)
 
 option --isub &set(STDIN=&$<shift>)
 option --osub &set(STDOUT=&$<shift>)
 option --esub &set(STDERR=&$<shift>)
+option --psub &set(PREFORK=&$<shift>)
 
 option --set-io-color &io_color($<shift>)
 option --io-color --set-io-color STDERR=555/201;E

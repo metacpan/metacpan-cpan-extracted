@@ -1,6 +1,7 @@
 package MsOffice::Word::Surgeon::Run;
 use feature 'state';
 use Moose;
+use MooseX::StrictConstructor;
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
 use Carp                           qw(croak);
 
@@ -11,7 +12,7 @@ has 'props'       => (is => 'ro', isa => 'Str', required => 1);
 has 'inner_texts' => (is => 'ro', required => 1,
                       isa => 'ArrayRef[MsOffice::Word::Surgeon::Text]');
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 sub as_xml {
   my $self = shift;
@@ -40,7 +41,6 @@ sub merge {
   !$next_run->xml_before
     or croak "cannot merge -- next run contains xml before the run : "
            . $next_run->xml_before;
-
 
   # loop over all text nodes of the next run
   foreach my $txt (@{$next_run->inner_texts}) {

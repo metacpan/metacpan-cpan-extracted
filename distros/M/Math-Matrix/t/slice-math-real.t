@@ -1,19 +1,17 @@
 #!perl
 
-# Test when each element is a numerical object. This is to verify that each
-# element in the returned matrix is a different object than the corresponding
-# object in the invocand matrix.
-
 use strict;
 use warnings;
+
+use Test::More;
 
 use lib 't/lib';
 use Math::Matrix::Real;
 
-use Test::More tests => 19;
+plan tests => 19;
 
-my $orig = [[ 11 .. 19 ],
-            [ 21 .. 29 ]];
+my $orig = [[11 .. 19],
+            [21 .. 29]];
 
 # Create an object.
 
@@ -27,8 +25,8 @@ is(ref($B), 'Math::Matrix::Real', '$B is a Math::Matrix::Real');
 
 # Modify the new object, and verify that the original matrix is unmodified.
 
-for (my $i = 0 ; $i < 2 ; ++$i) {
-    for (my $jB = 0 ; $jB < @colidx ; ++$jB) {
+for my $i (0 .. 1) {
+    for my $jB (0 .. @colidx - 1) {
         my $j = $colidx[$jB];
         is(ref($B->[$i][$jB]), 'Math::Real',
            "\$B->[$i][$jB] is a Math::Real");

@@ -3,9 +3,9 @@ NAME
     (popular) Unix commands
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.005 of
     Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution
-    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-26.
+    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-11-08.
 
 DESCRIPTION
     These CLI's usually are meant to be called as the Unix commands they
@@ -17,7 +17,7 @@ DESCRIPTION
 
     If you know of others, please drop me a message.
 
-INCLUDED MODULES
+MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
     *   App::sshwrap::hostcolor - Wraps ssh to remember the background
         terminal color of each user+host you went to
 
@@ -39,12 +39,15 @@ INCLUDED MODULES
     *   App::DiffDocText - Diffs two office word-processor documents by
         first converting them to plaintext
 
+    *   App::DiffXlsText - Diffs two office spreadsheets by first converting
+        them to directories of CSV files
+
     *   App::sdif - Provides sdif (diff side-by-side with nice color theme),
         cdif (highlight words with nice color scheme), and watchdiff (watch
         command and diff output)
 
-    *   App::lcpan - Wraps cpanm to use local CPAN mirror and let you
-        specify script name to install instead of module name
+    *   App::GrepUtils - Print lines that match terms (each term need not be
+        in particular order, support negative search)
 
 FAQ
   What are ways to use this module?
@@ -87,7 +90,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

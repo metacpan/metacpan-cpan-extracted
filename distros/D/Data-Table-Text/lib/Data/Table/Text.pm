@@ -17,7 +17,7 @@
 # updateDocumentation - detect parameter type mismatch between prototype and specified parameter
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20200831;                                                        # Version
+our $VERSION = 20201030;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -103,10 +103,10 @@ my $mmm = 0;                                                                    
 
 sub lll(@)                                                                      # Log messages with a time stamp and originating file and line number.
  {my (@messages) = @_;                                                          # Messages
-  my (@m) = map {defined ? $_ : q(undef)} @_;
-  return unless (join '', @_) =~ m(\S)s;
+  my @m = map {defined ? $_ : q(undef)} @_;
+  return unless (join '', @m) =~ m(\S)s;
 
-  my $m = join '', map {m(\s\Z) ? $_ : qq($_ )} timeStamp, @_;                  # Time stamp each message
+  my $m = join '', map {m(\s\Z) ? $_ : qq($_ )} timeStamp, @m;                  # Time stamp each message
   $mmm = time;                                                                  # Update time of last message
 
   unless(&onAws)                                                                # Not on AWS
@@ -770,7 +770,7 @@ sub countFileExtensions(@)                                                      
   \%ext                                                                         # Return extension counts
  } # countFileExtensions
 
-sub countFileTypes($@)                                                          # Return a hash which counts, in parallel with a maximum number of processes: B<$maximumNumberOfProcesses>, the results of applying the B<file> command to each file ina nd under the specified B<@folders>.
+sub countFileTypes($@)                                                          # Return a hash which counts, in parallel with a maximum number of processes: B<$maximumNumberOfProcesses>, the results of applying the B<file> command to each file in and under the specified B<@folders>.
  {my ($maximumNumberOfProcesses, @folders) = @_;                                # Maximum number of processes to run in parallel, Folders to search
 
   return undef unless confirmHasCommandLineCommand(q(file));                    # Confirm we have file command
@@ -1751,7 +1751,7 @@ sub decodeBase64($)                                                             
   $s
  }
 
-sub convertUnicodeToXml($)                                                      # Convert a B<$string> with L<unicode> codepoints that are not directly representable in L<ascii> into string that replaces these code points with their representation in L<Xml> making the string usable in L<Xml> documents.
+sub convertUnicodeToXml($)                                                      # Convert a B<$string> with L<unicode> code points that are not directly representable in L<ascii> into string that replaces these code points with their representation in L<Xml> making the string usable in L<Xml> documents.
  {my ($string) = @_;                                                            # String to convert
   my $t = '';
   for(split //, $string)                                                        # Each letter in the source
@@ -3070,7 +3070,7 @@ sub formatHtmlAndTextTables($$$$$%)                                             
 
 sub loadArrayFromLines($)                                                       # Load an array from lines of text in a string.
  {my ($string) = @_;                                                            # The string of lines from which to create an array
-  [split "\n", $string]
+  [grep {!/\A#/} split "\n", $string]
  }
 
 sub loadHashFromLines($)                                                        # Load a hash: first word of each line is the key and the rest is the value.
@@ -3699,7 +3699,7 @@ sub lengthOfLongestSubArray($)                                                  
   max map{scalar @$_} @$a
  }
 
-sub cmpArrays($$)                                                               # Apply cmp() to two arrays of strings
+sub cmpArrays($$)                                                               # Compare two arrays of strings
  {my ($a, $b) = @_;                                                             # Array A, array B
   my @a = @$a;
   my @b = @$b;
@@ -4135,7 +4135,7 @@ END
 sub wwwHeader {say STDOUT qq(Content-Type: text/html;charset=UTF-8\n\n)}        # Html header
 
 sub wwwGitHubAuth(&$$$$)                                                        # Logon as a L<GitHub> L<OAuth> app per: L<https://github.com/settings/developers>. If no L<OAuth> code is supplied then a web page is printed that allows the user to request that such a code be sent to the server.  If a valid code is received, by the server then it is converted to a L<OAuth> token which is handed to L<sub> L<saveUserDetails>.
- {my ($saveUserDetails, $clientId, $clientSecret, $code, $state) = @_;          # Process user token once obtained from GitHub, Client id, client secret, OAuth code, random string
+ {my ($saveUserDetails, $clientId, $clientSecret, $code, $state) = @_;          # Process user token once obtained from GitHub, Client id, client secret, authorization code, random string
 
   if (!$code)                                                                   # Show logon page if no code has been supplied
    {my $r = rand =~ s(\A0.) ()r;
@@ -4469,7 +4469,7 @@ Price Per Cpu hour    : $p      in millidollars per hour
 END
   );
 
-  genHash(q(Data::Table::Text::AwsEc2Price),                                    # Prices of selected aws ec2 instance types
+  genHash(q(Data::Table::Text::AwsEc2Price),                                    # Prices of selected aws elastic compute instance types
     cheapestInstance => $cit,                                                   # The instance type that has the lowest CPU cost
     pricePerCpu      => $pc,                                                    # The cost of the cheapest CPU In millidollars per hour
     report           => $r,                                                     # Report showing the cost of other selected instances
@@ -4516,7 +4516,7 @@ sub awsEc2DescribeSpotInstances(%)                                              
   \%r
  }
 
-sub awsEc2Tag($$$%)                                                             # Tag an Ec2 resource with the supplied tags.
+sub awsEc2Tag($$$%)                                                             # Tag an elastic compute resource with the supplied tags.
  {my ($resource, $name, $value, %options) = @_;                                 # Resource, tag name, tag value, options.
   return undef unless confirmHasCommandLineCommand(q(aws));                     # Confirm we have aws cli
   my $p = awsProfile(%options);                                                 # Profile
@@ -4669,7 +4669,7 @@ sub userId(;$)                                                                  
   $userid
  }
 
-sub awsTranslateText($$$;$)                                                     # Translate B<$text> from English to a specified B<$language> using AWS Translate with the specified global B<$options> and return the translated string.  Translations are cached in the specified B<$cacheFolder> for reuse were feasible.
+sub awsTranslateText($$$;$)                                                     # Translate B<$text> from English to a specified B<$language> using AWS Translate with the specified global B<$options> and return the translated string.  Translations are cached in the specified B<$cacheFolder> for reuse where feasible.
  {my ($string, $language, $cacheFolder, $Options) = @_;                         # String to translate, language code, cache folder, aws global options string
 
   $language =~ m(\A(ar|zh|zh\-TW|cs|da|nl|en|fi|fr|de|he|id|it|ja|ko|pl|pt|ru|es|sv|tr)\Z)i or
@@ -5328,7 +5328,6 @@ sub Data::Table::Text::Starter::start($$)                                       
       makePath($f);                                                             # Make path for transfer file folder
       eval {store [$results], $f};                                              # Store data
       $@ and confess "$@\n";                                                    # Confess to any errors
-#lll "AAAA size of file $f = ", fileSize($f), "versus", total_size($results);
      }
     exit;
    }
@@ -5910,7 +5909,7 @@ sub parseXmlDocType($)                                                          
   undef
  }
 
-sub reportSettings($;$)                                                         # Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>. Return the text of the report.
+sub reportSettings($;$)                                                         # Report the current values of parameterless subs.
  {my ($sourceFile, $reportFile) = @_;                                           # Source file, optional report file
   warn "Deprecated, please use reportAttributeSettings instead";
   my $s = readFile($sourceFile);
@@ -6036,134 +6035,134 @@ END
 
 sub wellKnownUrls                                                               #P Short names for some well known urls
  {genHash(q(Short_Names_For_Well_Known_Urls),                                   #  Short names for some well known urls
-    apache          => [q(Apache Web Server),                                   "https://en.wikipedia.org/wiki/Apache_HTTP_Server"                                                                            ],
-    ascii           => [q(Ascii),                                               "https://en.wikipedia.org/wiki/ASCII"                                                                                         ],
-    awsami          => [q(Amazon Web Services - Amazon Machine Image),          "https://en.wikipedia.org/wiki/Amazon_Machine_Image"                                                                          ],
-    awscli          => [q(Amazon Web Services Command Line Interface),          "https://aws.amazon.com/cli/"                                                                                                 ],
-    aws             => [q(Amazon Web Services),                                 "http://aws.amazon.com"                                                                                                       ],
-    blob            => [q(blob),                                                "https://en.wikipedia.org/wiki/Binary_large_object"                                                                           ],
-    boson           => [q(boson),                                               "https://en.wikipedia.org/wiki/Boson"                                                                                         ],
-    browser         => [q(web browser),                                         "https://en.wikipedia.org/wiki/Web_browser"                                                                                   ],
-    cgi             => [q(Common Gateway Interface),                            "https://en.wikipedia.org/wiki/Common_Gateway_Interface"                                                                      ],
-    chmod           => [q(chmod),                                               "https://linux.die.net/man/1/chmod"                                                                                           ],
-    chown           => [q(chown),                                               "https://linux.die.net/man/1/chown"                                                                                           ],
-    commandline     => [q(command line),                                        "https://en.wikipedia.org/wiki/Command-line_interface"                                                                        ],
-    concept         => [q(Dita Concept),                                        "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html#concept"],
-    confess         => [q(confess),                                             "http://perldoc.perl.org/Carp.html#SYNOPSIS/"                                                                                 ],
-    conref          => [q(conref),                                              "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/archSpec/base/conref.html#conref"         ],
-    corpus          => [q(corpus),                                              "https://en.wikipedia.org/wiki/Text_corpus"                                                                                   ],
-    cpan            => [q(CPAN),                                                "https://metacpan.org/author/PRBRENAN"                                                                                        ],
-    cpu             => [q(Cpu),                                                 "https://en.wikipedia.org/wiki/Central_processing_unit"                                                                       ],
-    csv             => [q(csv),                                                 "https://en.wikipedia.org/wiki/Comma-separated_values"                                                                        ],
-    curl            => [q(curl),                                                "https://linux.die.net/man/1/curl"                                                                                            ],
-    dexl            => [q(Data::Edit::Xml::Lint),                               "https://metacpan.org/release/Data-Edit-Xml-Lint"                                                                             ],
-    dex             => [q(Data::Edit::Xml),                                     "https://metacpan.org/pod/Data::Edit::Xml"                                                                                    ],
-    dexr            => [q(Data::Edit::Xml::Reuse),                              "https://metacpan.org/release/Data-Edit-Xml-Reuse"                                                                            ],
-    dexx            => [q(Data::Edit::Xml::Xref),                               "https://metacpan.org/release/Data-Edit-Xml-Xref"                                                                             ],
-    dfa             => [q(DFA),                                                 "https://metacpan.org/pod/Data::DFA"                                                                                          ],
-    die             => [q(die),                                                 "http://perldoc.perl.org/functions/die.html"                                                                                  ],
-    ditaot          => [q(DITA Open ToolKit),                                   "http://www.dita-ot.org/download"                                                                                             ],
-    dita            => [q(Dita),                                                "http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html"                        ],
-    docbook         => [q(DocBook),                                             "https://tdg.docbook.org/tdg/5.1/"                                                                                            ],
-    domain          => [q(domain name),                                         "https://en.wikipedia.org/wiki/Domain_name"                                                                                   ],
-    dtd             => [q(DTD),                                                 "https://en.wikipedia.org/wiki/Document_type_definition"                                                                      ],
-    dtt             => [q(Data::Table::Text),                                   "https://metacpan.org/pod/Data::Table::Text"                                                                                  ],
-    ec2Console      => [q(EC2 Console),                                         "https://us-east-1.console.aws.amazon.com/ec2/"                                                                               ],
-    ec2             => [q(EC2),                                                 "https://aws.amazon.com/ec2/"                                                                                                 ],
-    eval            => [q(eval),                                                "http://perldoc.perl.org/functions/eval.html"                                                                                 ],
-    extensions      => [q(file name extensions),                                "https://en.wikipedia.org/wiki/List_of_filename_extensions"                                                                   ],
-    file            => [q(file),                                                "https://en.wikipedia.org/wiki/Computer_file"                                                                                 ],
-    find            => [q(find),                                                "https://en.wikipedia.org/wiki/Find_(Unix)"                                                                                   ],
-    folder          => [q(folder),                                              "https://en.wikipedia.org/wiki/File_folder"                                                                                   ],
-    fork            => [q(fork),                                                "https://en.wikipedia.org/wiki/Fork_(system_call)"                                                                            ],
-    gbstandard      => [q(GB Standard),                                         "http://metacpan.org/pod/Dita::GB::Standard"                                                                                  ],
-    geany           => [q(Geany),                                               "https://www.geany.org"                                                                                                       ],
-    ghc             => [q(Github Automation),                                   "https://metacpan.org/release/GitHub-Crud"                                                                                    ],
-    github          => [q(GitHub),                                              "https://github.com"                                                                                                          ],
-    gmt             => [q(Greenwich Mean Time),                                 "https://en.wikipedia.org/wiki/Greenwich_Mean_Time"                                                                           ],
-    gnufdl          => [q(GNU Free Documentation License),                      "https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License"                                          ],
-    grep            => [q(grep),                                                "https://en.wikipedia.org/wiki/Grep"                                                                                          ],
-    guid            => [q(guid),                                                "https://en.wikipedia.org/wiki/Universally_unique_identifier"                                                                 ],
-    gui             => [q(graphical user interface),                            "https://en.wikipedia.org/wiki/Graphical_user_interface"                                                                      ],
-    gunzip          => [q(gunzip),                                              "https://en.wikipedia.org/wiki/Gunzip"                                                                                        ],
-    gzip            => [q(gzip),                                                "https://en.wikipedia.org/wiki/Gzip"                                                                                          ],
-    help            => [q(help),                                                "https://en.wikipedia.org/wiki/Online_help"                                                                                   ],
-    hexadecimal     => [q(hexadecimal),                                         "https://en.wikipedia.org/wiki/Hexadecimal"                                                                                   ],
-    html            => [q(HTML),                                                "https://en.wikipedia.org/wiki/HTML"                                                                                          ],
-    htmltable       => [q(html table),                                          "https://www.w3.org/TR/html52/tabular-data.html#the-table-element"                                                            ],
-    hxnormalize     => [q(hxnormalize),                                         "https://www.w3.org/Tools/HTML-XML-utils/man1/hxnormalize.html"                                                               ],
-    iconv           => [q(iconv),                                               "https://linux.die.net/man/1/iconv"                                                                                           ],
-    ide             => [q(Integrated Development Environment),                  "https://en.wikipedia.org/wiki/Integrated_development_environment"                                                            ],
-    ietf            => [q(Internet Engineering Task Force),                     "https://en.wikipedia.org/wiki/Internet_Engineering_Task_Force"                                                               ],
-    imagemagick     => [q(Imagemagick),                                         "https://www.imagemagick.org/script/index.php"                                                                                ],
-    inTakeForm      => [q(In-Take Form),                                        "https://philiprbrenan.github.io/c_MigrationAssessmentSalesforce2.html"                                                       ],
-    ipaddress       => [q(IP address),                                          "https://en.wikipedia.org/wiki/IP_address"                                                                                    ],
-    javascript      => [q(JavaScript),                                          "https://en.wikipedia.org/wiki/JavaScript"                                                                                    ],
-    json            => [q(Json),                                                "https://en.wikipedia.org/wiki/JSON"                                                                                          ],
-    laser           => [q(laser),                                               "https://en.wikipedia.org/wiki/Laser"                                                                                         ],
-    learningCurve   => [q(learning curve),                                      "https://en.wikipedia.org/wiki/Learning_curve"                                                                                ],
-    lint            => [q(lint),                                                "http://xmlsoft.org/xmllint.html"                                                                                             ],
-    linux           => [q(Linux),                                               "https://en.wikipedia.org/wiki/Linux"                                                                                         ],
-    liseMeitner     => [q(Lise Meitner),                                        "https://en.wikipedia.org/wiki/Lise_Meitner"                                                                                  ],
-    lvaluemethod    => [q(lvalue method),                                       "http://perldoc.perl.org/perlsub.html#Lvalue-subroutines"                                                                     ],
-    md              => [q(Mark Down),                                           "https://en.wikipedia.org/wiki/Markdown"                                                                                      ],
-    md5             => [q(md5 sum),                                             "https://en.wikipedia.org/wiki/MD5"                                                                                           ],
-    mentor          => [q(mentor),                                              "https://en.wikipedia.org/wiki/Mentorship"                                                                                    ],
-    mysql           => [q(MySql),                                               "https://en.wikipedia.org/wiki/MySQL"                                                                                         ],
-    mysqlMan        => [q(MySql manual),                                        "https://dev.mysql.com/doc/refman/8.0/en/"                                                                                    ],
-    nfa             => [q(NFA),                                                 "https://metacpan.org/pod/Data::NFA"                                                                                          ],
-    oauth           => [q(oauth),                                               "https://en.wikipedia.org/wiki/OAuth"                                                                                         ],
-    othermeta       => [q(othermeta),                                           "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlto.html#cmlto__othermeta"],
-    our             => [q(our),                                                 "https://perldoc.perl.org/functions/our.html"                                                                                 ],
-    oxygenformat    => [q(Oxygen Format),                                       "https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html"                 ],
-    oxygenworkshop  => [q(Oxygen Workshop),                                     "http://github.com/philiprbrenan/oxygenWorkShop"                                                                              ],
-    parse           => [q(parse),                                               "https://en.wikipedia.org/wiki/Parsing"                                                                                       ],
-    pcdInstall      => [q(PCD installation),                                    "https://github.com/philiprbrenan/philiprbrenan.github.io/blob/master/pcd_installation.md"                                    ],
-    pcdLang         => [q(PCD),                                                 "https://philiprbrenan.github.io/data_edit_xml_edit_commands.html"                                                            ],
-    pcd             => [q(Dita::Pcd),                                           "https://metacpan.org/pod/Dita::PCD"                                                                                          ],
-    pdf             => [q(Pdf),                                                 "https://en.wikipedia.org/wiki/PDF"                                                                                           ],
-    perlal          => [q(Perl Artistic Licence),                               "https://dev.perl.org/licenses/artistic.html"                                                                                 ],
-    perl            => [q(Perl),                                                "http://www.perl.org/"                                                                                                        ],
-    pod             => [q(POD),                                                 "https://perldoc.perl.org/perlpod.html"                                                                                       ],
-    rsync           => [q(rsync),                                               "https://linux.die.net/man/1/rsync"                                                                                           ],
-    ryffine         => [q(Ryffine),                                             "http://www,ryffine.com"                                                                                                      ],
-    s3Console       => [q(S3 Console),                                          "https://s3.console.aws.amazon.com/s3/home"                                                                                   ],
-    s3              => [q(S3),                                                  "https://aws.amazon.com/s3/"                                                                                                  ],
-    sha             => [q(sha),                                                 "https://en.wikipedia.org/wiki/SHA-1"                                                                                         ],
-    shell           => [q(shell),                                               "https://en.wikipedia.org/wiki/Shell_(computing)"                                                                             ],
-    smartmatch      => [q(smartmatch),                                          "https://perldoc.perl.org/perlop.html#Smartmatch-Operator"                                                                    ],
-    sql             => [q(Structure Query Language),                            "https://en.wikipedia.org/wiki/SQL"                                                                                           ],
-    spot            => [q(spot),                                                "https://aws.amazon.com/ec2/spot/"                                                                                            ],
-    ssh             => [q(Secure Shell),                                        "https://www.ssh.com/ssh"                                                                                                     ],
-    ssxr            => [q(Self Xref),                                           "https://philiprbrenan.github.io/selfServiceXref.pdf"                                                                         ],
-    step            => [q(step),                                                "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__step"     ],
-    steps           => [q(steps),                                               "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__steps"    ],
-    storable        => [q(Storable),                                            "https://metacpan.org/pod/Storable"                                                                                           ],
-    sub             => [q(sub),                                                 "https://perldoc.perl.org/perlsub.html"                                                                                       ],
-    substeps        => [q(substeps),                                            "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__substeps" ],
-    sws             => [q(Sir Walter Scott),                                    "https://en.wikipedia.org/wiki/Walter_Scott"                                                                                  ],
-    tab             => [q(tab),                                                 "https://en.wikipedia.org/wiki/Tab_key"                                                                                       ],
-    table           => [q(table of information),                                "https://en.wikipedia.org/wiki/Table_(information)"                                                                           ],
-    taocp           => [q(The Art of Computer Programming),                     "https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming"                                                               ],
-    task            => [q(Dita Task),                                           "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/task.html#task"  ],
-    ubuntu          => [q(Ubuntu 18),                                           "https://ubuntu.com/download/desktop"                                                                                         ],
-    undef           => [q(undef),                                               "https://perldoc.perl.org/functions/undef.html"                                                                               ],
-    unicode         => [q(Unicode),                                             "https://en.wikipedia.org/wiki/Unicode"                                                                                       ],
-    unoconv         => [q(unoconv),                                             "https://github.com/unoconv/unoconv"                                                                                          ],
-    url             => [q(url),                                                 "https://en.wikipedia.org/wiki/URL"                                                                                           ],
-    user            => [q(user),                                                "https://en.wikipedia.org/wiki/User_(computing)"                                                                              ],
-    utf8            => [q(utf8),                                                "https://en.wikipedia.org/wiki/UTF-8"                                                                                         ],
-    whitespace      => [q(white space),                                         "https://en.wikipedia.org/wiki/Whitespace_character"                                                                          ],
-    whp             => [q(Whp),                                                 "https://www.whp.net/en/"                                                                                                     ],
-    widget          => [q(widget),                                              "https://en.wikipedia.org/wiki/Graphical_widget"                                                                              ],
-    word            => [q(word),                                                "https://en.wikipedia.org/wiki/Doc_(computing)"                                                                               ],
-    xmlparser       => [q(Xml parser),                                          "https://metacpan.org/pod/XML::Parser/"                                                                                       ],
-    xml             => [q(Xml),                                                 "https://en.wikipedia.org/wiki/XML"                                                                                           ],
-    xmllint         => [q(Xml Lint),                                            "http://xmlsoft.org/xmllint.html"                                                                                             ],
-    xref            => [q(Xref),                                                "https://metacpan.org/pod/Data::Edit::Xml::Xref"                                                                              ],
-    zerowidthspace  => [q(zero width space),                                    "https://en.wikipedia.org/wiki/Zero-width_space"                                                                              ],
-    zip             => [q(zip),                                                 "https://linux.die.net/man/1/zip"                                                                                             ],
-    zoom            => [q(Zoom),                                                "https://zoom.us/"                                                                                                            ],
+    apache          => [q(Apache Web Server),                                   "https://en.wikipedia.org/wiki/Apache_HTTP_Server"                                                                                ], #
+    ascii           => [q(Ascii),                                               "https://en.wikipedia.org/wiki/ASCII"                                                                                             ], #
+    awsami          => [q(Amazon Web Services - Amazon Machine Image),          "https://en.wikipedia.org/wiki/Amazon_Machine_Image"                                                                              ], #
+    awscli          => [q(Amazon Web Services Command Line Interface),          "https://aws.amazon.com/cli/"                                                                                                     ], #
+    aws             => [q(Amazon Web Services),                                 "http://aws.amazon.com"                                                                                                           ], #
+    blob            => [q(blob),                                                "https://en.wikipedia.org/wiki/Binary_large_object"                                                                               ], #
+    boson           => [q(boson),                                               "https://en.wikipedia.org/wiki/Boson"                                                                                             ], #
+    browser         => [q(web browser),                                         "https://en.wikipedia.org/wiki/Web_browser"                                                                                       ], #
+    cgi             => [q(Common Gateway Interface),                            "https://en.wikipedia.org/wiki/Common_Gateway_Interface"                                                                          ], #
+    chmod           => [q(chmod),                                               "https://linux.die.net/man/1/chmod"                                                                                               ], #
+    chown           => [q(chown),                                               "https://linux.die.net/man/1/chown"                                                                                               ], #
+    commandline     => [q(command line),                                        "https://en.wikipedia.org/wiki/Command-line_interface"                                                                            ], #
+    concept         => [q(Dita Concept),                                        "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html#concept"], #
+    confess         => [q(confess),                                             "http://perldoc.perl.org/Carp.html#SYNOPSIS/"                                                                                     ], #
+    conref          => [q(conref),                                              "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/archSpec/base/conref.html#conref"             ], #
+    corpus          => [q(corpus),                                              "https://en.wikipedia.org/wiki/Text_corpus"                                                                                       ], #
+    cpan            => [q(CPAN),                                                "https://metacpan.org/author/PRBRENAN"                                                                                            ], #
+    cpu             => [q(Cpu),                                                 "https://en.wikipedia.org/wiki/Central_processing_unit"                                                                           ], #
+    csv             => [q(csv),                                                 "https://en.wikipedia.org/wiki/Comma-separated_values"                                                                            ], #
+    curl            => [q(curl),                                                "https://linux.die.net/man/1/curl"                                                                                                ], #
+    dexl            => [q(Data::Edit::Xml::Lint),                               "https://metacpan.org/release/Data-Edit-Xml-Lint"                                                                                 ], #
+    dex             => [q(Data::Edit::Xml),                                     "https://metacpan.org/pod/Data::Edit::Xml"                                                                                        ], #
+    dexr            => [q(Data::Edit::Xml::Reuse),                              "https://metacpan.org/release/Data-Edit-Xml-Reuse"                                                                                ], #
+    dexx            => [q(Data::Edit::Xml::Xref),                               "https://metacpan.org/release/Data-Edit-Xml-Xref"                                                                                 ], #
+    dfa             => [q(DFA),                                                 "https://metacpan.org/pod/Data::DFA"                                                                                              ], #
+    die             => [q(die),                                                 "http://perldoc.perl.org/functions/die.html"                                                                                      ], #
+    ditaot          => [q(DITA Open ToolKit),                                   "http://www.dita-ot.org/download"                                                                                                 ], #
+    dita            => [q(Dita),                                                "http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html"                            ], #
+    docbook         => [q(DocBook),                                             "https://tdg.docbook.org/tdg/5.1/"                                                                                                ], #
+    domain          => [q(domain name),                                         "https://en.wikipedia.org/wiki/Domain_name"                                                                                       ], #
+    dtd             => [q(DTD),                                                 "https://en.wikipedia.org/wiki/Document_type_definition"                                                                          ], #
+    dtt             => [q(Data::Table::Text),                                   "https://metacpan.org/pod/Data::Table::Text"                                                                                      ], #
+    ec2Console      => [q(EC2 Console),                                         "https://us-east-1.console.aws.amazon.com/ec2/"                                                                                   ], #
+    ec2             => [q(EC2),                                                 "https://aws.amazon.com/ec2/"                                                                                                     ], #
+    eval            => [q(eval),                                                "http://perldoc.perl.org/functions/eval.html"                                                                                     ], #
+    extensions      => [q(file name extensions),                                "https://en.wikipedia.org/wiki/List_of_filename_extensions"                                                                       ], #
+    file            => [q(file),                                                "https://en.wikipedia.org/wiki/Computer_file"                                                                                     ], #
+    find            => [q(find),                                                "https://en.wikipedia.org/wiki/Find_(Unix)"                                                                                       ], #
+    folder          => [q(folder),                                              "https://en.wikipedia.org/wiki/File_folder"                                                                                       ], #
+    fork            => [q(fork),                                                "https://en.wikipedia.org/wiki/Fork_(system_call)"                                                                                ], #
+    gbstandard      => [q(GB Standard),                                         "http://metacpan.org/pod/Dita::GB::Standard"                                                                                      ], #
+    geany           => [q(Geany),                                               "https://www.geany.org"                                                                                                           ], #
+    ghc             => [q(Github Automation),                                   "https://metacpan.org/release/GitHub-Crud"                                                                                        ], #
+    github          => [q(GitHub),                                              "https://github.com"                                                                                                              ], #
+    gmt             => [q(Greenwich Mean Time),                                 "https://en.wikipedia.org/wiki/Greenwich_Mean_Time"                                                                               ], #
+    gnufdl          => [q(GNU Free Documentation License),                      "https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License"                                              ], #
+    grep            => [q(grep),                                                "https://en.wikipedia.org/wiki/Grep"                                                                                              ], #
+    guid            => [q(guid),                                                "https://en.wikipedia.org/wiki/Universally_unique_identifier"                                                                     ], #
+    gui             => [q(graphical user interface),                            "https://en.wikipedia.org/wiki/Graphical_user_interface"                                                                          ], #
+    gunzip          => [q(gunzip),                                              "https://en.wikipedia.org/wiki/Gunzip"                                                                                            ], #
+    gzip            => [q(gzip),                                                "https://en.wikipedia.org/wiki/Gzip"                                                                                              ], #
+    help            => [q(help),                                                "https://en.wikipedia.org/wiki/Online_help"                                                                                       ], #
+    hexadecimal     => [q(hexadecimal),                                         "https://en.wikipedia.org/wiki/Hexadecimal"                                                                                       ], #
+    html            => [q(HTML),                                                "https://en.wikipedia.org/wiki/HTML"                                                                                              ], #
+    htmltable       => [q(html table),                                          "https://www.w3.org/TR/html52/tabular-data.html#the-table-element"                                                                ], #
+    hxnormalize     => [q(hxnormalize),                                         "https://www.w3.org/Tools/HTML-XML-utils/man1/hxnormalize.html"                                                                   ], #
+    iconv           => [q(iconv),                                               "https://linux.die.net/man/1/iconv"                                                                                               ], #
+    ide             => [q(Integrated Development Environment),                  "https://en.wikipedia.org/wiki/Integrated_development_environment"                                                                ], #
+    ietf            => [q(Internet Engineering Task Force),                     "https://en.wikipedia.org/wiki/Internet_Engineering_Task_Force"                                                                   ], #
+    imagemagick     => [q(Imagemagick),                                         "https://www.imagemagick.org/script/index.php"                                                                                    ], #
+    inTakeForm      => [q(In-Take Form),                                        "https://philiprbrenan.github.io/c_MigrationAssessmentSalesforce2.html"                                                           ], #
+    ipaddress       => [q(IP address),                                          "https://en.wikipedia.org/wiki/IP_address"                                                                                        ], #
+    javascript      => [q(JavaScript),                                          "https://en.wikipedia.org/wiki/JavaScript"                                                                                        ], #
+    json            => [q(Json),                                                "https://en.wikipedia.org/wiki/JSON"                                                                                              ], #
+    laser           => [q(laser),                                               "https://en.wikipedia.org/wiki/Laser"                                                                                             ], #
+    learningCurve   => [q(learning curve),                                      "https://en.wikipedia.org/wiki/Learning_curve"                                                                                    ], #
+    lint            => [q(lint),                                                "http://xmlsoft.org/xmllint.html"                                                                                                 ], #
+    linux           => [q(Linux),                                               "https://en.wikipedia.org/wiki/Linux"                                                                                             ], #
+    liseMeitner     => [q(Lise Meitner),                                        "https://en.wikipedia.org/wiki/Lise_Meitner"                                                                                      ], #
+    lvaluemethod    => [q(lvalue method),                                       "http://perldoc.perl.org/perlsub.html#Lvalue-subroutines"                                                                         ], #
+    md              => [q(Mark Down),                                           "https://en.wikipedia.org/wiki/Markdown"                                                                                          ], #
+    md5             => [q(md5 sum),                                             "https://en.wikipedia.org/wiki/MD5"                                                                                               ], #
+    mentor          => [q(mentor),                                              "https://en.wikipedia.org/wiki/Mentorship"                                                                                        ], #
+    mysql           => [q(MySql),                                               "https://en.wikipedia.org/wiki/MySQL"                                                                                             ], #
+    mysqlMan        => [q(MySql manual),                                        "https://dev.mysql.com/doc/refman/8.0/en/"                                                                                        ], #
+    nfa             => [q(NFA),                                                 "https://metacpan.org/pod/Data::NFA"                                                                                              ], #
+    oauth           => [q(oauth),                                               "https://en.wikipedia.org/wiki/OAuth"                                                                                             ], #
+    othermeta       => [q(othermeta),                                           "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlto.html#cmlto__othermeta"    ], #
+    our             => [q(our),                                                 "https://perldoc.perl.org/functions/our.html"                                                                                     ], #
+    oxygenformat    => [q(Oxygen Format),                                       "https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html"                     ], #
+    oxygenworkshop  => [q(Oxygen Workshop),                                     "http://github.com/philiprbrenan/oxygenWorkShop"                                                                                  ], #
+    parse           => [q(parse),                                               "https://en.wikipedia.org/wiki/Parsing"                                                                                           ], #
+    pcdInstall      => [q(PCD installation),                                    "https://github.com/philiprbrenan/philiprbrenan.github.io/blob/master/pcd_installation.md"                                        ], #
+    pcdLang         => [q(PCD),                                                 "https://philiprbrenan.github.io/data_edit_xml_edit_commands.html"                                                                ], #
+    pcd             => [q(Dita::Pcd),                                           "https://metacpan.org/pod/Dita::PCD"                                                                                              ], #
+    pdf             => [q(Pdf),                                                 "https://en.wikipedia.org/wiki/PDF"                                                                                               ], #
+    perlal          => [q(Perl Artistic Licence),                               "https://dev.perl.org/licenses/artistic.html"                                                                                     ], #
+    perl            => [q(Perl),                                                "http://www.perl.org/"                                                                                                            ], #
+    pod             => [q(POD),                                                 "https://perldoc.perl.org/perlpod.html"                                                                                           ], #
+    rsync           => [q(rsync),                                               "https://linux.die.net/man/1/rsync"                                                                                               ], #
+    ryffine         => [q(Ryffine),                                             "http://www,ryffine.com"                                                                                                          ], #
+    s3Console       => [q(S3 Console),                                          "https://s3.console.aws.amazon.com/s3/home"                                                                                       ], #
+    s3              => [q(S3),                                                  "https://aws.amazon.com/s3/"                                                                                                      ], #
+    sha             => [q(sha),                                                 "https://en.wikipedia.org/wiki/SHA-1"                                                                                             ], #
+    shell           => [q(shell),                                               "https://en.wikipedia.org/wiki/Shell_(computing)"                                                                                 ], #
+    smartmatch      => [q(smartmatch),                                          "https://perldoc.perl.org/perlop.html#Smartmatch-Operator"                                                                        ], #
+    sql             => [q(Structure Query Language),                            "https://en.wikipedia.org/wiki/SQL"                                                                                               ], #
+    spot            => [q(spot),                                                "https://aws.amazon.com/ec2/spot/"                                                                                                ], #
+    ssh             => [q(Secure Shell),                                        "https://www.ssh.com/ssh"                                                                                                         ], #
+    ssxr            => [q(Self Xref),                                           "https://philiprbrenan.github.io/selfServiceXref.pdf"                                                                             ], #
+    step            => [q(step),                                                "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__step"         ], #
+    steps           => [q(steps),                                               "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__steps"        ], #
+    storable        => [q(Storable),                                            "https://metacpan.org/pod/Storable"                                                                                               ], #
+    sub             => [q(sub),                                                 "https://perldoc.perl.org/perlsub.html"                                                                                           ], #
+    substeps        => [q(substeps),                                            "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__substeps"     ], #
+    sws             => [q(Sir Walter Scott),                                    "https://en.wikipedia.org/wiki/Walter_Scott"                                                                                      ], #
+    tab             => [q(tab),                                                 "https://en.wikipedia.org/wiki/Tab_key"                                                                                           ], #
+    table           => [q(table of information),                                "https://en.wikipedia.org/wiki/Table_(information)"                                                                               ], #
+    taocp           => [q(The Art of Computer Programming),                     "https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming"                                                                   ], #
+    task            => [q(Dita Task),                                           "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/task.html#task"      ], #
+    ubuntu          => [q(Ubuntu 18),                                           "https://ubuntu.com/download/desktop"                                                                                             ], #
+    undef           => [q(undef),                                               "https://perldoc.perl.org/functions/undef.html"                                                                                   ], #
+    unicode         => [q(Unicode),                                             "https://en.wikipedia.org/wiki/Unicode"                                                                                           ], #
+    unoconv         => [q(unoconv),                                             "https://github.com/unoconv/unoconv"                                                                                              ], #
+    url             => [q(url),                                                 "https://en.wikipedia.org/wiki/URL"                                                                                               ], #
+    user            => [q(user),                                                "https://en.wikipedia.org/wiki/User_(computing)"                                                                                  ], #
+    utf8            => [q(utf8),                                                "https://en.wikipedia.org/wiki/UTF-8"                                                                                             ], #
+    whitespace      => [q(white space),                                         "https://en.wikipedia.org/wiki/Whitespace_character"                                                                              ], #
+    whp             => [q(Whp),                                                 "https://www.whp.net/en/"                                                                                                         ], #
+    widget          => [q(widget),                                              "https://en.wikipedia.org/wiki/Graphical_widget"                                                                                  ], #
+    word            => [q(word),                                                "https://en.wikipedia.org/wiki/Doc_(computing)"                                                                                   ], #
+    xmlparser       => [q(Xml parser),                                          "https://metacpan.org/pod/XML::Parser/"                                                                                           ], #
+    xml             => [q(Xml),                                                 "https://en.wikipedia.org/wiki/XML"                                                                                               ], #
+    xmllint         => [q(Xml Lint),                                            "http://xmlsoft.org/xmllint.html"                                                                                                 ], #
+    xref            => [q(Xref),                                                "https://metacpan.org/pod/Data::Edit::Xml::Xref"                                                                                  ], #
+    zerowidthspace  => [q(zero width space),                                    "https://en.wikipedia.org/wiki/Zero-width_space"                                                                                  ], #
+    zip             => [q(zip),                                                 "https://linux.die.net/man/1/zip"                                                                                                 ], #
+    zoom            => [q(Zoom),                                                "https://zoom.us/"                                                                                                                ], #
    );
  } # wellKnownUrls
 
@@ -6380,13 +6379,19 @@ END
          }
        }
 
-      if ($line =~ m(\A(\s*)if\s*\x28\d+\x29))                                  # Process "if (\d+)" recording leading spaces
-       {my $S = $1;                                                             # Leading spaces so we can balance the indentation of the closing curly bracket
+      if ($line =~ m(\A(\s*)if\s*\x28(\d+)\x29))                                # Process "if (\d+)" recording leading spaces
+       {my $S = $1; my $minimumNumberOfLines = $2;                              # Leading spaces so we can balance the indentation of the closing curly bracket. Start testing for the closing } after this many lines
         my $M = $maxLinesInExample;
         for(my ($L, $N) = ($l + 1, 0); $L < @lines; ++$L, ++$N)
          {my $nextLine = $lines[$L];
           push @testLines, extractTest($nextLine);
-          last if $nextLine =~ m/\A$S }/;                                       # Finish on closing brace in column 2
+          if ($N >= $minimumNumberOfLines and $nextLine =~ m/\A$S }/)           # Finish on closing brace in column 2
+           {#say STDERR "End of example";
+            last;
+           }
+          else
+           {#say STDERR "$N  ", $nextLine;
+           }
           my $L = $l + 1;
           $N < $M or fff($L, $perlModule, "Too many lines in example");         # Prevent overruns
          }
@@ -7084,7 +7089,7 @@ sub extractPythonDocumentationFromFiles(@)                                      
     while(@text)                                                                # Parse text of module
      {my $text = shift @text;
 
-      if ($text =~ m(\A\s*def\s+(.*?)\((.*?)\)\s*:.*?#(\w*)\s+(.*))i)           # Def  aa(a =1, b = 2) :  # first, second
+      if ($text =~ m(\A\s*def\s+(.*?)\((.*?)\)\s*:.*?#(\w*)\s+(.*))i)           # Def  function(parameter1 =1, parameter2 = 2) :  # first, second
        {my ($def, $parameters, $attributes, $parameterDefinitions) = @{^CAPTURE};
 
         my @p = split m/\s*,\s*/, $parameters;
@@ -7105,14 +7110,14 @@ sub extractPythonDocumentationFromFiles(@)                                      
 
         $comments{$class}{$def} = getDocString
        }
-      elsif ($text =~ m(\A\s*def\s+(.*?)\((.*?)\)\s*:)i)                        # Def  aa(a =1, b = 2) :
+      elsif ($text =~ m(\A\s*def\s+(.*?)\((.*?)\)\s*:)i)                        # Def  function(parameter1 =1, parameter2 = 2) :
        {my ($def, $parameters) = @{^CAPTURE};
         my $doc = $comments{$class}{$def} = getDocString;
 
-        my @p = split m/\s*,\s*/, $parameters;                                  # Parameters defined by defn
+        my @p = split m/\s*,\s*/, $parameters;                                  # Parameters defined by a Python subroutine
         my %p;
 
-        for my $line(split m/\n/, $doc)                                         # Check for :param definitions in string
+        for my $line(split m/\n/, $doc)                                         # Check for parameter definitions
          {if ($line =~ m(\A\s*:\s*param\s*(.*?)\s*:\s*(.*?)\s*\Z))
            {my ($parm, $comment) = @{^CAPTURE};
             push $parameters{$class}{$def}->@*, [$parm, $comment];
@@ -7121,7 +7126,7 @@ sub extractPythonDocumentationFromFiles(@)                                      
            }
          }
 
-        if (keys %p)                                                            # Use :param definitions if present
+        if (keys %p)                                                            # Use parameter definitions if present
          {if (@p != keys %p)
            {error q(Differing numbers of parameters described in comment and code);
            }
@@ -7136,7 +7141,7 @@ sub extractPythonDocumentationFromFiles(@)                                      
             error qq(Parameters $b defined by :param but not present in defn);
            }
          }
-        else                                                                    # Use parameter definitions from defn
+        else                                                                    # Use parameter definitions from a Python subroutine
          {push $parameters{$class}{$def}->@*, [@p];
          }
         error qq(No parameter definitions for $class.$def)
@@ -7301,7 +7306,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  binModeAllUtf8 boldString boldStringUndo
  call callSubInOverlappedParallel callSubInParallel checkFile checkFilePath
  checkFilePathDir checkFilePathExt checkKeys childPids chooseStringAtRandom
- clearFolder cmpArrays confirmHasCommandLineCommand containingPowerOfTwo contains
+ clearFolder cmpArrays confirmHasCommandLineCommand
+ containingFolderName containingPowerOfTwo contains
  convertDocxToFodt convertImageToJpx convertPerlToJavaScript convertUnicodeToXml copyBinaryFile
  copyBinaryFileMd5Normalized copyBinaryFileMd5NormalizedCreate
  copyBinaryFileMd5NormalizedGetCompanionContent copyFile copyFileFromRemote
@@ -7585,7 +7591,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20200418.
+Version 20201030.
 
 
 The following sections describe the methods in each functional area of this
@@ -7946,6 +7952,17 @@ B<Example:>
       [["aaa", "bbb"],
        {c=>undef, dd=>undef, eee=>"EEEE", f=>"F", gg=>"g g", hh=>"h h"},
       ];
+
+  if (1)
+
+   {my $r = parseCommandLineArguments  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+     {ok 1;
+      $_[1]
+     }
+     [qw(--aAa=AAA --bbB=BBB)], [qw(aaa bbb ccc)];
+    is_deeply $r, {aaa=>'AAA', bbb=>'BBB'};
+   }
 
 
 =head2 call($sub, @our)
@@ -11437,9 +11454,9 @@ B<Example:>
       <a>1</a>
       <b>
       <array>
-                  <e id="0"><hash><c><array><e id="0">3</e><e id="1">4</e></array></c></hash></e>
-                  <e id="1"><hash><d><array><e id="0">5</e><e id="1">6</e></array></d></hash></e>
-                  <e id="2"><hash><e>7</e></hash></e>
+                  <e><hash><c><array><e>3</e><e>4</e></array></c></hash></e>
+                  <e><hash><d><array><e>5</e><e>6</e></array></d></hash></e>
+                  <e><hash><e>7</e></hash></e>
                   </array>
       </b>
       <f>8</f>
@@ -18002,6 +18019,11 @@ Create a region keyword from the specified B<%options>
      Parameter  Description
   1  %options   Options
 
+=head2 getNumberOfCpus()
+
+Number of cpus
+
+
 =head2 saveSourceToS3($aws, $saveIntervalInSeconds)
 
 Save source code.
@@ -18678,411 +18700,413 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 185 L<getCodeContext|/getCodeContext> - Recreate the code context for a referenced sub
 
-186 L<getSubName|/getSubName> - Returns the (package, name, file, line) of a perl B<$sub> reference.
+186 L<getNumberOfCpus|/getNumberOfCpus> - Number of cpus
 
-187 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
+187 L<getSubName|/getSubName> - Returns the (package, name, file, line) of a perl B<$sub> reference.
 
-188 L<guidFromString|/guidFromString> - Create a guid representation of the L<md5 sum|https://en.wikipedia.org/wiki/MD5> of the content of a string.
+188 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
 
-189 L<hashifyFolderStructure|/hashifyFolderStructure> - Hashify a list of file names to get the corresponding folder structure.
+189 L<guidFromString|/guidFromString> - Create a guid representation of the L<md5 sum|https://en.wikipedia.org/wiki/MD5> of the content of a string.
 
-190 L<hexToAsciiString|/hexToAsciiString> - Decode a string of L<hexadecimal|https://en.wikipedia.org/wiki/Hexadecimal> digits as an L<Ascii|https://en.wikipedia.org/wiki/ASCII> string.
+190 L<hashifyFolderStructure|/hashifyFolderStructure> - Hashify a list of file names to get the corresponding folder structure.
 
-191 L<hostName|/hostName> - The name of the host we are running on.
+191 L<hexToAsciiString|/hexToAsciiString> - Decode a string of L<hexadecimal|https://en.wikipedia.org/wiki/Hexadecimal> digits as an L<Ascii|https://en.wikipedia.org/wiki/ASCII> string.
 
-192 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+192 L<hostName|/hostName> - The name of the host we are running on.
 
-193 L<imageSize|/imageSize> - Return (width, height) of an B<$image>.
+193 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-194 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+194 L<imageSize|/imageSize> - Return (width, height) of an B<$image>.
 
-195 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list of numbers confessing to any ill defined values.
+195 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-196 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list of numbers confessing to any ill defined values.
+196 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list of numbers confessing to any ill defined values.
 
-197 L<intersectionOfHashesAsArrays|/intersectionOfHashesAsArrays> - Form the intersection of the specified hashes B<@h> as one hash whose values are an array of corresponding values from each hash
+197 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list of numbers confessing to any ill defined values.
 
-198 L<intersectionOfHashKeys|/intersectionOfHashKeys> - Form the intersection of the keys of the specified hashes B<@h> as one hash whose keys represent the intersection.
+198 L<intersectionOfHashesAsArrays|/intersectionOfHashesAsArrays> - Form the intersection of the specified hashes B<@h> as one hash whose values are an array of corresponding values from each hash
 
-199 L<invertHashOfHashes|/invertHashOfHashes> - Invert a hash of hashes: given {a}{b} = c return {b}{c} = c
+199 L<intersectionOfHashKeys|/intersectionOfHashKeys> - Form the intersection of the keys of the specified hashes B<@h> as one hash whose keys represent the intersection.
 
-200 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+200 L<invertHashOfHashes|/invertHashOfHashes> - Invert a hash of hashes: given {a}{b} = c return {b}{c} = c
 
-201 L<isBlank|/isBlank> - Test whether a string is blank.
+201 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-202 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
+202 L<isBlank|/isBlank> - Test whether a string is blank.
 
-203 L<isSubInPackage|/isSubInPackage> - Test whether the specified B<$package> contains the subroutine <$sub>.
+203 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
 
-204 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+204 L<isSubInPackage|/isSubInPackage> - Test whether the specified B<$package> contains the subroutine <$sub>.
 
-205 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+205 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-206 L<javaScriptExports|/javaScriptExports> - Extract the Javascript functions marked for export in a file or string.
+206 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-207 L<keyCount|/keyCount> - Count keys down to the specified level.
+207 L<javaScriptExports|/javaScriptExports> - Extract the Javascript functions marked for export in a file or string.
 
-208 L<lengthOfLongestSubArray|/lengthOfLongestSubArray> - Given an array of arrays find the length of the longest sub array.
+208 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-209 L<lll|/lll> - Log messages with a time stamp and originating file and line number.
+209 L<lengthOfLongestSubArray|/lengthOfLongestSubArray> - Given an array of arrays find the length of the longest sub array.
 
-210 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+210 L<lll|/lll> - Log messages with a time stamp and originating file and line number.
 
-211 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+211 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-212 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
+212 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-213 L<loadHash|/loadHash> - Load the specified blessed B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+213 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
 
-214 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+214 L<loadHash|/loadHash> - Load the specified blessed B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-215 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+215 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-216 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+216 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-217 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred
+217 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-218 L<makePath|/makePath> - Make the path for the specified file name or folder on the local machine.
+218 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred
 
-219 L<makePathRemote|/makePathRemote> - Make the path for the specified B<$file> or folder on the L<Amazon Web Services|http://aws.amazon.com> instance whose ip address is specified by B<$ip> or returned by L<awsIp>.
+219 L<makePath|/makePath> - Make the path for the specified file name or folder on the local machine.
 
-220 L<matchPath|/matchPath> - Return the deepest folder that exists along a given file name path.
+220 L<makePathRemote|/makePathRemote> - Make the path for the specified B<$file> or folder on the L<Amazon Web Services|http://aws.amazon.com> instance whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-221 L<mathematicalBoldItalicString|/mathematicalBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
+221 L<matchPath|/matchPath> - Return the deepest folder that exists along a given file name path.
 
-222 L<mathematicalBoldItalicStringUndo|/mathematicalBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
+222 L<mathematicalBoldItalicString|/mathematicalBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
 
-223 L<mathematicalBoldString|/mathematicalBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
+223 L<mathematicalBoldItalicStringUndo|/mathematicalBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
 
-224 L<mathematicalBoldStringUndo|/mathematicalBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
+224 L<mathematicalBoldString|/mathematicalBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
 
-225 L<mathematicalMonoSpaceString|/mathematicalMonoSpaceString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
+225 L<mathematicalBoldStringUndo|/mathematicalBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
 
-226 L<mathematicalMonoSpaceStringUndo|/mathematicalMonoSpaceStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
+226 L<mathematicalMonoSpaceString|/mathematicalMonoSpaceString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
 
-227 L<mathematicalSansSerifBoldItalicString|/mathematicalSansSerifBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
+227 L<mathematicalMonoSpaceStringUndo|/mathematicalMonoSpaceStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
 
-228 L<mathematicalSansSerifBoldItalicStringUndo|/mathematicalSansSerifBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
+228 L<mathematicalSansSerifBoldItalicString|/mathematicalSansSerifBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
 
-229 L<mathematicalSansSerifBoldString|/mathematicalSansSerifBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
+229 L<mathematicalSansSerifBoldItalicStringUndo|/mathematicalSansSerifBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
 
-230 L<mathematicalSansSerifBoldStringUndo|/mathematicalSansSerifBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
+230 L<mathematicalSansSerifBoldString|/mathematicalSansSerifBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
 
-231 L<mathematicalSansSerifItalicString|/mathematicalSansSerifItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
+231 L<mathematicalSansSerifBoldStringUndo|/mathematicalSansSerifBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
 
-232 L<mathematicalSansSerifItalicStringUndo|/mathematicalSansSerifItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
+232 L<mathematicalSansSerifItalicString|/mathematicalSansSerifItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
 
-233 L<mathematicalSansSerifString|/mathematicalSansSerifString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
+233 L<mathematicalSansSerifItalicStringUndo|/mathematicalSansSerifItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
 
-234 L<mathematicalSansSerifStringUndo|/mathematicalSansSerifStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
+234 L<mathematicalSansSerifString|/mathematicalSansSerifString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
 
-235 L<max|/max> - Find the maximum number in a list of numbers confessing to any ill defined values.
+235 L<mathematicalSansSerifStringUndo|/mathematicalSansSerifStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
 
-236 L<maximumLineLength|/maximumLineLength> - Find the longest line in a B<$string>.
+236 L<max|/max> - Find the maximum number in a list of numbers confessing to any ill defined values.
 
-237 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
+237 L<maximumLineLength|/maximumLineLength> - Find the longest line in a B<$string>.
 
-238 L<mergeFolder|/mergeFolder> - Copy the B<$source> folder into the B<$target> folder retaining any existing files not replaced by copied files.
+238 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
 
-239 L<mergeFolderFromRemote|/mergeFolderFromRemote> - Merge the specified B<$Source> folder from the corresponding remote folder on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+239 L<mergeFolder|/mergeFolder> - Copy the B<$source> folder into the B<$target> folder retaining any existing files not replaced by copied files.
 
-240 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge a list of hashes B<@h> by summing their values
+240 L<mergeFolderFromRemote|/mergeFolderFromRemote> - Merge the specified B<$Source> folder from the corresponding remote folder on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-241 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+241 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge a list of hashes B<@h> by summing their values
 
-242 L<min|/min> - Find the minimum number in a list of numbers confessing to any ill defined values.
+242 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-243 L<mmm|/mmm> - Log messages with a differential time in milliseconds and originating file and line number.
+243 L<min|/min> - Find the minimum number in a list of numbers confessing to any ill defined values.
 
-244 L<moveFileNoClobber|/moveFileNoClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
+244 L<mmm|/mmm> - Log messages with a differential time in milliseconds and originating file and line number.
 
-245 L<moveFileWithClobber|/moveFileWithClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
+245 L<moveFileNoClobber|/moveFileNoClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
 
-246 L<nameFromFolder|/nameFromFolder> - Create a name from the last folder in the path of a file name.
+246 L<moveFileWithClobber|/moveFileWithClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
 
-247 L<nameFromString|/nameFromString> - Create a readable name from an arbitrary string of text.
+247 L<nameFromFolder|/nameFromFolder> - Create a name from the last folder in the path of a file name.
 
-248 L<nameFromStringRestrictedToTitle|/nameFromStringRestrictedToTitle> - Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
+248 L<nameFromString|/nameFromString> - Create a readable name from an arbitrary string of text.
 
-249 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+249 L<nameFromStringRestrictedToTitle|/nameFromStringRestrictedToTitle> - Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
 
-250 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+250 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-251 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+251 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-252 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+252 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-253 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+253 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-254 L<numberOfCpus|/numberOfCpus> - Number of cpus scaled by an optional factor - but only if you have nproc.
+254 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-255 L<numberOfLinesInFile|/numberOfLinesInFile> - Return the number of lines in a file.
+255 L<numberOfCpus|/numberOfCpus> - Number of cpus scaled by an optional factor - but only if you have nproc.
 
-256 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+256 L<numberOfLinesInFile|/numberOfLinesInFile> - Return the number of lines in a file.
 
-257 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+257 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-258 L<onAws|/onAws> - Returns 1 if we are on AWS else return 0.
+258 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-259 L<onAwsPrimary|/onAwsPrimary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> and we are on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on a secondary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
+259 L<onAws|/onAws> - Returns 1 if we are on AWS else return 0.
 
-260 L<onAwsSecondary|/onAwsSecondary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> but we are not on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on the primary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
+260 L<onAwsPrimary|/onAwsPrimary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> and we are on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on a secondary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
 
-261 L<overrideAndReabsorbMethods|/overrideAndReabsorbMethods> - Override methods down the list of B<@packages> then reabsorb any unused methods back up the list of packages so that all the packages have the same methods as the last package with methods from packages mentioned earlier overriding methods from packages mentioned later.
+261 L<onAwsSecondary|/onAwsSecondary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> but we are not on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on the primary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
 
-262 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+262 L<overrideAndReabsorbMethods|/overrideAndReabsorbMethods> - Override methods down the list of B<@packages> then reabsorb any unused methods back up the list of packages so that all the packages have the same methods as the last package with methods from packages mentioned earlier overriding methods from packages mentioned later.
 
-263 L<overWriteBinaryFile|/overWriteBinaryFile> - Write to B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
+263 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
 
-264 L<overWriteFile|/overWriteFile> - Write to a B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+264 L<overWriteBinaryFile|/overWriteBinaryFile> - Write to B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
 
-265 L<overWriteHtmlFile|/overWriteHtmlFile> - Write an L<HTML|https://en.wikipedia.org/wiki/HTML> file to /var/www/html and make it readable
+265 L<overWriteFile|/overWriteFile> - Write to a B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-266 L<overWritePerlCgiFile|/overWritePerlCgiFile> - Write a L<Perl|http://www.perl.org/> file to /usr/lib/cgi-bin and make it executable after checking it for syntax errors
+266 L<overWriteHtmlFile|/overWriteHtmlFile> - Write an L<HTML|https://en.wikipedia.org/wiki/HTML> file to /var/www/html and make it readable
 
-267 L<packBySize|/packBySize> - Given B<$N> buckets and a list B<@sizes> of ([size of file, name of file].
+267 L<overWritePerlCgiFile|/overWritePerlCgiFile> - Write a L<Perl|http://www.perl.org/> file to /usr/lib/cgi-bin and make it executable after checking it for syntax errors
 
-268 L<pad|/pad> - Pad the specified B<$string> to a multiple of the specified B<$length>  with blanks or the specified padding character to a multiple of a specified length.
+268 L<packBySize|/packBySize> - Given B<$N> buckets and a list B<@sizes> of ([size of file, name of file].
 
-269 L<parseCommandLineArguments|/parseCommandLineArguments> - Call the specified B<$sub> after classifying the specified array of [arguments] in B<$args> into positional and keyword parameters.
+269 L<pad|/pad> - Pad the specified B<$string> to a multiple of the specified B<$length>  with blanks or the specified padding character to a multiple of a specified length.
 
-270 L<parseDitaRef|/parseDitaRef> - Parse a dita reference B<$ref> into its components (file name, topic id, id) .
+270 L<parseCommandLineArguments|/parseCommandLineArguments> - Call the specified B<$sub> after classifying the specified array of [arguments] in B<$args> into positional and keyword parameters.
 
-271 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension) considering .
+271 L<parseDitaRef|/parseDitaRef> - Parse a dita reference B<$ref> into its components (file name, topic id, id) .
 
-272 L<parseIntoWordsAndStrings|/parseIntoWordsAndStrings> - Parse a B<$string> into words and quoted strings.
+272 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension) considering .
 
-273 L<parseS3BucketAndFolderName|/parseS3BucketAndFolderName> - Parse an L<S3|https://aws.amazon.com/s3/> bucket/folder name into a bucket and a folder name removing any initial s3://.
+273 L<parseIntoWordsAndStrings|/parseIntoWordsAndStrings> - Parse a B<$string> into words and quoted strings.
 
-274 L<parseXmlDocType|/parseXmlDocType> - Parse an L<Xml|https://en.wikipedia.org/wiki/XML> DOCTYPE and return a hash indicating its components
+274 L<parseS3BucketAndFolderName|/parseS3BucketAndFolderName> - Parse an L<S3|https://aws.amazon.com/s3/> bucket/folder name into a bucket and a folder name removing any initial s3://.
 
-275 L<partitionStringsOnPrefixBySize|/partitionStringsOnPrefixBySize> - Partition a hash of strings and associated sizes into partitions with either a maximum size B<$maxSize> or only one element; the hash B<%Sizes> consisting of a mapping {string=>size}; with each partition being named with the shortest string prefix that identifies just the strings in that partition.
+275 L<parseXmlDocType|/parseXmlDocType> - Parse an L<Xml|https://en.wikipedia.org/wiki/XML> DOCTYPE and return a hash indicating its components
 
-276 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+276 L<partitionStringsOnPrefixBySize|/partitionStringsOnPrefixBySize> - Partition a hash of strings and associated sizes into partitions with either a maximum size B<$maxSize> or only one element; the hash B<%Sizes> consisting of a mapping {string=>size}; with each partition being named with the shortest string prefix that identifies just the strings in that partition.
 
-277 L<powerOfTwo|/powerOfTwo> - Test whether a number B<$n> is a power of two, return the power if it is else B<undef>.
+277 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-278 L<printPerlDataAsXml|/printPerlDataAsXml> - Print a Perl data structure as xml
+278 L<powerOfTwo|/powerOfTwo> - Test whether a number B<$n> is a power of two, return the power if it is else B<undef>.
 
-279 L<printQw|/printQw> - Print an array of words in qw() format.
+279 L<printPerlDataAsXml|/printPerlDataAsXml> - Print a Perl data structure as xml
 
-280 L<processFilesInParallel|/processFilesInParallel> - Process files in parallel using (8 * the number of CPUs) processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
+280 L<printQw|/printQw> - Print an array of words in qw() format.
 
-281 L<processJavaFilesInParallel|/processJavaFilesInParallel> - Process java files of known size in parallel using (the number of CPUs) processes with the process each item is assigned to depending on the size of the java item so that each process is loaded with approximately the same number of bytes of data in total from the java files it processes.
+281 L<processFilesInParallel|/processFilesInParallel> - Process files in parallel using (8 * the number of CPUs) processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
 
-282 L<processSizesInParallel|/processSizesInParallel> - Process items of known size in parallel using (8 * the number of CPUs) processes with the process each item is assigned to depending on the size of the item so that each process is loaded with approximately the same number of bytes of data in total from the items it processes.
+282 L<processJavaFilesInParallel|/processJavaFilesInParallel> - Process java files of known size in parallel using (the number of CPUs) processes with the process each item is assigned to depending on the size of the java item so that each process is loaded with approximately the same number of bytes of data in total from the java files it processes.
 
-283 L<processSizesInParallelN|/processSizesInParallelN> - Process items of known size in parallel using the specified number B<$N> processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
+283 L<processSizesInParallel|/processSizesInParallel> - Process items of known size in parallel using (8 * the number of CPUs) processes with the process each item is assigned to depending on the size of the item so that each process is loaded with approximately the same number of bytes of data in total from the items it processes.
 
-284 L<quoteFile|/quoteFile> - Quote a file name.
+284 L<processSizesInParallelN|/processSizesInParallelN> - Process items of known size in parallel using the specified number B<$N> processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
 
-285 L<readBinaryFile|/readBinaryFile> - Read a binary file on the local machine.
+285 L<quoteFile|/quoteFile> - Quote a file name.
 
-286 L<readFile|/readFile> - Return the content of a file residing on the local machine interpreting the content of the file as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+286 L<readBinaryFile|/readBinaryFile> - Read a binary file on the local machine.
 
-287 L<readFileFromRemote|/readFileFromRemote> - Copy and read a B<$file> from the remote machine whose ip address is specified by B<$ip> or returned by L<awsIp> and return the content of $file interpreted as utf8 .
+287 L<readFile|/readFile> - Return the content of a file residing on the local machine interpreting the content of the file as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-288 L<readFiles|/readFiles> - Read all the files in the specified list of folders into a hash.
+288 L<readFileFromRemote|/readFileFromRemote> - Copy and read a B<$file> from the remote machine whose ip address is specified by B<$ip> or returned by L<awsIp> and return the content of $file interpreted as utf8 .
 
-289 L<readGZipFile|/readGZipFile> - Read the specified file containing compressed L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8> through L<gzip|https://en.wikipedia.org/wiki/Gzip>.
+289 L<readFiles|/readFiles> - Read all the files in the specified list of folders into a hash.
 
-290 L<readStdIn|/readStdIn> - Return the contents of STDIN and return the results as either an array or a string.
+290 L<readGZipFile|/readGZipFile> - Read the specified file containing compressed L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8> through L<gzip|https://en.wikipedia.org/wiki/Gzip>.
 
-291 L<readUtf16File|/readUtf16File> - Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> encoded in utf-16.
+291 L<readStdIn|/readStdIn> - Return the contents of STDIN and return the results as either an array or a string.
 
-292 L<rectangularArray|/rectangularArray> - Create a two dimensional rectangular array whose first dimension is B<$first> from a one dimensional linear array.
+292 L<readUtf16File|/readUtf16File> - Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> encoded in utf-16.
 
-293 L<rectangularArray2|/rectangularArray2> - Create a two dimensional rectangular array whose second dimension is B<$second> from a one dimensional linear array.
+293 L<rectangularArray|/rectangularArray> - Create a two dimensional rectangular array whose first dimension is B<$first> from a one dimensional linear array.
 
-294 L<reinstateWellKnown|/reinstateWellKnown> - Contract references to well known Urls to their abbreviated form
+294 L<rectangularArray2|/rectangularArray2> - Create a two dimensional rectangular array whose second dimension is B<$second> from a one dimensional linear array.
 
-295 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Relative file from one absolute file B<$a> against another B<$b>.
+295 L<reinstateWellKnown|/reinstateWellKnown> - Contract references to well known Urls to their abbreviated form
 
-296 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+296 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Relative file from one absolute file B<$a> against another B<$b>.
 
-297 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+297 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-298 L<removeDuplicatePrefixes|/removeDuplicatePrefixes> - Remove duplicated leading directory names from a file name.
+298 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-299 L<removeFilePathsFromStructure|/removeFilePathsFromStructure> - Remove all file paths from a specified B<$structure> to make said $structure testable with L<Test::More/is_deeply>.
+299 L<removeDuplicatePrefixes|/removeDuplicatePrefixes> - Remove duplicated leading directory names from a file name.
 
-300 L<removeFilePrefix|/removeFilePrefix> - Removes a file B<$prefix> from an array of B<@files>.
+300 L<removeFilePathsFromStructure|/removeFilePathsFromStructure> - Remove all file paths from a specified B<$structure> to make said $structure testable with L<Test::More/is_deeply>.
 
-301 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name by ensuring it has a single trailing directory separator.
+301 L<removeFilePrefix|/removeFilePrefix> - Removes a file B<$prefix> from an array of B<@files>.
 
-302 L<replaceStringWithString|/replaceStringWithString> - Replace all instances in B<$string> of B<$source> with B<$target>
+302 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name by ensuring it has a single trailing directory separator.
 
-303 L<reportAttributes|/reportAttributes> - Report the attributes present in a B<$sourceFile>
+303 L<replaceStringWithString|/replaceStringWithString> - Replace all instances in B<$string> of B<$source> with B<$target>
 
-304 L<reportAttributeSettings|/reportAttributeSettings> - Report the current values of the attribute methods in the calling file and optionally write the report to B<$reportFile>.
+304 L<reportAttributes|/reportAttributes> - Report the attributes present in a B<$sourceFile>
 
-305 L<reportExportableMethods|/reportExportableMethods> - Report the exportable methods marked with #e in a B<$sourceFile>
+305 L<reportAttributeSettings|/reportAttributeSettings> - Report the current values of the attribute methods in the calling file and optionally write the report to B<$reportFile>.
 
-306 L<reportReplacableMethods|/reportReplacableMethods> - Report the replaceable methods marked with #r in a B<$sourceFile>
+306 L<reportExportableMethods|/reportExportableMethods> - Report the exportable methods marked with #e in a B<$sourceFile>
 
-307 L<reportSettings|/reportSettings> - Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>.
+307 L<reportReplacableMethods|/reportReplacableMethods> - Report the replaceable methods marked with #r in a B<$sourceFile>
 
-308 L<retrieveFile|/retrieveFile> - Retrieve a B<$file> created via L<Storable|https://metacpan.org/pod/Storable>.
+308 L<reportSettings|/reportSettings> - Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>.
 
-309 L<runInParallel|/runInParallel> - Process the elements of an array in parallel using a maximum of B<$maximumNumberOfProcesses> processes.
+309 L<retrieveFile|/retrieveFile> - Retrieve a B<$file> created via L<Storable|https://metacpan.org/pod/Storable>.
 
-310 L<runInSquareRootParallel|/runInSquareRootParallel> - Process the elements of an array in square root parallel using a maximum of B<$maximumNumberOfProcesses> processes.
+310 L<runInParallel|/runInParallel> - Process the elements of an array in parallel using a maximum of B<$maximumNumberOfProcesses> processes.
 
-311 L<s3Delete|/s3Delete> - Return an S3 --delete keyword from an S3 option set
+311 L<runInSquareRootParallel|/runInSquareRootParallel> - Process the elements of an array in square root parallel using a maximum of B<$maximumNumberOfProcesses> processes.
 
-312 L<s3DownloadFolder|/s3DownloadFolder> - Download a specified B<$folder> on S3 to a B<$local> folder using the specified B<%options> if any.
+312 L<s3Delete|/s3Delete> - Return an S3 --delete keyword from an S3 option set
 
-313 L<s3FileExists|/s3FileExists> - Return (name, size, date, time) for a B<$file> that exists on S3 else () using the specified B<%options> if any.
+313 L<s3DownloadFolder|/s3DownloadFolder> - Download a specified B<$folder> on S3 to a B<$local> folder using the specified B<%options> if any.
 
-314 L<s3ListFilesAndSizes|/s3ListFilesAndSizes> - Return {file=>size} for all the files in a specified B<$folderOrFile> on S3 using the specified B<%options> if any.
+314 L<s3FileExists|/s3FileExists> - Return (name, size, date, time) for a B<$file> that exists on S3 else () using the specified B<%options> if any.
 
-315 L<s3Profile|/s3Profile> - Return an S3 profile keyword from an S3 option set
+315 L<s3ListFilesAndSizes|/s3ListFilesAndSizes> - Return {file=>size} for all the files in a specified B<$folderOrFile> on S3 using the specified B<%options> if any.
 
-316 L<s3ReadFile|/s3ReadFile> - Read from a B<$file> on S3 and write the contents to a local file B<$local> using the specified B<%options> if any.
+316 L<s3Profile|/s3Profile> - Return an S3 profile keyword from an S3 option set
 
-317 L<s3ReadString|/s3ReadString> - Read from a B<$file> on S3 and return the contents as a string using specified B<%options> if any.
+317 L<s3ReadFile|/s3ReadFile> - Read from a B<$file> on S3 and write the contents to a local file B<$local> using the specified B<%options> if any.
 
-318 L<s3WriteFile|/s3WriteFile> - Write to a file B<$fileS3> on S3 the contents of a local file B<$fileLocal> using the specified B<%options> if any.
+318 L<s3ReadString|/s3ReadString> - Read from a B<$file> on S3 and return the contents as a string using specified B<%options> if any.
 
-319 L<s3WriteString|/s3WriteString> - Write to a B<$file> on S3 the contents of B<$string> using the specified B<%options> if any.
+319 L<s3WriteFile|/s3WriteFile> - Write to a file B<$fileS3> on S3 the contents of a local file B<$fileLocal> using the specified B<%options> if any.
 
-320 L<s3ZipFolder|/s3ZipFolder> - Zip the specified B<$source> folder and write it to the named B<$target> file on S3.
+320 L<s3WriteString|/s3WriteString> - Write to a B<$file> on S3 the contents of B<$string> using the specified B<%options> if any.
 
-321 L<s3ZipFolders|/s3ZipFolders> - Zip local folders and upload them to S3 in parallel.
+321 L<s3ZipFolder|/s3ZipFolder> - Zip the specified B<$source> folder and write it to the named B<$target> file on S3.
 
-322 L<saveAwsIp|/saveAwsIp> - Make the server at L<Amazon Web Services|http://aws.amazon.com> with the given IP address the default primary server as used by all the methods whose names end in B<r> or B<Remote>.
+322 L<s3ZipFolders|/s3ZipFolders> - Zip local folders and upload them to S3 in parallel.
 
-323 L<saveCodeToS3|/saveCodeToS3> - Save source code every B<$saveCodeEvery> seconds by zipping folder B<$folder> to zip file B<$zipFileName> then saving this zip file in the specified L<S3|https://aws.amazon.com/s3/> B<$bucket> using any additional L<S3|https://aws.amazon.com/s3/> parameters in B<$S3Parms>.
+323 L<saveAwsIp|/saveAwsIp> - Make the server at L<Amazon Web Services|http://aws.amazon.com> with the given IP address the default primary server as used by all the methods whose names end in B<r> or B<Remote>.
 
-324 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+324 L<saveCodeToS3|/saveCodeToS3> - Save source code every B<$saveCodeEvery> seconds by zipping folder B<$folder> to zip file B<$zipFileName> then saving this zip file in the specified L<S3|https://aws.amazon.com/s3/> B<$bucket> using any additional L<S3|https://aws.amazon.com/s3/> parameters in B<$S3Parms>.
 
-325 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+325 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-326 L<setCombination|/setCombination> - Count the elements in sets B<@s> represented as arrays of strings and/or the keys of hashes
+326 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-327 L<setFileExtension|/setFileExtension> - Given a B<$file>, change its extension to B<$extension>.
+327 L<setCombination|/setCombination> - Count the elements in sets B<@s> represented as arrays of strings and/or the keys of hashes
 
-328 L<setIntersection|/setIntersection> - Intersection of sets B<@s> represented as arrays of strings and/or the keys of hashes
+328 L<setFileExtension|/setFileExtension> - Given a B<$file>, change its extension to B<$extension>.
 
-329 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets B<@s> represented as arrays and/or hashes
+329 L<setIntersection|/setIntersection> - Intersection of sets B<@s> represented as arrays of strings and/or the keys of hashes
 
-330 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+330 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets B<@s> represented as arrays and/or hashes
 
-331 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified level of I<$confidence**2>
+331 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-332 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+332 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified level of I<$confidence**2>
 
-333 L<setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel|/setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+333 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
 
-334 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified I<$confidence**2>
+334 L<setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel|/setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
 
-335 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@strings>, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified I<$confidence**2>
+335 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified I<$confidence**2>
 
-336 L<setPermissionsForFile|/setPermissionsForFile> - Apply L<chmod|https://linux.die.net/man/1/chmod> to a B<$file> to set its B<$permissions>.
+336 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@strings>, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified I<$confidence**2>
 
-337 L<setUnion|/setUnion> - Union of sets B<@s> represented as arrays of strings and/or the keys of hashes
+337 L<setPermissionsForFile|/setPermissionsForFile> - Apply L<chmod|https://linux.die.net/man/1/chmod> to a B<$file> to set its B<$permissions>.
 
-338 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+338 L<setUnion|/setUnion> - Union of sets B<@s> represented as arrays of strings and/or the keys of hashes
 
-339 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+339 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-340 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
+340 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-341 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+341 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
 
-342 L<storeFile|/storeFile> - Store into a B<$file>, after creating a path to the file with L<makePath> if necessary, a data B<$structure> via L<Storable|https://metacpan.org/pod/Storable>.
+342 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-343 L<stringMd5Sum|/stringMd5Sum> - Get the Md5 sum of a B<$string> that might contain L<utf8|https://en.wikipedia.org/wiki/UTF-8> code points.
+343 L<storeFile|/storeFile> - Store into a B<$file>, after creating a path to the file with L<makePath> if necessary, a data B<$structure> via L<Storable|https://metacpan.org/pod/Storable>.
 
-344 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+344 L<stringMd5Sum|/stringMd5Sum> - Get the Md5 sum of a B<$string> that might contain L<utf8|https://en.wikipedia.org/wiki/UTF-8> code points.
 
-345 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+345 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-346 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+346 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-347 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative names of B<@files> starting at the current working folder to get an absolute file name.
+347 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-348 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
+348 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative names of B<@files> starting at the current working folder to get an absolute file name.
 
-349 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+349 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
 
-350 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+350 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-351 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a B<$file> name from a B<$known> name to a B<$new> one if the file does in fact start with the $known name otherwise returns the original file name as it is.
+351 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-352 L<swapFolderPrefix|/swapFolderPrefix> - Given a B<$file>, swap the folder name of the $file from B<$known> to B<$new> if the file $file starts with the $known folder name else return the $file as it is.
+352 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a B<$file> name from a B<$known> name to a B<$new> one if the file does in fact start with the $known name otherwise returns the original file name as it is.
 
-353 L<syncFromS3InParallel|/syncFromS3InParallel> - Download from L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
+353 L<swapFolderPrefix|/swapFolderPrefix> - Given a B<$file>, swap the folder name of the $file from B<$known> to B<$new> if the file $file starts with the $known folder name else return the $file as it is.
 
-354 L<syncToS3InParallel|/syncToS3InParallel> - Upload to L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
+354 L<syncFromS3InParallel|/syncFromS3InParallel> - Download from L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
 
-355 L<temporaryFile|/temporaryFile> - Create a new, empty, temporary file.
+355 L<syncToS3InParallel|/syncToS3InParallel> - Upload to L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
 
-356 L<temporaryFolder|/temporaryFolder> - Create a new, empty, temporary folder.
+356 L<temporaryFile|/temporaryFile> - Create a new, empty, temporary file.
 
-357 L<timeStamp|/timeStamp> - hours:minute:seconds
+357 L<temporaryFolder|/temporaryFolder> - Create a new, empty, temporary folder.
 
-358 L<transitiveClosure|/transitiveClosure> - Transitive closure of a hash of hashes
+358 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-359 L<trim|/trim> - Remove any white space from the front and end of a string.
+359 L<transitiveClosure|/transitiveClosure> - Transitive closure of a hash of hashes
 
-360 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
+360 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-361 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+361 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
 
-362 L<Udsr::webUser|/Udsr::webUser> - Create a systemd installed server that processes http requests using a specified userid.
+362 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-363 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+363 L<Udsr::webUser|/Udsr::webUser> - Create a systemd installed server that processes http requests using a specified userid.
 
-364 L<unbless|/unbless> - Remove the effects of bless from a L<Perl|http://www.perl.org/> data B<$structure> enabling it to be converted to L<Json|https://en.wikipedia.org/wiki/JSON> or compared with L<Test::More::is_deeply>.
+364 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-365 L<unionOfHashesAsArrays|/unionOfHashesAsArrays> - Form the union of the specified hashes B<@h> as one hash whose values are a array of corresponding values from each hash
+365 L<unbless|/unbless> - Remove the effects of bless from a L<Perl|http://www.perl.org/> data B<$structure> enabling it to be converted to L<Json|https://en.wikipedia.org/wiki/JSON> or compared with L<Test::More::is_deeply>.
 
-366 L<unionOfHashKeys|/unionOfHashKeys> - Form the union of the keys of the specified hashes B<@h> as one hash whose keys represent the union.
+366 L<unionOfHashesAsArrays|/unionOfHashesAsArrays> - Form the union of the specified hashes B<@h> as one hash whose values are a array of corresponding values from each hash
 
-367 L<uniqueNameFromFile|/uniqueNameFromFile> - Create a unique name from a file name and the md5 sum of its content
+367 L<unionOfHashKeys|/unionOfHashKeys> - Form the union of the keys of the specified hashes B<@h> as one hash whose keys represent the union.
 
-368 L<updateDocumentation|/updateDocumentation> - Update the documentation for a Perl module from the comments in its source code.
+368 L<uniqueNameFromFile|/uniqueNameFromFile> - Create a unique name from a file name and the md5 sum of its content
 
-369 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a B<$perlModule> and display said documentation in a web browser.
+369 L<updateDocumentation|/updateDocumentation> - Update the documentation for a Perl module from the comments in its source code.
 
-370 L<userId|/userId> - Get or confirm the userid we are currently running under.
+370 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a B<$perlModule> and display said documentation in a web browser.
 
-371 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+371 L<userId|/userId> - Get or confirm the userid we are currently running under.
 
-372 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+372 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-373 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+373 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-374 L<wellKnownUrls|/wellKnownUrls> - Short names for some well known urls
+374 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-375 L<writeBinaryFile|/writeBinaryFile> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
+375 L<wellKnownUrls|/wellKnownUrls> - Short names for some well known urls
 
-376 L<writeFile|/writeFile> - Write to a new B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+376 L<writeBinaryFile|/writeBinaryFile> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
 
-377 L<writeFiles|/writeFiles> - Write the values of a B<$hash> reference into files identified by the key of each value using L<overWriteFile|/overWriteFile> optionally swapping the prefix of each file from B<$old> to B<$new>.
+377 L<writeFile|/writeFile> - Write to a new B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-378 L<writeFileToRemote|/writeFileToRemote> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8> then copy the $file to the remote server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+378 L<writeFiles|/writeFiles> - Write the values of a B<$hash> reference into files identified by the key of each value using L<overWriteFile|/overWriteFile> optionally swapping the prefix of each file from B<$old> to B<$new>.
 
-379 L<writeGZipFile|/writeGZipFile> - Write to a B<$file>, after creating a path to the file with L<makePath> if necessary, through L<gzip|https://en.wikipedia.org/wiki/Gzip> a B<$string> whose content is encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+379 L<writeFileToRemote|/writeFileToRemote> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8> then copy the $file to the remote server whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-380 L<writeStructureTest|/writeStructureTest> - Write a test for a data B<$structure> with file names in it.
+380 L<writeGZipFile|/writeGZipFile> - Write to a B<$file>, after creating a path to the file with L<makePath> if necessary, through L<gzip|https://en.wikipedia.org/wiki/Gzip> a B<$string> whose content is encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-381 L<writeTempFile|/writeTempFile> - Write an array of strings as lines to a temporary file and return the file name.
+381 L<writeStructureTest|/writeStructureTest> - Write a test for a data B<$structure> with file names in it.
 
-382 L<wwwDecode|/wwwDecode> - Percent decode a L<url|https://en.wikipedia.org/wiki/URL> B<$string> per: https://en.
+382 L<writeTempFile|/writeTempFile> - Write an array of strings as lines to a temporary file and return the file name.
 
-383 L<wwwEncode|/wwwEncode> - Percent encode a L<url|https://en.wikipedia.org/wiki/URL> per: https://en.
+383 L<wwwDecode|/wwwDecode> - Percent decode a L<url|https://en.wikipedia.org/wiki/URL> B<$string> per: https://en.
 
-384 L<wwwGitHubAuth|/wwwGitHubAuth> - Logon as a L<GitHub|https://github.com> L<oauth|https://en.wikipedia.org/wiki/OAuth> app per: L<https://github.
+384 L<wwwEncode|/wwwEncode> - Percent encode a L<url|https://en.wikipedia.org/wiki/URL> per: https://en.
 
-385 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+385 L<wwwGitHubAuth|/wwwGitHubAuth> - Logon as a L<GitHub|https://github.com> L<oauth|https://en.wikipedia.org/wiki/OAuth> app per: L<https://github.
 
-386 L<xxxr|/xxxr> - Execute a command B<$cmd> via bash on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+386 L<xxx|/xxx> - Execute a shell command optionally checking its response.
 
-387 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+387 L<xxxr|/xxxr> - Execute a command B<$cmd> via bash on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-388 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+388 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+389 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
 
 =head1 Installation
 
@@ -19664,7 +19688,7 @@ if (1) {                                                                        
     ];
  }
 
-if (1)
+if (1)                                                                          #TparseCommandLineArguments
  {my $r = parseCommandLineArguments
    {ok 1;
     $_[1]

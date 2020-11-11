@@ -1,11 +1,12 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
 # The Gearhart-Brenan Dita Topic Naming Standard
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2019
 #-------------------------------------------------------------------------------
 # podDocumentation
+# gbBinaryStandardFileName produces different results when given the file name versus the file content - it should be the same
 package Dita::GB::Standard;
-our $VERSION = 20190911;
+our $VERSION = 20201030;
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -65,7 +66,7 @@ sub gbStandardFileName($$%)                                                     
   $extension && ($extension =~ m(\A\S{2,}\Z)s) or
     confess "Extension must be non blank and at least two characters long";
   my $name = $options{g} || nameFromStringRestrictedToTitle($content, %options);# Human readable component either as supplied in exceptional cases, or ideally, as taken from the title tag according to the prescription of the Monroe Title Method.
-  my $md5  = $options{md5} // fileMd5Sum($content);                             # Md5 sum either as supplied or computed
+  my $md5  = $options{md5} // stringMd5Sum($content);                           # Md5 sum either as supplied or computed
 
   fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5),                         # Add extension
       fe($extension)||$extension);                                              # fe returns blank given an extension name without a .
@@ -95,7 +96,7 @@ sub gbStandardCreateFile($$$%)                                                  
      {writeFile($comp, $content);                                               # Write companion file
      }
     else
-     {confess "Companion file already exists:\n$comp\n";
+     {lll "Companion file already exists:\n$comp\n";
      }
    }
   $out
@@ -149,7 +150,7 @@ sub gbStandardDelete($)                                                         
 #D1 Make and manage binary files                                                # Make and manage files that conform to the L<GBStandard> and are in plain binary.
 
 sub gbBinaryStandardFileName($$)                                                #E Return the L<GBStandard> file name given the content and extension of a proposed file.
- {my ($content, $extension) = @_;                                               # Content, extension
+ {my ($content, $extension) = @_;                                               # Content a file or a string, extension
   defined($content) or confess "Content must be defined";
 
   my $e = fe($extension) || $extension;                                         # File extension - if given an extension without a leading . fe will return blank
@@ -157,7 +158,7 @@ sub gbBinaryStandardFileName($$)                                                
     confess "Extension must be non blank and at least two characters long: ".
     dump([$e, $extension]);
   my $name   = lc $e;                                                           # Human readable component was taken from the file content but this produced long garbled names as there was no useful ascii content at the start of most image files.  Substituted the extension lower case instead to separate the images out in directory listings.
-  my $md5    = fileMd5Sum($content);                                            # Md5 sum
+  my $md5    = stringMd5Sum($content);                                          # Md5 sum
   fpe($name.q(_).(&useWords ? hexAsWords($md5) : $md5), $e)                     # Add extension
  }
 
@@ -185,7 +186,7 @@ sub gbBinaryStandardCreateFile($$$;$)                                           
      {writeBinaryFile($comp, $companionContent);                                # Write companion file
      }
     else
-     {confess "Companion file already exists:\n$comp\n";
+     {lll "Companion file already exists:\n$comp\n";
      }
    }
   $out

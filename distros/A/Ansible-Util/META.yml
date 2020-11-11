@@ -1,0 +1,40 @@
+---
+abstract: 'Utilities for interacting with Ansible.'
+author:
+  - 'John Gravatt <gravattj@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Util::Medley::File: '0'
+  lib: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ansible-Util
+requires:
+  Alt::Devel::CallParser::ButWorking: '0'
+  Data::Printer: '0'
+  File::Temp: '0'
+  Hash::DotPath: '0.004'
+  JSON: '0'
+  Kavorka: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Util::Medley::Roles::Attributes::Cache: '0'
+  Util::Medley::Roles::Attributes::File: '0'
+  Util::Medley::Roles::Attributes::Logger: '0'
+  Util::Medley::Roles::Attributes::Spawn: '0'
+  YAML: '0'
+  constant: '0'
+  namespace::autoclean: '0'
+resources:
+  repository: https://github.com/gravattj/Ansible-Util-perl.git
+version: '0.001'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

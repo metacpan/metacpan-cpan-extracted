@@ -15,12 +15,12 @@ WriteMakefile(
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
       # modules you MAY have to (or want to) install:
       #  Build and install:
-      #   Test::Pod (can test without)
-      #   Test::CheckManifest (can test without)
-      #   Test::More (required)
+      #   Test::Pod (can test without, tests if present)
+      #   Test::CheckManifest (can test without, tests if present)
+      #   Test::More (required) (is core)
       #  Run time:
-      #   Pod::Simple::HTML (for POD->HTML generation, optional)
-      #   Carp (required)
+      #   Pod::Simple::HTML (for POD->HTML generation, optional) (is core)
+      #   Carp (required) (is core)
       #  And of course, PDF::API2 *OR* PDF::Builder (both can be installed)
     ABSTRACT_FROM     => 'lib/PDF/Table.pm', # retrieve abstract from module
     AUTHOR            => 'Phil Perry <omega@cpan.org>',

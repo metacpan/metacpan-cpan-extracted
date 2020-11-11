@@ -1,9 +1,9 @@
 package Tables::Test::Angka;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2020-11-10'; # DATE
 our $DIST = 'TablesRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Role::Tiny::With;
 with 'TablesRole::Source::CSVDATA';
@@ -21,7 +21,7 @@ Tables::Test::Angka - Number from 1-5 with English and Indonesian text
 
 =head1 VERSION
 
-This document describes version 0.003 of Tables::Test::Angka (from Perl distribution TablesRoles-Standard), released on 2020-06-01.
+This document describes version 0.006 of Tables::Test::Angka (from Perl distribution TablesRoles-Standard), released on 2020-11-10.
 
 =head1 HOMEPAGE
 

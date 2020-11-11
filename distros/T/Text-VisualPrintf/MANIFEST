@@ -15,5 +15,6 @@ t/03_special.t
 t/04_combined.t
 t/05_filehandle.t
 t/06_io.t
+t/07_backspace.t
 META.yml
 MANIFEST

@@ -4,12 +4,13 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'Algorithm::SixDegrees',
-    AUTHOR              => 'Pete Krawczyk <petek@cpan.org>',
+    AUTHOR              => 'Peter Krawczyk <petek@cpan.org>',
     VERSION_FROM        => 'lib/Algorithm/SixDegrees.pm',
     ABSTRACT_FROM       => 'lib/Algorithm/SixDegrees.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
+        'Scalar::Util' => 0,
+        'Test::More'   => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Algorithm-SixDegrees-*' },

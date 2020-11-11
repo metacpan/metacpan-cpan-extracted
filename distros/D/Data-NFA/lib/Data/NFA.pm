@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Data::NFA;
-our $VERSION = 20200623;
+our $VERSION = 20201031;
 require v5.26;
 use warnings FATAL => qw(all);
 use strict;

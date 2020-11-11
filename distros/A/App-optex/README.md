@@ -401,4 +401,4 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2019 Kazumasa Utashiro
+Copyright 2017-2020 Kazumasa Utashiro

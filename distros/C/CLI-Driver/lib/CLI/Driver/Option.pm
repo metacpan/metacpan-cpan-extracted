@@ -63,7 +63,7 @@ has 'use_argv_map' => ( is => 'rw', isa => 'Bool' );
 method get_signature {
 
 	my %sig;
-	
+
 	my $val = $self->_get_val;
 	$self->value($val);
 	if ( defined $val ) {
@@ -123,20 +123,7 @@ method _get_val {
 	my $arg = $self->cli_arg;
 	my $val;
 
-	if ( $self->is_boolean ) {
-		#
-		# deprecated in favor of self->is_flag
-		#
-		my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
-
-		if ($success) {
-			my $val = $val ? 1 : 0;
-			return $val;
-		}
-
-		confess "something went sideways?";
-	}
-	elsif ( $self->is_flag ) {
+	if ( $self->is_flag ) {
 
 		# - just a cli switch
 		# - never required from cmdline
@@ -172,9 +159,9 @@ method _get_val {
 			my $success =
 			  GetOptionsFromArray( \@ARGV, "$arg=$arg_type" => \$val, );
             if ($success) {
-                return $val; 	
+                return $val;
             }
-            		
+
 			confess "something went sideways?" if !$success;
 		}
 
@@ -185,15 +172,6 @@ method _get_val {
 	}
 
 	return;
-}
-
-method is_boolean {
-
-	if ( length $self->cli_arg > 1 ) {
-		return 1;
-	}
-
-	return 0;
 }
 
 1;

@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Win32-Pipe
 abstract: Win32 Named Pipe
-version: 0.025
+version: 0.026
 author:
   - Dave Roth <rothd@roth.net>
   - Jan Dubois <jand@activestate.com>

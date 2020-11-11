@@ -3,8 +3,8 @@ NAME
     directory
 
 VERSION
-    This document describes version 0.004 of Firefox::Util::Profile (from
-    Perl distribution Firefox-Util-Profile), released on 2020-05-24.
+    This document describes version 0.005 of Firefox::Util::Profile (from
+    Perl distribution Firefox-Util-Profile), released on 2020-11-02.
 
 SYNOPSIS
 DESCRIPTION
@@ -33,8 +33,9 @@ FUNCTIONS
 
     List available Firefox profiles.
 
-    This utility will read ~/.mozilla/firefox/profiles.ini and extracts the
-    list of profiles.
+    This utility will read ~/.mozilla/firefox/profiles.ini (or
+    %APPDATA%\Mozilla\Firefox\profiles.ini on Windows) and extracts the list
+    of profiles.
 
     This function is not exported by default, but exportable.
 

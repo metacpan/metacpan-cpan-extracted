@@ -28,6 +28,8 @@ Files: Changes
  t/31lexhas.t
  t/32multifactory-zylite.t
  t/32multifactory.t
+ t/66aq-zylite.t
+ t/66aq.t
  t/70tagrole.t
  t/87weirdscopes.t
  t/88patchpackage.t
@@ -57,6 +59,7 @@ Files: INSTALL
  Makefile.PL
  examples/HTTP-Tiny-Objects/get.pl
  examples/HTTP-Tiny-Objects/lib/HTTP/Tiny/Objects.pm
+ examples/asking.pl
 Copyright: Unknown
 License: Unknown
 

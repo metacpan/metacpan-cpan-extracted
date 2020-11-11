@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Net::Kalk',
-    AUTHOR           => q{Thierry Le Gall <facila@gmx.fr>},
+    AUTHOR           => q{Thierry LE GALL <facila@gmx.fr>},
     VERSION_FROM     => 'lib/Net/Kalk.pm',
     ABSTRACT_FROM    => 'lib/Net/Kalk.pm',
     LICENSE          => 'artistic_2',
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
         #'Foo::Bar::Module' => '5.0401',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Net-Kalk-*' },
+    clean => { FILES => 'Net-Kalk-2.06-*' },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

@@ -17,9 +17,19 @@
 	- Minor POD formatting fixups.
 	- Ran POD through spell-checker.
 	- Default the Redis-key prefix to the Application class to avoid
-  	  collisions if you're running multiple applications on one host.
-        - Updated META.yml to specify build/run dependencies.
+	  collisions if you're running multiple applications on one host.
+    - Updated META.yml to specify build/run dependencies.
 
 0.6 - 05-08-2014
 	- Added explicit licences to the Makefile.PL and git mirror.
 	- Added minimum perl-version.
+
+0.7 - 31-10-2020
+    - Changed throttle algorithm to work on time-slots and not revive again.
+    - Changed Redis calls to avoid race conditions.
+    - Changed Redis calls to single call, most of the time, instead of three.
+    - Added callback for throttle keys to specify your own.
+    - Added callback for throttle rule to filter a specific one on current keys
+    - Allow to ignore throttling when callback returns explicit undef.
+    - Updated POD.
+    - Added unit-test, and hoprefully avoid breaking other their stuff.

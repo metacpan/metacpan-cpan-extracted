@@ -58,19 +58,19 @@
    "provides" : {
       "Pod::Definitions" : {
          "file" : "lib/Pod/Definitions.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Pod::Definitions::Heuristic" : {
          "file" : "lib/Pod/Definitions/Heuristic.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Pod::Headings" : {
          "file" : "lib/Pod/Headings.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

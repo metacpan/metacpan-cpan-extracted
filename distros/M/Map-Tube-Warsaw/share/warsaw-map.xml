@@ -7,34 +7,38 @@
   </lines>
   <stations>
     <!-- https://pl.wikipedia.org/wiki/Linia_M1_metra_w_Warszawie -->
-    <station id="A1" name="Kabaty" line="Linia M1" link="A2"/>
-    <station id="A2" name="Natolin" line="Linia M1" link="A1,A3"/>
-    <station id="A3" name="Imielin" line="Linia M1" link="A2,A4"/>
-    <station id="A4" name="Stokłosy" line="Linia M1" link="A3,A5"/>
-    <station id="A5" name="Ursynów" line="Linia M1" link="A4,A6"/>
-    <station id="A6" name="Służew" line="Linia M1" link="A5,A7"/>
-    <station id="A7" name="Wilanowska" line="Linia M1" link="A6,A8"/>
-    <station id="A8" name="Wierzbno" line="Linia M1" link="A7,A9"/>
-    <station id="A9" name="Racławicka" line="Linia M1" link="A8,A10"/>
-    <station id="A10" name="Pole Mokotowskie" line="Linia M1" link="A9,A11"/>
-    <station id="A11" name="Politechnika" line="Linia M1" link="A10,A13"/>
-    <station id="A13" name="Centrum" line="Linia M1" link="A11,A14"/>
-    <station id="A14" name="Świętokrzyska" line="Linia M1" link="A13,A15" other_link="Tunnel:C11"/>
-    <station id="A15" name="Ratusz Arsenał" line="Linia M1" link="A14,A17"/>
-    <station id="A17" name="Dworzec Gdański" line="Linia M1" link="A15,A18"/>
-    <station id="A18" name="Plac Wilsona" line="Linia M1" link="A17,A19"/>
-    <station id="A19" name="Marymont" line="Linia M1" link="A18,A20"/>
-    <station id="A20" name="Słodowiec" line="Linia M1" link="A19,A21"/>
-    <station id="A21" name="Stare Bielany" line="Linia M1" link="A20,A22"/>
-    <station id="A22" name="Wawrzyszew" line="Linia M1" link="A21,A23"/>
-    <station id="A23" name="Młociny" line="Linia M1" link="A22"/>
+    <station id="A1" name="Kabaty" line="M1:1" link="A2"/>
+    <station id="A2" name="Natolin" line="M1:2" link="A1,A3"/>
+    <station id="A3" name="Imielin" line="M1:3" link="A2,A4"/>
+    <station id="A4" name="Stokłosy" line="M1:4" link="A3,A5"/>
+    <station id="A5" name="Ursynów" line="M1:5" link="A4,A6"/>
+    <station id="A6" name="Służew" line="M1:6" link="A5,A7"/>
+    <station id="A7" name="Wilanowska" line="M1:7" link="A6,A8"/>
+    <station id="A8" name="Wierzbno" line="M1:8" link="A7,A9"/>
+    <station id="A9" name="Racławicka" line="M1:9" link="A8,A10"/>
+    <station id="A10" name="Pole Mokotowskie" line="M1:10" link="A9,A11"/>
+    <station id="A11" name="Politechnika" line="M1:11" link="A10,A13"/>
+    <station id="A13" name="Centrum" line="M1:12" link="A11,A14"/>
+    <station id="A14" name="Świętokrzyska" line="M1:13" link="A13,A15" other_link="Tunnel:C11"/>
+    <station id="A15" name="Ratusz Arsenał" line="M1:14" link="A14,A17"/>
+    <station id="A17" name="Dworzec Gdański" line="M1:15" link="A15,A18"/>
+    <station id="A18" name="Plac Wilsona" line="M1:16" link="A17,A19"/>
+    <station id="A19" name="Marymont" line="M1:17" link="A18,A20"/>
+    <station id="A20" name="Słodowiec" line="M1:18" link="A19,A21"/>
+    <station id="A21" name="Stare Bielany" line="M1:19" link="A20,A22"/>
+    <station id="A22" name="Wawrzyszew" line="M1:20" link="A21,A23"/>
+    <station id="A23" name="Młociny" line="M1:21" link="A22"/>
 
-    <station id="C9" name="Rondo Daszyńskiego" line="Linia M2" link="C10"/>
-    <station id="C10" name="Rondo ONZ" line="Linia M2" link="C9,C11"/>
-    <station id="C11" name="Świętokrzyska" line="Linia M2" link="C10,C12" other_link="Tunnel:A14"/>
-    <station id="C12" name="Nowy Świat-Uniwersytet" line="Linia M2" link="C11,C13"/>
-    <station id="C13" name="Centrum Nauki Kopernik" line="Linia M2" link="C12,C14"/>
-    <station id="C14" name="Stadion Narodowy" line="Linia M2" link="C13,C15"/>
-    <station id="C15" name="Dworzec Wileński" line="Linia M2" link="C14"/>
+    <!-- https://pl.wikipedia.org/wiki/Linia_M2_metra_w_Warszawie -->
+    <station id="C6" name="Księcia Janusza" line="M2:6" link="C7"/>
+    <station id="C7" name="Młynów" line="M2:7" link="C6,C8"/>
+    <station id="C8" name="Płocka" line="M2:8" link="C7,C9"/>
+    <station id="C9" name="Rondo Daszyńskiego" line="M2:9" link="C8,C10"/>
+    <station id="C10" name="Rondo ONZ" line="M2:10" link="C9,C11"/>
+    <station id="C11" name="Świętokrzyska" line="M2:11" link="C10,C12" other_link="Tunnel:A14"/>
+    <station id="C12" name="Nowy Świat-Uniwersytet" line="M2:12" link="C11,C13"/>
+    <station id="C13" name="Centrum Nauki Kopernik" line="M2:13" link="C12,C14"/>
+    <station id="C14" name="Stadion Narodowy" line="M2:14" link="C13,C15"/>
+    <station id="C15" name="Dworzec Wileński" line="M2:15" link="C14"/>
   </stations>
 </tube>

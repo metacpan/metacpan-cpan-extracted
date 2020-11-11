@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Filename::Archive - Archive filename
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Regexp::Pattern::Filename::Archive (from Perl distribution
-    Regexp-Pattern-Filename-Archive), released on 2020-04-01.
+    Regexp-Pattern-Filename-Archive), released on 2020-05-31.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -22,11 +22,13 @@ PATTERNS
 
         No extension.
 
-         "foo" =~ re("Filename::Archive::filename_archive");  # doesn't match
+         "foo" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
 
         Not an extension.
 
-         "zip" =~ re("Filename::Archive::filename_archive");  # doesn't match
+         "zip" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
+
+        Example #3.
 
          "foo.zip" =~ re("Filename::Archive::filename_archive");  # matches
 
@@ -40,9 +42,11 @@ PATTERNS
 
         Regex is anchored.
 
-         "foo.ARJ is the file" =~ re("Filename::Archive::filename_archive");  # doesn't match
+         "foo.ARJ is the file" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
 
-         "foo.txt" =~ re("Filename::Archive::filename_archive");  # doesn't match
+        Example #7.
+
+         "foo.txt" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -61,9 +65,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Filename::Archive
+
     Regexp::Pattern
 
-    Filename::Archive
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

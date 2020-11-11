@@ -1,10 +1,9 @@
 'digraph Perl {
- graph [ label="Record demo 3 - Deeply nested records using strings as labels" ]
- node [ shape="record" ]
- "Alphabet" [ label="<port_a> a:port_a |{<port_b> b:port_b | c |{<port_d> d:port_d | e | f |{ g |<port_h> h:port_h | i | j |{ k | l | m |<port_n> n:port_n | o | p}| q | r |<port_s> s:port_s | t }| u | v |<port_w> w:port_w }| x |<port_y> y:port_y }| z" ]
- "Alphabet":port_a -> "Alphabet":port_n [ color="maroon" ]
- "Alphabet":port_b -> "Alphabet":port_s [ color="blue" ]
- "Alphabet":port_d -> "Alphabet":port_w [ color="red" ]
- "Alphabet":port_y -> "Alphabet":port_h [ color="green" ]
+ graph [ label="Record demo 3 - Deeply nested records using nested array-refs" ]
+ "Alphabet" [ label="<port_a> a:port_a|{<port_b> b:port_b|<port1> c|{<port_d> d:port_d|<port2> e|<port3> f|{<port4> g|<port_h> h:port_h|<port5> i|<port6> j|{<port7> k|<port8> l|<port9> m|<port_n> n:port_n|<port10> o|<port11> p}|<port12> q|<port13> r|<port_s> s:port_s|<port14> t}|<port15> u|<port16> v|<port_w> w:port_w}|<port17> x|<port_y> y:port_y}|<port18> z" shape="record" ]
+ "Alphabet":"port_a" -> "Alphabet":"port_n" [ color="maroon" ]
+ "Alphabet":"port_b" -> "Alphabet":"port_s" [ color="blue" ]
+ "Alphabet":"port_d" -> "Alphabet":"port_w" [ color="red" ]
+ "Alphabet":"port_y" -> "Alphabet":"port_h" [ color="green" ]
 }
 '

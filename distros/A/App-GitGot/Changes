@@ -1,5 +1,14 @@
 Changes file for App-GitGot
 
+1.339     2020-10-29 20:36:17-07:00 America/Los_Angeles
+
+  * s/main/master/g in tests and documentation [#74] (genehack)
+
+1.338     2020-10-26 18:46:10-07:00 America/Los_Angeles
+
+  * switch JSON backend to JSON::MaybeXS (Karen Etheridge)
+  * s/master/main/g in tests and documentation [#74] (genehack)
+
 1.337     2020-04-25 15:33:17-07:00 America/Los_Angeles
 
   * Add 'readd' command to update repo entries in ~/.gitgot based on
@@ -10,7 +19,6 @@ Changes file for App-GitGot
   * switch from File::HomeDir to File::HomeDir::Tiny, for fewer
     dependencies (Karen Etheridge) [#70]
 
->>>>>>> ether/ether/homedir
 1.336     2018-04-13 15:38:00-07:00 America/Los_Angeles
 
   * Add 'git-got' binary to allow running as `git got` (genehack)

@@ -27,7 +27,7 @@ $ptkPath =~ s/\/Lang.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '1.25',
+    'VERSION'	=> '1.26',
     'XS_VERSION'=> '0.9',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
@@ -55,23 +55,7 @@ sub MY::post_initialize
  my ($self) = @_;
  my %mTk;
  my $dir;
- my @list;
- if ($Tk::MMutil::IsWin32)
-  {  # only Tktable needed for everything
-   @list = ($mTkDir);
-  }
- elsif ($win_arch eq 'open32')
-  {
-   @list = ($mTkDir);
-  }
- elsif ($win_arch eq 'pm')
-  {
-   @list = ($mTkDir);
-  }
- else
-  {
-   @list = ($mTkDir);
-  }
+ my @list = ($mTkDir);
  print STDERR "Generating Dependencies for $^O, win_arch=$win_arch\n";
  foreach $dir (@list)
   {
@@ -82,7 +66,7 @@ sub MY::post_initialize
     {
      while (<EXC>)
       {          
-       chomp;    
+       s/\s+$//s;
        s/#.*$//;
        next unless /\S/;
        $mTk{$_} = $self->catfile($src,$_) unless (exists $mTk{$_});
@@ -96,7 +80,7 @@ sub MY::post_initialize
       {            
        while (<EXC>)
         {          
-         chomp;    
+         s/\s+$//s;
          s/#.*$//;
          next unless /\S/;
          $exc{$_} = 1;
@@ -236,7 +220,7 @@ sub MY::postamble {
 
     $dep .= $self->dir_target(@{$self->{'dir_targets'}}); 
     
-    # add some additional dir targets - reason currently unknown. Use $(DFSEP) as dir separatir or makefile will not find target (target uses $(DFSEP) too).
+    # add some additional dir targets - reason currently unknown. Use $(DFSEP) as dir separator or makefile will not find target (target uses $(DFSEP) too).
     $dep .= "config :: " . join(" \\\n\t",map($_.'$(DFSEP).exists',@{$self->{'dir_targets'}})) .
         "\n\t".$self->{NOECHO}."\$(NOOP)\n";
 

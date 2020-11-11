@@ -1,0 +1,32 @@
+---
+abstract: 'Mojolicious Plugin to send mail through Email::Mailer.'
+author:
+  - 'Luc Didry <ldidry@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-EmailMailer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Email::Mailer: '1.15'
+  Email::Sender: '1.300034'
+  Hash::Merge: '0'
+  MIME::Words: '0'
+  Mojolicious: '8.36'
+  Try::Tiny: '0.30'
+  perl: '5.02'
+resources:
+  bugtracker: https://framagit.org/luc/mojolicious-plugin-emailmailer/issues
+  repository: https://framagit.org/luc/mojolicious-plugin-emailmailer.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

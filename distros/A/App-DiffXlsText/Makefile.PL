@@ -20,9 +20,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::DiffXlsText",
   "PREREQ_PM" => {
-    "App::OfficeUtils" => "0.004",
     "File::Temp" => "0.2307",
     "File::Which" => 0,
+    "File::chdir" => 0,
     "Getopt::Long" => "2.50",
     "IPC::System::Options" => "0.335",
     "Log::ger" => "0.037",
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,10 +43,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::OfficeUtils" => "0.004",
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
   "File::Which" => 0,
+  "File::chdir" => 0,
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

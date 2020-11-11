@@ -3,15 +3,13 @@
 #
 #  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget;
+package Tickit::Widget 0.53;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.54';
-
 use Carp;
-use Scalar::Util qw( weaken );
+use Scalar::Util qw( blessed weaken );
 use List::Util 1.33 qw( all );
 
 use Tickit::Pen;
@@ -290,6 +288,12 @@ sub get_style_values
       }
 
       undef $tagset;
+
+      # After all the classes, try again with type as "*"
+      if( $type ne "*" and !@classes ) {
+         $type = "*";
+         @classes = ( $self->style_classes, undef );
+      }
    }
 
    foreach my $i ( 0 .. $#keys ) {
@@ -932,6 +936,52 @@ notated by a literal space character in brackets, for neatness of the style
 information.
 
 =cut
+
+=head1 UTILITY FUNCTIONS
+
+The following functions (not methods) are not exported by this package, but
+intended to be called by widget subclasses fully-qualified.
+
+=cut
+
+=head2 split_widget_opts
+
+   ( $widget, %opts ) = split_widget_opts( $arg )
+
+If C<$arg> is an object reference derived from C<Tickit::Widget>, return it
+directly with no extra options.
+
+If C<$arg> is a reference to an unblessed hash, return the C<widget> value
+from it (which must exist), followed by any other keys and values in no
+particular order.
+
+This function is intended for methods that add an entire collection of child
+widgets in a single call (for example L<Tickit::Widget::LinearBox>'s
+C<add_children>) where the caller wants to override options on specific ones.
+
+=cut
+
+sub split_widget_opts
+{
+   my ( $arg ) = @_;
+
+   my $child;
+   my %opts;
+
+   if( blessed $arg and $arg->isa( "Tickit::Widget" ) ) {
+      $child = $arg;
+   }
+   elsif( ref $arg eq "HASH" ) {
+      %opts = %$arg;
+      $child = delete $opts{child} or
+         croak "Expected to find a 'child' key";
+   }
+   else {
+      croak "Unsure what to do with argument $arg";
+   }
+
+   return ( $child, %opts );
+}
 
 =head1 EXAMPLES
 

@@ -27,6 +27,7 @@ prereqs:
       - List::Util
       - Module::Loader
       - Moo
+      - Ref::Util
       - Safe::Isa
       - Scalar::Util
       - String::CamelCase

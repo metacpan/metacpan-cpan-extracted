@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 2f15b97fe52ddd5054198f3f6fff47d0efa12c9f2f94a017c1a723ba04ba538e COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 3b48af00cf6de88b59cb4cf57c99366813faf442e4314269b682c8480103dab5 Changes
+SHA256 88af6694a8d5c4479d6d8081e427b64c0ebc684d37fedbbda50fbe4e4dd6e6eb INSTALL
+SHA256 1fb7395e76eabf94c421912d7d0a4f7fa745d49e1acb76b222c21d605b66bd25 LICENSE
+SHA256 5da09ca382d034817a848e68ad81834ecea429927e6311c3a8c326464f235c64 MANIFEST
+SHA256 5d7a4a8c02c7dfc8c2c364a4a2fcf83357a6c04cb65c02a561dd9c07f1b3d86e META.json
+SHA256 3aee95f394d782a74c09754b4a472f1ebe848029b4fb893b4508490993beb795 META.yml
+SHA256 2caa63bf8e41ebedf1976cacbbcd0b566528995859133cba837a114ef7b62ab4 Makefile.PL
+SHA256 b4df4f26fe2297cc62081832c1957c9086be7bce92a7c6ec6cff2f59b3bc2ac9 README
+SHA256 a4be220e6e0e6c90edf99e31fdb740a7e71036207e7962369300153278eb33b6 dist.ini
+SHA256 3542814d8ea6b87dd9f4cc4e249292cfee7ff6788caed451a85690a63b8bf66c doap.ttl
+SHA256 38d4d62d6596ba8792512e88852541af1e09901d5e918ecdd2e9c7b6ed3a93cc examples/greeter
+SHA256 b0362e7be9de786f95bc800300db42e3bd589e0a1c6895600771625e5c4c6c9a examples/greeter-ask
+SHA256 ef9484368069a9d30a2e69204c9ce2bb01650a08d28d145b3f9ad5cca1938998 lib/Z/App.pm
+SHA256 2214d2a2c7084df637a50b7447c08b7abbc591ec09a63d80582cf1eae22dc8be lib/Zydeco/Lite/App.pm
+SHA256 5060b8e306bb7db67ffff2539c26323737a0cc256b631b766a7c078cdcef8148 t-02app.toml
+SHA256 4fbb4df2ea659870c48de2bc1f8832cd0e755f8d5ca35f04bc8303158e4df023 t/01basic.t
+SHA256 9bb5e833c771162e2e3de7d8b8f526aff05a28faecea0f6a8dec6ab4f30d74fb t/02app.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCX6gZCwAKCRDOv4Eoaip9
+OX/3AKCtmKiFqjSYpjekigCPpskoYS1XsgCgsiHyBHaFY5d1nQ+9ZNnkRzrGRW0=
+=egeg
+-----END PGP SIGNATURE-----

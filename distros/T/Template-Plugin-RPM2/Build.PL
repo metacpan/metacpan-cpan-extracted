@@ -19,6 +19,16 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup      => [ 'Template-Plugin-RPM2-*' ],
     create_makefile_pl  => 'traditional',
+    meta_merge => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'git://github.com/davorg/template-plugin-rpm2.git',
+                web  => 'https://github.com/davorg/template-plugin-rpm2',
+            },
+        },
+    },
 );
 
 $builder->create_build_script();

@@ -1,3 +1,8 @@
-0.001    2018-09-07 (PERLANCAR)
+0.002   2020-10-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: case_insensitive_comparison.
+
+
+0.001    2018-09-07  Released-By: PERLANCAR
 
          - First release.

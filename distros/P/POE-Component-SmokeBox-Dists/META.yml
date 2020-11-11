@@ -3,29 +3,33 @@ abstract: 'Search for CPAN distributions by cpanid or distribution name'
 author:
   - 'Chris Williams <chris@bingosnet.co.uk>'
 build_requires:
-  Capture::Tiny: 0
-  Test::More: 0.88
-  blib: 0
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: POE-Component-SmokeBox-Dists
 requires:
-  CPAN::DistnameInfo: 0.06
-  File::Fetch: 0
-  File::Path: 0
-  File::Spec: 0
-  IO::Zlib: 0
-  POE: 1.004
-  Sort::Versions: 1.5
-  URI: 0
-  perl: 5.006
+  CPAN::DistnameInfo: '0.06'
+  File::Fetch: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  IO::Zlib: '0'
+  POE: '1.004'
+  Sort::Versions: '1.5'
+  URI: '0'
+  perl: '5.006'
 resources:
   homepage: https://github.com/bingos/poe-component-smokebox-dists
   repository: https://github.com/bingos/poe-component-smokebox-dists.git
-version: 1.08
+version: '1.10'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

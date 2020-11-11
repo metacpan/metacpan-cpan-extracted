@@ -2583,6 +2583,8 @@ void
 Trans_DESTROY(trans)
   URPM::Transaction trans
   CODE:
+  FD_t fd = rpmtsScriptFd(trans->ts);
+  if (fd) Fclose(fd);
   (void)rpmtsFree(trans->ts);
   if (!--trans->count) free(trans);
 

@@ -4,7 +4,7 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,7 +53,7 @@
    "provides" : {
       "Comics" : {
          "file" : "lib/Comics.pm",
-         "version" : "1.16"
+         "version" : "1.18"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "web" : "https://github.com/sciurius/comics"
       }
    },
-   "version" : "1.16",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

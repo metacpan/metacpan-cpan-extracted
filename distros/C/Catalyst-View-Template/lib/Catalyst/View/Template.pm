@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package Catalyst::View::Template;
 
-our $VERSION = '1.001';
+our $VERSION = '1.101';
 
 use MRO::Compat ();
 use Catalyst::Utils ();
@@ -39,15 +39,15 @@ sub new_template {
 }
 
 sub process {
-	my ( $self, $c, $template ) = ( shift, shift, shift );
+	my ( $self, $c ) = ( shift, @_ );
 
 	my %vars = %{ $c->stash };
-	$template ||= $c->stash->{'template'} || $c->action->reverse;
+	my $template = $c->stash->{'template'} || $c->action->reverse;
 
 	my $output;
-	$self->render          ( $c, $template, \%vars, \$output, @_ )
-	? $self->process_output( $c, $template, \%vars, \$output, @_ )
-	: $self->process_error ( $c, $template, \%vars,           @_ )
+	$self->render          ( $c, $template, \%vars, \$output )
+	? $self->process_output( $c, $template, \%vars, \$output )
+	: $self->process_error ( $c, $template, \%vars, )
 }
 
 sub render {

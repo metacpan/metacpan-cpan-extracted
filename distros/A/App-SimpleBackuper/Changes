@@ -1,33 +1,46 @@
-0.2.9 2020-10-26
+0.2.13	2020-01-08
+	- Remove debug of OOM on openBSD: cause of OOM in Compress::Raw::Lzma & this compression method eats many of RAM.
+0.2.12	2020-01-05
+	- Removed requirements included to perl core.
+	- Debug OOM for openbsd.
+0.2.11	2020-01-02
+	- Do not restoring mode and ownership of symlinks.
+	- Debug OOM for openbsd.
+0.2.10	2020-10-31
+	- Minor docs fix.
+	- Minor fix in stats command.
+	- Progress info minor fix.
+	- Tests run in verbose mode.
+0.2.9	2020-10-26
 	- Fix merging blocks of file parts.
-0.2.8 2020-10-22
+0.2.8	2020-10-22
 	- Minor POD fix.
-0.2.7 2020-10-21
+0.2.7	2020-10-21
 	- Fix case with ignoring some dirs to backup.
 	- Minor storage integrity report fix.
 	- Minor verbosity output fix.
 	- Minor POD improvement.
-0.2.6 2020-10-18
+0.2.6	2020-10-18
 	- POD minor change.
-0.2.5 2020-10-18
+0.2.5	2020-10-18
 	- Version bump.
-0.2.4 2020-10-18
+0.2.4	2020-10-18
 	- Added info about installing required libs to docs.
 	- Fix some restoring bugs.
-0.2.3 2020-10-16
+0.2.3	2020-10-16
 	- Try to fix issue with failed test on comparing file owner in FreeBSD.
 	- Little bit POD improvement.
 	- Fix win32 exception in Makefile.PL.
-0.2.2 2020-10-15
+0.2.2	2020-10-15
 	- Some kwalitee improvements.
-0.2.1 2020-10-15
+0.2.1	2020-10-15
 	- Some kwalitee improvements.
-0.2.0 2020-10-15
+0.2.0	2020-10-15
 	- Version bump.
-0.1.1 2020-10-15
+0.1.1	2020-10-15
 	- Fix cpan module requirements.
 	- POD moved to .pod-file.
-0.1   2020-10-12
+0.1   	2020-10-12
 	- Fully rewrited app.
 	- Data encryption on host with backuped data.
 	- Data compression with LZMA algorythm.

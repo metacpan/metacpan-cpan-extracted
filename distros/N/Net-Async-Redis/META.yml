@@ -5,22 +5,17 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  IO::Async::Loop: '0'
-  IO::Async::Test: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::Any::Adapter: '0'
   Test::CheckDeps: '0.010'
   Test::Deep: '0'
-  Test::Fatal: '0'
   Test::HexString: '0'
   Test::More: '0.98'
   Variable::Disposition: '0.004'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,37 +31,37 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '3.002'
+    version: '3.004'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '3.002'
+    version: '3.004'
 requires:
   Cache::LRU: '0.04'
   Class::Method::Modifiers: '0'
@@ -74,37 +69,24 @@ requires:
   Future: '0.42'
   Future::AsyncAwait: '0.40'
   IO::Async: '0'
-  IO::Async::Notifier: '0'
-  IO::Async::Stream: '0'
   List::BinarySearch::XS: '0.09'
   List::Util: '1.29'
-  List::UtilsBy: '0'
   Log::Any: '1.050'
   Math::Random::Secure: '0'
   Metrics::Any: '0'
-  Mixin::Event::Dispatch::Bus: '2.000'
   OpenTracing::Any: '1.003'
   Ryu::Async: '0.016'
-  Scalar::Util: '0'
-  Syntax::Keyword::Dynamically: '0'
+  Syntax::Keyword::Dynamically: '0.06'
   Syntax::Keyword::Try: '0.11'
   URI: '0'
   URI::redis: '0'
-  constant: '0'
   curry: '0'
-  curry::weak: '0'
-  indirect: '0'
-  mro: '0'
-  overload: '0'
   parent: '0'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '3.002'
+version: '3.004'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'

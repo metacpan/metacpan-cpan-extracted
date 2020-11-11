@@ -14,10 +14,11 @@ my @files = (
     'lib/Games/Solitaire/BlackHole/Solver/App/Base.pm',
     'lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/01-run.t',
+    't/data/1.bh.board.txt',
     't/data/10.golf.board.txt',
     't/data/26464608654870335080.bh.board.txt',
+    't/data/27.bh.board.txt',
     't/data/35.golf.board.txt'
 );
 

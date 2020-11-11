@@ -1,9 +1,9 @@
 package TablesRole::Source::CSVDATA;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2020-11-10'; # DATE
 our $DIST = 'TablesRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -108,7 +108,7 @@ TablesRole::Source::CSVDATA - Role to access table data from CSV in DATA section
 
 =head1 VERSION
 
-This document describes version 0.003 of TablesRole::Source::CSVDATA (from Perl distribution TablesRoles-Standard), released on 2020-06-01.
+This document describes version 0.006 of TablesRole::Source::CSVDATA (from Perl distribution TablesRoles-Standard), released on 2020-11-10.
 
 =head1 DESCRIPTION
 

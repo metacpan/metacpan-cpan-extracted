@@ -1,3 +1,29 @@
+1.000038  2020-11-02 20:49:12-08:00 America/Los_Angeles
+
+    - Add shellcall and aux output capture for plugins
+
+1.000037  2020-11-02 14:31:10-08:00 America/Los_Angeles
+
+    - Fix conflict between process management and resource management
+
+1.000036  2020-11-01 20:34:19-08:00 America/Los_Angeles
+
+    - Add initializing status line
+
+1.000035  2020-10-29 15:00:33-07:00 America/Los_Angeles
+
+    - Add glob() and relgob() .yath.rc pseudo-functions
+    - Document rel() .yath.rc pseudo-function
+
+1.000034  2020-10-29 07:51:19-07:00 America/Los_Angeles
+
+    - Fix warning when output is not a terminal
+
+1.000033  2020-10-28 16:37:19-07:00 America/Los_Angeles
+
+    - Better status line while tests are running
+    - Do not use --START-- and --END-- on long single-lines
+
 1.000032  2020-10-23 11:59:34-07:00 America/Los_Angeles
 
     - Make it possible to run an alternate file to the one specified
@@ -35,7 +61,7 @@
 
 1.000024  2020-08-24 09:06:43-07:00 America/Los_Angeles
 
-    - Add Test2::Harness::Runner::Resource for reasource management
+    - Add Test2::Harness::Runner::Resource for resource management
 
 1.000023  2020-08-14 21:18:29-07:00 America/Los_Angeles
 

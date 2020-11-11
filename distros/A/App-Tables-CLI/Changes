@@ -1,0 +1,15 @@
+0.003   2020-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename distribution from App-tables to App-Tables-CLI to avoid clash
+          with existing App::Tables.
+
+
+0.002   2020-11-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Change 'table' argument to allow optional args in
+	  Mod=arg1name,arg1val,arg2name,arg2val,... syntax.
+
+
+0.001   2020-06-01  Released-By: PERLANCAR
+
+        - First early release.

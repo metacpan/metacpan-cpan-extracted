@@ -8,6 +8,7 @@ pod_spelling_system:
   stopwords:
     - wasmtime
     - Wasm
+    - WebAssembly
 
 pod_coverage:
   skip: 0

@@ -1,5 +1,8 @@
 Revision history for App::Cpanx
 
+0.10 Tue Oct 27 23:22:54 CDT 2020
+    - Do not install testing and Dist::Zilla prerequisits
+
 0.08  Tue Jun  5 11:17:58 CDT 2018
     - Display the actual curl command
 

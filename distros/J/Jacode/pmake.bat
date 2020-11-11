@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.22';
+$VERSIONE = '0.23';
 $VERSIONE = $VERSIONE;
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
@@ -1315,6 +1315,7 @@ pmake - make of Perl Poor Tools
   pmake.bat install
   pmake.bat dist
   pmake.bat ptar
+  pmake.bat xzvf
   pmake.bat pwget
 
 =head1 DEPENDENCIES

@@ -1,5 +1,5 @@
 This archive contains the distribution Test-Dependencies,
-version 0.29:
+version 0.30:
 
   Verify dependencies in META.yml, META.json or cpanfile
 

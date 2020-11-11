@@ -9,6 +9,7 @@ namespace panda { namespace protocol { namespace http {
 struct Request : Message, AllocatedObject<Request> {
     enum class Method {unspecified, OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT};
     enum class EncType {MULTIPART, URLENCODED, disabled};
+    enum class FormStreaming { none, started, file, done };
 
     static inline string method_str(Request::Method rm) noexcept {
         using Method = Request::Method;
@@ -29,7 +30,13 @@ struct Request : Message, AllocatedObject<Request> {
     struct Builder; template <class, class> struct BuilderImpl;
     using Cookies = Fields<string, true, 3>;
 
-    struct Form: string_multimap<string, string> {
+    struct NamedString {
+        string value;
+        string name;
+        string content_type;
+    };
+
+    struct Form: string_multimap<string, NamedString> {
 
         Form(EncType enc_type = EncType::disabled) noexcept :_enc_type(enc_type){}
 
@@ -38,13 +45,13 @@ struct Request : Message, AllocatedObject<Request> {
 
         operator bool () const noexcept { return _enc_type != EncType::disabled; }
 
-        void add(const string& key, const string& value) {
-            insert({key, value});
+        void add(const string& key, const string& value, const string& filename = "", const string content_type = "") {
+            insert({key, NamedString{value, filename, content_type}});
         }
 
     private:
-        void to_body (Body& body, URI& uri, const URISP original_uri, const string& boundary) const noexcept;
-        void to_uri  (URI& uri, const URISP original_uri) const noexcept;
+        const URI* to_body (Body& body, uri::URI &uri, const URISP original_uri, const string& boundary) const noexcept;
+        void to_uri  (URI& uri, const URISP original_uri) const ;
         EncType _enc_type = EncType::MULTIPART;
         friend struct Request;
     };
@@ -83,8 +90,41 @@ struct Request : Message, AllocatedObject<Request> {
 
     std::uint8_t allowed_compression (bool inverse = false) const noexcept;
 
+    void form_stream() {
+        if (_form_streaming == FormStreaming::none) {
+            _form_streaming = FormStreaming::started;
+            form._enc_type = EncType::MULTIPART;
+            _form_boundary = _generate_boundary();
+        }
+        else if (_form_streaming != FormStreaming::started) {
+            throw "invalid state for form streaming";
+        }
+    }
+
+    bool form_streaming() noexcept { return  _form_streaming == FormStreaming::started; }
+
+    wrapped_chunk form_finish();
+    wrapped_chunk form_field(const string& name, const string& content, const string& filename = "", const string& mime_type = "");
+    wrapped_chunk form_file(const string& name, const string filename = "", const string& mime_type = "application/octet-stream");
+    wrapped_chunk form_data(const string& data);
+
 protected:
+    struct SerializationContext: Message::SerializationContext {
+        const URI* uri;
+    };
+
+    string form_trailer(const string& boundary) const noexcept {
+        auto sz = boundary.size() + 6;
+        string r(sz);
+        r += "--";
+        r += boundary;
+        r += "--\r\n";
+        return r;
+    }
+
     Method  _method = Method::unspecified;
+    FormStreaming _form_streaming = FormStreaming::none;
+    string _form_boundary;
 
     template<typename... PrefN>
     void _allow_compression (Compression::Type p, PrefN... prefn) {
@@ -92,6 +132,7 @@ protected:
         return _allow_compression(prefn...);
     }
     void _allow_compression () {}
+    void form_file_finalize(string& out) noexcept;
 
     ~Request () {} // restrict stack allocation
 
@@ -100,6 +141,7 @@ private:
 
     static Method deduce_method (bool has_form, EncType form_enc, Method _method) noexcept;
     string _http_header (SerializationContext &ctx) const;
+    static string _generate_boundary() noexcept;
 };
 using RequestSP = iptr<Request>;
 
@@ -136,6 +178,11 @@ struct Request::BuilderImpl : Message::Builder<T, R> {
     template<typename Form>
     T& form(Form&& form) {
         this->_message->form = std::forward<Form>(form);
+        return this->self();
+    }
+
+    T& form_stream() {
+        this->_message->form_stream();
         return this->self();
     }
 };

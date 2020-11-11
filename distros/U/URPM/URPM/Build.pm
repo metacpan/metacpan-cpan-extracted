@@ -514,7 +514,7 @@ sub make_delta_rpm ($$) {
     @_ == 2 or return 0;
     -e $_[0] && -e $_[1] && -x $MAKEDELTARPM or return 0;
     my @id;
-    my $urpm = new URPM;
+    my $urpm = URPM->new;
     foreach my $i (0, 1) {
 	($id[$i]) = $urpm->parse_rpm($_[$i]);
 	defined $id[$i] or return 0;

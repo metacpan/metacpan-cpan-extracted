@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 package POSIX::1003;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 
 use warnings;

@@ -15,14 +15,16 @@ name: Tree-Ops
 provides:
   Tree::Ops:
     file: lib/Tree/Ops.pm
-    version: '20200725'
+    version: '20201030'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20200418'
+  Data::Table::Text: '20201029'
   Test2::API: '0'
   Test::More: '0'
 resources:
+  bugtracker: https://github.com/philiprbrenan/TreeOps/issues
   license: http://dev.perl.org/licenses/
-version: '20200725'
+  repository: https://github.com/philiprbrenan/TreeOps
+version: '20201030'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

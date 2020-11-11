@@ -71,7 +71,7 @@
    "provides" : {
       "Z" : {
          "file" : "lib/Z.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -90,6 +90,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Z/project"
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

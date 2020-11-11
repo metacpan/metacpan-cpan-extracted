@@ -5,7 +5,7 @@ use Export::XS();
 use XS::librangeV3;
 use XS::libboost::mini;
 
-our $VERSION = '1.0.9';
+our $VERSION = '1.0.10';
 
 XS::Loader::bootstrap;
 

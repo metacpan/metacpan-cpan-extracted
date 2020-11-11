@@ -1,5 +1,5 @@
 package IPC::Simple::Message;
-$IPC::Simple::Message::VERSION = '0.02';
+$IPC::Simple::Message::VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -21,6 +21,7 @@ use overload fallback => 1,
     return $self->source == $other;
   };
 
+use constant IPC_STDIN  => 0;
 use constant IPC_STDOUT => 1;
 use constant IPC_STDERR => 2;
 use constant IPC_ERROR  => 3;
@@ -29,6 +30,7 @@ BEGIN{
   extends 'Exporter';
 
   our @EXPORT = qw(
+    IPC_STDIN
     IPC_STDOUT
     IPC_STDERR
     IPC_ERROR
@@ -63,7 +65,7 @@ IPC::Simple::Message
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

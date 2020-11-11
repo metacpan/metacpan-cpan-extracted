@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::HasError;
 # ABSTRACT: Class to model an error
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -10,6 +10,7 @@ use Mail::BIMI::Error;
 use Sub::Install;
 
 has errors => ( is => 'rw', isa => 'ArrayRef', lazy => 1, default => sub{return []}, traits => ['Cacheable','CacheSerial'] );
+has warnings => ( is => 'rw', isa => 'ArrayRef', lazy => 1, default => sub{return []}, traits => ['Cacheable'] );
 
 
 
@@ -39,6 +40,11 @@ sub add_error($self,$code,$detail=undef) {
     ($detail?(detail=>$detail):()),
   );
   $self->add_error_object($error);
+}
+
+
+sub add_warning($self,$detail) {
+  push $self->warnings->@*, $detail;
 }
 
 
@@ -84,11 +90,11 @@ Mail::BIMI::Role::HasError - Class to model an error
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
-Role for handling validation errors
+Role for handling validation errors and warnings
 
 =head1 METHODS
 
@@ -103,6 +109,10 @@ De-serialize the errors property for cache storage
 =head2 I<add_error($code,$detail)>
 
 Add an error with the given code and optional detail to the current operation.
+
+=head2 I<add_warning($detail)>
+
+Add a warning which may be returned to a validator.
 
 =head2 I<add_error_object($error)>
 

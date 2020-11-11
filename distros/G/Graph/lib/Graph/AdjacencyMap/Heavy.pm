@@ -5,6 +5,7 @@ package Graph::AdjacencyMap::Heavy;
 # ALMOST GUARANTEED TO CHANGE OR GO AWAY IN FUTURE RELEASES.
 
 use strict;
+use warnings;
 
 # $SIG{__DIE__ } = sub { use Carp; confess };
 # $SIG{__WARN__} = sub { use Carp; confess };
@@ -218,6 +219,37 @@ sub del_path {
 	}
     }
     return 1;
+}
+
+# $vertices = hash index => array-ref of vertex-names
+# $this_path = tree-hash of vertex-name to next depth or leaf=index
+sub _rename_path {
+    my ($from, $to, $vertices, $this_path, $depth, $found) = @_;
+    if (!ref $this_path) {
+	# at a leaf
+	return if !defined $found;
+	$vertices->{ $this_path }[ $found ] = $to;
+	return;
+    }
+    my %recurse = map +($_ => undef), keys %$this_path;
+    if (exists $recurse{ $from }) {
+	delete $recurse{ $from };
+	my $tp = $this_path->{ $to } = delete $this_path->{ $from };
+	# recurse with $found defined
+	_rename_path($from, $to, $vertices, $tp, $depth + 1, $depth);
+    }
+    # recurse with $found not further specified
+    _rename_path($from, $to, $vertices, $this_path->{ $_ }, $depth + 1, $found)
+	for keys %recurse;
+}
+
+sub rename_path {
+    my ($m, $from, $to) = @_;
+    return 1 if $m->[ _a ] > 1; # arity > 1, all integers, no names
+    for my $node_length (0..$#{$m->[ _s ]}) {
+	next unless my $this_path = $m->[ _s ][$node_length];
+	_rename_path($from, $to, $m->[ _i ], $this_path, 0);
+    }
 }
 
 sub del_path_by_multi_id {

@@ -33,6 +33,8 @@ SYNOPSIS
 
             use StreamFinder;
 
+            die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
             my $station = new StreamFinder($ARGV[0]);
 
             die "Invalid URL or no streams found!\n"  unless ($station);
@@ -100,18 +102,19 @@ SYNOPSIS
             }
 
 DESCRIPTION
-    StreamFinder accepts a valid radio station or video URL on supported
-    websites and returns the actual stream URL(s), title, and cover art icon
-    for that station / podcast / video. The purpose is that one needs one of
-    these URLs in order to have the option to stream the station / video in
-    one's own choice of media player software rather than using their web
-    browser and accepting flash, ads, javascript, cookies, trackers,
-    web-bugs, and other crapware associated with that method of play. The
-    author uses his own custom all-purpose media player called "Fauxdacious"
-    (his custom hacked version of the open-source "Audacious" audio player).
-    "Fauxdacious" (<https://wildstar84.wordpress.com/fauxdacious/>
-    incorporates this module to decode and play streams, along with their
-    titles / station names, and station / podcast / video icons!
+    StreamFinder accepts a webpage URL for a valid radio station, video, or
+    podcast URL on supported websites and returns the actual stream URL(s),
+    title, and cover art icon for that station / podcast / video. The
+    purpose is that one needs one of these URLs in order to have the option
+    to stream the station / video in one's own choice of media player
+    software rather than using their web browser and accepting flash, ads,
+    javascript, cookies, trackers, web-bugs, and other crapware associated
+    with that method of play. The author uses his own custom all-purpose
+    media player called "Fauxdacious" (his custom hacked version of the
+    open-source "Audacious" audio player). "Fauxdacious"
+    (<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this
+    module to decode and play streams, along with their titles / station
+    names, and station / podcast / video icons!
 
     Please NOTE: StreamFinder is a module, NOT a standalone application. It
     is designed to be used by other Perl applications. To create your own
@@ -121,13 +124,13 @@ DESCRIPTION
     streaming site URL as the argument. You can then edit it to tailor it to
     your needs.
 
-    The currently-supported websites are: banned.video
-    (StreamFinder::BannedVideo), bitchute.com (StreamFinder::Bitchute,
-    blogger.com (StreamFinder::Blogger), brighteon.com
-    (StreamFinder::Brighteon), iheartradio.com (StreamFinder::IHeartRadio),
-    podcasts.apple.com (StreamFinder::Apple), radio.net
-    (StreamFinder::RadioNet), radionomy.com (StreamFinder::Radionomy),
-    reciva.com (StreamFinder::Reciva), spreaker.com podcasts
+    The currently-supported websites are: podcasts.apple.com
+    (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute, blogger.com
+    (StreamFinder::Blogger), brighteon.com (StreamFinder::Brighteon),
+    castbox.fm (StreamFinder::Castbox), iheartradio.com
+    (StreamFinder::IHeartRadio), radio.net (StreamFinder::RadioNet),
+    reciva.com (StreamFinder::Reciva), sermonaudio.com
+    (StreamFinder::SermonAudio) spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
     (StreamFinder::Vimeo), and (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube).
@@ -137,11 +140,9 @@ DESCRIPTION
     as a "rogue app. login" and will cause them to LOCK your account and
     FORCE you to change your password the next time you log in to Facebook!
 
-    NOTE: Radionomy appears to be defunct.
-
-    NOTE: For some sites, ie. Youtube, Vimeo, Brighteon, Bitchute, and
-    BannedVideo, etc. the "station" object actually refers to a specific
-    video or podcast, but functions the same way.
+    NOTE: For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, etc.
+    the "station" object actually refers to a specific video or podcast, but
+    functions the same way.
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
@@ -177,8 +178,9 @@ DESCRIPTION
 
 SUBROUTINES/METHODS
     new(*url* [, *options* ])
-        Accepts a URL and creates and returns a new station object, or
-        *undef* if the URL is not a valid station or no streams are found.
+        Accepts a URL and creates and returns a new station, video, or
+        podcast object, or *undef* if the URL is not a valid station or no
+        streams are found.
 
         NOTE: Depending on the type of site being queried, the "station
         object" can be either a streaming station, a video, or a podcast,
@@ -186,9 +188,9 @@ SUBROUTINES/METHODS
 
         NOTE: A full URL must be specified here, but if using any of the
         subpackage modules directly instead, then either a full URL OR just
-        the station / video's site ID may be used! Reason being that this
-        function parses the full URL to determine which subpackage (site)
-        module to use.
+        the station / video / podcast's site ID may be used! Reason being
+        that this function parses the full URL to determine which subpackage
+        (site) module to use.
 
         *options* can vary depending on the type of site that is being
         queried. One option common to all sites is *-debug*, which turns on
@@ -249,11 +251,12 @@ SUBROUTINES/METHODS
         use by your preferred media player.
 
         NOTE: If no "banner image" (usually a larger image) is found, the
-        "icon image" data will be returned.
+        "icon image" data, if any, will be returned.
 
     $station->getType()
-        Returns the station's type (*submodule-name*). (one of: "Apple",
-        "BannedVideo", "IHeartRadio", "RadioNet", "Radionomy", "Reciva",
+        Returns the station / podcast / video's type (*submodule-name*).
+        (one of: "Apple", "BitChute", "Blogger", "Brighteon", "Castbox",
+        "IHeartRadio", "RadioNet", "Reciva", "SermonAudio", "Spreaker",
         "Tunein", "Youtube" or "Vimeo" - depending on the sight that matched
         the URL.
 

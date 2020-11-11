@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQLLex - SPARQL Lexer
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQLLex version 0.026
+This document describes AtteanX::Parser::SPARQLLex version 0.027
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ This document describes AtteanX::Parser::SPARQLLex version 0.026
 
 =cut
 
-package AtteanX::Parser::SPARQLLex 0.026 {
+package AtteanX::Parser::SPARQLLex 0.027 {
 	use utf8;
 	use Moo;
 	use Attean;
@@ -104,7 +104,7 @@ the SPARQL query/update read from the L<IO::Handle> object C<< $fh >>.
 	}
 }
 
-package AtteanX::Parser::SPARQLLex::Iterator 0.026 {
+package AtteanX::Parser::SPARQLLex::Iterator 0.027 {
 	use utf8;
 	use Moo;
 	use Attean;
@@ -162,6 +162,7 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.026 {
 			q["]	=> '_get_double_literal',
 			q[:]	=> '_get_pname',
 			q[?]	=> '_get_variable',
+			q[$]	=> '_get_variable',
 			q[!]	=> '_get_bang',
 			q[>]	=> '_get_iriref_or_relational',
 			q([)	=> '_get_lbracket_or_anon',
@@ -362,12 +363,22 @@ package AtteanX::Parser::SPARQLLex::Iterator 0.026 {
 
 	sub _get_variable {
 		my $self	= shift;
-		$self->get_char_safe('?');
-		if ($self->buffer =~ /^$r_VARNAME/) {
-			my $name	= $self->read_length($+[0]);
-			return $self->new_token(VAR, $self->start_line, $self->start_column, $name);
+		if (substr($self->buffer, 0, 1) eq '$') {
+			$self->get_char_safe('$');
+			if ($self->buffer =~ /^$r_VARNAME/) {
+				my $name	= $self->read_length($+[0]);
+				return $self->new_token(VAR, $self->start_line, $self->start_column, $name);
+			} else {
+				$self->_throw_error("Invalid variable name");
+			}
 		} else {
-			return $self->new_token(QUESTION, $self->start_line, $self->start_column, '?');
+			$self->get_char_safe('?');
+			if ($self->buffer =~ /^$r_VARNAME/) {
+				my $name	= $self->read_length($+[0]);
+				return $self->new_token(VAR, $self->start_line, $self->start_column, $name);
+			} else {
+				return $self->new_token(QUESTION, $self->start_line, $self->start_column, '?');
+			}
 		}
 	}
 	
@@ -672,7 +683,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams. This
+Copyright (c) 2014--2020 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

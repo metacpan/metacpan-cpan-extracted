@@ -1,0 +1,59 @@
+{
+   "abstract" : "A PKCE extension for Net::OAuth2Server",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OAuth2Server-PKCE",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Method::Modifiers" : "0",
+            "Digest::SHA" : "0",
+            "Role::Tiny" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Net::OAuth2Server::Request::Authorization" : "0.003",
+            "Net::OAuth2Server::Request::Token::AuthorizationCode" : "0.003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ap/Net-OAuth2Server-PKCE/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Net-OAuth2Server-PKCE.git",
+         "web" : "https://github.com/ap/Net-OAuth2Server-PKCE"
+      }
+   },
+   "version" : "0.002",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2020
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

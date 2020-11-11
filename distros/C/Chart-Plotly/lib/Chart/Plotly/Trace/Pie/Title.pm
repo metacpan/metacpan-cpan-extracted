@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Pie::Title::Font;
 
-our $VERSION = '0.040';    # VERSION
+our $VERSION = '0.041';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pie.
 
@@ -69,7 +69,7 @@ Chart::Plotly::Trace::Pie::Title - This attribute is one of the possible options
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use Test::Most;
 use Test::MockModule;
 use Test::Output;
 
-my $socket = Test::MockModule->new('IO::Socket::INET');
+my $socket = Test::MockModule->new('IO::Socket::IP');
 $socket->mock( new => sub {
     return bless( {}, shift );
 } );
@@ -40,6 +40,7 @@ my $settings = {
         name   => 'Yet Another IRC Bot',
         join   => [ '#test', '#perl' ],
         ssl    => 0,
+        ipv6   => 0,
     },
 };
 

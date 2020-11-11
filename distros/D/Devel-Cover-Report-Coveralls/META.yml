@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Devel::Cover::Report::Coveralls:
     file: lib/Devel/Cover/Report/Coveralls.pm
-    version: '0.15'
+    version: '0.20'
 requires:
   Devel::Cover: '1.02'
   HTTP::Tiny: '0.043'
@@ -41,9 +41,10 @@ resources:
   bugtracker: https://github.com/kan/coveralls-perl/issues
   homepage: https://github.com/kan/coveralls-perl
   repository: git://github.com/kan/coveralls-perl.git
-version: '0.15'
+version: '0.20'
 x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Ed J <mohawk2@users.noreply.github.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Jacques Germishuys <jacquesg@striata.com>'
   - 'James Raspass <jraspass@gmail.com>'

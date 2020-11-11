@@ -139,6 +139,20 @@ subtest 'auto module by namespace' => sub {
             $ctx->check(msg => "D", module => "A3");
         }
     };
+    
+    subtest 'up to main' => sub {
+        {
+            package main;
+            our $xlog_module = XLog::Module->new("mainperl");
+            
+            package A4;
+            sub func () { XLog::error("A4"); }
+        }
+        for (1..2) {
+            A4::func();
+            $ctx->check(msg => "A4", module => "mainperl");
+        }
+    };
 };
 
 sub has_module {

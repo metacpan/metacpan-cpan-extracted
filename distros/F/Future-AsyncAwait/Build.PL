@@ -24,7 +24,7 @@ die "OS unsupported - threaded perl earlier than 5.22 (RT124351)"
 my $build = Module::Build->new(
    module_name => 'Future::AsyncAwait',
    requires => {
-      'Future' => 0,
+      'Future' => '0.43',
       'perl' => '5.016', # PL_keyword_plugin, pad_new(), CvDYNFILE, many tests fail on 5.14
       'XS::Parse::Sublike' => '0.10',
    },

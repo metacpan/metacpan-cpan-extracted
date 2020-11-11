@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -177,6 +177,32 @@ is_display( \@screen,
 
    is( $gridbox->rowcount, 3, '->rowcount 3 after incremental build by col' );
    is( $gridbox->colcount, 2, '->colcount 2 after incremental build by col' );
+}
+
+# append_row with options
+{
+   my $gridbox = Tickit::Widget::GridBox->new;
+   $gridbox->append_row( [
+      Tickit::Widget::Static->new( text => "left" ),
+      { child => Tickit::Widget::Static->new( text => "right" ), col_expand => 1 }
+   ] );
+
+   is_deeply( { $gridbox->child_opts( $gridbox->get( 0, 1 ) ) },
+      { col_expand => 1, row_expand => 0 },
+      '->append_row accepts hashes with extra opts' );
+}
+
+# append_col with options
+{
+   my $gridbox = Tickit::Widget::GridBox->new;
+   $gridbox->append_col( [
+      Tickit::Widget::Static->new( text => "top" ),
+      { child => Tickit::Widget::Static->new( text => "bottom" ), row_expand => 1 }
+   ] );
+
+   is_deeply( { $gridbox->child_opts( $gridbox->get( 1, 0 ) ) },
+      { col_expand => 0, row_expand => 1 },
+      '->append_col accepts hashes with extra opts' );
 }
 
 done_testing;

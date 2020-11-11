@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,32 +12,32 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 f2e9bbdc98d8573e690a8ef6c8fcb38f6e9f1943 Build.PL
-SHA1 a7be1af08825cb9f5efcdcc5a305a3d5724c17c8 Changes
-SHA1 7bd12259f7919875fb684c707777b6db6c1a7ec8 INSTALL
-SHA1 8d08f3ce7f533ea91d8392cffee6563cfda282ba LICENSE
-SHA1 3e555b2cb569f65bb209b6c05f01342ad4f66387 MANIFEST
-SHA1 9f64c2b9d558d57e53a3ef8538d7aa8a83a0c997 META.yml
-SHA1 83c41e3fece8a1164aee3ba3579bd086a584bbff Makefile.PL
-SHA1 0fbbe8f1e8215c85b9f2fdd4b6fc468ce2c757f3 README
-SHA1 9a9fb4ed2783aa879090379c882f5cd978a0a742 dist.ini
-SHA1 38375213141996df4e721336761516e34d021902 lib/Parse/CSV.pm
-SHA1 b777a52b5967bfaee2f99e9a6efff27937a9d9cc perlcritic.rc
-SHA1 3c5c33067b3b30aa2d405ee46fb16745f8d78c32 t/01_compile.t
-SHA1 4a48c88ca1a43d2392c23c1fd2805e8e9670bfe5 t/02_main.t
-SHA1 d92bd52d8a4963b51372389a0f6108ea12d87787 t/03_data.t
-SHA1 20011aeac19a73a69dfa2bb32422ae4648a129de t/author-critic.t
-SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
-SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
-SHA1 afbd06340ab97c2e86eb4ea8387add7e2bc6590c t/data/malformed.csv
-SHA1 fc9da04ffc04d4e0b46e6b7ebdf4767654f0f637 t/data/newlines.csv
-SHA1 3db576757504a8b76cf956632e91e90b5bf4e59d t/data/simple.csv
+SHA256 c3264d2dcf758a72489c6d543e6f299bfeeaefa3052257e6600ff7ba3b8fc696 Build.PL
+SHA256 77c9800268eea553c5bdbc8ba82127ecb4d0f9d71c2cec53ed8f12d2d9086348 Changes
+SHA256 bca87457edf9426a5f80bcb3421f3ba1063670ef736ec23e4ec1f2df01728184 INSTALL
+SHA256 746afe391368bbbbc95ff11ebcbde11de70dca404d136d8068e40bc859bba417 LICENSE
+SHA256 74b523cc471578abaa35f1196896563108a8160a04c5aad2d72848fac6fe14c2 MANIFEST
+SHA256 73673e8356e6c96fa01ad10fc7a86a92e5fac237e821db702a5c733d2672e839 META.yml
+SHA256 d4f6283ca73571f75f4d87b6208f4dbab71b57049b98a9f69f755fa6120c504c Makefile.PL
+SHA256 97594705ea13b91659643cbb2871424a44214c1e7287da52b8fb6f0b3a480232 README
+SHA256 a6b2f0bab0c11908a9cc492242335b809c7d8137fd9e4243c2f237391066556f dist.ini
+SHA256 96e6808f56d3b476b3e17c9c4a3a9750e46addf5c1c6f7fd3329d8787981c4f0 lib/Parse/CSV.pm
+SHA256 15e671dbcd5a27370d9eb815ab39ccfe41a9ef17db07730b382dd153bce922ff perlcritic.rc
+SHA256 decb373cef66d69c2b72c6be28bc1a447231f144c115b3a6064d71a8e2d8acec t/01_compile.t
+SHA256 11e18c8420c02eba2822cfe4235f4b0f8f0bfda5ba3c2c41e8423f45c7ccb204 t/02_main.t
+SHA256 f27f823d4467a124c45538103e6d5d3e01dd99102cf5484cf331c780a13144fb t/03_data.t
+SHA256 d58e5c4f2e2d61f37b23600a075825ae1c125754dd16408f827f415d4b35912a t/author-critic.t
+SHA256 8a96a1b54dca225db0ffc545d4e0d58b3fd1605bece1d3e434ba1d988d479473 t/author-pod-coverage.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 87caa7d303f40d43b1fff1fbc3a69276041d05fa45fb29ec73eb6178cf9fd2e7 t/data/malformed.csv
+SHA256 b886013425d0829ef2b5f08b0cb0e44cfdb243e641f2c1d89e346b00c629c429 t/data/newlines.csv
+SHA256 86f7262d26e7300d9c23a5dbb7a7479f02798c0659b64937f4aadf905b3ed3ac t/data/simple.csv
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - http://gpgtools.org
 
-iF0EARECAB0WIQSty9sFtA6yoqVVVGKCu8wEt++UdgUCWzWfJQAKCRCCu8wEt++U
-dq3MAKDiwn+jo6JjDaeEMHlsSfHP1IioPACcCqn9ZIYtt8+ftNBmRgJMFX8djtA=
-=dMLs
+iF0EAREDAB0WIQSty9sFtA6yoqVVVGKCu8wEt++UdgUCX542+QAKCRCCu8wEt++U
+dqhqAJ0U/hg5EwYjA9Gd05q54WiwvKZmEACZAV/Sity6Y7y3+8wsVPCG7WFPSH4=
+=VuBL
 -----END PGP SIGNATURE-----

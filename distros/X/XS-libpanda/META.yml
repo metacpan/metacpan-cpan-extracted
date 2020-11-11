@@ -3,16 +3,16 @@ abstract: 'panda::lib C++ library for XS.'
 author:
   - unknown
 build_requires:
-  Test::Catch: v1.0.13
+  Test::Catch: v1.0.14
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::libcatch: v2.12.1
+  XS::libcatch: v2.12.1.1
 configure_requires:
   Alien::cmake3: '0'
-  Test::Catch: v1.0.13
-  XS::Install: v1.2.20
-  XS::libcatch: v2.12.1
+  Test::Catch: v1.0.14
+  XS::Install: v1.2.21
+  XS::libcatch: v2.12.1.1
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -25,7 +25,7 @@ no_index:
     - t
     - inc
 requires:
-  XS::Install: v1.2.20
+  XS::Install: v1.2.21
   perl: '5.012000'
-version: v1.4.9
+version: v1.4.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

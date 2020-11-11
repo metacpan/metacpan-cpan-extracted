@@ -1,0 +1,87 @@
+=head1 NAME
+
+UniEvent::Check - runs the given callback once after polling for I/O
+
+=head1 SYNOPSIS
+
+    my $loop = UniEvent::Loop->default_loop;
+    my $h = UniEvent::Check->new;
+    $h->event->add(sub { say 'hello' });
+    $h->start;
+    $loop->run_nowait;  # prints 'hello'
+    $loop->run_nowait;  # prints 'hello' again
+
+    $h->stop;
+    $loop->run_nowait;  # no effect
+
+    $h->reset;
+
+=head1 DESCRIPTION
+
+The Check handle is useful for doing post-I/O actions for a loop with
+the help of callback or listener. It is inherited from L<UniEvent::Handle>.
+
+=head1 METHODS
+
+=head2 new([$loop = UniEvent::Loop->default_loop])
+
+Constructs new Check handle and binds it to the specified event loop
+
+=head2 start([$callback = undef])
+
+Starts the check handle, i.e. makes it active for the next even loop
+iteration. Optionally it adds the C<$callback> to the event listeners.
+
+=head2 stop()
+
+Stops the check handle, i.e. makes it inactive for the next event loop
+iteration.
+
+=head2 callback($code)
+
+Sets the callback, which will be invoked after loop run. All previously
+set event listeners or callbacks will be discarded.
+
+=head2 event()
+
+Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
+can be assigned with. The callbacks will be invoked after loop run.
+The C++ interface is:
+
+    void(const CheckSP&);
+
+i.e. the callback returns nothing and as an argument takes Check handle
+itself.
+
+Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
+interface.
+
+=head2 event_listener($delegate [, $weak = false])
+
+Delegates callback invocation to the C<$delegate> object of arbitrary
+class having C<on_check> method. The object can optionally be weakened.
+
+The method will be invoked as
+
+  $obj->on_check($handle);
+
+=head2 call_now()
+
+Immediately ivokes assigned callbacks and listeners in the caller context
+(i.e. not waiting loop run).
+
+=head1 CONSTANTS
+
+=head2 TYPE
+
+Check type constant
+
+=head1 REFERENCES
+
+L<UniEvent::Handle>
+
+L<UniEvent::Idle>
+
+
+L<XS::Framework::CallbackDispatcher>
+=cut

@@ -3,11 +3,16 @@
 use strict;
 use warnings;
 
-use Indent::Utils qw(remove_first_ws);
+use Indent::String;
 
-my $input = '  a';
-remove_first_ws(\$input);
-print "$input|\n";
+# Object.
+my $i = Indent::String->new(
+        'line_size' => 20,
+);
+
+# Indent.
+print $i->indent(join(' ', ('text') x 7))."\n";
 
 # Output:
-# a|
+# text text text text
+# <--tab->text text text

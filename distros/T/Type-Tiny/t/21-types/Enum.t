@@ -38,6 +38,14 @@ is(exception { Enum->inline_check(q/$xyz/) }, undef, "Inlining Enum doesn't thro
 ok(!Enum->has_coercion, "Enum doesn't have a coercion");
 ok(Enum->is_parameterizable, "Enum is parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	pass => 'false'                    => !!0,
@@ -141,6 +149,12 @@ ok('FOO' =~ $re_i);
 ok('xyz' !~ $re_i);
 ok('foo bar baz' !~ $re_i);
 
+like(
+	exception { $enum1->as_regexp('42') },
+	qr/Unknown regexp flags/,
+	'Unknown flags passed to as_regexp'
+);
+
 #
 # Enum allows you to pass objects overloading stringification when
 # creating the type, but rejects blessed objects (even overloaded)
@@ -164,6 +178,50 @@ should_fail(Local::Stringy->new('foo'), $enum2);
 is_deeply($enum2->values, [qw/ foo bar bar baz /]);
 is_deeply($enum2->unique_values, [qw/ bar baz foo /]);
 is_deeply([@$enum2], [qw/ foo bar bar baz /]);
+
+#
+# Enum-wise sorting
+#
+
+is_deeply(
+	[ $enum1->sort( 'baz', 'foo' ) ],
+	[ 'foo', 'baz' ],
+	'"foo" comes before "baz" because they were listed in that order when $enum1 was defined',
+);
+
+#
+# Auto coercion
+#
+
+my $enum3 = Enum[ \1, qw( FOO BAR BAZ ) ];
+is $enum3->coerce('FOO'), 'FOO';
+is $enum3->coerce('foo'), 'FOO';
+is $enum3->coerce('f'),   'FOO';
+is $enum3->coerce('ba'),  'BAR';
+is $enum3->coerce('baz'), 'BAZ';
+is $enum3->coerce(0),     'FOO';
+is $enum3->coerce(1),     'BAR';
+is $enum3->coerce(2),     'BAZ';
+is $enum3->coerce(-1),    'BAZ';
+is $enum3->coerce('XYZ'), 'XYZ';
+is_deeply $enum3->coerce([123]), [123];
+
+#
+# Manual coercion
+#
+
+my $enum4 = Enum[
+	[
+		Types::Standard::ArrayRef() => sub { 'FOO' },
+		Types::Standard::HashRef()  => sub { 'BAR' },
+		Types::Standard::Str()      => sub { 'BAZ' },
+	],
+	qw( FOO BAR BAZ )
+];
+
+is $enum4->coerce([]), 'FOO';
+is $enum4->coerce({}), 'BAR';
+is $enum4->coerce(''), 'BAZ';
 
 done_testing;
 

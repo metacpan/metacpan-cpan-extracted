@@ -1,4 +1,3 @@
-.includepath
 .project
 bin/cli-driver-example.pl
 bin/cli-driver-sharedir-example.pl
@@ -38,6 +37,7 @@ t/11-use-argv-map.t
 t/12-test12.t
 t/13-test13.t
 t/14-test14.t
+t/15-test15.t
 t/etc/cli-driver.yml
 t/lib/CLI/Driver/Test.pm
 t/lib/CLI/Driver/Test2.pm

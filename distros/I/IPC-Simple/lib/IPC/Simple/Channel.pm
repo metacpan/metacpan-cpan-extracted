@@ -1,5 +1,5 @@
 package IPC::Simple::Channel;
-$IPC::Simple::Channel::VERSION = '0.02';
+$IPC::Simple::Channel::VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -58,16 +58,18 @@ sub get {
 
 sub async {
   my $self = shift;
+  my $cv = AnyEvent->condvar;
 
-  return shift @{ $self->buffer }
-    if $self->is_shutdown;
-
-  my $cv = AE::cv;
-  push @{ $self->waiters }, $cv;
-
-  $self->flush;
-
-  return $cv;
+  if ($self->is_shutdown) {
+    my $msg = shift @{ $self->buffer };
+    $cv->send($msg);
+    return $cv;
+  }
+  else {
+    push @{ $self->waiters }, $cv;
+    $self->flush;
+    return $cv;
+  }
 }
 
 sub flush {
@@ -92,7 +94,7 @@ IPC::Simple::Channel
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

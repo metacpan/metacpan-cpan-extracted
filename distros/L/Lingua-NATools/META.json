@@ -4,13 +4,13 @@
       "Alberto SimÃµes <ambs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-NATools",
    "prereqs" : {
@@ -76,55 +76,61 @@
    "provides" : {
       "Lingua::NATools" : {
          "file" : "lib/Lingua/NATools.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::CGI" : {
          "file" : "lib/Lingua/NATools/CGI.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Client" : {
          "file" : "lib/Lingua/NATools/Client.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Config" : {
          "file" : "lib/Lingua/NATools/Config.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Corpus" : {
          "file" : "lib/Lingua/NATools/Corpus.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Corpus::Iterator" : {
          "file" : "lib/Lingua/NATools/Corpus.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Dict" : {
          "file" : "lib/Lingua/NATools/Dict.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Lexicon" : {
          "file" : "lib/Lingua/NATools/Lexicon.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::Matrix" : {
          "file" : "lib/Lingua/NATools/Matrix.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::NATDict" : {
          "file" : "lib/Lingua/NATools/NATDict.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       },
       "Lingua::NATools::PCorpus" : {
          "file" : "lib/Lingua/NATools/PCorpus.pm",
-         "version" : "v0.7.10"
+         "version" : "v0.7.12"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-NATools"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://natura.di.uminho.pt/svn/main/Lingua/NATools/"
+      }
    },
-   "version" : "v0.7.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.7.12",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

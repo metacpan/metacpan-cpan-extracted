@@ -55,6 +55,16 @@ use constant {
 
   ###
   # access ports: CISCO-VLAN-MEMBERSHIP-MIB
+  # table maybe empty!
+  #
+  # "A table for configuring VLAN port membership.
+  # There is one row for each bridge port that is
+  # assigned to a static or dynamic access port. Trunk
+  # ports are not  represented in this table.  An entry
+  # may be created and deleted when ports are created or
+  # deleted via SNMP or the management console on a
+  # device."
+
   VM_MEMBERSHIP_TABLE => '1.3.6.1.4.1.9.9.68.1.2.2',
   VM_VLAN_TYPE        => '1.3.6.1.4.1.9.9.68.1.2.2.1.1',
   VM_VLAN             => '1.3.6.1.4.1.9.9.68.1.2.2.1.2',
@@ -66,11 +76,11 @@ Net::SNMP::Mixin::CiscoDot1qVlanStatic - mixin class for static Cisco vlan info
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -435,6 +445,7 @@ sub _calc_tagged_ports {
 =head2 B<< _fetch_vm_membership_tbl_entries($session) >>
 
 Fetch selected rows from vmMembershipTable during object initialization.
+The table maybe empty if there is no switch port in access mode.
 
 =cut
 
@@ -465,7 +476,7 @@ sub _fetch_vm_membership_tbl_entries {
 
 =head2 B<< _vm_membership_tbl_entries_cb($session) >>
 
-The callback for _fetch_vm_membership_tbl_entries
+The callback for _fetch_vm_membership_tbl_entries.
 
 =cut
 
@@ -474,9 +485,19 @@ sub _vm_membership_tbl_entries_cb {
   my $vbl     = $session->var_bind_list;
 
   unless ( defined $vbl ) {
-    if ( my $err_msg = $session->error ) {
-      push_error( $session, "$prefix: $err_msg" );
+    my $err_msg = $session->error // '';
+
+    if ( $err_msg !~ m/The requested entries are empty or do not exist/i ) {
+      push_error( $session, "$prefix: $err_msg" ) if defined $err_msg;
     }
+    else {
+      # the table maybe empty if the device has no access ports
+      $session->{$prefix}{AccessVlan} = {};
+
+      # this init slot is finished even if table is empty!
+      get_init_slot($session)->{$prefix}--;
+    }
+
     return;
   }
 

@@ -75,14 +75,6 @@ If you have found a bug, but do not have an accompanying patch to fix it, you
 can submit an issue report [via the web](https://github.com/houseabsolute/DateTime-TimeZone/issues).
 
 
-## Continuous Integration
-
-All pull requests for this distribution will be automatically tested
-on Linux by [Travis](https://travis-ci.org/houseabsolute/DateTime-TimeZone).
-
-All CI results will be visible in the pull request on GitHub. Follow the
-appropriate links for details when tests fail. PRs cannot be merged until tests
-pass.
 
 
 ## TidyAll

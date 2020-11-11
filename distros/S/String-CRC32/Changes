@@ -1,5 +1,8 @@
 Revision history for String::CRC32
 
+2.000     2020-11-09
+        - Switch to XSLoader rather than DynaLoader (GH #5, thanks to atoomic)
+
 1.800     2019-11-01
         - Perldoc tweaks, GH #3, thanks to mattias-p
 

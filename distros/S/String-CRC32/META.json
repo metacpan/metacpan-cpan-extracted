@@ -44,6 +44,6 @@
          "url" : "https://github.com/leejo/string-crc32"
       }
    },
-   "version" : 1.8,
+   "version" : 2,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

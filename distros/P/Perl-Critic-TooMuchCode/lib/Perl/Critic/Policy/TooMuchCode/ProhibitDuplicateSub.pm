@@ -51,14 +51,14 @@ violation.
 
 perl runtime allows a named subroutine to be redefined in the same source file
 and the latest definition wins. In the event that this is done by developers,
-preferrably unintentionally, perl runtime warns about a subroutine is
+preferably unintentionally, perl runtime warns about a subroutine is
 redefined with the position is for the one that wins. This policy does the
 opposite.
 
 Although the last one is not marked as a violation, it's position is
 reported together. Making it easier for developer to locate the subroutine.
 
-Should the developer decide to programatically remove the duplicates,
+Should the developer decide to programmatically remove the duplicates,
 simply go through all the violations and remove those statements.
 
 =cut

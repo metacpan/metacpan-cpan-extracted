@@ -49,6 +49,7 @@ t/030_st_execute_array.t
 t/031_setup_callbacks.t
 t/032_selectall_arrayref.t
 t/033_table_info.t
+t/034_custom_attributes.t
 t/998_pod.t
 t/999_pod_coverage.t
 t/bug_015602.t

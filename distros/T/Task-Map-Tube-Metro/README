@@ -5,6 +5,9 @@ SYNOPSIS
      cpanm Task::Map::Tube::Metro
 
 SEE ALSO
+    Map::Tube::Athens
+        Map::Tube interface to the Athens Metro
+
     Map::Tube::Barcelona
         Interface to the Barcelona Metro Map.
 
@@ -14,17 +17,26 @@ SEE ALSO
     Map::Tube::Berlin
         Interface to the Berlin S- and U-Bahn map.
 
+    Map::Tube::Bielefeld
+        interface to the Bielefeld Stadtbahn
+
     Map::Tube::Bucharest
         Interface to the Bucharest Metro Map.
 
     Map::Tube::Budapest
         Interface to the Budapest Metro Map.
 
+    Map::Tube::Copenhagen
+        Interface to the Copenhagen Metro map
+
     Map::Tube::Delhi
         Interface to the Delhi Metro Map.
 
     Map::Tube::Dnipropetrovsk
         Interface to the Dnipropetrovsk Metro Map.
+
+    Map::Tube::Frankfurt
+        interface to the Frankfurt S- and U-Bahn map
 
     Map::Tube::Glasgow
         Interface to the Glasgow tube map
@@ -41,6 +53,9 @@ SEE ALSO
     Map::Tube::KoelnBonn
         Interface to the Koeln-Bonn U- and S-Bahn and tram maps.
 
+    Map::Tube::Kolkatta
+        Interface to the Kolkatta Metro Map.
+
     Map::Tube::KualaLumpur
         Interface to the KualaLumpur urban monorail system map.
 
@@ -50,8 +65,14 @@ SEE ALSO
     Map::Tube::Lyon
         Interface to the Lyon metro map.
 
+    Map::Tube::Madrid
+        Interface to the Madrid Metro Map.
+
     Map::Tube::Malaga
         Interface to the Málaga Metro Map.
+
+    Map::Tube::Milan
+        Interface to the Milan tube map.
 
     Map::Tube::Minsk
         Interface to the Minsk Metro Map.
@@ -67,6 +88,9 @@ SEE ALSO
 
     Map::Tube::Novosibirsk
         Interface to the Novosibirsk Metro Map.
+
+    Map::Tube::Nuremberg
+        interface to the Nuremberg U-Bahn map
 
     Map::Tube::Prague
         Interface to the Prague Metro Map.
@@ -99,18 +123,20 @@ SEE ALSO
         Interface to the Yekaterinburg Metro Map.
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Map-Tube-Metro>
+    <https://github.com/michal-josef-spacek/Task-Map-Tube-Metro>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2016 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2015-2020 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 # ABSTRACT: create form fields based on a definition in a JSON file
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp;
 use File::Basename;
@@ -19,13 +19,13 @@ use Mojo::JSON qw(decode_json);
 
 use Mojolicious ();
 
-has dir => sub {["."]} ;
+has dir => sub { ["."] };
 
 my $selected_value = Mojolicious->VERSION < 6.16 ? 'selected' : undef;
 my $checked_value  = Mojolicious->VERSION < 6.16 ? 'checked'  : undef;
 
 sub register {
-    my ($self, $app, $config) = @_;
+    my ( $self, $app, $config ) = @_;
 
     $config //= {};
 
@@ -33,15 +33,15 @@ sub register {
         $config->{template} = Mojo::File->new( $app->home, 'templates', $config->{template_file} )->slurp;
         $config->{template} //= $app->renderer->get_data_template( $config->{template_file} );
     }
-  
+
     my %configs;
-    if(ref $config->{dir} eq "ARRAY"){
-        @{$self->dir} = @{$config->{dir}}; 
+    if ( ref $config->{dir} eq "ARRAY" ) {
+        @{ $self->dir } = @{ $config->{dir} };
     }
-    else{
-        @{$self->dir} = ($config->{dir});
+    else {
+        @{ $self->dir } = ( $config->{dir} );
     }
-  
+
     my %valid_types = (
         %{ $config->{types} || {} },
         text     => 1,
@@ -56,45 +56,45 @@ sub register {
     my %configfiles;
     $app->helper(
         forms => sub {
-            if( %configfiles ) {
-                return sort keys %configfiles;
+            if (%configfiles) {
+                my @sorted_configfiles = sort keys %configfiles;
+                return @sorted_configfiles;
             }
 
-            for my $dir (@{$self->dir}){
-                my $dir = IO::Dir->new( $dir );
+            for my $dir ( @{ $self->dir } ) {
+                my $dir = IO::Dir->new($dir);
 
-                FILE:
+              FILE:
                 while ( my $file = $dir->read ) {
                     next FILE if $file !~ m{\.json\z};
 
                     my $filename = basename $file;
-                    $filename    =~ s{\.json\z}{};
+                    $filename =~ s{\.json\z}{};
 
                     $configfiles{$filename} = 1;
                 }
             }
 
-            return sort keys %configfiles;
+            my @sorted_configfiles = sort keys %configfiles;
+            return @sorted_configfiles;
         }
     );
 
-    $app->helper(
-        "form_fields_from_json_dir" => sub {return $self->dir}
-    );
+    $app->helper( "form_fields_from_json_dir" => sub { return $self->dir } );
 
     $app->helper(
         fields => sub {
-            my ($c, $file, $params) = @_;
+            my ( $c, $file, $params ) = @_;
 
             if ( !$configs{$file} ) {
-                $self->_load_config_from_file($c, \%configs, $file);
+                $self->_load_config_from_file( $c, \%configs, $file );
             }
 
             my @fields;
             my @fields_long;
             for my $field ( @{ $configs{$file} } ) {
                 my $name = $field->{label} // $field->{name} // '';
-                push @fields, $name;
+                push @fields,      $name;
                 push @fields_long, +{ label => $name, name => $field->{name} // '' };
             }
 
@@ -108,16 +108,16 @@ sub register {
 
     $app->helper(
         'validate_form_fields' => sub {
-            my ($c, $file) = @_;
-  
+            my ( $c, $file ) = @_;
+
             return '' if !$file;
-  
+
             if ( !$configs{$file} ) {
-                $self->_load_config_from_file($c, \%configs, $file);
+                $self->_load_config_from_file( $c, \%configs, $file );
             }
-  
+
             return '' if !$configs{$file};
-  
+
             my $config = $configs{$file};
 
             my $validation = $c->validation;
@@ -125,15 +125,15 @@ sub register {
             my $params_hash = $c->req->params->to_hash;
             my @param_names = keys %{ $params_hash || {} };
 
-            my %params = map{ $_ => $c->every_param( $_ ) }@param_names;
+            my %params = map { $_ => $c->every_param($_) } @param_names;
             $validation->input( \%params );
 
             my %errors;
-  
-            FIELD:
-            for my $field ( @{ $config } ) {
+
+          FIELD:
+            for my $field ( @{$config} ) {
                 if ( 'HASH' ne ref $field ) {
-                    $app->log->error( 'Field definition must be a HASH - skipping field' );
+                    $app->log->error('Field definition must be a HASH - skipping field');
                     next FIELD;
                 }
 
@@ -142,7 +142,7 @@ sub register {
                 }
 
                 if ( 'HASH' ne ref $field->{validation} ) {
-                    $app->log->warn( 'Validation settings must be a HASH - skipping field' );
+                    $app->log->warn('Validation settings must be a HASH - skipping field');
                     next FIELD;
                 }
 
@@ -150,18 +150,18 @@ sub register {
                 my $global_error = 1;
 
                 if ( $field->{validation}->{required} ) {
-                    $validation->required( $name );
+                    $validation->required($name);
 
-                    my $value  = $field->{validation}->{required};
+                    my $value = $field->{validation}->{required};
                     if ( ref $value && 'HASH' eq ref $value ) {
                         $global_error = $value->{msg} // 1;
                     }
                 }
                 else {
-                    $validation->optional( $name );
+                    $validation->optional($name);
                 }
 
-                RULE:
+              RULE:
                 for my $rule ( sort keys %{ $field->{validation} } ) {
                     last RULE if !defined $params{$name};
 
@@ -178,27 +178,27 @@ sub register {
                         @params = $value;
                     }
                     elsif ( $ref eq 'ARRAY' ) {
-                        @params = @{ $value };
+                        @params = @{$value};
                     }
                     elsif ( $ref eq 'HASH' ) {
                         @params = ref $value->{args} ? @{ $value->{args} } : $value->{args};
                         $error  = $value->{msg} // 1;
                     }
 
-                    eval{
+                    eval {
                         $validation->check( $method, @params );
                         1;
                     } or do {
-                        $app->log->error( "Validating $name with rule $method failed: $@" );
+                        $app->log->error("Validating $name with rule $method failed: $@");
                     };
 
-                    if ( $validation->has_error( $name ) ) {
+                    if ( $validation->has_error($name) ) {
                         $errors{$name} = $error;
                         last RULE;
                     }
                 }
 
-                if ( $validation->has_error( $name ) && !defined $errors{$name} ) {
+                if ( $validation->has_error($name) && !defined $errors{$name} ) {
                     $errors{$name} = $global_error;
                 }
             }
@@ -209,10 +209,10 @@ sub register {
 
     $app->helper(
         'form_fields' => sub {
-            my ($c, $file, %params) = @_;
+            my ( $c, $file, %params ) = @_;
 
             # get form config
-            return '' if !$self->_load_config_from_file($c, \%configs, $file);
+            return '' if !$self->_load_config_from_file( $c, \%configs, $file );
             return '' if !$configs{$file} && !ref $file;
             my $field_config = $configs{$file} || $file;
 
@@ -220,13 +220,13 @@ sub register {
 
             my %fields_to_show = map { $_ => 1 } @{ $params{fields} || [] };
 
-            FIELD:
+          FIELD:
             for my $field ( @{$field_config} ) {
                 next FIELD if %fields_to_show && !$fields_to_show{ $field->{name} };
 
-                my $field_content = $self->_build_form_field($c, $field, \%params, $config, \%valid_types);
+                my $field_content = $self->_build_form_field( $c, $field, \%params, $config, \%valid_types );
 
-                if (length $field_content) {
+                if ( length $field_content ) {
                     push @fields, $field_content;
                 }
             }
@@ -237,27 +237,27 @@ sub register {
 
     $app->helper(
         'form_field_by_name' => sub {
-            my ($c, $file, $field_name, %params) = @_;
+            my ( $c, $file, $field_name, %params ) = @_;
 
             # get form config
-            return '' if !$self->_load_config_from_file($c, \%configs, $file);
+            return '' if !$self->_load_config_from_file( $c, \%configs, $file );
             return '' if !$configs{$file} && !ref $file;
             my $field_config = $configs{$file} || $file;
 
             # find field config
-            my @fields_filtered = grep {
-                $_->{name} eq $field_name
-            } @{ $field_config };
+            my @fields_filtered = grep { $_->{name} eq $field_name } @{$field_config};
 
-            return '' if !(scalar @fields_filtered);
+            return '' if !( scalar @fields_filtered );
 
-            return $self->_build_form_field($c, $fields_filtered[0], \%params, $config, \%valid_types);
+            return $self->_build_form_field( $c, $fields_filtered[0], \%params, $config, \%valid_types );
         }
     );
+
+    return 1;
 }
 
 sub _load_config_from_file {
-    my ($self, $c, $configs, $file) = @_;
+    my ( $self, $c, $configs, $file ) = @_;
 
     return 0 if !$file;
 
@@ -265,28 +265,28 @@ sub _load_config_from_file {
         my $path;
 
         # search until first match
-        my $i=0;
+        my $i = 0;
         do {
-            my $_path= File::Spec->catfile( $self->dir->[$i], $file . '.json' );
+            my $_path = File::Spec->catfile( $self->dir->[$i], $file . '.json' );
             $path = $_path if -r $_path;
-        } while ( not defined $path and ++$i <= $#{$self->dir} );
+        } while ( not defined $path and ++$i <= $#{ $self->dir } );
 
-        if( not defined $path){
-            $c->app->log->error( "FORMFIELDS $file: not found in directories" );
-            $c->app->log->error( "  $_") for @{$self->dir};
+        if ( not defined $path ) {
+            $c->app->log->error("FORMFIELDS $file: not found in directories");
+            $c->app->log->error("  $_") for @{ $self->dir };
             return 0;
         }
 
         eval {
-            my $content     = Mojo::Asset::File->new( path => $path )->slurp;
+            my $content = Mojo::Asset::File->new( path => $path )->slurp;
             $configs->{$file} = decode_json $content;
         } or do {
-            $c->app->log->error( "FORMFIELDS $file: $@" );
+            $c->app->log->error("FORMFIELDS $file: $@");
             return 0;
         };
 
         if ( 'ARRAY' ne ref $configs->{$file} ) {
-            $c->app->log->error( 'Definition JSON must be an ARRAY' );
+            $c->app->log->error('Definition JSON must be an ARRAY');
             return 0;
         }
     }
@@ -295,11 +295,10 @@ sub _load_config_from_file {
 }
 
 sub _build_form_field {
-    my ($self, $c, $field, $params, $plugin_config, $valid_types) = @_;
-
+    my ( $self, $c, $field, $params, $plugin_config, $valid_types ) = @_;
 
     if ( 'HASH' ne ref $field ) {
-        $c->app->log->error( 'Field definition must be an HASH - skipping field' );
+        $c->app->log->error('Field definition must be an HASH - skipping field');
         return '';
     }
 
@@ -311,13 +310,16 @@ sub _build_form_field {
     }
 
     if ( !$valid_types->{$type} ) {
-        $c->app->log->warn( "Invalid field type $type - falling back to 'text'" );
+        $c->app->log->warn("Invalid field type $type - falling back to 'text'");
         $type = 'text';
     }
 
-    if ( $plugin_config->{global_attributes} && $type ne 'hidden' && 'HASH' eq ref $plugin_config->{global_attributes} ) {
+    if (   $plugin_config->{global_attributes}
+        && $type ne 'hidden'
+        && 'HASH' eq ref $plugin_config->{global_attributes} )
+    {
 
-        ATTRIBUTE:
+      ATTRIBUTE:
         for my $attribute ( keys %{ $plugin_config->{global_attributes} } ) {
             $field->{attributes}->{$attribute} //= '';
 
@@ -328,27 +330,31 @@ sub _build_form_field {
 
             my $space = length $field_attr ? ' ' : '';
 
-            $field->{attributes}->{$attribute}  .= $space . $global_attr;
+            $field->{attributes}->{$attribute} .= $space . $global_attr;
         }
     }
 
-    if ( $field->{translate_sublabels} && $plugin_config->{translation_method} && !$field->{translation_method} ) {
+    if (   $field->{translate_sublabels}
+        && $plugin_config->{translation_method}
+        && !$field->{translation_method} )
+    {
         $field->{translation_method} = $plugin_config->{translation_method};
     }
 
     my $sub        = $self->can( '_' . $type );
-    my $form_field = $self->$sub( $c, $field, %{ $params } );
+    my $form_field = $self->$sub( $c, $field, %{$params} );
 
-    $form_field = Mojo::ByteStream->new( $form_field );
+    $form_field = Mojo::ByteStream->new($form_field);
 
-    my $template = $field->{template} // $plugin_config->{templates}->{$orig_type} // $plugin_config->{template};
+    my $template = $field->{template} // $plugin_config->{templates}->{$orig_type}
+      // $plugin_config->{template};
 
     if ( $template && $type ne 'hidden' ) {
         my $label = $field->{label} // '';
         my $loc   = $plugin_config->{translation_method};
 
         if ( $plugin_config->{translate_labels} && $loc && 'CODE' eq ref $loc ) {
-            $label = $loc->($c, $label);
+            $label = $loc->( $c, $label );
         }
 
         $form_field = Mojo::ByteStream->new(
@@ -357,96 +363,96 @@ sub _build_form_field {
                 id      => $field->{id} // $field->{name} // $field->{label} // '',
                 label   => $label,
                 field   => $form_field,
-                message => $field->{msg}  // '',
+                message => $field->{msg} // '',
                 info    => $field->{info} // '',
             )
         );
-#        $c->app->log->debug("rendered formfield: ".$form_field);
+
+        #        $c->app->log->debug("rendered formfield: ".$form_field);
     }
 
     return $form_field;
 }
 
 sub _hidden {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
-    my $name  = $field->{name} // $field->{label} // '';
+    my $name = $field->{name} // $field->{label} // '';
 
     my $from_stash_key = $params{from_stash};
-    my $from_stash     = $from_stash_key ?
-        $c->stash( $from_stash_key )->{$name} :
-        undef;
+    my $from_stash =
+        $from_stash_key
+      ? $c->stash($from_stash_key)->{$name}
+      : undef;
 
-    my $value = $params{$name}->{data} // $from_stash //
-        $c->stash( $name ) // $c->param( $name ) //
-        $field->{data} // '';
+    my $value = $params{$name}->{data} // $from_stash // $c->stash($name) // $c->param($name)
+      // $field->{data} // '';
 
-    my $id    = $field->{id} // $name;
+    my $id = $field->{id} // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
     return $c->hidden_field( $name, $value, id => $id, %attrs );
 }
 
 sub _text {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
-    my $name  = $field->{name} // $field->{label} // '';
+    my $name = $field->{name} // $field->{label} // '';
 
     my $from_stash_key = $params{from_stash};
-    my $from_stash     = $from_stash_key ?
-        $c->stash( $from_stash_key )->{$name} :
-        undef;
+    my $from_stash =
+        $from_stash_key
+      ? $c->stash($from_stash_key)->{$name}
+      : undef;
 
-    my $value = $params{$name}->{data} // $from_stash //
-        $c->stash( $name ) // $c->param( $name ) //
-        $field->{data} // '';
+    my $value = $params{$name}->{data} // $from_stash // $c->stash($name) // $c->param($name)
+      // $field->{data} // '';
 
-    my $id    = $field->{id} // $name;
+    my $id = $field->{id} // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
     return $c->text_field( $name, $value, id => $id, %attrs );
 }
 
 sub _select {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
-    my $name   = $field->{name} // $field->{label} // '';
+    my $name = $field->{name} // $field->{label} // '';
 
     my $from_stash_key = $params{from_stash};
-    my $from_stash     = $from_stash_key ?
-        $c->stash( $from_stash_key )->{$name} :
-        undef;
+    my $from_stash =
+        $from_stash_key
+      ? $c->stash($from_stash_key)->{$name}
+      : undef;
 
     my $field_params = $params{$name} || {},
 
-    my %select_params = (
-       disabled => $self->_get_highlighted_values( $field, 'disabled' ),
-       selected => $self->_get_highlighted_values( $field, 'selected' ),
-    );
+      my %select_params = (
+        disabled => $self->_get_highlighted_values( $field, 'disabled' ),
+        selected => $self->_get_highlighted_values( $field, 'selected' ),
+      );
 
-    my $stash_values = $c->every_param( $name );
-    if (scalar(@{ $stash_values || [] }) == 0 && defined( $c->stash( $name ))){
-        my $local_stash = $c->stash( $name );
-        $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
+    my $stash_values = $c->every_param($name);
+    if ( scalar( @{ $stash_values || [] } ) == 0 && defined( $c->stash($name) ) ) {
+        my $local_stash = $c->stash($name);
+        $stash_values = ref $local_stash ? $local_stash : [$local_stash];
     }
 
-    if ( $from_stash ) {
-        $stash_values = ref $from_stash ? $from_stash : [ $from_stash ];
+    if ($from_stash) {
+        $stash_values = ref $from_stash ? $from_stash : [$from_stash];
     }
 
     my $reset;
     if ( @{ $stash_values || [] } ) {
-        $select_params{selected} = $self->_get_highlighted_values(
-            +{ selected => $stash_values },
-            'selected',
-        );
+        $select_params{selected} =
+          $self->_get_highlighted_values( +{ selected => $stash_values }, 'selected', );
 
         $reset = 1;
     }
 
-    for my $key ( qw/disabled selected/ ) {
+    for my $key (qw/disabled selected/) {
         my $hashref = $self->_get_highlighted_values( $field_params, $key );
-        if ( keys %{ $hashref } ) {
+        if ( keys %{$hashref} ) {
             $select_params{$key} = $hashref;
         }
     }
@@ -465,17 +471,17 @@ sub _select {
     }
 
     my @selected = keys %{ $select_params{selected} };
-    if ( @selected ) {
+    if (@selected) {
         my $single = scalar @selected;
         my $param  = $single == 1 ? $selected[0] : \@selected;
         $c->param( $name, $param );
     }
 
-    my $select_field = $c->select_field( $name, [ @values ], id => $id, %attrs );
+    my $select_field = $c->select_field( $name, [@values], id => $id, %attrs );
 
     # reset parameters
-    if ( $reset ) {
-        my $single = scalar @{ $stash_values };
+    if ($reset) {
+        my $single = scalar @{$stash_values};
         my $param  = $single == 1 ? $stash_values->[0] : $stash_values;
         $c->param( $name, $param );
     }
@@ -484,7 +490,7 @@ sub _select {
 }
 
 sub _get_highlighted_values {
-    my ($self, $field, $key) = @_;
+    my ( $self, $field, $key ) = @_;
 
     return +{} if !$field->{$key};
 
@@ -504,22 +510,22 @@ sub _get_highlighted_values {
 }
 
 sub _get_select_values {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
     my $data = $params{data} || $field->{data} || [];
     if ( $field->{data_cb} ) {
         my @parts   = split /::/, $field->{data_cb};
         my $subname = pop @parts;
         my $class   = join '::', @parts;
-        my $sub     = $class->can( $subname );
-        $data       = $sub->() if $sub;
+        my $sub     = $class->can($subname);
+        $data = $sub->() if $sub;
     }
 
     my @values;
     if ( 'ARRAY' eq ref $data ) {
         @values = $self->_transform_array_values( $data, %params );
     }
-    elsif( 'HASH' eq ref $data ) {
+    elsif ( 'HASH' eq ref $data ) {
         @values = $self->_transform_hash_values( $c, $data, %params );
     }
 
@@ -527,15 +533,15 @@ sub _get_select_values {
 }
 
 sub _transform_hash_values {
-    my ($self, $c, $data, %params) = @_;
+    my ( $self, $c, $data, %params ) = @_;
 
     my @values;
     my $numeric = 1;
     my $counter = 0;
     my %mapping;
 
-    KEY:
-    for my $key ( keys %{ $data } ) {
+  KEY:
+    for my $key ( keys %{$data} ) {
         if ( ref $data->{$key} ) {
             my @group_values = $self->_get_select_values( $c, +{ data => $data->{$key} }, %params );
             $values[$counter] = Mojo::Collection->new( $key => \@group_values );
@@ -546,37 +552,39 @@ sub _transform_hash_values {
 
             $opts{disabled} = 'disabled'      if $params{disabled}->{$key};
             $opts{selected} = $selected_value if $params{selected}->{$key};
+
             #$opts{selected} = undef if $params{selected}->{$key};
 
             $values[$counter] = [ $data->{$key} => $key, %opts ];
-            $mapping{$key}    = $counter;
+            $mapping{$key} = $counter;
         }
 
         $counter++;
     }
 
-    if ( first{ $_ =~ m{[^0-9]} }keys %mapping ) {
+    if ( first { $_ =~ m{[^0-9]} } keys %mapping ) {
         $numeric = 0;
     }
 
-    my @sorted_keys = $numeric ? 
-        sort { $a <=> $b }keys %mapping :
-        sort { $a cmp $b }keys %mapping;
+    my @sorted_keys =
+      $numeric
+      ? sort { $a <=> $b } keys %mapping
+      : sort { $a cmp $b } keys %mapping;
 
-    my @indexes = @mapping{ @sorted_keys };
+    my @indexes = @mapping{@sorted_keys};
 
-    my @sorted_values = @values[ @indexes ];
+    my @sorted_values = @values[@indexes];
 
     return @sorted_values;
 }
 
 sub _transform_array_values {
-    my ($self, $data, %params) = @_;
+    my ( $self, $data, %params ) = @_;
 
     my @values;
     my $numeric = 1;
 
-    for my $value ( @{ $data } ) {
+    for my $value ( @{$data} ) {
         if ( $numeric && $value =~ m{[^0-9]} ) {
             $numeric = 0;
         }
@@ -585,65 +593,65 @@ sub _transform_array_values {
 
         $opts{disabled} = 'disabled'      if $params{disabled}->{$value};
         $opts{selected} = $selected_value if $params{selected}->{$value};
+
         #$opts{selected} = undef if $params{selected}->{$value};
 
         push @values, [ $value => $value, %opts ];
     }
 
-    @values = $numeric ?
-        sort{ $a->[0] <=> $b->[0] }@values :
-        sort{ $a->[0] cmp $b->[0] }@values;
+    @values =
+      $numeric
+      ? sort { $a->[0] <=> $b->[0] } @values
+      : sort { $a->[0] cmp $b->[0] } @values;
 
     return @values;
 }
 
 sub _radio {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
-    my $name  = $field->{name} // $field->{label} // '';
-    my $id    = $field->{id} // $name;
+    my $name = $field->{name} // $field->{label} // '';
+    my $id   = $field->{id}   // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
-    my $data   = $params{$name}->{data} // $field->{data} // [];
-    my @values = ref $data ? @{ $data } : ($data);
+    my $data = $params{$name}->{data} // $field->{data} // [];
+    my @values = ref $data ? @{$data} : ($data);
 
     my $field_params = $params{$name} || {},
 
-    my %select_params = (
-       disabled => $self->_get_highlighted_values( $field, 'disabled' ),
-       selected => $self->_get_highlighted_values( $field, 'selected' ),
-    );
+      my %select_params = (
+        disabled => $self->_get_highlighted_values( $field, 'disabled' ),
+        selected => $self->_get_highlighted_values( $field, 'selected' ),
+      );
 
-    my $stash_values = $c->every_param( $name );
-    if (scalar(@{ $stash_values || [] }) == 0 && defined( $c->stash( $name ))){
-        my $local_stash = $c->stash( $name );
-        $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
+    my $stash_values = $c->every_param($name);
+    if ( scalar( @{ $stash_values || [] } ) == 0 && defined( $c->stash($name) ) ) {
+        my $local_stash = $c->stash($name);
+        $stash_values = ref $local_stash ? $local_stash : [$local_stash];
     }
     my $reset;
     if ( @{ $stash_values || [] } ) {
-        $select_params{selected} = $self->_get_highlighted_values(
-            +{ selected => $stash_values },
-            'selected',
-        );
+        $select_params{selected} =
+          $self->_get_highlighted_values( +{ selected => $stash_values }, 'selected', );
         $reset = 1;
     }
 
-    for my $key ( qw/disabled selected/ ) {
+    for my $key (qw/disabled selected/) {
         my $hashref = $self->_get_highlighted_values( $field_params, $key );
-        if ( keys %{ $hashref } ) {
+        if ( keys %{$hashref} ) {
             $select_params{$key} = $hashref;
         }
     }
 
     my @selected = keys %{ $select_params{selected} };
-    if ( @selected ) {
+    if (@selected) {
         my $single = scalar @selected;
         my $param  = $single == 1 ? $selected[0] : \@selected;
         $c->param( $name, $param );
     }
 
     my $radiobuttons = '';
-    for my $radio_value ( @values ) {
+    for my $radio_value (@values) {
         my %value_attributes;
 
         if ( $select_params{disabled}->{$radio_value} ) {
@@ -661,14 +669,14 @@ sub _radio {
 
         my $loc = $field->{translation_method};
         if ( length $local_label && $field->{translate_sublabels} && $loc && 'CODE' eq ref $loc ) {
-            $local_label = $loc->($c, $local_label);
+            $local_label = $loc->( $c, $local_label );
         }
 
         $local_label = " " . $local_label if length $local_label;
 
         $radiobuttons .= $c->radio_button(
             $name => $radio_value,
-            id => $id,
+            id    => $id,
             %attrs,
             %value_attributes,
         ) . "$local_label\n";
@@ -678,8 +686,8 @@ sub _radio {
         }
     }
 
-    if ( $reset ) {
-        my $single = scalar @{ $stash_values };
+    if ($reset) {
+        my $single = scalar @{$stash_values};
         my $param  = $single == 1 ? $stash_values->[0] : $stash_values;
         $c->param( $name, $param );
     }
@@ -688,53 +696,51 @@ sub _radio {
 }
 
 sub _checkbox {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
-    my $name  = $field->{name} // $field->{label} // '';
-    my $id    = $field->{id} // $name;
+    my $name = $field->{name} // $field->{label} // '';
+    my $id   = $field->{id}   // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
-    my $data   = $params{$name}->{data} // $field->{data} // [];
-    my @values = ref $data ? @{ $data } : ($data);
+    my $data = $params{$name}->{data} // $field->{data} // [];
+    my @values = ref $data ? @{$data} : ($data);
 
     my $field_params = $params{$name} || {},
 
-    my %select_params = (
-       disabled => $self->_get_highlighted_values( $field, 'disabled' ),
-       selected => $self->_get_highlighted_values( $field, 'selected' ),
-    );
+      my %select_params = (
+        disabled => $self->_get_highlighted_values( $field, 'disabled' ),
+        selected => $self->_get_highlighted_values( $field, 'selected' ),
+      );
 
-    my $stash_values = $c->every_param( $name );
-    if (scalar(@{ $stash_values || [] }) == 0 && defined( $c->stash( $name ))){
-        my $local_stash = $c->stash( $name );
-        $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
+    my $stash_values = $c->every_param($name);
+    if ( scalar( @{ $stash_values || [] } ) == 0 && defined( $c->stash($name) ) ) {
+        my $local_stash = $c->stash($name);
+        $stash_values = ref $local_stash ? $local_stash : [$local_stash];
     }
     my $reset;
     if ( @{ $stash_values || [] } ) {
-        $select_params{selected} = $self->_get_highlighted_values(
-            +{ selected => $stash_values },
-            'selected',
-        );
+        $select_params{selected} =
+          $self->_get_highlighted_values( +{ selected => $stash_values }, 'selected', );
         $c->param( $name, '' );
         $reset = 1;
     }
 
-    for my $key ( qw/disabled selected/ ) {
+    for my $key (qw/disabled selected/) {
         my $hashref = $self->_get_highlighted_values( $field_params, $key );
-        if ( keys %{ $hashref } ) {
+        if ( keys %{$hashref} ) {
             $select_params{$key} = $hashref;
         }
     }
 
     my @selected = keys %{ $select_params{selected} };
-    if ( @selected ) {
+    if (@selected) {
         my $single = scalar @selected;
         my $param  = $single == 1 ? $selected[0] : \@selected;
         $c->param( $name, $param );
     }
 
     my $checkboxes = '';
-    for my $checkbox_value ( @values ) {
+    for my $checkbox_value (@values) {
         my %value_attributes;
 
         if ( $select_params{disabled}->{$checkbox_value} ) {
@@ -752,14 +758,14 @@ sub _checkbox {
 
         my $loc = $field->{translation_method};
         if ( length $local_label && $field->{translate_sublabels} && $loc && 'CODE' eq ref $loc ) {
-            $local_label = $loc->($c, $local_label);
+            $local_label = $loc->( $c, $local_label );
         }
 
         $local_label = " " . $local_label if length $local_label;
 
         $checkboxes .= $c->check_box(
             $name => $checkbox_value,
-            id => $id,
+            id    => $id,
             %attrs,
             %value_attributes,
         ) . "$local_label\n";
@@ -769,8 +775,8 @@ sub _checkbox {
         }
     }
 
-    if ( $reset ) {
-        my $single = scalar @{ $stash_values };
+    if ($reset) {
+        my $single = scalar @{$stash_values};
         my $param  = $single == 1 ? $stash_values->[0] : $stash_values;
         $c->param( $name, $param );
     }
@@ -779,10 +785,10 @@ sub _checkbox {
 }
 
 sub _textarea {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
     my $name  = $field->{name} // $field->{label} // '';
-    my $value = $params{$name}->{data} // $c->stash( $name ) // $c->param( $name ) // $field->{data} // '';
+    my $value = $params{$name}->{data} // $c->stash($name) // $c->param($name) // $field->{data} // '';
     my $id    = $field->{id} // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
@@ -790,10 +796,10 @@ sub _textarea {
 }
 
 sub _password {
-    my ($self, $c, $field, %params) = @_;
+    my ( $self, $c, $field, %params ) = @_;
 
     my $name  = $field->{name} // $field->{label} // '';
-    my $value = $params{$name}->{data} // $c->stash( $name ) // $c->param( $name ) // $field->{data} // '';
+    my $value = $params{$name}->{data} // $c->stash($name) // $c->param($name) // $field->{data} // '';
     my $id    = $field->{id} // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
@@ -814,7 +820,7 @@ Mojolicious::Plugin::FormFieldsFromJSON - create form fields based on a definiti
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -955,7 +961,7 @@ You get
 =item * translate_labels
 
 If I<translate_labels> is true, the labels for the templates are translated. You have to provide a
-I<translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method>, too.
+L<translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method>, too.
 
   plugin 'FormFieldsFromJSON' => {
     template           => '<%= $label %>: <%= $field %>',
@@ -963,12 +969,12 @@ I<translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method>
     translation_method => \&loc,
   };
 
-For more details see I<Translation|Mojolicious::Plugin::FormFieldsFromJSON/Translation>.
+For more details see L<Translation|Mojolicious::Plugin::FormFieldsFromJSON/Translation>.
 
 =item * translation_method
 
 If I<translate_labels> is true, the labels for the templates are translated. You have to provide a
-I<translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method>, too.
+L<translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method>, too.
 
   plugin 'FormFieldsFromJSON' => {
     template           => '<%= $label %>: <%= $field %>',

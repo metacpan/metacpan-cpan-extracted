@@ -15,11 +15,11 @@ Test::Dependencies - Ensure that the dependency listing is complete
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ sub _get_modules_used_in_file {
     my $p = Pod::Strip->new;
     $p->output_string(\$code);
     $p->parse_string_document($data);
-    $used{$2}++ while $code =~ /^\s*(use|with|extends)\s+['"]?([\w:]+)['"]?/gm;
+    $used{$2}++ while $code =~ /^\s*(use|with|extends)\s+['"]?([\w:.]+)['"]?/gm;
     while ($code =~ m{^\s*use\s+base
                           \s+(?:qw.|(?:(?:['"]|q.|qq.)))([\w\s:]+)}gmx) {
         $used{$_}++ for split ' ', $1;
@@ -304,6 +304,7 @@ sub ok_dependencies {
 
     foreach my $mod (sort keys %used) {
         next if ($mod =~ $ignores_re
+                 or $mod =~ m/^v?\d+[.]\d+/  # minimum perl version requirement
                  or ($exclude_re and  $mod =~ $exclude_re));
 
         my $first_in = Module::CoreList->first_release($mod, $required{$mod});

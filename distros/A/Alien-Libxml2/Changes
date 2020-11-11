@@ -1,5 +1,8 @@
 Revision history for Alien-Libxml2
 
+0.17      2020-11-02 12:03:28 -0700
+  - Bump required version of AB for bug fixes (gh#23, gh#24)
+
 0.16      2020-04-22 03:50:16 -0600
   - Fix mixed probe on macOS (gh#20)
 

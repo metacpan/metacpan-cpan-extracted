@@ -82,7 +82,7 @@ struct UVLoop : LoopImpl {
     uint64_t delay        (const delayed_fn& f, const iptr<Refcnt>& guard = {}) override { return _delayer.add(f, guard); }
     void     cancel_delay (uint64_t id)                                noexcept override { _delayer.cancel(id); }
 
-    virtual void* get() {return uvloop;}
+    void* get() override {return uvloop;}
 
 private:
     uv_loop_t _uvloop_body;

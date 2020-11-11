@@ -32,7 +32,7 @@ print "Example2\n";
 # Reset.
 $indent->reset;
 
-# Output: 
+# Output:
 # ->Example
 # ->->Ok
 # ->Example2

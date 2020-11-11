@@ -1,5 +1,10 @@
 Revision history for Redis
 
+0.28 2020-11-01T23:04:30Z
+    - make the reconnect option double #101
+    - fix memory leak of info command #102
+    - Fix leak when croak #104
+
 0.27 2020-08-08T22:45:05Z
     - bump up hiredis v1.0.0
     - add debug option

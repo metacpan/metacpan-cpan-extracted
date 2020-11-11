@@ -2,7 +2,7 @@
 
 use POSIX qw(locale_h);
 
-setlocale(LC_CTYPE, "pt_PT");
+setlocale(LC_CTYPE, "pt_PT.UTF-8");
 
 use locale;
 

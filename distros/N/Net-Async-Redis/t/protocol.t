@@ -50,6 +50,7 @@ my @resp3 = (
 
 subtest decoding => sub {
     my $proto = new_ok('Net::Async::Redis::Protocol', [
+        hashrefs => 1,
         handler => sub { fail 'bad handler' }
     ]);
 
@@ -83,6 +84,7 @@ subtest 'RESP2 encoding' => sub {
 subtest 'RESP3 encoding' => sub {
     my $proto = new_ok('Net::Async::Redis::Protocol', [
         protocol => 'resp3',
+        hashrefs => 1,
         handler => sub { fail 'bad handler' }
     ]);
 

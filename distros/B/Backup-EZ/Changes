@@ -1,10 +1,82 @@
 ==================================================
-Changes from 2019-01-09 00:00:00 +0000 to present.
+Changes from 2019-10-30 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.43 at 2020-01-09 16:36:53 +0000
+version 0.45 at 2020-10-29 19:42:58 +0000
 -----------------------------------------
+
+  Change: 3fab9d8b94fa23427a9133eeed584d637db73939
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-29 14:39:30 +0000
+
+    Merge pull request #5 from sandidgm/remote_sudo
+
+    add sudo option for all remote commands 
+
+  Change: 947e537bd0a4d3959fc8fe9a150ce51e53969304
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-29 14:38:21 +0000
+
+    Merge pull request #4 from sandidgm/ignore-vanished
+
+    add ignore vanished config option 
+
+  Change: b7e0c448a5c1d669cf18c0ef5f61c0e3b2897aa1
+  Author: Marty Sandidge <marty.sandidge@act.org>
+  Date : 2020-10-29 11:13:06 +0000
+
+    increment release number 
+
+  Change: 43ca0ff1867256d13c8e5d1fd6f35eaa363e3450
+  Author: Marty Sandidge <marty.sandidge@act.org>
+  Date : 2020-10-29 10:07:12 +0000
+
+    add sudo option for all remote commands 
+
+  Change: 86973536069ca0f969fc1afa7232e93e650b9b3a
+  Author: Marty Sandidge <marty.sandidge@act.org>
+  Date : 2020-10-29 09:38:47 +0000
+
+    increment release number 
+
+  Change: e295249530f7ba8556a5b75a69eb60be996b4bdb
+  Author: Marty Sandidge <marty.sandidge@act.org>
+  Date : 2020-10-29 09:13:25 +0000
+
+    add sudo option for all remote commands 
+
+  Change: 382d6e2252afcdafdea96d7acf1133196240822b
+  Author: Marty Sandidge <marty.sandidge@act.org>
+  Date : 2020-10-29 09:05:18 +0000
+
+    add ignore vanished config option 
+
+  Change: de98263e45dc3b2b6dd6c1dccd83462c7513d5b8
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-28 09:21:18 +0000
+
+    incremented release number 
+
+  Change: 7dd3a0b929ef8c8fdd346cb1387a8cdc99ecc4db
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-10-28 09:19:51 +0000
+
+    Merge pull request #2 from sandidgm/master
+
+    add ssh opts config option 
+
+  Change: 623bc8e943bf9ad797986743f5015eda090a6a31
+  Author: Marty Sandidge <marty.sandidge@act.org>
+  Date : 2020-10-27 21:12:37 +0000
+
+    add ssh opts config option 
+
+  Change: 8b24b6b6e1468557e87a5e6d2ff4122f120e2095
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 10:42:01 +0000
+
+    housekeeping changes 
 
   Change: 1d5d70a2f01f219c36f462669eb44e5eb2a32be1
   Author: John Gravatt <john@gravatt.org>
@@ -29,10 +101,6 @@ version 0.43 at 2020-01-09 16:36:53 +0000
   Date : 2020-01-09 09:49:35 +0000
 
     fix for TravisCI failure 
-
------------------------------------------
-version 0.42 at 2020-01-09 15:29:10 +0000
------------------------------------------
 
   Change: 1536026adf996641c600f5c9f2d4f8a2f14e9ab5
   Author: John Gravatt <john@gravatt.org>

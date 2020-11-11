@@ -6,10 +6,11 @@
 
 package Rex::File::Parser::Data;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 sub new {
   my $that  = shift;

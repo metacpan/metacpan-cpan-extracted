@@ -1,5 +1,11 @@
 Revision history for Perl module cPanel::APIClient
 
+0.08 - 26 Oct 2020
+- Fix tests that 0.07 broke.
+- Add the ability to call cPanel UAPI from WHM.
+- Add GitHub CI to the repository.
+- Set curl’s POST payload size explicitly.
+
 0.07 - 20 Oct 2020
 - BUG FIX: WHM1 HTTP responses now work.
 - Additional tests added for WHM.

@@ -20,7 +20,7 @@ in Makefile.PL
     
 in your C test files
 
-    #include <catch.hpp>
+    #include <catch2/catch.hpp>
     ...
     
 Run tests from perl .t file:

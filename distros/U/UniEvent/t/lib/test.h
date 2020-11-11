@@ -2,7 +2,7 @@
 #include <mutex>
 #include <chrono>
 #include <thread>
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <panda/unievent.h>
 #include <panda/unievent/test/AsyncTest.h>
 

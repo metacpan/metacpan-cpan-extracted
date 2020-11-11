@@ -3,8 +3,11 @@
 # Data testing for Parse::CSV
 
 use strict;
-use Test::More tests => 11;
+use warnings FATAL => 'all';
+use Test::More tests => 13;
+use Text::CSV_XS;
 use Parse::CSV;
+use File::Temp qw(tempfile);
 
 
 {
@@ -53,3 +56,26 @@ EOF
   is( $csv->errstr, '', '->errstr returns ""' );
 }
 
+{
+  # Byte-order mark - https://github.com/kenahoo/Perl-Parse-CSV/issues/8
+  my $data = <<EOF;
+domain,first,last,reference,type
+broadbean.com,peter,sergeant,peters\@broadbean.com,good
+EOF
+
+  # Need to write data to a real file, or else we get the error "Strings with code points over 0xFF may not be mapped into in-memory file handles"
+  my ($fh, $filename) = tempfile();
+  binmode $fh, ":utf8";
+  print {$fh} chr(0xfeff);
+  print {$fh} $data;
+  close $fh or die $!;
+
+  open $fh, '<', $filename or die $!;
+  my $csv = Parse::CSV->new( handle => $fh, names => 1, csv_attr => { binary => 1, decode_utf8 => undef });
+
+  my $row = $csv->fetch;
+  is_deeply($row,
+            {domain=>'broadbean.com', first=>'peter', last=>'sergeant', reference=>'peters@broadbean.com', type=>'good'},
+            '->fetch returns as expected');
+  is( $csv->errstr, '', '->errstr returns ""' );
+}

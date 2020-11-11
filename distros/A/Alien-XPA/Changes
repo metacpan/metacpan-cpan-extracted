@@ -1,6 +1,71 @@
 Revision history for Alien-XPA
 
-0.01      2017-05-11 17:15:20-04:00 America/New_York
+0.09      2020-11-06 01:05:26-05:00 America/New_York
+
+  [BUILD]
+   * attempt to diagnose CPAN Testers build failures:
+     add more diagnostics
+
+0.08      2020-11-03 16:35:56-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+   * attempt to diagnose CPAN Testers build failures:
+     require ExtUtils::MakeMaker 7.50
+
+0.07      2020-11-02 09:14:46-05:00 America/New_York (TRIAL RELEASE)
+
+  [TEST]
+
+   * broke Windows test
+
+0.06      2020-11-01 18:52:59-05:00 America/New_York
+
+  [BUILD]
+
+   * distribution fix; no functional changes
+
+
+0.05      2020-11-01 12:13:04-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+   *  Use the latest version of the XPA distribution. It rarely changes and is very stable.
+
+  [TEST FIX]
+
+   * be more careful when destroying server
+
+
+0.04      2017-05-25 14:16:11-04:00 America/New_York (TRIAL RELEASE)
+
+  [TEST FIX]
+
+   * t/alien.t: Win32 process creation flags were incorrectly specified.
+
+
+0.03      2017-05-25 13:09:17-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+   * incomplete Makefile.PL was released in 0.02, causing build
+     failures on Win32
+
+0.02      2017-05-11 17:15:20-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIXES]
+
+   * Win32 specific code to handle test processes
+    (chorny@cpan.org: RT#121653, https://github.com/djerius/Alien-XPA/pull/1)
+
+   * more proper *NIX handling of test processes
+
+   * force -fPIC option in XPA build static library build can be linked
+     into dynamic Perl module
+
+   * increase the timeout for contacting the XPA name server from
+     150ms to 1000ms (Eric Mandel <eric@cfa.harvard.edu> )
+
 
 0.01      2017-05-11 17:15:20-04:00 America/New_York
 

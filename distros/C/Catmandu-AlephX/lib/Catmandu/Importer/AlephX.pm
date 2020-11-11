@@ -7,7 +7,7 @@ use Data::Dumper;
 
 with 'Catmandu::Importer';
 
-our $VERSION = "1.071";
+our $VERSION = "1.072";
 
 has url     => (is => 'ro', required => 1);
 has base    => (is => 'ro', required => 1);

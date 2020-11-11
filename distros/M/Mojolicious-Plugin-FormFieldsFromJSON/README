@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.01
+    version 1.02
 
 SYNOPSIS
 
@@ -149,9 +149,7 @@ CONFIGURATION
       * translate_labels
 
       If translate_labels is true, the labels for the templates are
-      translated. You have to provide a
-      translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method,
-      too.
+      translated. You have to provide a translation_method, too.
 
         plugin 'FormFieldsFromJSON' => {
           template           => '<%= $label %>: <%= $field %>',
@@ -159,15 +157,12 @@ CONFIGURATION
           translation_method => \&loc,
         };
 
-      For more details see
-      Translation|Mojolicious::Plugin::FormFieldsFromJSON/Translation.
+      For more details see Translation.
 
       * translation_method
 
       If translate_labels is true, the labels for the templates are
-      translated. You have to provide a
-      translation_method|Mojolicious::Plugin::FormFieldsFromJSON/Translation_method,
-      too.
+      translated. You have to provide a translation_method, too.
 
         plugin 'FormFieldsFromJSON' => {
           template           => '<%= $label %>: <%= $field %>',

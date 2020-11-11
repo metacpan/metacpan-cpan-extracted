@@ -1,0 +1,14 @@
+metadata:
+  description:
+  choices: []
+  jurisdiction:
+  date:
+  type: RCV Range Ordinal-Range RCVEqual Approval
+  # rcvequal uses the same format as range
+  # approval uses the same format as rcv but the positions are arbitrary
+  # Ordinal-Range is the same as range except equal rankins are not permitted
+
+
+
+ballots:
+

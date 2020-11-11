@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -29,9 +29,9 @@ This man page lists the configuration options specific to
 this unit type. See
 L<systemd.unit(5)>
 for the common options of all unit configuration files. The common
-configuration items are configured in the generic C<[Unit]> and
-C<[Install]> sections. The timer specific configuration options are
-configured in the C<[Timer]> section.
+configuration items are configured in the generic [Unit] and
+[Install] sections. The timer specific configuration options are
+configured in the [Timer] section.
 
 For each timer file, a matching unit file must exist,
 describing the unit to activate when the timer elapses. By
@@ -80,7 +80,10 @@ and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
 These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock pauses, too.
+temporarily suspended, the monotonic clock generally pauses, too. Note that if
+C<WakeSystem> is used, a different monotonic clock is selected that continues to
+advance while the system is suspended and thus can be used as the trigger to resume the
+system.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
 monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
@@ -119,7 +122,10 @@ and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
 These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock pauses, too.
+temporarily suspended, the monotonic clock generally pauses, too. Note that if
+C<WakeSystem> is used, a different monotonic clock is selected that continues to
+advance while the system is suspended and thus can be used as the trigger to resume the
+system.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
 monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
@@ -158,7 +164,10 @@ and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
 These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock pauses, too.
+temporarily suspended, the monotonic clock generally pauses, too. Note that if
+C<WakeSystem> is used, a different monotonic clock is selected that continues to
+advance while the system is suspended and thus can be used as the trigger to resume the
+system.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
 monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
@@ -197,7 +206,10 @@ and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
 These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock pauses, too.
+temporarily suspended, the monotonic clock generally pauses, too. Note that if
+C<WakeSystem> is used, a different monotonic clock is selected that continues to
+advance while the system is suspended and thus can be used as the trigger to resume the
+system.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
 monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
@@ -236,7 +248,10 @@ and the configured unit is started. This is not the case for
 timers defined in the other directives.
 
 These are monotonic timers, independent of wall-clock time and timezones. If the computer is
-temporarily suspended, the monotonic clock pauses, too.
+temporarily suspended, the monotonic clock generally pauses, too. Note that if
+C<WakeSystem> is used, a different monotonic clock is selected that continues to
+advance while the system is suspended and thus can be used as the trigger to resume the
+system.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
 monotonic timers and C<OnCalendar> timers, see below), and all prior assignments
@@ -300,7 +315,13 @@ C<TimerSlackNSec> setting. See
 L<prctl(2)>
 for details. To optimize power consumption, make sure to set
 this value as high as possible and as low as
-necessary.',
+necessary.
+
+Note that this setting is primarily a power saving option that allows coalescing CPU
+wake-ups. It should not be confused with C<RandomizedDelaySec> (see below) which
+adds a random value to the time the timer shall elapse next and whose purpose is the opposite: to
+stretch elapsing of timer events over a longer period to reduce workload spikes. For further details
+and explanations and how both settings play together, see below.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -372,9 +393,10 @@ suffix.',
       {
         'description' => "Takes a boolean argument. If true, the time when the service unit was last triggered
 is stored on disk.  When the timer is activated, the service unit is triggered immediately if it
-would have been triggered at least once during the time when the timer was inactive. This is useful
-to catch up on missed runs of the service when the system was powered down. Note that this setting
-only has an effect on timers configured with C<OnCalendar>. Defaults to
+would have been triggered at least once during the time when the timer was inactive. Such triggering
+is nonetheless subject to the delay imposed by C<RandomizedDelaySec>.
+This is useful to catch up on missed runs of the service when the system was powered down. Note that
+this setting only has an effect on timers configured with C<OnCalendar>. Defaults to
 C<false>.
 
 Use systemctl clean --what=state \x{2026} on the timer unit to remove the timestamp
@@ -398,7 +420,16 @@ after any work that is to be done is finished. Defaults to
 C<false>.
 
 Note that this functionality requires privileges and is thus generally only available in the
-system service manager.',
+system service manager.
+
+Note that behaviour of monotonic clock timers (as configured with
+C<OnActiveSec>, C<OnBootSec>, C<OnStartupSec>,
+C<OnUnitActiveSec>, C<OnUnitInactiveSec>, see above) is altered
+depending on this option. If false, a monotonic clock is used that is paused during system suspend
+(C<CLOCK_MONOTONIC>), if true a different monotonic clock is used that continues
+advancing during system suspend (C<CLOCK_BOOTTIME>), see
+L<clock_getres(2)> for
+details.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -408,18 +439,14 @@ system service manager.',
       },
       'RemainAfterElapse',
       {
-        'description' => 'Takes a boolean argument. If true, an elapsed
-timer will stay loaded, and its state remains queryable. If
-false, an elapsed timer unit that cannot elapse anymore is
-unloaded. Turning this off is particularly useful for
-transient timer units that shall disappear after they first
-elapse. Note that this setting has an effect on repeatedly
-starting a timer unit that only elapses once: if
-C<RemainAfterElapse> is on, it will not be
-started again, and is guaranteed to elapse only once. However,
-if C<RemainAfterElapse> is off, it might be
-started again if it is already elapsed, and thus be triggered
-multiple times. Defaults to
+        'description' => 'Takes a boolean argument. If true, a timer will stay loaded, and its state remains
+queryable even after it elapsed and the associated unit (as configured with C<Unit>,
+see above) deactivated again. If false, an elapsed timer unit that cannot elapse anymore is unloaded
+once its associated unit deactivated again. Turning this off is particularly useful for transient
+timer units. Note that this setting has an effect when repeatedly starting a timer unit: if
+C<RemainAfterElapse> is on, starting the timer a second time has no effect. However,
+if C<RemainAfterElapse> is off and the timer unit was already unloaded, it can be
+started again, and thus the service can be triggered multiple times. Defaults to
 C<yes>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -429,7 +456,7 @@ C<yes>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 244 doc',
+    'generated_by' => 'parse-man.pl from systemd 246 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }

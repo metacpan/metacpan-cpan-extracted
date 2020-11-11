@@ -10,13 +10,14 @@ WriteMakefile (
    'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
    'clean' => {FILES => "tmp* Calendar *~"},
    'LICENSE' => 'perl',
+   'EXE_FILES' => [ 'bin/cal2html' ],	       
    'PREREQ_PM' => {
 		   # Foo::Ey => '1.00',
 		  },
    'PL_FILES' => {},
    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM => $name, # retrieve abstract from module
-     AUTHOR     => 'Vlado Keselj web.cs.dal.ca/~vlado') : 
+     AUTHOR     => 'Vlado Keselj vlado@dnlp.ca http://vlado.ca') : 
     ()
    ),
    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {

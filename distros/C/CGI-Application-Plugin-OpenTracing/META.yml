@@ -28,8 +28,7 @@ requires:
   HTTP::Status: '0'
   OpenTracing::GlobalTracer: '0'
   OpenTracing::Implementation: v0.31.0
-  Sub::Name: '0'
   Syntax::Feature::Maybe: '0'
   Time::HiRes: '0'
-version: v0.103.2
+version: v0.103.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

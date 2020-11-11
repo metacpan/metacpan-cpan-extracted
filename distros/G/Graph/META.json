@@ -30,6 +30,12 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "1.00"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Heap" : "0.80",
@@ -43,7 +49,7 @@
       "test" : {
          "requires" : {
             "Math::Complex" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.82"
          }
       }
    },
@@ -58,6 +64,6 @@
          "web" : "https://github.com/neilb/Graph"
       }
    },
-   "version" : "0.9706",
+   "version" : "0.9708",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

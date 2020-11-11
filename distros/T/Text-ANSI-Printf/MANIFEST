@@ -10,5 +10,6 @@ t/00_compile.t
 t/01_simple.t
 t/02_export.t
 t/03_shorten.t
+t/04_backspace.t
 META.yml
 MANIFEST

@@ -21,7 +21,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->last_insert_id((undef)x4), 123, "... got the right insert id from the database's last_insert_id");
 
     SKIP: {
-        skip "Version of DBI::st doesn't support last_insert_id" unless $sth->can('last_insert_id');
+        skip "Version of DBI::st doesn't support last_insert_id", 1 unless $sth->can('last_insert_id');
 
         is($sth->last_insert_id((undef)x4), 123, "... got the right insert id from the statement handle's last_insert_id");
     }
@@ -30,7 +30,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->{mock_last_insert_id}, 124, '... got the right insert id');
     is($dbh->last_insert_id((undef)x4), 124, "... got the right insert id from the database handle's last_insert_id");
     SKIP: {
-        skip "Version of DBI::st doesn't support last_insert_id" unless $sth->can('last_insert_id');
+        skip "Version of DBI::st doesn't support last_insert_id", 1 unless $sth->can('last_insert_id');
 
         is($sth->last_insert_id((undef)x4), 124, "... got the right insert id from the statement handle's last_insert_id");
     }
@@ -39,7 +39,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->{mock_last_insert_id}, 125, '... got the right insert id');
     is($dbh->last_insert_id((undef)x4), 125, "... got the right insert id from the database handle's last_insert_id");
     SKIP: {
-        skip "Version of DBI::st doesn't support last_insert_id" unless $sth->can('last_insert_id');
+        skip "Version of DBI::st doesn't support last_insert_id", 1 unless $sth->can('last_insert_id');
 
         is($sth->last_insert_id((undef)x4), 125, "... got the right insert id from the statement handle's last_insert_id");
     }
@@ -52,7 +52,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->{mock_last_insert_id}, 345, '... got the right insert id');
     is($dbh->last_insert_id((undef)x4), 345, "... got the right insert id from the database handle's last_insert_id");
     SKIP: {
-        skip "Version of DBI::st doesn't support last_insert_id" unless $sth->can('last_insert_id');
+        skip "Version of DBI::st doesn't support last_insert_id", 1 unless $sth->can('last_insert_id');
 
         is($sth->last_insert_id((undef)x4), 345, "... got the right insert id from the statement handle's last_insert_id");
     }
@@ -61,7 +61,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->{mock_last_insert_id}, 346, '... got the right insert id');
     is($dbh->last_insert_id((undef)x4), 346, "... got the right insert id from the database handle's last_insert_id");
     SKIP: {
-        skip "Version of DBI::st doesn't support last_insert_id" unless $sth->can('last_insert_id');
+        skip "Version of DBI::st doesn't support last_insert_id", 1 unless $sth->can('last_insert_id');
 
         is($sth->last_insert_id((undef)x4), 346, "... got the right insert id from the statement handle's last_insert_id");
     }
@@ -70,7 +70,7 @@ $dbh->{mock_start_insert_id} = ['Baz', 345];
     is($dbh->{mock_last_insert_id}, 347, '... got the right insert id');
     is($dbh->last_insert_id((undef)x4), 347, "... got the right insert id from the database handle's last_insert_id");
     SKIP: {
-        skip "Version of DBI::st doesn't support last_insert_id" unless $sth->can('last_insert_id');
+        skip "Version of DBI::st doesn't support last_insert_id", 1 unless $sth->can('last_insert_id');
 
         is($sth->last_insert_id((undef)x4), 347, "... got the right insert id from the statement handle's last_insert_id");
     }

@@ -1,13 +1,17 @@
 bin/sc-api
 Changes
 INSTALL.md
+lib/App/TenableSC.pm
+lib/App/TenableSC/API.pm
+lib/App/TenableSC/Logger.pm
+lib/App/TenableSC/Utils.pm
 lib/Net/SecurityCenter.pm
-lib/Net/SecurityCenter/API.pm
 lib/Net/SecurityCenter/API/Analysis.pm
 lib/Net/SecurityCenter/API/Credential.pm
 lib/Net/SecurityCenter/API/DeviceInfo.pm
 lib/Net/SecurityCenter/API/Feed.pm
 lib/Net/SecurityCenter/API/File.pm
+lib/Net/SecurityCenter/API/Notification.pm
 lib/Net/SecurityCenter/API/Plugin.pm
 lib/Net/SecurityCenter/API/PluginFamily.pm
 lib/Net/SecurityCenter/API/Policy.pm
@@ -20,6 +24,7 @@ lib/Net/SecurityCenter/API/Status.pm
 lib/Net/SecurityCenter/API/System.pm
 lib/Net/SecurityCenter/API/User.pm
 lib/Net/SecurityCenter/API/Zone.pm
+lib/Net/SecurityCenter/Base.pm
 lib/Net/SecurityCenter/Error.pm
 lib/Net/SecurityCenter/REST.pm
 lib/Net/SecurityCenter/Utils.pm
@@ -32,6 +37,10 @@ t/10-rest.t
 t/20-utils.t
 t/99-local.t
 t/manifest.t
+t/mock/rest-analysis-post.json
+t/mock/rest-currentUser-get.json
+t/mock/rest-notification-39-get.json
+t/mock/rest-notification-get.json
 t/mock/rest-plugin-0-get.json
 t/mock/rest-plugin-get.json
 t/mock/rest-pluginFamily-1000030-get.json

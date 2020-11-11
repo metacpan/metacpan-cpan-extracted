@@ -5,23 +5,35 @@ use Exporter qw/import/;
 use File::Spec;
 use Test::More;
 
-our @EXPORT = qw/setup_dbs teardown_dbs/;
+our @EXPORT = qw/setup_dbs teardown_dbs disconnect_all/;
 
 my %Requires = (
     SQLite     => 'DBD::SQLite',
     MySQL      => 'Test::mysqld',
+    MariaDB    => 'Test::mysqld',
     PostgreSQL => 'Test::PostgreSQL',
     Oracle     => 'DBD::Oracle',
     SQLServer  => 'DBD::ODBC',
 );
 
 my %TestDB;
+my $Driver;
 
-sub driver { $ENV{DOD_TEST_DRIVER} || 'SQLite' }
+sub driver { $Driver ||= _driver() }
+
+sub _driver {
+    my $driver = $ENV{DOD_TEST_DRIVER} || 'SQLite';
+    return $driver if exists $Requires{$driver};
+    return 'PostgreSQL' if lc $driver eq 'pg';
+    for my $key (keys %Requires) {
+        return $key if lc $key eq lc $driver;
+    }
+    plan skip_all => "Unknown driver: $driver";
+}
 
 sub check_driver {
     my $driver = driver();
-    my $module = $Requires{$driver} or plan skip_all => "Uknonwn driver: $driver";
+    my $module = $Requires{$driver};
     unless ( eval "require $module; 1" ) {
         plan skip_all => "Test requires $module";
     }
@@ -40,20 +52,38 @@ sub db_filename {
     $dbname . $$ . '.db';
 }
 
+my $test_mysqld_dsn;
 sub dsn {
     my($dbname) = @_;
     my $driver = driver();
     if ( my $dsn = env('DOD_TEST_DSN', $dbname) ) {
         return "$dsn;dbname=$dbname";
     }
-    if ( $driver eq 'MySQL' ) {
+    if ( $driver =~ /MySQL|MariaDB/ ) {
+        if ( $driver eq 'MariaDB' && !$test_mysqld_dsn ) {
+            my $help = `mysql --help`;
+            my ($mariadb_version) = $help =~ /\A.*?([0-9]+\.[0-9]+)\.[0-9]+\-MariaDB/;
+            no warnings 'redefine';
+            $test_mysqld_dsn = \&Test::mysqld::dsn;
+            *Test::mysqld::dsn = sub {
+                my $dsn = $test_mysqld_dsn->(@_);
+                # cf. https://github.com/kazuho/p5-test-mysqld/issues/32
+                $dsn =~ s/;user=root// if $mariadb_version && $mariadb_version > 10.3;
+                $dsn;
+            };
+        }
         $TestDB{$dbname} ||= Test::mysqld->new(
             my_cnf => {
                 'skip-networking' => '', # no TCP socket
                 'sql-mode' => 'TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY',
             }
         ) or die $Test::mysqld::errstr;
-        return $TestDB{$dbname}->dsn;
+        my $dsn = $TestDB{$dbname}->dsn;
+        if ( $driver eq 'MariaDB' ) {
+            $dsn =~ s/^dbi:mysql/dbi:MariaDB/i;
+            $dsn =~ s/mysql_/mariadb_/ig;
+        }
+        return $dsn;
     }
     if ( $driver eq 'PostgreSQL' ) {
         $TestDB{$dbname} ||= Test::PostgreSQL->new(
@@ -65,7 +95,8 @@ CONF
         return $TestDB{$dbname}->dsn;
     }
     if ( $driver eq 'SQLite' ) {
-        return 'dbi:SQLite:' . db_filename($dbname);
+        $TestDB{$dbname} ||= db_filename($dbname);
+        return 'dbi:SQLite:' . $TestDB{$dbname};
     }
 }
 
@@ -75,8 +106,8 @@ sub setup_dbs {
     for my $dbname (keys %$info) {
         my $dbh = DBI->connect(
             dsn($dbname),
-            env('DOD_TEST_USER', $dbname),
-            env('DOD_TEST_PASS', $dbname),
+            env('DOD_TEST_USER', $dbname) || undef,
+            env('DOD_TEST_PASS', $dbname) || undef,
             { RaiseError => 1, PrintError => 0, ShowErrorStatement => 1 });
         for my $table (@{ $info->{$dbname} }) {
             $dbh->do($_) for create_sql($table);
@@ -88,17 +119,46 @@ sub setup_dbs {
 sub teardown_dbs {
     my(@dbs) = @_;
     my $driver = driver();
+    return unless $driver eq 'SQLite';
     for my $db (@dbs) {
-        next unless $driver eq 'SQLite';
-        my $file = db_filename($db);
+        my $file = $TestDB{$db};
         next unless -e $file;
-        unlink $file or die "Can't teardown $db: $!";
+        unlink $file or die "Can't teardown $file: $!";
+    }
+}
+
+sub disconnect_all {
+    my @tables = @_;
+    return unless driver() eq 'SQLite';
+    for my $table (@tables) {
+        my $driver = $table->driver;
+        if ($driver->can('fallback')) {
+            $driver = $driver->fallback;
+        }
+        if ($driver->can('dbh')) {
+            my $dbh = $driver->dbh or next;
+            $dbh->disconnect;
+        }
+        elsif ($driver->can('drivers')) {
+            for my $d (@{ $driver->drivers }) {
+                my $dbh = $d->dbh or next;
+                $dbh->disconnect;
+            }
+        }
+        else {
+            my @drivers = @{ $driver->get_driver->(undef, {multi_partition => 1})->partitions };
+            for my $d (@drivers) {
+                my $dbh = $d->dbh or next;
+                $dbh->disconnect;
+            }
+        }
     }
 }
 
 sub create_sql {
     my($table) = @_;
     my $driver = driver();
+    $driver = 'MySQL' if $driver eq 'MariaDB';
     my $file = File::Spec->catfile('t', 'schemas', $table . '.sql');
     open my $fh, $file or die "Can't open $file: $!";
     my $sql = do { local $/; <$fh> };

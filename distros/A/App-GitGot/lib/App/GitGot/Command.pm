@@ -1,6 +1,6 @@
 package App::GitGot::Command;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::VERSION = '1.337';
+$App::GitGot::Command::VERSION = '1.339';
 # ABSTRACT: Base class for App::GitGot commands
 use 5.014;
 
@@ -346,7 +346,7 @@ sub _git_fetch {
       # similar to:
       #
       #     From git://example.com/link-to-repo
-      #         SHA1___..SHA1___  master     -> origin/master
+      #         SHA1___..SHA1___  main     -> origin/main
       #
       # So search for /^From / in STDERR to see if anything was outputed
       if ( grep { /^From / } @err ) {
@@ -586,7 +586,7 @@ App::GitGot::Command - Base class for App::GitGot commands
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 METHODS
 

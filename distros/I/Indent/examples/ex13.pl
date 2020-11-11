@@ -3,18 +3,17 @@
 use strict;
 use warnings;
 
-use Indent::Block;
+use Indent::Data;
 
-# Object.
-my $i = Indent::Block->new(
-        'line_size' => 2,
- 'next_indent' => '',
+# Indent::Data object.
+my $i = Indent::Data->new(
+       'line_size' => '10',
+       'next_indent' => '  ',
+       'output_separator' => "|\n",
 );
 
-# Print in scalar context.
-print $i->indent(['text', 'text', 'text'])."\n";
+# Print indented text.
+print $i->indent('text text text text text text', '<->', 1)."|\n";
 
 # Output:
-# text
-# text
-# text
+# <->text text text text text text|

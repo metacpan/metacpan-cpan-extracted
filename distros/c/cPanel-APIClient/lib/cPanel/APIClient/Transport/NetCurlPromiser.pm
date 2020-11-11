@@ -131,11 +131,12 @@ sub _create_easy {
 
     if ( $self->_needs_session() ) {
         $easy->setopt( Net::Curl::Easy::CURLOPT_COOKIEFILE, q<> );
-        $easy->setopt( Net::Curl::Easy::CURLOPT_SHARE(),    $self->{'share'} );
+        $easy->setopt( Net::Curl::Easy::CURLOPT_SHARE,      $self->{'share'} );
     }
 
     # We POST even if there’s no payload.
     $payload = q<> if !defined $payload;
+    $easy->setopt( Net::Curl::Easy::CURLOPT_POSTFIELDSIZE,  length $payload );
     $easy->setopt( Net::Curl::Easy::CURLOPT_COPYPOSTFIELDS, $payload );
 
     $easy->setopt( Net::Curl::Easy::CURLOPT_URL, $url );

@@ -1337,9 +1337,9 @@ without affecting the selection state of cells outside that range.
 
 =back
 
-=over 1
-
 perltk note this needs to be perlized
+
+=over 1
 
 =item I<$table>-E<gt>B<set>(?I<row|col>?, I<index>, ?I<value>?, ?I<index, value, ...>?)
 
@@ -1602,6 +1602,8 @@ I<what> is B<units>, the view adjusts up or down by I<number> cells; if it is
 B<pages> then the view adjusts by I<number> screenfuls.  If I<number> is negative 
 then earlier elements become visible; if it is positive then later elements 
 become visible.   
+
+=back
 
 =back
 

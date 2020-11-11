@@ -1,11 +1,9 @@
 package Task::Map::Tube::Metro;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 1;
 
@@ -27,6 +25,10 @@ Task::Map::Tube - Install the Map::Tube concrete metro modules.
 
 =over
 
+=item L<Map::Tube::Athens>
+
+Map::Tube interface to the Athens Metro
+
 =item L<Map::Tube::Barcelona>
 
 Interface to the Barcelona Metro Map.
@@ -39,6 +41,10 @@ Interface to the Beijing tube map
 
 Interface to the Berlin S- and U-Bahn map.
 
+=item L<Map::Tube::Bielefeld>
+
+interface to the Bielefeld Stadtbahn
+
 =item L<Map::Tube::Bucharest>
 
 Interface to the Bucharest Metro Map.
@@ -47,6 +53,10 @@ Interface to the Bucharest Metro Map.
 
 Interface to the Budapest Metro Map.
 
+=item L<Map::Tube::Copenhagen>
+
+Interface to the Copenhagen Metro map
+
 =item L<Map::Tube::Delhi>
 
 Interface to the Delhi Metro Map.
@@ -54,6 +64,10 @@ Interface to the Delhi Metro Map.
 =item L<Map::Tube::Dnipropetrovsk>
 
 Interface to the Dnipropetrovsk Metro Map.
+
+=item L<Map::Tube::Frankfurt>
+
+interface to the Frankfurt S- and U-Bahn map
 
 =item L<Map::Tube::Glasgow>
 
@@ -75,6 +89,10 @@ Interface to the Kiev Metro Map.
 
 Interface to the Koeln-Bonn U- and S-Bahn and tram maps.
 
+=item L<Map::Tube::Kolkatta>
+
+Interface to the Kolkatta Metro Map.
+
 =item L<Map::Tube::KualaLumpur>
 
 Interface to the KualaLumpur urban monorail system map.
@@ -87,9 +105,17 @@ Interface to the London Tube Map.
 
 Interface to the Lyon metro map.
 
+=item L<Map::Tube::Madrid>
+
+Interface to the Madrid Metro Map.
+
 =item L<Map::Tube::Malaga>
 
 Interface to the Málaga Metro Map.
+
+=item L<Map::Tube::Milan>
+
+Interface to the Milan tube map.
 
 =item L<Map::Tube::Minsk>
 
@@ -110,6 +136,10 @@ Interface to the Nanjing Metro Map.
 =item L<Map::Tube::Novosibirsk>
 
 Interface to the Novosibirsk Metro Map.
+
+=item L<Map::Tube::Nuremberg>
+
+interface to the Nuremberg U-Bahn map
 
 =item L<Map::Tube::Prague>
 
@@ -155,22 +185,24 @@ Interface to the Yekaterinburg Metro Map.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Map-Tube-Metro>
+L<https://github.com/michal-josef-spacek/Task-Map-Tube-Metro>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015-2016 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2015-2020 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

@@ -4,15 +4,15 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'NAME' => 'AudioFile::Info::Ogg::Vorbis::Header::PurePerl',
-  'VERSION_FROM' => 'lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm',
   'PREREQ_PM' => {
-                   'AudioFile::Info' => 0,
-                   'Module::Build' => 0,
                    'Ogg::Vorbis::Header::PurePerl' => 0,
-                   'YAML' => 0
+                   'YAML' => 0,
+                   'Module::Build' => 0,
+                   'AudioFile::Info' => 0
                  },
-  'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
-  'PL_FILES' => {}
+  'INSTALLDIRS' => 'site',
+  'PL_FILES' => {},
+  'VERSION_FROM' => 'lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm'
 )
 ;

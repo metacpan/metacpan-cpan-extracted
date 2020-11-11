@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::ShareDir" => 0,
     "HTML::Entities" => 0,
+    "JSON::PP" => 0,
     "URI::Escape" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "HTML::Entities" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON::PP" => 0,
   "Test::More" => 0,
   "URI::Escape" => 0,
   "strict" => 0,

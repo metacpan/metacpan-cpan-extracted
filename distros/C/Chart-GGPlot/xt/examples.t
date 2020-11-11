@@ -3,12 +3,12 @@
 use FindBin;
 use Path::Tiny;
 use Capture::Tiny qw(:all);
-use Chart::Plotly::Image::Orca;
+use Chart::Kaleido::Plotly;
 
 use Test2::V0;
 
-eval { Chart::Plotly::Image::Orca::orca_available(); };
-plan skip_all("needs plotly-orca to run") if $@;
+eval { Chart::Kaleido::Plotly::kaleido_available(); };
+plan skip_all("needs kaleido to run") if $@;
 
 my $script = "$FindBin::RealBin/../utils/run_all_examples.pl";
 

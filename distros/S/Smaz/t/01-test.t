@@ -22,7 +22,6 @@ my @strings = (
         "/media/hdb1/music/Alben/The Bla",
 );
 
-use MIME::Base64 qw/encode_base64url/;;
 for my $string (@strings) {
 	ok(my $comp = smaz_compress($string));
 	ok(my $decomp = smaz_decompress($comp));

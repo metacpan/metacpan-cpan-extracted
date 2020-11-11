@@ -1,6 +1,6 @@
 package Text::VisualPrintf;
 
-our $VERSION = "3.09";
+our $VERSION = "3.11";
 
 use v5.10;
 use strict;
@@ -17,7 +17,7 @@ sub vprintf  { &printf (@_) }
 sub vsprintf { &sprintf(@_) }
 
 use Text::VisualWidth::PP;
-our $IS_TARGET = qr/[\e\P{ASCII}]/;
+our $IS_TARGET = qr/[\e\b\P{ASCII}]/;
 our $VISUAL_WIDTH = \&Text::VisualWidth::PP::width;
 
 sub sprintf {
@@ -25,7 +25,9 @@ sub sprintf {
     my $xform = Text::VisualPrintf::Transform
 	->new(except => $format,
 	      test   => $IS_TARGET,
-	      length => $VISUAL_WIDTH);
+	      length => $VISUAL_WIDTH,
+	      max    => int @args,
+	);
     $xform->encode(@args) if $xform;
     my $s = CORE::sprintf $format, @args;
     $xform->decode($s) if $xform;
@@ -59,7 +61,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 =head1 VERSION
 
-Version 3.09
+Version 3.11
 
 =head1 DESCRIPTION
 

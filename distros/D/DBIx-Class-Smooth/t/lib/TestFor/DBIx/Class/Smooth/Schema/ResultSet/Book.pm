@@ -17,3 +17,5 @@ sub except_titles($self, @titles) {
     # Here, we want the arguments that would be passed to filter.
     return $self->_smooth__prepare_for_filter(title__not_in => \@titles);
 }
+
+1;

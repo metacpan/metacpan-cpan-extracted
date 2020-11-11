@@ -15,17 +15,19 @@ name: Data-DFA
 provides:
   Data::DFA:
     file: lib/Data/DFA.pm
-    version: '20200705'
+    version: '20201031'
   dtdElementDfa:
     file: lib/Data/DFA.pm
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::NFA: '20200623'
-  Data::Table::Text: '20200418'
+  Data::NFA: '20201030'
+  Data::Table::Text: '20201029'
   Test2::API: '0'
   Test::More: '0'
 resources:
+  bugtracker: https://github.com/philiprbrenan/DataDFA/issues
   license: http://dev.perl.org/licenses/
-version: '20200705'
+  repository: https://github.com/philiprbrenan/DataDFA
+version: '20201031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

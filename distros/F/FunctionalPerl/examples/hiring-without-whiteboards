@@ -24,22 +24,23 @@ my $mainfile= "README.md";
 sub usage {
     print "usage: $myname path/to/hiring-without-whiteboards/
 
-  Parse the $mainfile file of a check-out of
-  https://github.com/poteto/hiring-without-whiteboards, present it in
-  a repl as an FP::Stream of Company objects via the `cs` function. Now
-  you can do things like:
+  Starts an \`FP::Repl\` with access to a \`cs\` function which returns a
+  stream (\`FP::Stream\`) of \`Company\` objects representing the contents
+  of the $mainfile file of a check-out of
+  https://github.com/poteto/hiring-without-whiteboards
+
+  You can then enter 'queries' like:
 
      cs->filter(fun(\$r) { \$r->locations->any(fun(\$l) { \$l=~ /\\bUK\\b/ }) })->show_items
 
   The 'show_items' method shows the object structure. If you instead
   use the 'print' method, it will serialize back to markdown, although
-  without the grouping. `print_grouped` will re-sort and re-group and
+  without the grouping. \`print_grouped\` will re-sort and re-group and
   show the group subtitles the same way as in the original markdown.
 
-  Use tab completion to learn about the available methods on an object
-  in a variable (which you will have to introduce for this, sadly;
-  don't use 'our' or 'my' keywords), and read the (probably
-  not-so-fine) docs on functional-perl.org.
+  You can use tab completion to learn about the available methods on a
+  variable (don't use \`my\` for making variables, or they won't persist
+  to your next entry). Also see the docs on \`functional-perl.org\`.
 
   See https://news.ycombinator.com/item?id=19290044 for a
   discussion.
@@ -53,7 +54,6 @@ our $verbose=0;
 GetOptions("verbose"=> \$verbose,
            "help"=> sub{usage},
            ) or exit 1;
-usage unless @ARGV==1;
 
 my ($basedir)= @ARGV;
 
@@ -75,19 +75,19 @@ use FP::Show;
 use Chj::xperlfunc ":all";
 use FP::PureArray ":all";
 
-use Chj::TEST;
+use Chj::TEST ":all";
 
 
 # XX lib
 sub triples {
     my @out;
     while (@_) {
-	my $k= shift;
-	@_ or die "wrong number of inputs";
-	my $v= shift;
-	@_ or die "wrong number of inputs";
-	my $v2= shift;
-	push @out, [$k,$v,$v2]
+        my $k= shift;
+        @_ or die "wrong number of inputs";
+        my $v= shift;
+        @_ or die "wrong number of inputs";
+        my $v2= shift;
+        push @out, [$k,$v,$v2]
     }
     array_to_purearray \@out
 }
@@ -423,13 +423,25 @@ fun parse_location($str) {
         $Remote
     } else {
         my @s= split /\s*,\s*/, $str;
-        if (@s > 2) {
-            die "more than one comma in: '$str'"
+        if (@s == 1) {
+            parse_country($s[0])
         } elsif (@s == 2) {
             my ($city, $country)= @s;
             City($city, parse_country($country))
+        } elsif (@s == 3) {
+            my ($city, $state, $country)= @s;
+            if ($country eq "USA") {
+                my $s= parse_country($state);
+                if ($s->is_USA) {
+                    City($city, $s)
+                } else {
+                    die "presumed state '$state' is not a state in the USA";
+                }
+            } else {
+                die "don't know how to deal with presumed state '$state' in country '$country': don't know that country";
+            }
         } else {
-            parse_country($s[0])
+            die "more than two commas in: '$str'"
         }
     }
 }
@@ -457,7 +469,7 @@ TEST {
     parse_line "- [Accredible](https://www.accredible.com/careers) | Cambridge, UK / San Francisco, CA / Remote | Take home project, then a pair-programming and discussion onsite / Skype round."
 }
   Company ("Accredible", "https://www.accredible.com/careers",
-           list ("Cambridge, UK", "San Francisco, CA", "Remote"),
+           list (City('Cambridge', NonUSCountry('UK')), City('San Francisco', USPSCode('California', 'CA', 1)), Remote()),
            "Take home project, then a pair-programming and discussion onsite / Skype round.");
 
 
@@ -552,5 +564,9 @@ fun FP::Abstract::Sequence::print_grouped ($l,$please_sort=1) {
 
 fun cs() { companies() }
 
-# let the user play with the data
-repl;
+
+perhaps_run_tests "main" or do {
+    usage unless @ARGV==1;
+    # let the user play with the data
+    repl;
+};

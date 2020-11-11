@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.58      2020-10-26 19:14:59 -0600
+  - Added travis_com and travis_base options
+
 2.57      2020-09-22 10:10:53 -0600
   - Newly minted dists will use LF on windows CI
 

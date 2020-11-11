@@ -6,11 +6,12 @@
 
 package Rex::Exporter;
 
+use 5.010001;
 use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Data::Dumper;
 

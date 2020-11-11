@@ -1,5 +1,8 @@
 Revision history for Perl extension Graphics::TIFF.
 
+7   Thu, 27 Oct 2020 19:30 +0100
+        - Fix TIFFGetField for TIFFTAG_COLORMAP
+
 6   Wed, 02 Aug 2017 19:30 +0200
         - correct number of tests to skip in t/1.t. Closes RT 122665
           (t/1.t fails on some Linux systems)

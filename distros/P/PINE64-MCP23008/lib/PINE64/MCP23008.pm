@@ -6,7 +6,7 @@ use Fcntl;
 
 package PINE64::MCP23008;
 
-our $VERSION = '0.9';
+our $VERSION = '0.901';
 
 #global vars
 my ($i2cbus, $addr, $gpext);
@@ -75,10 +75,18 @@ sub write_pin{
 	#1 or 0
 	my $val = $_[2];
 
-	if($val == 1){
+	#check 0x09 register to see if
+	#pin already high; if so, do nothing
+	my $regval = $gpext->readByteData(0x09);
+	my $binout = sprintf("%08b", $regval);
+	my @pinvals = split(//, $binout); 
+	@pinvals = reverse(@pinvals); 
+	my $already_high = $pinvals[$ind]; 
+
+	if($val == 1 && $already_high == 0){
 		$gpregval+=$iox; 
 	}#end if
-	if($val == 0){
+	if($val == 0 && $already_high == 1){
 		$gpregval-=$iox;
 	}#end if
 
@@ -107,6 +115,13 @@ sub read_pin{
 
 	return $pinval; 
 }#end read_pin
+
+sub read_gpio_register{
+	#read GPIO register
+	my $regval = $gpext->readByteData(0x09); 
+
+	return $regval;
+}#end read_gpio_register
 
 1;
 __END__
@@ -183,3 +198,7 @@ as an output.
 Returns the value of $pin_number.  As stated before, use with reversed
 polarity, and enable the pullup resistors (or build an external pull up
 resistor).  
+
+=head2 read_gpio_register()
+
+Returns the decimal value (0-255) of the 0x09 gpio register

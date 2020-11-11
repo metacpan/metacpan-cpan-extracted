@@ -1,6 +1,6 @@
 package App::GitGot::Command::list;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::list::VERSION = '1.337';
+$App::GitGot::Command::list::VERSION = '1.339';
 # ABSTRACT: list managed repositories
 use 5.014;
 
@@ -25,12 +25,12 @@ sub _execute {
   my( $self, $opt, $args ) = @_;
 
   if ( $self->opt->json ) {
-    try_load_class( 'JSON' )
-      or die "json serializing requires the module 'JSON' to be installed\n";
+    try_load_class( 'JSON::MaybeXS' )
+      or die "json serializing requires the module 'JSON::MaybeXS' to be installed\n";
 
     my @data = map { {%$_}  } $self->active_repos;
 
-    say JSON::to_json( \@data, { pretty => 1 } );
+    say JSON::MaybeXS->new(pretty => 1)->encode( \@data );
     return;
   }
 
@@ -71,7 +71,7 @@ App::GitGot::Command::list - list managed repositories
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 AUTHOR
 

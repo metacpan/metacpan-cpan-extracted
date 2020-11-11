@@ -142,14 +142,14 @@ static SV *av_push_r(AV *av, SV *sv)
     hv_delete((hv), ("" key ""), (sizeof(key)-1), (flags))
 #endif
 
-#define hv_store_or_delete(hv, key, val)  S_hv_store_or_delete(aTHX_ hv, key, val)
-static void S_hv_store_or_delete(pTHX_ HV *hv, SV *key, SV *val)
+#define hv_setsv_or_delete(hv, key, val)  S_hv_setsv_or_delete(aTHX_ hv, key, val)
+static void S_hv_setsv_or_delete(pTHX_ HV *hv, SV *key, SV *val)
 {
   if(!val) {
     hv_delete_ent(hv, key, G_DISCARD, 0);
   }
   else
-    hv_store_ent(hv, key, val, 0);
+    sv_setsv(HeVAL(hv_fetch_ent(hv, key, 1, 0)), val);
 }
 
 #define ENSURE_HV(sv)  S_ensure_hv(aTHX_ sv)
@@ -198,17 +198,16 @@ static void S_popdyn(pTHX_ void *_data)
   if(dyn->keysv) {
     HV *hv = ENSURE_HV(dyn->var);
 
-    hv_store_or_delete(hv, dyn->keysv, dyn->oldval);
-    /* hv now owns oldval; no need to dec refcount */
+    hv_setsv_or_delete(hv, dyn->keysv, dyn->oldval);
 
     SvREFCNT_dec(dyn->keysv);
   }
   else {
     sv_setsv_mg(dyn->var, dyn->oldval);
-    SvREFCNT_dec(dyn->oldval);
   }
 
   SvREFCNT_dec(dyn->var);
+  SvREFCNT_dec(dyn->oldval);
 
   SvREFCNT_dec(sv);
 }
@@ -246,15 +245,14 @@ static void hook_postsuspend(pTHX_ HV *modhookdata)
       HE *he = hv_fetch_ent(hv, dyn->keysv, 0, 0);
       suspdyn->curval = he ? newSVsv(HeVAL(he)) : NULL;
 
-      hv_store_or_delete(hv, dyn->keysv, dyn->oldval);
-      /* hv now owns oldval; no need to dec refcount */
+      hv_setsv_or_delete(hv, dyn->keysv, dyn->oldval);
     }
     else {
       suspdyn->curval = newSVsv(dyn->var);
 
       sv_setsv_mg(dyn->var, dyn->oldval);
-      SvREFCNT_dec(dyn->oldval);
     }
+    SvREFCNT_dec(dyn->oldval);
   }
 
   if(i < max)
@@ -307,16 +305,15 @@ static void hook_preresume(pTHX_ HV *modhookdata)
       HE *he = hv_fetch_ent(hv, suspdyn->keysv, 0, 0);
       pushdynhelem(hv, suspdyn->keysv, he ? HeVAL(he) : NULL);
 
-      hv_store_or_delete(hv, suspdyn->keysv, suspdyn->curval);
-      /* hv now owns curval; no need to dec refcount */
+      hv_setsv_or_delete(hv, suspdyn->keysv, suspdyn->curval);
     }
     else {
       SV *var = suspdyn->var;
       pushdyn(var);
 
       sv_setsv_mg(var, suspdyn->curval);
-      SvREFCNT_dec(suspdyn->curval);
     }
+    SvREFCNT_dec(suspdyn->curval);
 
     if(suspdyn->is_outer) {
       SAVEDESTRUCTOR_X(&S_popdyn, suspdyn->var);
@@ -375,7 +372,8 @@ static OP *pp_startdyn(pTHX)
     save_freesv(SvREFCNT_inc(var));
     /* When save_item() is restored it won't reset the SvPADMY flag properly.
      * This upsets -DDEBUGGING perls, so we'll have to save the flags too */
-    save_set_svflags(var, SvFLAGS(var), SvFLAGS(var));
+    if(SvFLAGS(var) & SVs_PADMY)
+      save_set_svflags(var, SvFLAGS(var), SvFLAGS(var));
     save_item(var);
   }
 
@@ -394,6 +392,23 @@ static OP *MY_newSTARTDYNOP(pTHX_ I32 flags, OP *expr)
  * value (or absence of) the key in the hash to be restored again on scope
  * exit. It copes with missing keys by deleting them again to "restore".
  */
+
+static void S_restore(pTHX_ void *_data)
+{
+  DynamicVar *dyn = _data;
+
+  if(dyn->keysv) {
+    hv_setsv_or_delete(ENSURE_HV(dyn->var), dyn->keysv, dyn->oldval);
+
+    SvREFCNT_dec(dyn->var);
+    SvREFCNT_dec(dyn->keysv);
+    SvREFCNT_dec(dyn->oldval);
+  }
+  else
+    croak("ARGH: Expected a keysv");
+
+  Safefree(dyn);
+}
 
 static XOP xop_helemdyn;
 
@@ -424,13 +439,13 @@ static OP *pp_helemdyn(pTHX)
     SAVEDESTRUCTOR_X(&S_popdyn, (SV *)hv);
   }
   else {
-    /* Basically identical to `local $hv{keysv}` at this point */
-    if(preexisting) {
-      save_helem_flags(hv, keysv, svp, SAVEf_SETMAGIC);
-    }
-    else {
-      SAVEHDELETE(hv, keysv);
-    }
+    DynamicVar *dyn;
+    Newx(dyn, 1, DynamicVar);
+
+    dyn->var   = SvREFCNT_inc(hv);
+    dyn->keysv = SvREFCNT_inc(keysv);
+    dyn->oldval = preexisting ? newSVsv(*svp) : NULL;
+    SAVEDESTRUCTOR_X(&S_restore, dyn);
   }
 
   PUSHs(*svp);

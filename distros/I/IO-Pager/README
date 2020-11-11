@@ -12,7 +12,7 @@ IO::Pager is lightweight and can be used to locate an available pager
 and set the PAGER environment variable sanely or as a factory for
 creating objects defined elsewhere such as IO::Pager::Buffered,
 IO::Pager::Unbuffered, and IO::Pager::less which provides a pure perl
-pager.
+pager called tp.
 
 IO::Pager subclasses are designed to programmatically decide whether
 or not to pipe a filehandle's output to a program specified in PAGER.
@@ -38,7 +38,12 @@ Multiple core modules are used:
 base, Env, File::Spec, File::Which, IO::Handle, PerlIO, SelectSaver,
 Symbol, Text::Wrap, Tie::Handle
 
+Term::ReadKey is also require for IO::Pager::less, IO::Pager::Perl and tp.
+Win32::Console::ANSI, included in some distributions of Win32 perl like
+Strawberry is recommended on Windows for IO::Pager::less et al. to function.
+
 Test::More is used during the installation procedure.
+
 
 PORTABILITY
 
@@ -50,7 +55,7 @@ COPYRIGHT AND LICENSE
 
 IO::Pager::Perl - Jerrad Pierce & Jeff Weisberg, Perl Artistic License
 
-All Else - Copyright (C) 2003-2019 Jerrad Pierce:
+All Else - Copyright (C) 2003-2020 Jerrad Pierce:
 
  * Thou shalt not claim ownership of unmodified materials.
  * Thou shalt not claim whole ownership of modified materials.

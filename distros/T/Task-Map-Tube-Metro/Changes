@@ -1,3 +1,24 @@
+0.13 2020-11-03T23:51:31+01:00
+ - Add Map::Tube::Athens 0.01 version.
+ - Add Map::Tube::Bielefeld 2020.0330 version.
+ - Add Map::Tube::Copenhagen 0.04 version.
+ - Add Map::Tube::Frankfurt 0.04 version.
+ - Add Map::Tube::Kolkatta 0.33 version.
+ - Add Map::Tube::Madrid 0.39 version.
+ - Add Map::Tube::Milan 0.005 version.
+ - Add Map::Tube::Nuremberg 0.06 version.
+ - Fix Makefile.PL failing with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Update Map::Tube::London to 0.76 version.
+ - Update Map::Tube::Sofia to 0.08 version.
+ - Update Map::Tube::Tokyo to 0.59 version.
+ - Update Map::Tube::Vienna to 0.08 version.
+ - Update Map::Tube::Warsaw to 0.07 version.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years to 2020.
+
 0.12 2016-06-27T11:33:08+02:00
  - Update Map::Tube::Barcelona to 0.37 version.
  - Update Map::Tube::Berlin to 0.14 version.

@@ -1,9 +1,9 @@
 package Acme::CPANModules::CLI::Wrapper::UnixCommand;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-26'; # DATE
+our $DATE = '2020-11-08'; # DATE
 our $DIST = 'Acme-CPANModules-CLI-Wrapper-UnixCommand'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
     summary => "Various CLIs that wrap (popular) Unix commands",
@@ -19,6 +19,7 @@ If you know of others, please drop me a message.
 
 _
     entries => [
+        # ssh
         {
             summary => 'Wraps ssh to remember the background terminal color of each user+host you went to',
             module => 'App::sshwrap::hostcolor',
@@ -26,6 +27,7 @@ _
             'x.command' => 'ssh',
         },
 
+        # man
         {
             summary => 'Wraps man to search for (and tab-complete) Perl module documentation',
             module => 'App::manwrap::pm',
@@ -40,6 +42,7 @@ _
             'x.command' => 'git',
         },
 
+        # rsync
         {
             summary => 'Wraps rsync to add color to output, particularly highlighting deletion',
             module => 'App::rsynccolor',
@@ -53,6 +56,7 @@ _
             'x.command' => 'rsync',
         },
 
+        # diff
         {
             summary => 'Wraps (or filters output of) diff to add colors and highlight words',
             module => 'App::diffwc',
@@ -66,18 +70,26 @@ _
             'x.command' => 'diff',
         },
         {
+            summary => 'Diffs two office spreadsheets by first converting them to directories of CSV files',
+            module => 'App::DiffXlsText',
+            script => ['diff-xls-text'],
+            'x.command' => 'diff',
+        },
+        {
             summary => 'Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output)',
             module => 'App::sdif',
             script => ['sdif', 'cdif', 'watchdiff'],
             'x.command' => ['diff', 'watch'],
         },
 
+        # grep
         {
-            summary => 'Wraps cpanm to use local CPAN mirror and let you specify script name to install instead of module name',
-            module => 'App::lcpan',
-            script => ['lcpanm', 'lcpanm-script'],
-            'x.command' => 'cpanm',
+            summary => 'Print lines that match terms (each term need not be in particular order, support negative search)',
+            module => 'App::GrepUtils',
+            script => ['grep-terms'],
+            'x.command' => ['grep'],
         },
+
     ],
 };
 
@@ -96,7 +108,7 @@ Acme::CPANModules::CLI::Wrapper::UnixCommand - Various CLIs that wrap (popular) 
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-26.
+This document describes version 0.005 of Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-11-08.
 
 =head1 DESCRIPTION
 
@@ -108,7 +120,7 @@ But they perform additional stuff.
 
 If you know of others, please drop me a message.
 
-=head1 INCLUDED MODULES
+=head1 MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
 
 =over
 
@@ -126,9 +138,11 @@ If you know of others, please drop me a message.
 
 =item * L<App::DiffDocText> - Diffs two office word-processor documents by first converting them to plaintext
 
+=item * L<App::DiffXlsText> - Diffs two office spreadsheets by first converting them to directories of CSV files
+
 =item * L<App::sdif> - Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output)
 
-=item * L<App::lcpan> - Wraps cpanm to use local CPAN mirror and let you specify script name to install instead of module name
+=item * L<App::GrepUtils> - Print lines that match terms (each term need not be in particular order, support negative search)
 
 =back
 
@@ -177,7 +191,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

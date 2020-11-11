@@ -29,6 +29,7 @@ BEGIN {
 ##     highlight=>[$pre,$post],  ##-- highlighting substrings
 ##     width=>$nchars,           ##-- context width; default=32
 ##     useMatchIds=>$bool,       ##-- whether to use match-ids if available; undef (default) if non-trivial match-ids are specified
+##     wsAttr=>$wskey,            ##-- token attribute to use for preceding whitespace (default='ws')
 ##    )
 sub new {
   my $that = shift;
@@ -36,6 +37,7 @@ sub new {
 		highlight=>['__','__'],
 		width=>32,
 		useMatchIds=>undef,
+		wsAttr=>'ws',
 		@_
 	       }, ref($that)||$that;
 }
@@ -55,6 +57,12 @@ sub maxlen {
   my $l = 0;
   do { $l=length($_) if (length($_) > $l) } foreach (@_);
   return $l;
+}
+
+## $wsStr = $fmt->wsStr($token)
+sub wsStr {
+  my ($fmt,$w) = @_;
+  return (!$fmt->{wsAttr} || !ref($w) || !defined($w->{$fmt->{wsAttr}}) || $w->{$fmt->{wsAttr}} ? ' ' : '');
 }
 
 ##======================================================================
@@ -99,19 +107,20 @@ sub toString {
 	$ary = \@r;
       }
       $hl = ($ary eq \@c ? '__' : '_');
-      push(@$ary, (ref($_)
-		   ? ($_->{hl_}
-		      ? ($hl.$_->{$fkey}.$hl.($useMatchIds ? "/$_->{hl_}" : ''))
-		      : $_->{$fkey})
-		   : $_));
+      push(@$ary, ($fmt->wsStr($_)
+		   .(ref($_)
+		     ? ($_->{hl_}
+			? ($hl.$_->{$fkey}.$hl.($useMatchIds ? "/$_->{hl_}" : ''))
+			: $_->{$fkey})
+		     : $_)));
     }
 
-    my $ls = join(' ', @l);
-    my $rs = join(' ', @r);
+    my $ls = join('', @l);
+    my $rs = join('', @r);
     substr($ls, 0,       length($ls)-$xlen+3, '...') if (length($ls) > $xlen);
     substr($rs, $xlen-3, length($rs)-$xlen+3, '...') if (length($rs) > $xlen);
 
-    push(@hits,[$hnum++, "[$f:$p]", $ls, join(' ',@c), $rs]);
+    push(@hits,[$hnum++, "[$f:$p]", $ls, join('',@c), $rs]);
   }
 
   my $ln = maxlen(map {$_->[0]} @hits);
@@ -196,6 +205,7 @@ Accepted keywords in %args:
   highlight   => [$pre,$post],      ##-- highlighting substrings (default=['__','__'])
   width       => $nchars,           ##-- context width; default=32
   useMatchIds => $bool,             ##-- whether to use match-ids if available; undef (default) if non-trivial match-ids are specified
+  wsAttr      => $attr,             ##-- token attribute to use for preceding whitespace (default='ws')
 
 =item reset
 
@@ -260,7 +270,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2016 by Bryan Jurish
+Copyright (C) 2014-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

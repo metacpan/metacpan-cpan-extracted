@@ -192,6 +192,16 @@ METHODS
 
       * opentracing
 
+      * protocol - either 'resp2' or 'resp3', default is autodetect
+
+      * hashrefs - RESP3 (Redis 6.0+) supports more data types, currently
+      the only difference this makes to us is that it now supports hashrefs
+      for key/value pairs. This is disabled by default to ensure
+      compatibility across newer+older versions.
+
+    Note that enabling hashrefs will cause connections to fail if the
+    server does not support RESP3.
+
  host
 
     Returns the host or IP address for the Redis server.
@@ -456,7 +466,7 @@ METHODS - Internal
 
     Factory method for creating new Future instances.
 
- protocol
+ wire_protocol
 
     Returns the Net::Async::Redis::Protocol instance used for encoding and
     decoding messages.

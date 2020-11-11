@@ -3,11 +3,11 @@ package Net::SecurityCenter::API::System;
 use warnings;
 use strict;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 #-------------------------------------------------------------------------------
 # METHODS
@@ -19,6 +19,8 @@ sub get_status {
 
     deprecated
         '"Net::SecurityCenter::API::System->get_status" is DEPRECATED use "Net::SecurityCenter::API::Status->status" instead';
+
+    return;
 
 }
 
@@ -47,13 +49,8 @@ sub info {
     my $raw    = delete( $params->{'raw'} );
     my $info   = $self->client->get('/system');
 
-    if ( !$info ) {
-        return;
-    }
-
-    if ($raw) {
-        return $info;
-    }
+    return       if ( !$info );
+    return $info if ($raw);
 
     return sc_normalize_hash($info);
 
@@ -73,9 +70,7 @@ sub debug {
     my $category = delete( $params->{'category'} );
     my $debug    = $self->client->get('/system/debug');
 
-    if ( !$debug ) {
-        return;
-    }
+    return if ( !$debug );
 
     my $id_results       = {};
     my $name_results     = {};

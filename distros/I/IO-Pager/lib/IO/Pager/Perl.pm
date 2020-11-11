@@ -1,5 +1,5 @@
 package IO::Pager::Perl;
-our $VERSION = '1.03'; #Untouched since 1.03
+our $VERSION = '2.10'; #Untouched since 2.10
 
 use strict;
 use warnings;
@@ -16,8 +16,8 @@ sub ReadKey;
 sub new {
   my $class = shift;
   my %param = @_;
-  local $ENV{TERM} = $ENV{TERM} || '';
-  local $ENV{TERMCAP} = $ENV{TERM} || '';
+  $ENV{TERM} = $ENV{TERM} || '';
+  $ENV{TERMCAP} = $ENV{TERMCAP} || '';
 
   my %dims = get_size(cols =>$param{cols} ||80,
 		      rows =>$param{rows} ||25,
@@ -26,25 +26,38 @@ sub new {
 
   #screen is vt100 compatible but does not list sf?!
   #No matter, it's only used for workaround mode.
-  if( $ENV{TERM} eq 'screen' && $ENV{TERMCAP} !~ /sf/ ){
-    $ENV{TERM} = 'vt100';
+  $ENV{TERM} = 'vt100' if( $ENV{TERM} eq 'screen' && $ENV{TERMCAP} !~ /sf/ );
+
+  #Hack together Windows support. We could use Term::Screen(::Uni),
+  #but that uses many layers of tie-ing, some of which could be inheritiance.
+  #This way also reduces dependencies
+  if( $^O =~ /MSWin/ ){
+    eval "use Win32::Console::ANSI;";
+    if( $@ ){
+      warn "Could not load Win32::Console::ANSI, falling back to dumb mode - $@"; }
+    else{
+      $ENV{TERM} = 'WINANSI';
+      #Windows lacks vb as does the fallback Term::Cap vt220 entry, add our own
+      #https://www.ibiblio.org/oswg/oswg-nightly/oswg/en_US.ISO_8859-1/articles/alessandro-rubini/visual-bell/visual-bell-howto.html#VISIBLEBELL
+      $ENV{TERMCAP} = do{ undef $/; $_=<DATA>; y/\n//d; $_ };
+    }
   }
-
-#cm=>cup, ce=>el, cl=>clear, sf=>ind, sr=>ri
-#md=>bold, me=>sgr0, mr=>rev, us=>smul
-  #Speed is mostly useless except Term::Cap expects it?
+  else{
+    #Try to enable mouse support
+    print "\e[?1000;1006;1015h";
+  }
+  #Speed is mostly useless except Term::Cap demands it
   my $t = Term::Cap->Tgetent({ OSPEED => $param{speed} });
-  eval{ $t->Trequire(qw/cm ce cl sf sr/) };
-  my $dumb = $@ ? 1 : 0;
+  my $dumb = eval{ $t->Trequire(qw/cm ce cl sf sr/) } ? 1 : 0;
 
-  my %primitives = (
-		    # if the entries don't exist, nothing bad will happen
+  #CORE:  cm=>cup,  ce=>el,   cl=>clear, sf=>ind,  sr=>ri
+  #EXTRA: md=>bold, me=>sgr0, mr=>rev,   us=>smul, vb=>flash
+  my %primitives = (# if the entries don't exist, nothing bad will happen
 		    BLD   => $t->Tputs('md'), # Bold
 		    ULN   => $t->Tputs('us'), # Underscore
 		    REV   => $t->Tputs('mr'), # Reverse
 		    NOR   => $t->Tputs('me'), # Normal
 		   );
-
   my $text;
   if( defined( $param{text} ) ){
     my $ref = ref( $param{text} );
@@ -72,7 +85,8 @@ sub new {
 		  _search => '',	_statCols => 0,    _lineNo=>[0],
 		  lineNo => 0,		pause => '',	   #pause=>"\cL" #more
 		  raw => 0,		statusCol => 0,	   squeeze=>0,
-		  visualBell=>0,	fold=>0,
+		  visualBell => 0,	fold => 0,         _fileN => 1,
+		  _mark => {1=>0},      scrollBar => 0,
 		  %dims,
 
 		  # if the termcap entries don't exist, nothing bad will happen
@@ -89,11 +103,11 @@ sub new {
   $me->add_text($text) if defined $text;
 
   $me->{_I18N}={
-		status=>		'',
+		prompt=>	'',
 		404=>		'Not Found',
 		top=>		'Top',
 		bottom=>	'Bottom',
-		prompt=>	"<h>=help \000<space>=down <b>=back <q>=quit",
+		minihelp=>	"<h>=help \000<space>=down <b>=back <q>=quit",
 		continue=>	'press any key to continue',
 		searchwrap=>    'No more matches, next search will wrap',
 		nowrap=>        'Text::Wrap unavailable, disabling folding',
@@ -124,12 +138,14 @@ EOH
   add_keys(\&to_bott,   '>', 'G', '$', "\e>", "\e[F", "\e0E", "\e0W", "\e[4~");
                                      #M->      ?     End     End     End
   add_keys(\&downpage,  ' ', 'z', "\cV", , 'f', "\cF", "\e ", "\e[6~"); #M-  PgDn
+  add_keys(\&downpage,  "\eOs") if $ENV{TERM} eq 'WINANSI';
   add_keys(\&downhalf,  'd', "\cD");
   add_keys(\&downline,  'e', 'j', 'J', "\cE", "\cN", "\e[B"); #down
-  add_keys(\&downline_raw, "\n");
+  add_keys(\&downline_raw, "\n", "\r");
   add_keys(\&upline,    'y', 'k', "\cY", "\cK", 'K', 'Y', "\cP", "\e[A"); #up
   add_keys(\&uphalf,    'u', "\cU");
   add_keys(\&uppage,    'w', 'b', "\cB", "\ev", "\e[5~"); #M-v PgUp
+  add_keys(\&uppage,  "\eOy") if $ENV{TERM} eq 'WINANSI';
   add_keys(\&to_top,    '<', 'g',      "\e<", "\e[H", "\e0",          "\e[1~");
                                         #M-<    Home    Home            Home
   add_keys(\&next_file, ':n', "\e[1;4C");
@@ -149,6 +165,7 @@ EOH
   #"\e\[1;3D"=> #M-right
 
   $me->add_func(%config,
+		"\e[<" => \&mouse,
 		'/(\d+)/' => 1,         #jump to line
 		"\e[D" => \&tab_left,   #left
 		"\e[C" => \&tab_right,  #right, 
@@ -157,10 +174,11 @@ EOH
 		'?' => \&hcraes,
 		"'" => \&goto_mark,
 		'#' => \&toggle_num,    #XXX Change toggle* to '-' initiated
-		'C' => \&toggle_raw,    #multi-key input mode like \d+ to
-		'S' => \&toggle_fold,   #mimic less?
+		'C' => \&toggle_raw,    #input mode like : to mimic less?
+		'S' => \&toggle_fold,
 		'R' => \&flush_buffer,
 		':w'=> \&write_buffer,
+		':e'=> \&open_file,
 	       );
   
   #Mise-en-place; prepare to cook some characters
@@ -169,15 +187,15 @@ EOH
 
   $me->{_end} = $me->{rows} - 1;
 
-  if( $me->{fold} ){
-    eval "use Text::Wrap";
-    $me->dialog($me->{_I18N}{nowrap} . "\n\n$@") if $@;
-  }
-  if( $@ or not $me->{fold} ){
-    sub wrap {@_}
-  }
+  $SIG{WINCH} = sub{ $me->resize() } unless $ENV{TERM} eq 'WINANSI';
+  $me->{cols}-- if $me->{scrollBar};
 
-  $SIG{WINCH} = sub{ $me->resize() };
+  #Can we fold?
+  eval "use Text::Wrap";
+  if( $@ ){
+    sub wrap{ join '', @_ }
+    $me->{fold} = 0;
+  }
 
   $me;
 }
@@ -186,12 +204,22 @@ sub resize {
   my $me = shift;
   my %dims = get_size();
   $dims{rows}--;
+  $dims{cols}-- if $me->{scrollBar};
   $me->{$_} = $dims{$_} foreach keys %dims;
 
   $me->{_end} = $me->{rows} - 1;
 
-  $me->{fold} ? $me->reflow() : $me->refresh();
-  $me->prompt();
+  if( $me->{fold} ){
+    $me->reflow();
+    #XXX Crude attempt to mintain position,
+    #XXX only works if all rows folded same amount
+    #$me->jump( int($me->{_cursor} * $me->{cols) / $dims{cols})-1 );
+    #XXX need to somehow use _lineNo instead?
+  }
+  else{
+    $me->refresh();
+  }
+  $me->status();
 
   $me->{WINCH}->() if ref($me->{WINCH}) eq 'CODE';
 }
@@ -216,13 +244,16 @@ sub get_size {
     *ReadKey = sub{ getc() };
 
     #Can we get better defaults?
-    if( `stty` =~ /speed/ ){
-      @dims{'rows','cols'} = ($1-1,$2-1) if `stty size` =~ /^(\d+)\s+(\d+)$/;
-      $dims{speed} = $1 if `stty speed` =~ /^(\d+)$/;
+    if( $ENV{TERM} eq 'WINANSI' ){
+	eval{ @dims{'rows','cols'} = Win32::Console::ANSI::Cursor() };
+    }
+    elsif( `stty` =~ /speed/ ){
+	@dims{'rows','cols'} = ($1-1,$2-1) if `stty size` =~ /^(\d+)\s+(\d+)$/;
+	$dims{speed} = $1 if `stty speed` =~ /^(\d+)$/;
     }
     else{
-      $dims{rows} = `tput lines`  || $dims{rows};
-      $dims{cols} = `tput cols`   || $dims{cols};
+	$dims{rows} = `tput lines`  || $dims{rows};
+	$dims{cols} = `tput cols`   || $dims{cols};
     }
   }
   return %dims;
@@ -342,7 +373,7 @@ sub more {
     #INPUT LOOP, revised with inspiration from Term::Screen::getch()
     #my $input=''; #TIGHT
     while( 1 ){
-      $me->prompt();					# status line
+      $me->status();					# status line
       my $exit = undef;
 
       my $char = ReadKey($param{RT});
@@ -350,9 +381,9 @@ sub more {
       #functionality and for cleaner startup (no preload on piped input)
       #next unless defined($char); #TIGHT
       return 1 unless defined($char);
-      $me->{_I18N}{status} = $input .= $char;
-      $me->prompt();
-
+      $me->{_I18N}{prompt} = $input .= $char;
+      $me->status();
+     
       unless( ($input=~ /^\e/ and index($me->{_fncRE}, $input)>0 )
 	      || $input =~ /^\d+/
 	      || $input =~ /:+/
@@ -363,37 +394,37 @@ sub more {
       }
 
       if( $me->{_fnc}->{$input} ){
-	use B 'svref_2object';
-	my $n = $me->{_fnc}->{$input};
-	$n = svref_2object($n)->GV->NAME;
+	#Get mapped sub name
+#	use B 'svref_2object';
+#	my $n = $me->{_fnc}->{$input};
+#	$n = svref_2object($n)->GV->NAME;
+
 	$exit = $me->{_fnc}->{$input}->($me);
-	$me->{_I18N}{status} = $input = '';
+	$me->{_I18N}{prompt} = $input = '';
       }
       #vi-style input
       elsif( $input =~ /^:/ ){
 	if( ($char eq "\cG") or ($input eq '::') ){
-	  $me->{_I18N}{status} = $input = '';
-	  $me->prompt();
+	  $me->{_I18N}{prompt} = $input = '';
+	  $me->status();
 	  return 1; }
       }
-      #Line-number input
+      #Line-number input; would love to use getln, but does not mix w/ status
       elsif( $me->{_fnc}->{'/(\d+)/'} and $input =~ /^\d+/ ){
 	if( $char eq "\cH" or ord($char)==127 ){
-	  chop($input); chop($input); }
+	  $input = substr($input, 0, -2, ''); }
 	elsif( $char eq "\cG" ){
-	  $me->{_I18N}{status} = $input = '';
-	  $me->prompt();
-	  return 1; }
-	if( $input =~ /^\d+\n$/ ){
-	  chomp($input);
+	  $input = '';
+	  $exit = 1; }
+	elsif( $char eq "\n" || $char eq "\r" ){
+	  #Remove extraneous characters that could cause infinite error loop
+	  #XXX this prevents goofy RPN-like repeated commands
+	  $input =~ y/0-9//cd;#	  chomp($input);
 	  $exit = $input < $me->{_txtN} ? $me->jump($input) : $me->to_bott();
-	  $me->{_I18N}{status} = $input = '';
-	  $me->prompt();
-	  next; }
-	#XXX need to do something here to handle no-decimal/bogus entry
-	else{
-	  $me->{_I18N}{status} = $input;
-	  $me->prompt(); }
+	  $input = ''; }
+
+	$me->{_I18N}{prompt} = $input;
+	$me->status();
       }
 
       return 1 if $param{RT} && defined($exit);
@@ -440,7 +471,7 @@ sub add_func{
   }
   #XXX RegExp::Trie, List::RegExp? #quotemeta?
   $me->{_fncRE} = join '|', sort keys %{ $me->{_fnc} };
-  #$me->{_fncRE} = qr/^($me->{_fncRE})/;
+  #$me->{_fncRE} = qr/^($me->{_fncRE})$/;
 }
 
 sub beep{
@@ -451,40 +482,66 @@ sub beep{
     $_[1] =~ s/\e/^[/;
     $_[1] =~ s/([^[:print:]])/sprintf("\\%03o", ord($1))/ge; #Cook
     $_[0]->dialog("Unrecognized command: $_[1]", 1);
+
+    $_[0]->{_I18N}{prompt} = '';
+    $_[0]->status();
   }
 }
 
-# display a prompt, etc
-sub prompt{
+sub getln{
+  my $input;
+  while(1){
+    my $l = ReadKey();
+    last if $l eq "\n" || $l eq "\r";
+
+    if( !defined($l)| $l eq "\e" || $l eq "\cG" ){
+      $input = '';
+      last; }
+    elsif( $l eq "\b" || $l eq "\177" ){
+      print "\b \b" if $input ne '';
+      substr($input, -1, 1, '');
+      next;
+    }
+
+    print $l;
+    $input .= $l;
+  }
+  return $input;
+}
+
+
+# display a minihelp, etc
+sub status{
   my $me = shift;
   $me->{_txtN} ||= 0;
 
   my $end= $me->{_cursor} + $me->{rows};
 
   my $pct = $me->{_txtN} > $end ? $end/($me->{_txtN}) : 1;
+  #XXX unify with scrollbar: consistency and as private property
   my $pos = $me->{_cursor} ?
     ($pct==1 ? $me->{_I18N}{bottom} : 'L'.$me->{_cursor}) :
 	       $me->{_I18N}{top};
   $pos .= 'C'.$me->{_left} if $me->{_left};
-  my $p = sprintf "[tp] %d%% %s %s", 100*$pct, $pos, $me->{_I18N}{status};
+  my $p = sprintf "[tp] %d%% %s %s", 100*$pct, $pos, $me->{_I18N}{prompt};
 
   print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# bottom left
   print $me->{_term}->Tputs('ce');			# clear line
-  my $prompt = $me->{_I18N}{prompt};
+  my $minihelp = $me->{_I18N}{minihelp};
   (my $pSansCodes = $p) =~ s/\e\[[\d;]*[a-zA-Z]//g;
-  my $pN = $me->{cols} - 2 - length($pSansCodes) - length($me->{_I18N}{prompt});
+  my $pN = $me->{cols} -1 -length($pSansCodes) -length($me->{_I18N}{minihelp});
   $p .= ' ' x ($pN > 1 ? $pN : 1);
-  $prompt = $pN>2 ? $prompt : do {$prompt =~ s/\000.+//; $prompt };
+  $minihelp = $pN>2 ? $minihelp : do {$minihelp =~ s/\000.+//; $minihelp };
   print $me->{REV};					# reverse video
-  print $p,"  ", $prompt;  				# status line
+  print $p,"  ", $minihelp;  				# status line
   print $me->{NOR};					# normal video
 }
 
 sub close{
   ReadMode 0;
-  print "\n";
+  print "\n\e[?1000l";
   $| = $SP || 0;
-  #Did we exit via signal or prompt?
+  #Did we exit via signal or user?
   $RT ? die : return \"foo";
 }
 
@@ -515,15 +572,6 @@ sub help{
   $me->dialog( $help . "\n" . (' 'x$padding) . $cont );
 }
 
-sub dialog{
-  my($me, $msg, $timeout) = @_;
-  $msg = defined($msg) ? $msg : '';
-  $timeout = defined($timeout) ? $timeout : 0;
-  $me->disp_menu( $me->box_text($msg) );
-  $timeout ? sleep($timeout) : getc();
-  $me->remove_menu();
-}
-
 sub max_width{
   my $me = shift;
   my $width = 0;
@@ -531,50 +579,34 @@ sub max_width{
   return $width;
 }
 
-# put a box around some text
-sub box_text{
-  my $me  = shift;
-  my @txt = split(/\n/, $_[0]);
-  my $width = $me->max_width(@txt);
+sub dialog{
+  my($me, $msg, $timeout) = @_;
+  my @txt = defined($msg) ? split(/\n/, $msg) : ();
+  my $w = $me->max_width(@txt);
 
-  my $b = '+' . '=' x ($width + 2) . '+';
-  my $o = join('', map { "| $_" . (' 'x($width-length($_))) ." |\n" } @txt); 
-  "$b\n$o$b\n";
-}
+  #Prepare dialog
+  my $h = '+' . '='x($w+2) . '+';
+  my $d = join('', map { sprintf("%s| %- @{[$w+4]}s |\n",
+				 $me->{_term}->Tgoto('RI',0,4),
+				 $_) } $h, @txt, $h); 
 
-# display a popup menu (or other text)
-sub disp_menu{
-  my $me = shift;
-  my $menu = shift;
+  print $me->{_term}->Tgoto('cm',0, 2),	# move
+        $me->{MENU},		        # set color
+        $d,				# dialog
+        $me->{NOR};			# normal color
 
-  $me->{_menuRows} = @{[split /\n/, $menu]};
-  print $me->{_term}->Tgoto('cm',0, 2);	# move
-  print $me->{MENU};					# set color
-  my $x = $me->{_term}->Tgoto('RI',0,4);		# 4 transparent spaces
-  $menu =~ s/^\s*/$x/gm;
-  print $menu;
-  print $me->{NOR};					# normal color
-}
-
-# remove popup and repaint
-sub remove_menu{
-  my $me = shift;
-
-  my $s = $me->{_menuRows} +2;
+  defined($timeout) ? sleep($timeout) : getc();
 
   #Allow wipe of incomplete/paused output.
-  my $pause = $me->{pause};
-  $me->{pause} = undef;
+  local($me->{pause});
 
+  #XXX Use full refresh if _grep for simple accurate solution?
   # Fractional restoration instead of full refresh
-  foreach my $n (2 .. $s){
+  foreach my $n (2 .. scalar(@txt)+3){
     print $me->{_term}->Tgoto('cm', 0, $n);		# move
     print $me->{_term}->Tputs('ce');			# clear line
     $me->line($n);
   }
-
-  #Reset pause
-  $me->{pause} = $pause;
 }
 
 sub flush_buffer{
@@ -606,7 +638,58 @@ sub refresh{
     $me->line($n+$me->{_cursor}) if			# XXX w/o cursor messy
       $me->{_cursor}+$me->{rows}+$n <= $me->{_txtN}     # after menu & refresh
   }
+  $me->scrollBar() if $me->{scrollBar};
 }
+
+sub scrollBar{
+  my $me = shift;
+  $me->{_pages}  = $me->{_txtN}/$me->{rows};
+  $me->{_thumbW} = $me->{rows}/$me->{_pages};
+  $me->{_thumbT} = sprintf("%i", ($me->{_cursor} / $me->{_pages}) )+($me->{_cursor}>$me->{_txtN}/2);
+  $me->{_thumbB} =   sprintf("%i",  $me->{_thumbT}+$me->{_thumbW});
+
+#$me->dialog("cursor $me->{_cursor} top $me->{_thumbT} + width $me->{_thumbW}");
+
+  for my $n (0 .. $me->{rows} -1){
+    print $me->{_term}->Tgoto('cm', $me->{cols}+1, $n);
+    print $n>=$me->{_thumbT} && $n<$me->{_thumbB} ? ' ' : "$me->{REV} $me->{NOR}";
+  }
+}
+
+sub mouse{
+  my $me = shift;
+  my $input ='';
+  $input .= ReadKey(0) until $input =~ /M$/i;
+
+  my @args = split /;/, $input;
+
+  if( $args[0] == 65 ){
+    $me->downhalf(); }
+  elsif( $args[0] == 64 ){
+    $me->uphalf(); }
+  elsif( $me->{scrollBar} && $args[1] == $me->{cols}+1 ){
+    if( chop $args[2] eq 'm'){ #mouse-up
+      if( $me->{_thumbDrag} ){
+	$me->{_thumbDrag} = 0;
+	my $pos;
+	if( $args[2]==1 ){
+	    $pos=0 }
+	elsif( $args[2]==$me->{rows} ){
+	    $pos= $me->{_txtN} - 2*$me->{rows}-1 }
+	else{
+	    $pos = sprintf("%i", $args[2] / $me->{rows} * $me->{_txtN}) }
+	$me->jump($pos);
+      }
+      $me->uppage() if $args[2] < $me->{_thumbT};
+      $me->downpage() if $args[2] > $me->{_thumbB};
+    }
+    elsif( $args[2]>=$me->{_thumbT} &&
+	   $args[2]<=$me->{_thumbB} ){ #automagically M (mouse-down)
+      $me->{_thumbDrag}=1;
+    }
+  }
+}
+
 
 sub line{
   my $me = shift;
@@ -647,18 +730,14 @@ sub line{
     $me->{_search} ne '';
 
   #Line numbering & search status
-  my $info = $me->{statusCol} && !$me->{lineNo} ?
-    ($matched ? '*' : ' ') :''; 
+  my $info = $me->{statusCol} && !$me->{lineNo} ? ($matched ? '*' : ' ') : ''; 
   $info = sprintf("% 8s", 
 		  $me->{fold} ? ($me->{_lineNo}->[$n]||-1) : 
 				(defined($me->{_text}[$n]) ? $n+1 : '')
 		 ) if $me->{lineNo};
-  $_ = ($me->{statusCol} && $matched ? $me->{REV} : '').
-    $info.
-      ($me->{statusCol} && $matched ? $me->{NOR} : '').
-	($me->{lineNo} ? ' ' : '').
-	  $_;
-
+  $_ = ($me->{Statuscol} && $matched ? $me->{REV} : ''). $info.
+       ($me->{statusCol} && $matched ? $me->{NOR} : '').
+       ($me->{lineNo} ? ' ' : ''). $_;
   print;
 
   if( $pausey ){
@@ -672,10 +751,9 @@ sub down_lines{
   my $n  = shift;
   my $t  = $me->{_term};
 
-#  for(my $i=1; $i<=$n; $i++){
   LINE: for(1..$n){
     if( $me->{_end} >= $me->{_txtN}-1 ){
-      exit if $me->{eof} && ref($me->{text}) ne 'CODE';
+      $me->close() if $me->{eof} && ref($me->{text}) ne 'CODE';
       if( ref($me->{text}) eq 'CODE' ){
 	$me->add_text( $me->{text}->() ); }
       else{
@@ -691,14 +769,16 @@ sub down_lines{
 	print $t->Tputs('sf');				# scroll
 	print $t->Tgoto('cm', 0, $me->{rows} - 1);	# move
       }
-
       print $t->Tputs('ce');				# clear line
 
       #Skip cursor ahead to matching line if in grep mode
       if( $me->{_grep} && $me->{_end} < $me->{_txtN} ){
 	until( $me->{_text}->[$me->{_end}] =~
 	       m%$me->{_search}|\cF\c]\cL\cE \[\d+/% ){
-	  $me->{_end}++;
+	  $me->dialog(#"$me->{_end} >= $me->{_txtN} #$me->{_cursor}\n".
+		      'Pagination in grep mode does not work at this time.', 1);
+	  last LINE;
+#	  $me->{_end}++;
 	  $me->{_cursor}++;
 	  if( $me->{_end} >= $me->{_txtN} ){
 	    $me->{cursor} = $me->{_end} = $me->{_txtN};
@@ -710,13 +790,14 @@ sub down_lines{
       $me->{_cursor}++;
     }
   }
+  $me->refresh() if $ENV{TERM} eq 'WINANSI'; #XXX Windows scroll is lame
+  $me->scrollBar() if $me->{scrollBar};
 }
 sub downhalf {  $_[0]->down_lines( $_[0]->{rows} / 2 ); }
 sub downpage {  $_[0]->down_lines( $_[0]->{rows} );
 		#WTF?! add_text in tp's while-loop cannot be reached if there's
 		#no delay here until something other than downpage is called?!
 		select(undef, undef, undef, .1); #XXX WTF?!
-#		warn "\n\n", map{$_[0]->{$_}."\n"} qw/rows _cursor _end/;
 }
 sub downline {  $_[0]->down_lines( 1 ); }
 #Term::ReadKey doesn't offer sufficiently fine control; we want CS8 but -OCRNL
@@ -728,23 +809,32 @@ sub up_lines{
 
   for (1 .. $n){
     if( $me->{_cursor} <= 0 ){
-      &beep; last;
-    }else{
+      &beep; last; }
+    else{
       print $me->{_term}->Tgoto('cm',0,0);	# move
       print $me->{_term}->Tputs('sr');		# scroll back
 
       #XXX Skip cursor back to matching line if in grep mode
-      #XXX this is tough because we want {rows} matching lines
-      #XXX Requires cache of currently grepped lines, then unshift
-      #XXX as we scroll back until we get {rows} new lines or hit top.
-      #XXX finally, displaying the to {rows} of the cache
+      #Skip cursor back to matching line if in grep mode
+#      if( $me->{_grep} && $me->{_cursor} > 0 ){
+#	until( $me->{_text}->[$me->{_end}] =~
+#	       m%$me->{_search}|\cF\c]\cL\cE \[\d+/% ){
+#	  $me->{_cursor}--;
+#	  if( $me->{_cursor} <= 0 ){
+#	    $me->{cursor} = 0;
+#	    last;
+#	  }
+#	}
+#      }
 
       $me->line( --$me->{_cursor} );
       $me->{_end}--;
     }
   }
 
+  $me->refresh() if $ENV{TERM} eq 'WINANSI'; #XXX Windows scroll is lame
   print $me->{_term}->Tgoto('cm',0,$me->{rows});		# goto bottom
+  $me->scrollBar() if $me->{scrollBar};
 }
 sub uppage {  $_[0]->up_lines( $_[0]->{rows} ); }
 sub upline {  $_[0]->up_lines( 1 ); }
@@ -754,15 +844,20 @@ sub to_top {  $_[0]->jump(0); }
 
 sub to_bott{
   my $me = shift;
-  $me->jump( $me->{rows}>$me->{_txtN} ? 0 : $me->{_txtN}-$me->{rows} );
+  if( $me->{rows}>$me->{_txtN} ){
+    $me->jump( 0 ) }
+  else{
+    $me->jump( $me->{_txtN}-1 );
+    $me->uppage() }
 }
 
 sub save_mark{
   my $me = shift;
 
   $me->I18N('status', $me->{BLD}.'*Mark name?*'.$me->{NOR}.$me->{REV});
-  $me->prompt();
+  $me->status();
   $me->{_term}->Tgoto('cm',
+		      #XXX I18N
 		      length('[tp] 100% Bottom Mark name?')+1,
 		      $me->{rows});
   my $mark = ReadKey();
@@ -770,14 +865,14 @@ sub save_mark{
   next if $mark eq "'";
   $me->{_mark}->{$mark} = $me->{_cursor};
   $me->I18N('status', '');
-  $me->prompt();
+  $me->status();
 }
 
 sub goto_mark{
   my $me = shift;
 
   my $mark = ReadKey();
-  return if $mark eq "\cG";
+  return if $mark eq "\cG" or not exists($me->{_mark}->{$mark});
 
   my $jump = $me->{_mark}->{$mark};
   if( $mark eq '^' ){
@@ -811,7 +906,6 @@ sub next_file{
 
 sub jump{
   my $me = shift;
-
   $me->{_cursor} = shift;
   $me->{_end}   = $me->{_cursor} + $me->{rows}; # - 1;
   $me->refresh();
@@ -819,31 +913,25 @@ sub jump{
 
 sub tab_right{
   my $me = shift;
-
   $me->{_left} += 8;
   $me->refresh();
 }
 
 sub tab_left{
   my $me = shift;
-
-  $me->{_left} -= 8;
-  $me->{_left} = 0 if $me->{_left} < 0;
+  $me->{_left} = 0 if ($me->{_left} -= 8) < 0;
   $me->refresh();
 }
 
 sub shift_right{
   my $me = shift;
-
   $me->{_left} += int($me->{cols}/2);
   $me->refresh();
 }
 
 sub shift_left{
   my $me = shift;
-
-  $me->{_left} -= int($me->{cols}/2);
-  $me->{_left} = 0 if $me->{_left} < 0;
+  $me->{_left} = 0 if ( $me->{_left} -= int($me->{cols}/2) ) < 0;
   $me->refresh();
 }
 
@@ -865,21 +953,7 @@ sub search{
   print $me->{HILT};					# set color
   print $mode ? ( $mode > 0 ? '?' : '&' ) : '/';
 
-  while(1){
-    my $l = ReadKey();
-    last if $l eq "\n" || $l eq "\r";
-    if( $l eq "\e" || !defined($l) ){
-      $me->{_search} = '';
-      last;
-    }
-    if( $l eq "\b" || $l eq "\177" ){ #Why not octothorpe? || $l eq '#' ){
-      print "\b \b" if $me->{_search} ne '';
-      substr($me->{_search}, -1, 1, '');
-      next;
-    }
-    print $l;
-    $me->{_search} .= $l;
-  }
+  $me->{_search} = $me->getln() || '';
   print $me->{NOR};					# normal color
   print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# move bottom
   print $me->{_term}->Tputs('ce');			# clear line
@@ -893,6 +967,7 @@ sub search{
 
   $me->{_search} = $prev if $me->{_search} eq '/' && $prev;
 
+  #Jump to first match
   for my $n ( $me->{_cursor} .. $me->{_txtN} -1){	#XXX why offset needed?
     next unless $me->{_text}[$n] =~ /$me->{_search}/i;
  
@@ -975,28 +1050,12 @@ sub toggle_fold{
 
 sub write_buffer{
   my $me = shift;
-  my $out;
 
   print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# move bottom
   print $me->{_term}->Tputs('ce');			# clear line
   print "Save to: ";
 
-  while(1){
-    my $l = ReadKey();
-    return if $l eq "\cG";
-    last if $l eq "\n" || $l eq "\r";
-
-    if( !defined($l)| $l eq "\e" || $l eq "\cG" ){
-      return;
-    }
-    if( $l eq "\b" || $l eq "\177" ){
-      print "\b \b" if $out ne '';
-      substr($out, -1, 1, '');
-      next;
-    }
-    print $l;
-    $out .= $l;
-  }
+  my $out = $me->{_search} = $me->getln();
   if( ! -e $out && open(OUT, '>', $out) ){
     print OUT join($/, @{$me->{_text}});
     CORE::close(OUT);
@@ -1005,6 +1064,31 @@ sub write_buffer{
     $me->dialog("ERROR: " . -e $out ? "File exists" : $!)
   }
 }
+
+sub open_file{
+  my $me = shift;
+
+  print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# move bottom
+  print $me->{_term}->Tputs('ce');			# clear line
+  print "Examine: ";
+
+  my $file = $me->getln();
+  unless( -e $file ){
+    $me->dialog( sprintf("%s: $file", $me->{_I18N}{404}) );
+    return;
+  }
+  unless( open(IN, '<', $file) ){
+    $me->dialog($!);
+    return;
+  }
+  my $N = $me->get_fileN();
+  $me->set_fileN($N+1);
+  $me->add_text(sprintf("======== \cF\c]\cL\cE [%i/..] %s ========\n",
+			$N, $file), <IN>);
+}
+
+sub get_fileN{ $_[0]->{_fileN} }
+sub set_fileN{ $_[0]->{_fileN} = $_[1] }
 
 
 sub dumb_mode{
@@ -1027,6 +1111,24 @@ sub dumb_mode{
 }
 
 1;
+__DATA__
+WINANSI|vt220|Win32 Console based on DEC VT220 in vt100 emulation mode:
+am:mi:xn:xo:
+co#80:li#24:
+RA=\E[?7l:SA=\E[?7h:
+ac=kkllmmjjnnwwqquuttvvxx:ae=\E(B:al=\E[L:as=\E(0:
+bl=^G:cd=\E[J:ce=\E[K:cl=\E[H\E[2J:cm=\E[%i%d;%dH:
+cr=^M:cs=\E[%i%d;%dr:dc=\E[P:dl=\E[M:do=\E[B:
+ei=\E[4l:ho=\E[H:im=\E[4h:
+is=\E[1;24r\E[24;1H:
+nd=\E[C:
+kd=\E[B::kl=\E[D:kr=\E[C:ku=\E[A:le=^H:
+mb=\E[5m:md=\E[1m:me=\E[m:mr=\E[7m:
+kb=\0177:
+r2=\E>\E[24;1H\E[?3l\E[?4l\E[?5l\E[?7h\E[?8h\E=:rc=\E8:
+sc=\E7:se=\E[27m:sf=\ED:so=\E[7m:sr=\EM:ta=^I:
+ue=\E[24m:up=\E[A:us=\E[4m:ve=\E[?25h:vi=\E[?25l:
+vb=\E7\E[?5h\E[?5l\E[?5h\E[?5l\E[?5h\E[?5l\E[?5h\E[?5l\E8:
 __END__
 =pod
 
@@ -1102,6 +1204,12 @@ behavior of L<more/1>.
 Pass control characters from input unadulterated to the terminal.
 By default, chracters other than tab and newline will be converted
 to caret notation e.g; ^@ for null or ^L for form feed.
+
+=item I<scrollBar> =E<gt>0
+
+=item B<--scrollbar>
+
+Display an interactive scrollbar in the right-most column.
 
 =item I<squeeze> =E<gt>0
 
@@ -1224,6 +1332,8 @@ descriptions are available in L<tp>.
 
 =item &write_buffer - C<:w>
 
+=item &open_file - C<:e>
+
 =back
 
 =head3 Navigation
@@ -1326,25 +1436,23 @@ C<I18N> method to replace the default text or save text for your own interface.
     my $help = $t->I18N('help');
 
     #Minimal status line
-    $t->I18N('prompt', "<h> help");
+    $t->I18N('minihelp', "<h> help");
 
 Current text elements available for customization are:
 
     404        - search text not found dialog
-    bottom     - prompt line end of file indicator
     continue   - text to display at the bottom of the help dialog
     help       - help dialog text, a list of keys and their functions
-    prompt     - displayed at the bottom of the screen
+    minihelp   - basic instructions displayed at the bottom of the screen
     status     - brief message to include in the status line
-    top        - prompt line start of file indicator
-    bottom     - prompt line end of file indicator
+    top        - start of file prompt
+    bottom     - end of file prompt
     searchwrap - message that pager is about to loop for more matches
-    nowrap     - notice that missing Text::Wrap prevents folding toggle
 
-I<status> is intended for sharing short messages not worthy of a dialog
-e.g; when debugging. You will need to call the C<prompt> method after
-setting it to refresh the status line of the display, then void I<status>
-and call C<prompt> again to clear the message.
+I<prompt> is intended for sharing short messages not worthy of a dialog
+e.g; when debugging. You will need to call the C<status> method after
+setting it to refresh the status line of the display, then void I<prompt>
+and call C<status> again to clear the message.
 
 =head3 Scalability
 
@@ -1383,6 +1491,10 @@ IO::Pager::Perl sets a global signal handler for I<SIGWINCH>, this is the
 only way it can effectively detect and accommodate changes in terminal size.
 If you also need notification of this signal, the handler will trigger any
 callback assigned to the I<WINCH> attribute of the C<new> method.
+
+I<WINCH> is not available on Windows. You will need to manually refresh your
+screen B<^L> if you resize the terminal in Windows to clean up the text
+however, this will not change the size of the pager itself.
 
 =head1 ENVIRONMENT
 

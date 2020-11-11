@@ -65,7 +65,7 @@ sub parse_cli_response {
     my ( $self, $resp_body ) = @_;
 
     my $resp_struct = cPanel::APIClient::Utils::JSON::decode($resp_body);
-    return cPanel::APIClient::Response::WHM1->new($resp_struct);
+    return $self->HTTP_RESPONSE_CLASS()->new($resp_struct);
 }
 
 #----------------------------------------------------------------------

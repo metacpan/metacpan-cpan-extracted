@@ -7,7 +7,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
-README.pod
+README.md
 dist.ini
 lib/Git/Hooks.pm
 lib/Git/Hooks/CheckAcls.pm

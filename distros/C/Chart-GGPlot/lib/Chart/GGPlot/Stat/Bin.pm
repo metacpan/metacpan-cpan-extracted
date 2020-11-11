@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.0009'; # VERSION
+our $VERSION = '0.0011'; # VERSION
 
 use PDL::Primitive qw(which);
 use POSIX qw(floor);
@@ -186,7 +186,7 @@ Chart::GGPlot::Stat::Bin - Statistic method that gets histogram of data
 
 =head1 VERSION
 
-version 0.0009
+version 0.0011
 
 =head1 SEE ALSO
 
@@ -198,7 +198,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

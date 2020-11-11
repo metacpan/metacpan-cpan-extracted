@@ -9,6 +9,7 @@ use Capture::Tiny qw( capture_merged );
 use File::chdir;
 use Path::Tiny qw( path );
 use Alien::Build::Util qw( _dump );
+use Digest::SHA qw( sha1_hex );
 
 subtest 'simple new' => sub {
 
@@ -1665,6 +1666,207 @@ alien_subtest 'interpolate env overrides' => sub {
   };
 
   alien_build_ok;
+
+};
+
+alien_subtest 'plugin instance prop' => sub {
+
+  {
+    package Alien::Build::Plugin::ABC::XYZ1;
+    use Alien::Build::Plugin;
+    has x => undef;
+    has y => undef;
+  }
+
+  {
+    my $build = alienfile_ok q{
+      use alienfile;
+    };
+
+    my $plugin1 = Alien::Build::Plugin::ABC::XYZ1->new( x => 1, y => 2 );
+    $build->plugin_instance_prop($plugin1)->{x} = 1;
+    $build->plugin_instance_prop($plugin1)->{y} = 2;
+
+    my $plugin2 = Alien::Build::Plugin::ABC::XYZ1->new( x => 3, y => 4 );
+    $build->plugin_instance_prop($plugin2)->{x} = 3;
+    $build->plugin_instance_prop($plugin2)->{y} = 4;
+
+    my $plugin3 = Alien::Build::Plugin::ABC::XYZ1->new( x => 5, y => 6 );
+
+    is(
+      $build,
+      object {
+        call [ plugin_instance_prop => $plugin1 ] => hash {
+          field x => 1;
+          field y => 2;
+          end;
+        };
+        call [ plugin_instance_prop => $plugin2 ] => hash {
+          field x => 3;
+          field y => 4;
+          end;
+        };
+        call [ plugin_instance_prop => $plugin3 ] => hash {
+          end;
+        };
+      },
+    );
+
+    alien_checkpoint_ok;
+  }
+
+  {
+    my $build = alien_resume_ok;
+
+    my $plugin1 = Alien::Build::Plugin::ABC::XYZ1->new( x => 1, y => 2 );
+    my $plugin2 = Alien::Build::Plugin::ABC::XYZ1->new( x => 3, y => 4 );
+    my $plugin3 = Alien::Build::Plugin::ABC::XYZ1->new( x => 5, y => 6 );
+
+    is(
+      $build,
+      object {
+        call [ plugin_instance_prop => $plugin1 ] => hash {
+          field x => 1;
+          field y => 2;
+          end;
+        };
+        call [ plugin_instance_prop => $plugin2 ] => hash {
+          field x => 3;
+          field y => 4;
+          end;
+        };
+        call [ plugin_instance_prop => $plugin3 ] => hash {
+          end;
+        };
+      },
+    );
+  }
+
+};
+
+subtest 'system probe plugin property' => sub {
+
+  alien_subtest 'good 1' => sub {
+
+    my $build = alienfile_ok q{
+      use alienfile;
+      use Digest::SHA qw( sha1_hex );
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Foo';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('foo');
+        'system';
+      };
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Bar';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('bar');
+        'share';
+      };
+    };
+
+    alien_install_type_is 'system';
+    is
+      $build->install_prop,
+      hash {
+        field system_probe_class => 'Foo::Foo';
+        field system_probe_instance_id => sha1_hex('foo');
+        etc;
+      },
+    ;
+
+  };
+
+  alien_subtest 'good 2' => sub {
+
+    my $build = alienfile_ok q{
+      use alienfile;
+      use Digest::SHA qw( sha1_hex );
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Foo';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('foo');
+        'share';
+      };
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Bar';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('bar');
+        'system';
+      };
+    };
+
+    alien_install_type_is 'system';
+    is
+      $build->install_prop,
+      hash {
+        field system_probe_class => 'Foo::Bar';
+        field system_probe_instance_id => sha1_hex('bar');
+        etc;
+      },
+    ;
+
+  };
+
+  alien_subtest 'bad 1' => sub {
+
+    my $build = alienfile_ok q{
+      use alienfile;
+      use Digest::SHA qw( sha1_hex );
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Foo';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('foo');
+        'share';
+      };
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Bar';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('bar');
+        'share';
+      };
+    };
+
+    alien_install_type_is 'share';
+    is
+      $build->install_prop,
+      hash {
+        field system_probe_class => DNE();
+        field system_probe_instance_id => DNE();
+        etc;
+      },
+    ;
+
+  };
+
+  alien_subtest 'bad 2' => sub {
+
+    my $build = alienfile_ok q{
+      use alienfile;
+      use Digest::SHA qw( sha1_hex );
+      probe sub {
+        my($build) = @_;
+        $build->hook_prop->{probe_class}       = 'Foo::Foo';
+        $build->hook_prop->{probe_instance_id} = sha1_hex('foo');
+        'share';
+      };
+      probe sub {
+        my($build) = @_;
+        'system';
+      };
+    };
+
+    alien_install_type_is 'system';
+    is
+      $build->install_prop,
+      hash {
+        field system_probe_class => DNE();
+        field system_probe_instance_id => DNE();
+        etc;
+      },
+    ;
+
+  };
 
 };
 

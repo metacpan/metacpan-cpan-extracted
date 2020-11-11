@@ -18,12 +18,13 @@ Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
 
 # What instances of Chrome will we try?
 my @instances = t::helper::browser_instances();
+my $testcount = 21;
 
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
     exit
 } else {
-    plan tests => 21*@instances;
+    plan tests => $testcount*@instances;
 };
 
 sub new_mech {
@@ -41,7 +42,7 @@ my $server = Test::HTTP::LocalServer->spawn(
     #debug => 1
 );
 
-t::helper::run_across_instances(\@instances, \&new_mech, 21, sub {
+t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
 
     # See https://bugs.chromium.org/p/chromium/issues/detail?id=795336
     #     https://bugs.chromium.org/p/chromium/issues/detail?id=767683
@@ -63,12 +64,13 @@ t::helper::run_across_instances(\@instances, \&new_mech, 21, sub {
     my $ua = "WWW::Mechanize::Chrome $0 $$";
     my $version = $mech->chrome_version;
     my $ref;
-    if( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" >= 63.84)) {
+    if( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" eq "64.3275")) {
+        $ref = ''; # Chrome v64 crashes on a referer
+    } elsif( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" >= 63.84)) {
         $ref = 'https://example.com/';
     } else {
         $ref = 'http://example.com/'; # earlier versions crash on https referrer ...
     };
-
     my @host;
     if( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" < 76.00)) {
         @host = (Host => 'www.example.com'); # later versions won't fetch a page with a "wrong" Host: header

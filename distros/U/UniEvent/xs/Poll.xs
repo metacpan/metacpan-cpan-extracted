@@ -34,6 +34,7 @@ BOOT {
     xs::exp::autoexport(s);
     
     xs::at_perl_destroy([]() { cbn.on_poll = nullptr; });
+    unievent::register_perl_class(Poll::TYPE, s);
 }
 
 Poll* Poll::new (Sv fd, LoopSP loop = {}) {

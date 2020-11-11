@@ -30,7 +30,7 @@ None by default.
 use 5.10.0;
 use Moose;
 
-extends 'WWW::WebKit2' => { -version => 0.12 };
+extends 'WWW::WebKit2' => { -version => 0.126 };
 
 use Glib qw(TRUE FALSE);
 use Time::HiRes qw(time usleep);
@@ -42,7 +42,7 @@ has 'debug' => (
     default => 0,
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.111';
 
 sub shout {
     my ($self, $error) = @_;
@@ -59,62 +59,75 @@ sub shout {
 }
 
 sub open_ok {
-    my ($self, $url) = @_;
+    my ($self, $url, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $self->open($url);
 
-    ok(1, "open_ok($url)");
+    ok(1, "open_ok($url, $description)");
 }
 
 sub refresh_ok {
-    my ($self) = @_;
+    my ($self, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $self->refresh;
-    ok(1, "refresh_ok()");
+    ok(1, "refresh_ok($description)");
 }
 
 sub go_back_ok {
-    my ($self) = @_;
+    my ($self, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $self->go_back;
-    ok(1, "go_back_ok()");
+    ok(1, "go_back_ok($description)");
 }
 
 sub select_ok {
-    my ($self, $select, $option) = @_;
+    my ($self, $select, $option, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->select($select, $option) }, "select_ok($select, $option)")
+    ok(eval { $self->select($select, $option) }, "select_ok($select, $option, $description)")
         or $self->shout($@);
 }
 
 sub click_ok {
-    my ($self, $locator, $wait) = @_;
+    my ($self, $locator, $timeout, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my $retval = ok(eval { $self->click($locator, $wait) }, "click_ok($locator)")
+    $timeout ||= $self->default_timeout;
+
+    my $result = eval { $self->click($locator, $timeout) };
+
+    my $retval = ok($result, "click_ok($locator, $timeout, $description)")
         or $self->shout($@);
 
     return $retval;
 }
 
 sub click_and_wait_ok {
-    my ($self, $locator, $timeout) = @_;
+    my ($self, $locator, $timeout, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my $retval = ok(
-        eval { $self->click_and_wait($locator, $timeout) },
-        "click_and_wait_ok($locator)"
-    ) or $self->shout($@);
+    $timeout ||= $self->default_timeout;
+
+    my $result = eval { $self->click_and_wait($locator, $timeout) };
+
+    my $retval = ok($result, "click_and_wait_ok($locator, $timeout, $description)")
+        or $self->shout($@);
 
     return $retval;
 }
 
 sub wait_for_page_to_load_ok {
-    my ($self, $timeout) = @_;
+    my ($self, $timeout, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $self->wait_for_page_to_load($timeout);
@@ -191,82 +204,91 @@ sub wait_for_async_page_load_ok {
 }
 
 sub is_element_present_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $result = eval { $self->is_element_present($locator) };
 
-    my $retval = ok($result, "is_element_present_ok($locator)")
+    my $retval = ok($result, "is_element_present_ok($locator, $description)")
         or $self->shout($@);
 
     return $retval;
 }
 
 sub type_ok {
-    my ($self, $locator, $text) = @_;
+    my ($self, $locator, $text, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->type($locator, $text) }, "type_ok($locator, $text)")
+    ok(eval { $self->type($locator, $text) }, "type_ok($locator, $text, $description)")
         or $self->shout($@);
 }
 
 sub type_keys_ok {
-    my ($self, $locator, $text) = @_;
+    my ($self, $locator, $text, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->type_keys($locator, $text) }, "type_keys_ok($locator, $text)")
+    ok(eval { $self->type_keys($locator, $text) }, "type_keys_ok($locator, $text, $description)")
         or $self->shout($@);
 }
 
 sub control_key_down_ok {
-    my ($self) = @_;
+    my ($self, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $self->control_key_down;
-    ok(1, "control_key_down_ok()");
+    ok(1, "control_key_down_ok($description)");
 }
 
 sub control_key_up_ok {
-    my ($self) = @_;
+    my ($self, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $self->control_key_up;
-    ok(1, "control_key_up_ok()");
+    ok(1, "control_key_up_ok($description)");
 }
 
 sub is_ordered_ok {
-    my ($self, $first, $second) = @_;
+    my ($self, $first, $second, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $result = eval { $self->is_ordered($first, $second) };
 
-    my $retval = ok($result, "is_ordered_ok($first, $second)")
+    my $retval = ok($result, "is_ordered_ok($first, $second, $description)")
         or $self->shout($@);
 
     return $retval;
 }
 
 sub mouse_over_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->mouse_over($locator) }, "mouse_over_ok($locator)")
+    ok(eval { $self->mouse_over($locator) }, "mouse_over_ok($locator, $description)")
         or $self->shout($@);
 }
 
 sub mouse_down_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->mouse_down($locator) }, "mouse_down_ok($locator)")
+    ok(eval { $self->mouse_down($locator) }, "mouse_down_ok($locator, $description)")
         or $self->shout($@);
 }
 
 sub fire_event_ok {
-    my ($self, $locator, $event_type) = @_;
+    my ($self, $locator, $event_type, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->fire_event($locator, $event_type) }, "fire_event_ok($locator, $event_type)")
+    ok(eval { $self->fire_event($locator, $event_type) }, "fire_event_ok($locator, $event_type, $description)")
         or $self->shout($@);
 }
 
@@ -277,103 +299,116 @@ sub text_is {
 
     my $result = eval { $self->get_text($locator) };
 
-    my $retval = is($result, $text, "text_is($locator, $text, $description)")
+    my $retval = is($result, $text, "text_is($locator, $text, $description, $description)")
         or $self->shout($@);
 
     return $retval;
 }
 
 sub text_like {
-    my ($self, $locator, $text) = @_;
+    my ($self, $locator, $text, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    like(eval { $self->get_text($locator) }, $text, "test_like($text)")
+    like(eval { $self->get_text($locator) }, $text, "test_like($text, $description)")
         or $self->shout($@);
 }
 
 sub body_text_like {
-    my ($self, $text) = @_;
+    my ($self, $text, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    like(eval { $self->get_body_text() }, $text, "body_text_like($text)")
+    like(eval { $self->get_body_text() }, $text, "body_text_like($text, $description)")
         or $self->shout($@);
 }
 
 sub value_is {
-    my ($self, $locator, $value) = @_;
+    my ($self, $locator, $value, $description) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    is(eval { $self->get_value($locator) }, $value, "value_is($locator, $value)")
+    is(eval { $self->get_value($locator) }, $value, "value_is($locator, $value, $description)")
         or $self->shout($@);
 }
 
 sub title_like {
-    my ($self, $text) = @_;
+    my ($self, $text, $description) = @_;
+    $description //= '';
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    like(eval { $self->get_title }, $text, "title_like($text)")
+    like(eval { $self->get_title }, $text, "title_like($text, $description)")
         or $self->shout($@);
 }
 
 sub is_visible_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->is_visible($locator) }, "is_visible($locator)")
+    ok(eval { $self->is_visible($locator) }, "is_visible($locator, $description)")
         or $self->shout($@);
 }
 
 sub attribute_like {
-    my ($self, $locator, $expr) = @_;
+    my ($self, $locator, $expr, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    like(eval { $self->get_attribute($locator) }, $expr, "attribute_like($locator, $expr)")
+    like(eval { $self->get_attribute($locator) }, $expr, "attribute_like($locator, $expr, $description)")
         or $self->shout($@);
 }
 
 sub attribute_unlike {
-    my ($self, $locator, $expr) = @_;
+    my ($self, $locator, $expr, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    unlike(eval { $self->get_attribute($locator) }, $expr, "attribute_unlike($locator, $expr)")
+    unlike(eval { $self->get_attribute($locator) }, $expr, "attribute_unlike($locator, $expr, $description)")
         or $self->shout($@);
 }
 
 sub submit_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->submit($locator) }, "submit_ok($locator)")
+    ok(eval { $self->submit($locator) }, "submit_ok($locator, $description)")
         or $self->shout($@);
 }
 
 sub eval_is {
-    my ($self, $js, $expr) = @_;
+    my ($self, $js, $expr, $description) = @_;
+    $description //= '';
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    is(eval { $self->eval_js($js) }, $expr, "eval_is($expr)")
+    is(eval { $self->eval_js($js) }, $expr, "eval_is($expr, $description)")
         or $self->shout($@);
 }
 
 sub check_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->check($locator) }, "check_ok($locator)")
+    ok(eval { $self->check($locator) }, "check_ok($locator, $description)")
         or $self->shout($@);
 }
 
 sub uncheck_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->uncheck($locator) }, "uncheck_ok($locator)")
+    ok(eval { $self->uncheck($locator) }, "uncheck_ok($locator, $description)")
         or $self->shout($@);
 }
 
 sub print_requested_ok {
-    my ($self) = @_;
+    my ($self, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok(eval { $self->print_requested }, "print_requested_ok")
+    ok(eval { $self->print_requested }, "print_requested_ok($description)")
         or $self->shout($@);
 }
 
@@ -391,10 +426,13 @@ If $text is undef, it waits for any alert. Since alerts do not get automatically
 =cut
 
 sub wait_for_alert_ok {
-    my ($self, $text, $timeout) = @_;
+    my ($self, $text, $timeout, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok($self->wait_for_alert($text, $timeout), "wait_for_alert_ok($text)")
+    $timeout ||= $self->default_timeout;
+
+    ok($self->wait_for_alert($text, $timeout), "wait_for_alert_ok($text, $timeout, $description)")
         or diag(
             @{ $self->alerts }
             ? 'Last alert was: "' . $self->alerts->[-1] . '"'
@@ -409,12 +447,13 @@ Drag and drop $source to position ($target_x and $target_y)
 =cut
 
 sub native_drag_and_drop_to_position_ok {
-    my ($self, $source, $target_x, $target_y, $options) = @_;
+    my ($self, $source, $target_x, $target_y, $options, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     eval { $self->native_drag_and_drop_to_position($source, $target_x, $target_y, $options) };
 
-    ok($@ eq '', "native_drag_and_drop_to_position_ok($source, $target_x, $target_y)")
+    ok($@ eq '', "native_drag_and_drop_to_position_ok($source, $target_x, $target_y, $description)")
         or $self->shout($@);
 }
 
@@ -425,12 +464,13 @@ Drag and drop $source to $target.
 =cut
 
 sub native_drag_and_drop_to_object_ok {
-    my ($self, $source, $target, $options) = @_;
+    my ($self, $source, $target, $options, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     eval { $self->native_drag_and_drop_to_object($source, $target, $options) };
 
-    ok($@ eq '', "native_drag_and_drop_to_object_ok($source, $target)")
+    ok($@ eq '', "native_drag_and_drop_to_object_ok($source, $target, $description)")
         or $self->shout($@);
 }
 

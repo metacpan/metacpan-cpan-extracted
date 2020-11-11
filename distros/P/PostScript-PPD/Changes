@@ -1,1 +1,4 @@
 Kwalitee requires this.
+
+0.300 Added PostScript::PPD->parse
+      Fixed PostScript::PPD->get

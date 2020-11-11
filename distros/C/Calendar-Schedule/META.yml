@@ -1,7 +1,7 @@
 ---
 abstract: 'manage calendar schedules'
 author:
-  - 'Vlado Keselj web.cs.dal.ca/~vlado'
+  - 'Vlado Keselj vlado@dnlp.ca http://vlado.ca'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -20,4 +20,4 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/vkeselj/calendar-schedule.git
-version: '1.13'
+version: '1.19'

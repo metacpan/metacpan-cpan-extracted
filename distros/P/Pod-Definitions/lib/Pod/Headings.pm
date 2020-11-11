@@ -7,7 +7,7 @@ use v5.20;
 
 use Pod::Simple;
 our @ISA = qw(Pod::Simple);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -19,23 +19,28 @@ sub new ($class, @args) {
     my $self = $class->SUPER::new();
     $self->{handlers} = {@args}; # if scalar @args;
     $self->{_elements} = [];
+    $self->{_sequence} = 0;
     return $self;
 }
 
 sub _handle_element_start ($parser, $element_name, $attr_hash_r) {
 
     return unless defined $parser->{handlers}{$element_name};
-    push @{$parser->{_elements}}, { heading => $element_name, text => '', attrs=> $attr_hash_r };
+    push @{$parser->{_elements}}, { element => $element_name,
+                                    text => '',
+                                    attrs=> $attr_hash_r,
+                                    sequence => $parser->{_sequence}++,
+                                };
 }
 
 sub _handle_element_end ($parser, $element_name, $attr_hash_r = undef) {
 
-    return unless scalar @{$parser->{_elements}} && ($element_name eq ${$parser->{_elements}}[-1]->{heading});
+    return unless scalar @{$parser->{_elements}} && ($element_name eq ${$parser->{_elements}}[-1]->{element});
     
     my $propagate_text = 0;
     my $this_element = pop @{$parser->{_elements}};
     if (ref $parser->{handlers}{$element_name} eq 'CODE') {
-        $propagate_text = $parser->{handlers}{$element_name}->($parser, $element_name, $this_element->{attrs}, $this_element->{text});
+        $propagate_text = $parser->{handlers}{$element_name}->($parser, $element_name, $this_element, $this_element->{text});
     } else {
         $propagate_text = $parser->{handlers}{$element_name};
     }
@@ -64,7 +69,7 @@ Pod::Headings -- extract headings and paragraphs (and other elements) from Pod
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Universiteitsbibliotheek/Activiti-Rest-Client/issues
   homepage: https://github.com/Universiteitsbibliotheek/Activiti-Rest-Client
   repository: https://github.com/Universiteitsbibliotheek/Activiti-Rest-Client.git
-version: '0.1256'
+version: '0.1257'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'njfranck <njfranck@ca20c521.ugent.be>'

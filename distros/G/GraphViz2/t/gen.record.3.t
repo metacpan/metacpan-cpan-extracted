@@ -1,4 +1,4 @@
-# Annotation: Deeply nested records using strings as labels.
+# Annotation: Deeply nested records using nested array-refs.
 
 use strict;
 use warnings;
@@ -7,55 +7,61 @@ use GraphViz2;
 
 my $id    = '3';
 my $graph = GraphViz2->new(
-	global => {directed => 1},
+	global => {directed => 1, combine_node_and_port => 0, record_shape => 'record'},
 	graph  => {
           label => "Record demo $id - Deeply nested records " .
-            "using strings as labels"
+            "using nested array-refs"
         },
-	node   => {shape => 'record'},
 );
 
-$graph->add_node(name => 'Alphabet',
-label => join('|',
-  '<port_a> a:port_a ',
-  '{<port_b> b:port_b ',
-  ' c ',
-  '{<port_d> d:port_d ',
-  ' e ',
-  ' f ',
-  '{ g ',
-  '<port_h> h:port_h ',
-  ' i ',
-  ' j ',
-  '{ k ',
-  ' l ',
-  ' m ',
-  '<port_n> n:port_n ',
-  ' o ',
-  ' p}',
-  ' q ',
-  ' r ',
-  '<port_s> s:port_s ',
-  ' t }',
-  ' u ',
-  ' v ',
-  '<port_w> w:port_w }',
-  ' x ',
-  '<port_y> y:port_y }',
-  ' z',
-));
+$graph->add_node(name => 'Alphabet', label => [
+  { port => 'port_a', text => 'a:port_a' },
+  [
+    { port => 'port_b', text => 'b:port_b' },
+    'c',
+    [
+      { port => 'port_d', text => 'd:port_d' },
+      'e',
+      'f',
+      [
+        'g',
+        { port => 'port_h', text => 'h:port_h' },
+        'i',
+        'j',
+        [
+          'k',
+          'l',
+          'm',
+          { port => 'port_n', text => 'n:port_n' },
+          'o',
+          'p',
+        ],
+        'q',
+        'r',
+        { port => 'port_s', text => 's:port_s' },
+        't',
+      ],
+      'u',
+      'v',
+      { port => 'port_w', text => 'w:port_w' },
+    ],
+    'x',
+    { port => 'port_y', text => 'y:port_y' },
+  ],
+  'z',
+]);
 
 $graph -> add_edge(
-  from => 'Alphabet:port_a', to => 'Alphabet:port_n', color => 'maroon',
+  from => 'Alphabet', tailport => 'port_a', to => 'Alphabet', headport => 'port_n', color => 'maroon',
 );
 $graph -> add_edge(
-  from => 'Alphabet:port_b', to => 'Alphabet:port_s', color => 'blue',
+  from => 'Alphabet', tailport => 'port_b', to => 'Alphabet', headport => 'port_s', color => 'blue',
 );
 $graph -> add_edge(
-  from => 'Alphabet:port_d', to => 'Alphabet:port_w', color => 'red',
+  from => 'Alphabet', tailport => 'port_d', to => 'Alphabet', headport => 'port_w', color => 'red',
 );
 $graph -> add_edge(
-  from => 'Alphabet:port_y', to => 'Alphabet:port_h', color => 'green',
+  from => 'Alphabet', tailport => 'port_y', to => 'Alphabet', headport => 'port_h', color => 'green',
 );
 
 if (@ARGV) {

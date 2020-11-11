@@ -95,6 +95,7 @@ do { my $x = {
                                       'List::Util' => '1.45',
                                       'Module::Loader' => '0',
                                       'Moo' => '0',
+                                      'Ref::Util' => '0',
                                       'Safe::Isa' => '1.000005',
                                       'Scalar::Util' => '0',
                                       'String::CamelCase' => '0.02',

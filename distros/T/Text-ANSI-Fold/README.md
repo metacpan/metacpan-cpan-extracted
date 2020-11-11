@@ -4,7 +4,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.01
+Version 2.05
 
 # SYNOPSIS
 
@@ -168,10 +168,14 @@ function as well as **new** and **configure** method.
 - **padding** => _bool_
 
     If **padding** option is given with true value, margin space is filled
-    up with space character.  Next code fills spaces if the given text is
-    shorter than 80.
+    up with space character.  Default is 0.  Next code fills spaces if the
+    given text is shorter than 80.
 
         ansi_fold($text, 80, padding => 1);
+
+    If an ANSI **Erase Line** sequence is found in the string, color status
+    at the position is remembered, and padding string is produced in that
+    color.
 
 - **padchar** => _char_
 
@@ -185,6 +189,12 @@ function as well as **new** and **configure** method.
     Tells how to treat Unicode East Asian ambiguous characters.  Default
     is "narrow" which means single column.  Set "wide" to tell the module
     to treat them as wide character.
+
+- **keep\_el** => _bool_
+
+    Keep sole ANSI Erase Line sequence or not.  Default is 1.  If not
+    true, individual Erase Line sequence is not kept in the result string.
+    Erase Line right after RESET sequence is always kept.
 
 - **linebreak** => _mode_
 - **runin** => _width_

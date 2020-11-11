@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckDiff;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckDiff::VERSION = '2.13.0';
+$Git::Hooks::CheckDiff::VERSION = '2.14.0';
 use 5.010;
 use utf8;
 use Carp;
@@ -30,17 +30,11 @@ sub check_pre_commit {
 
     $log->debug(__PACKAGE__ . "::check_pre_commit");
 
-    my @commands = $git->get_config($CFG => 'shell');
-
-    return 1 unless @commands;
-
     my $current_branch = $git->get_current_branch();
 
     return 1 unless $git->is_reference_enabled($current_branch);
 
-    return _check_commands(
-        $git, {ref => $current_branch}, 'diff-index', ['--cached', 'HEAD'], \@commands,
-    ) == 0;
+    return _check_everything($git, {ref => $current_branch}, qw/diff-index --cached HEAD/);
 }
 
 sub check_patchset {
@@ -49,10 +43,6 @@ sub check_patchset {
     $log->debug(__PACKAGE__ . "::check_patchset");
 
     return 1 if $git->im_admin();
-
-    my @commands = $git->get_config($CFG => 'shell');
-
-    return 1 unless @commands;
 
     # The --branch argument contains the branch short-name if it's in the
     # refs/heads/ namespace. But we need to always use the branch long-name,
@@ -65,9 +55,7 @@ sub check_patchset {
 
     my $commit = $opts->{'--commit'};
 
-    return _check_commands(
-        $git, {ref => $branch, commit => $commit}, 'diff-tree', [$commit], \@commands,
-    ) == 0;
+    return _check_everything($git, {ref => $branch, commit => $commit}, 'diff-tree', $commit);
 }
 
 sub check_affected_refs {
@@ -77,22 +65,18 @@ sub check_affected_refs {
 
     return 1 if $git->im_admin();
 
-    my @commands = $git->get_config($CFG => 'shell');
-
-    return 1 unless @commands;
-
     my $errors = 0;
 
     foreach my $ref ($git->get_affected_refs()) {
         next unless $git->is_reference_enabled($ref);
-        $errors += _check_ref($git, $ref, \@commands);
+        $errors += _check_ref($git, $ref);
     }
 
     return $errors == 0;
 }
 
 sub _check_ref {
-    my ($git, $ref, $commands) = @_;
+    my ($git, $ref) = @_;
 
     my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
 
@@ -125,24 +109,43 @@ sub _check_ref {
         }
     }
 
-    return _check_commands(
-        $git, {ref => $ref}, 'diff-tree', [$old_commit, $new_commit], $commands,
-    );
+    return _check_everything($git, {ref => $ref}, 'diff-tree', $old_commit, $new_commit);
 }
 
-sub _check_commands {
-    my ($git, $ctx, $git_cmd, $args, $commands) = @_;
+sub _check_everything {
+    my ($git, $ctx, $git_cmd, @git_args) = @_;
 
-    my $diff_file = _diff_file($git, $git_cmd, qw/-p -U0 --no-color --diff-filter=AM --no-prefix/, @$args);
+    my $diff_text;
+    my $diff = sub {
+        $diff_text //= $git->run(
+            $git_cmd, qw/-p -U0 --no-color --diff-filter=AM --no-prefix/, @git_args
+        );
+        return $diff_text;
+    };
+
+    return 0 == (
+        _check_shell($git, $ctx, $diff) +
+        _check_token($git, $ctx, $diff)
+    )
+}
+
+sub _check_shell {
+    my ($git, $ctx, $diff) = @_;
+
+    my @commands = $git->get_config($CFG => 'shell');
+
+    return 0 unless @commands;
+
+    my $diff_file = _diff_file($diff);
 
     unless ($diff_file) {
-        $git->fault("git $git_cmd failed", {%$ctx});
+        $git->fault("git diff failed", {%$ctx});
         return 1;
     }
 
     my $errors = 0;
 
-    foreach my $command (@$commands) {
+    foreach my $command (@commands) {
         $errors += _check_command($git, $ctx, $command, $diff_file);
     }
 
@@ -150,15 +153,11 @@ sub _check_commands {
 }
 
 sub _diff_file {
-    my ($git, @diff) = @_;
+    my ($diff) = @_;
 
     my $file = Path::Tiny->tempfile();
 
-    my $diff = $git->run(@diff);
-
-    return unless $? == 0;
-
-    $file->spew($diff);
+    $file->spew($diff->());
 
     return $file;
 }
@@ -210,6 +209,78 @@ sub _check_command {
     return $exit != 0;
 }
 
+sub _check_token {
+    my ($git, $ctx, $diff) = @_;
+
+    my @deny_tokens = $git->get_config($CFG => 'deny-token')
+        or return 0;
+
+    if ($git->version_lt('1.7.4')) {
+        $git->fault(<<'EOS', {option => 'deny-token'});
+This option requires Git 1.7.4 or later but your Git is older.
+Please, upgrade your Git or disable this option.
+EOS
+        return 1;
+    }
+
+    my $errors = 0;
+
+    foreach my $deny_token (@deny_tokens) {
+        my ($regex, $filters) = split /\s+--\s+/, $deny_token, 2;
+
+        my $match_token = qr/^\+.*?$regex/; # FIXME: detect error
+
+        my @filters;
+
+        if ($filters) {
+            foreach my $filter (split ' ', $filters) {
+                my $negated;
+                if ($filter =~ s/^\!//) {
+                    $negated = 1;
+                }
+                if ($filter =~ m/^\^/) {
+                    $filter = qr/$filter/;
+                }
+                push @filters, [$negated, $filter];
+            }
+        }
+
+        my $file = '';
+        my @matches;
+
+      LINE:
+        foreach (split /\n/, $diff->()) {
+            if (/^\+\+\+ (.+)/) {
+                $file = $1;
+                if (@filters) {
+                    foreach my $filter (@filters) {
+                        if ($filter->[0] xor ## no critic (ProhibitDeepNests)
+                                ((ref $filter->[1] and
+                                  $file =~ $filter->[1]) or
+                                  (not ref $filter->[1] and
+                                   $filter->[1] eq substr($file, 0, length($filter->[1]))))) {
+                            next LINE;
+                        }
+                    }
+                    $file = '';
+                }
+            } elsif (length $file && $_ =~ $match_token) {
+                push @matches, "$file: $_";
+            }
+        }
+
+        if (@matches) {
+            $git->fault(<<"EOS", {%$ctx, option => 'deny-token', details => join("\n", @matches)});
+Invalid lines matching '$regex' below.
+Please, rewrite them and try again.
+EOS
+            $errors += 1;
+        }
+    }
+
+    return $errors;
+}
+
 1;
 
 __END__
@@ -224,7 +295,7 @@ Git::Hooks::CheckDiff - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.13.0
+version 2.14.0
 
 =head1 SYNOPSIS
 
@@ -240,6 +311,13 @@ may configure it in a Git configuration file like this:
     admin = joe molly
 
   [githooks "checkdiff"]
+
+    # Reject commits adding lines containing FIXME
+    deny-token = \\bFIXME\\b
+
+    # Reject commits adding lines containing TODO (ignoring case) but only on
+    # files under the directories lib/ and t/.
+    deny-token = (?i)\\bTODO\\b -- ^lib/ ^t/
 
     # Reject commits which change lines containing the string COPYRIGHT
     shell = /usr/bin/grep COPYRIGHT && false
@@ -310,6 +388,31 @@ C<githooks.checkdiff> subsection.
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
+
+=head2 deny-token REGEXP [-- FILTER...]
+
+This directive rejects commits or pushes which add lines matching REGEXP, which
+is a Perl regular expression. This is a multi-valued directive, i.e., you can
+specify it multiple times to check several REGEXes.
+
+It is useful to detect marks left by developers in the code while developing,
+such as FIXME or TODO. These marks are usually a reminder to fix things before
+commit, but as it so often happens, they end up being forgotten.
+
+By default the token are looked for in all added lines in the whole commit or
+commit sequence diff. Optional filters may be specified to restrict which files
+should be considered. Only differences of affected files which names match at
+least one filter are checked for tokens.
+
+The REGEXP and the FILTERs are separated by two hyphens.
+
+A FILTER is a string used to match file paths. It can be optionally initiated by
+a '!' character, which reverses the matching logic, effectively selecting paths
+not matching it. If the remaining string initiates with a '^' it's treated as a
+Perl regular expression anchored at the beginning, which is used to match file
+paths. Otherwise, the string matches files paths having it as a prefix.
+
+Note that this option requires Git 1.7.4 or newer.
 
 =head2 shell COMMAND
 

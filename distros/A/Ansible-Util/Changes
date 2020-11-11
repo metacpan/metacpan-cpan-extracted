@@ -1,0 +1,35 @@
+==================================================
+Changes from 2019-11-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2020-11-06 17:43:42 +0000
+------------------------------------------
+
+  Change: 3206b44eca24cb6bf8b13f4c617bce831209f8e8
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-06 11:43:27 +0000
+
+    fixed bug in lib/Ansible/Util/Vars.pm 
+
+  Change: 0d67f845c8145e6d843affcf27578778b539fb33
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-06 11:36:18 +0000
+
+    more refactoring and additional unit tests 
+
+  Change: f6b9f57a272845439f516b69e47f7ca687ec7004
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-05 12:09:12 +0000
+
+    refactoring 
+
+  Change: 95e5de2e2a30c14aa3bde19d4bfd1cf4862045ef
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-03 12:53:59 +0000
+
+    first 
+
+================
+End of releases.
+================

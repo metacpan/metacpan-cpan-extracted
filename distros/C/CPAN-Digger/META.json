@@ -1,0 +1,66 @@
+{
+   "abstract" : "To dig CPAN",
+   "author" : [
+      "Gabor Szabo <gabor@szabgab.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Digger",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Log4perl" : "0",
+            "MetaCPAN::Client" : "0",
+            "Path::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mock::Quick" : "0",
+            "Storable" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/CPAN-Digger/issues"
+      },
+      "homepage" : "https://perlmaven.com/cpan-digger",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/szabgab/CPAN-Digger.git",
+         "web" : "https://github.com/szabgab/CPAN-Digger"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

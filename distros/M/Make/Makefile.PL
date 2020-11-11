@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
     "LICENSE"      => "perl",
     "META_MERGE"   => {
         dynamic_config => 0,
-        'meta-spec'    => { version => 2 },
+        'meta-spec'    => { version   => 2 },
         no_index       => { directory => ['t'] },
         prereqs        => {
             develop => {
@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
                     "Test::Pod"           => "1.00",
                     "Test::Code::TidyAll" => "0.41",
                     "Test::Perl::Critic"  => "1.02",
+                    "Perl::Tidy"          => "20200822",    # new formatting
                 },
             },
         },

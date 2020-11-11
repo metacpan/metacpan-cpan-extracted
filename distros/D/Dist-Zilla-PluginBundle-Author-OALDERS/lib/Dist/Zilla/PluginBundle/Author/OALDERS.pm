@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use feature qw( say );
 
@@ -146,7 +146,6 @@ sub configure {
             }
         ],
         'ShareDir',
-        'TravisCI::StatusBadge',
         'CheckIssues',
         'ConfirmRelease',
         'UploadToCPAN',
@@ -201,7 +200,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000028
+version 0.000029
 
 =head2 configure
 

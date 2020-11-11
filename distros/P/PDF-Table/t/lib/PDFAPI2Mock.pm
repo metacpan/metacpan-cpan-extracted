@@ -78,10 +78,10 @@ BEGIN {
     package PDF::API2::Content; ## no critic
     our @ISA = 'Mock';
     __PACKAGE__->set_true(
-        qw(strokecolor linewidth move hline vline fillcolor stroke rect fill));
+        qw(strokecolor linewidth linedash move hline vline fillcolor stroke rect fill));
     package PDF::API2::Content::Text; ## no critic
     our @ISA = 'Mock';
-    __PACKAGE__->set_true(qw(font fillcolor translate text));
+    __PACKAGE__->set_true(qw(font fillcolor translate text text_center text_right));
     sub advancewidth { shift; return 5 * length shift }
 }
 return 1;

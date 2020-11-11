@@ -37,15 +37,20 @@
    "provides" : {
       "Template::Plugin::RPM2" : {
          "file" : "lib/Template/Plugin/RPM2.pm",
-         "version" : "v1.3.0"
+         "version" : "v1.3.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/template-plugin-rpm2.git",
+         "web" : "https://github.com/davorg/template-plugin-rpm2"
+      }
    },
-   "version" : "v1.3.0",
+   "version" : "v1.3.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

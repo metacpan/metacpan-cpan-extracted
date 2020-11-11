@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Getopt::Kingpin::Base -base;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 sub help_name {
     my $self = shift;
@@ -17,6 +17,9 @@ sub help_name {
     my $ret = '<' . $self->name . '>';
     if ($mode and $self->is_cumulative) {
         $ret = $ret . '...';
+    }
+    if ($self->is_hash) {
+        $ret =~ s/</<KEY=/;
     }
     if (not $self->_required) {
         $ret = '[' . $ret . ']';

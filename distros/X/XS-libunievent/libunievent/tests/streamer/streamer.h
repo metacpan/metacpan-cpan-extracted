@@ -20,12 +20,12 @@ struct TestInput : Streamer::IInput {
         timer->event.add([this](auto...){
             //printf("on read\n");
             if (!size) {
-                handle_eof();
+                this->handle_eof();
                 timer->stop();
                 return;
             }
             if (speed > size) speed = size;
-            handle_read(string(speed, 'x'), {});
+            this->handle_read(string(speed, 'x'), {});
             size -= speed;
         });
         return {};
@@ -63,8 +63,8 @@ struct TestOutput : Streamer::IOutput {
         timer->event.add([this](auto...){
             bufs.pop_front();
             //printf("on write que left %d\n", write_queue_size());
-            handle_write({});
-            _write();
+            this->handle_write({});
+            this->_write();
         });
         return {};
     }

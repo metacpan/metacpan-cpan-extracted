@@ -230,7 +230,8 @@ method do {
 	
 	if ( $self->use_argv_map ) {
 		if ( keys %ARGV ) {
-			$self->die("extra args detected: %ARGV");
+			my @argv = %ARGV;
+			$self->die("extra args detected: @argv");
 		}
 	}
 	else {

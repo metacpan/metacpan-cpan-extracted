@@ -1,3 +1,18 @@
+0.07 2020-11-03T23:23:41+01:00
+ - Add new stations.
+ - Add EXAMPLE5 section to doc.
+ - Add URL for M2 line to XML file.
+ - Add test for ok_map_functions().
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Implement station order.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rewrite XML map to new version with line IDs.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years to 2020.
+ - Update to Map::Tube 3.41.
+
 0.06 2015-10-16T11:59:24+02:00
  - Improve description for get_lines() in doc.
  - Update to Map::Tube 3.06.

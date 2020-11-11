@@ -17,10 +17,11 @@ meta-spec:
   version: '1.4'
 name: App-DuplicateFilesUtils
 requires:
-  App::UniqFiles: '0.131'
+  App::UniqFiles: '0.132'
   Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
+  File::Copy: '0'
   Log::ger: '0.037'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DuplicateFilesUtils
   homepage: https://metacpan.org/release/App-DuplicateFilesUtils
   repository: git://github.com/perlancar/perl-App-DuplicateFilesUtils.git
-version: '0.002'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

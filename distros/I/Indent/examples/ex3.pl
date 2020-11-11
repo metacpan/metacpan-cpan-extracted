@@ -3,11 +3,19 @@
 use strict;
 use warnings;
 
-use Indent::Utils qw(reduce_duplicit_ws);
+use Indent::Word;
+use Term::ANSIColor;
 
-my $input = 'a  b';
-reduce_duplicit_ws(\$input);
-print "$input|\n";
+# Object.
+my $i = Indent::Word->new(
+        'ansi' => 1,
+        'line_size' => 20,
+);
+
+# Indent.
+print $i->indent('text text '.color('cyan').'text'.color('reset').
+        ' text '.color('red').'text'.color('reset').' text text')."\n";
 
 # Output:
-# a b|
+# text text text text
+# <--tab->text text text

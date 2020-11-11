@@ -34,6 +34,12 @@ string Response::message (SV* newval = NULL) {
     RETVAL = THIS->message;
 }
 
+string Response::to_string (Request* req = nullptr)
+
+string Response::message_for_code (int code = 0) {
+    RETVAL = THIS->message_for_code(code ? code : THIS->code);
+}
+
 Hash Response::cookies (Hash new_cookies = Hash()) {
     if (new_cookies) {
         set_response_cookies(THIS, new_cookies);
@@ -55,5 +61,4 @@ Response::Cookie Response::cookie (string_view name, SV* val = nullptr) {
     if (it == THIS->cookies.end()) XSRETURN_UNDEF;
     RETVAL = it->value;
 }
-
-string Response::to_string (Request* req = nullptr)
+

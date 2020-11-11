@@ -16,6 +16,8 @@ t/04_linebreak.t
 t/05_margin.t
 t/06_color.t
 t/07_expand.t
+t/08_backspace.t
+t/09_padcolor.t
 tool/fix-w3c.pl
 META.yml
 MANIFEST

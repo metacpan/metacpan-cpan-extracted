@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More qw();
 use Scalar::Util qw(blessed);
-use Types::TypeTiny qw(to_TypeTiny);
+use Types::TypeTiny ();
 use Type::Tiny ();
 
 require Exporter::Tiny;
@@ -16,7 +16,7 @@ BEGIN {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.010006';
+our $VERSION   = '1.012000';
 our @EXPORT    = qw( should_pass should_fail ok_subtype );
 our @EXPORT_OK = qw( EXTENDED_TESTING matchfor );
 
@@ -74,16 +74,34 @@ sub should_pass
 	my ($value, $type, $message) = @_;
 	
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	
 	my $strictures = $type->can("_strict_check");
+	my $compiled   = $type->can("compiled_check");
+	my $can_inline = $type->can("can_be_inlined") && $type->can_be_inlined && $type->can("inline_check");
+	
+	my $count = 1;
+	$count +=1 if $strictures;
+	$count +=1 if $compiled;
+	$count +=2 if $can_inline;
+	
+	my @codes;
+	if ( $can_inline ) {
+		push @codes, eval sprintf('no warnings; [ q(inlined), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+		local $Type::Tiny::AvoidCallbacks = 1;
+		push @codes, eval sprintf('no warnings; [ q(inlined avoiding callbacks), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+	}
 	
 	my $test = "Test::Builder"->new->child(
 		$message || _mk_message("%s passes type constraint $type", $value),
 	);
-	$test->plan(tests => ($strictures ? 2 : 1));
+	$test->plan(tests => $count);
 	$test->ok(!!$type->check($value), '->check');
 	$test->ok(!!$type->_strict_check($value), '->_strict_check') if $strictures;
+	$test->ok(!!$type->compiled_check->($value), '->compiled_check') if $compiled;
+	for my $code ( @codes ) {
+		$test->ok(!!$code->[1]->($value), $code->[0]);
+	}
 	$test->finalize;
 	return $test->is_passing;
 }
@@ -91,18 +109,36 @@ sub should_pass
 sub should_fail
 {
 	my ($value, $type, $message) = @_;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	my $strictures = $type->can("_strict_check");
+	my $compiled   = $type->can("compiled_check");
+	my $can_inline = $type->can("can_be_inlined") && $type->can_be_inlined && $type->can("inline_check");
+	
+	my $count = 1;
+	$count +=1 if $strictures;
+	$count +=1 if $compiled;
+	$count +=2 if $can_inline;
+	
+	my @codes;
+	if ( $can_inline ) {
+		push @codes, eval sprintf('no warnings; [ q(inlined), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+		local $Type::Tiny::AvoidCallbacks = 1;
+		push @codes, eval sprintf('no warnings; [ q(inlined avoiding callbacks), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+	}
 	
 	my $test = "Test::Builder"->new->child(
 		$message || _mk_message("%s fails type constraint $type", $value),
 	);
-	$test->plan(tests => ($strictures ? 2 : 1));
+	$test->plan(tests => $count);
 	$test->ok(!$type->check($value), '->check');
 	$test->ok(!$type->_strict_check($value), '->_strict_check') if $strictures;
+	$test->ok(!$type->compiled_check->($value), '->compiled_check') if $compiled;
+	for my $code ( @codes ) {
+		$test->ok(!$code->[1]->($value), $code->[0]);
+	}
 	$test->finalize;
 	return $test->is_passing;
 }
@@ -112,7 +148,7 @@ SLOW
 sub should_pass
 {
 	my ($value, $type, $message) = @_;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	@_ = (
 		!!$type->check($value),
 		$message || _mk_message("%s passes type constraint $type", $value),
@@ -123,7 +159,7 @@ sub should_pass
 sub should_fail
 {
 	my ($value, $type, $message) = @_;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	@_ = (
 		!$type->check($value),
 		$message || _mk_message("%s fails type constraint $type", $value),

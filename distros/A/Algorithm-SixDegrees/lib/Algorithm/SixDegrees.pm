@@ -3,7 +3,9 @@ package Algorithm::SixDegrees;
 require 5.006;
 use warnings;
 use strict;
-use UNIVERSAL qw(isa);
+use Scalar::Util qw(reftype);
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -11,11 +13,11 @@ Algorithm::SixDegrees - Find a path through linked elements in a set
 
 =head1 VERSION
 
-Version 0.03
+Version 1.01
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '1.01';
 our $ERROR = '';
 
 =head1 SYNOPSIS
@@ -80,7 +82,7 @@ sub forward_data_source {
 	my ($self, $name, $sub, @args) = @_;
 	die "Data sources must be named\n" unless defined($name);
 	die "Data sources must have code supplied\n" unless defined($sub);
-	die "Data sources must have a coderef argument\n" unless ref($sub) && isa($sub,'CODE');
+	die "Data sources must have a coderef argument\n" unless ref($sub) && reftype($sub) eq 'CODE';
 	$self->{'_source_left'}{$name}{'sub'} = $sub;
 	$self->{'_source_left'}{$name}{'args'} = \@args;
 	foreach my $source (@{$self->{'_sources'}}) {
@@ -105,7 +107,7 @@ sub reverse_data_source {
 	my ($self, $name, $sub, @args) = @_;
 	die "Data sources must be named\n" unless defined($name);
 	die "Data sources must have code supplied\n" unless defined($sub);
-	die "Data sources must have a coderef argument\n" unless ref($sub) && isa($sub,'CODE');
+	die "Data sources must have a coderef argument\n" unless ref($sub) && reftype($sub) eq 'CODE';
 	$self->{'_source_right'}{$name}{'sub'} = $sub;
 	$self->{'_source_right'}{$name}{'args'} = \@args;
 	foreach my $source (@{$self->{'_sources'}}) {
@@ -142,7 +144,7 @@ sub make_link {
 	my ($self, $mainsource, $start, $end) = @_;
 	$ERROR = undef;
 
-	unless (ref($self) && isa($self,__PACKAGE__)) {
+	unless (ref($self) && $self->isa(__PACKAGE__)) {
 		$ERROR = 'Invalid object reference used to call make_link';
 		return;
 	}
@@ -168,7 +170,7 @@ sub make_link {
 	# If $altsource gets defined, that means there are two sources used.
 	my $altsource;
 
-	unless (exists($self->{'_sources'}) && isa($self->{'_sources'},'ARRAY')) {
+	unless (exists($self->{'_sources'}) && reftype($self->{'_sources'}) eq 'ARRAY') {
 		$ERROR = 'No data sources defined';
 		return;
 	}
@@ -186,13 +188,13 @@ sub make_link {
 		}
 		unless (ref($self->{'_source_left'}) && 
 			ref($self->{'_source_left'}{$source}) &&
-			isa($self->{'_source_left'}{$source}{'sub'},'CODE')) {
+			reftype($self->{'_source_left'}{$source}{'sub'}) eq 'CODE') {
 			$ERROR = "Source '$source' does not have a valid forward subroutine";
 			return;
 		}
 		unless (ref($self->{'_source_right'}) && 
 			ref($self->{'_source_right'}{$source}) &&
-			isa($self->{'_source_right'}{$source}{'sub'},'CODE')) {
+			reftype($self->{'_source_right'}{$source}{'sub'}) eq 'CODE') {
 			$ERROR = "Source '$source' does not have a valid reverse subroutine";
 			return;
 		}
@@ -348,10 +350,10 @@ sub _match_one {
 sub _match {
 	my ($self,$side,$fromsource,$tosource,$thisside,$thatside) = @_;
 	# Assume $self is OK since this is an internal function
-	return (undef,undef,'Internal error: missing code') unless isa($self->{"_source_$side"}{$fromsource}{'sub'},'CODE');
-	return (undef,undef,'Internal error: missing side (1)') unless isa($thisside,'HASH');
+	return (undef,undef,'Internal error: missing code') unless reftype($self->{"_source_$side"}{$fromsource}{'sub'}) eq 'CODE';
+	return (undef,undef,'Internal error: missing side (1)') unless reftype($thisside) eq 'HASH';
 	return (undef,undef,'Internal error: missing side (2)') unless exists($thisside->{$fromsource});
-	return (undef,undef,'Internal error: missing side (3)') unless isa($thatside,'HASH');
+	return (undef,undef,'Internal error: missing side (3)') unless reftype($thatside) eq 'HASH';
 	return (undef,undef,'Internal error: missing side (4)') unless exists($thatside->{$tosource});
 
 	my $newsidecount = 0;
@@ -359,7 +361,7 @@ sub _match {
 		next if exists($self->{"_investigated"}{$fromsource}{$id});
 		$self->{"_investigated"}{$fromsource}{$id} = 1;
 
-		my $use_args = isa($self->{"_source_$side"}{$fromsource}{'args'},'ARRAY') ? 1 : 0;
+		my $use_args = reftype($self->{"_source_$side"}{$fromsource}{'args'}) eq 'ARRAY' ? 1 : 0;
 
 		my @ids = &{$self->{"_source_$side"}{$fromsource}{'sub'}}($id,($use_args?@{$self->{"_source_$side"}{$fromsource}{'args'}}:()));
 		return (undef,undef,$ERROR) if scalar(@ids) == 1 && !defined($ids[0]);
@@ -404,7 +406,7 @@ one-element list.
 
 =head1 AUTHOR
 
-Pete Krawczyk, C<< <petek@cpan.org> >>
+Peter Krawczyk, C<< <petek@cpan.org> >>
 
 =head1 BUGS
 
@@ -414,6 +416,10 @@ L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
 be notified of progress on your bug as I make changes.
 
 =head1 ACKNOWLEDGEMENTS
+
+Thank you to Slaven Rezić and Peter John Acklam for bug reports.
+Apologies it took so long to see and fix them. (So much for
+notifications...)
 
 Andy Lester and Ricardo Signes wrote Module::Starter, which helped
 get the framework up and running fairly quickly.
@@ -425,7 +431,7 @@ into this module.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005 Pete Krawczyk, All Rights Reserved.
+Copyright 2005-2020 Peter Krawczyk, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

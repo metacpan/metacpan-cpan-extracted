@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Filename::Backup - Backup filename
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Regexp::Pattern::Filename::Backup (from Perl distribution
-    Regexp-Pattern-Filename-Backup), released on 2020-04-01.
+    Regexp-Pattern-Filename-Backup), released on 2020-05-31.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -22,11 +22,13 @@ PATTERNS
 
         No extension.
 
-         "foo" =~ re("Filename::Backup::filename_backup");  # doesn't match
+         "foo" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
 
         Not an extension.
 
-         "gz" =~ re("Filename::Backup::filename_backup");  # doesn't match
+         "gz" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
+
+        Example #3.
 
          "foo~" =~ re("Filename::Backup::filename_backup");  # matches
 
@@ -36,9 +38,11 @@ PATTERNS
 
         Regex is anchored.
 
-         "foo.old is the file" =~ re("Filename::Backup::filename_backup");  # doesn't match
+         "foo.old is the file" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
 
-         "foo.txt" =~ re("Filename::Backup::filename_backup");  # doesn't match
+        Example #6.
+
+         "foo.txt" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -57,9 +61,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Filename::Backup
+
     Regexp::Pattern
 
-    Filename::Backup
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

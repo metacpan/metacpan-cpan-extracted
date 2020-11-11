@@ -49,8 +49,12 @@ sub _parse_ok {
     $res = _parse_ok($parser, ' foo ');
     is_deeply( $res, { words => ['foo'] }, 'parse single word with leading and trailing whitespace.' );
 
+    my $expected1 = { keywords => { title => ['foo'] } };
+    $res = _parse_ok($parser, 'title:foo');
+    is_deeply( $res, $expected1, 'parse single keyword without space after colon.' );
+
     $res = _parse_ok($parser, 'title: foo');
-    is_deeply( $res, { keywords => { title => ['foo'] } }, 'parse single keyword.' );
+    is_deeply( $res, $expected1, 'parse single keyword with space after colon.' );
 
     $res = $parser->process('nokeyword: foo');
     _parse_error($res, 'Parse Error: Invalid search query.');
@@ -68,13 +72,13 @@ sub _parse_ok {
     is_deeply( $res, { keywords => { name => ['foo bar'] } }, 'parse keyword with quoted value.' );
 
     $res = _parse_ok($parser, 'name:"foo bar" name:baz meh "mii"');
-    my $expected = {
+    my $expected2 = {
         words => [ 'meh' , 'mii' ],
         keywords => {
             name => ['foo bar', 'baz'],
         },
     };
-    is_deeply( $res, $expected, 'mix words and keywords.' );
+    is_deeply( $res, $expected2, 'mix words and keywords.' );
 
     $res = $parser->process('&');
     _parse_error($res, 'Parse Error: Invalid search query.');

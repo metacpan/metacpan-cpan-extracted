@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+use CPAN::Digger::CLI;
+CPAN::Digger::CLI::run();

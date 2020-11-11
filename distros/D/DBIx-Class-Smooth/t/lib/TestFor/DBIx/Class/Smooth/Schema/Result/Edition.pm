@@ -11,7 +11,7 @@ use DBIx::Class::Smooth::Fields -all;
 
 primary id => IntegerField(auto_increment => 1);
 belongs Book => ForeignKey();
+belongs Publisher => ForeignKey();
     col year => YearField();
-    col publisher_name => VarcharField(size => 150);
 
 1;

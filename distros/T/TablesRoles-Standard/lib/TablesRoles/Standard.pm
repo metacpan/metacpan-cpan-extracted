@@ -1,9 +1,9 @@
 package TablesRoles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2020-11-10'; # DATE
 our $DIST = 'TablesRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Standard set of roles for Tables
@@ -20,7 +20,7 @@ TablesRoles::Standard - Standard set of roles for Tables
 
 =head1 VERSION
 
-This document describes version 0.003 of TablesRoles::Standard (from Perl distribution TablesRoles-Standard), released on 2020-06-01.
+This document describes version 0.006 of TablesRoles::Standard (from Perl distribution TablesRoles-Standard), released on 2020-11-10.
 
 =head1 HOMEPAGE
 

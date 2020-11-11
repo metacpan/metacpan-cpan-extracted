@@ -61,11 +61,8 @@ sub cmd_sync_bin_deps {
             warn("Reverse dependency write failed: $@");
         }
         if ($fh_lock) {
-            my $ok = eval {
-                flock($fh_lock, LOCK_UN) or warn "Cannot unlock $lock_file: $!\n";
-                unlink($lock_file);
-            };
-            warn "Cannot unlock $lock_file: $! ($@)\n" unless $ok;
+            # possible errors are ignored, as we can do nothing
+            flock($fh_lock, LOCK_UN) && unlink($lock_file);
         }
     }
 }

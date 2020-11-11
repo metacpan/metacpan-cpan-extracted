@@ -1,6 +1,6 @@
 package Pod::Definitions;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -30,8 +30,11 @@ sub new ($class, @args) {
 sub file ($self) { return $self->{file}; }       # Local path to file
 sub manpage ($self) { return $self->{manpage}; } # Full name of manpage ('Mojo::Path')
 sub module ($self) { return $self->{module}; }   # Module leaf name ('Path')
-sub sections ($self) { return $self->{sections}; } # Hash (key=toplevel section) of arrays
-                                # of section names
+sub sections ($self, $section = undef) {
+    return defined $section ?
+    $self->{sections}->{$section} : # Array of entries in that section, or undef
+    $self->{sections};              # Hash (key=toplevel section) of arrays of section names
+} 
 #
 #
 #
@@ -46,6 +49,7 @@ sub _save_definition ($self, $parser, $attrs, $head1, $text) {
     my $cooked_heading = Pod::Definitions::Heuristic->new(text => $text);
     push @{$self->{sections}{$head1}}, {raw => $text,
                                         cooked => $cooked_heading->clean,
+                                        sequence => $attrs->{sequence},
                                         link => $self->manpage(),
                                         link_fragment => convert_to_href_text($text),
                                     };
@@ -149,7 +153,7 @@ Pod::Definitions -- extract main sections and contained definitions from Pod
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

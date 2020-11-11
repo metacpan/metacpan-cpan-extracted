@@ -2,8 +2,8 @@ NAME
     App::PlatformInfo - Packed platform-info script
 
 VERSION
-    This document describes version 0.004 of App::PlatformInfo (from Perl
-    distribution App-PlatformInfo), released on 2020-10-08.
+    This document describes version 0.006 of App::PlatformInfo (from Perl
+    distribution App-PlatformInfo), released on 2020-11-02.
 
 DESCRIPTION
     This distribution provides a "platform-info" which is packed with its

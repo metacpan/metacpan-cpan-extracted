@@ -8,13 +8,15 @@ sub new {
 
     # these params have default values
     # but can be overridden
-    $params{return_data}       ||= [];
-    $params{fields}            ||= $DBD::Mock::DefaultFieldsToUndef ? undef : [];
-    $params{bound_params}      ||= [];
-    $params{bound_param_attrs} ||= [];
-    $params{statement}         ||= "";
-    $params{failure}           ||= undef;
-    $params{callback}          ||= undef;
+    $params{return_data}        ||= [];
+    $params{fields}             ||= $DBD::Mock::DefaultFieldsToUndef ? undef : [];
+    $params{bound_params}       ||= [];
+    $params{bound_param_attrs}  ||= [];
+    $params{statement}          ||= "";
+    $params{failure}            ||= undef;
+    $params{callback}           ||= undef;
+    $params{driver_attributes}  ||= {};
+    $params{execute_attributes} ||= {};
 
     # these params should never be overridden
     # and should always start out in a default
@@ -131,6 +133,8 @@ sub mark_executed {
     $self->is_executed('yes');
     $self->current_record_num(0);
 
+    $self->{driver_attributes} = { %{ $self->{driver_attributes} }, %{ $self->{execute_attributes} } };
+
     if (ref $self->{callback} eq "CODE") {
         my %recordSet = $self->{callback}->(@{ $self->{bound_params} });
 
@@ -144,6 +148,10 @@ sub mark_executed {
 
         if (defined $recordSet{last_insert_id}) {
             $self->{last_insert_id} = $recordSet{last_insert_id};
+        }
+
+        if (defined $recordSet{execute_attributes}) {
+            $self->{driver_attributes} = { %{ $self->{driver_attributes} }, %{ $recordSet{execute_attributes} } };
         }
     }
 }

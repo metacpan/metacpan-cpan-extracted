@@ -77,7 +77,7 @@ _Get(xpa, xtemplate, paramlist, mode, max_servers )
 	int     max_servers
 	PREINIT:
 		char **bufs;
-		int *lens;
+		size_t *lens;
 		char **names;
 		char **messages;
 		int i;
@@ -85,7 +85,7 @@ _Get(xpa, xtemplate, paramlist, mode, max_servers )
 	PPCODE:
 		/* allocate return arrays */
 		New( 0, bufs, max_servers, char *);
-		New( 0, lens, max_servers, int);
+		New( 0, lens, max_servers, size_t);
 		New( 0, names, max_servers, char *);
 		New( 0, messages, max_servers, char *);
 		/* send request to server */

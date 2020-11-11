@@ -2,7 +2,7 @@ NAME
     LaTeX::Driver - Latex driver
 
 VERSION
-    1.1.1
+    1.2.0
 
 SYNOPSIS
         use LaTeX::Driver;
@@ -13,7 +13,6 @@ SYNOPSIS
                                    %other_params );
         $ok    = $drv->run;
         $stats = $drv->stats;
-        $drv->cleanup($what);
 
 DESCRIPTION
     The LaTeX::Driver module encapsulates the details of invoking the Latex
@@ -26,7 +25,8 @@ DESCRIPTION
     either explicitly with the "dirname" option or implicitly by the
     directory part of "basename", or in the current directory. As a result
     of the processing up to a dozen or more intermediate files are created.
-    These can be removed with the "cleanup" method.
+    These will be removed upon object destruction, given the "cleanup"
+    argument to "new".
 
 SOURCE
     Source code can be found at <https://github.com/fordmason/LaTeX-Driver>
@@ -181,12 +181,6 @@ SUBROUTINES/METHODS
         Note: the return value will probably become an object in a future
         version of the module.
 
-    "cleanup($what)"
-        Removes temporary intermediate files from the document directory and
-        resets the stats.
-
-        Not yet implemented
-
     "program_path($program_name, $opt_value)"
         Get or set the path to the named program. Can be used as a class
         method to set the default path or as an object method to set the
@@ -332,6 +326,12 @@ DIAGNOSTICS
         location.
 
 CONFIGURATION AND ENVIRONMENT
+    When the using application configures Log::Any, this module will use it
+    to log "debug" and "trace" level messages to the "LaTeX::Driver"
+    category. Please note that the $DEBUG variable does not need to be set
+    to enable this type of logging. When this type of logging is enabled,
+    the value of $DEBUG is ignored.
+
 DEPENDENCIES
     "LaTeX::Driver" depends on latex and friends being installed.
 
@@ -339,9 +339,9 @@ INCOMPATIBILITIES
     None known.
 
 BUGS AND LIMITATIONS
-    This is beta software - there are bound to be bugs and misfeatures. If
-    you have any comments about this software I would be very grateful to
-    hear them; email me at <a.ford@ford-mason.co.uk>.
+    If you have any comments about this software I would be very grateful to
+    hear them; please file your comments as issues at
+    <https://github.com/Template-Toolkit-Latex/LaTeX-Driver/issues>.
 
     Among the things I am aware of are:
 
@@ -443,7 +443,7 @@ INTERNALS
     web2c TeX distribution, TeX live, tetex, TeX on Windows, etc.
 
 AUTHOR
-       Chris Travers <chris.travers@gmail.com>  (current maintainer)
+       Erik Huelsmann  <erik@efficito.com>  (current maintainer)
 
 LICENSE AND COPYRIGHT
        Copyright (C) 2020  Erik Huelsmann.

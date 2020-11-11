@@ -3,7 +3,7 @@ package Make;
 use strict;
 use warnings;
 
-our $VERSION = '2.002';
+our $VERSION = '2.004';
 
 use Carp qw(confess croak);
 use Config;
@@ -24,7 +24,7 @@ my %date;
 my %fs_function_map = (
     glob          => sub { glob $_[0] },
     fh_open       => sub { open my $fh, $_[0], $_[1] or die "open @_: $!"; $fh },
-    fh_write      => sub { my $fh = shift; print {$fh} @_ },
+    fh_write      => sub { my $fh = shift;                                 print {$fh} @_ },
     file_readable => sub { -r $_[0] },
     mtime         => sub { ( stat $_[0] )[9] },
 );
@@ -62,9 +62,6 @@ sub target {
         elsif ( $target =~ /^\./ ) {
             $self->{Dot}{$target} = $t;
         }
-        else {
-            $self->{Vars}{'.DEFAULT_GOAL'} ||= $target;
-        }
     }
     return $self->{Depend}{$target};
 }
@@ -91,6 +88,11 @@ sub patmatch {
     return;
 }
 
+sub in_dir {
+    my ( $file, $dir ) = @_;
+    defined $dir ? "$dir/$file" : $file;
+}
+
 sub locate {
     my ( $self, $file ) = @_;
     my $readable = $self->fsmap->{file_readable};
@@ -98,7 +100,7 @@ sub locate {
         next unless defined( my $Pat = patmatch( $key, $file ) );
         foreach my $dir ( @{ $self->{Vpath}{$key} } ) {
             ( my $maybe_file = $dir ) =~ s/%/$Pat/g;
-            return $maybe_file if $readable->($maybe_file);
+            return $maybe_file if $readable->( in_dir $maybe_file, $self->{InDir} );
         }
     }
     return;
@@ -115,10 +117,7 @@ sub dotrules {
             next unless my $r = delete $Dot->{ $f . $t };
             DEBUG and print STDERR "Pattern %$t : %$f\n";
             my $target   = $self->target( '%' . $t );
-            my @dotrules = @{ $r->rules };
-            die "Failed on pattern rule for '$f$t', too many rules"
-                if @dotrules != 1;
-            my $thisrule = $dotrules[0];
+            my $thisrule = $r->rules->[-1];             # last-specified
             die "Failed on pattern rule for '$f$t', no prereqs allowed"
                 if @{ $thisrule->prereqs };
             my $rule = Make::Rule->new( '::', [ '%' . $f ], $thisrule->recipe );
@@ -134,7 +133,7 @@ sub dotrules {
 sub date {
     my ( $self, $name ) = @_;
     unless ( exists $date{$name} ) {
-        $date{$name} = $self->fsmap->{mtime}->($name);
+        $date{$name} = $self->fsmap->{mtime}->( in_dir $name, $self->{InDir} );
     }
     return $date{$name};
 }
@@ -251,7 +250,7 @@ sub tokenize {
     my ( $string, @extrasep ) = @_;
     ## no critic ( BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
     my $pat  = join '|', '\s+', map quotemeta, @extrasep;
-    my @toks = grep length, parse_line $pat, 1, $string;
+    my @toks = grep defined && length, parse_line $pat, 1, $string;
     ## use critic
     s/\\(\s)/$1/g for @toks;
     return \@toks;
@@ -306,6 +305,7 @@ sub process_ast_bit {
         my ($tokens) = tokenize( $self->expand( $args[1] ) );
         foreach my $file (@$tokens) {
             eval {
+                $file = in_dir $file, $self->{InDir};
                 my $mf  = $self->fsmap->{fh_open}->( '<', $file );
                 my $ast = parse_makefile($mf);
                 close($mf);
@@ -325,6 +325,8 @@ sub process_ast_bit {
         my ( $targets, $kind, $prereqs, $cmnds ) = @args;
         ($prereqs) = tokenize( $self->expand($prereqs) );
         ($targets) = tokenize( $self->expand($targets) );
+        $self->{Vars}{'.DEFAULT_GOAL'} ||= $targets->[0]
+            if $targets->[0] !~ /%|^\./;
         unless ( @$targets == 1 and $targets->[0] =~ /^\.[A-Z]/ ) {
             $self->target($_) for @$prereqs;    # so "exist or can be made"
         }
@@ -414,9 +416,13 @@ sub pseudos {
 }
 
 sub find_makefile {
-    my ( $file, $extra_names, $fsmap ) = @_;
-    return $file if defined $file;
-    for ( qw(makefile Makefile), @{ $extra_names || [] } ) {
+    my ( $file, $extra_names, $fsmap, $dir ) = @_;
+    return in_dir $file, $dir if defined $file;
+    my @search = ( qw(makefile Makefile), @{ $extra_names || [] } );
+    ## no critic (BuiltinFunctions::RequireBlockMap)
+    @search = map in_dir( $_, $dir ), @search;
+    ## use critic
+    for (@search) {
         return $_ if $fsmap->{file_readable}->($_);
     }
     return;
@@ -424,7 +430,7 @@ sub find_makefile {
 
 sub parse {
     my ( $self, $file ) = @_;
-    $file = find_makefile $file, $self->{GNU} ? ['GNUmakefile'] : [], $self->fsmap;
+    $file = find_makefile $file, $self->{GNU} ? ['GNUmakefile'] : [], $self->fsmap, $self->{InDir};
     my $fh;
     if ( ref $file eq 'SCALAR' ) {
         open my $tfh, "+<", $file;
@@ -667,6 +673,11 @@ file-system. Created to help testing, but might be more widely useful.
 Defaults to code accessing the actual local filesystem. The various
 functions are expected to return real Perl filehandles. Relevant keys:
 C<glob>, C<fh_open>, C<fh_write>, C<mtime>.
+
+=head3 InDir
+
+Optional. If supplied, will be treated as the current directory instead
+of the default which is the real current directory.
 
 =head2 parse
 

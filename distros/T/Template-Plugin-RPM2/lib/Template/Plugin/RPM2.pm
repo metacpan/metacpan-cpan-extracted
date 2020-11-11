@@ -17,11 +17,11 @@ Template::Plugin::RPM2 - Template Toolkit plugin for RPM2
 
 =head1 VERSION
 
-Version 1.3.0
+Version 1.3.2
 
 =cut
 
-our $VERSION = '1.3.0';
+our $VERSION = '1.3.2';
 
 =head1 SYNOPSIS
 

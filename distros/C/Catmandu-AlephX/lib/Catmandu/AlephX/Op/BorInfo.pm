@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
-our $VERSION = "1.071";
+our $VERSION = "1.072";
 
 extends('Catmandu::AlephX::Op::BorAuth');
 with('Catmandu::AlephX::Response');

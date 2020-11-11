@@ -1,3 +1,8 @@
+0.015   2020-11-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Try to load Win32::Console::ANSI on Windows.
+
+
 0.014   2020-03-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump v to 2 to comply to Log::ger 0.037.

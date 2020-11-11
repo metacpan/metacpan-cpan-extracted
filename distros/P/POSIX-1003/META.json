@@ -51,6 +51,6 @@
          "web" : "https://github.com/markov2/perl5-POSIX-1003"
       }
    },
-   "version" : "1.00",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -29,7 +29,7 @@ sub test_unitTest : Test(4) {
     # CSS
 
     my ($rules,$bgColor) = Quiq::Html::Pygments->css;
-    $self->like($rules,qr/^\.[a-z]+/);
+    $self->like($rules,qr/^\.[a-z]+/m);
     $self->like($bgColor,qr/^#[0-9A-Fa-f]{6}/);
 
     # HTML

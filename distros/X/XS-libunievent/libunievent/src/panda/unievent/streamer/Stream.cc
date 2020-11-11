@@ -45,16 +45,23 @@ ErrorCode StreamOutput::start (const LoopSP&) {
 }
 
 ErrorCode StreamOutput::write (const string& data) {
-    stream->write(data);
+    auto wreq = stream->write(data);
+    if (!first_wreq) first_wreq = wreq;
     return {};
 }
 
-void StreamOutput::on_write (const ErrorCode& err, const WriteRequestSP&) {
+void StreamOutput::on_write (const ErrorCode& err, const WriteRequestSP& wreq) {
+    if (!handle_write_started) {
+        if (wreq != first_wreq) return;
+        handle_write_started = true;
+    }
     handle_write(err);
 }
 
 void StreamOutput::stop () {
     stream->event_listener(prev_lst);
+    first_wreq.reset();
+    handle_write_started = false;
 }
 
 }}}

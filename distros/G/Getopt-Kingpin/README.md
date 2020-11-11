@@ -139,6 +139,13 @@ The default value can be overridden with the default($value).
     # Set default value to true (1)
     my $debug = $kingpin->flag("debug", "Enable debug mode.")->default(1)->bool;
 
+The default can be set to a coderef or object overloading &{}.
+
+    my $debug = $kingpin->flag("debug", "Enable debug mode.")->default(sub {
+      my $config = read_config_files();
+      return $config->{DEBUG};
+    })->bool;
+
 ### override\_default\_from\_envar()
 
 The default value can be overridden with the override\_default\_from\_envar($envar).
@@ -196,10 +203,26 @@ Path::Tiny object.
 
 Integer value.
 
+#### num()
+
+Numeric value.
+
 #### string()
 
 String value.
 It is default type to flag.
+
+#### string\_list(), int\_list(), file\_list(), etc
+
+Allows repeated uses of a flag.
+
+    --input=customers.csv --input=customers2.csv
+
+#### string\_hash(), int\_hash(), file\_hash(), etc
+
+Allows repeated use of a flag as key-value pairs.
+
+    --define os=linux --define arch=x86_64
 
 ## arg($name, $description)
 
@@ -253,6 +276,13 @@ If define sub-command, parse() return Getopt::Kingpin::Command object;
     my $cmd = $kingpin->parse;
     printf "cmd : %s\n", $cmd;
     printf "cmd : %s\n", $cmd->name;
+
+You may also pass an arrayref to parse():
+
+    $kingpin->parse( \@arguments );
+
+An empty arrayref will not cause Kingpin to parse @ARGV like
+an empty array would.
 
 ## \_parse()
 

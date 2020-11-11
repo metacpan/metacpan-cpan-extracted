@@ -1,22 +1,6 @@
 use ExtUtils::MakeMaker;
 use Config;
 
-if($ENV{RELEASE_TESTING}) {
-    opendir(T, 't') || die("Can't read t/ directory: $!\n");
-    my @tests = grep { -f "t/$_" } readdir(T);
-    closedir(T);
-    unlink(map { "t/$_" } grep { /^XX-/ } @tests);
-    @tests = grep { $_ !~ /^XX-/ } @tests;
-    foreach my $test (@tests) {
-        open(IN, "t/$test") || die("Can't read t/$test: $!\n");
-        open(OUT, ">t/XX-$test") || die("Can't write t/XX-$test: $!\n");
-        print OUT "use Devel::Hide qw(LWP::Protocol::https);\n";
-        print OUT <IN>;
-        close(OUT);
-        close(IN);
-    }
-}
-
 WriteMakefile(
   NAME         => 'CPAN::FindDependencies',
   META_MERGE => {
@@ -28,18 +12,29 @@ WriteMakefile(
   },
   VERSION_FROM => 'lib/CPAN/FindDependencies.pm',
   EXE_FILES    => [qw(
-    examples/cpandeps
+    bin/cpandeps
+    bin/cpandeps-diff
   )],
   PREREQ_PM    => {
-    'Parse::CPAN::Packages' => 2.31,
-    'Module::CoreList'      => 2.90,
-    'YAML::Tiny'            => 1.57,
-    'LWP::UserAgent'        => 0,
-    'Scalar::Util'          => 1.14,
-    'URI::file'             => 4.13,
-    'File::Temp'            => 0.19,
+    'Archive::Tar'          => 0,
+    'Archive::Zip'          => 0,
     'Capture::Tiny'         => 0.05,
+    'CPAN::Meta'            => 0,
     'Devel::CheckOS'        => 1.52,
+    'File::Find::Rule'      => 0,
+    'File::Path'            => '2.17',
+    'File::Temp'            => 0.19,
+    'File::Type'            => 0,
+    'LWP::Protocol::https'  => 6.09,
+    'LWP::Simple'           => 0,
+    'Module::CoreList'      => '5.20200920',
+    'Parse::CPAN::Packages' => 2.31,
+    'Scalar::Util'          => 1.14,
+    'Test::Differences'     => 0,
+    'Test::More'            => 0.88, # done_testing
+    'Test::Time'            => 0,
+    'Text::Diff'            => 0,
+    'URI::file'             => 4.13,
     $^O eq 'MSWin32' ? ('Win32::Job' => 0,) : (),
   },
   dist => {

@@ -172,3 +172,16 @@ Revision history for StreamFinder
         found on Bitchute anyway!
         - StreamFinder::Youtube: Fix minor bug that sometimes returned no 
         streams.
+1.33    2020/11/01
+        - StreamFinder::Apple: Fix some icon images not being downloaded.
+        - Add StreamFinder::SermonAudio.
+        - Remove depreciated StreamFinder::Radionomy (site now defunct).
+1.34    2020/11/02
+        - Add StreamFinder::Castbox (https://castbox.fm podcasts)
+        - StreamFinder::Spreaker: Enhance to accept podcast page URLs (like 
+        other podcast-ish modules rather then just the bare widget.spreaker... 
+        URLs.  These pages also have artist and albumartist fields!  Also, 
+        properly return the total no. of streams found ($podcast->count()).
+        - "internationalize" several sites (eliminate the ".com" from the 
+        required matching regices (allow for ".eu", ".net", etc. to match").
+1.35    - Fix regex glitch breaking the sites we "internationalized" in v1.34.

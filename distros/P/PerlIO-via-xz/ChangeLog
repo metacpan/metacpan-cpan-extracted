@@ -1,0 +1,6 @@
+0.02	- 05 Nov 2020, H.Merijn Brand
+    * Fix $/ = undef (issue #1, Thank you Paul Marquess)
+    * Test $/ in more cases
+
+0.01	- 02 Oct 2020, H.Merijn Brand
+    * First release

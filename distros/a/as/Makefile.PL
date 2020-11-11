@@ -1,14 +1,67 @@
+use 5.006;
 use strict;
+use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 eval "use Devel::Required";
 
-WriteMakefile (
- NAME		=> "as",
- AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
- ABSTRACT	=> 'load OO module under another name',
- VERSION_FROM	=> 'lib/as.pm',
-
- PREREQ_PM	=> {qw(
-                    warnings::register    0
-                   )},
+my %WriteMakefileArgs = (
+    NAME             => 'as',
+    AUTHOR           => 'Elizabeth Mattijsen (liz@dijkmat.nl)',
+    VERSION_FROM     => 'lib/as.pm',
+    ABSTRACT_FROM    => 'lib/as.pm',
+    LICENSE          => 'artistic_2',
+    MIN_PERL_VERSION => '5.006',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+        'Module::Metadata' => '0',
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0',
+    },
+    PREREQ_PM => {
+        'warnings::register' => '0',
+        'Carp' => '0',
+	'strict' => '0',
+	'warnings' => '0'
+    },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'as-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/as.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/as',
+            },
+        },
+    },
+    META_ADD => {
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+    }
 );
+
+delete $WriteMakefileArgs{META_MERGE} && delete $WriteMakefileArgs{META_ADD}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
+
+# Compatibility with old versions of ExtUtils::MakeMaker
+unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
+    my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
+    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
+}
+
+unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
+    my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
+    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
+delete $WriteMakefileArgs{MIN_PERL_VERSION}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
+delete $WriteMakefileArgs{LICENSE}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+
+WriteMakefile(%WriteMakefileArgs);

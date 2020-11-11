@@ -51,6 +51,8 @@ sub test_dynamic_path : Local {
 	$c->stash( additional_template_paths => [ $c->path_to( 'alt_root' ) ] );
 }
 
+sub test_args : Local Args {}
+
 sub end : Private {
 	my ( $self, $c ) = ( shift, @_ );
 	return 1 if $c->response->status =~ /^3\d\d$/;

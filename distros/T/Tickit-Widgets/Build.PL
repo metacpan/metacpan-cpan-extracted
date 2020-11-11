@@ -10,10 +10,12 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    requires => {
-      'perl' => '5.010',
+      'perl' => '5.020', # experimental.pm; postderef
       'List::Util' => '1.33',
+      'Object::Pad' => '0.27', # BUILD block
       'Parser::MGC' => 0,
       'Struct::Dumb' => 0,
+      'Syntax::Keyword::Dynamically' => 0,
       'Tickit::Event' => '0.66', # $info->type newapi
       'Tickit::RenderBuffer' => 0,
       'Tickit::Utils' => '0.29',

@@ -12,3 +12,7 @@ Revision history for Compiled-Params-OO
 
 0.03    2020-04-14
 	- Optimize more (final)
+
+0.05    2020-04-14
+	- Update Makefile deps to require latest Type::Tiny
+	- Update Makefile meta information

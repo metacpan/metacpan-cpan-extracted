@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Scalar my $DEFAULT_TAB_LENGTH => 8;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Length of tab.
 our $TAB_LENGTH = $DEFAULT_TAB_LENGTH;
@@ -93,6 +93,7 @@ __END__
 
  use Indent::Utils qw(line_size_check reduce_duplicit_ws remove_first_ws
          remove_last_ws remove_ws string_len);
+
  line_size_check($object_with_line_size_parameter);
  reduce_duplicit_ws(\$string);
  remove_first_ws(\$string);
@@ -112,33 +113,41 @@ __END__
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<line_size_check>
 
-=item C<line_size_check($object_with_line_size_parameter)>
+ line_size_check($object_with_line_size_parameter);
 
- Line size 'line_size' parameter check.
+Line size 'line_size' parameter check.
 
-=item C<reduce_duplicit_ws($string_sr)>
+=head2 C<reduce_duplicit_ws>
 
- Reduce duplicit blank space in string to one space.
+ reduce_duplicit_ws(\$string);
 
-=item C<remove_first_ws($string_sr)>
+Reduce duplicit blank space in string to one space.
 
- Remove blank characters in begin of string.
+=head2 C<remove_first_ws>
 
-=item C<remove_last_ws($string_sr)>
+ remove_first_ws(\$string);
 
- Remove blank characters in end of string.
+Remove blank characters in begin of string.
 
-=item C<remove_ws($string_sr)>
+=head2 C<remove_last_ws>
 
- Remove white characters in begin and end of string.
+ remove_last_ws(\$string);
 
-=item C<string_len($string)>
+Remove blank characters in end of string.
 
- Gets length of string.
+=head2 C<remove_ws>
 
-=back
+ remove_ws(\$string);
+
+Remove white characters in begin and end of string.
+
+=head2 C<string_len>
+
+ my $length_of_string = string_len($string);
+
+Gets length of string.
 
 =head1 ERRORS
 
@@ -249,7 +258,7 @@ Class for word indenting.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Indent>
+L<https://github.com/michal-josef-spacek/Indent>
 
 =head1 AUTHOR
 
@@ -259,11 +268,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

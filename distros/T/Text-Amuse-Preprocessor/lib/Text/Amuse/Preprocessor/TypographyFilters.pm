@@ -164,6 +164,19 @@ sub characters {
                    endash =>  "-", # between numbers, use the hyphen
                    dash =>    "\x{2013}",
                   },
+            # like serbian
+            bg => {
+                   #  „članak o ’svicima’“
+                   ldouble => "\x{201e}",
+                   rdouble => "\x{201c}",
+                   lsingle => "\x{2019}",
+                   rsingle => "\x{2019}",
+                   apos =>    "\x{2019}",
+                   # serbian uses short dash.
+                   emdash =>  "\x{2013}",
+                   endash =>  "\x{2013}",
+                   dash =>    "\x{2014}",
+                  },
             sr => {
                    #  „članak o ’svicima’“
                    ldouble => "\x{201e}",

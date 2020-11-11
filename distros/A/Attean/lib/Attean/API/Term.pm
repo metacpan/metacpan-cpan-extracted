@@ -7,7 +7,7 @@ Attean::API::Term - RDF Terms
 
 =head1 VERSION
 
-This document describes Attean::API::Term version 0.026
+This document describes Attean::API::Term version 0.027
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ Returns a string serialization of the term.
 
 =cut
 
-package Attean::API::Term 0.026 {
+package Attean::API::Term 0.027 {
 	use Moo::Role;
 	
 	with 'Attean::API::TermOrVariable', 'Attean::API::ResultOrTerm';
@@ -105,7 +105,7 @@ Returns true if the term has a true SPARQL "effective boolean value", false othe
 	}
 }
 
-package Attean::API::Literal 0.026 {
+package Attean::API::Literal 0.027 {
 	use IRI;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Maybe Str ConsumerOf);
@@ -152,6 +152,8 @@ package Attean::API::Literal 0.026 {
 			my $type	= $dt->value;
 			if ($type =~ qr<^http://www[.]w3[.]org/2001/XMLSchema#(?:integer|decimal|float|double|non(?:Positive|Negative)Integer|(?:positive|negative)Integer|long|int|short|byte|unsigned(?:Long|Int|Short|Byte))$>) {
 				Moo::Role->apply_roles_to_object($self, 'Attean::API::NumericLiteral');
+			} elsif ($type eq 'http://www.w3.org/2001/XMLSchema#boolean') {
+				Moo::Role->apply_roles_to_object($self, 'Attean::API::BooleanLiteral');
 			} elsif ($type eq 'http://www.w3.org/2001/XMLSchema#dateTime') {
 				Moo::Role->apply_roles_to_object($self, 'Attean::API::DateTimeLiteral');
 			}
@@ -289,7 +291,7 @@ package Attean::API::Literal 0.026 {
 	};
 }
 
-package Attean::API::DateTimeLiteral 0.026 {
+package Attean::API::DateTimeLiteral 0.027 {
 	use DateTime::Format::W3CDTF;
 
 	use Moo::Role;
@@ -301,12 +303,31 @@ package Attean::API::DateTimeLiteral 0.026 {
 	}
 }
 
-package Attean::API::CanonicalizingLiteral 0.026 {
+package Attean::API::CanonicalizingLiteral 0.027 {
 	use Moo::Role;
 	requires 'canonicalized_term';
 }
 
-package Attean::API::NumericLiteral 0.026 {
+package Attean::API::BooleanLiteral 0.027 {
+	use Scalar::Util qw(blessed looks_like_number);
+
+	use Moo::Role;
+
+	sub canonicalized_term {
+		my $self	= shift;
+		my $value	= $self->value;
+		if ($value =~ m/^(true|false|0|1)$/) {
+			return ($value eq 'true' or $value eq '1')
+				? Attean::Literal->true
+				: Attean::Literal->false;
+		} else {
+			die "Bad lexical form for xsd:boolean: '$value'";
+		}
+	}
+	with 'Attean::API::Literal', 'Attean::API::CanonicalizingLiteral';
+}
+
+package Attean::API::NumericLiteral 0.027 {
 	use Scalar::Util qw(blessed looks_like_number);
 
 	use Moo::Role;
@@ -338,6 +359,14 @@ package Attean::API::NumericLiteral 0.026 {
 			} else {
 				die "Bad lexical form for xsd:integer: '$value'";
 			}
+		} elsif ($type eq 'negativeInteger') {
+			if ($value =~ m/^-(\d+)$/) {
+				my $num		= $1;
+				$num		=~ s/^0+(\d)/$1/;
+				return Attean::Literal->new(value => "-${num}", datatype => 'http://www.w3.org/2001/XMLSchema#negativeInteger');
+			} else {
+				die "Bad lexical form for xsd:integer: '$value'";
+			}
 		} elsif ($type eq 'decimal') {
 			if ($value =~ m/^([-+])?((\d+)([.]\d*)?)$/) {
 				my $sign	= $1 || '';
@@ -346,7 +375,7 @@ package Attean::API::NumericLiteral 0.026 {
 				my $frac	= $4;
 				$sign		= '' if ($sign eq '+');
 				$num		=~ s/^0+(.)/$1/;
-				$num		=~ s/[.](\d)0+$/.$1/;
+				$num		=~ s/[.](\d+)0+$/.$1/;
 				if ($num =~ /^[.]/) {
 					$num	= "0$num";
 				}
@@ -389,6 +418,14 @@ package Attean::API::NumericLiteral 0.026 {
 			} else {
 				die "Bad lexical form for xsd:float: '$value'";
 			}
+		} elsif ($type eq 'boolean') {
+			if ($value =~ m/^(true|false|0|1)$/) {
+				return ($value eq 'true' or $value eq '1')
+					? Attean::Literal->true
+					: Attean::Literal->false;
+			} else {
+				die "Bad lexical form for xsd:boolean: '$value'";
+			}
 		} elsif ($type eq 'double') {
 			if ($value =~ m/^(?:([-+])?(?:(\d+(?:\.\d*)?|\.\d+)([Ee][-+]?\d+)?|(INF)))|(NaN)$/) {
 				my $sign	= $1;
@@ -415,6 +452,8 @@ package Attean::API::NumericLiteral 0.026 {
 			} else {
 				die "Bad lexical form for xsd:double: '$value'";
 			}
+		} else {
+			warn "No canonicalization for type $type";
 		}
 		return $self;
 	}
@@ -497,7 +536,7 @@ package Attean::API::NumericLiteral 0.026 {
 	with 'Attean::API::Literal', 'Attean::API::CanonicalizingLiteral';
 }
 
-package Attean::API::Blank 0.026 {
+package Attean::API::Blank 0.027 {
 	use Scalar::Util qw(blessed);
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
@@ -523,7 +562,7 @@ package Attean::API::Blank 0.026 {
 	}
 }
 
-package Attean::API::IRI 0.026 {
+package Attean::API::IRI 0.027 {
 	use IRI;
 	use Scalar::Util qw(blessed);
 	use AtteanX::SPARQL::Constants;
@@ -593,7 +632,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams.
+Copyright (c) 2014--2020 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

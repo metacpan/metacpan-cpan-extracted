@@ -15,14 +15,16 @@ name: Data-NFA
 provides:
   Data::NFA:
     file: lib/Data/NFA.pm
-    version: '20200623'
+    version: '20201031'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20200418'
+  Data::Table::Text: '20201029'
   Test2::API: '0'
   Test::More: '0'
 resources:
+  bugtracker: https://github.com/philiprbrenan/DataNFA/issues
   license: http://dev.perl.org/licenses/
-version: '20200623'
+  repository: https://github.com/philiprbrenan/DataNFA
+version: '20201031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

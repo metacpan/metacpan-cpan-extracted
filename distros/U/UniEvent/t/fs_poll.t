@@ -21,7 +21,6 @@ subtest 'non-existant file' => sub {
     check_call_cnt(1);
 };
 
-=x
 subtest 'file appears' => sub {
     my $h = new UniEvent::FsPoll;
     $h->start(var 'file', 0.01);
@@ -121,7 +120,6 @@ subtest 'event listener' => sub {
     $l->run;
     is $cnt, 1111, "listener&event called";
 };
-=cut
 
 done_testing();
 
@@ -143,9 +141,9 @@ sub check_appears {
         ok(!$err, "fspoll callback without error ($name)");
         $prev->[STAT_TYPE] = $curr->[STAT_TYPE] = 0;
         my $prev_sum = 0;
-        $prev_sum += $_ for @$prev;
+        $prev_sum += $_ // 0 for @$prev;
         my $curr_sum = 0;
-        $curr_sum += $_ for @$curr;
+        $curr_sum += $_ // 0 for @$curr;
         is($prev_sum, 0, "fspoll callback prev is empty ($name)");
         cmp_ok($curr_sum, '>', 0, "fspoll callback curr is not empty ($name)");
         $call_cnt++;

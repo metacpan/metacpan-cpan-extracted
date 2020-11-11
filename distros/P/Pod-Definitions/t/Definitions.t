@@ -38,6 +38,10 @@ use Test::More;
     ok (scalar keys %{$p->sections()}, 'POD has sections');
     ok (scalar @{$p->sections->{Methods}} > 5, 'POD has six or more sections');
 
+    ok (ref $p->sections('Methods') eq 'ARRAY', '"Methods" section exists');
+    ok ($p->sections('Methods')->[0]->{sequence} >= 0, 'Headings have sequence numbers');
+    ok ($p->sections('Methods')->[0]->{sequence} < $p->sections('Methods')->[1]->{sequence}, 'Heading sequence numbers are incremented');
+
     my $found_parse = 0;
     foreach my $section ( @{$p->sections->{Methods}} ) {
         $found_parse = 1 if ($section->{cooked} eq 'parse_file');

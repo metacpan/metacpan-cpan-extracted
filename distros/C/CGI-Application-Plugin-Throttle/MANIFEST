@@ -1,13 +1,20 @@
-lib/CGI/Application/Plugin/Throttle.pm
 ChangeLog
 LICENSE
-Makefile.PL
 MANIFEST
+Makefile.PL
 README.md
-META.yml
+lib/CGI/Application/Plugin/Throttle.pm
 t/00-load.t
-t/manifest.t
-t/pod.t
-t/style-no-tabs.t
-t/style-no-trailing-whitespace.t
-t/test-strict.t
+t/11-get_keys-default.t
+t/11-get_keys-list.t
+t/11-get_keys-undef.t
+t/12-get_rule.t
+t/90-callback-integration.t
+t/90-simple-integration.t
+xt/manifest.t
+xt/pod.t
+xt/style-no-tabs.t
+xt/style-no-trailing-whitespace.t
+xt/test-strict.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

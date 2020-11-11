@@ -12,4 +12,7 @@
 ^_build/
 ^MYMETA.yml$
 ^MYMETA.json$
+^MYMETA.json.lock$
 ^perltidy.LOG$
+^bitbucket-pipelines.yml$
+^cover_db/

@@ -1,0 +1,13 @@
+Revision history for Mojolicious-Plugin-EmailMailer
+
+0.4.0 ????-??-??
+
+0.3.0 2020-10-28
+	- ⬆️ — Upgrade min version of Mojolicious to 8.36
+	- 🐛🍓 — Fix test for strawberry perl
+
+0.2.0 2020-10-27
+	- ⬆️ — Upgrade min version of Email::Mailer to 1.15
+
+0.1.0 2020-09-14
+	- 🎉 — Initial version

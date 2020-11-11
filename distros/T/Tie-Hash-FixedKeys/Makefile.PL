@@ -3,11 +3,11 @@ require 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Tie::Hash::FixedKeys',
   'VERSION_FROM' => 'lib/Tie/Hash/FixedKeys.pm',
   'PREREQ_PM' => {},
-  'INSTALLDIRS' => 'site',
+  'NAME' => 'Tie::Hash::FixedKeys',
+  'PL_FILES' => {},
   'EXE_FILES' => [],
-  'PL_FILES' => {}
+  'INSTALLDIRS' => 'site'
 )
 ;

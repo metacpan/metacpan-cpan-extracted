@@ -1,7 +1,9 @@
 package Text::Table::HTML::DataTables;
 
-our $DATE = '2020-09-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-08'; # DATE
+our $DIST = 'Text-Table-HTML-DataTables'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +21,7 @@ sub _escape_uri {
 
 sub table {
     require File::ShareDir;
+    require JSON::PP;
 
     my %params = @_;
     my $rows = $params{rows} or die "Must provide rows!";
@@ -33,10 +36,19 @@ sub table {
     # load css/js
     push @table, "<html>\n";
     push @table, "<head>\n";
-    push @table, qq(<link rel="stylesheet" type="text/css" href="file://)._escape_uri("$dist_dir/datatables-1.10.13/css/jquery.dataTables.min.css").qq(">\n);
+
+    push @table, qq(<link rel="stylesheet" type="text/css" href="file://)._escape_uri("$dist_dir/datatables-1.10.22/datatables.css").qq(">\n);
     push @table, qq(<script src="file://)._escape_uri("$dist_dir/jquery-2.2.4/jquery-2.2.4.min.js").qq("></script>\n);
-    push @table, qq(<script src="file://)._escape_uri("$dist_dir/datatables-1.10.13/js/jquery.dataTables.min.js").qq("></script>\n);
-    push @table, '<script>$(document).ready(function() { $("table").DataTable(); });</script>'."\n\n";
+    push @table, qq(<script src="file://)._escape_uri("$dist_dir/datatables-1.10.22/datatables.js").qq("></script>\n);
+
+    push @table, '<script>';
+    my $dt_opts = {
+        dom => 'lQfrtip',
+        buttons => ['colvis', 'print'],
+    };
+    push @table, 'var dt_opts = ', JSON::PP::encode_json($dt_opts), '; ';
+    push @table, '$(document).ready(function() { $("table").DataTable(dt_opts); });';
+    push @table, '</script>'."\n\n";
     push @table, "</head>\n\n";
 
     push @table, "<body>\n";
@@ -109,7 +121,7 @@ Text::Table::HTML::DataTables - Generate HTML table with jQuery and DataTables p
 
 =head1 VERSION
 
-This document describes version 0.003 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2020-09-09.
+This document describes version 0.007 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2020-11-08.
 
 =head1 SYNOPSIS
 
@@ -132,7 +144,20 @@ load jQuery (L<http://jquery.com>) and the DataTables plugin
 (L<http://datatables.net>) from the local filesystem (distribution shared
 directory), so you can filter and sort the table in the browser.
 
-The example shown in the SYNOPSIS generates the following table:
+The datatables bundled in this distribution has the following characteristics:
+
+=over
+
+=item * Support negative search using dash prefix syntax ("-foo") a la Google
+
+To search for table rows that contain "foo", "bar" (in no particular order) and
+not "baz", you can enter in the search box:
+
+ foo bar -baz
+
+=back
+
+The example shown in the SYNOPSIS generates HTML code like the following:
 
  <link rel="stylesheet" type="text/css" href="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.13/css/jquery.dataTables.min.css">
  <script src="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/jquery-2.2.4/jquery-2.2.4.min.js"></script>
@@ -190,6 +215,8 @@ feature.
 L<Text::Table::HTML>
 
 See also L<Bencher::Scenario::TextTableModules>.
+
+L<https://datatables.net>
 
 =head1 AUTHOR
 

@@ -34,7 +34,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Sub::SymMethod" => { file => "lib/Sub/SymMethod.pm", version => 0.004 },
+                        "Sub::SymMethod" => { file => "lib/Sub/SymMethod.pm", version => 0.005 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -50,7 +50,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/project",
                       },
-  "version"        => 0.004,
+  "version"        => 0.005,
 };
 
 my %dynamic_config;
@@ -64,7 +64,7 @@ $got_sub_name++ if eval { require Sub::Util; Sub::Util->can('set_subname') };
 $got_sub_name++ if eval { require Sub::Name; Sub::Name->can('subname') };
 
 if (!$got_sub_name) {
-	$meta->{prereqs}{runtime}{requires}{'Sub::Name'} = 1.40;
+	$meta->{prereqs}{runtime}{requires}{'Sub::Util'} = 1.40;
 }
 
 };

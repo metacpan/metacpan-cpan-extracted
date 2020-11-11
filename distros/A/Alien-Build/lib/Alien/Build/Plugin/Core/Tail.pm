@@ -6,7 +6,7 @@ use 5.008004;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core tail setup plugin
-our $VERSION = '2.33'; # VERSION
+our $VERSION = '2.37'; # VERSION
 
 
 sub init
@@ -33,7 +33,7 @@ Alien::Build::Plugin::Core::Tail - Core tail setup plugin
 
 =head1 VERSION
 
-version 2.33
+version 2.37
 
 =head1 SYNOPSIS
 

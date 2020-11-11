@@ -21,7 +21,7 @@ use Carp;
 
 use Ogg::Vorbis::Header::PurePerl;
 
-our $VERSION = '1.5.2';
+our $VERSION = '1.5.3';
 
 my %data = (artist => 'ARTIST',
             title  => 'TITLE',

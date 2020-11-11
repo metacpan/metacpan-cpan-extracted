@@ -1,5 +1,5 @@
 #pragma once
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <panda/protocol/http.h>
 
 using namespace panda;

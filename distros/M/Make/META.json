@@ -33,6 +33,7 @@
       },
       "develop" : {
          "requires" : {
+            "Perl::Tidy" : "20200822",
             "Test::Code::TidyAll" : "0.41",
             "Test::Perl::Critic" : "1.02",
             "Test::Pod" : "1.00",
@@ -71,6 +72,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl"
    },
-   "version" : "2.002",
+   "version" : "2.004",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

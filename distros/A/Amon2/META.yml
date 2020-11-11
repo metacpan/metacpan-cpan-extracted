@@ -27,7 +27,7 @@ no_index:
 provides:
   Amon2:
     file: lib/Amon2.pm
-    version: '6.14'
+    version: '6.15'
   Amon2::Config::Simple:
     file: lib/Amon2/Config/Simple.pm
   Amon2::ContextGuard:
@@ -72,13 +72,13 @@ provides:
     file: lib/Amon2/Setup/Flavor.pm
   Amon2::Setup::Flavor::Basic:
     file: lib/Amon2/Setup/Flavor/Basic.pm
-    version: '6.14'
+    version: '6.15'
   Amon2::Setup::Flavor::Large:
     file: lib/Amon2/Setup/Flavor/Large.pm
-    version: '6.14'
+    version: '6.15'
   Amon2::Setup::Flavor::Minimum:
     file: lib/Amon2/Setup/Flavor/Minimum.pm
-    version: '6.14'
+    version: '6.15'
   Amon2::Setup::VC::Git:
     file: lib/Amon2/Setup/VC/Git.pm
   Amon2::Trigger:
@@ -117,7 +117,6 @@ requires:
   Hash::MultiValue: '0'
   JSON: '2'
   MIME::Base64: '0'
-  MRO::Compat: '0'
   Module::CPANfile: '0.9020'
   Plack: '0.9982'
   Plack::Request: '0'
@@ -133,13 +132,14 @@ requires:
   URI: '1.54'
   URI::Escape: '0'
   URI::QueryParam: '0'
+  mro: '0'
   parent: '0.223'
-  perl: '5.008001'
+  perl: '5.010000'
 resources:
   bugtracker: https://github.com/tokuhirom/Amon/issues
   homepage: https://github.com/tokuhirom/Amon
   repository: git://github.com/tokuhirom/Amon.git
-version: '6.14'
+version: '6.15'
 x_contributors:
   - 'Adrian <adrian@investometrica.com>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'

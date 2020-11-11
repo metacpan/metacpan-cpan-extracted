@@ -1,9 +1,9 @@
 package Tables::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2020-11-10'; # DATE
 our $DIST = 'TablesRoles-Standard'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ Tables::DBI - Get table data from DBI
 
 =head1 VERSION
 
-This document describes version 0.003 of Tables::DBI (from Perl distribution TablesRoles-Standard), released on 2020-06-01.
+This document describes version 0.006 of Tables::DBI (from Perl distribution TablesRoles-Standard), released on 2020-11-10.
 
 =head1 SYNOPSIS
 

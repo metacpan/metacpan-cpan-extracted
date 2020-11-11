@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/OfficeUtils.pm','script/doc2txt','script/xls2csv'];
+my $filenames = ['lib/App/OfficeUtils.pm','script/doc2txt'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

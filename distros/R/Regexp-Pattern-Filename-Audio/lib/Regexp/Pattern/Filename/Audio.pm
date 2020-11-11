@@ -1,9 +1,9 @@
 package Regexp::Pattern::Filename::Audio;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Audio'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ Regexp::Pattern::Filename::Audio - Audio filename
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Audio (from Perl distribution Regexp-Pattern-Filename-Audio), released on 2020-04-01.
+This document describes version 0.002 of Regexp::Pattern::Filename::Audio (from Perl distribution Regexp-Pattern-Filename-Audio), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,13 @@ Examples:
 
 No extension.
 
- "foo" =~ re("Filename::Audio::filename_audio");  # doesn't match
+ "foo" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
 
 Not an extension.
 
- "mp3" =~ re("Filename::Audio::filename_audio");  # doesn't match
+ "mp3" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
+
+Example #3.
 
  "foo.mp3" =~ re("Filename::Audio::filename_audio");  # matches
 
@@ -80,9 +82,11 @@ Case insensitive.
 
 Regex is anchored.
 
- "foo.mp3 is the file" =~ re("Filename::Audio::filename_audio");  # doesn't match
+ "foo.mp3 is the file" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
 
- "foo.mp4" =~ re("Filename::Audio::filename_audio");  # doesn't match
+Example #6.
+
+ "foo.mp4" =~ re("Filename::Audio::filename_audio");  # DOESN'T MATCH
 
 =back
 
@@ -104,9 +108,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Filename::Audio>
+
 L<Regexp::Pattern>
 
-L<Filename::Audio>
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
 
 =head1 AUTHOR
 

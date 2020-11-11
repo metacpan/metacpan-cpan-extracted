@@ -63,11 +63,9 @@ lib/Comics/Plugin/MonkeyUser.pm
 lib/Comics/Plugin/Monty.pm
 lib/Comics/Plugin/MrLovenstein.pm
 lib/Comics/Plugin/MyJetpack.pm
-lib/Comics/Plugin/NickScipio.pm
 lib/Comics/Plugin/NonSequitur.pm
 lib/Comics/Plugin/Nozzman.pm
 lib/Comics/Plugin/OffTheMark.pm
-lib/Comics/Plugin/Oglaf.pm
 lib/Comics/Plugin/Optipess.pm
 lib/Comics/Plugin/OrderOfTheStick.pm
 lib/Comics/Plugin/OverTheHedge.pm
@@ -88,7 +86,6 @@ lib/Comics/Plugin/Russmo.pm
 lib/Comics/Plugin/S1ngle.pm
 lib/Comics/Plugin/SMBC.pm
 lib/Comics/Plugin/SavageChickens.pm
-lib/Comics/Plugin/SexyLosers.pm
 lib/Comics/Plugin/Sigmund.pm
 lib/Comics/Plugin/Sinfest.pm
 lib/Comics/Plugin/SlackWyrm.pm

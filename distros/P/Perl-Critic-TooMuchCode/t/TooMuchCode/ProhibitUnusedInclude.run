@@ -12,6 +12,29 @@ print 42;
 use File::Spec;
 print 42;
 
+
+## name File::Which is used
+## failures 0
+## cut
+
+use File::Which;
+my $prog = which('ls');
+
+## name File::Which is unused
+## failures 1
+## cut
+
+use File::Which;
+my $prog = "/bin/ls";
+
+## TODO File::Which used in 'constant'
+## failures 0
+## cut
+
+use File::Which;
+use constant PROG => which("ls");
+print "ls is: " . PROg;
+
 ## name Try::Tiny
 ## failures 1
 ## cut

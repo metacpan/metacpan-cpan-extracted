@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use lib "../lib";
 use MsOffice::Word::Surgeon;
 
 (my $dir = $0) =~ s[msoffice-word-surgeon.t$][];
@@ -42,11 +41,4 @@ like $test_tabs, qr/starts\twith an\tinitial TAB, and also has\tmany internal TA
   "TABS were preserved";
 
 
-
-
 done_testing();
-
-# $surgeon->contents($new_xml);
-# print $surgeon->indented_contents;
-
-# $surgeon->save_as("foo.docx");

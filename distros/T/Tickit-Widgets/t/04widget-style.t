@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -10,11 +10,11 @@ use Tickit::Test;
 
 use Tickit::Widget;
 
+use Object::Pad 0.09;
+
 my $win = mk_window;
 
-package StyledWidget;
-
-use base qw( Tickit::Widget );
+class StyledWidget extends Tickit::Widget;
 use Tickit::Style;
 
 # Needs declarative code
@@ -36,42 +36,41 @@ BEGIN {
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub cols  { 1 }
-sub lines { 1 }
+method cols  { 1 }
+method lines { 1 }
 
 my $RENDERED;
-sub render_to_rb { $RENDERED++ }
+method render_to_rb { $RENDERED++ }
 
 my $RESHAPED;
-sub reshape { $RESHAPED++ }
+method reshape { $RESHAPED++ }
 
 my %style_changed_values;
-sub on_style_changed_values
+method on_style_changed_values
 {
-   shift;
    %style_changed_values = @_;
 }
 
-package StyledWidget::Subclass;
-use base qw( StyledWidget );
-
-package StyledWidget::StyledSubclass;
-use base qw( StyledWidget );
-use Tickit::Style -blank;
-
-BEGIN {
-   style_definition base =>
-      fg => 7;
+class StyledWidget::Subclass extends StyledWidget {
 }
 
-package StyledWidget::CopiedSubclass;
-use base qw( StyledWidget );
-use Tickit::Style -copy;
+class StyledWidget::StyledSubclass extends StyledWidget {
+   use Tickit::Style -blank;
 
-BEGIN {
-   # Change just one thing
-   style_definition base =>
-      text => "Altered world";
+   BEGIN {
+      style_definition base =>
+         fg => 7;
+   }
+}
+
+class StyledWidget::CopiedSubclass extends StyledWidget {
+   use Tickit::Style -copy;
+
+   BEGIN {
+      # Change just one thing
+      style_definition base =>
+         text => "Altered world";
+   }
 }
 
 package main;
@@ -293,6 +292,23 @@ EOF
    is( $widget->get_style_values( "text" ),
        "Altered world",
        'widget subclass as -copy has altered text' );
+}
+
+# A * widget type sits below all
+{
+   Tickit::Style->load_style( <<'EOF' );
+   *.red {
+      bg: "red";
+   }
+   * {
+      u: true;
+   }
+EOF
+
+   my $widget = StyledWidget->new( class => "red" );
+
+   is_deeply( { $widget->get_style_pen->getattrs }, { fg => 4, bg => 1, u => 1 },
+      'style pen for default with wildcard' );
 }
 
 done_testing;

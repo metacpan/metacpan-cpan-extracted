@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.33
+    version 2.37
 
 SYNOPSIS
 
@@ -327,6 +327,32 @@ PROPERTIES
       The stage directory where files will be copied. This is usually the
       root of the blib share directory.
 
+    system_probe_class
+
+      After the probe step this property may contain the plugin class that
+      performed the system probe. It shouldn't be filled in directly by the
+      plugin (instead if should use the hook property probe_class, see
+      below). This is optional, and not all probe plugins will provide this
+      information.
+
+    system_probe_instance_id
+
+      After the probe step this property may contain the plugin instance id
+      that performed the system probe. It shouldn't be filled in directly
+      by the plugin (instead if should use the hook property
+      probe_instance_id, see below). This is optional, and not all probe
+      plugins will provide this information.
+
+ plugin_instance_prop
+
+     my $href = $build->plugin_instance_prop($plugin);
+
+    This returns the private plugin instance properties for a given plugin.
+    This method should usually only be called internally by plugins
+    themselves to keep track of internal state. Because the content can be
+    used arbitrarily by the owning plugin because it is private to the
+    plugin, and thus is not part of the Alien::Build spec.
+
  runtime_prop
 
      my $href = $build->runtime_prop;
@@ -445,6 +471,19 @@ PROPERTIES
       Probe and PkgConfig plugins may set this property indicating the
       version of the alienized package. Not all plugins and configurations
       may be able to provide this.
+
+    probe_class (probe)
+
+      Probe and PkgConfig plugins may set this property indicating the
+      plugin class that made the probe. If the probe results in a system
+      install this will be propagated to system_probe_class for later use.
+
+    probe_instance_id (probe)
+
+      Probe and PkgConfig plugins may set this property indicating the
+      plugin instance id that made the probe. If the probe results in a
+      system install this will be propagated to system_probe_instance_id
+      for later use.
 
 METHODS
 

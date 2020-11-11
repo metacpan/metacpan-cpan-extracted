@@ -7,7 +7,7 @@ package Comics::Plugin::CSectionComicsBonus;
 
 use parent qw(Comics::Fetcher::Cascade);
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 our $name    = "C-Section Comics";
 
@@ -44,7 +44,7 @@ our @patterns =
 	   src="?(?<url>https?://.*?.csectioncomics.com/csectioncomics/
 		       wp-content/uploads/\d+/\d+/
 		       (?<image>.*?\.\w+))"? \s+
-	   alt="(?<alt>.*?)" \s+
+	   alt(?:="(?<alt>.*?)" \s+)?
       }six,
    );
 

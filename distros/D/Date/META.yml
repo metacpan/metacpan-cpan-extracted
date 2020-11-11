@@ -4,25 +4,25 @@ author:
   - unknown
 build_requires:
   Export::XS: v3.0.5
-  Test::Catch: v1.0.13
+  Test::Catch: v1.0.14
   Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::Framework: v1.3.2
-  XS::libcatch: v2.12.1
-  XS::libpanda: v1.4.0
+  XS::Framework: v1.3.3
+  XS::libcatch: v2.12.1.1
+  XS::libpanda: v1.4.10
   next::XS: v1.0.7
 configure_requires:
   Export::XS: v3.0.5
-  Test::Catch: v1.0.13
-  XS::Framework: v1.3.2
-  XS::Install: v1.2.17
-  XS::libcatch: v2.12.1
-  XS::libpanda: v1.4.0
+  Test::Catch: v1.0.14
+  XS::Framework: v1.3.3
+  XS::Install: v1.2.21
+  XS::libcatch: v2.12.1.1
+  XS::libpanda: v1.4.10
   next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,9 +34,9 @@ no_index:
     - inc
 requires:
   Export::XS: v3.0.5
-  XS::Framework: v1.3.2
-  XS::Install: v1.2.17
-  XS::libpanda: v1.4.0
+  XS::Framework: v1.3.3
+  XS::Install: v1.2.21
+  XS::libpanda: v1.4.10
   next::XS: v1.0.7
-version: v5.2.0
+version: v5.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,106 @@
+{
+   "abstract" : "Perl client for Playwright",
+   "author" : [
+      "George S. Baugh <george@troglodyne.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Playwright",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Async" : "0",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurper" : "0",
+            "File::Which" : "0",
+            "File::pushd" : "0",
+            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "1.33",
+            "Moo" : "1.005",
+            "Net::EmptyPort" : "0",
+            "Sub::Install" : "0",
+            "feature" : "0",
+            "perl" : "5.010",
+            "sigtrap" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Tools::Explain" : "0",
+            "Test2::V0" : "0",
+            "Test::Mock::Cmd" : "0",
+            "Test::MockFile" : "0",
+            "Test::MockModule" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Playwright" : {
+         "file" : "lib/Playwright.pm",
+         "version" : "0.001"
+      },
+      "Playwright::Base" : {
+         "file" : "lib/Playwright/Base.pm",
+         "version" : "0.001"
+      },
+      "Playwright::Util" : {
+         "file" : "lib/Playwright/Util.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/teodesian/playwright-perl/issues"
+      },
+      "homepage" : "https://github.com/teodesian/playwright-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/teodesian/playwright-perl.git",
+         "web" : "https://github.com/teodesian/playwright-perl"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21"
+}
+

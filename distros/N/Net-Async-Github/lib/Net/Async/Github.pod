@@ -107,6 +107,24 @@ Expects the following named parameters:
 
 Resolves to the current status.
 
+=head2 create_pr
+
+Creates a new pull request.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<head> - head commit starting point, typically the latest commit on your fork's branch
+
+=item * C<base> - base commit this PR applies changes to typically you'd want the target repo C<master>
+
+=back
+
 =head2 user
 
 Returns information about the given user.

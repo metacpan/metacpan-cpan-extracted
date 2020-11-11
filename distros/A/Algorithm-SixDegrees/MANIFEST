@@ -14,3 +14,4 @@ t/simple-1source.t
 t/simple-2source.t
 t/simple-2source-args.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json

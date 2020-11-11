@@ -19,11 +19,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::Apple;
 
-	my $podcast = new StreamFinder::Apple(<url>);
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $podcast = new StreamFinder::Apple($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($podcast);
 
@@ -418,12 +422,22 @@ sub new
 	my ($pre, $post) = split(/\"included\"\:/, $html, 2);
 	$html = '';
 	return undef  unless ($pre && $post);
+
 	$self->{'iconurl'} = ($pre =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
+	if ($self->{'iconurl'} !~ /^http/) {
+		$self->{'iconurl'} = ($pre =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : '';
+	}
 	$self->{'imageurl'} = $self->{'iconurl'};
 	if ($pre =~ m#\<span\s+class\=\"product\-header\_\_identity(.+)?\<\/span\>#s) {
 		my $span = $1;
-		$self->{'artist'} = $1  if ($span =~ m#\"\>\s*([^\<]+)\<\/#s);
+		#x $self->{'artist'} = $1  if ($span =~ m#\"\>\s*([^\<]+)\<\/#s);
+		$self->{'artist'} = $1  if ($span =~ m#\>\s*([^\<]+)\<\/a#s);
 		$self->{'artist'} =~ s/\s+$//;
+		$self->{'albumartist'} = $1  if ($span =~ m#href\=\"([^\"]+)\"\s+class\=\"link#is);
+	}
+	if ($pre =~ m#\s+Copyright\s+([^\<]+)#s) {
+		$self->{'album'} = $1;
+		$self->{'album'} =~ s/\s+$//s;
 	}
 	if ($pre =~ m#\"assetUrl\"\:\"([^\"]+)\"#s) {   #INVIDUAL EPISODE:
 		print STDERR "---EPISODE---\n"  if ($DEBUG);

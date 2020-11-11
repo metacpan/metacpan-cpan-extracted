@@ -1,9 +1,9 @@
 package Regexp::Pattern::Filename::Backup;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Backup'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Regexp::Pattern::Filename::Backup - Backup filename
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Backup (from Perl distribution Regexp-Pattern-Filename-Backup), released on 2020-04-01.
+This document describes version 0.002 of Regexp::Pattern::Filename::Backup (from Perl distribution Regexp-Pattern-Filename-Backup), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -69,11 +69,13 @@ Examples:
 
 No extension.
 
- "foo" =~ re("Filename::Backup::filename_backup");  # doesn't match
+ "foo" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
 
 Not an extension.
 
- "gz" =~ re("Filename::Backup::filename_backup");  # doesn't match
+ "gz" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
+
+Example #3.
 
  "foo~" =~ re("Filename::Backup::filename_backup");  # matches
 
@@ -83,9 +85,11 @@ Case insensitive.
 
 Regex is anchored.
 
- "foo.old is the file" =~ re("Filename::Backup::filename_backup");  # doesn't match
+ "foo.old is the file" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
 
- "foo.txt" =~ re("Filename::Backup::filename_backup");  # doesn't match
+Example #6.
+
+ "foo.txt" =~ re("Filename::Backup::filename_backup");  # DOESN'T MATCH
 
 =back
 
@@ -107,9 +111,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Filename::Backup>
+
 L<Regexp::Pattern>
 
-L<Filename::Backup>
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
 
 =head1 AUTHOR
 

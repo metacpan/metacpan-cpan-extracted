@@ -75,6 +75,27 @@ sub call_api1 {
     return $self->{'transporter'}->request( $self, $req );
 }
 
+#----------------------------------------------------------------------
+
+=head2 I<OBJ>->call_cpanel_uapi( $USERNAME, $MODULE_NAME, $FUNCTION_NAME, \%ARGUMENTS )
+
+Like C<call_api1()> but calls cPanel UAPI from a WHM connection.
+Its eventual yield will be a L<cPanel::APIClient::Response::UAPI>
+instance.
+
+=cut
+
+sub call_cpanel_uapi {
+    my ( $self, $cpusername, $mod, $func, $args_hr, $metaargs_hr ) = @_;
+
+    require cPanel::APIClient::Request::UAPIFromWHM1;
+    my $req = cPanel::APIClient::Request::UAPIFromWHM1->new( $cpusername, $mod, $func, $args_hr, $metaargs_hr );
+
+    return $self->{'transporter'}->request( $self, $req );
+}
+
+#----------------------------------------------------------------------
+
 # left undocumented since unneeded
 sub get_https_port {
     return $_PORT;

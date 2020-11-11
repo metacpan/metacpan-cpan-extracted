@@ -27,13 +27,13 @@ optional_features: {}
 provides:
   MooX::Press:
     file: lib/MooX/Press.pm
-    version: '0.082'
+    version: '0.083'
   MooX::Press::Keywords:
     file: lib/MooX/Press/Keywords.pm
-    version: '0.082'
+    version: '0.083'
   Zydeco::Lite:
     file: lib/Zydeco/Lite.pm
-    version: '0.082'
+    version: '0.083'
 recommends:
   Moose: '2.12'
   MooseX::NonMoose: '0'
@@ -57,5 +57,5 @@ resources:
   homepage: https://metacpan.org/release/MooX-Press
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-press.git
-version: '0.082'
+version: '0.083'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

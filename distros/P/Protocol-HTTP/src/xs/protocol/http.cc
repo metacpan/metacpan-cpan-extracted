@@ -39,8 +39,20 @@ static void fill(Request::Form& form, Array& arr, Request::EncType enc_type)  {
         size_t last = even ? arr.size() - 1 : arr.size() - 2;
         for(size_t i = 0; i < last; i += 2) {
             string key = arr.at(i).as_string();
-            string val = arr.at(i + 1).as_string();
-            form.add(key, val);
+            auto value = arr.at(i +1);
+            if (value.is_simple()) {
+                form.add(key, value.as_string());
+            }
+            else if(value.is_array_ref()) {
+                auto values = Array(value);
+                if (values.size() != 3) {
+                    string err = "invalid file fieild '";
+                    err += key;
+                    err += ": it should be array [$filename => $filecontent, $filetype]";
+                    throw err;
+                }
+                form.add(key, values[1].as_string(), values[0].as_string(), values[2].as_string());
+            }
         }
         if (!even) {
             string key = arr.back().as_string();
@@ -48,6 +60,27 @@ static void fill(Request::Form& form, Array& arr, Request::EncType enc_type)  {
         }
     }
 }
+
+void fill_form(Request* req, const Sv& sv) {
+    if (!sv || !sv.defined()) return;
+    auto& form = req->form;
+    if (sv.is_hash_ref()) {
+        Hash h(sv);
+        Request::EncType type = h.exists("enc_type") ? get_encoding(h.fetch("enc_type")) : Request::EncType::MULTIPART;
+        Sv fields;
+        if ((fields = h.fetch("fields"))) {
+            Array arr(fields);
+            fill(form, arr, type);
+        }
+        else form.enc_type(type);
+    }
+    else if (sv.is_array_ref()) {
+        Array arr(sv);
+        fill(form, arr, Request::EncType::MULTIPART);
+    }
+    else form.enc_type(get_encoding(sv));
+}
+
 
 void fill (Request* req, const Hash& h) {
     msgfill(req, h);
@@ -68,25 +101,6 @@ void fill (Request* req, const Hash& h) {
             uint8_t val = SvIV(sv);
             if (is_valid_compression(val)) req->allow_compression((Compression::Type)val);
         }
-    }
-
-    if ((sv = h.fetch("form"))) {
-        auto& form = req->form;
-        if (sv.is_hash_ref()) {
-            Hash h(sv);
-            Request::EncType type = h.exists("enc_type") ? get_encoding(h.fetch("enc_type")) : Request::EncType::MULTIPART;
-            Sv fields;
-            if ((fields = h.fetch("fields"))) {
-                Array arr(fields);
-                fill(form, arr, type);
-            }
-            else form.enc_type(type);
-        }
-        else if (sv.is_array_ref()) {
-            Array arr(sv);
-            fill(form, arr, Request::EncType::MULTIPART);
-        }
-        else form.enc_type(get_encoding(sv));
     }
 }
 

@@ -1,9 +1,9 @@
 package Regexp::Pattern::Filename::Ebook;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Ebook'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Regexp::Pattern::Filename::Ebook - Ebook filename
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Ebook (from Perl distribution Regexp-Pattern-Filename-Ebook), released on 2020-05-30.
+This document describes version 0.002 of Regexp::Pattern::Filename::Ebook (from Perl distribution Regexp-Pattern-Filename-Ebook), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -69,11 +69,13 @@ Examples:
 
 No extension.
 
- "foo" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+ "foo" =~ re("Filename::Ebook::filename_ebook");  # DOESN'T MATCH
 
 Not an extension.
 
- "pdf" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+ "pdf" =~ re("Filename::Ebook::filename_ebook");  # DOESN'T MATCH
+
+Example #3.
 
  "foo.pdf" =~ re("Filename::Ebook::filename_ebook");  # matches
 
@@ -83,9 +85,11 @@ Case insensitive.
 
 Regex is anchored.
 
- "foo.doc is the file" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+ "foo.doc is the file" =~ re("Filename::Ebook::filename_ebook");  # DOESN'T MATCH
 
- "foo.jpg" =~ re("Filename::Ebook::filename_ebook");  # doesn't match
+Example #6.
+
+ "foo.jpg" =~ re("Filename::Ebook::filename_ebook");  # DOESN'T MATCH
 
 =back
 

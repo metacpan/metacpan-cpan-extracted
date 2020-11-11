@@ -142,7 +142,7 @@ XS(XS_WIN32__Pipe_Constant)
 
 
 /*----------------------- M I S C   F U N C T I O N S -------------------*/
-int	Error(int iErrorNum, char *szErrorText){
+int	Error(int iErrorNum, const char *szErrorText){
 	strncpy((char *)gszError, szErrorText, ERROR_TEXT_SIZE);
 	gszError[ERROR_TEXT_SIZE] = '\0';
 	giError = iErrorNum;
@@ -426,7 +426,7 @@ extern "C"
 XS(boot_Win32__Pipe)
 {
 	dXSARGS;
-	char* file = __FILE__;
+	const char* file = __FILE__;
 
 	giError = 0;
 	memset((void *)gszError, 0, ERROR_TEXT_SIZE);

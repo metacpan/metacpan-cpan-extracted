@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 
@@ -83,7 +83,7 @@ is( $clicked, 2, '$clicked after <Enter> key' );
    );
 
    is( $button_without_border->lines, 1, '->lines without border' );
-   is( $button_without_border->cols,  12, '->cols without border' );
+   is( $button_without_border->cols,  14, '->cols without border' );
 }
 
 done_testing;

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Utils::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Utils::VERSION   = '1.010006';
+	$Type::Utils::VERSION   = '1.012000';
 }
 
 $Type::Utils::VERSION =~ tr/_//d;
@@ -16,7 +16,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 use Scalar::Util qw< blessed >;
 use Type::Library;
 use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny to_TypeTiny HashLike StringLike CodeLike >;
+use Types::TypeTiny qw< TypeTiny is_TypeTiny to_TypeTiny HashLike StringLike >;
 
 our @EXPORT = qw<
 	declare as where message inline_as
@@ -30,9 +30,15 @@ our @EXPORT_OK = (
 		extends type subtype
 		match_on_type compile_match_on_type
 		dwim_type english_list
-		classifier
+		classifier assert
 	>,
+	"is",
 );
+our %EXPORT_TAGS = (
+	default => [ @EXPORT ],
+	all     => [ @EXPORT_OK ],
+);
+pop @{$EXPORT_TAGS{all}};  # remove 'is'
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -125,7 +131,7 @@ sub declare
 	{
 		$opts{parent} = to_TypeTiny($opts{parent});
 		
-		unless (TypeTiny->check($opts{parent}))
+		unless (is_TypeTiny($opts{parent}))
 		{
 			$caller->isa("Type::Library")
 				or _croak("Parent type cannot be a %s", ref($opts{parent})||'non-reference scalar');
@@ -285,7 +291,7 @@ sub declare_coercion
 		$opts{name} = '' . shift;
 	}
 	
-	while (HashLike->check($_[0]) and not TypeTiny->check($_[0]))
+	while (Types::TypeTiny::is_HashLike($_[0]) and not is_TypeTiny($_[0]))
 	{
 		%opts = (%opts, %{+shift});
 	}
@@ -347,7 +353,7 @@ sub from (@)
 sub to_type (@)
 {
 	my $type = shift;
-	unless (TypeTiny->check($type))
+	unless (is_TypeTiny($type))
 	{
 		caller->isa("Type::Library")
 			or _croak "Target type cannot be a string";
@@ -376,10 +382,10 @@ sub match_on_type
 		else
 		{
 			(my($type), $code) = splice(@_, 0, 2);
-			TypeTiny->($type)->check($value) or next;
+			Types::TypeTiny::assert_TypeTiny($type)->check($value) or next;
 		}
 		
-		if (StringLike->check($code))
+		if (Types::TypeTiny::is_StringLike($code))
 		{
 			local $_ = $value;
 			if (wantarray) {
@@ -398,7 +404,7 @@ sub match_on_type
 		}
 		else
 		{
-			CodeLike->($code);
+			Types::TypeTiny::assert_CodeLike($code);
 			local $_ = $value;
 			return $code->($value);
 		}
@@ -426,7 +432,7 @@ sub compile_match_on_type
 		else
 		{
 			($type, $code) = splice(@_, 0, 2);
-			TypeTiny->($type);
+			Types::TypeTiny::assert_TypeTiny($type);
 		}
 		
 		if ($type->can_be_inlined)
@@ -441,13 +447,13 @@ sub compile_match_on_type
 		
 		$els = 'els';
 		
-		if (StringLike->check($code))
+		if (Types::TypeTiny::is_StringLike($code))
 		{
 			push @code, sprintf('  { %s }', $code);
 		}
 		else
 		{
-			CodeLike->($code);
+			Types::TypeTiny::assert_CodeLike($code);
 			push @actions, $code;
 			push @code, sprintf('  { $actions[%d]->(@_) }', $#actions);
 		}
@@ -612,6 +618,62 @@ sub dwim_type
 	}
 	
 	$type;
+}
+
+my $TEMPLATE = <<'SUBTEMPLATE';
+sub SUBNAME
+{
+	require Types::TypeTiny;
+	no warnings 'uninitialized';
+	
+	my ($type, $value) = @_;
+	my $caller = caller;
+	
+	my $uniq = Types::TypeTiny::is_TypeTiny($type) ? $type->{uniq} : "$type";
+	
+	if (not Types::TypeTiny::is_TypeTiny $type) {
+		my $orig = $type;
+		
+		$type = $is_cache{$caller}{$uniq} || do {
+			Types::TypeTiny::is_StringLike($type)
+				? eval { dwim_type("$type", for => $caller) }
+				: undef;
+		};
+		
+		if (blessed $type) {
+			$is_cache{$caller}{$uniq} ||= $type;
+		}
+		else {
+			my $thing = Type::Tiny::_dd($orig);
+			substr($thing, 0, 1) = lc substr($thing, 0, 1);
+			require Carp;
+			FAILURE
+		}
+	}
+	
+	my $check = ( $is_cache_coderef{$caller}{$uniq} ||= $type->compiled_check );
+	
+	BODY
+}
+SUBTEMPLATE
+
+my %is_cache;
+my %is_cache_coderef;
+
+{
+	my $code = $TEMPLATE;
+	$code =~ s/SUBNAME/is/g;
+	$code =~ s/FAILURE/Carp::carp("Expected type, but got \$thing; returning false"); return undef;/g;
+	$code =~ s/BODY/0+!! \$check->(\$value)/;
+	eval $code;
+}
+
+{
+	my $code = $TEMPLATE;
+	$code =~ s/SUBNAME/assert/g;
+	$code =~ s/FAILURE/Carp::croak("Expected type, but got \$thing; stopping"); return undef;/g;
+	$code =~ s/BODY/\$check->(\$value) ? \$value : \$type->_failed_check("\$type", \$value)/;
+	eval $code;
 }
 
 sub english_list
@@ -1072,6 +1134,31 @@ if the type constraint string is syntactically malformed), preferring to
 return undef.
 
 This function is not exported by default.
+
+=item C<< is($type, $value) >>
+
+Shortcut for C<< $type->check($value) >> but also if $type is a string,
+will look it up via C<dwim_type>.
+
+This function is not exported by default.
+This function is not even exported by C<< use Type::Utils -all >>.
+You must request it explicitly.
+
+  use Type::Utils "is";
+
+Beware using this in test scripts because it has the same name as a function
+exported by L<Test::More>. Note that you can rename this function if
+C<is> will cause conflicts:
+
+   use Type::Utils "is" => { -as => "isntnt" };
+
+=item C<< assert($type, $value) >>
+
+Like C<is> but instead of returning a boolean, returns C<< $value >> and
+dies if the value fails the type check.
+
+This function is not exported by default, but it is exported by
+C<< use Type::Utils -all >>.
 
 =item C<< english_list(\$conjunction, @items) >>
 

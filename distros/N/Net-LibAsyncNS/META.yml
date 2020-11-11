@@ -4,17 +4,16 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  ExtUtils::PkgConfig: '0'
-  Module::Build: '0'
-  Module::Build::Compat: '0'
   Test::Identity: '0'
   Test::More: '0'
   Test::Refcount: '0'
 configure_requires:
   ExtUtils::CChecker: '0.05'
   ExtUtils::PkgConfig: '0'
+  Module::Build: '0.88'
+  Module::Build::Using::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +22,13 @@ name: Net-LibAsyncNS
 provides:
   Net::LibAsyncNS:
     file: lib/Net/LibAsyncNS.pm
-    version: '0.02'
+    version: '0.03'
   Net::LibAsyncNS::Constants:
     file: lib/Net/LibAsyncNS/Constants.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Exporter: '5.57'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,7 +12,7 @@ use XS::Install::Payload;
 use XS::Install::CMake;
 use Data::Dumper;
 
-our $VERSION = '1.2.20';
+our $VERSION = '1.2.21';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -84,6 +84,7 @@ sub makemaker_args {
     process_BIN_SHARE($params);
     attach_BIN_DEPENDENT($params);
     warn_BIN_DEPENDENT($params);
+    fix_CCFLAGS($params);
     
     post_process($params);
     
@@ -417,8 +418,8 @@ sub process_CLIB {
     $clib = [$clib] unless ref($clib) eq 'ARRAY';
     return unless @$clib;
 
-    my $wa_open  = $mac ? '-force_load' : '-Wl,--whole-archive';
-    my $wa_close = $mac ? ''            : '-Wl,--no-whole-archive';
+    my $wa_open  = $mac ? '-Wl,-force_load' : '-Wl,--whole-archive';
+    my $wa_close = $mac ? ''                : '-Wl,--no-whole-archive';
     
     foreach my $info (@$clib) {
         my $cmake_target = $info->{CMAKE_TARGET};
@@ -556,9 +557,13 @@ sub process_CPLUS {
 
 sub process_CCFLAGS {
     my $params = shift;
-    _string_merge($params->{CCFLAGS}, '-o $@');
     $params->{CCFLAGS} = "$Config{ccflags} $params->{CCFLAGS}" if $params->{CCFLAGS};
     _string_merge($params->{CCFLAGS}, '-Wno-unused-parameter') if $win32; # on Strawberry's mingw PERL_UNUSED_DECL doesn't work
+}
+
+sub fix_CCFLAGS {
+    my $params = shift;
+    _string_merge($params->{CCFLAGS}, '-o $@');
 }
 
 sub process_LD {

@@ -47,7 +47,8 @@ BOOT {
     
     xs::exp::create_constants(s, {
         {"IPV6ONLY", Tcp::Flags::IPV6ONLY}
-    });    
+    });
+    unievent::register_perl_class(Tcp::TYPE, s);
 }
 
 TcpSP Tcp::new (LoopSP loop = {}, int domain = AF_UNSPEC) {

@@ -1,3 +1,32 @@
+0.007   2020-11-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Don't exclude all rows when user type '-' term in search
+	  box.
+
+
+0.006   2020-11-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Support negative search with dash prefix syntax (-foo), a la
+	  Google.
+
+	- Clean generated HTML code.
+
+	- Remove separate datatables plugins in shared/ because they are
+	  bundled in datatables.{js,css}.
+
+
+0.005   2020-11-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Add custom operator Does Not Contain to SearchBuilder plugin.
+
+
+0.004   2020-11-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Update datatables from 1.10.13 to 1.10.22 (use the unminified version
+	  for patching convenience), add some datatables plugins. Currently
+	  enabled plugin is SearchBuilder.
+
+
 0.003   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Patch bundled datatables 1.10.13: allow page size of 250, 500, 1000,

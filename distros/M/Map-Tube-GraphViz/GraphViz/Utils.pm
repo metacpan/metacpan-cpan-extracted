@@ -1,12 +1,9 @@
 package Map::Tube::GraphViz::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
-use Error::Pure qw(err);
 use Readonly;
 
 # Constants.
@@ -17,8 +14,7 @@ Readonly::Array our @COLORS => qw(red green yellow cyan magenta blue grey
 	lawngreen indigo deeppink darkslategrey khaki thistle peru darkgreen
 );
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Create GraphViz color node.
 sub node_color {
@@ -26,7 +22,7 @@ sub node_color {
 	my %params = _node_color_params($obj, $node);
 	$obj->{'g'}->add_node(
 		'label' => $node->name,
-		'name' => $node->id,
+		'name' => $obj->{'callback_node_id'}->($obj, $node),
 		%params,
 	);
 	return;
@@ -38,7 +34,7 @@ sub node_color_id {
 	my %params = _node_color_params($obj, $node);
 	$obj->{'g'}->add_node(
 		'label' => $node->id,
-		'name' => $node->id,
+		'name' => $obj->{'callback_node_id'}->($obj, $node),
 		%params,
 	);
 	return;
@@ -50,7 +46,7 @@ sub node_color_without_label {
 	my %params = _node_color_params($obj, $node);
 	$obj->{'g'}->add_node(
 		'label' => '',
-		'name' => $node->id,
+		'name' => $obj->{'callback_node_id'}->($obj, $node),
 		%params,
 	);
 	return;
@@ -69,7 +65,7 @@ sub color_line {
 			} else {
 				$obj->{'_color_index'}++;
 				if ($obj->{'_color_index'} > $#COLORS) {
-					err "No color for line '$line'.";
+					$obj->{'_color_index'} = 0;
 				}
 			}
 			my $rand_color = $COLORS[$obj->{'_color_index'}];
@@ -115,8 +111,9 @@ __END__
 =head1 SYNOPSIS
 
  use Map::Tube::GraphViz::Utils qw(node_color node_color_id node_color_without_label color_line);
+
  node_color($obj, $node);
- node_color($obj, $node);
+ node_color_id($obj, $node);
  node_color_without_label($obj, $node);
  my $color = color_line($obj, $line);
 
@@ -150,38 +147,121 @@ __END__
 
 =back
 
-=head1 ERRORS
+=head1 EXAMPLE
 
- color_line():
-         No color for line '%s'.
+ use strict;
+ use warnings;
+
+ use Map::Tube::Prague;
+ use Map::Tube::GraphViz;
+ use Map::Tube::GraphViz::Utils qw(color_line);
+
+ my $prague = Map::Tube::Prague->new;
+
+ my $graphviz = Map::Tube::GraphViz->new(
+         'tube' => $prague,
+ );
+
+ foreach my $line_num (1 .. 25) {
+         print "Line number: $line_num\n";
+         my $line = Map::Tube::Line->new('id' => 'line'.$line_num);
+         my $line_color = color_line($graphviz, $line);
+         print "Line color: $line_color\n";
+ }
+
+ # Output:
+ # Line number: 1
+ # Line color: red
+ # Line number: 2
+ # Line color: green
+ # Line number: 3
+ # Line color: yellow
+ # Line number: 4
+ # Line color: cyan
+ # Line number: 5
+ # Line color: magenta
+ # Line number: 6
+ # Line color: blue
+ # Line number: 7
+ # Line color: grey
+ # Line number: 8
+ # Line color: orange
+ # Line number: 9
+ # Line color: brown
+ # Line number: 10
+ # Line color: white
+ # Line number: 11
+ # Line color: greenyellow
+ # Line number: 12
+ # Line color: red4
+ # Line number: 13
+ # Line color: violet
+ # Line number: 14
+ # Line color: tomato
+ # Line number: 15
+ # Line color: cadetblue
+ # Line number: 16
+ # Line color: aquamarine
+ # Line number: 17
+ # Line color: lawngreen
+ # Line number: 18
+ # Line color: indigo
+ # Line number: 19
+ # Line color: deeppink
+ # Line number: 20
+ # Line color: darkslategrey
+ # Line number: 21
+ # Line color: khaki
+ # Line number: 22
+ # Line color: thistle
+ # Line number: 23
+ # Line color: peru
+ # Line number: 24
+ # Line color: darkgreen
+ # Line number: 25
+ # Line color: red
 
 =head1 DEPENDENCIES
 
-L<Error::Pure>,
 L<Exporter>,
 L<Readonly>.
 
 =head1 SEE ALSO
 
-L<Map::Tube>.
+=over
+
+=item L<Map::Tube::GraphViz>
+
+GraphViz output for Map::Tube.
+
+=item L<Task::Map::Tube>
+
+Install the Map::Tube modules.
+
+=item L<Task::Map::Tube::Metro>
+
+Install the Map::Tube concrete metro modules.
+
+=back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-GraphViz>
+L<https://github.com/michal-josef-spacek/Map-Tube-GraphViz>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

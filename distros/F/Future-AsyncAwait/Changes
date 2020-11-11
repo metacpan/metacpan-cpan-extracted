@@ -1,5 +1,12 @@
 Revision history for Future-AsyncAwait
 
+0.46    2020-11-09
+        [CHANGES]
+         * Provide future_asyncawait_on_activate() in AsyncAwait.h
+         * Adjusted docs around new `AWAIT_CHAIN_CANCEL` method
+         * Depend on Future 0.43 for Awaitable role named methods, rather than
+           monkey-patching older versions
+
 0.45    2020-10-22
         [CHANGES]
          * Have Test::Future::AsyncAwait::Awaitable check for the suggested

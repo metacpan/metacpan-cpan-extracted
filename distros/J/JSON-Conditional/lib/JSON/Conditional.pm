@@ -1,5 +1,5 @@
 package JSON::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '0.04';
+use 5.006; use strict; use warnings; our $VERSION = '0.05';
 use JSON; use base 'Struct::Conditional';
 
 our $JSON;
@@ -57,7 +57,7 @@ JSON::Conditional - A conditional language within a JSON struct
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

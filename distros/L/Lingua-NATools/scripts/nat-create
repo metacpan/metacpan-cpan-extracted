@@ -1,7 +1,7 @@
 #!/usr/bin/perl -s
 
 # NATools - Package with parallel corpora tools
-# Copyright (C) 2002-2012  Alberto Simões
+# Copyright (C) 2002-2017  Alberto Simões
 #
 # This package is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 
 use POSIX qw(locale_h);
-setlocale(LC_CTYPE, "pt_PT");
+setlocale(LC_CTYPE, "pt_PT.UTF-8");
 use locale;
 
 use Lingua::NATools;

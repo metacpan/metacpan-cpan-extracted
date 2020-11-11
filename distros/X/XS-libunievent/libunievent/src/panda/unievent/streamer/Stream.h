@@ -34,6 +34,8 @@ struct StreamOutput : Streamer::IOutput, private IStreamSelfListener {
 private:
     StreamSP         stream;
     IStreamListener* prev_lst = nullptr;
+    WriteRequestSP   first_wreq;
+    bool             handle_write_started = false;
 
     void on_write (const ErrorCode&, const WriteRequestSP&) override;
 };

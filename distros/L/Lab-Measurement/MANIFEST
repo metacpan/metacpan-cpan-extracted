@@ -219,6 +219,7 @@ lib/Lab/Moose/Instrument/RS_FSV.pm
 lib/Lab/Moose/Instrument/RS_SMB.pm
 lib/Lab/Moose/Instrument/RS_ZVA.pm
 lib/Lab/Moose/Instrument/RS_ZVM.pm
+lib/Lab/Moose/Instrument/Rigol_DG5000.pm
 lib/Lab/Moose/Instrument/Rigol_DSA815.pm
 lib/Lab/Moose/Instrument/SCPI/Display/Window.pm
 lib/Lab/Moose/Instrument/SCPI/Format.pm
@@ -245,6 +246,7 @@ lib/Lab/Moose/Instrument/SCPI/Unit.pm
 lib/Lab/Moose/Instrument/SCPIBlock.pm
 lib/Lab/Moose/Instrument/SR830.pm
 lib/Lab/Moose/Instrument/SpectrumAnalyzer.pm
+lib/Lab/Moose/Instrument/TBS1000C.pm
 lib/Lab/Moose/Instrument/VNASweep.pm
 lib/Lab/Moose/Instrument/Yokogawa7651.pm
 lib/Lab/Moose/Instrument/YokogawaGS200.pm

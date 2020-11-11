@@ -8,7 +8,7 @@
 
 package POSIX::1003::Proc;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 use base 'POSIX::1003::Module';
 

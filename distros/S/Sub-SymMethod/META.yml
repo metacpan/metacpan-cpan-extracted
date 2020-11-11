@@ -29,7 +29,7 @@ optional_features: {}
 provides:
   Sub::SymMethod:
     file: lib/Sub/SymMethod.pm
-    version: '0.004'
+    version: '0.005'
 recommends:
   Type::Params: '1.003000'
 requires:
@@ -42,5 +42,5 @@ resources:
   homepage: https://metacpan.org/release/Sub-SymMethod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-symmethod.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

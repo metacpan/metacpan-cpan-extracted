@@ -37,13 +37,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Slurper" => 0,
     "File::Spec" => 0,
-    "File::Temp" => 0,
+    "File::Temp" => "0.2307",
     "File::chdir" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.131",
+  "VERSION" => "0.132",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +61,7 @@ my %FallbackPrereqs = (
   "File::Find" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.2307",
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

@@ -1,7 +1,7 @@
 use alienfile;
 use Config;
 
-configure { requires 'Alien::Build' => '2.12' };
+configure { requires 'Alien::Build' => '2.37' };
 
 my $test_program = <<'EOF';
 #include <stdio.h>

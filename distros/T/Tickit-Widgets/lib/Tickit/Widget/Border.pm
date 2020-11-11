@@ -3,14 +3,13 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Border;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::SingleChildWidget );
+package Tickit::Widget::Border 0.31;
+class Tickit::Widget::Border
+   extends Tickit::SingleChildWidget;
+
 use Tickit::Style;
-
-our $VERSION = '0.30';
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
@@ -61,35 +60,32 @@ without the C<set_> prefix.
 
 =cut
 
-sub new
+has $_top_border    = 0;
+has $_bottom_border = 0;
+has $_left_border   = 0;
+has $_right_border  = 0;
+
+BUILD
 {
-   my $class = shift;
-   my %args = @_;
-   my $self = $class->SUPER::new( %args );
+   my %params = @_;
 
-   $self->{"${_}_border"} = 0 for qw( top bottom left right );
-
-   defined $args{$_} and $self->${\"set_$_"}( delete $args{$_} ) for qw(
+   defined $params{$_} and $self->${\"set_$_"}( delete $params{$_} ) for qw(
       border
       h_border v_border
       top_border bottom_border left_border right_border
    );
-
-   return $self;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $child = $self->child;
    return $self->top_border +
           ( $child ? $child->requested_lines : 0 ) +
           $self->bottom_border;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $child = $self->child;
    return $self->left_border +
           ( $child ? $child->requested_cols : 0 ) +
@@ -112,16 +108,11 @@ Return or set the number of lines of border at the top of the widget
 
 =cut
 
-sub top_border
-{
-   my $self = shift;
-   return $self->{top_border};
-}
+method top_border { $_top_border }
 
-sub set_top_border
+method set_top_border
 {
-   my $self = shift;
-   $self->{top_border} = $_[0];
+   $_top_border = $_[0];
    $self->resized;
 }
 
@@ -137,16 +128,11 @@ Return or set the number of lines of border at the bottom of the widget
 
 =cut
 
-sub bottom_border
-{
-   my $self = shift;
-   return $self->{bottom_border};
-}
+method bottom_border { $_bottom_border }
 
-sub set_bottom_border
+method set_bottom_border
 {
-   my $self = shift;
-   $self->{bottom_border} = $_[0];
+   $_bottom_border = $_[0];
    $self->resized;
 }
 
@@ -162,16 +148,11 @@ Return or set the number of cols of border at the left of the widget
 
 =cut
 
-sub left_border
-{
-   my $self = shift;
-   return $self->{left_border};
-}
+method left_border { $_left_border }
 
-sub set_left_border
+method set_left_border
 {
-   my $self = shift;
-   $self->{left_border} = $_[0];
+   $_left_border = $_[0];
    $self->resized;
 }
 
@@ -187,16 +168,11 @@ Return or set the number of cols of border at the right of the widget
 
 =cut
 
-sub right_border
-{
-   my $self = shift;
-   return $self->{right_border};
-}
+method right_border { $_right_border }
 
-sub set_right_border
+method set_right_border
 {
-   my $self = shift;
-   $self->{right_border} = $_[0];
+   $_right_border = $_[0];
    $self->resized;
 }
 
@@ -208,10 +184,9 @@ Set the number of cols of both horizontal (left and right) borders simultaneousl
 
 =cut
 
-sub set_h_border
+method set_h_border
 {
-   my $self = shift;
-   $self->{left_border} = $self->{right_border} = $_[0];
+   $_left_border = $_right_border = $_[0];
    $self->resized;
 }
 
@@ -223,10 +198,9 @@ Set the number of lines of both vertical (top and bottom) borders simultaneously
 
 =cut
 
-sub set_v_border
+method set_v_border
 {
-   my $self = shift;
-   $self->{top_border} = $self->{bottom_border} = $_[0];
+   $_top_border = $_bottom_border = $_[0];
    $self->resized;
 }
 
@@ -238,20 +212,17 @@ Set the number of cols or lines in all four borders simultaneously
 
 =cut
 
-sub set_border
+method set_border
 {
-   my $self = shift;
-   $self->{top_border} = $self->{bottom_border} = $self->{left_border} = $self->{right_border} = $_[0];
+   $_top_border = $_bottom_border = $_left_border = $_right_border = $_[0];
    $self->resized;
 }
 
 ## This should come from Tickit::ContainerWidget
-sub children_changed { shift->reshape }
+method children_changed { $self->reshape }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $window = $self->window or return;
    my $child  = $self->child  or return;
 
@@ -277,9 +248,8 @@ sub reshape
    }
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my $win = $self->window or return;

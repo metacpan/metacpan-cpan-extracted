@@ -8,7 +8,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.2.1";
+our $VERSION = "1.3";
 
 # just need to be an object
 sub new {
@@ -313,8 +313,8 @@ my $app = sub {
 
 # rotate the log every day
 my $rotatelog = File::RotateLogs->new(
-	logfile => '[%pepper_directory%]/log/pepper_access_log.%Y%m%d%H%M',
-	linkname => '[%pepper_directory%]/log/pepper_access_log',
+	logfile => 'PEPPER_DIRECTORY/log/pepper_access_log.%Y%m%d%H%M',
+	linkname => 'PEPPER_DIRECTORY/log/pepper_access_log',
 	rotationtime => 86400,
 	maxage => 86400,
 );

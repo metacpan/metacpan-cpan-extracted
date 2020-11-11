@@ -1,9 +1,6 @@
 use 5.012;
 use lib 't/lib';
 use MyTest;
-use Test::Catch;
-
-variate_catch('[tcp]', qw/ssl buf/);
 
 subtest "run in order" => sub {
     my $test = UE::Test::Async->new(0, 2);

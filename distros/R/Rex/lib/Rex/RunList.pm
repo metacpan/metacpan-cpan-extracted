@@ -6,13 +6,14 @@
 
 package Rex::RunList;
 
+use 5.010001;
 use strict;
 use warnings;
 
 use Rex::Logger;
 use Rex::TaskList;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 my $INSTANCE;
 

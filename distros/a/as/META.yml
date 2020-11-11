@@ -4,11 +4,13 @@ author:
   - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+  Module::Metadata: '0'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,7 +19,17 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  as:
+    file: lib/as.pm
+    version: '0.12'
 requires:
+  Carp: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
   warnings::register: '0'
-version: '0.10'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/as.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

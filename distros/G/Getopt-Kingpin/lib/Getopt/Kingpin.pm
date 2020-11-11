@@ -8,8 +8,9 @@ use Getopt::Kingpin::Args;
 use Getopt::Kingpin::Commands;
 use File::Basename;
 use Carp;
+use Scalar::Util qw(blessed);
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use overload (
     '""' => sub {$_[0]->name},
@@ -140,6 +141,11 @@ sub _parse {
     };
     my $arg_index = 0;
     my $arg_only = 0;
+    
+    if (@argv == 1 and ref($argv[0]) and ref($argv[0]) eq "ARRAY") {
+        @argv = @{ $argv[0] };
+    }
+    
     while (scalar @argv > 0) {
         my $arg = shift @argv;
         if ($arg eq "--") {
@@ -226,11 +232,12 @@ sub _parse {
 
             if (not ($arg_index == 0 and $arg eq "help")) {
                 if ($arg_index < $self->args->count) {
-                    my ($dummy, $exit) = $self->args->get_by_index($arg_index)->set_value($arg);
+                    my $arg_obj = $self->args->get_by_index($arg_index);
+                    my ($dummy, $exit) = $arg_obj->set_value($arg);
                     if (defined $exit) {
                         return undef, $exit;
                     }
-                    if (not $self->args->get_by_index($arg_index)->is_cumulative) {
+                    if (not $arg_obj->is_cumulative || $arg_obj->is_hash) {
                         $arg_index++;
                     }
                 } else {
@@ -251,58 +258,57 @@ sub _parse {
         return undef, 0;
     }
 
-    foreach my $f ($self->flags->values) {
-        if (defined $f->value) {
-            next;
-        } elsif (defined $f->_envar) {
-            my ($dummy, $exit) = $f->set_value($f->_envar);
+    my $process_item = sub {
+        my $item = shift;
+        if (defined $item->value) {
+            return;
+        } elsif (defined $item->_envar) {
+            my ($dummy, $exit) = $item->set_value($item->_envar);
             if (defined $exit) {
                 return undef, $exit;
             }
-        } elsif (defined $f->_default) {
-            if ($f->type =~ /List$/) {
-                foreach my $default (@{$f->_default}) {
-                    my ($dummy, $exit) = $f->set_value($default);
+        } elsif (defined $item->_default) {
+            my $default = $item->_default;
+            if (ref($default) eq 'CODE'
+            || (blessed($default) && overload::Method($default, '&{}'))) {
+                $default = $default->();
+            }
+            if ($item->type =~ /List$/) {
+                foreach my $val (@{$default}) {
+                    my ($dummy, $exit) = $item->set_value($val);
+                    if (defined $exit) {
+                        return undef, $exit;
+                    }
+                }
+            } elsif ($item->type =~ /Hash$/) {
+                while (my ($key, $val) = each %{$default}) {
+                    my ($dummy, $exit) = $item->set_value([ $key, $val ]);
                     if (defined $exit) {
                         return undef, $exit;
                     }
                 }
             } else {
-                my ($dummy, $exit) = $f->set_value($f->_default);
+                my ($dummy, $exit) = $item->set_value($default);
                 if (defined $exit) {
                     return undef, $exit;
                 }
             }
-        } elsif ($f->type =~ /List$/) {
-            $f->value([]);
+        } elsif ($item->type =~ /List$/) {
+            $item->value([]);
+        } elsif ($item->type =~ /Hash$/) {
+            $item->value({});
         }
+        return;
+    };
+
+    foreach my $f ($self->flags->values) {
+        my @r = $process_item->($f);
+        return @r if @r > 1;
     }
     for (my $i = 0; $i < $self->args->count; $i++) {
         my $arg = $self->args->get_by_index($i);
-        if (defined $arg->value) {
-            next;
-        } elsif (defined $arg->_envar) {
-            my ($dummy, $exit) = $arg->set_value($arg->_envar);
-            if (defined $exit) {
-                return undef, $exit;
-            }
-        } elsif (defined $arg->_default) {
-            if ($arg->type =~ /List$/) {
-                foreach my $default (@{$arg->_default}) {
-                    my ($dummy, $exit) = $arg->set_value($default);
-                    if (defined $exit) {
-                        return undef, $exit;
-                    }
-                }
-            } else {
-                my ($dummy, $exit) = $arg->set_value($arg->_default);
-                if (defined $exit) {
-                    return undef, $exit;
-                }
-            }
-        } elsif ($arg->type =~ /List$/) {
-            $arg->value([]);
-        }
+        my @r = $process_item->($arg);
+        return @r if @r > 1;
     }
 
     foreach my $r (values %$required_but_not_found) {
@@ -534,6 +540,13 @@ The default value can be overridden with the default($value).
     # Set default value to true (1)
     my $debug = $kingpin->flag("debug", "Enable debug mode.")->default(1)->bool;
 
+The default can be set to a coderef or object overloading &{}.
+
+    my $debug = $kingpin->flag("debug", "Enable debug mode.")->default(sub {
+      my $config = read_config_files();
+      return $config->{DEBUG};
+    })->bool;
+
 =head3 override_default_from_envar()
 
 The default value can be overridden with the override_default_from_envar($envar).
@@ -591,10 +604,26 @@ Path::Tiny object.
 
 Integer value.
 
+=head4 num()
+
+Numeric value.
+
 =head4 string()
 
 String value.
 It is default type to flag.
+
+=head4 string_list(), int_list(), file_list(), etc
+
+Allows repeated uses of a flag.
+
+  --input=customers.csv --input=customers2.csv
+
+=head4 string_hash(), int_hash(), file_hash(), etc
+
+Allows repeated use of a flag as key-value pairs.
+
+  --define os=linux --define arch=x86_64
 
 =head2 arg($name, $description)
 
@@ -648,6 +677,13 @@ If define sub-command, parse() return Getopt::Kingpin::Command object;
     my $cmd = $kingpin->parse;
     printf "cmd : %s\n", $cmd;
     printf "cmd : %s\n", $cmd->name;
+
+You may also pass an arrayref to parse():
+
+    $kingpin->parse( \@arguments );
+
+An empty arrayref will not cause Kingpin to parse @ARGV like
+an empty array would.
 
 =head2 _parse()
 

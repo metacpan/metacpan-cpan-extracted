@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scatter::Marker::Colorbar;
 use Chart::Plotly::Trace::Scatter::Marker::Gradient;
 use Chart::Plotly::Trace::Scatter::Marker::Line;
 
-our $VERSION = '0.040';    # VERSION
+our $VERSION = '0.041';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter.
 
@@ -193,7 +193,7 @@ Chart::Plotly::Trace::Scatter::Marker - This attribute is one of the possible op
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

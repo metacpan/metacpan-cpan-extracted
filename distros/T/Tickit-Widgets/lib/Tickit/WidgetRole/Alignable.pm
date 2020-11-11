@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::WidgetRole::Alignable;
+package Tickit::WidgetRole::Alignable 0.51;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Tickit::WidgetRole );
-
-our $VERSION = '0.51';
 
 use Carp;
 

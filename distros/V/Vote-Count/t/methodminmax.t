@@ -239,7 +239,8 @@ subtest "Loop 1 dataset, opposition score" => sub {
 
 subtest 'setting active to other than the default' => sub {
   my $bigger = Vote::Count::Method::MinMax->new(
-    'BallotSet' => read_ballots('t/data/biggerset1.txt') );
+    'BallotSet' => read_ballots('t/data/biggerset1.txt'),
+    'FloorRounding' => 'down' );
   my $remaining = $bigger->TopCountFloor(1);
   $bigger->SetActive( $remaining );
   my $bigscores = $bigger->ScoreMinMax( 'opposition' );

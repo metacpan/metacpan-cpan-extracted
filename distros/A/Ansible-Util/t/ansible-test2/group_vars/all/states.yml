@@ -1,0 +1,30 @@
+# vim: tabstop=2 softtabstop=2 expandtab
+
+---
+
+states:
+  iowa:
+    area: 56272 
+    cities:
+      - name: dubuque
+        zip_codes: 
+          - 52001
+          - 52002
+      - name: 'des moines'
+        zip_codes: 
+          - 50047
+          - 50303
+    secret: "{{ vault_ia_secret }}"
+  texas:
+    area: 268596
+    cities:
+      - name: austin
+        zip_codes:
+          - 73301
+          - 78652
+      - name: dallas
+        zip_codes:
+          - 75001
+          - 75043
+    secret: "{{ vault_tx_secret }}"
+          

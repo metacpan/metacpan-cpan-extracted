@@ -3,16 +3,18 @@
 #
 #  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::LinearBox;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::ContainerWidget );
+package Tickit::Widget::LinearBox 0.48;
+class Tickit::Widget::LinearBox
+   extends Tickit::ContainerWidget;
+
+use experimental 'postderef';
+
 use Tickit::RenderBuffer;
 
-our $VERSION = '0.47';
-
 use Carp;
+use Syntax::Keyword::Dynamically;
 
 use Tickit::Utils qw( distribute );
 
@@ -77,23 +79,26 @@ L</add_children> methods.
 
 =cut
 
-sub new
+has @_children;
+
+sub BUILDARGS
 {
    my $class = shift;
    my %args = @_;
 
    exists $args{$_} and $args{style}{$_} = delete $args{$_} for qw( spacing );
 
-   my $self = $class->SUPER::new( %args );
+   return $class->SUPER::BUILDARGS( %args );
+}
 
-   $self->{children} = [];
+BUILD
+{
+   my %args = @_;
 
    if( $args{children} ) {
-      Carp::carp( "The 'children' constructor argument to $class is discouraged; use ->add_children instead" );
-      $self->add( $_ ) for @{ $args{children} };
+      Carp::carp( "The 'children' constructor argument to ${\ref $self} is discouraged; use ->add_children instead" );
+      $self->add( $_ ) for $args{children}->@*;
    }
-
-   return $self;
 }
 
 =head1 METHODS
@@ -109,27 +114,21 @@ returns a list of all the child widgets.
 
 =cut
 
-sub children
+method children
 {
-   my $self = shift;
-
-   return @{ $self->{children} };
+   return @_children;
 }
 
-sub _any2index
+method _any2index
 {
-   my $self = shift;
-
-   my $children = $self->{children};
-
    if( ref $_[0] ) {
       my $child = shift;
-      $children->[$_] == $child and return $_ for 0 .. $#$children;
+      $_children[$_] == $child and return $_ for 0 .. $#_children;
       croak "Unable to find child $child";
    }
    else {
       my $index = shift;
-      return $index if $index >= 0 and $index < scalar @$children;
+      return $index if $index >= 0 and $index < scalar @_children;
       croak "Index $index out of bounds";
    }
 }
@@ -143,10 +142,9 @@ reference or by index.
 
 =cut
 
-sub child_opts
+method child_opts
 {
-   my $self = shift;
-   my $child = ref $_[0] ? shift : $self->{children}[shift];
+   my $child = ref $_[0] ? shift : $_children[shift];
 
    return unless $child;
 
@@ -162,22 +160,21 @@ preserving any options that are set on it.
 
 =cut
 
-sub set_child
+method set_child
 {
-   my $self = shift;
    my ( $index, $child ) = @_;
 
-   my $old_child = $self->{children}[$index];
+   my $old_child = $_children[$index];
 
    my %opts;
    if( $old_child ) {
       %opts = $self->child_opts( $old_child );
 
-      local $self->{suppress_redistribute} = 1;
+      dynamically $self->{suppress_redistribute} = 1;
       $self->SUPER::remove( $old_child );
    }
 
-   $self->{children}[$index] = $child;
+   $_children[$index] = $child;
 
    $self->SUPER::add( $child, %opts );
 }
@@ -191,19 +188,17 @@ index. Any options whose value is given as C<undef> are deleted.
 
 =cut
 
-sub set_child_opts
+method set_child_opts
 {
-   my $self = shift;
-   my $child = ref $_[0] ? shift : $self->{children}[shift];
+   my $child = ref $_[0] ? shift : $_children[shift];
 
    return unless $child;
 
    return $self->SUPER::set_child_opts( $child, @_ );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->eraserect( $rect );
@@ -227,12 +222,11 @@ which is now discouraged.
 
 =cut
 
-sub add
+method add
 {
-   my $self = shift;
    my ( $child, %opts ) = @_;
 
-   push @{ $self->{children} }, $child;
+   push @_children, $child;
 
    $self->SUPER::add( $child,
       expand     => $opts{expand} || 0,
@@ -246,8 +240,10 @@ sub add
 
    $widget->add_children( @children )
 
-Adds each of the given widgets as a new child of this one, with no additional
-options.
+Adds each of the given widgets as a new child of this one. Each element of the
+list should either be a widget object reference directly, or an unblessed hash
+reference containing additional options. (See
+L<Tickit::Widget/split_widget_opts>).
 
 This method returns the container widget instance itself making it suitable to
 use as a chaining mutator.
@@ -258,7 +254,9 @@ sub add_children
 {
    my $self = shift;
 
-   $self->add( $_ ) for @_;
+   foreach my $arg ( @_ ) {
+      $self->add( Tickit::Widget::split_widget_opts $arg );
+   }
 
    return $self;
 }
@@ -271,19 +269,17 @@ Removes the given child widget if present, by reference or index
 
 =cut
 
-sub remove
+method remove
 {
-   my $self = shift;
    my $index = $self->_any2index( shift );
 
-   my ( $child ) = splice @{ $self->{children} }, $index, 1, ();
+   my ( $child ) = splice @_children, $index, 1, ();
 
    $self->SUPER::remove( $child ) if $child;
 }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
    $self->{suppress_redistribute} and return;
 
    my $window = $self->window;

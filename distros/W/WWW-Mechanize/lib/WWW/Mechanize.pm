@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -975,6 +975,20 @@ sub click_button {
         }
     }
 
+    my %exclusive_options = (
+        id     => 1,
+        input  => 1,
+        name   => 1,
+        number => 1,
+        value  => 1,
+    );
+
+    my @present_exclusive_options = @exclusive_options{ keys %args };
+
+    if ( scalar @present_exclusive_options > 1 ) {
+        $self->die( 'click_button: More than one button selector has been used' );
+    }
+
     for ($args{x}, $args{y}) {
         $_ = 1 unless defined;
     }
@@ -1769,7 +1783,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

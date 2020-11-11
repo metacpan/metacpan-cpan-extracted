@@ -5,6 +5,7 @@ package Graph::AdjacencyMap::Vertex;
 # ALMOST GUARANTEED TO CHANGE OR GO AWAY IN FUTURE RELEASES.
 
 use strict;
+use warnings;
 
 # $SIG{__DIE__ } = sub { use Carp; confess };
 # $SIG{__WARN__} = sub { use Carp; confess };
@@ -144,6 +145,15 @@ sub del_path {
 	delete $m->[ _i ]->{ ref $n ? $n->[ _ni ] : $n };
 	delete $p->[ -1 ]->{ $l };
     }
+    return 1;
+}
+
+sub rename_path {
+    my ($m, $from, $to) = @_;
+    my ($e, $n, $p, $k, $l) = $m->__get_path_node( $from );
+    return unless $e;
+    $m->[ _i ]{ ref $n ? $n->[ _ni ] : $n } = $to;
+    $p->[ -1 ]->{ $to } = delete $p->[ -1 ]->{ $l };
     return 1;
 }
 

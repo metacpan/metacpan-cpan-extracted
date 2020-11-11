@@ -3,19 +3,22 @@
 use strict;
 use warnings;
 
-use Indent::Word;
-use Term::ANSIColor;
+use Indent::Data;
 
-# Object.
-my $i = Indent::Word->new(
-        'ansi' => 1,
-        'line_size' => 20,
+# Indent::Data object.
+my $i = Indent::Data->new(
+       'line_size' => '10',
+       'next_indent' => '  ',
+       'output_separator' => "|\n",
 );
 
-# Indent.
-print $i->indent('text text '.color('cyan').'text'.color('reset').
-        ' text '.color('red').'text'.color('reset').' text text')."\n";
+# Print indented text.
+print $i->indent('text text text text text text', '<->')."|\n";
 
 # Output:
-# text text text text
-# <--tab->text text text
+# <->text te|
+# <->  xt te|
+# <->  xt te|
+# <->  xt te|
+# <->  xt te|
+# <->  xt|

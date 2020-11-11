@@ -1,10 +1,7 @@
 use 5.012;
 use lib 't/lib';
 use MyTest;
-use Test::Catch;
 use Net::SockAddr;
-
-variate_catch('[tcp-connect]', qw/ssl buf/);
 
 my $loop = UniEvent::Loop->default_loop;
 

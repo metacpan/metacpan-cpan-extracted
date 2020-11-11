@@ -53,6 +53,7 @@ t/pod-coverage.t
 t/pod.t
 t/russian.t
 t/subs.t
+t/testfiles/bg.muse
 t/testfiles/da.muse
 t/testfiles/de.muse
 t/testfiles/en.muse

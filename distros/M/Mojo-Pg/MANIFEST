@@ -31,6 +31,15 @@ t/crud.t
 t/database.t
 t/migrations.t
 t/migrations/test.sql
+t/migrations/tree/1/down.sql
+t/migrations/tree/1/up.sql
+t/migrations/tree/2/down.sql
+t/migrations/tree/2/up.sql
+t/migrations/tree/36/up.sql
+t/migrations/tree/55/upgrade.sql
+t/migrations/tree/99/up.sql
+t/migrations/tree2/8/up.sql
+t/migrations/tree2/subtree/9/up.sql
 t/pg_lite_app.t
 t/pod.t
 t/pod_coverage.t

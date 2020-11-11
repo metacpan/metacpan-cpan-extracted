@@ -1,6 +1,10 @@
 Build.PL
+CHANGES
+CONTRIBUTING
 lib/GitHub/Crud.pm
-MANIFEST			This list of files
+MANIFEST
+README
+README.md
 test.pl
 META.yml
 META.json

@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.43
+version 2.44
 
 # SYNOPSIS
 
@@ -232,10 +232,13 @@ these, `undef` will be returned.
 This means that if you want to specify hours as a single digit, then
 each element of the offset must be separated by a colon (:).
 
-## DateTime::TimeZone->offset\_as\_string( $offset )
+## DateTime::TimeZone->offset\_as\_string( $offset, $sep )
 
 Given an offset as a number, this returns the offset as a string.
 Returns `undef` if $offset is not in the range `-359999` to `359999`.
+
+You can also provide an optional separator which will go between the hours,
+minutes, and seconds (if applicable) portions of the offset.
 
 ## Storable Hooks
 

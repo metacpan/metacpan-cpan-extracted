@@ -4,13 +4,13 @@
       "Philip Gwyn <fil@localdomain>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PostScript-PPD",
    "no_index" : {
@@ -32,10 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Zlib" : "2"
+            "Compress::Zlib" : "2",
+            "Data::Dump" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.0206"
+   "version" : "0.0300",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

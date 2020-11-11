@@ -1,16 +1,16 @@
 {
    "abstract" : "FileEntry widget with optional file selection box",
    "author" : [
-      "Alex Becker <c a p f a n _a-t_ g m x write_Adot-here d e - i n v a l l i d>"
+      "Alex Becker <asb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tk-FileEntry",
    "no_index" : {
@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.98",
-            "Test::Pod" : "1.0",
-            "Test::Pod::Coverage" : "1.08"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -39,6 +36,13 @@
             "Tk" : "804.030",
             "perl" : "5.008008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.0",
+            "Test::Pod::Coverage" : "1.08"
+         }
       }
    },
    "release_status" : "stable",
@@ -47,5 +51,6 @@
          "url" : "https://github.com/asb-capfan/Tk-FileEntry"
       }
    },
-   "version" : "2.3"
+   "version" : "2.4",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

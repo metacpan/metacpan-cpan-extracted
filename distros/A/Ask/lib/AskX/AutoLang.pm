@@ -5,7 +5,7 @@ use warnings;
 package AskX::AutoLang;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.015';
 
 use Moo::Role;
 
@@ -14,14 +14,13 @@ my @methods = qw(
 	single_choice multiple_choice
 );
 
-has language => (is => 'ro', required => 1);
+has language => ( is => 'ro', required => 1 );
 
-for my $method (@methods)
-{
+for my $method ( @methods ) {
 	around $method => sub {
 		my $orig = shift;
 		my $self = shift;
-		$self->$orig(lang => $self->language, @_);
+		$self->$orig( lang => $self->language, @_ );
 	};
 }
 
@@ -68,4 +67,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

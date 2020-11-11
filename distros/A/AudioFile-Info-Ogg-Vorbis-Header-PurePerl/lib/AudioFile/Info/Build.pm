@@ -32,34 +32,31 @@ sub ACTION_install {
 
   # calculate "usefulness" score
 
-  my ($mp3, $ogg);
+  my ($score);
+  my @types = qw[ogg mp3];
+  my @modes = qw[read write];
 
-  for (qw(read write)) {
-    $mp3 += 50 if $config->{$pkg}{"${_}_mp3"};
-  }
-
-  for (qw(read write)) {
-    $ogg +=50 if $config->{$pkg}{"${_}_ogg"};
+  for my $type (@types) {
+    for my $mode (@modes) {
+      $score->{$type} += 50 if $config->{$pkg}{"${mode}_${type}"};
+    }
   }
 
   # prefer non-perl implementations
   unless ($config->{$pkg}{pure_perl}) {
-    $mp3 += 10 if $mp3;
-    $ogg += 10 if $ogg;
+    for (@types) {
+      $score->{$_} += 10 if $score->{$_};
+    }
   }
 
   # if no default set and this plugin has a score, or if this plugin
   # score higher than the existing default, then set default
-  if ($mp3 and (not exists $config->{default}{mp3}
-     or $mp3 >= $config->{default}{mp3}{score})) {
-    $config->{default}{mp3} = { name => $pkg, score => $mp3 };
-    warn "AudioFile::Info - Default mp3 handler is now $pkg\n";
-  }
-
-  if ($ogg and (not exists $config->{default}{ogg}
-     or $ogg >= $config->{default}{ogg}{score})) {
-    $config->{default}{ogg} = { name => $pkg, score => $ogg };
-    warn "AudioFile::Info - Default ogg handler is now $pkg\n";
+  for (@types) {
+    if ($score->{$_} and (not exists $config->{default}{$_}
+       or $score->{$_} >= $config->{default}{$_}{score})) {
+      $config->{default}{$_} = { name => $pkg, score => $score->{$_} };
+      warn "AudioFile::Info - Default $_ handler is now $pkg\n";
+    }
   }
 
   DumpFile($path, $config);

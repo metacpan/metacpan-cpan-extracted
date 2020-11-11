@@ -1,6 +1,12 @@
 Changelog for HealthCheck
 
-v1.6.0 2020-08-04T18:23:15
+v1.7.0 2020-11-11T17:09:00
+ - Update README (Andrew Hewus Fresh)
+ - Support leap seconds (Andrew Hewus Fresh)
+ - Switch to stricter RFC 3339 timestamps (Andrew Hewus Fresh)
+ - Allow optional timezone in timestamp (Andrew Hewus Fresh)
+
+v1.6.0 2020-08-04T18:12:55
  - Update README (Andrew Hewus Fresh)
  - Add support for skipping result summarization (Andrew Hewus Fresh)
  - Use a new reference in tests, not the one we modify (Andrew Hewus Fresh)

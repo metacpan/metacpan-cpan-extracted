@@ -348,6 +348,35 @@ test_gen(
     },
 );
 
+{
+    my $table_data = [
+        {s=>'a1'},
+        {s=>'A1'},
+        {s=>'a2'},
+    ];
+    my $table_spec = {
+        fields => {
+            s  => {schema=>'str*'   , pos=>0, filterable_regex=>1, },
+            # TODO
+            #s2  => {schema=>'cistr*'   , pos=>1, filterable_regex=>1, },
+        },
+        pk => 's',
+    };
+
+    test_gen(
+        name => 'case sensitive comparison 1',
+        table_data => $table_data,
+        table_spec => $table_spec,
+        other_args => {case_insensitive_comparison=>1},
+        status => 200,
+        post_test => sub {
+            my ($res) = @_;
+            my $func = $res->[2]{code};
+            test_query($func, {"s.is"=>"a1"}, 2, 's.is');
+        },
+    );
+}
+
 test_gen(
     name => 'case sensitive search',
     table_data => $table_data,

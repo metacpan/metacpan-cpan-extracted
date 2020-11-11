@@ -13,3 +13,5 @@ msgstr "Sauver le brouillon"
 msgid "Update draft"
 msgstr "Mettre à jour le brouillon"
 
+msgid "Period (in seconds) to automatically save a response/comment draft"
+msgstr "Délais (en secondes) de sauvegarde automatique des brouillons de réponses/commentaires"

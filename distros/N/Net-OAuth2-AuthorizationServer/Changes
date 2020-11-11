@@ -1,5 +1,8 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.28     2020-11-02
+        - Handle lack of token in Authorization header (GH #27)
+
 0.27     2020-09-02
         - Update example w/r/t recent(ish) changes in callback return expectations
 

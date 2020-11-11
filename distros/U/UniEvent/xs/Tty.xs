@@ -29,6 +29,7 @@ BOOT {
         {"MODE_RAW", (int)Tty::Mode::RAW},
         {"MODE_IO",  (int)Tty::Mode::IO }
     });
+    unievent::register_perl_class(Tty::TYPE, s);
 }
 
 TtySP Tty::new (Sv fd, LoopSP loop = {}) {

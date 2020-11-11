@@ -6,10 +6,11 @@
 
 package Rex::Interface::Exec::Sudo;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Rex::Config;
 use Rex::Interface::Exec::Local;

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::ConstrainedObject::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::ConstrainedObject::VERSION   = '1.010006';
+	$Type::Tiny::ConstrainedObject::VERSION   = '1.012000';
 }
 
 $Type::Tiny::ConstrainedObject::VERSION =~ tr/_//d;
@@ -49,7 +49,7 @@ sub parent
 
 sub _short_name
 {
-	die "implement this";
+	die "subclasses must implement this"; # uncoverable statement
 }
 
 my $i = 0;

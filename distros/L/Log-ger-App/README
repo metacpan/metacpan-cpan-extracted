@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.014
+    version 0.018
 
 SYNOPSIS
     In your script:
@@ -134,13 +134,38 @@ FUNCTIONS
 
     *   outputs
 
-        hash. Specify extra outputs. Will be passed to
-        Log::ger::Output::Composite configuration.
+        hash. Specify extra outputs. Will be added to
+        Log::ger::Output::Composite's "outputs" configuration.
+
+        Example:
+
+         outputs => {
+             DirWriteRotate => {
+                 conf => {dir=>'/home/ujang/log', max_size=>10_000},
+                 level => 'off',
+                 category_level => {Dump => 'info'},
+             },
+         },
+
+    *   extra_conf
+
+        Hash. Specify extra configuration, will be added to
+        Log::ger::Output::Composite's configuration.
+
+        Example:
+
+         extra_conf => {
+             category_level => {Dump => 'off'},
+         },
 
 VARIABLES
   $DEBUG
     Default is false. If set to true, will show more details about how log
     level, etc is set.
+
+  @IMPORT_ARGS
+    Will be set with the last aguments passed to import(), for informational
+    purposes.
 
 ENVIRONMENT
   LOG_GER_APP_DEBUG
@@ -152,7 +177,7 @@ ENVIRONMENT
 
   LOG_ADD_MEMORY_INFO
     Boolean. Default to false. If set to true, will add memory info to log
-    (see "_{vmtime}" in Log::ger::Layout::Pattern).
+    (see %_{vmtime} pattern in Log::ger::Layout::Pattern).
 
   LOG_LEVEL
     String. Can be set to "off" or numeric/string log level.

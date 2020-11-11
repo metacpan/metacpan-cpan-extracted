@@ -3,7 +3,7 @@ package Markdent::Types::Internal;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use IO::Handle;
 
@@ -14,8 +14,8 @@ use parent 'Specio::Exporter';
 
 declare(
     'HeaderLevel',
-    parent => t('Int'),
-    inline => sub {"$_[1] >= 1 && $_[1] <= 6"},
+    parent            => t('Int'),
+    inline            => sub {"$_[1] >= 1 && $_[1] <= 6"},
     message_generator =>
         sub {"Header level must be a number from 1-6 (not $_)"},
 );

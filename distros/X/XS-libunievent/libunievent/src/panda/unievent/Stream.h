@@ -92,12 +92,13 @@ struct Stream : virtual BackendHandle, protected backend::IStreamImplListener {
     excepted<void, ErrorCode>         listen (int backlog) { return listen(nullptr, backlog); }
     virtual excepted<void, ErrorCode> listen (connection_fn callback = nullptr, int backlog = DEFAULT_BACKLOG);
 
-    virtual void write    (const WriteRequestSP&);
-    /*INL*/ void write    (const string& buf, write_fn callback = nullptr);
+    virtual void   write (const WriteRequestSP&);
+    WriteRequestSP write (const string& buf, write_fn callback = nullptr); /*INLINE*/
     template <class It>
-    /*INL*/ void write (const It& begin, const It& end, write_fn callback = nullptr);
+    WriteRequestSP write (const It& begin, const It& end, write_fn callback = nullptr); /*INLINE*/
     template <class Range, typename = typename std::enable_if<std::is_convertible<decltype(*std::declval<Range>().begin()), string>::value>::type>
-    /*INL*/ void write (const Range& range, write_fn callback = nullptr);
+    WriteRequestSP write (const Range& range, write_fn callback = nullptr); /*INLINE*/
+
     virtual void shutdown (const ShutdownRequestSP&);
     /*INL*/ void shutdown (shutdown_fn callback = {});
     /*INL*/ void shutdown (uint64_t timeout, shutdown_fn callback = {});
@@ -380,24 +381,27 @@ struct RunInOrderRequest : StreamRequest {
     void notify       (const ErrorCode&) override;
 };
 
-inline void Stream::write (const string& data, write_fn callback) {
-    auto req = new WriteRequest(data);
+inline WriteRequestSP Stream::write (const string& data, write_fn callback) {
+    WriteRequestSP req = new WriteRequest(data);
     if (callback) req->event.add(callback);
     write(req);
+    return req;
 }
 
 template <class It>
-inline void Stream::write (const It& begin, const It& end, write_fn callback) {
-    auto req = new WriteRequest(begin, end);
+inline WriteRequestSP Stream::write (const It& begin, const It& end, write_fn callback) {
+    WriteRequestSP req = new WriteRequest(begin, end);
     if (callback) req->event.add(callback);
     write(req);
+    return req;
 }
 
 template <class Range, typename>
-inline void Stream::write (const Range& range, write_fn callback) {
-    auto req = new WriteRequest(range);
+inline WriteRequestSP Stream::write (const Range& range, write_fn callback) {
+    WriteRequestSP req = new WriteRequest(range);
     if (callback) req->event.add(callback);
     write(req);
+    return req;
 }
 
 inline void Stream::shutdown (shutdown_fn callback)                   { shutdown(new ShutdownRequest(callback)); }

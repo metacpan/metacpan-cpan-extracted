@@ -3,9 +3,9 @@ NAME
     structures
 
 VERSION
-    This document describes version 0.002 of Log::ger::UseDataDumpColor
+    This document describes version 0.003 of Log::ger::UseDataDumpColor
     (from Perl distribution Log-ger-UseDataDumpColor), released on
-    2020-04-17.
+    2020-06-04.
 
 SYNOPSIS
      use Log::ger::UseDataDumpColor;
@@ -33,6 +33,7 @@ SEE ALSO
     Data::Dump::Color
 
     Other modules to set data dumper for Log::ger: Log::ger::UseDataDump,
+    Log::ger::UseDataDumpObjectAsString, Log::ger::UseDataDumpOptions,
     Log::ger::UseDataDumper, Log::ger::UseDataPrinter.
 
 AUTHOR

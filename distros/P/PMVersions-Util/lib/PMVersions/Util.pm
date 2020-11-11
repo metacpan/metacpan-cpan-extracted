@@ -1,7 +1,9 @@
 package PMVersions::Util;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-11'; # DATE
+our $DIST = 'PMVersions-Util'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +24,7 @@ sub read_pmversions {
     if (-e $path) {
         $hoh = Config::IOD::Reader->new->read_file($path);
     } else {
-        die "pmversions file '$path' does not exist";
+        warn "pmversions file '$path' does not exist";
     }
 
     $hoh->{GLOBAL} // {};
@@ -51,7 +53,7 @@ PMVersions::Util - Utilities related to pmversions.ini
 
 =head1 VERSION
 
-This document describes version 0.001 of PMVersions::Util (from Perl distribution PMVersions-Util), released on 2018-06-07.
+This document describes version 0.002 of PMVersions::Util (from Perl distribution PMVersions-Util), released on 2020-11-11.
 
 =head1 SYNOPSIS
 
@@ -84,7 +86,8 @@ Usage:
 
 Read F<pmversions.ini> and return a hash of module names and versions. If
 C<$path> is not specified, will look at C<PMVERSIONS_PATH> environment variable,
-or defaults to F<~/pmversions.ini>. Will die if file cannot be read or parsed.
+or defaults to F<~/pmversions.ini>. Will warn if file does not exist. Will die
+if file cannot be read or parsed.
 
 =head2 version_from_pmversions
 
@@ -96,6 +99,9 @@ Check version from pmversions file. C<$path> will be passed to
 L</"read_pmversions"> only the first time; after that, the contents of the file
 is cached in a hash variable so the pmversions file is only read and parsed
 once.
+
+Will return undef if file does not exist or version for C<$mod> is not set in
+the pmversions file.
 
 =head1 ENVIRONMENT
 
@@ -128,7 +134,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

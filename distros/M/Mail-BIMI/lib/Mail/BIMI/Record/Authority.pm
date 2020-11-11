@@ -1,6 +1,6 @@
 package Mail::BIMI::Record::Authority;
 # ABSTRACT: Class to model a BIMI authority
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -23,12 +23,6 @@ sub _build_is_authority_valid($self) {
   return 1 if $self->uri eq 'self';
   if ( ! ( $self->uri =~ /^https:\/\// ) ) {
     $self->add_error('INVALID_TRANSPORT_A');
-  }
-
-  # Currently .pem implies VMC, and is the only evidence document defined
-  # Expand this as more options become available
-  if ( !( $self->uri =~ /\.pem\?/ || $self->uri =~ /\.pem$/ )) {
-    $self->add_error('INVALID_EXTENSION_A','VMC MUST have .pem extension');
   }
 
   return 0 if $self->errors->@*;
@@ -82,7 +76,7 @@ Mail::BIMI::Record::Authority - Class to model a BIMI authority
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -121,6 +115,10 @@ Is this Authority valid
 is=rw
 
 Mail::BIMI::VMC object for this Authority
+
+=head2 warnings
+
+is=rw
 
 =head1 CONSUMES
 

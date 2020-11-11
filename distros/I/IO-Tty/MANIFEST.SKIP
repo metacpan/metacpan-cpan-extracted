@@ -7,3 +7,4 @@
 ^xssubs.c
 ^Tty/Constant.pm
 ^Makefile$
+^IO-Tty-\d

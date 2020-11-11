@@ -1,6 +1,28 @@
 Changelog for DBIx-BatchChunker
 
-v0.940.1 2020-05-14T19:56:46
+v0.940.2 2020-10-29T14:41:19
+ - Move has_dbic_retry_opts to a private predicate (Brendan Byrd)
+ - update README for v0.940.2 (Mark Flickinger)
+ - SM-2747: Fix max_end boundary bug with process_past_max (Brendan Byrd)
+ - SM-2747: Add max_end tests to all scenarios (Brendan Byrd)
+ - SM-2747 Ensure looping never exceeds max_end (Nathaniel Blake)
+ - SM-2747 Add tests that reproduce bug (Nathaniel Blake)
+ - Very small POD fix (Brendan Byrd)
+ - POD fixes (Brendan Byrd)
+ - Enable fractional multipliers in chunk resizing (Brendan Byrd)
+ - Create new LoopState object class (Brendan Byrd)
+ - Fix missing 'defined' on $max_id check (Brendan Byrd)
+ - Use the DBIC storage engine retry protection by default (Brendan Byrd)
+ - Fix argument sanity check error for DIY mode (Brendan Byrd)
+
+v0.940.1 2020-05-08T19:25:47
+ - Update README (Brendan Byrd)
+ - Clean up cpanfile (Andrew Hewus Fresh)
+ - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
+ - Move xt tests where they belong (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+
+v0.940.0 2019-08-06T22:24:54
  - No changes found
 
 0.94 2019-08-06T22:24:54
@@ -10,9 +32,6 @@ v0.940.1 2020-05-14T19:56:46
    (Brendan Byrd)
  - SM-1828: Prep for new version 0.94 (Brendan Byrd)
  - SM-1828: Change boolean $rs calls to "defined $rs" (Brendan Byrd)
-
-v0.940.0 2019-08-06T22:24:54
- - No changes found
 
 0.93 2019-01-09T20:08:59
  - SM-1647: Prep for new version 0.93 (Brendan Byrd)

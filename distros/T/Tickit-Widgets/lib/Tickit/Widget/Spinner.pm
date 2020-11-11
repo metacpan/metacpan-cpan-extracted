@@ -3,15 +3,15 @@
 #
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Spinner;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::Widget::Spinner 0.31;
+class Tickit::Widget::Spinner
+   extends Tickit::Widget;
+
+use experimental 'postderef';
 
 use Tickit::Style;
-
-our $VERSION = '0.30';
 
 use List::Util qw( max );
 use Tickit::Utils qw( textwidth );
@@ -70,36 +70,39 @@ Optional. The time each string is displayed for. Defaults to 0.5.
 
 =cut
 
-sub new
+has @_chars;
+has $_state = 0;
+has $_interval;
+has $_cols;
+
+BUILD
 {
-   my $class = shift;
    my %params = @_;
 
-   my $self = $class->SUPER::new( %params );
+   @_chars = $params{chars} ? $params{chars}->@* : (qw( - \ | / ));
 
-   $self->{chars} = $params{chars} || [qw( - \ | / )];
-   $self->{state} = 0;
+   $_interval = $params{interval} // 0.5;
 
-   $self->{interval} = $params{interval} // 0.5;
-
-   $self->{cols} = max map { textwidth $_ } @{ $self->{chars} };
-
-   return $self;
+   $_cols = max map { textwidth $_ } @_chars;
 }
+
+has $_running;
+has $_x;
+has $_y;
+has $_rect;
 
 =head1 METHODS
 
 =cut
 
-sub lines
+method lines
 {
    return 1;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
-   return $self->{cols};
+   return $_cols;
 }
 
 =head2 start
@@ -110,11 +113,10 @@ Starts the animation effect.
 
 =cut
 
-sub start
+method start
 {
-   my $self = shift;
-   return if $self->{running};
-   $self->{running} = 1;
+   return if $_running;
+   $_running = 1;
    $self->tick;
 }
 
@@ -126,61 +128,52 @@ Stops the animation effect.
 
 =cut
 
-sub stop
+method stop
 {
-   my $self = shift;
-   $self->{running} = 0;
+   $_running = 0;
 }
 
-sub window_gained
+method window_gained
 {
-   my $self = shift;
    $self->SUPER::window_gained( @_ );
    $self->start;
 }
 
 # precache position
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $win = $self->window or return;
 
-   @{$self}{qw( x y )} = map int($_ / 2), $win->cols - $self->cols, $win->lines - $self->lines;
+   ( $_x, $_y ) = map int($_ / 2), $win->cols - $self->cols, $win->lines - $self->lines;
 
-   $self->{rect} = Tickit::Rect->new(
-      top   => $self->{y},
-      left  => $self->{x},
+   $_rect = Tickit::Rect->new(
+      top   => $_y,
+      left  => $_x,
       lines => $self->lines,
       cols  => $self->cols,
    );
 }
 
-sub tick
+method tick
 {
-   my $self = shift;
-   return unless $self->{running};
+   return unless $_running;
 
-   my $state = $self->{state}++;
-   $self->{state} %= @{ $self->{chars} };
+   my $state = $_state++;
+   $_state %= @_chars;
 
    if( my $win = $self->window ) {
-      $win->tickit->timer( after => $self->{interval} => sub { $self->tick } );
-      $win->expose( $self->{rect} );
+      $win->tickit->timer( after => $_interval => sub { $self->tick } );
+      $win->expose( $_rect );
    }
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
-
-   my $chars = $self->{chars};
-   my $state = $self->{state};
 
    $rb->eraserect( $rect );
 
-   $rb->text_at( $self->{y}, $self->{x}, $chars->[$state] );
+   $rb->text_at( $_y, $_x, $_chars[$_state] );
 }
 
 =head1 AUTHOR

@@ -13,6 +13,7 @@ dist.ini
 doap.ttl
 examples/HTTP-Tiny-Objects/get.pl
 examples/HTTP-Tiny-Objects/lib/HTTP/Tiny/Objects.pm
+examples/asking.pl
 lib/MooX/Press.pm
 lib/MooX/Press/Keywords.pm
 lib/Zydeco/Lite.pm
@@ -50,6 +51,8 @@ t/32multifactory-zylite.t
 t/32multifactory.t
 t/40symmethods-zylite.t
 t/40symmethods.t
+t/66aq-zylite.t
+t/66aq.t
 t/70tagrole.t
 t/87weirdscopes.t
 t/88patchpackage.t

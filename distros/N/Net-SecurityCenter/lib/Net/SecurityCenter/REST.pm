@@ -3,8 +3,8 @@ package Net::SecurityCenter::REST;
 use warnings;
 use strict;
 
-use Carp;
-use English qw( -no_match_vars );
+use version;
+use Carp ();
 use HTTP::Cookies;
 use JSON;
 use LWP::UserAgent;
@@ -12,7 +12,8 @@ use LWP::UserAgent;
 use Net::SecurityCenter::Error;
 use Net::SecurityCenter::Utils qw(trim dumper);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
+our $ERROR;
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -23,8 +24,7 @@ sub new {
     my ( $class, $host, $options ) = @_;
 
     if ( !$host ) {
-        $@ = 'Specify valid Tenable.sc (SecurityCenter) hostname or IP address';    ## no critic
-        return;
+        Carp::croak 'Specify the Tenable.sc hostname or IP address';
     }
 
     my $agent      = LWP::UserAgent->new();
@@ -36,7 +36,9 @@ sub new {
     my $timeout  = delete( $options->{'timeout'} );
     my $ssl_opts = delete( $options->{'ssl_options'} ) || {};
     my $logger   = delete( $options->{'logger'} ) || undef;
-    my $no_check = delete( $options->{'no_check'} ) || 0;
+    my $scheme   = delete( $options->{'scheme'} ) || 'https';
+
+    my $url = "$scheme://$host/rest";
 
     if ($timeout) {
         $agent->timeout($timeout);
@@ -51,17 +53,18 @@ sub new {
     my $self = {
         host    => $host,
         options => $options,
-        url     => "https://$host/rest",
+        url     => $url,
         token   => undef,
+        api_key => undef,
         agent   => $agent,
         logger  => $logger,
-        _error  => undef,
+        error   => undef,
     };
 
     bless $self, $class;
 
-    if ( !$no_check ) {
-        $self->check();
+    if ( !$self->_check ) {
+        Carp::croak $self->{error}->message;
     }
 
     return $self;
@@ -83,14 +86,14 @@ sub _agent {
 
 #-------------------------------------------------------------------------------
 
-sub check {
+sub _check {
 
     my ($self) = @_;
 
     my $response = $self->request( 'GET', '/system' );
 
     if ( !$response ) {
-        $self->error( 'Failed to connect to Tenable.sc (SecurityCenter) : ', $self->{'host'}, 500 );
+        $self->error( 'Failed to connect to Tenable.sc (' . $self->{'host'} . ')', 500 );
         return;
     }
 
@@ -99,11 +102,7 @@ sub check {
     $self->{'license'}  = $response->{'licenseStatus'};
     $self->{'uuid'}     = $response->{'uuid'};
 
-    if ( $self->{'logger'} ) {
-        $self->logger( 'info',
-            'Tenable.sc (SecurityCenter) ' . $self->{'version'} . ' (Build ID:' . $self->{'build_id'} . ')' );
-    }
-
+    $self->logger( 'info', 'Tenable.sc ' . $self->{'version'} . ' (Build ID:' . $self->{'build_id'} . ')' );
     return 1;
 
 }
@@ -115,10 +114,10 @@ sub error {
     my ( $self, $message, $code ) = @_;
 
     if ( defined $message ) {
-        $self->{'_error'} = Net::SecurityCenter::Error->new( $message, $code );
+        $self->{error} = Net::SecurityCenter::Error->new( $message, $code );
         return;
     } else {
-        return $self->{'_error'};
+        return $self->{error};
     }
 
 }
@@ -136,7 +135,7 @@ for my $sub_name (qw/get head put post delete patch/) {
         my ( \$self, \$path, \$params ) = \@_;
         my \$class = ref \$self;
         ( \@_ == 2 || ( \@_ == 3 && ref \$params eq 'HASH' ) )
-            or croak("Usage: \$class->$sub_name( PATH, [HASHREF] )\n");
+            or Carp::croak("Usage: \$class->$sub_name( PATH, [HASHREF] )\n");
         return \$self->request('$req_method', \$path, \$params || {});
     }
 HERE
@@ -150,32 +149,27 @@ sub request {
     my ( $self, $method, $path, $params ) = @_;
 
     ( @_ == 3 || @_ == 4 )
-        or croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
+        or Carp::croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
 
     $method = uc($method);
     $path =~ s{^/}{};
 
     if ( $method !~ m/(?:GET|POST|PUT|DELETE|PATCH)/ ) {
-        carp( $method, ' is an unsupported request method' );
-        croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
+        Carp::carp( $method . ' is an unsupported request method' );
+        Croak::croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
     }
 
-    my $url             = $self->{'url'} . "/$path";
-    my $agent           = $self->{'agent'};
-    my $request         = HTTP::Request->new( $method => $url );
-    my $request_content = undef;
+    my $url     = $self->{'url'} . "/$path";
+    my $agent   = $self->{'agent'};
+    my $request = HTTP::Request->new( $method => $url );
 
-    if ( $self->{'logger'} ) {
+    $self->logger( 'debug', "Method: $method" );
+    $self->logger( 'debug', "Path: $path" );
+    $self->logger( 'debug', "URL: $url" );
 
-        $self->logger( 'info', "Method: $method" );
-        $self->logger( 'info', "Path: $path" );
-        $self->logger( 'info', "URL: $url" );
-
-        # Don't log credential
-        if ( $path !~ /token/ ) {
-            $self->logger( 'info', "Params: " . dumper($params) );
-        }
-
+    # Don't log credential
+    if ( $path !~ /token/ ) {
+        $self->logger( 'debug', "Params: " . dumper($params) );
     }
 
     if ( $params->{'file'} ) {
@@ -190,23 +184,18 @@ sub request {
             ],
         );
 
-        if ( $self->{'logger'} ) {
-            $self->logger( 'debug', $request->dump );
-        }
-
     } else {
 
         $request->header( 'Content-Type', 'application/json' );
 
         if ($params) {
-            $request_content = encode_json($params);
-        }
-
-        if ($request_content) {
-            $request->content($request_content);
+            $request->content( encode_json($params) );
         }
 
     }
+
+    # Reset error
+    $self->{'error'} = undef;
 
     my $response         = $agent->request($request);
     my $response_content = $response->content();
@@ -225,16 +214,12 @@ sub request {
         $result = eval { decode_json($response_content) };
     }
 
-    if ( $self->{'logger'} ) {
+    $self->logger( 'debug', 'Response status: ' . $response->status_line );
 
-        my $log_http_status = 'Response status: ' . $response->status_line;
-
-        if ( $response->is_success() ) {
-            $self->logger( 'info', $log_http_status );
-        } else {
-            $self->logger( 'error', $log_http_status );
+    if ( ref $result->{warnings} eq 'ARRAY' ) {
+        foreach my $warning ( @{ $result->{'warnings'} } ) {
+            Carp::carp( $warning->{code} . ': ' . $warning->{warning} );
         }
-
     }
 
     if ( $response->is_success() ) {
@@ -248,12 +233,11 @@ sub request {
 
                 my $error_msg = trim( $result->{'error_msg'} );
 
-                if ( $self->{'logger'} ) {
-                    $self->logger( 'error', $error_msg );
-                }
-
+                $self->logger( 'error', $error_msg );
                 $self->error( $error_msg, $response_code );
+
                 return;
+
             }
 
         }
@@ -266,20 +250,16 @@ sub request {
 
         my $error_msg = trim( $result->{'error_msg'} );
 
-        if ( $self->{'logger'} ) {
-            $self->logger( 'error', $error_msg );
-        }
-
+        $self->logger( 'error', $error_msg );
         $self->error( $error_msg, $response_code );
+
         return;
 
     }
 
-    if ( $self->{'logger'} ) {
-        $self->logger( 'error', $response_content );
-    }
-
+    $self->logger( 'error', $response_content );
     $self->error( $response_content, $response_code );
+
     return;
 
 }
@@ -293,7 +273,7 @@ sub upload {
     my ( $self, $file ) = @_;
 
     ( @_ == 2 )
-        or croak( 'Usage: ' . __PACKAGE__ . '->upload( $FILE )' );
+        or Carp::croak( 'Usage: ' . __PACKAGE__ . '->upload( $FILE )' );
 
     return $self->request( 'POST', '/file/upload', { 'file' => $file } );
 
@@ -305,9 +285,7 @@ sub logger {
 
     my ( $self, $level, $message ) = @_;
 
-    if ( !$self->{'logger'} ) {
-        return 0;
-    }
+    return if ( !$self->{'logger'} );
 
     $level = lc($level);
 
@@ -324,29 +302,69 @@ sub logger {
 
 sub login {
 
-    my ( $self, $username, $password ) = @_;
+    my ( $self, %args ) = @_;
 
-    ( @_ == 3 ) or croak( 'Usage: ' . __PACKAGE__ . '->login( $USERNAME, $PASSWORD )' );
+    # Detect "flat" login argument with username and password
+    if (   !( defined( $args{'access_key'} ) && defined( $args{'secret_key'} ) )
+        && !( defined( $args{'username'} ) && defined( $args{'password'} ) ) )
+    {
 
-    my $response = $self->request(
-        'POST', '/token',
-        {
+        my $username = ( keys %args )[0];
+        my $password = $args{$username};
+
+        %args = (
             username => $username,
-            password => $password
-        }
-    );
+            password => $password,
+        );
 
-    if ( !$response ) {
-        return;
     }
 
-    $self->{'token'} = $response->{'token'};
-    $self->{'agent'}->default_header( 'X-SecurityCenter', $self->{'token'} );
+    my $username   = delete( $args{'username'} );
+    my $password   = delete( $args{'password'} );
+    my $access_key = delete( $args{'access_key'} );
+    my $secret_key = delete( $args{'secret_key'} );
 
-    if ( $self->{'logger'} ) {
-        $self->logger( 'info',  'Connected to SecurityCenter (' . $self->{'host'} . ')' );
+    if ( !$username && !$access_key ) {
+        Carp::croak('Specify username/password or API Key');
+    }
+
+    if ($username) {
+
+        my $response = $self->request(
+            'POST', '/token',
+            {
+                username => $username,
+                password => $password
+            }
+        );
+
+        return if ( !$response );
+
+        $self->{'token'} = $response->{'token'};
+        $self->{'agent'}->default_header( 'X-SecurityCenter', $self->{'token'} );
+
+        $self->logger( 'info',  'Connected to Tenable.sc (' . $self->{'host'} . ')' );
         $self->logger( 'debug', "User: $username" );
-        $self->logger( 'debug', "Token: " . $self->{'token'} );
+
+    }
+
+    if ($access_key) {
+
+        my $version_check = ( version->parse( $self->{'version'} ) <=> version->parse('5.13.0') );
+
+        if ( $version_check < 0 ) {
+            Carp::croak "API Key Authentication require Tenable.sc v5.13.0 or never";
+        }
+
+        $self->{'api_key'} = 1;
+        $self->{'agent'}->default_header( 'X-APIKey', "accessKey=$access_key; secretKey=$secret_key" );
+
+        my $response = $self->request( 'GET', '/currentUser' );
+
+        return if ( !$response );
+
+        $self->logger( 'info', 'Connected to Tenable.sc (' . $self->{'host'} . ') using API Key' );
+
     }
 
     return 1;
@@ -359,12 +377,17 @@ sub logout {
 
     my ($self) = @_;
 
-    $self->request( 'DELETE', '/token' );
-    $self->{'token'} = undef;
-
-    if ( $self->{'logger'} ) {
-        $self->logger( 'info', 'Disconnected from SecurityCenter (' . $self->{'host'} . ')' );
+    if ( $self->{'token'} ) {
+        $self->request( 'DELETE', '/token' );
+        $self->{'token'} = undef;
     }
+
+    if ( $self->{'api_key'} ) {
+        $self->{'agent'}->default_header( 'X-APIKey', undef );
+        $self->{'api_key'} = undef;
+    }
+
+    $self->logger( 'info', 'Disconnected from Tenable.sc (' . $self->{'host'} . ')' );
 
     return 1;
 
@@ -405,7 +428,9 @@ Net::SecurityCenter::REST - Perl interface to Tenable.sc (SecurityCenter) REST A
 
     my $sc = Net::SecurityCenter::REST('sc.example.org');
 
-    $sc->login('secman', 'password');
+    if (! $sc->login('secman', 'password')) {
+        die $sc->error;
+    }
 
     my $running_scans = $sc->get('/scanResult', { filter => 'running' });
 
@@ -437,10 +462,10 @@ read or write takes longer than the timeout, an exception is thrown.
 
 =item * C<ssl_options> : A hashref of C<SSL_*> options to pass through to L<IO::Socket::SSL>.
 
-=item * C<logger> : A logger instance (eg. L<Log::Log4perl> or L<Log::Any> for log
-the REST request and response messages.
+=item * C<logger> : A logger instance (eg. L<Log::Log4perl>, L<Log::Any> or L<Mojo::Log>)
+for log the REST request and response messages.
 
-=item * C<no_check> : Disable the check of SecurityCenter installation.
+=item * C<scheme> : URI scheme (default: HTTPS).
 
 =back
 
@@ -449,7 +474,7 @@ the REST request and response messages.
 
 =head2 $sc->post|get|put|delete|patch ( $path [, \%params ] )
 
-Execute a request to SecurityCenter REST API. These methods are shorthand for
+Execute a request to Tenable.sc REST API. These methods are shorthand for
 calling C<request()> for the given method.
 
     my $nessus_scan = $sc->post('/scanResult/1337/download',  { 'downloadType' => 'v2' });
@@ -457,19 +482,46 @@ calling C<request()> for the given method.
 =head2 $sc->request ( $method, $path [, \%params ] )
 
 Execute a HTTP request of the given method type ('GET', 'POST', 'PUT', 'DELETE',
-''PATCH') to SecurityCenter REST API.
+''PATCH') to Tenable.sc REST API.
 
-=head2 $sc->login ( $username, $password )
+=head2 $sc->login ( ... )
 
-Login into SecurityCenter.
+Login into Tenable.sc using username/password or API Key.
+
+=head3 Username and password authentication
+
+    $sc->login( $username, $password ):
+    $sc->login( username => ..., password => ... );
+
+
+=head3 API Key authentication
+
+Since Tenable.SC 5.13 it's possibile to use API Key authentication using C<access_key>
+and C<secret_key>:
+
+    $sc->login( access_key => ..., secret_key => ... );
+
+More information about API Key authentication:
+
+=over 4
+
+=item * Enable API Key Authentication - L<https://docs.tenable.com/tenablesc/Content/EnableAPIKeys.htm>
+
+=item * Generate API Keys - L<https://docs.tenable.com/tenablesc/Content/GenerateAPIKey.htm>
+
+=back
 
 =head2 $sc->logout
 
-Logout from SecurityCenter.
+Logout from Tenable.sc.
 
 =head2 $sc->upload ( $file )
 
-Upload a file into SecurityCenter.
+Upload a file into Tenable.sc.
+
+=head2 $sc->error
+
+Catch the Tenable.sc errors and return L<Net::SecurityCenter::Error> class.
 
 
 =head1 SUPPORT

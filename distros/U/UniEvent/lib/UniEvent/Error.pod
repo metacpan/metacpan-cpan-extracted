@@ -1,0 +1,114 @@
+=head1 NAME
+
+UniEvent::Error - Perl bindings for UniEvent and system errors.
+
+=head1 DESCRIPTION
+
+The package allows to create and inspect errors, created in UnieEvent.
+
+=head1 SYNOPSIS
+
+    my $e = UniEvent::Error->new("message");
+    say "got error: ", $e->what, "\n";
+    my $c = $e->clone;
+
+=head1 METHODS
+
+=head2 new($string)
+
+=head2 new($error_code)
+
+Constructs new Error object either from textual description or
+prepared L<XS::ErrorCode>.
+
+=head2 what()
+
+Returns human-readable description of the error
+
+=head2 clone()
+
+Clones the error
+
+=head1 CONSTANTS
+
+=head2 There is a list of predefined L<error categories|XS::STL::ErrorCategory>:
+
+=head3 system_category
+
+An alias for standard syster error category
+
+=head3 category
+
+Own UniEvent errors
+
+=head3 resolve_category
+
+DNS resolver error category
+
+=head3 ssl_category
+
+SSL and TLS error category (high-level errors)
+
+=head3 openssl_category
+
+Low level openssl library errors.
+
+Predefined list of error codes of the own UniEvent error category:
+
+=head3 unknown_error
+
+=head3 read_start_error
+
+=head3 ssl_error
+
+=head3 resolve_error
+
+=head3 ai_address_family_not_supported
+
+=head3 ai_temporary_failure
+
+=head3 ai_bad_flags
+
+=head3 ai_bad_hints
+
+=head3 ai_request_canceled
+
+=head3 ai_permanent_failure
+
+=head3 ai_family_not_supported
+
+=head3 ai_out_of_memory
+
+=head3 ai_no_address
+
+=head3 ai_unknown_node_or_service
+
+=head3 ai_argument_buffer_overflow
+
+=head3 ai_resolved_protocol_unknown
+
+=head3 ai_service_not_available_for_socket_type
+
+=head3 ai_socket_type_not_supported
+
+=head3 invalid_unicode_character
+
+=head3 not_on_network
+
+=head3 transport_endpoint_shutdown
+
+=head3 host_down
+
+=head3 remote_io
+
+=head1 REFERENCES
+
+L<UniEvent::ResolveError>
+
+L<XS::ErrorCode>
+
+L<XS::STL::ErrorCode>
+
+L<XS::STL::ErrorCategory>
+
+=cut

@@ -361,6 +361,9 @@ sub FETCH {
     elsif ( $attrib eq 'Active' ) {
         return $tracker->is_active;
     }
+    elsif ( exists $tracker->{driver_attributes}->{$attrib} ) {
+        return $tracker->{driver_attributes}->{$attrib};
+    }
     elsif ( $attrib !~ /^mock/ ) {
         if ( $sth->{Database}->{mock_attribute_aliases} ) {
             if (

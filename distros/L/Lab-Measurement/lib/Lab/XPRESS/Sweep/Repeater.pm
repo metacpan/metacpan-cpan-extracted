@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Repeater;
 #ABSTRACT: Simple repeater
-$Lab::XPRESS::Sweep::Repeater::VERSION = '3.722';
+$Lab::XPRESS::Sweep::Repeater::VERSION = '3.730';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -72,7 +72,7 @@ Lab::XPRESS::Sweep::Repeater - Simple repeater
 
 =head1 VERSION
 
-version 3.722
+version 3.730
 
 =head1 SYNOPSIS
 

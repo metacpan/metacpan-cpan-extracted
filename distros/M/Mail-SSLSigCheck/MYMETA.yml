@@ -1,0 +1,19 @@
+---
+abstract: 'Module to validate S/SMIME email'
+author:
+  - "Bruce Schuck <bschuck@asgard-systems.com>"
+distribution_type: module
+module_name: Mail::SSLSigCheck
+name: Mail-SSLSigCheck
+no_index:
+  directory:
+    - lib
+    - t
+    - xt
+provides:
+  Mail::SSLSigCheck:
+    file: lib/Mail/SSLSigCheck.pm
+    version: 0.00
+requires:
+  MIME::Tools
+version: '0.00'

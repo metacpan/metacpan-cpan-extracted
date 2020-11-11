@@ -26,21 +26,21 @@ no_index:
 provides:
   Pepper:
     file: lib/Pepper.pm
-    version: v1.2.1
+    version: '1.3'
   Pepper::Commander:
     file: lib/Pepper/Commander.pm
-    version: v1.2.1
+    version: '1.3'
   Pepper::DB:
     file: lib/Pepper/DB.pm
   Pepper::PlackHandler:
     file: lib/Pepper/PlackHandler.pm
-    version: v1.2.1
+    version: '1.3'
   Pepper::Templates:
     file: lib/Pepper/Templates.pm
-    version: v1.2.1
+    version: '1.3'
   Pepper::Utilities:
     file: lib/Pepper/Utilities.pm
-    version: v1.2.1
+    version: '1.3'
 requires:
   Cpanel::JSON::XS: '4.08'
   DBD::mysql: '4.050'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://github.com/ericschernoff/Pepper/issues
   homepage: https://github.com/ericschernoff/Pepper
   repository: git://github.com/ericschernoff/Pepper.git
-version: 1.2.1
+version: '1.3'
 x_contributors:
   - 'Eric Chernoff <ericschernoff@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

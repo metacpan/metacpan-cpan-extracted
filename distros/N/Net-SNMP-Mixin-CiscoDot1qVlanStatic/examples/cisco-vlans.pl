@@ -9,7 +9,7 @@ cisco-vlans.pl
 
 =head1 ABSTRACT
 
-A script to get the vlan tag/untag info from cisco switches.
+An example script to get the vlan tag/untag info from cisco switches.
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ my $community = $opts{c} || 'public';
 my $version   = $opts{v} || '2';
 my $blocking  = $opts{b};
 my $timeout   = $opts{t} || 5;
-my $retries   = $opts{t} || 0;
+my $retries   = $opts{t} || 2;
 
 my $from_stdin = $opts{i} || undef;
 
@@ -62,7 +62,7 @@ foreach my $agent ( sort @agents ) {
     -nonblocking => !$blocking,
     -timeout     => $timeout,
     -retries     => $retries,
-    -debug       => $debug ? DEBUG_ALL: 0,
+    -debug       => $debug ? DEBUG_ALL : 0,
   );
 
   if ($error) {
@@ -70,9 +70,9 @@ foreach my $agent ( sort @agents ) {
     next;
   }
 
-  $session->mixer( qw/Net::SNMP::Mixin::IfInfo Net::SNMP::Mixin::CiscoDot1qVlanStatic/);
+  $session->mixer(qw/Net::SNMP::Mixin::IfInfo Net::SNMP::Mixin::CiscoDot1qVlanStatic/);
+  $session->init_mixins;
 
-  $session->init_mixins;;
   push @sessions, $session;
 
 }
@@ -88,10 +88,11 @@ $_->init_ok foreach @sessions;
   else              { 1 }
 } @sessions;
 
-
 foreach my $session ( sort { $a->hostname cmp $b->hostname } @sessions ) {
-  print_header($session);
+  print "######################################\n";
+  printf "Hostname:    %s\n", $session->hostname;
   print_cisco_vlan_info($session);
+  print "\n";
 }
 
 exit 0;
@@ -116,7 +117,7 @@ sub print_cisco_vlan_info {
     $idx++;
   }
 
-  print_header( $session, @trunks );
+  print_tab_header( $session, @trunks );
   foreach my $vlan_id ( sort { $a <=> $b } keys %{$ids2names} ) {
 
     # preset tagslist
@@ -134,12 +135,10 @@ sub print_cisco_vlan_info {
 
     printf "%s vid: %4d (%s)\n", $tags, $vlan_id, $ids2names->{$vlan_id};
   }
-  print_header( $session, @trunks ) if scalar @vlans > 20;
-  print "\n";
-
+  print_tab_header( $session, @trunks ) if scalar @vlans > 20;
 }
 
-sub print_header {
+sub print_tab_header {
   my $session = shift;
   my @trunks  = @_;
 
@@ -172,11 +171,6 @@ sub print_header {
     }
     print "\n";
   }
-
-  # print the delimiter line
-  #print '#' x scalar @trunks, "\n";
-  print "\n";
-
 }
 
 # strip leading and trailing whitespace
@@ -197,7 +191,6 @@ sub shorten {
   $val =~ s/Port-Channel/PO/ig;
   return $val;
 }
-
 
 sub usage {
   my @msg = @_;

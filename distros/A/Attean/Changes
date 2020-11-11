@@ -5,6 +5,19 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
+0.027  2020-11-06
+
+ - (Addition) Add canonicalization support for xsd:negativeInteger.
+ - (Addition) Added TextTable SPARQL results serializer.
+ - (Update) Fix SPARQL lexer to accept variables using the $ sigil.
+ - (Update) Fix evaluation of aggregates over empty groups.
+ - (Update) Fix handling of utf-8 encoding in AtteanX::Parser::SPARQLXML.
+ - (Update) Improve Attean::API::Result->apply_map handling of unbound
+   variables.
+ - (Update) Improve Test::Attean::SPARQLSuite.
+ - (Update) Improve handling of XPath Constructor (casting) functions.
+ - (Update) Update module metadata URLs (#155 from @szabgab).
+
 0.026  2020-02-20
 
  - (Addition) Added Attean::API::Model->evaluate convenience method (#149,

@@ -1,0 +1,5 @@
+[globals]
+someflag2=42
+
+[mycommand]
+someflag1="t/02app.t"

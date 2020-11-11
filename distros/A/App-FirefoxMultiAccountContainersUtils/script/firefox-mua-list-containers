@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FirefoxMultiAccountContainersUtils/firefox_mua_list_containers
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-21'; # DATE
+our $DATE = '2020-11-02'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,7 +26,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Sort Firefox Multi-Account Containers add-on's containers
+# ABSTRACT: List Firefox Multi-Account Containers add-on's containers
 # PODNAME: firefox-mua-list-containers
 
 __END__
@@ -37,11 +37,11 @@ __END__
 
 =head1 NAME
 
-firefox-mua-list-containers - Sort Firefox Multi-Account Containers add-on's containers
+firefox-mua-list-containers - List Firefox Multi-Account Containers add-on's containers
 
 =head1 VERSION
 
-This document describes version 0.010 of firefox-mua-list-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-09-21.
+This document describes version 0.011 of firefox-mua-list-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-11-02.
 
 =head1 SYNOPSIS
 
@@ -50,11 +50,6 @@ Usage:
  % firefox-mua-list-containers [--debug] [--format=name] [--json]
      [--log-level=level] [--(no)naked-res] [--page-result[=program]]
      [--quiet] [--trace] [--verbose] [--view-result[=program]] <profile>
-
-=head1 DESCRIPTION
-
-At the time of this writing, the UI does not provide a way to sort the
-containers. Thus this utility.
 
 =head1 OPTIONS
 

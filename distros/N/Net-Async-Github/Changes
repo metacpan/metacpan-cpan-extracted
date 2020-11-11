@@ -1,5 +1,15 @@
 Revision history for Net-Async-Github
 
+0.007     2020-10-28 07:34:00+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->create_pr for creating a new pull request
+
+    Bugs fixed:
+
+    - some methods were trying to use the legacy ->request method, which was removed
+    in favour of ->http_post/put/patch/get
+
 0.006     2020-06-29 01:03:13+08:00 Asia/Kuala_Lumpur
     No new features.
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,51 +12,55 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 43bd56b2e6c5124e9ed88ddc82c637ac218cb313 Changes
-SHA1 df55372ea220325a7b86ef0609c55a304d2b6c91 GraphViz.pm
-SHA1 947ef2005f21025ba186456222922d8398cfec27 GraphViz/Utils.pm
-SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 5ee05aed80c62462649d4b4726341e7cbb6b96e8 MANIFEST
-SHA1 a53499972fb44ddd2c7603ef7b99c2b69a950b6f META.yml
-SHA1 358f414381e01b8b558ee43bd8885860ab9df51d Makefile.PL
-SHA1 b7334b7b5e1ca02d5d753effae37ab849a9d3648 README
-SHA1 ba7b59a0d46cb5ff56d4695793362c46ea3a1fc0 examples/ex1.pl
-SHA1 8c383c9f6d42c2a783afb8bbceb70cb5f2bd2de6 examples/ex2.pl
-SHA1 eaebfe7c286e494965a87f61712e43a91821bed1 examples/ex3.pl
-SHA1 3fb5786f450a2f2f09504610e37b5b836f09f3a6 examples/ex4.pl
-SHA1 fb35caf900c5eadaddb9f53364a50714af7ff941 images/ex1.png
-SHA1 7c9bd0efe4e0ad84b4fd179373277a8fb50caee1 images/ex2.png
-SHA1 6e60c3b45ebc7422e348b26e5b846fd97364565e images/ex3.png
-SHA1 364da21c00b863ef6715a37a362344a16bcbaca4 images/ex4.png
-SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
-SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
-SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
-SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
-SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
-SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
-SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
-SHA1 028b85d29fc289353b0947f1d57205ae091ddae4 t/Map-Tube-GraphViz-Utils/00-use.t
-SHA1 d7b7b9eca6be80165e2316e4afdbcdbe3dea985f t/Map-Tube-GraphViz-Utils/01-version.t
-SHA1 89f5c1479dbea85919645bfc73072ffcda985532 t/Map-Tube-GraphViz-Utils/02-pod_coverage.t
-SHA1 8d3ae5c02ac4f7d397d2a05c9c77adc4ee1842c5 t/Map-Tube-GraphViz-Utils/03-pod.t
-SHA1 52dce8b6682173de235d83bb867dcad0409f31a1 t/Map-Tube-GraphViz/00-use.t
-SHA1 b83316cdc2598577a98c16a1e997b6e4f2c52a65 t/Map-Tube-GraphViz/01-version.t
-SHA1 fe8c4819bf8fb6e4bd641d4749a2690d78149fd9 t/Map-Tube-GraphViz/02-pod_coverage.t
-SHA1 c8c6141e640547c87fe7bfd3d2572b1299f3c3a1 t/Map-Tube-GraphViz/03-pod.t
-SHA1 3270dbd46382deb784809811dd62336a84278ae8 t/Map-Tube-GraphViz/04-new.t
+SHA256 f01874a21b93b6adb63181be3c948f171ecdec41c051db797880d0112c48dfc5 Changes
+SHA256 1aaeeb8961db390a0bbcb5503a3656ce480c17ad912b25ffc2bb0412e87a1835 GraphViz.pm
+SHA256 1a5567d9acb604c1c9fadb980281f8f467e9d2f09411675430313d1a6b77dd09 GraphViz/Utils.pm
+SHA256 4fd520fd3174c7bc1875a90a588fe12fbd2268830d6275df890f9acb6b76ec7b LICENSE.artistic_2
+SHA256 73c54c20df0c1eb887cbbc99b6dea34fcb6714e5cebc0bbbcd3a571560f1ec80 LICENSE.bsd
+SHA256 0401035c3228c6ad37c1f4efe478640362fd727f97eccc176de6c7b3cf79cff4 MANIFEST
+SHA256 959ecfcc7600de6670993f2d829790046b2f0d38c7cf78cea9b534bd263a027d META.yml
+SHA256 88c2e0c141a4277065a13982887eca0b837e6a3aeff1fb2aa35246da27dd7c68 Makefile.PL
+SHA256 0cb86331998ded74f65d27dfaa6e526a91e9854044fc24de5f7ddb17211d8228 README
+SHA256 8a5d40336c0b88f3df76d91c086443d9b74bcffe1d4dd6cca1a74b868d27e43d examples/ex1.pl
+SHA256 0bdf679db5924330ddd8e4c1ae026da2e640f8393ac2984e6ba11dddf6594329 examples/ex2.pl
+SHA256 9bb29a0daa225b8dad7c0f0d5ad61b9d458feb98a110ab010ccf00fd488b47e3 examples/ex3.pl
+SHA256 5eb3d630e37dd4f248e9021fdf9e829e48888f057657975657a4ab45e97aec13 examples/ex4.pl
+SHA256 e59fd4af5593a16e79caf3a0663f86a580d0114d60a5bd7549f2b4d011d9a421 examples/ex5.pl
+SHA256 9b628cdb08805a6b69082d4530454bb7360a17a702e16d0fab3437c7a44d9462 images/ex1.png
+SHA256 e6d84d679b8c7c864c1852c3102877f5f926cef99a9cd9c2328e06d1eabbe6ff images/ex2.png
+SHA256 b4662ac2552fc67d6bfacf8fd1dc77c28264df53b447bc5b1a2b23f7093d5ffa images/ex3.png
+SHA256 7797409e79eb50019b2512f72e67fb26083c9e9a55d4bb973017b703bff371f4 images/ex4.png
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 08f49e6a50c12c07346862781e1b4e55fc7db1129be6963284ae29d2131e8bbb t/Map-Tube-GraphViz-Utils/01-use.t
+SHA256 bc0203198a49ad1c00c2c8b0abe67779d1b395fe15a04732c3ca1ccb86c1fd7b t/Map-Tube-GraphViz-Utils/02-version.t
+SHA256 5456ffceecb9342dd0fbcb5e1e847a938d13efdf6e41c988c938901f635001a5 t/Map-Tube-GraphViz-Utils/03-color_line.t
+SHA256 848a0c1e519cd41155da35d23d517f78e3d9a4c88b390f1cff6e2c796d0f437c t/Map-Tube-GraphViz/01-use.t
+SHA256 48d5c0718d8ff0c069de7fd5b202af385b83702d4ca8b00c9133a2e9c11aeeec t/Map-Tube-GraphViz/02-version.t
+SHA256 8c1d7c64a1a71ac3325ccf8a7b6ddab565a985ce675170137f65f5c1b73dde7b t/Map-Tube-GraphViz/03-new.t
+SHA256 f97f957069c58b4772a2dc2cddf54e353bf68df376efdef16610cdf8fcf185ec xt/Map-Tube-GraphViz-Utils/01-pod_coverage.t
+SHA256 c6c56ede8567abb9e0319b5bbd99e556e416c8a9253b018e02e76ad0c4ff8a5e xt/Map-Tube-GraphViz-Utils/02-pod.t
+SHA256 2a3b60ac77fbbcfbb8b7b8e4f6a688b0792e769e915017f491ecd5eef6b8d8e7 xt/Map-Tube-GraphViz/01-pod_coverage.t
+SHA256 02105bc30495d0c804ccd89bf3b4a1ee4f115631b3adb7d9ea955281f5529043 xt/Map-Tube-GraphViz/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJU7COWAAoJEJe+XXKaIuTlCHkIALEGpsrGpnd6vPgRE1LfyqTc
-9aToLYdyU0s07lXY5pDr8MfXAJljBFItHOaH27qh0HLwE2GjvKZRzFaUhZciVWHz
-4uCBfxKOgA0SXDz+r+T4lUHOlO3TEucyzOefCshChejkJDzn46PeMBva4ydBaS2m
-eZ8Do6+eXfvy27+sMJ0beMnCYHFdCCUWBo7l77nrwoQGiLM3ujzL6A0sNm5BGZnw
-d5K79ueUJMPzSoMIfI3+Fs8zTgjkCuUIZ7yKGm2snL1ZneYBdjEN7LHmDDZKwyjp
-mtqN3FlkN2OyeLqFIhqgVm5Gu9hVoOI/u6ozuYcSyBiNbmwthKydpdtl9cCxuv8=
-=5gsA
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl+hVWQACgkQKyiOZjWe
+rHZHXAf/eqTDG3N4bmOAORBbxUPHSQ9WR12tDg+bKdvD9x4x+U9vwwMi8q6yYALG
+N1WDoKrTELf8gmBISajKPUj+EbtCwNAfNIUZxkl3BBrPL7h+vNUJIjuCAdkqWF0X
+u/U6ea1eN92yaXnqFyThvk7uokww73c/GjI+yBfqQ4ZQCduuaEo0Shc2YDYCIaNJ
+f2+Hxn8o+flYZFkyBEYk5Vk1s/WU/673NO7obe9R9bsZWFAiedB4EbvRIzguPLtq
+Pp1GyFNpjdBM7HAImR7lb059x3pZm0WvH54Mz5h03fioSASrz7kffVsJ5k7F/vaL
+LhCoYMwnDCqAvnzPB4HVuNqcVv0czA==
+=lCRL
 -----END PGP SIGNATURE-----

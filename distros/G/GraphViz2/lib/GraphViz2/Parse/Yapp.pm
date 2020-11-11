@@ -8,20 +8,34 @@ our $VERSION = '2.47';
 
 use GraphViz2;
 use Moo;
+use Graph::Directed;
 
-has graph =>
-(
-	default  => sub {
-		GraphViz2->new(
-			edge   => {color => 'grey'},
-			global => {directed => 1},
-			graph  => {rankdir => 'TB'},
-			node   => {color => 'blue', shape => 'oval'},
-		)
-        },
-	is       => 'rw',
-	#isa     => 'GraphViz2',
-	required => 0,
+my %EDGEATTR = (headport => 'port1');
+my %GRAPHVIZ_ARGS = (
+    edge   => {color => 'grey'},
+    global => {directed => 1, combine_node_and_port => 0},
+    graph  => {rankdir => 'TB'},
+    node   => {color => 'blue', shape => 'oval'},
+);
+
+has as_graph => (
+    is       => 'lazy',
+    required => 0,
+);
+sub _build_as_graph { to_graph($_[0]->file_name) }
+
+has graph => (
+    is       => 'lazy',
+    #isa     => 'GraphViz2',
+    required => 0,
+);
+sub _build_graph {
+    GraphViz2->new(%GRAPHVIZ_ARGS)->from_graph(graphvizify($_[0]->as_graph));
+}
+
+has file_name => (
+    is       => 'rw',
+    required => 0,
 );
 
 sub read_file {
@@ -29,220 +43,176 @@ sub read_file {
   map +((chomp, $_)[1]), <$fh>;
 }
 
-sub create
-{
-	my($self, %arg) = @_;
+sub create {
+    my ($self, %arg) = @_;
+    $self->file_name($arg{file_name});
+    $self->graph->from_graph(graphvizify($self->as_graph));
+    return $self;
+}
 
-	my(%edges);
-	my(%is_rule);
-	my(%labels);
-	my($rule, $rule_label);
-	my($text);
+sub to_graph {
+    my ($file_name) = @_;
+    my $g = Graph::Directed->new;
+    my (%edges, %labels);
+    for my $line (read_file($file_name)) {
+        next if ($line !~ /\w/) || ($line !~ /^\d+:\s+/);
+        $line =~ s/^\d+:\s+//;
+        my ($rule, $text) = split ' -> ', $line, 2;
+        $text = '(empty)' if ($text eq '/* empty */');
+        push @{$labels{$rule}}, $text;
+        @{$edges{$rule}}{split ' ', $text} = (); # only needs to exist
+    }
+    for my $f (keys %edges) {
+        $g->add_edges(map [$f, $_], grep $edges{$_}, keys %{$edges{$f}});
+        $g->set_vertex_attribute($f, labels => $labels{$f});
+    }
+    $g;
+}
 
-	for my $line (read_file($arg{file_name}) )
-	{
-		if ( ($line !~ /\w/) || ($line !~ /^\d+:\s+/) )
-		{
-			next;
-		}
+sub _quote { my $t = $_[0]; $t =~ s/\\/\\\\/g; $t; }
 
-		$line          =~ s/^\d+:\s+//;
-		($rule, $text) = $line =~ /^(.+) -> (.+)$/;
-
-		$is_rule{$rule} = 0 if (! $is_rule{$rule});
-		$is_rule{$rule}++;
-
-		$text       = '(empty)' if ($text eq '/* empty */');
-		$rule_label = '';
-
-		for my $item (split(' ', $text) )
-		{
-			$rule_label          .= "$item ";
-			$edges{$rule}        = {} if (! $edges{$rule});
-			$edges{$rule}{$item} = 0  if (! $edges{$rule}{$item});
-
-			$edges{$rule}{$item}++;
-        }
-
-		$rule_label    .= '\n';
-		$labels{$rule} .= $rule_label;
-	}
-
-	for my $from (sort keys %edges)
-	{
-		next if (! $is_rule{$from});
-
-		for my $to (sort keys %{$edges{$from} })
-		{
-			next if (! $is_rule{$to});
-
-			$self -> graph -> add_edge(from => $from, to => $to);
-		}
-	}
-
-	for my $rule (sort keys %labels)
-	{
-		$self -> graph -> add_node(name => $rule, label => [$rule, $labels{$rule}]);
-	}
-
-	return $self;
-
-}	# End of create.
-
-# -----------------------------------------------
+sub graphvizify {
+    my ($g) = @_;
+    for my $v ($g->vertices) {
+        $g->set_vertex_attribute($v, graphviz => {
+            label => [$v, [ map _quote($_).'\\l', @{$g->get_vertex_attribute($v, 'labels')} ]],
+        });
+        $g->set_edge_attribute(@$_, graphviz => \%EDGEATTR) for $g->edges_from($v);
+    }
+    $g->set_graph_attribute(graphviz => { global => $GRAPHVIZ_ARGS{global} });
+    $g;
+}
 
 1;
-
-=pod
 
 =head1 NAME
 
 L<GraphViz2::Parse::Yapp> - Visualize a yapp grammar as a graph
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
-	#!/usr/bin/env perl
+    use GraphViz2::Parse::Yapp;
+    # no objects - quicker
+    my $gd = GraphViz2::Parse::Yapp::to_graph('t/calc.output');
 
-	use strict;
-	use warnings;
+    # populate a GraphViz2 object with a Graph::Directed of a parser
+    my $gv = GraphViz2->from_graph(GraphViz2::Parse::Yapp::graphvizify($gd));
 
-	use File::Spec;
+    # OO interface, using lazy-built attributes
+    my $gvp = GraphViz2::Parse::Yapp->new(file_name => $file_name);
+    my $gd = $gvp->as_graph; # Graph::Directed object
+    # or supply a suitable Graph::Directed object
+    my $gvp = GraphViz2::Parse::Yapp->new(as_graph => $gd);
+    # then get the GraphViz2 object
+    my $gv = $gvp->graph;
 
-	use GraphViz2;
-	use GraphViz2::Parse::Yapp;
+    # DEPRECATED ways to get $gvp with populated $gv
+    my $gvp = GraphViz2::Parse::Yapp->new;
+    $gvp->create(file_name => 't/calc.output');
+    my $gv = $gvp->graph;
+    # or give it a pre-set-up GraphViz2 object
+    my $gv = GraphViz2->new(...);
+    my $gvp = GraphViz2::Parse::Yapp->new(graph => $gv);
+    # call ->create as above
 
-	my($graph)  = GraphViz2 -> new
-		(
-		 edge   => {color => 'grey'},
-		 global => {directed => 1},
-		 graph  => {concentrate => 1, rankdir => 'TB'},
-		 node   => {color => 'blue', shape => 'oval'},
-		);
-	my($g) = GraphViz2::Parse::Yapp -> new(graph => $graph);
+    # produce a visualisation
+    my $format = shift || 'svg';
+    my $output_file = shift || "output.$format";
+    $gv->run(format => $format, output_file => $output_file);
 
-	$g -> create(file_name => File::Spec -> catfile('t', 'calc.output') );
+See F<t/gen.parse.yapp.pl>.
 
-	my($format)      = shift || 'svg';
-	my($output_file) = shift || File::Spec -> catfile('html', "parse.yapp.$format");
+=head1 DESCRIPTION
 
-	$graph -> run(format => $format, output_file => $output_file);
+Takes a yapp grammar and converts it into a L<Graph::Directed>
+object, or directly into a L<GraphViz2> object.
 
-See scripts/parse.yapp.pl (L<GraphViz2/Scripts Shipped with this Module>).
+=head1 FUNCTIONS
 
-=head1 Description
+This is the recommended interface.
 
-Takes a yapp grammar and converts it into a graph.
+=head2 to_graph
 
-You can write the result in any format supported by L<Graphviz|http://www.graphviz.org/>.
+    my $gd = GraphViz2::Parse::Yapp::to_graph('t/calc.output');
 
-Here is the list of L<output formats|http://www.graphviz.org/content/output-formats>.
+Given a yapp grammar, returns a L<Graph::Directed> object
+describing the finite state machine for it.
 
-=head1 Distributions
+=head2 graphvizify
 
-This module is available as a Unix-style distro (*.tgz).
+    my $gv = GraphViz2->from_graph(GraphViz2::Parse::Yapp::graphvizify($gd));
 
-See L<http://savage.net.au/Perl-modules/html/installing-a-module.html>
-for help on unpacking and installing distros.
+Mutates the given graph object to add to it the C<graphviz> attributes
+visualisation "hints" that will make the L<GraphViz2/from_graph> method
+visualise this regular expression in the most meaningful way, including
+labels and groupings.
 
-=head1 Installation
+It is idempotent as it simply sets the C<graphviz> attribute of the
+relevant graph entities.
 
-Install L<GraphViz2> as you would for any C<Perl> module:
+Returns the graph object for convenience.
 
-Run:
+=head1 METHODS
 
-	cpanm GraphViz2
+This is a L<Moo> class, but with a recommended functional interface.
 
-or run:
+=head2 Constructor attributes
 
-	sudo cpan GraphViz2
+=head3 file_name
 
-or unpack the distro, and then either:
+The name of a yapp output file. See F<t/calc.output>.
 
-	perl Build.PL
-	./Build
-	./Build test
-	sudo ./Build install
+This key is optional. You need to provide it by the time you access
+either the L</as_graph> or L</graph>.
 
-or:
+=head3 as_graph
 
-	perl Makefile.PL
-	make (or dmake or nmake)
-	make test
-	make install
+The L<Graph::Directed> object to use. If not given, will be lazily built
+on access, from the L</regexp>.
 
-=head1 Constructor and Initialization
+=head3 graph
 
-=head2 Calling new()
+The L<GraphViz2> object to use. This allows you to configure it as desired.
 
-C<new()> is called as C<< my($obj) = GraphViz2::Parse::Yapp -> new(k1 => v1, k2 => v2, ...) >>.
+This key is optional. If provided, the C<create> method will populate it.
+If not, it will have these defaults, lazy-built and populated from the
+L</as_graph>.
 
-It returns a new object of type C<GraphViz2::Parse::Yapp>.
+    my $gv = GraphViz2->new(
+            edge   => {color => 'grey'},
+            global => {directed => 1},
+            graph  => {rankdir => 'TB'},
+            node   => {color => 'blue', shape => 'oval'},
+    );
 
-Key-value pairs accepted in the parameter list:
+=head2 create(regexp => $regexp)
 
-=over 4
-
-=item o graph => $graphviz_object
-
-This option specifies the GraphViz2 object to use. This allows you to configure it as desired.
-
-The default is GraphViz2->new. The default attributes are the same as in the synopsis, above.
-
-This key is optional.
-
-=back
-
-=head1 Methods
-
-=head2 create(file_name => $file_name)
-
-Creates the graph, which is accessible via the graph() method, or via the graph object you passed to new().
+DEPRECATED. Mutates the object to set the C<file_name> attribute, then
+accesses the C<as_graph> attribute (possibly lazy-building it), then
+C<graphvizify>s its C<as_graph> attribute with that information, then
+C<from_graph>s its C<graph>.
 
 Returns $self for method chaining.
 
-$file_name is the name of a yapp output file. See t/calc.output.
-
-=head2 graph()
-
-Returns the graph object, either the one supplied to new() or the one created during the call to new().
-
-=head1 FAQ
-
-See L<GraphViz2/FAQ> and L<GraphViz2/Scripts Shipped with this Module>.
-
-=head1 Thanks
+=head1 THANKS
 
 Many thanks are due to the people who chose to make L<Graphviz|http://www.graphviz.org/> Open Source.
 
 And thanks to L<Leon Brocard|http://search.cpan.org/~lbrocard/>, who wrote L<GraphViz>, and kindly gave me co-maint of the module.
 
-=head1 Version Numbers
-
-Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
-
-=head1 Machine-Readable Change Log
-
-The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes>.
-
-=head1 Support
-
-Email the author, or log a bug on RT:
-
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=GraphViz2>.
-
-=head1 Author
+=head1 AUTHOR
 
 L<GraphViz2> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> in 2011.
 
 Home page: L<http://savage.net.au/index.html>.
 
-=head1 Copyright
+=head1 COPYRIGHT
 
 Australian copyright (c) 2011, Ron Savage.
 
-	All Programs of mine are 'OSI Certified Open Source Software';
-	you can redistribute them and/or modify them under the terms of
-	The Perl License, a copy of which is available at:
-	http://dev.perl.org/licenses/
+All Programs of mine are 'OSI Certified Open Source Software';
+you can redistribute them and/or modify them under the terms of
+The Perl License, a copy of which is available at:
+http://dev.perl.org/licenses/
 
 =cut

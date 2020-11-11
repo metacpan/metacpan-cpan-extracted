@@ -1,8 +1,8 @@
 package App::PlatformInfo;
 
-our $DATE = '2020-10-08'; # DATE
+our $DATE = '2020-11-02'; # DATE
 our $DIST = 'App-PlatformInfo'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Packed platform-info script
@@ -19,7 +19,7 @@ App::PlatformInfo - Packed platform-info script
 
 =head1 VERSION
 
-This document describes version 0.004 of App::PlatformInfo (from Perl distribution App-PlatformInfo), released on 2020-10-08.
+This document describes version 0.006 of App::PlatformInfo (from Perl distribution App-PlatformInfo), released on 2020-11-02.
 
 =head1 DESCRIPTION
 

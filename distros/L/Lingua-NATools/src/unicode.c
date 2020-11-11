@@ -37,14 +37,14 @@
 #include <locale.h>
 #include <langinfo.h>
 
-void init_locale(void) {
+void init_locale(void) { 
     setlocale(LC_CTYPE, "");
     if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
         /* failed, try en_US.UTF-8 */
         setlocale(LC_CTYPE, "en_US.UTF-8");
         if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
-            fprintf(stderr, "Could not find an UTF-8 locale \n"
-                    "(check LC_CTYPE env var, or the availability of en_US.UTF-8 locale)\n");
+            fprintf(stderr, "Could not find an UTF-8 locale (got %s)\n"
+                    "(check LC_CTYPE env var, or the availability of en_US.UTF-8 locale)\n", nl_langinfo(CODESET));
             exit(1);
         }
     }

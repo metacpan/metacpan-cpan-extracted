@@ -24,6 +24,7 @@ BOOT {
     stash.inherit("UniEvent::Handle");
     stash.add_const_sub("TYPE", Simple(Check::TYPE.name));
     xs::at_perl_destroy([]() { cbn.on_check = nullptr; });
+    unievent::register_perl_class(Check::TYPE, stash);
 }
 
 Check* Check::new (LoopSP loop = {}) {

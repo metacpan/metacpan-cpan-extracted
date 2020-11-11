@@ -1,23 +1,24 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 12;
 
-use File::Spec ();
-use Path::Tiny qw/ path /;
-use Socket qw/ :crlf /;
-
-sub _normalize_lf
-{
-    my ($s) = @_;
-    $s =~ s#$CRLF#$LF#g;
-    return $s;
-}
+use Path::Tiny qw/ path cwd /;
+use Dir::Manifest::Slurp qw/ as_lf /;
+use Test::Differences qw/ eq_or_diff /;
 
 sub _filename
 {
-    return File::Spec->catfile( File::Spec->curdir(), "t", "data", shift() );
+    return cwd()->child( "t", "data", shift() );
 }
+
+sub _exe
+{
+    return cwd()->child( "bin", shift );
+}
+
+my $BHS    = _exe("black-hole-solve");
+my $GOLF_S = _exe("golf-solitaire-solve-perl");
 
 my $solution1 = <<'EOF';
 Solved!
@@ -93,9 +94,8 @@ EOF
 
     # TEST
     is(
-        _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($solution1),
-        "Testing for correct solution.",
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($solution1), "Testing for correct solution.",
     );
 
     unlink($sol_fn);
@@ -106,20 +106,15 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib",
-            File::Spec->catfile(
-                File::Spec->curdir(), "bin", "black-hole-solve"
-            ),
-            "-o", $sol_fn,
+        !system( $^X, "-Mblib", $BHS, "-o", $sol_fn,
             _filename("26464608654870335080.bh.board.txt")
         )
     );
 
     # TEST
     is(
-        _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($solution1),
-        "Testing for correct solution.",
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($solution1), "Testing for correct solution.",
     );
 
     unlink($sol_fn);
@@ -180,21 +175,114 @@ EOF
 
     # TEST
     ok(
-        !system( $^X, "-Mblib",
-            File::Spec->catfile(
-                File::Spec->curdir(), "bin", "golf-solitaire-solve-perl"
-            ),
-            "--queens-on-kings",
-            "-o", $sol_fn,
+        !system( $^X, "-Mblib", $GOLF_S, "--queens-on-kings",, "-o", $sol_fn,
             _filename("35.golf.board.txt")
         )
     );
 
     # TEST
     is(
-        _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($GOLF_35_SOLUTION),
+        as_lf( path($sol_fn)->slurp_utf8 ),
+        as_lf($GOLF_35_SOLUTION),
         "Testing for correct Golf solution.",
+    );
+
+    unlink($sol_fn);
+}
+
+my $MAX_NUM_PLAYED_CARDS_RE =
+    qr/\AAt most ([0-9]+) cards could be played\.\n?\z/ms;
+
+my @MAX_NUM_PLAYED_FLAG = ("--show-max-num-played-cards");
+
+sub _test_max_num_played_cards
+{
+    my ($args) = @_;
+    my ( $name, $want, $input_lines ) =
+        @{$args}{qw/ name expected_num input_lines/};
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return subtest $name => sub {
+        plan tests => 2;
+        my @matches = (
+            grep { /$MAX_NUM_PLAYED_CARDS_RE/ }
+            map  { as_lf($_) } @$input_lines,
+        );
+
+        is( scalar(@matches), 1, "One line." );
+
+        eq_or_diff(
+            [
+                map {
+                    /$MAX_NUM_PLAYED_CARDS_RE/
+                        ? ($1)
+                        : ( die "not matched!" )
+                } @matches
+            ],
+            [$want],
+            "num cards moved.",
+        );
+    };
+}
+
+{
+    my $sol_fn = _filename("26464608654870335080-with-max-depth.bh.sol.txt");
+
+    # TEST
+    ok(
+        !system( $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
+            _filename("26464608654870335080.bh.board.txt")
+        )
+    );
+
+    # TEST
+    _test_max_num_played_cards(
+        {
+            name         => "max-num-played on success",
+            expected_num => 51,
+            input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
+    );
+
+    unlink($sol_fn);
+}
+
+{
+    my $sol_fn = _filename("1-with-max-depth.bh.sol.txt");
+
+    # TEST
+    ok(
+        system( $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
+            _filename("1.bh.board.txt") ) != 0
+    );
+
+    # TEST
+    _test_max_num_played_cards(
+        {
+            name         => "max-num-played on fail",
+            expected_num => 3,
+            input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
+    );
+
+    unlink($sol_fn);
+}
+
+{
+    my $sol_fn = _filename("27.bh.sol.txt");
+
+    # TEST
+    ok(
+        system( $^X, "-Mblib", $BHS, @MAX_NUM_PLAYED_FLAG, "-o", $sol_fn,
+            _filename("27.bh.board.txt") ) != 0
+    );
+
+    # TEST
+    _test_max_num_played_cards(
+        {
+            name         => "max-num-played on no moves",
+            expected_num => 0,
+            input_lines  => [ path($sol_fn)->lines_utf8() ]
+        }
     );
 
     unlink($sol_fn);

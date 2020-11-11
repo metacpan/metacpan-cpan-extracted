@@ -4,7 +4,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr, expand)
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 

@@ -7,9 +7,9 @@ use warnings;
 use Carp;
 use Moose;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.2';
 
-has file          => ( is => 'rw', isa => 'Str', required => 1 );
+has file          => ( is => 'ro', isa => 'Str', required => 1 );
 has name          => ( is => 'rw', isa => 'Str' );
 has version       => ( is => 'rw', isa => 'Str' );
 has epoch	  => ( is => 'rw', isa => 'Str' );
@@ -18,11 +18,39 @@ has summary       => ( is => 'rw', isa => 'Str' );
 has license       => ( is => 'rw', isa => 'Str' );
 has group         => ( is => 'rw', isa => 'Str' );
 has url           => ( is => 'rw', isa => 'Str' );
-has source        => ( is => 'rw', isa => 'ArrayRef[Str]' );
+has source        => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] } );
 has buildroot     => ( is => 'rw', isa => 'Str' );
 has buildarch     => ( is => 'rw', isa => 'Str' );
-has buildrequires => ( is => 'rw', isa => 'ArrayRef[Str]' );
-has requires      => ( is => 'rw', isa => 'ArrayRef[Str]' );
+has buildrequires => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] } );
+has requires      => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] } );
+
+has parse_spec => (
+  is => 'ro',
+  isa => 'HashRef',
+  lazy_build => 1,
+);
+
+sub _build_parse_spec {
+  return {
+    scalars => {
+      name      => qr[^Name:\s*(\S+)],
+      version   => qr[^Version:\s*(\S+)],
+      epoch     => qr[^Epoch:\s*(\S+)],
+      release   => qr[^Release:\s*(\S+)],
+      summary   => qr[^Summary:\s*(.+)],
+      license   => qr[^License:\s*(.+)],
+      group     => qr[^Group:\s*(\S+)],
+      url       => qr[^URL:\s*(\S+)],
+      buildroot => qr[^BuildRoot:\s*(\S+)],
+      buildarch => qr[^BuildArch:\s*(\S+)],
+    },
+    arrays => {
+      source        => qr[^Source\d*:\s*(\S+)],
+      buildrequires => qr[^BuildRequires:\s*(.+)],
+      requires      => qr[^Requires:\s*(.+)],
+    },
+  };
+}
 
 sub BUILD {
   my $self = shift;
@@ -57,36 +85,20 @@ sub parse_file {
 
   open my $fh, $file or croak "Cannot open $file: $!\n";
 
-  my %strings = (
-    name      => qr[^Name:\s*(\S+)],
-    version   => qr[^Version:\s*(\S+)],
-    epoch     => qr[^Epoch:\s*(\S+)],
-    release   => qr[^Release:\s*(\S+)],
-    summary   => qr[^Summary:\s*(.+)],
-    license   => qr[^License:\s*(.+)],
-    group     => qr[^Group:\s*(\S+)],
-    url       => qr[^URL:\s*(\S+)],
-    buildroot => qr[^BuildRoot:\s*(\S+)],
-    buildarch => qr[^BuildArch:\s*(\S+)],
-  );
-
-  my %arrays = (
-    source        => qr[^Source\d*:\s*(\S+)],
-    buildrequires => qr[^BuildRequires:\s*(.+)],
-    requires      => qr[^Requires:\s*(.+)],
-  );
+  my $scalars = $self->parse_spec->{scalars};
+  my $arrays  = $self->parse_spec->{arrays};
 
   LINE: while (<$fh>) {
-    foreach my $attr (keys %strings) {
-      if (/$strings{$attr}/) {
-        $self->{$attr} = $1;
+    foreach my $attr (keys %$scalars) {
+      if (/$scalars->{$attr}/) {
+        $self->$attr($1);
         next LINE;
       }
     }
 
-    foreach my $attr (keys %arrays) {
-      if (/$arrays{$attr}/) {
-        push @{$self->{$attr}}, $1;
+    foreach my $attr (keys %$arrays) {
+      if (/$arrays->{$attr}/) {
+        push @{$self->$attr}, $1;
         next LINE;
       }
     }

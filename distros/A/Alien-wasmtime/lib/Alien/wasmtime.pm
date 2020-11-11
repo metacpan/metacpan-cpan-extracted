@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download wasmtime for use by other Perl modules
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::wasmtime - Find or download wasmtime for use by other Perl modules
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -37,9 +37,12 @@ version 0.14
 
 =head1 DESCRIPTION
 
-This L<Alien> provides C<wasmtime> a runtime for Wasm (Web Assembly).
-It's intended to be used by FFI (not XS) to build Wasm bindings for
-Perl.
+B<NOTE>: If you want to call WebAssembly from Perl you want to use
+L<Wasm> or L<Wasm::Wasmtime> instead.
+
+This L<Alien> provides C<wasmtime> a library runtime for Wasm
+(WebAssembly).  It's intended to be used by FFI (not XS) to build
+Wasm bindings for Perl.
 
 =head1 METHODS
 

@@ -12,7 +12,7 @@ use IO::Async::Loop;
 
 use Log::Any qw($log);
 
-plan skip_all => 'set NET_ASYNC_REDIS_HOST env var to test' unless exists $ENV{NET_ASYNC_REDIS_HOST};
+plan skip_all => 'set NET_ASYNC_REDIS_CLUSTER env var to test' unless $ENV{NET_ASYNC_REDIS_CLUSTER};
 
 # If we have ::TAP, use it - but no need to list it as a dependency
 eval {

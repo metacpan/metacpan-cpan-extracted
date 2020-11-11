@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Filter 6.015;
+package Dist::Zilla::PluginBundle::Filter 6.017;
 # ABSTRACT: use another bundle, with some plugins removed
 
 use Moose;
@@ -105,7 +105,7 @@ Dist::Zilla::PluginBundle::Filter - use another bundle, with some plugins remove
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 SYNOPSIS
 

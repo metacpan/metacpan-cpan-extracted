@@ -7,7 +7,7 @@ no warnings 'redefine'; # for 00load.t w/ core support
 
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 our %METHOD_CACHE;
 
@@ -66,7 +66,7 @@ use strict;
 use warnings;
 no warnings 'redefine'; # for 00load.t w/ core support
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 sub method { (next::method($_[0]) || return)->(@_) }
 

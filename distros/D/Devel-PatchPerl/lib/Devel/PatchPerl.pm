@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '2.00';
+$Devel::PatchPerl::VERSION = '2.02';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -203,6 +203,7 @@ my @patch = (
               qr/^5\.6\.[0-2]$/,
               qr/^5\.7\.[0-3]$/,
               qr/^5\.8\.[0-8]$/,
+              qr/^5\.9\.[0-4]$/,
             ],
     subs => [
               [ \&_patch_makedepend_SH ],
@@ -268,7 +269,7 @@ my @patch = (
   },
   {
     perl => [
-              qr/^5\.24\.[01]$/,
+              qr/^5\.24\.[012]$/,
             ],
     subs => [ [ \&_patch_time_hires ] ],
   },
@@ -280,6 +281,12 @@ my @patch = (
               qr/^5\.27\.[0-4]$/,
             ],
     subs => [ [ \&_patch_fp_class_denorm ] ],
+  },
+  {
+    perl => [
+              qr/^5\.28\.[01]$/,
+            ],
+    subs => [ [ \&_patch_useshrplib ] ],
   },
 );
 
@@ -1879,7 +1886,25 @@ BADGER
 BADGER
   last SWITCH;
   }
-  # If 5.8.[12345678]
+  # If 5.9.4
+  if ( $perl eq '5.9.4' ) {
+    _patch_b64(<<'BADGER');
+LS0tIG1ha2VkZXBlbmQuU0gJMjAyMC0wNi0wOSAxNjoxNDo1NC43Njc2MTI2OTAgKzAxMDAKKysr
+IG1ha2VkZXBlbmQuU0gJMjAyMC0wNi0wOSAxNjoxNTowNC40MTEwODI2ODUgKzAxMDAKQEAgLTEy
+OCw3ICsxMjgsNyBAQAogICAgICoueSkgZmlsZWJhc2U9YGJhc2VuYW1lICRmaWxlIC55YCA7Owog
+ICAgIGVzYWMKICAgICBjYXNlICIkZmlsZSIgaW4KLSAgICAqLyopIGZpbmM9Ii1JYGVjaG8gJGZp
+bGUgfCBzZWQgJ3MjL1teL10qJCMjYCIgOzsKKyAgICAqLyopIGZpbmM9Ii1JYGVjaG8gJGZpbGUg
+fCBzZWQgJ3MjL1teL10qJCMjJ2AiIDs7CiAgICAgKikgICBmaW5jPSA7OwogICAgIGVzYWMKICAg
+ICAkZWNobyAiRmluZGluZyBkZXBlbmRlbmNpZXMgZm9yICRmaWxlYmFzZSRfby4iCkBAIC0xNjks
+NiArMTY5LDcgQEAKICAgICAgICAgICAgIC1lICcvXiMuKjxjb21tYW5kIGxpbmU+L2QnIFwKICAg
+ICAgICAgICAgIC1lICcvXiMuKjxjb21tYW5kLWxpbmU+L2QnIFwKIAkgICAgLWUgJy9eIy4qIi0i
+L2QnIFwKKwkgICAgLWUgJy9eIy4qIlwvLipcLyIvZCcgXAogCSAgICAtZSAnLzogZmlsZSBwYXRo
+IHByZWZpeCAuKiBuZXZlciB1c2VkJC9kJyBcCiAJICAgIC1lICdzI1wuWzAtOV1bMC05XSpcLmMj
+JyIkZmlsZS5jIyIgXAogCSAgICAtZSAncy9eWwkgXSojWwkgXSpsaW5lLyMvJyBcCg==
+BADGER
+  last SWITCH;
+  }
+  # If 5.8.[12345678] and 5.9.[0123]
   _patch(<<'BADGER');
 --- makedepend.SH.org	2003-06-05 19:11:10.000000000 +0100
 +++ makedepend.SH	2010-09-01 10:24:39.000000000 +0100
@@ -7995,7 +8020,7 @@ FWRAPV
 sub _patch_utils_h2ph {
   my $perlver = shift;
   my $num = _norm_ver( $perlver );
-  return unless $num < 5.021010;
+  return unless $num < 5.021009;
   return if    $num == 5.020003;
   if ( $num < 5.006001 ) {
     return _patch_b64(<<'UH2PH560');
@@ -10056,7 +10081,7 @@ sub _patch_conf_gcc10 {
   my $num = _norm_ver( $perlver );
   return unless $num < 5.031006;
   return if     $num >= 5.030002;
-  if ( $num <= 5.006001 ) {
+  if ( $num <= 5.006001 or ( $num >= 5.00700 and $num < 5.00800 ) ) {
     return _patch_b64(<<'CONFGCC10561');
 LS0tIENvbmZpZ3VyZQorKysgQ29uZmlndXJlCkBAIC0zMTQ5LDcgKzMxNDksNyBAQCBlbHNlCiBm
 aQogJHJtIC1mIGdjY3ZlcnMqCiBjYXNlICIkZ2NjdmVyc2lvbiIgaW4KLTEqKSBjcHA9YC4vbG9j
@@ -10311,6 +10336,119 @@ WV9TT1VSQ0UgYWxyZWFkeSwgbm90IGFkZGluZyBpdC4iID4mNAo=
 CONFGCC10
 }
 
+sub _patch_useshrplib {
+  # from https://github.com/Perl/perl5/commit/191f8909fa4eca1db16a91ada42dd4a065c04890
+  _patch(<<'END');
+diff --git a/Makefile.SH b/Makefile.SH
+index 6e4d5ee684f..bebe50dc131 100755
+--- Makefile.SH
++++ Makefile.SH
+@@ -67,8 +67,16 @@ true)
+                             -compatibility_version \
+ 				${api_revision}.${api_version}.${api_subversion} \
+ 			     -current_version \
+-				${revision}.${patchlevel}.${subversion} \
+-			     -install_name \$(shrpdir)/\$@"
++				${revision}.${patchlevel}.${subversion}"
++		case "$osvers" in
++	        1[5-9]*|[2-9]*)
++			shrpldflags="$shrpldflags -install_name `pwd`/\$@ -Xlinker -headerpad_max_install_names"
++			exeldflags="-Xlinker -headerpad_max_install_names"
++			;;
++		*)
++			shrpldflags="$shrpldflags -install_name \$(shrpdir)/\$@"
++			;;
++		esac
+ 		;;
+ 	cygwin*)
+ 		shrpldflags="$shrpldflags -Wl,--out-implib=libperl.dll.a -Wl,--image-base,0x52000000"
+@@ -339,6 +347,14 @@ MANIFEST_SRT = MANIFEST.srt
+ 
+ !GROK!THIS!
+ 
++case "$useshrplib$osname" in
++truedarwin)
++	$spitshell >>$Makefile <<!GROK!THIS!
++PERL_EXE_LDFLAGS=$exeldflags
++!GROK!THIS!
++	;;
++esac
++
+ case "$usecrosscompile$perl" in
+ define?*)
+ 	$spitshell >>$Makefile <<!GROK!THIS!
+@@ -1050,6 +1066,20 @@ $(PERL_EXE): $& $(perlmain_dep) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
+ 	$(SHRPENV) $(CC) -o perl $(CLDFLAGS) $(CCDLFLAGS) $(perlmain_objs) $(LLIBPERL) $(static_ext) `cat ext.libs` $(libs)
+ !NO!SUBS!
+         ;;
++
++	darwin)
++	    case "$useshrplib$osvers" in
++	    true1[5-9]*|true[2-9]*) $spitshell >>$Makefile <<'!NO!SUBS!'
++	$(SHRPENV) $(CC) -o perl $(PERL_EXE_LDFLAGS) $(CLDFLAGS) $(CCDLFLAGS) $(perlmain_objs) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
++!NO!SUBS!
++	       ;;
++	    *) $spitshell >>$Makefile <<'!NO!SUBS!'
++	$(SHRPENV) $(CC) -o perl $(CLDFLAGS) $(CCDLFLAGS) $(perlmain_objs) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
++!NO!SUBS!
++	       ;;
++	    esac
++        ;;
++
+         *) $spitshell >>$Makefile <<'!NO!SUBS!'
+ 	$(SHRPENV) $(CC) -o perl $(CLDFLAGS) $(CCDLFLAGS) $(perlmain_objs) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+ !NO!SUBS!
+diff --git a/installperl b/installperl
+index 3bf79d2d6fc..6cd65a09238 100755
+--- installperl
++++ installperl
+@@ -304,6 +304,7 @@ elsif ($^O ne 'dos') {
+ 	safe_unlink("$installbin/$perl_verbase$ver$exe_ext");
+ 	copy("perl$exe_ext", "$installbin/$perl_verbase$ver$exe_ext");
+ 	strip("$installbin/$perl_verbase$ver$exe_ext");
++	fix_dep_names("$installbin/$perl_verbase$ver$exe_ext");
+ 	chmod(0755, "$installbin/$perl_verbase$ver$exe_ext");
+     }
+     else {
+@@ -388,6 +389,7 @@ foreach my $file (@corefiles) {
+     if (copy_if_diff($file,"$installarchlib/CORE/$file")) {
+ 	if ($file =~ /\.(\Q$so\E|\Q$dlext\E)$/) {
+ 	    strip("-S", "$installarchlib/CORE/$file") if $^O eq 'darwin';
++	    fix_dep_names("$installarchlib/CORE/$file");
+ 	    chmod($SO_MODE, "$installarchlib/CORE/$file");
+ 	} else {
+ 	    chmod($NON_SO_MODE, "$installarchlib/CORE/$file");
+@@ -791,4 +793,27 @@ sub strip
+     }
+ }
+ 
++sub fix_dep_names {
++    my $file = shift;
++
++    $^O eq "darwin" && $Config{osvers} =~ /^(1[5-9]|[2-9])/
++      && $Config{useshrplib}
++      or return;
++
++    my @opts;
++    my $so = $Config{so};
++    my $libperl = "$Config{archlibexp}/CORE/libperl.$Config{so}";
++    if ($file =~ /\blibperl.\Q$Config{so}\E$/a) {
++        push @opts, -id => $libperl;
++    }
++    else {
++        push @opts, -change => getcwd . "/libperl.$so", $libperl;
++    }
++    push @opts, $file;
++
++    $opts{verbose} and print "  install_name_tool @opts\n";
++    system "install_name_tool", @opts
++      and die "Cannot update $file dependency paths\n";
++}
++
+ # ex: set ts=8 sts=4 sw=4 et:
+END
+}
+
 qq[patchin'];
 
 __END__
@@ -10325,7 +10463,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 2.00
+version 2.02
 
 =head1 SYNOPSIS
 

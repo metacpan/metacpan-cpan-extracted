@@ -1,0 +1,15 @@
+{
+	"type": "regular",
+	"response": {
+		"totalRecords": "1",
+		"returnedRecords": 1,
+		"startOffset": "0",
+		"endOffset": "50",
+		"matchingDataElementCount": "-1",
+		"results": []
+	},
+	"error_code": 0,
+	"error_msg": "",
+	"warnings": [],
+	"timestamp": 1403115433
+}

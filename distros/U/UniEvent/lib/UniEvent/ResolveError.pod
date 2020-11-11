@@ -1,0 +1,60 @@
+=head1 NAME
+
+UniEvent::ResolveError - Perl for UniEvent resolve errors.
+
+=head1 DESCRIPTION
+
+The package contains resolver error constants.
+
+=head1 CONSTANTS
+
+=head2 host_not_found
+
+=head2 not_implemented 
+
+=head2 service_not_found 
+
+=head2 no_data
+
+=head2 bad_format
+
+=head2 server_failed
+
+=head2 refused
+
+=head2 bad_query
+
+=head2 bad_name
+
+=head2 bad_response
+
+=head2 eof
+
+=head2 file_read_error
+
+=head2 bad_string
+
+=head2 bad_flags
+
+=head2 noname
+
+=head2 bad_hints
+
+=head2 not_initialized
+
+=head2 iphlpapi_load_error
+
+=head2 no_get_network_params
+
+=head1 REFERENCES
+
+L<UniEvent::Error>
+
+L<XS::ErrorCode>
+
+L<XS::STL::ErrorCode>
+
+L<XS::STL::ErrorCategory>
+
+=cut
+

@@ -1,5 +1,10 @@
 Revision history for this software.
 
+2.13.4.24 2020-10-30 00:00:00
+  - jacode.pl supports use strict; (if running on Perl5 or later)
+  - jacode.pl supports use warnings; (if running on Perl5.6 or later)
+  - created by INABA Hitoshi
+
 2.13.4.23 2019-09-28 00:00:00
   - supports optimized RFC3629 for ja_JP
   - created by INABA Hitoshi

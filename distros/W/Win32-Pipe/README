@@ -60,6 +60,9 @@ PIPE.PM HISTORY:
 	- Fix required perl version 5.6 -> 5.006.
 	- Add Github repo link to META.yml
 
+2020.10.29 (v0.026)
+        - Fix incorrect type (Shaun Lowry <shaunl@activestate.com>)
+
 PIPE.PLL HISTORY:
 ----------------
 96.06.10 Dave Roth <rothd@roth.net>

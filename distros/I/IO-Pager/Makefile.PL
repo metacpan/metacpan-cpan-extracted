@@ -1,6 +1,9 @@
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+
+my @WINANSI = $^O =~ /MSWin/ ? ('Win32::Console::ANSI'=>0) : ();
+
 WriteMakefile(
     'MIN_PERL_VERSION'  => 5.8.0,
     'NAME'              => 'IO::Pager',
@@ -11,7 +14,7 @@ WriteMakefile(
        'Env'            => 0,
        'Exporter'       => 0,
        'File::Temp'     => 0,
-       'bignum'         => 0,
+       'bignum'         => 0
     },
     'PREREQ_PM'         => {
        'base'           => 0,
@@ -26,11 +29,12 @@ WriteMakefile(
        'Text::Wrap'     => 0,
        'Tie::Handle'    => 0,
     },
+    EXE_FILES  => [ 'lib/IO/Pager/tp' ],
     META_MERGE => {
 		   "meta-spec" => { version => 2 },
 		    runtime => {
 				recommends => {
-#				    #Since Term::Pager is unmodern
+					       @WINANSI
 #					       'Term::ReadKey' => 0,
 					      },
 			       },

@@ -8,8 +8,8 @@ Makefile.PL
 README
 dist.ini
 lib/Text/Table/HTML/DataTables.pm
-share/datatables-1.10.13/css/jquery.dataTables.min.css
-share/datatables-1.10.13/js/jquery.dataTables.min.js
+share/datatables-1.10.22/datatables.css
+share/datatables-1.10.22/datatables.js
 share/jquery-2.2.4/jquery-2.2.4.min.js
 t/00-compile.t
 t/author-critic.t

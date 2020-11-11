@@ -48,15 +48,11 @@ See L<rex|https://metacpan.org/pod/distribution/Rex/bin/rex> for more informatio
 
 package Rex;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
-
-# development version if this variable is not set
-if ( !$Rex::VERSION ) {
-  $Rex::VERSION = "9999.99.99_99";
-}
+our $VERSION = '1.13.1'; # VERSION
 
 BEGIN {
   use Rex::Logger;
@@ -761,6 +757,12 @@ sub import {
         $found_feature = 1;
       }
 
+      if ( $add eq 'autodie' ) {
+        Rex::Logger::debug('enabling autodie');
+        Rex::Config->set_autodie(1);
+        $found_feature = 1;
+      }
+
       if ( $add eq "no_autodie" ) {
         Rex::Logger::debug("disabling autodie");
         Rex::Config->set_autodie(0);
@@ -1036,7 +1038,7 @@ versions are activated. Available since version 0.56.
 
 =item autodie
 
-Will enable autodie feature: die on all failed L<filesytem commands|https://metacpan.org/pod/Rex::Commands::Fs>. Available since version 0.56.
+Will enable autodie feature: die on all failed L<filesytem commands|https://metacpan.org/pod/Rex::Commands::Fs>. Available since version 1.13.1.
 
 =item 0.55
 

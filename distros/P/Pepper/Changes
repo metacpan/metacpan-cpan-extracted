@@ -1,11 +1,12 @@
 Revision history for Perl extension Pepper
 
-1.2.1 2020-09-12T20:41:39Z
+1.3 2020-11-03T22:10:54Z
 
-    - Version number change to three-digits to work with PAUSE's version checks.
+    - Fixed bug in designating log directories in generated PSGI script.
 
-1.1.1 2020-09-12T20:10:28Z
+1.2 2020-09-14T15:10:08Z
 
+    - Remove unnecessary / problematic test for /opt
     - Make sure that the Y/N setup prompts only accept 'Y' or 'N'
     - Tweaks to AUTOLOAD messages
 

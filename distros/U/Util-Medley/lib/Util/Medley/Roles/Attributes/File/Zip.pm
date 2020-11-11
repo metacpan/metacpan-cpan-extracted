@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::File::Zip;
-$Util::Medley::Roles::Attributes::File::Zip::VERSION = '0.052';
+$Util::Medley::Roles::Attributes::File::Zip::VERSION = '0.053';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::File::Zip;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::File::Zip
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =cut
 

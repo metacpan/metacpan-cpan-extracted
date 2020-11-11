@@ -1,12 +1,16 @@
 package Log::ger::Output::Screen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
+our $DATE = '2020-11-02'; # DATE
 our $DIST = 'Log-ger-Output-Screen'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use strict;
 use warnings;
+
+if ($^O eq 'MSWin32') {
+    eval { require Win32::Console::ANSI };
+}
 
 use Log::ger::Util;
 
@@ -115,7 +119,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

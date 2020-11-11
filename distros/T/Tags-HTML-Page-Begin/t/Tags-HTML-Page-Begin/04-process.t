@@ -4,7 +4,7 @@ use warnings;
 use CSS::Struct::Output::Raw;
 use Tags::HTML::Page::Begin;
 use Tags::Output::Structure;
-use Test::More 'tests' => 19;
+use Test::More 'tests' => 20;
 use Test::NoWarnings;
 
 # Test.
@@ -775,4 +775,38 @@ is_deeply(
 		['b', 'body'],
 	],
 	'Begin of page in default with html lang attribute.',
+);
+
+# Test.
+$css = CSS::Struct::Output::Raw->new;
+$obj = Tags::HTML::Page::Begin->new(
+	'css' => $css,
+	'generator' => undef,
+	'tags' => $tags,
+);
+$css->put;
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['r', '<!DOCTYPE html>'],
+		['r', "\n"],
+		['b', 'html'],
+		['a', 'lang', 'en'],
+		['b', 'head'],
+
+		['b', 'meta'],
+		['a', 'http-equiv', 'Content-Type'],
+		['a', 'content', 'text/html; charset=UTF-8'],
+		['e', 'meta'],
+
+		['b', 'title'],
+		['d', 'Page title'],
+		['e', 'title'],
+
+		['e', 'head'],
+		['b', 'body'],
+	],
+	'Begin of page without charset and generator and with blank CSS.',
 );

@@ -1,3 +1,8 @@
+2020-11-03  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.0.2
+  * Packaging improvements
+
 2017-03-27  Dave Cross <dave@dave.org.uk>
 
   * lib/Genealogy/Ahnentafel.pm, t/01-basic.t: Fix test

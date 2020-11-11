@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '2.13.0';
+$Git::Hooks::CheckLog::VERSION = '2.14.0';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -146,13 +146,16 @@ sub revert_errors {
 
     if ($git->get_config_boolean($CFG => 'deny-merge-revert')) {
         if ($msg =~ /This reverts commit ([0-9a-f]{40})/s) {
-            my $reverted_commit = $git->get_commit($1);
-            if ($reverted_commit->parent() > 1) {
-                $git->fault(<<'EOS', {commit => $id, option => 'deny-merge-revert'});
+            # Get the reverted commit in an eval because it may be unreachable
+            # now. In this case we simply don't care anymore.
+            if (my $reverted_commit = eval {$git->get_commit($1)}) {
+                if ($reverted_commit->parent() > 1) {
+                    $git->fault(<<'EOS', {commit => $id, option => 'deny-merge-revert'});
 This commit reverts a merge commit, which is not allowed
 by your configuration option.
 EOS
-                return 1;
+                    return 1;
+                }
             }
         }
     }
@@ -430,7 +433,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 2.13.0
+version 2.14.0
 
 =head1 SYNOPSIS
 

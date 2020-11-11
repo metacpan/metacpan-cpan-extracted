@@ -32,11 +32,26 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::Simple" : "0.44"
+            "Class::Tiny" : "0",
+            "Data::Validate::URI" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Encode" : "0",
+            "Test2::Bundle::More" : "0",
+            "Test2::Tools::Class" : "0",
+            "Test2::Tools::ClassicCompare" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test::HTTP::MockServer" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.3",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

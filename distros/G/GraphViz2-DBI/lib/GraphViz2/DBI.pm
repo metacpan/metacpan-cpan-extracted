@@ -4,221 +4,91 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
-our $VERSION = '2.50';
+our $VERSION = '2.52';
 
 use DBIx::Admin::TableInfo;
-
 use GraphViz2;
-
-use Lingua::EN::PluralToSingular 'to_singular';
-
 use Moo;
 
-has catalog =>
-(
-	default  => sub{return undef},
-	is       => 'rw',
-	required => 0,
-);
-
-has dbh =>
-(
+has dbh => (
 	is       => 'rw',
 	required => 1,
 );
 
-has graph =>
-(
+has graph => (
 	default  => sub {
-		GraphViz2 -> new(
+		GraphViz2->new(
 			edge   => {color => 'grey'},
-			global => {directed => 1},
+			global => {directed => 1, combine_node_and_port => 0},
 			graph  => {rankdir => 'TB'},
 			node   => {color => 'blue', shape => 'oval'},
 		)
-        },
+	},
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
 );
 
-has schema =>
-(
-	default  => sub{return undef},
-	is       => 'rw',
-	required => 0,
-);
-
-has table =>
-(
-	default  => sub{return '%'},
-	is       => 'rw',
-	required => 0,
-);
-
-has table_info =>
-(
-	default  => sub{return {} },
-	is       => 'rw',
-	required => 0,
-);
-
-has type =>
-(
-	default  => sub{return 'TABLE'},
-	is       => 'rw',
-	required => 0,
-);
-
-sub create
-{
-	my($self, %arg) = @_;
-	my($name)       = $arg{name}    || '';
-	my($exclude)    = $arg{exclude} || [];
-	my($include)    = $arg{include} || [];
-	my($info)       = DBIx::Admin::TableInfo -> new(dbh => $self -> dbh) -> info;
-
-	my(%include);
-
-	@include{@$include} = (1) x @$include;
-
-	delete $$info{$_} for @$exclude;
-
-	# This 'if' stops us excluding all tables :-).
-
-	if ($#$include >= 0)
-	{
-		delete $$info{$_} for grep{! $include{$_} } keys %$info;
+sub create {
+	my ($self, %arg) = @_;
+	my $start_info = DBIx::Admin::TableInfo->new(dbh => $self->dbh)->info;
+	delete @$start_info{ @{ $arg{exclude} || [] } };
+	my %info = map +($_=>$$start_info{$_}), @{ $arg{include} || [keys %$start_info] };
+	my %port;
+	for my $table_name (sort keys %info) {
+		my $port = 0;
+		my %thisport = map +($_ => ++$port),
+			sort map{s/^"(.+)"$/$1/; $_} keys %{$info{$table_name}{columns} };
+		$self->graph->add_node(name => $table_name, label => [
+			{port => 'port0', text => $table_name},
+			[ map +{
+				port => "port$thisport{$_}",
+				text => "$thisport{$_}: $_",
+			}, sort keys %thisport ],
+		]);
+		$port{$table_name} = \%thisport;
 	}
-
-	$self -> table_info($info);
-
-	my($port, %port);
-
-	for my $table_name (sort keys %$info)
-	{
-		# Port 1 is the table name.
-
-		$port              = 0;
-		$port{$table_name} = {};
-
-		for my $column_name (sort map{s/^"(.+)"$/$1/; $_} keys %{$$info{$table_name}{columns} })
-		{
-			$port{$table_name}{$column_name} = ++$port;
-		}
-	}
-
-	for my $table_name (sort keys %$info)
-	{
-		# Step 1: Make the table name + 'N columns-in-one' be a horizontal record.
-
-		my($label) =
-		[
-			{text => "<port0> $table_name"},
-		];
-
-		for my $column (sort keys %{$port{$table_name} })
-		{
-			push @$label,
-			{
-				port => "<port$port{$table_name}{$column}>",
-				text => "$port{$table_name}{$column}: $column",
-			};
-		}
-
-		# Step 2: Make the N columns be a vertical record.
-
-		$$label[1]{port}        = "{$$label[1]{port}";
-		$$label[$#$label]{text} .= '}';
-
-		$self -> graph -> add_node(name => $table_name, label => [@$label]);
-	}
-
-	my($vendor_name) = uc $self -> dbh -> get_info(17);
-
-	my($temp_1, $temp_2, $temp_3);
-
-	if ($vendor_name eq 'MYSQL')
-	{
+	my $vendor_name = uc $self->dbh->get_info(17);
+	my ($temp_1, $temp_2, $temp_3);
+	if ($vendor_name eq 'MYSQL') {
 		$temp_1 = 'PKTABLE_NAME';
 		$temp_2 = 'FKTABLE_NAME';
 		$temp_3 = 'FKCOLUMN_NAME';
-	}
-	else # ORACLE && POSTGRESQL && SQLITE (at least).
-	{
+	} else {
+		# ORACLE && POSTGRESQL && SQLITE (at least).
 		$temp_1 = 'UK_TABLE_NAME';
 		$temp_2 = 'FK_TABLE_NAME';
 		$temp_3 = 'FK_COLUMN_NAME';
 	}
-
-	my(%special_fk_column) =
-	(
-		spouse_id => 'person_id',
-	);
-
-	my($destination_port);
-	my($fk_column_name, $fk_table_name);
-	my($pk_table_name, $primary_key_name);
-	my($singular_name, $source_port);
-
-	for my $table_name (sort keys %$info)
-	{
-		for my $item (@{$$info{$table_name}{foreign_keys} })
-		{
-			$pk_table_name  = $$item{$temp_1};
-			$fk_table_name  = $$item{$temp_2};
-			$fk_column_name = $$item{$temp_3};
-			$source_port    = $fk_column_name ? $port{$fk_table_name}{$fk_column_name} : 2;
-
-			if ($pk_table_name)
-			{
-				$singular_name = to_singular($pk_table_name);
-
-				if ($special_fk_column{$fk_column_name})
-				{
-					$primary_key_name = $special_fk_column{$fk_column_name};
-				}
-				elsif (defined($$info{$table_name}{columns}{$fk_column_name}) )
-				{
+	for my $table_name (sort keys %info) {
+		for my $item (@{ $info{$table_name}{foreign_keys} }) {
+			my $pk_table_name  = $$item{$temp_1};
+			my $fk_table_name  = $$item{$temp_2};
+			my $fk_column_name = $$item{$temp_3};
+			my $source_port    = $fk_column_name ? $port{$fk_table_name}{$fk_column_name} : 2;
+			my ($primary_key_name, $destination_port);
+			if ($pk_table_name) {
+				if (defined($info{$table_name}{columns}{$fk_column_name}) ) {
 					$primary_key_name = $fk_column_name;
-				}
-				elsif (defined($$info{$table_name}{columns}{id}) )
-				{
+				} elsif (defined($info{$table_name}{columns}{id}) ) {
 					$primary_key_name = 'id';
-				}
-				else
-				{
+				} else {
 					die "Primary table '$pk_table_name'. Foreign table '$fk_table_name'. Unable to find primary key name for foreign key '$fk_column_name'\n"
 				}
-
-				$primary_key_name =~ s/${singular_name}_//;
 				$destination_port = ($primary_key_name eq 'id') ? '0:w' : $port{$table_name}{$primary_key_name};
-
-			}
-			else
-			{
+			} else {
 				$destination_port = 2;
 			}
-
-			$self -> graph -> add_edge(from => "$fk_table_name:port$source_port", to => "$table_name:port$destination_port");
+			$self->graph->add_edge(
+				from => $fk_table_name,
+				tailport => "port$source_port",
+				to => $table_name,
+				headport => "port$destination_port",
+			);
 		}
 	}
-
-	if ($name)
-	{
-		$self -> graph -> add_node(name => $name, shape => 'doubleoctagon');
-
-		for my $table_name (sort keys %$info)
-		{
-			$self -> graph -> add_edge(from => $name, to => $table_name);
-		}
-	}
-
 	return $self;
-
-} # End of create.
-
-# -----------------------------------------------
+}
 
 1;
 
@@ -230,56 +100,32 @@ L<GraphViz2::DBI> - Visualize a database schema as a graph
 
 =head1 Synopsis
 
-	#!/usr/bin/env perl
-
-	use strict;
-	use warnings;
-
 	use DBI;
-
 	use GraphViz2;
 	use GraphViz2::DBI;
 
-	use Log::Handler;
-
-	# ---------------
-
 	exit 0 if (! $ENV{DBI_DSN});
 
-	my($logger) = Log::Handler -> new;
-
-	$logger -> add
-		(
-		 screen =>
-		 {
-			 maxlevel       => 'debug',
-			 message_layout => '%m',
-			 minlevel       => 'error',
-		 }
-		);
-
-	my($graph) = GraphViz2 -> new
-		(
-		 edge   => {color => 'grey'},
-		 global => {directed => 1},
-		 graph  => {rankdir => 'TB'},
-		 logger => $logger,
-		 node   => {color => 'blue', shape => 'oval'},
-		);
+	my($graph) = GraphViz2->new (
+		edge   => {color => 'grey'},
+		global => {directed => 1},
+		graph  => {rankdir => 'TB'},
+		node   => {color => 'blue', shape => 'oval'},
+	);
 	my($attr)              = {};
 	$$attr{sqlite_unicode} = 1 if ($ENV{DBI_DSN} =~ /SQLite/i);
-	my($dbh)               = DBI -> connect($ENV{DBI_DSN}, $ENV{DBI_USER}, $ENV{DBI_PASS}, $attr);
+	my($dbh)               = DBI->connect($ENV{DBI_DSN}, $ENV{DBI_USER}, $ENV{DBI_PASS}, $attr);
 
-	$dbh -> do('PRAGMA foreign_keys = ON') if ($ENV{DBI_DSN} =~ /SQLite/i);
+	$dbh->do('PRAGMA foreign_keys = ON') if ($ENV{DBI_DSN} =~ /SQLite/i);
 
-	my($g) = GraphViz2::DBI -> new(dbh => $dbh, graph => $graph);
+	my($g) = GraphViz2::DBI->new(dbh => $dbh, graph => $graph);
 
-	$g -> create(name => '');
+	$g->create;
 
 	my($format)      = shift || 'svg';
-	my($output_file) = shift || File::Spec -> catfile('html', "dbi.schema.$format");
+	my($output_file) = shift || File::Spec->catfile('html', "dbi.schema.$format");
 
-	$graph -> run(format => $format, output_file => $output_file);
+	$graph->run(format => $format, output_file => $output_file);
 
 See scripts/dbi.schema.pl (L<GraphViz2/Scripts Shipped with this Module>).
 
@@ -298,7 +144,7 @@ Here is the list of L<output formats|http://www.graphviz.org/content/output-form
 
 =head2 Calling new()
 
-C<new()> is called as C<< my($obj) = GraphViz2::DBI -> new(k1 => v1, k2 => v2, ...) >>.
+C<new()> is called as C<< my($obj) = GraphViz2::DBI->new(k1 => v1, k2 => v2, ...) >>.
 
 It returns a new object of type C<GraphViz2::DBI>.
 
@@ -316,7 +162,7 @@ This key is mandatory.
 
 This option specifies the GraphViz2 object to use. This allows you to configure it as desired.
 
-The default is GraphViz2 -> new. The default attributes are the same as in the synopsis, above,
+The default is GraphViz2->new. The default attributes are the same as in the synopsis, above,
 except for the graph label of course.
 
 This key is optional.
@@ -325,7 +171,7 @@ This key is optional.
 
 =head1 Methods
 
-=head2 create(exclude => [], include => [], name => $name)
+=head2 create(exclude => [], include => [])
 
 Creates the graph, which is accessible via the graph() method, or via the graph object you passed to
 new().
@@ -348,11 +194,6 @@ An optional arrayref of table names to include.
 
 If none are listed for inclusion, I<all> tables are included.
 
-=item o name
-
-$name is the string which will be placed in the root node of the tree.
-It may be omitted, in which case the root node is omitted.
-
 =back
 
 =head2 graph()
@@ -370,13 +211,6 @@ foreign table/key pair point to.
 The steps are listed here, in the order they are tested. The first match stops the search.
 
 =over 4
-
-=item o Check a hash for special cases
-
-Currently, the only special case is a foreign key of C<spouse_id>. It is assumed to point to a
-primary key called C<person_id>.
-
-There is no option available, at the moment, to override this check.
 
 =item o Ask the database for foreign key information
 
@@ -405,21 +239,7 @@ See L<DBIx::Admin::TableInfo/FAQ>.
 
 =head2 How does GraphViz2::DBI draw edges from foreign keys to primary keys?
 
-It assumes that the primary table's name is a plural word, and that the foreign key's name is
-prefixed by the singular
-of the primary table's name, separated by '_'.
-
-Thus a (primary) table 'people' with a primary key 'id' will be pointed to by a table
-'phone_numbers' using a column 'person_id'.
-
-Table 'phone_numbers' will probably have a primary key 'id' but that is not used (unless some other
-table has a foreign key pointing to the 'phone_numbers' table).
-
-The conversion of plural to singular is done with L<Lingua::EN::PluralToSingular>.
-
-If this naming convention does not hold, then both the source and destination ports default to '1',
-which is the port of the 1st column (in alphabetical order) in each table. The table name itself is
-port '0'.
+It uses L<DBIx::Admin::TableInfo>.
 
 =head1 Scripts Shipped with this Module
 

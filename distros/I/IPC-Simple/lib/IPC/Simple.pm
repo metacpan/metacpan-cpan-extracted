@@ -1,6 +1,6 @@
 package IPC::Simple;
 # ABSTRACT: simple, non-blocking IPC
-$IPC::Simple::VERSION = '0.02';
+$IPC::Simple::VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -8,20 +8,20 @@ use warnings;
 use AnyEvent::Handle;
 use AnyEvent;
 use Carp;
-use Fcntl;
 use IPC::Open3 qw(open3);
 use Moo;
-use POSIX qw(:sys_wait_h);
 use Symbol qw(gensym);
 use Types::Standard -types;
 
 use IPC::Simple::Channel;
 use IPC::Simple::Message;
+use IPC::Simple::Util;
 
 BEGIN{
   extends 'Exporter';
 
   our @EXPORT = qw(
+    IPC_STDIN
     IPC_STDOUT
     IPC_STDERR
     IPC_ERROR
@@ -45,7 +45,7 @@ has args =>
 has eol =>
   is => 'ro',
   isa => Str,
-  default => "\n";
+  default => "\n",
 
 has run_state =>
   is => 'rw',
@@ -56,11 +56,6 @@ has pid =>
   is => 'rw',
   isa => Num,
   init_arg => undef;
-
-has proc_monitor =>
-  is => 'rw',
-  init_arg => undef,
-  clearer => 1;
 
 has fh_in =>
   is => 'rw',
@@ -77,6 +72,11 @@ has fh_err =>
   isa => FileHandle,
   init_arg => undef;
 
+has handle_in =>
+  is => 'rw',
+  isa => InstanceOf['AnyEvent::Handle'],
+  init_arg => undef;
+
 has handle_out =>
   is => 'rw',
   isa => InstanceOf['AnyEvent::Handle'],
@@ -87,12 +87,12 @@ has handle_err =>
   isa => InstanceOf['AnyEvent::Handle'],
   init_arg => undef;
 
-has cv_exited =>
+has exit_status =>
   is => 'rw',
-  isa => InstanceOf['AnyEvent::CondVar'],
+  isa => Maybe[Int],
   init_arg => undef;
 
-has exit_status =>
+has exit_code =>
   is => 'rw',
   isa => Maybe[Int],
   init_arg => undef;
@@ -105,6 +105,15 @@ has messages =>
     recv => 'get',
   };
 
+has sigchld_watcher =>
+  is => 'rw',
+  init_arg => undef;
+
+has sigchld_cv =>
+  is => 'rw',
+  isa => InstanceOf['AnyEvent::CondVar'],
+  init_arg => undef;
+
 sub DEMOLISH {
   my $self = shift;
   $self->terminate;
@@ -114,12 +123,6 @@ sub DEMOLISH {
 sub is_ready    { $_[0]->run_state == STATE_READY }
 sub is_running  { $_[0]->run_state == STATE_RUNNING }
 sub is_stopping { $_[0]->run_state == STATE_STOPPING }
-
-sub exit_code {
-  my $self = shift;
-  return unless defined $self->exit_status;
-  return $self->exit_status >> 8;
-}
 
 sub launch {
   my $self = shift;
@@ -134,123 +137,162 @@ sub launch {
 
   debug('launching: %s %s', $self->cmd, "@{$self->args}");
 
-  my $pid = open3(
-    my $in,
-    my $out,
-    my $err = gensym,
-    $self->cmd,
-    @{$self->args},
-  ) or croak $!;
+  my $pid = open3(my $in, my $out, my $err = gensym, $self->cmd, @{$self->args})
+    or croak $!;
 
-  my $cv = AE::cv;
+  $self->sigchld_cv(AnyEvent->condvar);
+
+  $self->sigchld_watcher(
+    AnyEvent->child(
+      pid => $pid,
+      cb => sub{
+        my ($pid, $status) = @_;
+        $self->_on_exit($status);
+      },
+    )
+  );
+
+  debug('process launched with pid %d', $pid);
 
   $self->run_state(STATE_RUNNING);
-  $self->cv_exited($cv);
+  $self->exit_status(undef);
+  $self->exit_code(undef);
   $self->pid($pid);
   $self->fh_in($in);
   $self->fh_out($out);
   $self->fh_err($err);
   $self->messages(IPC::Simple::Channel->new);
-  $self->handle_err($self->_build_handle($err, IPC_STDERR));
-  $self->handle_out($self->_build_handle($out, IPC_STDOUT));
-
-  $self->proc_monitor(
-    AE::child($pid, sub{
-      my ($pid, $status) = @_;
-      debug('child (pid %d) exited with status %d (exit code: %d)', $pid, $status, $status >> 8);
-      $self->run_state(STATE_READY);
-      $self->exit_status($status);
-      $self->messages->shutdown;
-      $cv->send($status);
-      $self->clear_proc_monitor;
-    })
-  );
+  $self->handle_err($self->_build_input_handle($err, IPC_STDERR));
+  $self->handle_out($self->_build_input_handle($out, IPC_STDOUT));
+  $self->handle_in($self->_build_output_handle($in));
 
   return 1;
 }
 
-sub _build_handle {
+sub _build_output_handle {
+  my ($self, $fh) = @_;
+
+  # set non-blocking
+  AnyEvent::fh_unblock($fh);
+
+  my $handle = AnyEvent::Handle->new(
+    fh => $fh,
+    on_error => sub{ $self->_on_error(IPC_STDIN, @_) },
+  );
+
+  return $handle;
+}
+
+sub _build_input_handle {
   my ($self, $fh, $type) = @_;
 
   # set non-blocking
-  my $flags = fcntl $fh, F_GETFL, 0;
-  fcntl $fh, F_SETFL, $flags | O_NONBLOCK;
+  AnyEvent::fh_unblock($fh);
 
-  return AnyEvent::Handle->new(
-    fh => $fh,
-    on_eof => sub{ $self->terminate },
-
-    on_error => sub{
-      my ($handle, $fatal, $msg) = @_;
-      debug('recv error type=%d, msg="%s"', $type, $msg);
-
-      $self->messages->put(
-        IPC::Simple::Message->new(
-          source  => IPC_ERROR,
-          message => $msg,
-        ),
-      );
-
-      $self->terminate if $fatal;
-    },
-
-    on_read => sub{
-      my ($handle) = @_;
-      debug('read event type=%d', $type);
-
-      $handle->push_read(line => $self->eol, sub{
-        my ($handle, $line) = @_;
-        chomp $line;
-        debug('recv type=%d, msg="%s"', $type, $line);
-
-        $self->messages->put(
-          IPC::Simple::Message->new(
-            source  => $type,
-            message => $line,
-          ),
-        );
-      });
-    },
+  my $handle = AnyEvent::Handle->new(
+    fh       => $fh,
+    on_eof   => sub{ $self->terminate },
+    on_error => sub{ $self->_on_error($type, @_) },
+    on_read  => sub{ $self->_on_read($type, @_) },
   );
+
+  # push an initial read to prime the queue
+  $self->_push_read($handle, $type);
+
+  return $handle;
+}
+
+sub _on_error {
+  my ($self, $type, $handle, $fatal, $msg) = @_;
+  debug('recv error type=%d, msg="%s"', $type, $msg);
+
+  $self->messages->put(
+    IPC::Simple::Message->new(
+      source  => IPC_ERROR,
+      message => $msg,
+    ),
+  );
+
+  $self->terminate if $fatal;
+}
+
+sub _on_exit {
+  my ($self, $status) = @_;
+  $self->run_state(STATE_READY);
+  $self->exit_status($status || 0);
+  $self->exit_code($self->exit_status >> 8);
+
+  debug('child (pid %s) exited with status %d (exit code: %d)',
+    $self->pid || '(no pid)',
+    $self->exit_status,
+    $self->exit_code,
+  );
+
+  $self->messages->shutdown
+    if $self->messages; # won't be set if launch failed early enough
+
+  $self->sigchld_cv->send
+    if $self->sigchld_cv;
+}
+
+sub _on_read {
+  my ($self, $type, $handle) = @_;
+  debug('read event type=%d', $type);
+  $self->_push_read($handle, $type);
+}
+
+sub _push_read {
+  my ($self, $handle, $type) = @_;
+
+  $handle->push_read(line => $self->eol, sub{
+    my ($handle, $line) = @_;
+    chomp $line;
+    debug('recv type=%d, msg="%s"', $type, $line);
+
+    $self->messages->put(
+      IPC::Simple::Message->new(
+        source  => $type,
+        message => $line,
+      ),
+    );
+  });
 }
 
 sub terminate {
   my $self = shift;
   if ($self->is_running) {
-    debug('sending TERM to pid %d', $self->pid);
     $self->run_state(STATE_STOPPING);
+    debug('sending TERM to pid %d', $self->pid);
     kill 'TERM', $self->pid;
   }
 }
 
 sub join {
   my $self = shift;
-  if ($self->cv_exited) {
-    debug('waiting for process to exit, pid %d', $self->pid);
-    $self->cv_exited->recv;
-  }
+  debug('waiting for process to exit, pid %d', $self->pid);
+  return unless $self->sigchld_cv;
+  $self->sigchld_cv->recv;
 }
 
 sub send {
   my ($self, $msg) = @_;
-  my $fh = $self->fh_in;
-  local $\ = $self->eol;
-  local $| = 1;
-  print $fh $msg;
+  debug('sending "%s"', $msg);
+  $self->handle_in->push_write($msg . $self->eol);
+  1;
 }
+
+around recv => sub{
+  my $orig = shift;
+  my $self = shift;
+  debug('waiting on message');
+  $self->$orig();
+};
 
 sub async {
   my ($self, $cb) = @_;
   my $cv = $self->messages->async;
   $cv->cb(sub{ $cb->( $cv->recv ) });
   return;
-}
-
-sub debug {
-  if ($ENV{IPC_SIMPLE_DEBUG}) {
-    my $msg = sprintf shift, @_;
-    warn "<IPC::Simple> $msg\n";
-  }
 }
 
 after run_state => sub{
@@ -272,7 +314,7 @@ IPC::Simple - simple, non-blocking IPC
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -365,8 +407,8 @@ Blocks until the child process has exited.
 
 =head2 send
 
-Sends a string of text to the child process. The string will be appended with a
-single newline.
+Sends a string of text to the child process. The string will be appended with
+the value of L</eol>.
 
 =head2 recv
 
@@ -414,6 +456,10 @@ True when the message is a sub-process communication error.
 
 C<IPC::Simple> will emit highly verbose messages to C<STDERR> if the
 environment variable C<IPC_SIMPLE_DEBUG> is set to a true value.
+
+=head1 MSWIN32 SUPPORT
+
+Nope.
 
 =head1 AUTHOR
 

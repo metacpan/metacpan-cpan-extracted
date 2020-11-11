@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -92,56 +92,43 @@ is( $changed, 3, '$changed is 3' );
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.09;
 
-use base qw( Tickit::Widget );
-use constant WIDGET_PEN_FROM_STYLE => 1;
+class TestWidget extends Tickit::Widget {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub render_to_rb {}
+   method render_to_rb {}
 
-sub lines { $lines }
-sub cols  { $cols  }
-
-package TestContainer;
-
-use base qw( Tickit::ContainerWidget );
-use constant WIDGET_PEN_FROM_STYLE => 1;
-
-sub new
-{
-   my $class = shift;
-   my $self = $class->SUPER::new( @_ );
-   $self->{children} = [];
-   return $self;
+   method lines { $lines }
+   method cols  { $cols  }
 }
 
-sub render_to_rb {}
+class TestContainer extends Tickit::ContainerWidget {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub lines { 2 }
-sub cols  { 10 }
+   has @_children;
+   method children { @_children }
 
-sub children
-{
-   my $self = shift;
-   return @{ $self->{children} }
+   method render_to_rb {}
+
+   method lines { 2 }
+   method cols  { 10 }
+
+   method add
+   {
+      my ( $child ) = @_;
+      push @_children, $child;
+      $self->SUPER::add( @_ );
+   }
+
+   method remove
+   {
+      my ( $child ) = @_;
+      @_children = grep { $_ != $child } @_children;
+      $self->SUPER::remove( @_ );
+   }
+
+   method child_resized { $resized++ }
+
+   method children_changed { $changed++ }
 }
-
-sub add
-{
-   my $self = shift;
-   my ( $child ) = @_;
-   push @{ $self->{children} }, $child;
-   $self->SUPER::add( @_ );
-}
-
-sub remove
-{
-   my $self = shift;
-   my ( $child ) = @_;
-   @{ $self->{children} } = grep { $_ != $child } @{ $self->{children} };
-   $self->SUPER::remove( @_ );
-}
-
-sub child_resized { $resized++ }
-
-sub children_changed { $changed++ }

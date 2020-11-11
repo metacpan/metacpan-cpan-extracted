@@ -2,7 +2,7 @@ package IO::Pager::Page;
 use strict;
 use warnings;
 
-our $VERSION = 1.02;
+our $VERSION = 1.04; #Untouched since 1.02
 
 
 # The meat

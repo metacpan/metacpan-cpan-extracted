@@ -21,9 +21,9 @@ tidy_directory($basedir, $docname, $debug);
 my $source = read_file($docpath) or die "cannot read the source data";
 my $output;
 my $drv = LaTeX::Driver->new( source      => \$source,
-			      format      => 'ps',
-			      output      => \$output,
-			      @DEBUGOPTS );
+                              format      => 'ps',
+                              output      => \$output,
+                              @DEBUGOPTS );
 
 my $systmpdir = $ENV{TMPDIR} || '/tmp';
 

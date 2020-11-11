@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +25,41 @@ no_index:
     - examples
     - author
     - builder
+optional_features:
+  test_fork:
+    description: 'Test Fork'
+    requires:
+      DBI: '1.614'
+      POSIX::AtFork: '0'
+      Parallel::ForkManager: '0'
+      Scalar::Util: '0'
+      Test::SharedFork: '0'
+  test_mariadb:
+    description: 'Test MariaDB'
+    requires:
+      DBD::MariaDB: '0'
+      SQL::Translator: '0'
+      Test::mysqld: '0'
+  test_mysql:
+    description: 'Test MySQL'
+    requires:
+      DBD::mysql: '0'
+      SQL::Translator: '0'
+      Test::mysqld: '0'
+  test_postgresql:
+    description: 'Test PostgreSQL'
+    requires:
+      DBD::Pg: '0'
+      SQL::Translator: '0'
+      Test::PostgreSQL: '0'
+  test_sqlite:
+    description: 'Test SQLite'
+    requires:
+      DBD::SQLite: '0'
 provides:
   Data::ObjectDriver:
     file: lib/Data/ObjectDriver.pm
-    version: '0.20'
+    version: '0.21'
   Data::ObjectDriver::BaseObject:
     file: lib/Data/ObjectDriver/BaseObject.pm
   Data::ObjectDriver::BaseView:
@@ -45,6 +76,8 @@ provides:
     file: lib/Data/ObjectDriver/Driver/Cache/RAM.pm
   Data::ObjectDriver::Driver::DBD:
     file: lib/Data/ObjectDriver/Driver/DBD.pm
+  Data::ObjectDriver::Driver::DBD::MariaDB:
+    file: lib/Data/ObjectDriver/Driver/DBD/MariaDB.pm
   Data::ObjectDriver::Driver::DBD::Oracle:
     file: lib/Data/ObjectDriver/Driver/DBD/Oracle.pm
   Data::ObjectDriver::Driver::DBD::Oracle::db:
@@ -92,7 +125,7 @@ resources:
   bugtracker: https://github.com/sixapart/data-objectdriver/issues
   homepage: https://github.com/sixapart/data-objectdriver
   repository: git://github.com/sixapart/data-objectdriver.git
-version: '0.20'
+version: '0.21'
 x_authority: cpan:SIXAPART
 x_contributors:
   - 'Adam Thomason <athomason@sixapart.com>'

@@ -6,14 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Tables/DBI.pm',
     'Tables/Sample/DeNiro.pm',
     'Tables/Test/Angka.pm',
+    'Tables/Test/Dynamic.pm',
     'TablesRole/Source/CSVDATA.pm',
     'TablesRole/Source/DBI.pm',
+    'TablesRole/Source/Iterator.pm',
+    'TablesRole/Util/Basic.pm',
+    'TablesRole/Util/CSV.pm',
+    'TablesRole/Util/Random.pm',
     'TablesRoles/Standard.pm'
 );
 

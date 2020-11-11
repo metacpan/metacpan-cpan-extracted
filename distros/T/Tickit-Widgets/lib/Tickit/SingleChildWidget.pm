@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::SingleChildWidget;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::ContainerWidget );
-
-our $VERSION = '0.53';
+package Tickit::SingleChildWidget 0.53;
+class Tickit::SingleChildWidget
+   extends Tickit::ContainerWidget;
 
 use Carp;
 
@@ -48,19 +46,16 @@ used as a chaining mutator.
 
 =cut
 
-sub new
+has $_child;
+
+BUILD
 {
-   my $class = shift;
    my %args = @_;
 
-   my $self = $class->SUPER::new( %args );
-
    if( exists $args{child} ) {
-      Carp::carp( "The 'child' constructor argument to $class is discouraged; use ->set_child instead" );
+      Carp::carp( "The 'child' constructor argument to ${\ref $self} is discouraged; use ->set_child instead" );
       $self->set_child( $args{child} );
    }
-
-   return $self;
 }
 
 =head1 METHODS
@@ -75,18 +70,12 @@ Returns the contained child widget.
 
 =cut
 
-sub child
-{
-   my $self = shift;
-   return $self->{child};
-}
+method child { $_child }
 
-sub children
+method children
 {
-   my $self = shift;
-   my $child = $self->child;
-   return $child ? ( $child ) : () if wantarray;
-   return $child ? 1 : 0;
+   return $_child ? ( $_child ) : () if wantarray;
+   return $_child ? 1 : 0;
 }
 
 =head2 set_child
@@ -106,17 +95,16 @@ is now discouraged.
 
 =cut
 
-sub set_child
+method set_child
 {
-   my $self = shift;
    my ( $child ) = @_;
 
-   if( my $old_child = $self->child ) {
-      undef $self->{child};
+   if( my $old_child = $_child ) {
+      undef $_child;
       $self->SUPER::remove( $old_child );
    }
 
-   $self->{child} = $child;
+   $_child = $child;
 
    if( $child ) {
       $self->SUPER::add( $child );
@@ -125,18 +113,16 @@ sub set_child
    return $self;
 }
 
-sub add
+method add
 {
-   my $self = shift;
-   croak "Already have a child; cannot add another" if $self->child;
+   croak "Already have a child; cannot add another" if $_child;
    $self->set_child( $_[0] );
 }
 
-sub remove
+method remove
 {
-   my $self = shift;
    my ( $child ) = @_;
-   croak "Cannot remove this child" if !$self->child or $self->child != $child;
+   croak "Cannot remove this child" if !$_child or $_child != $child;
    $self->set_child( undef );
 }
 

@@ -7,7 +7,7 @@ package Chart::GGPlot::Util::Scales;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0009'; # VERSION
+our $VERSION = '0.0011'; # VERSION
 
 use Color::Brewer;
 use Color::Library;
@@ -15,7 +15,7 @@ use Convert::Color::LCh;
 use Data::Munge qw(elem);
 use Machine::Epsilon qw(machine_epsilon);
 use Math::Gradient qw(multi_array_gradient);
-use Math::Round qw(nearest round);
+use Math::Round qw(round);
 use Math::Interpolate;
 use Memoize;
 use PDL::Primitive qw(which);
@@ -591,25 +591,29 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
     my $YEAR = $DAY * 365.25;
     my $MONTH = $YEAR / 12;
 
-    state $diff_zz = sub {
+    state $diff_secs = sub {
         my ($zz) = @_;
-        my $zz_tm = $zz->dt_unpdl('Time::Moment');
-        return $zz_tm->[0]->delta_seconds($zz_tm->[1]);
+        my $x = $zz->double_epoch;
+        return ($x->at(1) - $x->at(0));
     };
 
-    my $D = $diff_zz->($zz);
+    my $D = $diff_secs->($zz);
 
-    my $make_output = sub {
+    state $make_output = sub {
         my ($at, $s, $round) = @_;
-        $round //= true;
 
+        # TODO: R implementation may round to date here if $x is Date.
+        # We don't do it so far because we don't have Date vs. DateTime yet.
+        # $round //= true;
         Role::Tiny->apply_roles_to_object($at, 'PDL::Role::HasNames');
         $at->names($at->dt_unpdl($s->{format}));
         return $at;
     };
 
     if ($D < $n * $DAY) {
-        $zz = $zz;
+
+        # TODO: Shall not align to day before we have Date vs DateTime.
+        # $zz = $zz->dt_align('day');   
         my $r = round($n - $D / $DAY);
         my $m = List::AllUtils::max(0, $r % 2);
         my $m2 = $m + ($r % 2);
@@ -626,12 +630,12 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
             }
         }   
         return $make_output->($dd, { format => "%b %d" }, false);
-    } elsif ($D < 1) { 
+    } elsif ($D < 1) {  # unique values / sub-second ranges
         my $m = List::AllUtils::min(30, List::AllUtils::max($D, $n/2));
-        # TODO
-        #$zz = ;
+
+        # TODO: won't reach here now as we don't have Date vs. DateTime.
     }
-    my $xspan = $diff_zz->($zz);
+    my $xspan = $diff_secs->($zz);
     my $steps = [
         { spec => '1 second',  secs => 1, format => '%S', start => 'minute' },
         { spec => '2 second',  secs => 2 },
@@ -766,8 +770,6 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
             # remove nl on left,  nr on right
             $init_at = $init_at->slice(pdl([$nl .. $init_at->length-$nr - 1]));
         }
-    } else {    # too few ticks
-        ;
     }
 
     $dn = $init_at->length - 1 - $n;
@@ -789,11 +791,10 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
     if ($new_n < $min_n) {
         $new_n = "-Inf";
     }
-    if (abs($new_n - $n) < abs($dn)) {
-        return $make_output->($new_at, $steps->[$new_i]);
-    } else {
-        return $make_output->($init_at, $st_i);
-    }
+    return
+      abs( $new_n - $n ) < abs($dn)
+      ? $make_output->( $new_at,  $steps->[$new_i] )
+      : $make_output->( $init_at, $st_i );
 }
 
 
@@ -945,7 +946,7 @@ Chart::GGPlot::Util::Scales - R 'scales' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0009
+version 0.0011
 
 =head1 FUNCTIONS
 
@@ -1018,7 +1019,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

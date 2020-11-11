@@ -1,6 +1,6 @@
 package App::GitGot::Command::move;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::move::VERSION = '1.337';
+$App::GitGot::Command::move::VERSION = '1.339';
 # ABSTRACT: move repo to new location
 use 5.014;
 
@@ -63,7 +63,7 @@ App::GitGot::Command::move - move repo to new location
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 AUTHOR
 

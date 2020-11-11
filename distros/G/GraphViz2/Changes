@@ -1,3 +1,16 @@
+2.61 2020-11-08
+- support Perl 5.8.8
+
+2.60 2020-11-04
+- fix GraphViz2->from_graph object method
+- Parse::STT add visualise modes: REs become nodes or ports for clearer transitions
+- more robust quoting for record ports
+- add handling array-ref for record ports
+
+2.59 2020-10-31
+- GraphViz2->from_graph, dep on Graph, use as intermediate in Parse::Regexp
+- convert Parse::Yacc, Parse::Yapp, Parse::STT to graph-based
+
 2.58 2020-10-19
 - add combine_node_and_port global option
 - add_node(label => [{port=>...}]) no need <>

@@ -1,3 +1,9 @@
+Version 5.123 - 4 November 2020
+
+- Fix file descriptor leak in rpm transactions
+- Build with the flags used to build perl itself
+- Make it work with no feature qw(indirect) (aka perl7)
+
 Version 5.122 - 3 June 2020
 
 - handle RPM version with "beta" or "rc" in it

@@ -6,12 +6,13 @@
 
 package Rex::Interface::Exec::Base;
 
+use 5.010001;
 use strict;
 use warnings;
 use Carp;
 use Rex::Helper::Run;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 sub new {
   my $that  = shift;

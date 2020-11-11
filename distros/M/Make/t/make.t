@@ -90,8 +90,8 @@ for my $l (@SUBs) {
 }
 
 my @CMDs = (
-    [ ' a line', { line => 'a line' } ],
-    [ 'a line',  { line => 'a line' } ],
+    [ ' a line',      { line => 'a line' } ],
+    [ 'a line',       { line => 'a line' } ],
     [ '@echo shhh',   { line => 'echo shhh',  silent   => 1 } ],
     [ '- @echo hush', { line => 'echo hush',  silent   => 1, can_fail => 1 } ],
     [ '-just do it',  { line => 'just do it', can_fail => 1 } ],
@@ -103,14 +103,23 @@ for my $l (@CMDs) {
     is_deeply $got, $expected;
 }
 
-my $m = Make->new;
-$m->parse;
-is ref($m), 'Make';
-eval { $m->Make('all') };
-is $@, '',;
+SKIP: {
+    skip '', 2 if !$ENV{AUTHOR_TESTING};    # avoid blowing up on dmake
+    my $m = Make->new;
+    isa_ok $m, 'Make';
+    $m->parse;
+    eval { $m->Make('all') };
+    is $@, '',;
+}
+
+{
+    my $m = Make->new;
+    $m->parse( \"all: sbar sfoo\n\techo larry\n\techo howdy\n" );
+    is $m->{Vars}{'.DEFAULT_GOAL'}, 'all';
+}
 
 my ( undef, $tempfile ) = tempfile;
-$m = Make->new;
+my $m = Make->new;
 $m->parse( \sprintf <<'EOF', $tempfile );
 var = value
 tempfile = %s
@@ -155,37 +164,43 @@ is $contents, " \n";
 $got = [ Make::parse_args(qw(all VAR=value)) ];
 is_deeply $got, [ [ [qw(VAR value)] ], ['all'] ] or diag explain $got;
 
-truncate $tempfile, 0;
-$fsmap = make_fsmap(
-    {
-        'src/a.c'   => [ 2, 'hi' ],
-        'a.o'       => [ 1, 'yo' ],
-        'b.c'       => [ 2, 'hi' ],
-        'b.o'       => [ 1, 'yo' ],
-        GNUmakefile => [ 1, "include inc.mk\n-include not.mk\n" ],
-        'inc.mk'    => [ 1, sprintf( <<'EOF', $tempfile, $^X ) ] } );
+my $inc_mk = sprintf <<'EOF', $tempfile, $^X;
 vpath %%.c src/%%.c # double-percent because sprintf
 objs = a.o b.o
 tempfile = %s
 CC = @"%s" -e "print qq[@ARGV\n]" COMPILE >>"$(tempfile)"
-CFLAGS =
+.c.o: ; $(CC) -c -o $@ $<
 all: $(objs)
 .PHONY: all
 EOF
-$m = Make->new( FSFunctionMap => $fsmap, GNU => 1 );
-$m->parse;
-$got = $m->target('all')->rules->[0]->prereqs;
-is_deeply $got, [qw(a.o b.o)] or diag explain $got;
-$got = $m->target('a.o')->rules->[0]->prereqs;
-is_deeply $got, ['src/a.c'] or diag explain $got;
-$m->Make('all');
-$contents = do { local $/; open my $fh, '<', $tempfile; <$fh> };
-is $contents, "COMPILE -c -o a.o src/a.c\nCOMPILE -c -o b.o b.c\n";
+my $vfs = {
+    'src/a.c'   => [ 2, 'hi' ],
+    'a.o'       => [ 1, 'yo' ],
+    'b.c'       => [ 2, 'hi' ],
+    'b.o'       => [ 1, 'yo' ],
+    GNUmakefile => [ 1, "include inc.mk\n-include not.mk\n" ],
+    'inc.mk'    => [ 1, $inc_mk ],
+};
+
+for my $tuple ( [ undef, undef ], [ undef, 'subdir' ], [qw(GNUmakefile subdir)] ) {
+    my ( $mf, $prefix ) = @$tuple;
+    truncate $tempfile, 0;
+    $m = Make->new( FSFunctionMap => make_fsmap( $vfs, $prefix ), GNU => 1, InDir => $prefix );
+    $m->parse($mf);
+    $got = $m->target('all')->rules->[0]->prereqs;
+    is_deeply $got, [qw(a.o b.o)] or diag explain $got;
+    $got = $m->target('a.o')->rules->[0]->prereqs;
+    is_deeply $got, ['src/a.c'] or diag explain $got;
+    $m->Make('all');
+    $contents = do { local $/; open my $fh, '<', $tempfile; <$fh> };
+    is $contents, "COMPILE -c -o a.o src/a.c\nCOMPILE -c -o b.o b.c\n";
+}
 
 done_testing;
 
 sub make_fsmap {
-    my ($vfs) = @_;
+    my ( $vfs, $maybe_prefix ) = @_;
+    my %vfs_copy = map +( Make::in_dir( $_, $maybe_prefix ) => $vfs->{$_} ), keys %$vfs;
     my %fh2file_tuple;
     return {
         glob => sub {
@@ -193,20 +208,21 @@ sub make_fsmap {
             for my $subpat ( split /\s+/, $_[0] ) {
                 $subpat =~ s/\*/.*/g;    # ignore ?, [], {} for now
                 ## no critic (BuiltinFunctions::RequireBlockGrep)
-                push @results, grep /^$subpat$/, sort keys %$vfs;
+                push @results, grep /^$subpat$/, sort keys %vfs_copy;
                 ## use critic
             }
             return @results;
         },
         fh_open => sub {
-            die "@_: No such file or directory" unless exists $vfs->{ $_[1] };
-            my $file_tuple = $vfs->{ $_[1] };
+            require Carp;
+            Carp::croak "@_: No such file or directory" unless exists $vfs_copy{ $_[1] };
+            my $file_tuple = $vfs_copy{ $_[1] };
             open my $fh, "+$_[0]", \$file_tuple->[1];
             $fh2file_tuple{$fh} = $file_tuple;
             return $fh;
         },
         fh_write      => sub { my $fh = shift; $fh2file_tuple{$fh}[0] = time; print {$fh} @_ },
-        file_readable => sub { exists $vfs->{ $_[0] } },
-        mtime         => sub { ( $vfs->{ $_[0] } || [] )->[0] },
+        file_readable => sub { exists $vfs_copy{ $_[0] } },
+        mtime         => sub { ( $vfs_copy{ $_[0] } || [] )->[0] },
     };
 }

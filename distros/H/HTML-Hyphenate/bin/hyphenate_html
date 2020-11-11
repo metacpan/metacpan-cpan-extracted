@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use utf8;
-use 5.014000;
+use 5.016000;
 use English qw( -no_match_vars );
 BEGIN { our $VERSION = v1.1.1; }
 

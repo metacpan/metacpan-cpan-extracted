@@ -4,7 +4,7 @@
       "Dave Cross <dave@mag-sol.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -35,15 +35,20 @@
    "provides" : {
       "Tie::Hash::Regex" : {
          "file" : "lib/Tie/Hash/Regex.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/tie-hash-regex.git",
+         "web" : "https://github.com/davorg/tie-hash-regex"
+      }
    },
-   "version" : "1.12",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,0 +1,64 @@
+=head1 NAME
+
+Base abstract class for all handle types
+
+=head1 SYNOPSIS
+
+    # since Handle is abstract, only concrete class can be instantiated
+    my $h = UniEvent::Timer->new; 
+    $h->loop; # event loop is returned, the default one in the case
+    $h->type; # UniEvent::Timer::TYPE
+
+    say $h->active; # => false
+    $h->start;
+    say $h->active; # => true
+
+    $h->weak(1); # make it weak
+
+    $h->reset;
+    $h->clear;
+
+
+=head1 DESCRIPTION
+
+The class contains methods, shared for all hanlde types.
+
+=head1 METHODS
+
+=head2 loop()
+
+Returns assigned to the handle event loop instance.
+
+=head2 type()
+
+Returns an integer, which uniquely identifies handle type (e.g.  UniEvent::Timer::TYPE).
+
+=head2 active()
+
+Returns true if the handle is "active". What "active" means depends on the concrete
+handle type, i.e. for timer hanlde active means, that it was started, for pipe, tcp etc.
+handle types "active" means that I/O operations will be performed.
+
+Usually, if there is a C<start()> method, then handle is active afther the invokation
+of the method, and vise versa, C<stop()> method deactivates handle.
+
+=head2 weak([$value = false])
+
+Marks the handle as weak (if C<$value> is true) or unmarks it (if value is defined
+and false). 
+
+Under the hood it increments/decrements refcounter for the backend handler. 
+
+The freshly created handle instance is non-weak (strong) by default.
+
+=head2 reset()
+
+Cancels (stops) the handle, resetting it to initial state, with the exception, that
+assigned callbacks are kept.
+
+=head2 clear()
+
+Resets everything, including assigned callbacks, as if the hanle has been created
+anew.
+
+=cut

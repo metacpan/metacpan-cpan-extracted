@@ -5,7 +5,7 @@ use warnings;
 package Ask::Caroline;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.015';
 
 use Moo;
 use Caroline ();
@@ -23,7 +23,7 @@ has caroline => (
 		'Caroline'->new(
 			completion_callback => sub {
 				return unless $weak && $weak->has_completion;
-				$weak->completion->(@_);
+				$weak->completion->( @_ );
 			},
 		);
 	},
@@ -36,14 +36,14 @@ sub BUILD {
 }
 
 sub is_usable {
-	my ($self) = @_;
+	my ( $self ) = @_;
 	-t STDIN and -t STDOUT;
 }
 
 sub quality {
 	my ( $self ) = ( shift );
 	
-	( ref($self) ? $self : 'Caroline'->new )->is_supported ? 90 : 30;
+	( ref( $self ) ? $self : 'Caroline'->new )->is_supported ? 90 : 30;
 }
 
 sub entry {
@@ -54,9 +54,11 @@ sub entry {
 		$self->completion( $opts{completion} );
 	}
 	else {
-		$self->completion( sub {
-			return $opts{default};
-		} );
+		$self->completion(
+			sub {
+				return $opts{default};
+			}
+		);
 	}
 	
 	if ( exists $opts{text} ) {
@@ -68,18 +70,22 @@ sub entry {
 	
 	my ( $line, $tio );
 	
-	if ( $opts{hide_text} and do { require POSIX; $tio = 'POSIX::Termios'->new } ) {
-		$tio->getattr(0);
-		$tio->setlflag($tio->getlflag & ~POSIX::ECHO());
-		$tio->setattr(0);
-		print STDOUT $opts{prompt}; # no new line;
+	if (
+		$opts{hide_text}
+		and do { require POSIX; $tio = 'POSIX::Termios'->new }
+		)
+	{
+		$tio->getattr( 0 );
+		$tio->setlflag( $tio->getlflag & ~POSIX::ECHO() );
+		$tio->setattr( 0 );
+		print STDOUT $opts{prompt};    # no new line;
 		STDOUT->flush;
 		chomp( $line = <STDIN> );
-		$tio->setlflag($tio->getlflag | POSIX::ECHO());
-		$tio->setattr(0);
+		$tio->setlflag( $tio->getlflag | POSIX::ECHO() );
+		$tio->setattr( 0 );
 		print STDOUT "\r\n";
 		STDOUT->flush;
-	}
+	} #/ if ( $opts{hide_text} ...)
 	else {
 		chomp( $line = $self->caroline->readline( $opts{prompt} ) );
 	}
@@ -87,7 +93,7 @@ sub entry {
 	$self->clear_completion;
 	
 	return $line;
-}
+} #/ sub entry
 
 sub question {
 	my ( $self, %opts ) = ( shift, @_ );
@@ -95,7 +101,7 @@ sub question {
 	
 	my $response = $self->entry( %opts );
 	my $lang     = $self->_lang_support( $opts{lang} );
-	$lang->boolean($response);
+	$lang->boolean( $response );
 }
 
 sub print_findings {
@@ -103,9 +109,10 @@ sub print_findings {
 	
 	if ( my @copy = @$findings ) {
 		print {$fh} "\r\n";
-		my $longest = 0; for ( @copy ) { $longest = length if length > $longest };
-		my $per_line = int( 80 / ($longest+2) ) || 1;
-		my $template = '%-' . ($longest+2) . 's';
+		my $longest = 0;
+		for ( @copy ) { $longest = length if length > $longest }
+		my $per_line = int( 80 / ( $longest + 2 ) ) || 1;
+		my $template = '%-' . ( $longest + 2 ) . 's';
 		while ( @copy ) {
 			my @chunk = splice @copy, 0, $per_line;
 			while ( @chunk < $per_line ) {
@@ -116,24 +123,30 @@ sub print_findings {
 		}
 		$fh->flush;
 		return 1;
-	}
+	} #/ if ( my @copy = @$findings)
 	
 	return;
-}
+} #/ sub print_findings
 
 sub file_selection {
 	my ( $self, %opts ) = ( shift, @_ );
 	
-	my $single = ! $opts{multiple};
+	my $single = !$opts{multiple};
 	
 	$opts{prompt} = sprintf( '%s> ', $opts{directory} ? 'directory' : 'file' )
 		unless exists $opts{prompt};
-	
+		
 	unless ( $opts{text} ) {
-		$opts{text} = $single
-			? ( $opts{directory} ? 'Please choose a directory.'      : 'Please choose a file.' )
-			: ( $opts{directory} ? 'Please choose some directories.' : 'Please choose some files.' )
-	}
+		$opts{text} =
+			$single
+			? (
+			$opts{directory} ? 'Please choose a directory.' : 'Please choose a file.' )
+			: (
+			$opts{directory}
+			? 'Please choose some directories.'
+			: 'Please choose some files.'
+			);
+	} #/ unless ( $opts{text} )
 	
 	$self->info(
 		text   => $opts{text},
@@ -141,50 +154,54 @@ sub file_selection {
 	);
 	
 	$self->info(
-		text   => 'Please enter one choice per line; leave a blank line to stop choosing.',
+		text =>
+			'Please enter one choice per line; leave a blank line to stop choosing.',
 		colour => $opts{colour} || 'bright_cyan',
 	) unless $single;
 	
-	$self->completion( sub {
-		my $raw = shift; $raw = '.' unless length $raw;
-		my $got = path( $raw );
-		
-		my @kids;
-		
-		if ( $got->is_dir ) {
-			@kids = $opts{directory} ? grep( $_->is_dir, $got->children ) : $got->children;
-		}
-		else {
-			my $dir  = $got->parent;
-			my $stem = quotemeta( $got->basename );
+	$self->completion(
+		sub {
+			my $raw = shift;
+			$raw = '.' unless length $raw;
+			my $got = path( $raw );
 			
-			@kids = $opts{directory} ? grep( $_->is_dir, $dir->children ) : $dir->children;
-			@kids = grep $_->basename =~ /^$stem/, @kids;
+			my @kids;
+			
+			if ( $got->is_dir ) {
+				@kids = $opts{directory} ? grep( $_->is_dir, $got->children ) : $got->children;
+			}
+			else {
+				my $dir  = $got->parent;
+				my $stem = quotemeta( $got->basename );
+				
+				@kids = $opts{directory} ? grep( $_->is_dir, $dir->children ) : $dir->children;
+				@kids = grep $_->basename =~ /^$stem/, @kids;
+			}
+			
+			my @printable = sort map $_->basename . ( $_->is_dir ? '/' : '' ), @kids;
+			unshift @printable, '.' if $got->is_dir;
+			
+			$self->print_findings( \@printable, \*STDOUT );
+			return map "$_", ( $got->is_dir ? $got : () ), @kids;
 		}
-		
-		my @printable = sort map $_->basename . ( $_->is_dir ? '/' : '' ), @kids;
-		unshift @printable, '.' if $got->is_dir;
-		
-		$self->print_findings( \@printable, \*STDOUT );
-		return map "$_", ( $got->is_dir ? $got : () ), @kids;
-	} );
+	);
 	
 	my @chosen;
 	
 	CHOICE: while ( 1 ) {
-		
+	
 		chomp( my $line = $self->caroline->readline( $opts{prompt} ) );
 		
 		if ( $line eq '' ) {
-			$single ? next(CHOICE) : last(CHOICE);
+			$single ? next( CHOICE ) : last( CHOICE );
 		}
 		
-		if ( $opts{existing} and not path($line)->exists ) {
+		if ( $opts{existing} and not path( $line )->exists ) {
 			$self->error(
 				text => sprintf( 'Does not exist: %s. Please try again.', $line ),
 			);
 		}
-		elsif ( $opts{directory} and not path($line)->is_dir ) {
+		elsif ( $opts{directory} and not path( $line )->is_dir ) {
 			$self->error(
 				text => sprintf( 'Not a directory: %s. Please try again.', $line ),
 			);
@@ -193,14 +210,14 @@ sub file_selection {
 			push @chosen, $line;
 			last CHOICE if $single;
 		}
-	}
+	} #/ CHOICE: while ( 1 )
 	
 	return $chosen[0] if $single;
 	
 	$self->clear_completion;
 	
 	return @chosen;
-}
+} #/ sub file_selection
 
 sub single_choice {
 	shift->multiple_choice( @_, _single => 1 );
@@ -223,34 +240,37 @@ sub multiple_choice {
 	my %allowed;
 	my @choices_list = map {
 		$allowed{ $_->[0] } = 1;
-		defined $_->[1] ? sprintf('"%s" (%s)', @$_) : "\"$_->[0]\""
+		defined $_->[1] ? sprintf( '"%s" (%s)', @$_ ) : "\"$_->[0]\""
 	} @{ $opts{choices} };
 	
 	$self->info(
-		text   => sprintf( 'Choices: %s.', join(q[, ], @choices_list) ),
+		text   => sprintf( 'Choices: %s.', join( q[, ], @choices_list ) ),
 		colour => $opts{colour} || 'bright_cyan',
 	) unless $opts{hide_choices};
 	
 	$self->info(
-		text   => 'Please enter one choice per line; leave a blank line to stop choosing.',
+		text =>
+			'Please enter one choice per line; leave a blank line to stop choosing.',
 		colour => $opts{colour} || 'bright_cyan',
 	) unless $single;
 	
-	$self->completion(sub {
-		my $got   = quotemeta( shift );
-		my @found = grep /^$got/, map $_->[0], @{ $opts{choices} };
-		$self->print_findings( \@found, \*STDOUT );
-		return @found;
-	});
+	$self->completion(
+		sub {
+			my $got   = quotemeta( shift );
+			my @found = grep /^$got/, map $_->[0], @{ $opts{choices} };
+			$self->print_findings( \@found, \*STDOUT );
+			return @found;
+		}
+	);
 	
 	my @chosen;
 	
 	CHOICE: while ( 1 ) {
-		
+	
 		chomp( my $line = $self->caroline->readline( $opts{prompt} ) );
 		
 		if ( $line eq '' ) {
-			$single ? next(CHOICE) : last(CHOICE);
+			$single ? next( CHOICE ) : last( CHOICE );
 		}
 		
 		if ( $allowed{$line} ) {
@@ -262,24 +282,24 @@ sub multiple_choice {
 				text => sprintf( 'Not valid: %s. Please try again.', $line ),
 			);
 			$self->info(
-				text   => sprintf( 'Choices: %s.', join(q[, ], @choices_list) ),
+				text   => sprintf( 'Choices: %s.', join( q[, ], @choices_list ) ),
 				colour => $opts{colour} || 'bright_cyan',
 			) unless $opts{hide_choices};
 		}
-	}
+	} #/ CHOICE: while ( 1 )
 	
 	return $chosen[0] if $single;
 	
 	$self->clear_completion;
 	
 	return @chosen;
-}
+} #/ sub multiple_choice
 
 sub info {
 	my ( $self, %opts ) = ( shift, @_ );
 	chomp( my $text = $opts{text} );
 	if ( $opts{colour} ) {
-		$text = colored( [$opts{colour}], $text );
+		$text = colored( [ $opts{colour} ], $text );
 	}
 	print STDOUT $text, "\n";
 	STDOUT->flush;
@@ -344,4 +364,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

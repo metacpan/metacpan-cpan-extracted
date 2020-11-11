@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <sstream>
 #include <iostream>
 #include <panda/log/file.h>

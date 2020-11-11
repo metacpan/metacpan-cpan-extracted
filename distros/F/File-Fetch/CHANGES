@@ -1,3 +1,8 @@
+1.00        Wed Nov 11 12:49:58 2020
+
+* Fixed the mitigations for CVE-2016-1238
+* Mentioned https support in CHANGES file
+
 0.56        Thu Nov 30 14:47:50 2017
 
 * Blacklist 'lftp' use on hpux
@@ -16,6 +21,7 @@
 
 * Require Module::Load::Conditional 0.66
 * Fix FTP tests for ipv6
+* Support https with LWP, Wget and curl
 
 0.48        Fri Jan 24 10:32:52 2014
 

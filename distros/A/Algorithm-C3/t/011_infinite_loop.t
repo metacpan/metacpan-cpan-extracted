@@ -1,10 +1,8 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
 use Test::More;
-use Algorithm::C3; # we already did use_ok 10 times by now..
+use Algorithm::C3;
 
 plan skip_all => "Your system has no SIGALRM" if !exists $SIG{ALRM};
 plan tests => 8;

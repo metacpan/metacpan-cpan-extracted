@@ -6,7 +6,7 @@ use Object::Simple -base;
 use Carp;
 use Path::Tiny;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 our $types;
 sub AUTOLOAD {
     my $self = shift;
@@ -31,7 +31,7 @@ sub _set_types {
 
     if (not exists $types->{$type}) {
         my $module = sprintf "Getopt::Kingpin::Type::%s", $type;
-        $module =~ s/List$//;
+        $module =~ s/(?:List|Hash)$//;
         if (not $module->can('set_value')) {
             croak "type error '$type'" unless eval "require $module"; ## no critic
         }
@@ -49,6 +49,10 @@ sub _set_types {
 
     if ($type =~ /List$/) {
         $self->is_cumulative(1);
+    }
+    
+    elsif ($type =~ /Hash$/) {
+        $self->is_hash(1);
     }
 }
 
@@ -69,6 +73,7 @@ has description   => undef;
 has value         => undef;
 has _defined      => 0;
 has is_cumulative => 0;
+has is_hash       => 0;
 has _default      => undef;
 has _envar        => undef;
 has type          => "String";
@@ -126,7 +131,20 @@ sub set_value {
         }
         push @values, $ret[0];
         $self->_defined(1);
-        $self->value([@values]);
+        $self->value(\@values);
+    } elsif ($self->is_hash) {
+        my %values;
+        if ($self->_defined) {
+            %values = %{$self->value};
+        }
+        my ($key, $val) = (ref($_[0]) eq 'ARRAY') ? @{$_[0]} : split(/=/, $_[0], 2);
+        my @ret = $types->{$type}->{set_value}->($self, $val);
+        if (scalar @ret > 1) {
+            return undef, $ret[1];
+        }
+        $values{$key} = $ret[0];
+        $self->_defined(1);
+        $self->value(\%values);
     } elsif ($self->_defined) {
         printf STDERR "error: flag '%s' cannot be repeated, try --help\n", $self->name;
         return undef, 1;

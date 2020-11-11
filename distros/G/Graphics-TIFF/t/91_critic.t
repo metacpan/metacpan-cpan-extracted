@@ -15,4 +15,4 @@ if ( not eval { require Test::Perl::Critic; } ) {
 
 my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
-all_critic_ok( 'bin', 'examples', 'lib' );
+all_critic_ok( 'examples', 'lib' );

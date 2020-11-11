@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.34    2020-11-04
+        [CHANGES]
+         * Reword the "experimental warning" at the top of the docs
+
+        [BUGFIXES]
+         * Use named enum for repr type (thanks ilmari) (RT133354)
+         * Use named structs so pahole can see them (thanks ilmari) (RT133355)
+         * Make sure to set the CvGV of embedded CVs of methods imported from
+           roles
+         * Fixed a crash case on Perl 5.18 and 5.20 involving the
+           PadnameOUTER() flag when fixing up PARENT_PAD_INDEX() (RT132814)
+
 0.33    2020-09-16
         [CHANGES]
          * Roles can now have data slots

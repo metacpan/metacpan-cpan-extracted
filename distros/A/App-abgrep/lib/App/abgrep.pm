@@ -2,8 +2,10 @@
 
 package App::abgrep;
 
-our $DATE = '2020-04-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-08'; # DATE
+our $DIST = 'App-abgrep'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +24,8 @@ gen_modified_sub(
     description => <<'_',
 
 This is a grep-like utility that is based on <pm:AppBase::Grep>, mainly for
-demoing and testing the module.
+demoing and testing the module. The unique features include multiple patterns
+and `--dash-prefix-inverts`.
 
 _
     add_args    => {
@@ -34,6 +37,21 @@ _
             greedy => 1,
         },
         # XXX recursive (-r)
+    },
+    modify_meta => sub {
+        my $meta = shift;
+        $meta->{examples} = [
+            {
+                summary => 'Show lines that contain foo, bar, AND baz (in no particular order), but do not contain qux NOR quux',
+                'src' => q([[prog]] --all --dash-prefix-inverts -e foo -e bar -e baz -e -qux -e -quux),
+                'src_plang' => 'bash',
+                'test' => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+        $meta->{links} = [
+            {url=>'prog:grep-terms'},
+        ];
     },
     output_code => sub {
         my %args = @_;
@@ -94,7 +112,7 @@ App::abgrep - Print lines matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.004 of App::abgrep (from Perl distribution App-abgrep), released on 2020-04-10.
+This document describes version 0.007 of App::abgrep (from Perl distribution App-abgrep), released on 2020-11-08.
 
 =head1 FUNCTIONS
 
@@ -108,7 +126,8 @@ Usage:
 Print lines matching a pattern.
 
 This is a grep-like utility that is based on L<AppBase::Grep>, mainly for
-demoing and testing the module.
+demoing and testing the module. The unique features include multiple patterns
+and C<--dash-prefix-inverts>.
 
 This function is not exported.
 
@@ -126,6 +145,15 @@ Require all patterns to match, instead of just one.
 
 Supress normal output, return a count of matching lines.
 
+=item * B<dash_prefix_inverts> => I<bool>
+
+When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)".
+
+This is a convenient way to search for lines that do not match a pattern.
+Instead of using C<-v> to invert the meaning of all patterns, this option allows
+you to invert individual pattern using the dash prefix, which is also used by
+Google search and a few other search engines.
+
 =item * B<files> => I<array[filename]>
 
 =item * B<ignore_case> => I<bool>
@@ -136,11 +164,11 @@ Invert the sense of matching.
 
 =item * B<line_number> => I<true>
 
-=item * B<pattern> => I<re>
+=item * B<pattern> => I<str>
 
 =item * B<quiet> => I<true>
 
-=item * B<regexps> => I<array[re]>
+=item * B<regexps> => I<array[str]>
 
 
 =back

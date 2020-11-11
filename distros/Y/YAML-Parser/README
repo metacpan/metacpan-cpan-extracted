@@ -1,0 +1,50 @@
+NAME
+
+    YAML::Parser - Generated Reference Parser for YAML 1.2
+
+VERSION
+
+    This document describes YAML::Parser version 0.0.3.
+
+SYNOPSIS
+
+    To get a set of event objects:
+
+        my @events = YAML::Parser->new->parse($yaml_string)->events;
+
+    To get the yaml-test-suite event output string:
+
+        my $receiver = PerlYamlReferenceParserTestReceiver->new;
+        my $output = YAML::Parser->new(receiver => $receiver)
+         ->parse($yaml_string)
+         ->receiver
+         ->output;
+
+DESCRIPTION
+
+    YAML::Parser is the first 100% YAML 1.2 spec compliant parser for Perl.
+    The Perl code is generated directly from the YAML 1.2 specification.
+
+SEE
+
+      * https://github.com/yaml/yaml-reference-parser/tree/master#readme
+
+      * https://github.com/yaml/yaml-grammar/blob/master/yaml-spec-1.2.yaml
+
+      * https://yaml.org/spec/1.2/spec.html#id2770814
+
+      * https://github.com/yaml/yaml-test-suite/tree/master/test
+
+AUTHOR
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2020. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

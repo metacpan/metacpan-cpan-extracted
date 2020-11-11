@@ -38,6 +38,14 @@ is(exception { StrictNum->inline_check(q/$xyz/) }, undef, "Inlining StrictNum do
 ok(!StrictNum->has_coercion, "StrictNum doesn't have a coercion");
 ok(!StrictNum->is_parameterizable, "StrictNum isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,
@@ -107,6 +115,18 @@ while (@tests) {
 		fail("expected '$expect'?!");
 	}
 }
+
+#
+# Numeric sorting
+#
+
+is_deeply(
+	[ StrictNum->sort( 11, 2, 1 ) ],
+	[ 1, 2, 11 ],
+	'Numeric sorting',
+);
+
+# this also works with subtypes, like Int, PositiveInt, etc.
 
 done_testing;
 

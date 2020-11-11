@@ -26,28 +26,28 @@
       "configure" : {
          "requires" : {
             "Alien::cmake3" : "0",
-            "Test::Catch" : "v1.0.13",
-            "XS::Install" : "v1.2.20",
-            "XS::libcatch" : "v2.12.1"
+            "Test::Catch" : "v1.0.14",
+            "XS::Install" : "v1.2.21",
+            "XS::libcatch" : "v2.12.1.1"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.20",
+            "XS::Install" : "v1.2.21",
             "perl" : "5.012000"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Catch" : "v1.0.13",
+            "Test::Catch" : "v1.0.14",
             "Test::Deep" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::libcatch" : "v2.12.1"
+            "XS::libcatch" : "v2.12.1.1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.4.9",
+   "version" : "v1.4.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

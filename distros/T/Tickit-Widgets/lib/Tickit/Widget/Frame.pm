@@ -3,16 +3,15 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Frame;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::SingleChildWidget );
+package Tickit::Widget::Frame 0.33;
+class Tickit::Widget::Frame
+   extends Tickit::SingleChildWidget;
+
 use Tickit::Style;
 
 use Tickit::WidgetRole::Alignable name => "title_align";
-
-our $VERSION = '0.32';
 
 use Carp;
 
@@ -132,12 +131,12 @@ For more details see the accessors below.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
+has $_title;
+has %_has_edge;
 
-   my $self = $class->SUPER::new( %args );
+BUILD
+{
+   my %args = @_;
 
    $self->set_title( $args{title} ) if defined $args{title};
    $self->set_title_align( $args{title_align} || 0 );
@@ -145,16 +144,15 @@ sub new
    # Prepopulate has_* caches
    $self->on_style_changed_values;
 
-   return $self;
+   $self->set_child( $args{child} ) if $args{child};
 }
 
 =head1 ACCESSORS
 
 =cut
 
-sub on_style_changed_values
+method on_style_changed_values
 {
-   my $self = shift;
    my %values = @_;
 
    my $reshape = 0;
@@ -168,25 +166,23 @@ sub on_style_changed_values
       my $new = ( $values{"linetype_$_"}[1] // $self->get_style_values( "linetype_$_") // $linetype )
          ne "none";
 
-      $reshape = 1 if $self->{"has_$_"} != $new;
-      $self->{"has_$_"} = $new;
+      $reshape = 1 if $_has_edge{$_} != $new;
+      $_has_edge{$_} = $new;
    }
 
    $self->reshape if $reshape;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    my $child = $self->child;
-   return ( $child ? $child->requested_lines : 0 ) + $self->{has_top} + $self->{has_bottom};
+   return ( $child ? $child->requested_lines : 0 ) + $_has_edge{top} + $_has_edge{bottom};
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $child = $self->child;
-   return ( $child ? $child->requested_cols : 0 ) + $self->{has_left} + $self->{has_right};
+   return ( $child ? $child->requested_cols : 0 ) + $_has_edge{left} + $_has_edge{right};
 }
 
 use constant {
@@ -220,10 +216,9 @@ my %LINESTYLES = (
 
 =cut
 
-sub title
+method title
 {
-   my $self = shift;
-   return $self->{title};
+   return $_title;
 }
 
 =head2 set_title
@@ -235,10 +230,9 @@ frame.
 
 =cut
 
-sub set_title
+method set_title
 {
-   my $self = shift;
-   $self->{title} = $_[0];
+   ( $_title ) = @_;
    $self->redraw;
 }
 
@@ -258,22 +252,20 @@ See also L<Tickit::WidgetRole::Alignable>.
 =cut
 
 ## This should come from Tickit::ContainerWidget
-sub children_changed { shift->reshape }
+method children_changed { $self->reshape }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $window = $self->window or return;
    my $child  = $self->child  or return;
 
    my $lines = $window->lines;
    my $cols  = $window->cols;
 
-   my $extra_lines = $self->{has_top} + $self->{has_bottom};
-   my $extra_cols  = $self->{has_left} + $self->{has_right};
+   my $extra_lines = $_has_edge{top} + $_has_edge{bottom};
+   my $extra_cols  = $_has_edge{left} + $_has_edge{right};
    if( $lines > $extra_lines and $cols > $extra_cols ) {
-      my @geom = ( $self->{has_top}, $self->{has_left}, $lines - $extra_lines, $cols - $extra_cols );
+      my @geom = ( $_has_edge{top}, $_has_edge{left}, $lines - $extra_lines, $cols - $extra_cols );
 
       if( my $childwin = $child->window ) {
          $childwin->change_geometry( @geom );
@@ -290,9 +282,8 @@ sub reshape
    }
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->setpen( $self->get_style_pen( "frame" ) );
@@ -317,8 +308,8 @@ sub render_to_rb
 
    my $h_caps = ( $left_is_line ? 0 : CAP_START ) | ( $right_is_line  ? 0 : CAP_END );
    my $v_caps = ( $top_is_line  ? 0 : CAP_START ) | ( $bottom_is_line ? 0 : CAP_END );
-   my $v_start = $top_is_line ? 0 : $self->{has_top};
-   my $v_end   = $bottom_is_line ? $bottom : $bottom - $self->{has_bottom};
+   my $v_start = $top_is_line ? 0 : $_has_edge{top};
+   my $v_end   = $bottom_is_line ? $bottom : $bottom - $_has_edge{bottom};
 
    my $linechars;
    my $style;

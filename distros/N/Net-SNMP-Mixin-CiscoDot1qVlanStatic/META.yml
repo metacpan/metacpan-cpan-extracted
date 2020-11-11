@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Net-SNMP-Mixin-CiscoDot1qVlanStatic
 provides:
   Net::SNMP::Mixin::CiscoDot1qVlanStatic:
     file: lib/Net/SNMP/Mixin/CiscoDot1qVlanStatic.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Net::SNMP: '0'
   Net::SNMP::Mixin: '0.14'
@@ -25,5 +25,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

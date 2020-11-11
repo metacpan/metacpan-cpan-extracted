@@ -39,15 +39,20 @@
       },
       "AudioFile::Info::Ogg::Vorbis::Header::PurePerl" : {
          "file" : "lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm",
-         "version" : "v1.5.2"
+         "version" : "v1.5.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl.git",
+         "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl"
+      }
    },
-   "version" : "v1.5.2",
+   "version" : "v1.5.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

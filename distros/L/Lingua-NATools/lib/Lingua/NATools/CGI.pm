@@ -18,7 +18,7 @@
 
 package Lingua::NATools::CGI;
 
-our $VERSION = '0.7.10';
+our $VERSION = '0.7.12';
 
 use 5.006;
 use strict;

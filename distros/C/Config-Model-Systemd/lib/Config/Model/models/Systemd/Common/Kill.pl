@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -51,28 +51,25 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
     'element' => [
       'KillMode',
       {
-        'description' => 'Specifies how processes of this unit shall be
-killed. One of
-C<control-group>,
-C<process>,
-C<mixed>,
+        'description' => 'Specifies how processes of this unit shall be killed. One of
+C<control-group>, C<mixed>, C<process>,
 C<none>.
 
-If set to C<control-group>, all remaining
-processes in the control group of this unit will be killed on
-unit stop (for services: after the stop command is executed,
-as configured with C<ExecStop>). If set to
-C<process>, only the main process itself is
-killed. If set to C<mixed>, the
-C<SIGTERM> signal (see below) is sent to the
-main process while the subsequent C<SIGKILL>
-signal (see below) is sent to all remaining processes of the
-unit\'s control group. If set to C<none>, no
-process is killed. In this case, only the stop command will be
-executed on unit stop, but no process will be killed otherwise.
-Processes remaining alive after stop are left in their control
-group and the control group continues to exist after stop
-unless it is empty.
+If set to C<control-group>, all remaining processes in the control group of this
+unit will be killed on unit stop (for services: after the stop command is executed, as configured
+with C<ExecStop>). If set to C<mixed>, the
+C<SIGTERM> signal (see below) is sent to the main process while the subsequent
+C<SIGKILL> signal (see below) is sent to all remaining processes of the unit\'s
+control group. If set to C<process>, only the main process itself is killed (not
+recommended!). If set to C<none>, no process is killed (strongly recommended
+against!). In this case, only the stop command will be executed on unit stop, but no process will be
+killed otherwise.  Processes remaining alive after stop are left in their control group and the
+control group continues to exist after stop unless empty.
+
+Note that it is not recommended to set C<KillMode> to
+C<process> or even C<none>, as this allows processes to escape
+the service manager\'s lifecycle and resource management, and to remain running even while their
+service is considered stopped and is assumed to not consume any resources.
 
 Processes will first be terminated via C<SIGTERM> (unless the signal to send
 is changed via C<KillSignal> or C<RestartKillSignal>). Optionally,
@@ -155,7 +152,7 @@ generate a coredump to troubleshoot why a service did not
 terminate upon receiving the initial C<SIGTERM>
 signal. This can be achieved by configuring C<LimitCORE>
 and setting C<FinalKillSignal> to either
-C<SIGQUIT> or C<SIGABRT>
+C<SIGQUIT> or C<SIGABRT>.
 Defaults to C<SIGKILL>.
 ',
         'type' => 'leaf',
@@ -171,7 +168,7 @@ C<WatchdogSec>). Defaults to C<SIGABRT>.
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 244 doc',
+    'generated_by' => 'parse-man.pl from systemd 246 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Kill'
   }

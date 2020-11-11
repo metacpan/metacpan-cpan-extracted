@@ -1,6 +1,12 @@
-Revision history for Test-Sah
+0.020   2020-03-01  Released-By: PERLANCAR; Urgency: low
 
-0.01    2012-11-07 (SHARYANTO)
+	- No functional changes.
 
-        First release.
+	- [doc] Mention Test::Sah::Schema.
 
+	- Remove perl 5.10 requirement.
+
+
+0.01    2012-11-07  Released-By: SHARYANTO
+
+        - First release.

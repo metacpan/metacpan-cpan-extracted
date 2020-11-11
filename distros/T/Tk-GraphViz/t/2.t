@@ -1,36 +1,32 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl 1.t'
-
-#########################
-
-use Test::More tests => 6;
-BEGIN { use_ok('Tk::GraphViz') };
-
-#########################
-
 # Creates a Tk::GraphViz, without displaying anything.
-# -- still requires connection to display, unfortunately
 # The test is simply to lay-out a simple dot file (test1.dot)
 
+use strict;
+use warnings;
+
+use Test::More;
 use Tk;
+use Tk::GraphViz;
 use File::Basename;
 
-my $mw = new MainWindow();
+my $mw = eval { MainWindow->new() };
+plan skip_all => 'No display' if !Tk::Exists($mw);
+
+plan tests => 6;
 
 my $gv = $mw->GraphViz();
 ok ( $gv );
 
 # Render the graph from the file
 ok ( eval { $gv->show ( dirname(__FILE__).'/test1.dot' ) } );
+is $@, '', 'no error in ->show';
 
 # Check the number of nodes, edges, subgraphs
 my @nodes = $gv->find ( withtag => 'node' );
-ok( @nodes == 15 );
+is scalar @nodes, 15, 'number nodes' or diag explain \@nodes;
 
 my @edges = $gv->find ( withtag => 'edge' );
-ok( @edges == 15 );
+is scalar @edges, 15, 'number edges' or diag explain \@edges;
 
 my @subgraphs = $gv->find ( withtag => 'subgraph' );
-ok( @subgraphs == 0 );
-
-
+is scalar @subgraphs, 0, 'number subgraphs' or diag explain \@subgraphs;

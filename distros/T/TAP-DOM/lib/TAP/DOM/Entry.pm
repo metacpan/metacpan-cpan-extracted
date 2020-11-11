@@ -1,7 +1,7 @@
 package TAP::DOM::Entry;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Accessors for TAP::DOM line entries
-$TAP::DOM::Entry::VERSION = '0.91';
+$TAP::DOM::Entry::VERSION = '0.92';
 use 5.006;
 use strict;
 use warnings;
@@ -15,6 +15,7 @@ use Class::XSAccessor
                         type
                         data
                         number
+                        severity
                         as_string
                         directive
                         description
@@ -114,6 +115,8 @@ accessors to all other entry fields.
 =head2 raw
 
 =head2 type
+
+=head2 severity
 
 =head1 AUTHOR
 

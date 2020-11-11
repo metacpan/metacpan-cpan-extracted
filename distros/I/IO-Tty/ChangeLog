@@ -1,3 +1,8 @@
+2020-10-03 Todd Rinaldo <toddr@cpan.org> 1.15
+    * Skip winsize test on Solaris and QNX NTO
+    * Make function tests more robust
+    * Work around a header name collission on util.h. This is breaking on recent OSX
+
 2020-01-18 Todd Rinaldo <toddr@cpan.org> 1.14
     * Add strict/warnings to Tty.pm
 	* Fix pod errors

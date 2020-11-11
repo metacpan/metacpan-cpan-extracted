@@ -1,6 +1,6 @@
 package App::GitGot::Command::readd;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::readd::VERSION = '1.337';
+$App::GitGot::Command::readd::VERSION = '1.339';
 # ABSTRACT: update config metadata to match repo
 use 5.014;
 
@@ -58,7 +58,7 @@ App::GitGot::Command::readd - update config metadata to match repo
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 SYNOPSIS
 

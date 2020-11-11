@@ -1225,6 +1225,66 @@ great caution (if at all).
             },
         };
 
+- Result Set Custom Attributes
+
+    If you're mocking a database driver that has it's own custom attributes
+    attached to its statement handles then you can use the result sets
+    `prepare_attributes` and `execute_attributes` options.
+
+    The `prepare_attributes` option takes a hashref that maps statement handle
+    attribute names to their values.  The attributes are set at the point that
+    the statement is prepared.
+
+        $dbh->{mock_add_resultset} = {
+            sql => 'SELECT foo FROM bar',
+            prepare_attributes => {
+                sqlite_unprepared_statements => '   ',
+            },
+            results => [[ 'foo' ], [ 10 ]]
+        };
+
+    The `execute_attributes` option also takes a hashref that maps statement
+    handle attribute names to their values, however these will only be set when the
+    statement is executed.
+
+        $dbh->{mock_add_resultset} = {
+            sql => 'SELECT foo FROM bar',
+            execute_attributes => {
+                syb_result_type => 1,
+            },
+            results => [[ 'foo' ], [ 10 ]]
+        };
+
+    If an attribute is also present in the `prepare_attributes` option then the
+    `prepare_attributes` version will take precedence up to the point the
+    statement handle is executed, at which point the `execute_attributes` version
+    will take precedence.
+
+    It is also possible to set `execute_attributes` from a result set's callback
+    by returning them under the `execute_attributes` key in your callback's
+    response.
+
+        $dbh->{mock_add_resultset} = {
+            sql => 'SELECT baz FROM qux',
+            callback => sub {
+                my @bound_params = @_;
+
+                my %result = (
+                    fields => [ 'baz'],
+                    rows => [],
+                    execute_attributes => {
+                        foo => 'bar'
+                    },
+                );
+
+                return %result;
+            }
+        };
+
+    If a result set has an `execute_attributes` option and a callback that also
+    returns an `execute_attributes` key then the callback's `execute_attributes`
+    value will take precedence.
+
 # BUGS
 
 - Odd `$dbh` attribute behavior
@@ -1278,6 +1338,8 @@ methods and tests.
 - Thanks to Tomas Zemresfor the unit test in RT #71438.
 - Thanks to Bernhard Graf for multiple patches fixing a range of issues
 and adding a new _One Shot Failure_ feature to `mock_add_resultset`.
+- Thanks to Erik Huelsmann for testing the new result set custom attributes
+feature.
 
 # COPYRIGHT
 

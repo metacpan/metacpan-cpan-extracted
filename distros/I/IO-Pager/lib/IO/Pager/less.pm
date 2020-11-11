@@ -1,5 +1,5 @@
 package IO::Pager::less;
-our $VERSION = 1.02; #Untouched since 1.02
+our $VERSION = 2.00; #Untouched since 2.00
 
 use strict;
 use warnings;
@@ -8,11 +8,15 @@ use base qw( IO::Pager::Unbuffered );
 BEGIN{
   die "Windows is currently unsupported" if $^O =~ /MSWin32/;
   my $PAGER;
+
+  #Required for test 16
   our $BLIB;
+
   #local $ENV{PATHEXT} .= ";.PL"
   foreach my $lib ( @INC ){
     $PAGER = File::Spec->catfile($lib, 'IO', 'Pager', 'tp');
     if( -e $PAGER ){
+      #Required for test 16
       $ENV{PAGER} = $^X.($BLIB?' -Mblib ':' ').$PAGER;
       last;
     }
@@ -222,10 +226,6 @@ L<IO::Pager>, L<Term::Pager>, L<IO::Pager::Buffered>, L<IO::Pager::Page>,
 =head1 AUTHOR
 
 Jerrad Pierce <jpierce@cpan.org>
-
-Florent Angly <florent.angly@gmail.com>
-
-This module was inspired by Monte Mitzelfelt's IO::Page 0.02
 
 Significant proddage provided by Tye McQueen.
 

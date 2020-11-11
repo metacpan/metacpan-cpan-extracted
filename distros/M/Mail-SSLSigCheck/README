@@ -1,0 +1,72 @@
+Mail-SSLSigCheck
+----------------
+
+What is Mail::SSLSigCheck
+-------------------------
+
+Mail::SSLSigCheck is an email filter, similar in nature to Apache's
+Mail::SpamAssassin. Each email message passed through it will be checked
+for an SSL signature. If an SSL signature is found, the signing certificate
+and its issuer will be compared against a user configurable store of
+user and CA (Certificate Authority) certificates. The results of these
+checks and comparisons will be recorded in the email message as extra
+headers. These headers can be examined to redirect incoming messages using
+a program like the included sslsigcheck.
+
+This module is still in development.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SSL Certificate Stores
+----------------------
+
+The first time the filter is executed, the following directories
+and files will be created if they do not already exist.
+
+$USER_HOME/.sslsigcheck/cacerts/trustedcacerts.pem
+$USER_HOME/.sslsigcheck/cacerts/untrustedcacerts.pem
+$USER_HOME/.sslsigcheck/usercerts/trustedcacerts.pem
+$USER_HOME/.sslsigcheck/usercerts/untrustedcacerts.pem
+
+The .pem files will contain the PEM versions of SSL certificates.
+Future versions may use an SQLite DB.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::SSLSigCheck
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-SSLSigCheck
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mail-SSLSigCheck
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Mail-SSLSigCheck
+
+    Search CPAN
+        https://metacpan.org/release/Mail-SSLSigCheck
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Bruce P Schuck.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

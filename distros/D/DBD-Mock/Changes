@@ -1,5 +1,9 @@
 Revision history for Perl extension DBD::Mock.
 
+1.58 2020-11-02T13:34:48Z
+    - Added the ability for mock result sets to set custom attributes for
+      statement handles. Thanks to Erik Huelsmann for testing the new feature.
+
 1.57 2020-09-18T06:57:48Z
     - Fixed bug rt133358 t/016_mock_add_resultset_test.t fails (with older DBI)
 

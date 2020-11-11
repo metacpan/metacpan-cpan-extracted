@@ -3,3 +3,7 @@ Revision history for Smaz
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+1.01 	2020/10/27
+	- Remove the MIME::Base64 dependency from test file
+	- Update Makefile to include Module::Metadata as a configure_requires
+	- Update Makefile to delete META_MERGE and META_ADD unless ExtUtils::MakeMaker->VERSION('6.46')

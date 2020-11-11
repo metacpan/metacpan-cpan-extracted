@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.082';
+our $VERSION   = '0.083';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -1530,6 +1530,44 @@ sub install_attributes {
 			$spec{coerce} = !!1;
 		}
 		
+		if ( is_ScalarRef $spec{default} ) {
+			require Ask::Question;
+			my $text = ${ $spec{default} };
+			$spec{default} = 'Ask::Question'->new( { text => $text } );
+		}
+		
+		if ( is_Object $spec{default} and $spec{default}->isa('Ask::Question') ) {
+			my %spec_copy = %spec;
+			my $default = delete $spec_copy{default};
+			
+			if ( $spec{isa} and not $default->has_type ) {
+				$default->_set_type( $spec{isa} );
+			}
+			if ( not $default->has_spec ) {
+				$default->_set_spec( \%spec_copy );
+			}
+			if ( not $default->has_title ) {
+				$default->_set_title( "$qname\::$attrname" );
+			}
+		}
+		
+		my $default_codulate = 0;
+		# Mouse doesn't support overloaded objects as defaults.
+		if ( $toolkit eq 'Mouse' and is_Object $spec{default} ) {
+			$default_codulate = 1;
+		}
+		# Moose doesn't usually either
+		elsif ( $toolkit eq 'Moose' and is_Object $spec{default} and not $spec{default}->isa('Class::MOP::Method') ) {
+			$default_codulate = 1;
+		}
+		
+		if ( $default_codulate ) {
+			my $deref = eval { \&{ $spec{default} } };
+			if ( is_CodeRef $deref ) {
+				$spec{default} = $deref;
+			}
+		}
+
 		if ($spec{lexical}) {
 			require Lexical::Accessor;
 			if ($spec{traits} || $spec{handles_via}) {
@@ -3465,6 +3503,23 @@ Moose or Mouse.
 
 MooX::Press supports the Moo-specific C<< clearer => 1 >> and
 will translate it if you're using Moose or Mouse.
+
+=item C<< default >> I<< (CodeRef|~Ref|Overloaded|ScalarRef) >>
+
+Coderefs and non-reference values can be used as defaults the same
+as in Moo/Moose/Mouse.
+
+Blessed L<Ask::Question> objects are additionally supported as
+defaults. The C<type> of the attribute will automatically be injected
+as the target type of the question if the target type is missing.
+
+A scalarref is converted to an L<Ask::Question> object so:
+
+  has age => ( is => 'ro', type => 'Int', default => \"Enter age" );
+
+Will require age to be an integer, and if it's not provided to the
+constructor, L<Ask> will prompt the user via STDIN/STDOUT, a GUI
+dialogue box, or whatever other method is available.
 
 =back
 

@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Fill;
+use Object::Pad 0.09;
 
-use strict;
-use warnings;
-use 5.010; # //
-use base qw( Tickit::Widget );
+package Tickit::Widget::Fill 0.31;
+class Tickit::Widget::Fill
+   extends Tickit::Widget;
+
 use Tickit::Style;
-
-our $VERSION = '0.30';
 
 use Tickit::Utils qw( textwidth );
 
@@ -53,12 +51,11 @@ style_redraw_keys qw( text skew );
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub lines { 1 }
-sub cols  { 1 }
+method lines { 1 }
+method cols  { 1 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my ( $text, $skew ) = $self->get_style_values(qw( text skew ));

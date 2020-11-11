@@ -5,7 +5,7 @@ use strict;
 
 use overload q|""| => 'message', fallback => 1;
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -27,15 +27,13 @@ sub new {
 #-------------------------------------------------------------------------------
 
 sub message {
-    my ($self) = @_;
-    return $self->{'message'};
+    return shift->{message};
 }
 
 #-------------------------------------------------------------------------------
 
 sub code {
-    my ($self) = @_;
-    return $self->{'code'};
+    return shift->{code};
 }
 
 #-------------------------------------------------------------------------------
@@ -57,18 +55,63 @@ Net::SecurityCenter::Error - Error helper for Net::SecurityCenter
 
     use Net::SecurityCenter;
 
-    my $sc = Net::SecurityCenter('sc.example.org') or die "Error : " . $@;
+    my $sc = Net::SecurityCenter('sc.example.org');
 
-    $sc->login('secman', 'password');
+    $sc->login('secman', 'password') or die $sc->error;
 
     if ($sc->error) {
         die $sc->error;
+    }
+
+    my $res = $sc->scan_result->list;
+
+    if (my $error = $sc->error) {
+        die $error;
     }
 
     $sc->logout();
 
 
 =head1 DESCRIPTION
+
+=head1 CONSTRUCTOR
+
+=head2 Net::SecurityCenter::Error->new ( $message [, $code ] )
+
+Create a new instance of L<Net::SecurityCenter::Error>.
+
+
+=head1 METHODS
+
+=head2 $error->message
+
+Return the error message.
+
+=head2 $error->code
+
+Return the error code.
+
+=head1 ERROR HANDLING
+
+Detect undef result:
+
+    $sc->get('/scanResult') or die $sc->error;
+
+    # or
+
+    my $res = $sc->get('/scanResult/1337');
+
+    if (! $res) {
+        die $sc->error;
+    }
+
+Use error object:
+
+    my $res = $sc->get('/scanResult/1337');
+
+    if (my $error = $sc->error) {
+        die $error;
+    }
 
 =head1 SUPPORT
 

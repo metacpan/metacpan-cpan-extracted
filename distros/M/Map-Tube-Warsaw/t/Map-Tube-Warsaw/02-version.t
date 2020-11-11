@@ -1,11 +1,9 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Map::Tube::Warsaw;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Map::Tube::Warsaw::VERSION, 0.06, 'Version.');
+is($Map::Tube::Warsaw::VERSION, 0.07, 'Version.');

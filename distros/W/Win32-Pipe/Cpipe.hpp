@@ -30,7 +30,7 @@ class CPipe {
 		CHAR	*cBuffer;
 		DWORD	dBufferSize;
 		int		iError;
-		LPSTR	szError[ERROR_TEXT_SIZE];
+		CHAR	szError[ERROR_TEXT_SIZE];
 
 
 	private:

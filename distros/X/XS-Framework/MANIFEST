@@ -7,6 +7,7 @@ lib/XS/ErrorCode.pod
 lib/XS/Framework.pm
 lib/XS/Framework.pod
 lib/XS/Framework/CallbackDispatcher.pm
+lib/XS/Framework/CallbackDispatcher.pod
 lib/XS/Framework/CallbackDispatcher/Event.pm
 lib/XS/Framework/Manual/Cookbook.pod
 lib/XS/Framework/Manual/recipe01.pod

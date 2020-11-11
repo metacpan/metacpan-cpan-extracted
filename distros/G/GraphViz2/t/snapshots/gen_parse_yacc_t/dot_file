@@ -2,17 +2,17 @@
  graph [ concentrate="1" rankdir="TB" ]
  node [ color="blue" shape="oval" ]
  edge [ color="grey" ]
- "$accept" -> "list"
- "expr" -> "expr"
- "expr" -> "number"
- "list" -> "list"
- "list" -> "stat"
- "number" -> "number"
- "stat" -> "expr"
- "$accept" [ label="<port1> $accept|<port2> list $end \\n" shape="Mrecord" ]
- "expr" [ label="<port1> expr|<port2> \'(\' expr \')\' \\nexpr \'+\' expr \\nexpr \'-\' expr \\nexpr \'*\' expr \\nexpr \'/\' expr \\nexpr \'%\' expr \\nexpr \'&\' expr \\nexpr \'|\' expr \\n\'-\' expr \\nLETTER \\nnumber \\n" shape="Mrecord" ]
- "list" [ label="<port1> list|<port2> (empty) \\nlist stat \'\\n\' \\nlist error \'\\n\' \\n" shape="Mrecord" ]
- "number" [ label="<port1> number|<port2> DIGIT \\nnumber DIGIT \\n" shape="Mrecord" ]
- "stat" [ label="<port1> stat|<port2> expr \\nLETTER \'=\' expr \\n" shape="Mrecord" ]
+ "$accept" [ label="<port1> $accept|{<port2> list\\ $end\\l}" shape="Mrecord" ]
+ "$accept" -> "list":"port1"
+ "expr" [ label="<port1> expr|{<port2> \'(\'\\ expr\\ \')\'\\l|<port3> expr\\ \'+\'\\ expr\\l|<port4> expr\\ \'-\'\\ expr\\l|<port5> expr\\ \'*\'\\ expr\\l|<port6> expr\\ \'/\'\\ expr\\l|<port7> expr\\ \'%\'\\ expr\\l|<port8> expr\\ \'&\'\\ expr\\l|<port9> expr\\ \'\\|\'\\ expr\\l|<port10> \'-\'\\ expr\\l|<port11> LETTER\\l|<port12> number\\l}" shape="Mrecord" ]
+ "expr" -> "expr":"port1"
+ "expr" -> "number":"port1"
+ "list" [ label="<port1> list|{<port2> (empty)\\l|<port3> list\\ stat\\ \'\\\\n\'\\l|<port4> list\\ error\\ \'\\\\n\'\\l}" shape="Mrecord" ]
+ "list" -> "list":"port1"
+ "list" -> "stat":"port1"
+ "number" [ label="<port1> number|{<port2> DIGIT\\l|<port3> number\\ DIGIT\\l}" shape="Mrecord" ]
+ "number" -> "number":"port1"
+ "stat" [ label="<port1> stat|{<port2> expr\\l|<port3> LETTER\\ \'=\'\\ expr\\l}" shape="Mrecord" ]
+ "stat" -> "expr":"port1"
 }
 '

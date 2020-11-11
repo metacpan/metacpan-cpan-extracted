@@ -13,12 +13,18 @@ my $b = Module::Build->new(
   requires             => {
      Carp              => 0,
     'Data::Dump'       => 0,
-    'Data::Table::Text'              => 20200218,
+    'Data::Table::Text'              => 20201029,
      Storable          => 0,
     'Test::More'       => 0,
     'Test2::API'       => 0,
     'XML::Parser'      => 0,
      utf8              => 0,
+   },
+  meta_merge =>
+   {resources =>
+     {repository => 'https://github.com/philiprbrenan/DataEditXml',
+      bugtracker => 'https://github.com/philiprbrenan/DataEditXml/issues'
+     }
    },
  );
 

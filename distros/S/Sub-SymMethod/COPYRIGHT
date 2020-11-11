@@ -11,11 +11,11 @@ Files: Changes
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- lib/Sub/SymMethod.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -23,11 +23,11 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: INSTALL
- LICENSE
- Makefile.PL
-Copyright: Unknown
-License: Unknown
+Files: README
+ lib/Sub/SymMethod.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
  This software is Copyright (c) 2020 by the copyright holder(s).

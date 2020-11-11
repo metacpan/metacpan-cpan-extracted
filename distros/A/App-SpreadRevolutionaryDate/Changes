@@ -1,6 +1,11 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.28 2020-01-07T22:52:14
+0.29 2020-11-07T15:57:44
+ - Process multinline messages (with \n) in targets, useful with -pud
+   option
+ - Upgrade travis perl releases
+
+0.28 2020-01-07T22:52:14Z
  - Fix #131391: Mastodon::Client 0.016 sends now '599 Internal Exception'
    when authentication fails
 

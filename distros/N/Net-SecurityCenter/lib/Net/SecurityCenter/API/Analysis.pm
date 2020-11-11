@@ -5,11 +5,11 @@ use strict;
 
 use Carp;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
     tool => {
@@ -208,7 +208,6 @@ sub get {
     }
 
     while ( $total > $count ) {
-
         my $result = $self->client->post( '/analysis', $analysis_params );
 
         return if ( !$result );

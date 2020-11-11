@@ -1,4 +1,9 @@
 
+0.02 2020.11.04
+    - Fix link to repository in about box.
+    - If there is a syntax error in the Perl code it is now reported in the output window in red.
+    - Automatically run deparse when code is changed.
+
 0.01 2020.10.17
     - Initial release
 

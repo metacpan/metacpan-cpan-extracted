@@ -70,3 +70,7 @@ as an output.
 Returns the value of $pin_number.  As stated before, use with reversed
 polarity, and enable the pullup resistors (or build an external pull up
 resistor).  
+
+=head2 read_gpio_register()
+
+Returns the decimal value (0-255) of the 0x09 gpio register

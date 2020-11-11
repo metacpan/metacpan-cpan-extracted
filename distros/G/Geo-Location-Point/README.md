@@ -1,23 +1,20 @@
 # NAME
 
-Geo::Location::Point -
-Location information
+Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.03
+Version 0.06
 
 # SYNOPSIS
+
+Geo::Location::Point stores a place.
 
     use Geo::Location::Point;
 
     my $location = Geo::Location::Point->new();
 
-# DESCRIPTION
-
-Geo::Location::Point stores a place.
-
-# METHODS
+# SUBROUTINES/METHODS
 
 ## new
 
@@ -36,7 +33,23 @@ Geo::Location::Point stores a place.
 ## distance
 
 Determine the distance between two locations,
-returns a [Class::Measure::Length](https://metacpan.org/pod/Class::Measure::Length) object.
+returns a [Class::Measure::Length](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ALength) object.
+
+## equal
+
+Are two points the same?
+
+    my $loc1 = location->new(lat => 2, long => 2);
+    my $loc2 = location->new(lat => 2, long => 2);
+    print ($loc1 == $loc2), "\n";       # Prints 1
+
+## not\_equal
+
+Are two points different same?
+
+    my $loc1 = location->new(lat => 2, long => 2);
+    my $loc2 = location->new(lat => 2, long => 2);
+    print ($loc1 != $loc2), "\n";       # Prints 0
 
 ## as\_string
 
@@ -49,6 +62,7 @@ Get/set location attributes, e.g. city
     $location->city('London');
     $location->country('UK');
     print $location->as_string(), "\n";
+    print "$location\n";        # Calls as_string
 
 # AUTHOR
 
@@ -61,12 +75,12 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[GIS::Distance](https://metacpan.org/pod/GIS::Distance),
-[Geo::Point](https://metacpan.org/pod/Geo::Point)
+[GIS::Distance](https://metacpan.org/pod/GIS%3A%3ADistance),
+[Geo::Point](https://metacpan.org/pod/Geo%3A%3APoint)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019 Nigel Horne.
+Copyright 2019-2020 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

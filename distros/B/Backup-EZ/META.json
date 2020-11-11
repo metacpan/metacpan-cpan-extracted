@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Backup-EZ",
    "prereqs" : {
@@ -58,8 +58,8 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.43",
+   "version" : "0.45",
    "x_generated_by_perl" : "v5.16.3",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::XS version 4.02"
 }
 

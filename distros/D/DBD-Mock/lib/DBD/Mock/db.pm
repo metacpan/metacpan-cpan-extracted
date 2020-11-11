@@ -110,7 +110,7 @@ sub prepare {
     else {
         # If we have available resultsets seed the tracker with one
 
-        my ($rs, $callback, $failure);
+        my ($rs, $callback, $failure, $prepare_attributes, $execute_attributes);
 
         if ( my $all_rs = $dbh->{mock_rs} ) {
             if ( my $by_name = defined $all_rs->{named}{$statement} ? $all_rs->{named}{$statement} : first { $statement =~ m/$_->{regexp}/ } @{ $all_rs->{matching} } ) {
@@ -118,12 +118,16 @@ sub prepare {
                 $rs = [ @{ $by_name->{results} } ];
                 $callback = $by_name->{callback};
                 $failure = $by_name->{failure};
+                $prepare_attributes = $by_name->{prepare_attributes};
+                $execute_attributes = $by_name->{execute_attributes};
             }
             else {
                 $rs = shift @{ $all_rs->{ordered} };
                 if (ref($rs) eq 'HASH') {
                     $callback = $rs->{callback};
                     $failure = $rs->{failure};
+                    $prepare_attributes = $rs->{prepare_attributes};
+                    $execute_attributes = $rs->{execute_attributes};
                     $rs = [ @{ $rs->{results} } ];
                 }
             }
@@ -131,10 +135,12 @@ sub prepare {
 
         if ( ref($rs) eq 'ARRAY' && ( scalar( @{$rs} ) > 0 || $callback ) ) {
             my $fields = shift @{$rs};
-            $track_params{return_data} = $rs;
-            $track_params{fields}      = $fields;
-            $track_params{callback}    = $callback;
-            $track_params{failure}     = $failure;
+            $track_params{return_data}        = $rs;
+            $track_params{fields}             = $fields;
+            $track_params{callback}           = $callback;
+            $track_params{failure}            = $failure;
+            $track_params{driver_attributes}  = $prepare_attributes;
+            $track_params{execute_attributes} = $execute_attributes;
 
             if( $fields ) {
                 $sth->STORE( NAME          => $fields );
@@ -157,7 +163,6 @@ sub prepare {
     }
 
     # This history object will track everything done to the statement
-
     my $history = DBD::Mock::StatementTrack->new(%track_params);
     $sth->STORE( mock_my_history => $history );
 
@@ -370,6 +375,8 @@ sub STORE {
                     results => \@copied_values,
                     callback => $value->{callback},
                     failure => ref($value->{failure}) ? [ @{ $value->{failure} } ] : undef,
+                    prepare_attributes => $value->{prepare_attributes},
+                    execute_attributes => $value->{execute_attributes},
                 };
             }
             elsif ( ref $name eq "Regexp" ) {
@@ -378,6 +385,8 @@ sub STORE {
                     results => \@copied_values,
                     callback => $value->{callback},
                     failure => ref($value->{failure}) ? [ @{ $value->{failure} } ] : undef,
+                    prepare_attributes => $value->{prepare_attributes},
+                    execute_attributes => $value->{execute_attributes},
                 };
                 # either replace existing match or push
                 grep { $_->{regexp} eq $name && ($_ = $matching) } @{ $dbh->{mock_rs}{matching} }
@@ -388,6 +397,8 @@ sub STORE {
                     results => \@copied_values,
                     callback => $value->{callback},
                     failure => ref($value->{failure}) ? [ @{ $value->{failure} } ] : undef,
+                    prepare_attributes => $value->{prepare_attributes},
+                    execute_attributes => $value->{execute_attributes},
                 };
             }
         }

@@ -1,7 +1,9 @@
 package Perinci::Sub::Gen::AccessTable::Simple;
 
-our $DATE = '2018-09-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-28'; # DATE
+our $DIST = 'Perinci-Sub-Gen-AccessTable-Simple'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,9 +56,12 @@ sub _gen_func {
             }
           FILTER:
             for my $f (@$filter_fields) {
-                if (defined($args{$f}) && (
-                    !defined($row->{$f}) || $row->{$f} ne $args{$f})) {
-                    next ROW;
+                next FILTER if !defined $args{$f};
+                next ROW if !defined $row->{$f};
+                if ($parent_args->{case_insensitive_comparison}) {
+                    next ROW if lc $row->{$f} ne lc $args{$f};
+                } else {
+                    next ROW if $row->{$f} ne $args{$f};
                 }
             }
             push @rows, $row;
@@ -97,6 +102,9 @@ _
         },
         filter_fields => {
             schema => ['array*', of => 'str*'],
+        },
+        case_insensitive_comparison => {
+            schema => 'bool*',
         },
     }, # args
     result => {
@@ -159,7 +167,7 @@ Perinci::Sub::Gen::AccessTable::Simple - Generate function (and its metadata) to
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Sub::Gen::AccessTable::Simple (from Perl distribution Perinci-Sub-Gen-AccessTable-Simple), released on 2018-09-07.
+This document describes version 0.002 of Perinci::Sub::Gen::AccessTable::Simple (from Perl distribution Perinci-Sub-Gen-AccessTable-Simple), released on 2020-10-28.
 
 =head1 SYNOPSIS
 
@@ -245,7 +253,7 @@ AoH or coderef not accepted.
 
 Usage:
 
- gen_read_table_func(%args) -> [status, msg, result, meta]
+ gen_read_table_func(%args) -> [status, msg, payload, meta]
 
 Generate function (and its metadata) to read table data.
 
@@ -270,11 +278,14 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<case_insensitive_comparison> => I<bool>
+
 =item * B<field_names>* => I<array[str]>
 
 =item * B<filter_fields> => I<array[str]>
 
 =item * B<table_data>* => I<array[array]>
+
 
 =back
 
@@ -283,7 +294,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -317,7 +328,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

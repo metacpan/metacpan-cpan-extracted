@@ -30,13 +30,19 @@ sub parse_http_response {
 
     my $resp_struct = cPanel::APIClient::Utils::JSON::decode($resp_body);
 
-    return $self->HTTP_RESPONSE_CLASS()->new($resp_struct);
+    return $self->HTTP_RESPONSE_CLASS()->new(
+        $self->_EXTRACT_RESPONSE($resp_struct),
+    );
 }
 
 sub create_transport_error {
     my ( $self, $description, @properties_kv ) = @_;
 
     die cPanel::APIClient::X->create( 'SubTransport', $description );
+}
+
+sub _EXTRACT_RESPONSE {
+    return $_[1];
 }
 
 1;

@@ -21,9 +21,9 @@ HOW DO I INSTALL IT?
 
        gzip -cd Tie-Hash-Regex-X.XX.tar.gz | tar xvf -
        cd Tie-Hash-Regex-X.XX
-       perl Makefile.PL
-       make
-       make test
+       perl Build.PL
+       Build
+       Build test
        make install
 
 
@@ -32,6 +32,12 @@ HOW DO I INSTALL IT?
   If this doesn't work for you then creating a directory called Tie/Hash 
   somewhere in your Perl library path (@INC) and copying the Regex.pm file 
   into this directory should also do the trick.
+
+  Since this has been published to CPAN,
+
+      cpanm Tie::Hash::Regex
+
+  will also install it for you along whatever dependency is not yet installed.
 
 WHERE IS THE DOCUMENTATION?
 

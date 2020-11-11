@@ -1,9 +1,9 @@
 package Log::ger::UseDataDumper;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-17'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Log-ger-UseDataDumper'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Data::Dumper ();
 use Log::ger ();
@@ -59,7 +59,7 @@ Log::ger::UseDataDumper - Use Data::Dumper (with nicer defaults) to dump data st
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::UseDataDumper (from Perl distribution Log-ger-UseDataDumper), released on 2020-04-17.
+This document describes version 0.004 of Log::ger::UseDataDumper (from Perl distribution Log-ger-UseDataDumper), released on 2020-06-04.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,8 @@ L<Log::ger>
 L<Data::Dumper>
 
 Other modules to set data dumper for Log::ger: L<Log::ger::UseDataDump>,
-L<Log::ger::UseDataDumpColor>, L<Log::ger::UseDataPrinter>.
+L<Log::ger::UseDataDumpColor>, L<Log::ger::UseDataDumpObjectAsString>,
+L<Log::ger::UseDataDumpOptions>, L<Log::ger::UseDataPrinter>.
 
 =head1 AUTHOR
 

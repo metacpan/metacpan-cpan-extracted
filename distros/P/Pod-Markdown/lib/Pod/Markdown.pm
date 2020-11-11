@@ -12,11 +12,11 @@ use strict;
 use warnings;
 
 package Pod::Markdown;
-# git description: v3.101-3-g70682ef
+# git description: v3.200-4-gd31d626
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Convert POD to Markdown
-$Pod::Markdown::VERSION = '3.200';
+$Pod::Markdown::VERSION = '3.300';
 use Pod::Simple 3.27 (); # detected_encoding and keep_encoding bug fix
 use parent qw(Pod::Simple::Methody);
 use Encode ();
@@ -105,6 +105,7 @@ my %attributes = map { ($_ => 1) }
     perldoc_fragment_format
     markdown_fragment_format
     include_meta_tags
+    escape_url
   );
 
 
@@ -116,6 +117,7 @@ sub new {
   $self->preserve_whitespace(1);
   $self->nbsp_for_S(1);
   $self->accept_targets(qw( markdown html ));
+  $self->escape_url(1);
 
   # Default to the global, but allow it to be overwritten in args.
   $self->local_module_re($LOCAL_MODULE_RE);
@@ -148,6 +150,10 @@ sub new {
 
   # TODO: call from the setters.
   $self->_prepare_fragment_formats;
+
+  if(defined $self->local_module_url_prefix && $self->local_module_url_prefix eq '' && !$self->escape_url) {
+    warn("turning escape_url with an empty local_module_url_prefix is not recommended as relative URLs could be confused for IPv6 addresses");
+  }
 
   return $self;
 }
@@ -1064,7 +1070,7 @@ sub format_perldoc_url {
 
   # If the link is to another module (external link).
   if ($name) {
-    $url = $url_prefix . URI::Escape::uri_escape($name);
+    $url = $url_prefix . ($self->escape_url ? URI::Escape::uri_escape($name) : $name);
   }
 
   # See https://rt.cpan.org/Ticket/Display.html?id=57776
@@ -1202,7 +1208,7 @@ Pod::Markdown - Convert POD to Markdown
 
 =head1 VERSION
 
-version 3.200
+version 3.300
 
 =for test_synopsis my ($pod_string);
 
@@ -1381,6 +1387,14 @@ C<include_meta_tags>
 Specifies whether or not to print author/title meta tags at the top of the document.
 Default is false.
 
+=item *
+
+C<escape_url>
+
+Specifies whether or not to escape URLs.  Default is true.  It is not recommended
+to turn this off with an empty local_module_url_prefix, as the resulting local
+module URLs can be confused with IPv6 addresses by web browsers.
+
 =back
 
 =head2 html_encode_chars
@@ -1469,6 +1483,11 @@ to an internal section in this document.
 
 Returns the boolean value indicating
 whether or not meta tags will be printed.
+
+=head2 escape_url
+
+Returns the boolean value indicating
+whether or not URLs should be escaped.
 
 =head2 format_man_url
 

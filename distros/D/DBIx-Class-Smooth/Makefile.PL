@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.45",
     "Module::Loader" => 0,
     "Moo" => 0,
+    "Ref::Util" => 0,
     "Safe::Isa" => "1.000005",
     "Scalar::Util" => 0,
     "String::CamelCase" => "0.02",
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::mysqld" => 0
   },
-  "VERSION" => "0.0105",
+  "VERSION" => "0.0107",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,6 +68,7 @@ my %FallbackPrereqs = (
   "Module::Load" => "0.26",
   "Module::Loader" => 0,
   "Moo" => 0,
+  "Ref::Util" => 0,
   "Safe::Isa" => "1.000005",
   "Scalar::Util" => 0,
   "String::CamelCase" => "0.02",

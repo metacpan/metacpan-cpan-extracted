@@ -1,7 +1,6 @@
 .circleci/config.yml
 .drone.yml
 .perlcriticrc
-.travis.yml
 Build.PL
 Changes
 LICENSE
@@ -32,5 +31,7 @@ t/TooMuchCode/ProhibitUnusedConstant.run
 t/TooMuchCode/ProhibitUnusedImport.run
 t/TooMuchCode/ProhibitUnusedInclude.run
 t/all.t
+t/ignored-modules.t
 t/large_block.t
+t/moose-types.t
 t/require.t

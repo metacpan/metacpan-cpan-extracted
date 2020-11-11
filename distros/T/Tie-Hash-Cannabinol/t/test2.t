@@ -1,4 +1,6 @@
 use strict;
+use warnings;
+
 use Test::More;
 use vars qw($Seed);
 

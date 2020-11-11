@@ -8,7 +8,7 @@
 
 package POSIX::1003::Module;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 
 use strict;
@@ -17,7 +17,7 @@ use warnings;
 # The VERSION of the distribution is sourced from this file, because
 # this module also loads the XS extension.  Therefore, Makefile.PL
 # extracts the version from the line below.
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 use Carp 'croak';
 
 # some other modules used by the program which uses POSIX::1003 may
@@ -129,7 +129,7 @@ sub exampleValue($)
 
 package POSIX::1003::ReadOnlyTable;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 sub TIEHASH($) { bless $_[1], $_[0] }
 sub FETCH($)   { $_[0]->{$_[1]} }

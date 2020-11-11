@@ -4,10 +4,11 @@ lib/StreamFinder/Apple.pm
 lib/StreamFinder/Bitchute.pm
 lib/StreamFinder/Blogger.pm
 lib/StreamFinder/Brighteon.pm
+lib/StreamFinder/Castbox.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/RadioNet.pm
-lib/StreamFinder/Radionomy.pm
 lib/StreamFinder/Reciva.pm
+lib/StreamFinder/SermonAudio.pm
 lib/StreamFinder/Spreaker.pm
 lib/StreamFinder/Tunein.pm
 lib/StreamFinder/Vimeo.pm

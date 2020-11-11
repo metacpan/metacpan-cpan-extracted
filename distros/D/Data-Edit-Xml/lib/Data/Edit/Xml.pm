@@ -18,7 +18,7 @@
 # #b means the method acts on one node and returns a string - its braceable
 
 package Data::Edit::Xml;
-our $VERSION = 20200218;
+our $VERSION = 20201031;
 use v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -340,7 +340,7 @@ genHash(__PACKAGE__,                                                            
 
 #D2 Parse tree                                                                  # Construct a L<parse|/parse> tree from another L<parse|/parse> tree.
 
-sub renew($@)                                                                   #C Returns a renewed copy of the L<parse|/parse> tree by first printing it and then reparsing it, optionally checking that the starting node is in a specified context: use this method if you have added nodes via the L</"Put as text"> methods and wish to traverse their L<parse|/parse> tree.\mReturns the starting node of the new L<parse|/parse> tree or B<undef> if the optional context constraint was supplied but not satisfied.
+sub renew($@)                                                                   #C Returns a renewed copy of the L<parse|/parse> tree by first printing it and then re-parsing it, optionally checking that the starting node is in a specified context: use this method if you have added nodes via the L</"Put as text"> methods and wish to traverse their L<parse|/parse> tree.\mReturns the starting node of the new L<parse|/parse> tree or B<undef> if the optional context constraint was supplied but not satisfied.
  {my ($node, @context) = @_;                                                    # Node to renew from, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $x = new($node->string);                                                   # Reconstruct parse tree from node
@@ -348,7 +348,7 @@ sub renew($@)                                                                   
   $x                                                                            # Return new parse tree
  }
 
-sub clone($)                                                                    #C Return a clone of the entire L<parse|/parse> tree which is created using the fast L<Storable::dclone> method. The L<parse|/parse> tree is cloned without converting it to string and reparsing it so this method will not L<renew|/renew> any nodes added L<as text|/Put as text>.\mReturns the starting node of the new L<parse|/parse> tree.
+sub clone($)                                                                    #C Return a clone of the entire L<parse|/parse> tree which is created using the fast L<Storable::dclone> method. The L<parse|/parse> tree is cloned without converting it to string and re-parsing it so this method will not L<renew|/renew> any nodes added L<as text|/Put as text>.\mReturns the starting node of the new L<parse|/parse> tree.
  {my ($tree) = @_;                                                              # Parse tree
   my $new = dclone($tree);
 # $new->parent = undef;
@@ -1819,7 +1819,7 @@ sub depthProfile($)                                                             
   join ' ', @d                                                                  # Depth profile as a string
  }
 
-sub setDepthProfile($)                                                          #U Sets the L<depthProfile|/depthProfile> for every node in the specified B<$tree>. The last set L<depthProfile|/depthProfile> for a specific niode can be retrieved from L<depthProfileLast|/depthProfileLast>.
+sub setDepthProfile($)                                                          #U Sets the L<depthProfile|/depthProfile> for every node in the specified B<$tree>. The last set L<depthProfile|/depthProfile> for a specific node can be retrieved from L<depthProfileLast|/depthProfileLast>.
  {my ($tree) = @_;                                                              # Tree of nodes.
   $tree->by(sub                                                                 # Each node
    {$_->depthProfileLast = $_->depthProfile;                                    # Set depth profile for node.
@@ -2040,7 +2040,7 @@ sub isOnlyChild($@)                                                             
 #c set id onlyChild
 #d Continue if we are at an only child.
 
-sub isOnlyChildToDepth($$@)                                                     #CU Return the specified B<$node> if it and its ancestors are L<only children|/isOnlyChild> to the specified depth else return B<undef>. isOnlyChildToDepth(1) is the same as L<isOnlychild|/isOnlyChild>
+sub isOnlyChildToDepth($$@)                                                     #CU Return the specified B<$node> if it and its ancestors are L<only children|/isOnlyChild> to the specified depth else return B<undef>. L<isOnlyChildToDepth(1)|/isOnlyChildToDepth> is the same as L<isOnlychild|/isOnlyChild>
  {my ($node, $depth, @context) = @_;                                            # Node, depth to which each parent node must also be an only child, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $p = $node;                                                                # Walk up through ancestors
@@ -2050,7 +2050,7 @@ sub isOnlyChildToDepth($$@)                                                     
   $p->isOnlyChild;                                                              # Confirm that we are still on an only child
  }
 
-sub isOnlyChildN($$@)                                                           #CU Return the specified B<$node> if it is an only child of B<$depth> ancestors with L<only children|/hasSingleChild> in the opptional B<@context> else return B<undef>. isOnlyChildN(1) is the same as L<isOnlychild|/isOnlyChild>.
+sub isOnlyChildN($$@)                                                           #CU Return the specified B<$node> if it is an only child of B<$depth> ancestors with L<only children|/hasSingleChild> in the optional B<@context> else return B<undef>. L<isOnlyChildN(1)|/isOnlyChildN> is the same as L<isOnlychild|/isOnlyChild>.
  {my ($node, $depth, @context) = @_;                                            # Node, depth to which each parent node must also be an only child, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $p = $node;                                                                # Walk up through ancestors
@@ -3973,7 +3973,7 @@ sub concatenate($$@)                                                            
   $target                                                                       # Return new node
  }
 
-sub concatenateSiblings($@)                                                     #CU Concatenate the nodes that precede and follow the specified B<$node> in the optioonal B<@context> as long as they have the same tag as the specified B<$node> and return the specified B<$node>.
+sub concatenateSiblings($@)                                                     #CU Concatenate the nodes that precede and follow the specified B<$node> in the optional B<@context> as long as they have the same tag as the specified B<$node> and return the specified B<$node>.
  {my ($node, @context) = @_;                                                    # Concatenate around this node, optional context.
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $t = $node->tag;                                                           # The tag to match
@@ -4116,7 +4116,7 @@ sub putNextAsComment($$@)                                                       
   $node->putNextAsText(qq(<!-- $text -->));                                     # Put comment as next node
  }
 
-sub putPrevAsComment($$@)                                                       #CU Put a comment before the specified B<$parent> parentand return the specified B<$node>
+sub putPrevAsComment($$@)                                                       #CU Put a comment before the specified B<$parent> parent and return the specified B<$node>
  {my ($node, $text, @context) = @_;                                             # Node, comment, context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   $node->putPrevAsText(qq(<!-- $text -->));                                     # Put comment as previous node
@@ -5065,7 +5065,7 @@ sub indexIds($)                                                                 
   \%ids                                                                         # Return the index
  }
 
-sub numberTreesJustIds($$)                                                      #U Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source. You can see the numbers by printing the tree with L<prettyStringNumbered()|/prettyStringNumbered>. This method differs from L<numberTree|/numberTree> in that only non text nodes without ids are numbered. The number applied to each node consists of the concatenation of the specified prefix, an underscore and a number that is unique within the specifed L<parse|/parse> tree. Consequently the ids across several trees trees can be made unique by supplying different prefixes for each tree.  Nodes can be found using L<findByNumber|/findByNumber>.  Returns the specified B<$node>.
+sub numberTreesJustIds($$)                                                      #U Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are numbered in the same sequence that they appear in the source. You can see the numbers by printing the tree with L<prettyStringNumbered()|/prettyStringNumbered>. This method differs from L<numberTree|/numberTree> in that only non text nodes without ids are numbered. The number applied to each node consists of the concatenation of the specified prefix, an underscore and a number that is unique within the specified L<parse|/parse> tree. Consequently the ids across several trees trees can be made unique by supplying different prefixes for each tree.  Nodes can be found using L<findByNumber|/findByNumber>.  Returns the specified B<$node>.
  {my ($node, $prefix) = @_;                                                     # Node, prefix for each id at and under the specified B<$node>
   my $parser = $node->parser;                                                   # Root node
   my $n = 0;                                                                    # Node number
@@ -5992,7 +5992,7 @@ sub putPrevRequiredCleanUp($$)                                                  
 
 #D2 Dita Conversions                                                            # Methods useful for enhancing L<Dita>.
 
-sub ditaGetConRef($$;$$)                                                        #S Get the value of a B<conref> attribute given a valid L<Dita> B<$ref>erence found in the file named B<$sourceFile>. Optionally, if the regular expression B<$matchContext> is supplied then nodes whose context (single blank separated) tags match this regular expression will be considered first as a target of the conref, if such a search fails then any unique node with the matching id will be the considered next as a possible target unless the optional B<$matchContextOnly> parameter is true. Note: all the conrefs in the included content will also be expanded creating the possibility of endless circular expansions.
+sub ditaGetConRef($$;$$)                                                        #S Get the value of a B<conref> attribute given a valid L<Dita> B<$ref> reference found in the file named B<$sourceFile>. Optionally, if the regular expression B<$matchContext> is supplied then nodes whose context (single blank separated) tags match this regular expression will be considered first as a target of the conref, if such a search fails then any unique node with the matching id will be the considered next as a possible target unless the optional B<$matchContextOnly> parameter is true. Note: all the conrefs in the included content will also be expanded creating the possibility of endless circular expansions.
  {my ($ref, $sourceFile, $matchContext, $matchContextOnly) = @_;                # Dita ref value of conref, source file containing conref, optional regular expression of acceptable context, confine search to acceptable context.
   my ($rf, $rt, $ri) = parseDitaRef($ref, $sourceFile);                         # Parse the reference
 # -e $rf or confess "No such file:\n$rf\n";                                     # Confess if the target file does not exist
@@ -7641,13 +7641,13 @@ sub ditaSyntaxDiagramFromDocBookCmdSynopsis($)                                  
     undef
    }
 
-  sub ditaNonOptionalGroupSeq($)                                                # Return the specified B<$node> if it is groupseq but not optional else return B<undef>.
+  sub ditaNonOptionalGroupSeq($)                                                # Return the specified B<$node> if it is group sequence but not optional else return B<undef>.
    {my ($node) = @_;                                                            # Node to test
     return $node if $node->at_groupseq and !ditaOptional($node);
     undef
    }
 
-  sub ditaOptionalGroupChoice($)                                                # Return the specified B<$node> if it is groupchoice and optional else return B<undef>.
+  sub ditaOptionalGroupChoice($)                                                # Return the specified B<$node> if it is a group choice and optional else return B<undef>.
    {my ($node) = @_;                                                            # Node to test
     return $node if $node->at_groupchoice and ditaOptional($node);
     undef
@@ -7760,7 +7760,7 @@ sub ditaSyntaxDiagramFromDocBookCmdSynopsis($)                                  
        }
      });
 
-    $x->by(sub                                                                  # groupseq single child of groupchoice importance=optional goes to groupseq importance=optional
+    $x->by(sub                                                                  # group sequence single child of group choice importance=optional goes to group sequence importance=optional
      {my ($s, $c) = @_;
       if ($s->isOnlyChild_groupseq_groupchoice)
        {if (ditaOptional($c))
@@ -7772,7 +7772,7 @@ sub ditaSyntaxDiagramFromDocBookCmdSynopsis($)                                  
        }
      });
 
-    $x->by(sub                                                                  # A non optional groupseq under a non optional groupseq can be unwrapped
+    $x->by(sub                                                                  # A non optional group sequence under a non optional group sequence can be unwrapped
      {my ($s, $t) = @_;
       if ($s->at_groupseq_groupseq)
        {if   (ditaNonOptionalGroupSeq($s))
@@ -7785,7 +7785,7 @@ sub ditaSyntaxDiagramFromDocBookCmdSynopsis($)                                  
        }
      });
 
-    $x->by(sub                                                                  # An only child group choice under a non optional groupseq: unwrap the groupseq as unnecessary
+    $x->by(sub                                                                  # An only child group choice under a non optional group sequence: unwrap the group sequence as unnecessary
      {my ($c, $s) = @_;
       if ($c->isOnlyChild_groupchoice_groupseq)
        {if (ditaNonOptionalGroupSeq($s))
@@ -7794,7 +7794,7 @@ sub ditaSyntaxDiagramFromDocBookCmdSynopsis($)                                  
        }
      });
 
-    $x->by(sub                                                                  # An only child group choice under a non optional groupseq: unwrap the groupseq as unnecessary
+    $x->by(sub                                                                  # An only child group choice under a non optional group sequence: unwrap the group sequence as unnecessary
      {my ($c, $d) = @_;
       if ($c->isOnlyChild_groupchoice_groupchoice)
        {if ($c->attrX_importance eq $d->attrX_importance)
@@ -7809,7 +7809,7 @@ sub ditaSyntaxDiagramFromDocBookCmdSynopsis($)                                  
        }
      });
 
-    $x->by(sub                                                                  # groupseq importance=optional under groupchoice importance=optional: remove importance from groupseq as it is redundant and leads to over bracketing
+    $x->by(sub                                                                  # group sequence importance=optional under group choice importance=optional: remove importance from group sequence as it is redundant and leads to over bracketing
      {my ($s, $c) = @_;
       if ($c and $c->at_groupchoice)
        {if   (ditaOptional($c) and ditaOptional($s))
@@ -7838,7 +7838,7 @@ sub ditaSyntaxDiagramToBasicRepresentation($)                                   
    {my ($o, $p) = @_;
 
     my $i = $o->attrX_importance;                                               # Add brackets
-    if ($o->at_groupchoice)                                                     # Groupchoice has brackets and separators
+    if ($o->at_groupchoice)                                                     # Group choice has brackets and separators
      {if ($i eq q(optional))
        {$o->putPrevAsText(q( [));
         $o->putNextAsText(q(] ));
@@ -7963,7 +7963,7 @@ our %savedNodes;                                                                
 sub putNodeAs($$@)                                                              #CU Return the specified B<$node> after saving it under the specified B<$name> if we are in the optional B<@context>.
  {my ($node, $name, @context) = @_;                                             # Node, save name, optional context
   return $node if @context and !$node->at(@context);                            # Not in specified context
-  $savedNodes{$name} = $node;                                                   # Save a reference to the node under the specified name and return the currentr node
+  $savedNodes{$name} = $node;                                                   # Save a reference to the node under the specified name and return the current node
  }
 
 BEGIN{*put=*putNodeAs}
@@ -8157,7 +8157,7 @@ sub nn($)                                                                       
 
 sub checkAllPaths($)                                                            #S Create a representation of all the paths permitted in a block of L<xml>. The syntax of each line is a word representing an L<xml> tag followed by one of: tag B<1 * + ? -> with B<1> being the default and meaning that exactly one instance of this tag is required under its parent, B<*> meaning that zero or more such tags are permitted under its parent, B<+> meaning that one or more such tags are required under its parent, B<?> meaning that no more than one such tag is permitted under its parent, B<-> meaning that this is a leaf tag that can be missing or present just once under its parent. The remaining words on the line being treated as a comment describing the purpose of the tag.  Tags that are not marked with B<-> are required to have either text under them if they are leaf tags. Tags marked with B<-> are boolean leafs and may not have any text or child tags under them. The children of a tag are listed on following lines with exactly two more spaces of indentation.  This enables the validation of a block of non recursive L<xml> without having to resort to writing a complex L<DTD>.
  {my ($valid) = @_;                                                             # Path descriptions
-  my %valid;                                                                    # Perl representation of validator string
+  my %valid;                                                                    # Perl representation of validating string
   my @stack;                                                                    # Tag stack
   my @lines = split m/\n/, $valid;                                              # Split into lines
 
@@ -8232,10 +8232,10 @@ END
  } # checkAllPaths
 
 sub xmlToPerl($$)                                                               #S Parse some L<xml>, validate using a description recognized by  L<checkAllPaths> and return the corresponding L<Perl> structure.  Valid fields in the returned structure can be referenced via methods with the same names as their corresponding L<xml> tags. Tags marked with B<*> or B<+> in the description processed by L<checkAllPaths> result in arrays of children, whilst tags marked with B<1> or B<?> can be referenced directly.
- {my ($xml, $valid) = @_;                                                       # Xml represented as a string, Xml validator represented as a string
+ {my ($xml, $valid) = @_;                                                       # Xml represented as a string, Xml validating represented as a string
 
   my $xmlTree   = Data::Edit::Xml::new($xml);                                   # Xml parse tree
-  my $validator = checkAllPaths($valid);                                        # Create a validator to check all the paths in the xml description of the system
+  my $validator = checkAllPaths($valid);                                        # Create a validating string to check all the paths in the xml description of the system
   my $perl;                                                                     # Perl representation of the Xml
 
   $xmlTree->by(sub                                                              # Traverse xml to build Perl data structure
@@ -8885,7 +8885,7 @@ END
 Edit data held in the XML format.
 
 
-Version 20200218.
+Version 20201031.
 
 
 The following sections describe the methods in each functional area of this
@@ -8973,30 +8973,32 @@ Create a new parse tree - call this method statically as in Data::Edit::Xml::new
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::𝗻𝗲𝘄(<<END);                                               
-  <a>
-    <b>
-      <c id="42" match="mm"/>
-    </b>
-    <d>
-      <e/>
-    </d>
-  </a>
-  END
-  
-    ok -p $a eq <<END;                                                                          
-  <a>
-    <b>
-      <c id="42" match="mm"/>
-    </b>
-    <d>
-      <e/>
-    </d>
-  </a>
-  END
-  
 
-This is a static method and so should be invoked as:
+    my $a = Data::Edit::Xml::new(<<END);                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  <a>
+    <b>
+      <c id="42" match="mm"/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+    ok -p $a eq <<END;
+  <a>
+    <b>
+      <c id="42" match="mm"/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::new
 
@@ -9009,8 +9011,10 @@ The name of the tag to be used to represent text - this tag must not also be use
 B<Example:>
 
 
-    ok Data::Edit::Xml::𝗰𝗱𝗮𝘁𝗮 eq q(CDATA);                                        
-  
+
+    ok Data::Edit::Xml::cdata eq q(CDATA);                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 parse($parser)
 
@@ -9022,22 +9026,24 @@ Parse input L<Xml|https://en.wikipedia.org/wiki/XML> specified via: L<inputFile|
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new;                                                 
-  
-       $x->inputString = <<END;                                                   
+    my $x = Data::Edit::Xml::new;
+
+       $x->inputString = <<END;
   <a id="aa"><b id="bb"><c id="cc"/></b></a>
   END
-  
-       $x->𝗽𝗮𝗿𝘀𝗲;                                                                 
-  
-       ok -p $x eq <<END;                                                         
+
+
+       $x->parse;                                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+       ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"/>
     </b>
   </a>
   END
-  
+
 
 =head2 Node by Node
 
@@ -9054,21 +9060,23 @@ Create a new text node.
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                             
+    ok -p $x eq <<END;
   <a class="aa" id="1">
     <b class="bb" id="2"/>
   </a>
   END
-  
-    $x->putLast($x->𝗻𝗲𝘄𝗧𝗲𝘅𝘁("t"));                                                
-  
-    ok -p $x eq <<END;                                                            
+
+
+    $x->putLast($x->newText("t"));                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a class="aa" id="1">
     <b class="bb" id="2"/>
   t
   </a>
   END
-  
+
 
 =head3 newTag(undef, $command, %attributes)
 
@@ -9082,16 +9090,18 @@ Create a new non text node.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa");                     
-  
-    $x->putLast($x->𝗻𝗲𝘄𝗧𝗮𝗴("b", id=>2, class=>"bb"));                             
-  
-    ok -p $x eq <<END;                                                             
+    my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa");
+
+
+    $x->putLast($x->newTag("b", id=>2, class=>"bb"));                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a class="aa" id="1">
     <b class="bb" id="2"/>
   </a>
   END
-  
+
 
 =head3 newTree($command, %attributes)
 
@@ -9104,10 +9114,12 @@ Create a new tree.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::𝗻𝗲𝘄𝗧𝗿𝗲𝗲("a", id=>1, class=>"aa");                     
-  
-    ok -s $x eq '<a class="aa" id="1"/>';                                         
-  
+
+    my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa");                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $x eq '<a class="aa" id="1"/>';
+
 
 =head3 dupTag($node, @context)
 
@@ -9131,12 +9143,12 @@ B<Example:>
     <b><c/></b>
   </a>
   END
-  
+
     my $d = $a->go_b__dupTag;
     ok -p $d eq <<END;
   <b/>
   END
-  
+
 
 =head3 replaceSpecialChars($string)
 
@@ -9148,10 +9160,12 @@ Replace < > " & with &lt; &gt; &quot; &amp; Larry Wall's excellent L<Xml parser>
 B<Example:>
 
 
-    ok Data::Edit::Xml::𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗦𝗽𝗲𝗰𝗶𝗮𝗹𝗖𝗵𝗮𝗿𝘀(q(<">)) eq q(&lt;&quot;&gt;);         
-  
 
-This is a static method and so should be invoked as:
+    ok Data::Edit::Xml::replaceSpecialChars(q(<">)) eq q(&lt;&quot;&gt;);           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::replaceSpecialChars
 
@@ -9166,10 +9180,12 @@ Reverse the results of calling L<replaceSpecialChars|/replaceSpecialChars>.
 B<Example:>
 
 
-    ok Data::Edit::Xml::𝘂𝗻𝗱𝗼𝗦𝗽𝗲𝗰𝗶𝗮𝗹𝗖𝗵𝗮𝗿𝘀(q(&lt;&quot;&gt;)) eq q(<">);            
-  
 
-This is a static method and so should be invoked as:
+    ok Data::Edit::Xml::undoSpecialChars(q(&lt;&quot;&gt;)) eq q(<">);              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::undoSpecialChars
 
@@ -9204,10 +9220,12 @@ B<Example:>
     my $a = Data::Edit::Xml::new("<a/>", inputFile=>q(aaa.xml));
     $a->putFirstAsText(qq(<b/>));
     ok !$a->go(q(b));
-    my $A = $a->𝗿𝗲𝗻𝗲𝘄;
+
+    my $A = $a->renew;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -t $A->go(q(b)) eq q(b);
     ok $A->root->inputFile eq $a->root->inputFile;
-  
+
 
 =head3 clone($tree)
 
@@ -9227,15 +9245,17 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new("<a> </a>");                                      
-  
-    my $A = $a->𝗰𝗹𝗼𝗻𝗲;                                                             
-  
-    ok -s $A eq q(<a/>);                                                           
-  
-    ok $a->equals($A);                                                             
-  
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new("<a> </a>");
+
+
+    my $A = $a->clone;                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $A eq q(<a/>);
+
+    ok $a->equals($A);
+
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a>aaa
       <b>bbb</b>
@@ -9245,11 +9265,13 @@ B<Example:>
     </a>
   </x>
   END
-  
-    my $y = $x->𝗰𝗹𝗼𝗻𝗲;                                                             
-  
-    ok !$x->diff($y);                                                              
-  
+
+
+    my $y = $x->clone;                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$x->diff($y);
+
 
 =head3 equals($node1, $node2)
 
@@ -9262,14 +9284,16 @@ Return the first node if the two L<parse|/parse> trees have identical representa
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new("<a> </a>");                                      
-  
-    my $A = $a->clone;                                                             
-  
-    ok -s $A eq q(<a/>);                                                           
-  
-    ok $a->𝗲𝗾𝘂𝗮𝗹𝘀($A);                                                             
-  
+   {my $a = Data::Edit::Xml::new("<a> </a>");
+
+    my $A = $a->clone;
+
+    ok -s $A eq q(<a/>);
+
+
+    ok $a->equals($A);                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 equalsIgnoringAttributes($node1, $node2, @attributes)
 
@@ -9283,28 +9307,32 @@ Return the first node if the two L<parse|/parse> trees have identical representa
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b   id="1" outputclass="1" name="b">
       <c id="2" outputclass="2" name="c"/>
     </b>
   </a>
   END
-  
-    my $A = Data::Edit::Xml::new(<<END);                                          
+
+    my $A = Data::Edit::Xml::new(<<END);
   <a>
     <b   id="11" outputclass="11" name="b">
       <c id="22" outputclass="22" name="c"/>
     </b>
   </a>
   END
-  
-    ok !$a->equals($A);                                                           
-  
-    ok !$a->𝗲𝗾𝘂𝗮𝗹𝘀𝗜𝗴𝗻𝗼𝗿𝗶𝗻𝗴𝗔𝘁𝘁𝗿𝗶𝗯𝘂𝘁𝗲𝘀($A, qw(id));                                 
-  
-    ok  $a->𝗲𝗾𝘂𝗮𝗹𝘀𝗜𝗴𝗻𝗼𝗿𝗶𝗻𝗴𝗔𝘁𝘁𝗿𝗶𝗯𝘂𝘁𝗲𝘀($A, qw(id outputclass));                     
-  
+
+    ok !$a->equals($A);
+
+
+    ok !$a->equalsIgnoringAttributes($A, qw(id));                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a->equalsIgnoringAttributes($A, qw(id outputclass));                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 diff($first, $second, $N)
 
@@ -9318,7 +9346,7 @@ Return () if the dense string representations of the two nodes are equal, else u
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a>aaa
       <b>bbb</b>
@@ -9328,16 +9356,20 @@ B<Example:>
     </a>
   </x>
   END
-  
-    ok !$x->𝗱𝗶𝗳𝗳($x);                                                             
-  
-    my $y = $x->clone;                                                             
-  
-    ok !$x->𝗱𝗶𝗳𝗳($y);                                                              
-  
-    $y->first->putLast($x->newTag(q(f)));                                         
-  
-    ok nws(<<END) eq nws(-p $y);                                                  
+
+
+    ok !$x->diff($x);                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $y = $x->clone;
+
+
+    ok !$x->diff($y);                                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    $y->first->putLast($x->newTag(q(f)));
+
+    ok nws(<<END) eq nws(-p $y);
   <x>
     <a>aaa
       <b>bbb</b>
@@ -9348,19 +9380,27 @@ B<Example:>
     </a>
   </x>
   END
-  
-    is_deeply [$x->𝗱𝗶𝗳𝗳($y)],    ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];  
-  
-    is_deeply [𝗱𝗶𝗳𝗳(-p $x, $y)], ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];  
-  
-    is_deeply [$x->𝗱𝗶𝗳𝗳(-p $y)], ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];  
-  
-    my $X = writeFile(undef, -p $x);                                              
-  
-    my $Y = writeFile(undef, -p $y);                                              
-  
-    is_deeply [𝗱𝗶𝗳𝗳($X, $Y)],    ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];  
-  
+
+
+    is_deeply [$x->diff($y)],    ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    is_deeply [diff(-p $x, $y)], ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    is_deeply [$x->diff(-p $y)], ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $X = writeFile(undef, -p $x);
+
+    my $Y = writeFile(undef, -p $y);
+
+
+    is_deeply [diff($X, $Y)],    ["<d>ddd</d> eee <", "/a></x>", "f/></a></x>"];    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 save($node, $file)
 
@@ -9373,12 +9413,14 @@ Save a copy of the L<parse|/parse> tree to a file which can be L<restored|/resto
 B<Example:>
 
 
-      $y->𝘀𝗮𝘃𝗲($f);                                                                
-  
-      my $Y = Data::Edit::Xml::restore($f);                                        
-  
-      ok $Y->equals($y);                                                           
-  
+
+      $y->save($f);                                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      my $Y = Data::Edit::Xml::restore($f);
+
+      ok $Y->equals($y);
+
 
 =head3 restore($file)
 
@@ -9390,14 +9432,16 @@ Return a L<parse|/parse> tree from a copy saved in a file by L<save|/save>.
 B<Example:>
 
 
-      $y->save($f);                                                                
-  
-      my $Y = Data::Edit::Xml::𝗿𝗲𝘀𝘁𝗼𝗿𝗲($f);                                        
-  
-      ok $Y->equals($y);                                                           
-  
+      $y->save($f);
 
-This is a static method and so should be invoked as:
+
+      my $Y = Data::Edit::Xml::restore($f);                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok $Y->equals($y);
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::restore
 
@@ -9412,26 +9456,28 @@ Expand the includes mentioned in a L<parse|/parse> tree: any tag that ends in B<
 B<Example:>
 
 
-    my @files =                                                                   
-  
-     (owf("in1/a.xml", q(<a id="a"><include href="../in2/b.xml"/></a>)),          
-  
-      owf("in2/b.xml", q(<b id="b"><include href="c.xml"/></b>)),                 
-  
-      owf("in2/c.xml", q(<c id="c"/>)));                                          
-  
-    my $x = Data::Edit::Xml::new(fpf(currentDirectory, $files[0]));               
-  
-       $x->𝗲𝘅𝗽𝗮𝗻𝗱𝗜𝗻𝗰𝗹𝘂𝗱𝗲𝘀;                                                        
-  
-    ok <<END eq -p $x;                                                            
+    my @files =
+
+     (owf("in1/a.xml", q(<a id="a"><include href="../in2/b.xml"/></a>)),
+
+      owf("in2/b.xml", q(<b id="b"><include href="c.xml"/></b>)),
+
+      owf("in2/c.xml", q(<c id="c"/>)));
+
+    my $x = Data::Edit::Xml::new(fpf(currentDirectory, $files[0]));
+
+
+       $x->expandIncludes;                                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <a id="a">
     <b id="b">
       <c id="c"/>
     </b>
   </a>
   END
-  
+
 
 =head1 Print
 
@@ -9454,7 +9500,7 @@ Return a readable string representing a node of a L<parse|/parse> tree and all t
 B<Example:>
 
 
-   {my $s = <<END;                                                                     
+   {my $s = <<END;
   <a>
     <b>
       <A/>
@@ -9466,24 +9512,26 @@ B<Example:>
     </c>
   </a>
   END
-  
-    my $a = Data::Edit::Xml::new($s);                                              
-  
-    ok $s eq $a->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴;                                                    
-  
-    ok $s eq -p $a;                                                               
-  
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+
+    my $a = Data::Edit::Xml::new($s);
+
+
+    ok $s eq $a->prettyString;                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $s eq -p $a;
+
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>bbb</b>.
     <c>ccc</c>.
   </a>
   END
-  
+
 
 =head3 prettyStringHtml($node, @context)
 
-Return a string of L<html|https://en.wikipedia.org/wiki/HTML> representing a node of a L<parse|/parse> tree and all the nodes below it if the node is in the specified context.
+Return a string of L<HTML|https://en.wikipedia.org/wiki/HTML> representing a node of a L<parse|/parse> tree and all the nodes below it if the node is in the specified context.
 
      Parameter  Description
   1  $node      Node
@@ -9502,8 +9550,10 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok $a->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴𝗛𝘁𝗺𝗹 eq <<END;
+
+
+    ok $a->prettyStringHtml eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <div class="xmlLine"><span class="xmlLineStartTag"></span><span class="xmlLt">&lt;</span><span class="xmlTag">a</span> <span class="xmlAttr">id</span><span class="xmlEquals">=</span><span class="xmlValue">"1"</span><span class="xmlGt">&gt;</span></div>
   <div class="xmlLine"><span class="xmlLineStartTag">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="xmlLt">&lt;</span><span class="xmlTag">b</span> <span class="xmlAttr">b</span><span class="xmlEquals">=</span><span class="xmlValue">"B"</span> <span class="xmlAttr">id</span><span class="xmlEquals">=</span><span class="xmlValue">"2"</span><span class="xmlGt">&gt;</span></div>
   <div class="xmlLine"><span class="xmlLineStartTag">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="xmlLt">&lt;</span><span class="xmlTag">c</span><span class="xmlSlashGt">/&gt;</span></div>
@@ -9511,7 +9561,7 @@ B<Example:>
   <div class="xmlLine"><span class="xmlLineStartTag">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="xmlLt">&lt;</span><span class="xmlTag">d</span> <span class="xmlAttr">d</span><span class="xmlEquals">=</span><span class="xmlValue">"D"</span> <span class="xmlAttr">id</span><span class="xmlEquals">=</span><span class="xmlValue">"3"</span><span class="xmlGt">&gt;</span><span class="xmlText">Some text</span><span class="xmlLtSlash">&lt;/</span><span class="xmlTag">d</span><span class="xmlGt">&gt;</span></div>
   <div class="xmlLine"><span class="xmlLineStartTag"></span><span class="xmlLtSlash">&lt;/</span><span class="xmlTag">a</span><span class="xmlGt">&gt;</span></div>
   END
-  
+
 
 =head3 prettyStringDitaHeaders($node)
 
@@ -9523,19 +9573,19 @@ Return a readable string representing the L<parse|/parse> tree below the specifi
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <concept/>
   END
-  
+
     ok $a->ditaPrettyPrintWithHeaders eq <<END;
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd" []>
   <concept/>
   END
-  
+
    }
-  
+
 
 =head3 prettyStringNumbered($node, $depth)
 
@@ -9548,7 +9598,7 @@ Return a readable string representing a node of a L<parse|/parse> tree and all t
 B<Example:>
 
 
-   {my $s = <<END;                                                                     
+   {my $s = <<END;
   <a>
     <b>
       <A/>
@@ -9560,10 +9610,12 @@ B<Example:>
     </c>
   </a>
   END
-  
-    $a->numberTree;                                                                  
-  
-    ok $a->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴𝗡𝘂𝗺𝗯𝗲𝗿𝗲𝗱 eq <<END;                                             
+
+    $a->numberTree;
+
+
+    ok $a->prettyStringNumbered eq <<END;                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <a id="1">
     <b id="2">
       <A id="3"/>
@@ -9575,7 +9627,7 @@ B<Example:>
     </c>
   </a>
   END
-  
+
 
 =head3 prettyStringCDATA($node, $depth)
 
@@ -9588,18 +9640,20 @@ Return a readable string representing a node of a L<parse|/parse> tree and all t
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new("<a><b>A</b></a>");                              
-  
-    my $b = $a->first;                                                            
-  
-       $b->first->replaceWithBlank;                                               
-  
-    ok $a->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴𝗖𝗗𝗔𝗧𝗔 eq <<END;                                              
+    my $a = Data::Edit::Xml::new("<a><b>A</b></a>");
+
+    my $b = $a->first;
+
+       $b->first->replaceWithBlank;
+
+
+    ok $a->prettyStringCDATA eq <<END;                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <a>
       <b><CDATA> </CDATA></b>
   </a>
   END
-  
+
 
 =head3 prettyStringContent($node)
 
@@ -9611,7 +9665,7 @@ Return a readable string representing all the nodes below a node of a L<parse|/p
 B<Example:>
 
 
-   {my $s = <<END;                                                                     
+   {my $s = <<END;
   <a>
     <b>
       <A/>
@@ -9623,8 +9677,10 @@ B<Example:>
     </c>
   </a>
   END
-  
-    ok $a->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴𝗖𝗼𝗻𝘁𝗲𝗻𝘁 eq <<END;                                          
+
+
+    ok $a->prettyStringContent eq <<END;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <b>
     <A/>
     <B/>
@@ -9634,7 +9690,7 @@ B<Example:>
     <D/>
   </c>
   END
-  
+
 
 =head3 prettyStringContentNumbered($node)
 
@@ -9646,28 +9702,32 @@ Return a readable string representing all the nodes below a node of a L<parse|/p
 B<Example:>
 
 
-   {my $s = <<END;                                                                
+   {my $s = <<END;
   <a>
     <b>
       <c/>
     </b>
   </a>
   END
-  
-    my $a = Data::Edit::Xml::new($s);                                             
-  
-    $a->numberTree;                                                               
-  
-    ok $a->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗡𝘂𝗺𝗯𝗲𝗿𝗲𝗱 eq <<END;                                  
+
+    my $a = Data::Edit::Xml::new($s);
+
+    $a->numberTree;
+
+
+    ok $a->prettyStringContentNumbered eq <<END;                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <b id="2">
     <c id="3"/>
   </b>
   END
-  
-    ok $a->go(qw(b))->𝗽𝗿𝗲𝘁𝘁𝘆𝗦𝘁𝗿𝗶𝗻𝗴𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗡𝘂𝗺𝗯𝗲𝗿𝗲𝗱 eq <<END;                                  
+
+
+    ok $a->go(qw(b))->prettyStringContentNumbered eq <<END;                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <c id="3"/>
   END
-  
+
 
 =head3 xmlHeader($string)
 
@@ -9679,13 +9739,15 @@ Add the standard L<Xml|https://en.wikipedia.org/wiki/XML> header to a string
 B<Example:>
 
 
-  ok 𝘅𝗺𝗹𝗛𝗲𝗮𝗱𝗲𝗿("<a/>") eq <<END;                                                  
+
+  ok xmlHeader("<a/>") eq <<END;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <?xml version="1.0" encoding="UTF-8"?>
   <a/>
   END
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::xmlHeader
 
@@ -9720,10 +9782,12 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
-    ok stringMd5Sum($a->𝗵𝘁𝗺𝗹𝗧𝗮𝗯𝗹𝗲𝘀 =~ s(#\w+) ()gsr) eq q(1e8555c2ea191a54361cbd8cc5baa94b);
+
+
+    ok stringMd5Sum($a->htmlTables =~ s(#\w+) ()gsr) eq q(1e8555c2ea191a54361cbd8cc5baa94b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok stringMd5Sum($a->jsonString)                  eq q(3afa81dc2b2a249834fbac53a1ebd5f1);
-  
+
 
 =head3 jsonString($node)
 
@@ -9751,10 +9815,12 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
     ok stringMd5Sum($a->htmlTables =~ s(#\w+) ()gsr) eq q(1e8555c2ea191a54361cbd8cc5baa94b);
-    ok stringMd5Sum($a->𝗷𝘀𝗼𝗻𝗦𝘁𝗿𝗶𝗻𝗴)                  eq q(3afa81dc2b2a249834fbac53a1ebd5f1);
-  
+
+    ok stringMd5Sum($a->jsonString)                  eq q(3afa81dc2b2a249834fbac53a1ebd5f1);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 xmlToJson($xml, $escape)
 
@@ -9773,29 +9839,31 @@ B<Example:>
   t2
   </a>
   END
-  
-    ok 𝘅𝗺𝗹𝗧𝗼𝗝𝘀𝗼𝗻($x) eq <<'END';
+
+
+    ok xmlToJson($x) eq <<'END';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   {
      "attributes" : {
         "a" : "1"
      },
-  
+
      "contents" : [
         {
            "tag" : "CDATA",
            "text" : "t1
   "
         },
-  
+
         {
            "attributes" : {
               "b" : "2",
               "c" : "3"
            },
-  
+
            "tag" : "b"
         },
-  
+
         {
            "tag" : "CDATA",
            "text" : "
@@ -9803,33 +9871,35 @@ t2
 "
         }
      ],
-  
+
      "tag" : "a"
   }
   END
-  
-    ok 𝘅𝗺𝗹𝗧𝗼𝗝𝘀𝗼𝗻($x, 1) eq <<'END';
+
+
+    ok xmlToJson($x, 1) eq <<'END';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   {
      "attributes" : {
         "a" : "1"
      },
-  
+
      "contents" : [
         {
            "tag" : "CDATA",
            "text" : "t1\
   "
         },
-  
+
         {
            "attributes" : {
               "b" : "2",
               "c" : "3"
            },
-  
+
            "tag" : "b"
         },
-  
+
         {
            "tag" : "CDATA",
            "text" : "\
@@ -9837,13 +9907,13 @@ t2\
 "
         }
      ],
-  
+
      "tag" : "a"
   }
   END
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::xmlToJson
 
@@ -9868,10 +9938,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my                $json = $a->jsonString;
     ok   stringMd5Sum($json) eq q(5bb9140c7076978dfd5f600d68a82164);
-    ok -p 𝗷𝘀𝗼𝗻𝗧𝗼𝗫𝗺𝗹  ($json) eq <<END;
+
+    ok -p jsonToXml  ($json) eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <a id="a">
     <b id="b" out="out">b1
       <c id="c"/>
@@ -9881,7 +9953,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 Dense
 
@@ -9897,7 +9969,7 @@ Return a dense string representing a node of a L<parse|/parse> tree and all the 
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -9907,9 +9979,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok -s $a eq '<a><b><c id="42" match="mm"/></b><d><e/></d></a>';                
-  
+
+    ok -s $a eq '<a><b><c id="42" match="mm"/></b><d><e/></d></a>';
+
 
 =head3 stringAsMd5Sum($node)
 
@@ -9928,11 +10000,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗔𝘀𝗠𝗱𝟱𝗦𝘂𝗺 eq q(390bf05d8f5671cc6a4771834840d695);
+
+
+    ok $a->stringAsMd5Sum eq q(390bf05d8f5671cc6a4771834840d695);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok ((-k $a)->id       eq q(GUID-390bf05d-8f56-71cc-6a47-71834840d695));
     ok $a->id             ne (-k $a->first)->id;
-  
+
 
 =head3 stringQuoted($node)
 
@@ -9944,7 +10018,7 @@ Return a quoted string representing a L<parse|/parse> tree a node of a L<parse|/
 B<Example:>
 
 
-   {my $s = <<END;                                                                     
+   {my $s = <<END;
   <a>
     <b>
       <A/>
@@ -9956,9 +10030,11 @@ B<Example:>
     </c>
   </a>
   END
-  
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗤𝘂𝗼𝘁𝗲𝗱 eq q('<a><b><A/><B/></b><c><C/><D/></c></a>');            
-  
+
+
+    ok $a->stringQuoted eq q('<a><b><A/><B/></b><c><C/><D/></c></a>');              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 stringReplacingIdsWithLabels($node)
 
@@ -9970,18 +10046,24 @@ Return a string representing the specified L<parse|/parse> tree with the id attr
 B<Example:>
 
 
-    ok $x->𝘀𝘁𝗿𝗶𝗻𝗴𝗥𝗲𝗽𝗹𝗮𝗰𝗶𝗻𝗴𝗜𝗱𝘀𝗪𝗶𝘁𝗵𝗟𝗮𝗯𝗲𝗹𝘀 eq '<a><b><c/></b></a>';                                             
-  
-    $b->addLabels(1..4);                                                          
-  
-    $c->addLabels(5..8);                                                          
-  
-    ok $x->𝘀𝘁𝗿𝗶𝗻𝗴𝗥𝗲𝗽𝗹𝗮𝗰𝗶𝗻𝗴𝗜𝗱𝘀𝗪𝗶𝘁𝗵𝗟𝗮𝗯𝗲𝗹𝘀 eq '<a><b id="1, 2, 3, 4"><c id="5, 6, 7, 8"/></b></a>';             
-  
-    my $s = $x->𝘀𝘁𝗿𝗶𝗻𝗴𝗥𝗲𝗽𝗹𝗮𝗰𝗶𝗻𝗴𝗜𝗱𝘀𝗪𝗶𝘁𝗵𝗟𝗮𝗯𝗲𝗹𝘀;                                     
-  
-    ok $s eq '<a><b id="1, 2, 3, 4"><c id="5, 6, 7, 8"/></b></a>';                
-  
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    $b->addLabels(1..4);
+
+    $c->addLabels(5..8);
+
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c id="5, 6, 7, 8"/></b></a>';               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    my $s = $x->stringReplacingIdsWithLabels;                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $s eq '<a><b id="1, 2, 3, 4"><c id="5, 6, 7, 8"/></b></a>';
+
 
 =head3 stringExtendingIdsWithLabels($node)
 
@@ -9993,7 +10075,7 @@ Return a string representing the specified L<parse|/parse> tree with the id attr
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a id="a">
     <b id="b">
       <c id="c"/>
@@ -10003,10 +10085,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my $N = 0; $a->by(sub{$_->addLabels((-t $_).++$N)});                          
-  
-    ok -p (new $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗘𝘅𝘁𝗲𝗻𝗱𝗶𝗻𝗴𝗜𝗱𝘀𝗪𝗶𝘁𝗵𝗟𝗮𝗯𝗲𝗹𝘀) eq <<END;                         
+
+    my $N = 0; $a->by(sub{$_->addLabels((-t $_).++$N)});
+
+
+    ok -p (new $a->stringExtendingIdsWithLabels) eq <<END;                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <a id="a, a5">
     <b id="b, b2">
       <c id="c, c1"/>
@@ -10016,7 +10100,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 stringContent($node)
 
@@ -10028,7 +10112,7 @@ Return a string representing all the nodes below a node of a L<parse|/parse> tre
 B<Example:>
 
 
-   {my $s = <<END;                                                                     
+   {my $s = <<END;
   <a>
     <b>
       <A/>
@@ -10040,9 +10124,11 @@ B<Example:>
     </c>
   </a>
   END
-  
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗖𝗼𝗻𝘁𝗲𝗻𝘁 eq "<b><A/><B/></b><c><C/><D/></c>";                     
-  
+
+
+    ok $a->stringContent eq "<b><A/><B/></b><c><C/><D/></c>";                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 stringContentOrText($node)
 
@@ -10057,12 +10143,14 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a>AAAA</a>
   END
-  
+
     ok $a->stringContent              eq q(AAAA);
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗢𝗿𝗧𝗲𝘅𝘁        eq q(AAAA);
+
+    ok $a->stringContentOrText        eq q(AAAA);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $a->first__stringContent       eq q();
     ok $a->first__stringContentOrText eq q(AAAA);
-  
+
 
 =head3 stringNode($node)
 
@@ -10074,20 +10162,22 @@ Return a string representing the specified B<$node> showing the attributes, labe
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';                                                
-  
-    my $b = $x->go(q(b));                                                            
-  
-    $b->addLabels(1..2);                                                             
-  
-    $b->addLabels(3..4);                                                             
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';                                 
-  
-    $b->numberTree;                                                               
-  
-    ok $b->𝘀𝘁𝗿𝗶𝗻𝗴𝗡𝗼𝗱𝗲 eq "b(2) 0:1 1:2 2:3 3:4";                                  
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';
+
+    my $b = $x->go(q(b));
+
+    $b->addLabels(1..2);
+
+    $b->addLabels(3..4);
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
+
+    $b->numberTree;
+
+
+    ok $b->stringNode eq "b(2) 0:1 1:2 2:3 3:4";                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 stringTagsAndText($node)
 
@@ -10099,7 +10189,7 @@ Return a string showing just the tags and text at and below a specified B<$node>
 B<Example:>
 
 
-  if (1)                                                                                 
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -10116,20 +10206,24 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
-   is_deeply [$b->𝘀𝘁𝗿𝗶𝗻𝗴𝗧𝗮𝗴𝘀𝗔𝗻𝗱𝗧𝗲𝘅𝘁],   [qw(cc d dd c b)];
-   is_deeply [$B->𝘀𝘁𝗿𝗶𝗻𝗴𝗧𝗮𝗴𝘀𝗔𝗻𝗱𝗧𝗲𝘅𝘁],   [qw(cc d dd c B)];
+
+   is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   is_deeply [$B->stringTagsAndText],   [qw(cc d dd c B)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok         $b->representationLast  eq qq(cc d dd c b);
    ok         $B->representationLast  eq qq(cc d dd c B);
    ok         $c->representationLast  eq qq(cc d dd c);
@@ -10137,15 +10231,15 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -10156,22 +10250,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head3 stringText($node)
 
@@ -10183,7 +10277,7 @@ Return a string showing just the text of the text nodes (separated by blanks) at
 B<Example:>
 
 
-  if (1)                                                                                 
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -10200,16 +10294,16 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -10221,41 +10315,45 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
-   is_deeply [$b->𝘀𝘁𝗿𝗶𝗻𝗴𝗧𝗲𝘅𝘁],          [qw(cc dd)];
-   is_deeply [$B->𝘀𝘁𝗿𝗶𝗻𝗴𝗧𝗲𝘅𝘁],          [qw(cc dd)];
+
+   is_deeply [$b->stringText],          [qw(cc dd)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   is_deeply [$B->stringText],          [qw(cc dd)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok         $b->representationLast  eq qq(cc dd);
    ok         $B->representationLast  eq qq(cc dd);
    is_deeply  $b->representationLast,
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head3 setRepresentationAsTagsAndText($tree)
 
@@ -10267,7 +10365,7 @@ Sets the L<representationLast|/representationLast> for every node in the specifi
 B<Example:>
 
 
-  if (1)                                                                                 
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -10284,18 +10382,20 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
-   $a->𝘀𝗲𝘁𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻𝗔𝘀𝗧𝗮𝗴𝘀𝗔𝗻𝗱𝗧𝗲𝘅𝘁;
+
+   $a->setRepresentationAsTagsAndText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
    is_deeply [$B->stringTagsAndText],   [qw(cc d dd c B)];
    ok         $b->representationLast  eq qq(cc d dd c b);
@@ -10305,15 +10405,15 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -10324,22 +10424,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head3 setRepresentationAsText($tree)
 
@@ -10351,7 +10451,7 @@ Sets the L<representationLast|/representationLast> for every node in the specifi
 B<Example:>
 
 
-  if (1)                                                                                 
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -10368,16 +10468,16 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -10389,17 +10489,19 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
-   $a->𝘀𝗲𝘁𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻𝗔𝘀𝗧𝗲𝘅𝘁;
+
+   $a->setRepresentationAsText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    is_deeply [$b->stringText],          [qw(cc dd)];
    is_deeply [$B->stringText],          [qw(cc dd)];
    ok         $b->representationLast  eq qq(cc dd);
@@ -10408,22 +10510,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head3 matchNodesByRepresentation($tree)
 
@@ -10435,7 +10537,7 @@ Creates a hash of arrays of nodes that have the same representation in the speci
 B<Example:>
 
 
-  if (1)                                                                                 
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -10452,16 +10554,16 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -10473,15 +10575,17 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
-   my $m  = $a->𝗺𝗮𝘁𝗰𝗵𝗡𝗼𝗱𝗲𝘀𝗕𝘆𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻;
-  
+
+
+   my $m  = $a->matchNodesByRepresentation;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -10492,22 +10596,24 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
-   my $M  = $a->𝗺𝗮𝘁𝗰𝗵𝗡𝗼𝗱𝗲𝘀𝗕𝘆𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻;
+
+
+   my $M  = $a->matchNodesByRepresentation;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head2 Conditions
 
@@ -10524,7 +10630,7 @@ Return a string representing the specified B<$node> of a L<parse|/parse> tree an
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                          
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -10532,21 +10638,27 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my $b = $a >= 'b';                                                            
-  
-    my ($c, $d) = $b->contents;                                                   
-  
-    $b->addConditions(qw(bb BB));                                                       
-  
-    $c->addConditions(qw(cc CC));                                                                                      
-  
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗪𝗶𝘁𝗵𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀         eq '<a><b><c/><d/></b></a>';              
-  
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗪𝗶𝘁𝗵𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀(qw(bb)) eq '<a><b><d/></b></a>';                  
-  
-    ok $a->𝘀𝘁𝗿𝗶𝗻𝗴𝗪𝗶𝘁𝗵𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀(qw(cc)) eq '<a/>';                                
-  
+
+    my $b = $a >= 'b';
+
+    my ($c, $d) = $b->contents;
+
+    $b->addConditions(qw(bb BB));
+
+    $c->addConditions(qw(cc CC));
+
+
+    ok $a->stringWithConditions         eq '<a><b><c/><d/></b></a>';                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $a->stringWithConditions(qw(bb)) eq '<a><b><d/></b></a>';                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $a->stringWithConditions(qw(cc)) eq '<a/>';                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 condition($node, $condition, @context)
 
@@ -10566,16 +10678,22 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    $b->addConditions(qw(bb BB));                                                       
-  
-    $c->addConditions(qw(cc CC));                                                                                      
-  
-    ok  $c->𝗰𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻(q(cc));                                                     
-  
-    ok !$c->𝗰𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻(q(dd));                                                     
-  
-    ok  $c->𝗰𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻(q(cc), qw(c b a));                                          
-  
+    $b->addConditions(qw(bb BB));
+
+    $c->addConditions(qw(cc CC));
+
+
+    ok  $c->condition(q(cc));                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$c->condition(q(dd));                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $c->condition(q(cc), qw(c b a));                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 anyCondition($node, @conditions)
 
@@ -10588,14 +10706,18 @@ Return the B<$node> if it has any of the specified B<@conditions>, else return B
 B<Example:>
 
 
-    $b->addConditions(qw(bb BB));                                                       
-  
-    $c->addConditions(qw(cc CC));                                                                                      
-  
-    ok  $b->𝗮𝗻𝘆𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻(qw(bb cc));                                              
-  
-    ok !$b->𝗮𝗻𝘆𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻(qw(cc CC));                                              
-  
+    $b->addConditions(qw(bb BB));
+
+    $c->addConditions(qw(cc CC));
+
+
+    ok  $b->anyCondition(qw(bb cc));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$b->anyCondition(qw(cc CC));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 allConditions($node, @conditions)
 
@@ -10608,14 +10730,18 @@ Return the B<$node> if it has all of the specified B<@conditions>, else return B
 B<Example:>
 
 
-    $b->addConditions(qw(bb BB));                                                       
-  
-    $c->addConditions(qw(cc CC));                                                                                      
-  
-    ok  $b->𝗮𝗹𝗹𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀(qw(bb BB));                                             
-  
-    ok !$b->𝗮𝗹𝗹𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀(qw(bb cc));                                             
-  
+    $b->addConditions(qw(bb BB));
+
+    $c->addConditions(qw(cc CC));
+
+
+    ok  $b->allConditions(qw(bb BB));                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$b->allConditions(qw(bb cc));                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 addConditions($node, @conditions)
 
@@ -10628,10 +10754,12 @@ Given a B<$node> add the specified B<@conditions> and return the node.
 B<Example:>
 
 
-    $b->𝗮𝗱𝗱𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀(qw(bb BB));                                                       
-  
-    ok join(' ', $b->listConditions) eq 'BB bb';                                        
-  
+
+    $b->addConditions(qw(bb BB));                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok join(' ', $b->listConditions) eq 'BB bb';
+
 
 =head3 deleteConditions($node, @conditions)
 
@@ -10644,12 +10772,14 @@ Given a B<$node> delete any B<@conditions> applied to the $node and return the $
 B<Example:>
 
 
-    ok join(' ', $b->listConditions) eq 'BB bb';                                        
-  
-    $b->𝗱𝗲𝗹𝗲𝘁𝗲𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀(qw(BB));                                                 
-  
-    ok join(' ', $b->listConditions) eq 'bb';                                     
-  
+    ok join(' ', $b->listConditions) eq 'BB bb';
+
+
+    $b->deleteConditions(qw(BB));                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok join(' ', $b->listConditions) eq 'bb';
+
 
 =head3 listConditions($node)
 
@@ -10661,10 +10791,12 @@ Return a list of conditions applied to a B<$node>.
 B<Example:>
 
 
-    $b->addConditions(qw(bb BB));                                                       
-  
-    ok join(' ', $b->𝗹𝗶𝘀𝘁𝗖𝗼𝗻𝗱𝗶𝘁𝗶𝗼𝗻𝘀) eq 'BB bb';                                        
-  
+    $b->addConditions(qw(bb BB));
+
+
+    ok join(' ', $b->listConditions) eq 'BB bb';                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Attributes
 
@@ -10691,18 +10823,24 @@ Return the value of an attribute of the current node as an L<lvalue method|http:
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(my $s = <<END);                                  
+    my $x = Data::Edit::Xml::new(my $s = <<END);
   <a number="1"/>
   END
-  
-    ok $x->𝗮𝘁𝘁𝗿(qq(number)) == 1;                                                 
-  
-       $x->𝗮𝘁𝘁𝗿(qq(number))  = 2;                                                 
-  
-    ok $x->𝗮𝘁𝘁𝗿(qq(number)) == 2;                                                 
-  
-    ok -s $x eq '<a number="2"/>';                                                
-  
+
+
+    ok $x->attr(qq(number)) == 1;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+       $x->attr(qq(number))  = 2;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x->attr(qq(number)) == 2;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $x eq '<a number="2"/>';
+
 
 =head3 attrX($node, $attribute)
 
@@ -10715,14 +10853,14 @@ Return the value of the specified B<$attribute> of the specified B<$node> or B<q
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b name="bb"/></a>));
-  
+
     my  $b = $a->first;
     ok  $b->attrX_name eq q(bb);
     ok !$b->attrX_bbb;
    }
-  
+
 
 =head3 set($node, %values)
 
@@ -10735,12 +10873,14 @@ Set the values of some attributes in a node and return the node. Identical in ef
 B<Example:>
 
 
-    ok q(<a a="1" b="1" id="aa"/>) eq -s $a;                                      
-  
-    $a->𝘀𝗲𝘁(a=>11, b=>undef, c=>3, d=>4, e=>5);                                   
-  
-   }                                                                              
-  
+    ok q(<a a="1" b="1" id="aa"/>) eq -s $a;
+
+
+    $a->set(a=>11, b=>undef, c=>3, d=>4, e=>5);                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   }
+
 
 =head3 addAttr($node, %values)
 
@@ -10754,12 +10894,14 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a id="a"/>));
-  
-    $a->𝗮𝗱𝗱𝗔𝘁𝘁𝗿(id=>"b", class=>"c");
-  
+
+
+    $a->addAttr(id=>"b", class=>"c");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq qq(<a class="c" id="a"/>
 );
-  
+
 
 =head3 setAttr($node, %values)
 
@@ -10772,12 +10914,14 @@ Set the values of some attributes in a node and return the node. Identical in ef
 B<Example:>
 
 
-    ok -s $x eq '<a number="2"/>';                                                 
-  
-    $x->𝘀𝗲𝘁𝗔𝘁𝘁𝗿(first=>1, second=>2, last=>undef);                                
-  
-    ok -s $x eq '<a first="1" number="2" second="2"/>';                               
-  
+    ok -s $x eq '<a number="2"/>';
+
+
+    $x->setAttr(first=>1, second=>2, last=>undef);                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $x eq '<a first="1" number="2" second="2"/>';
+
 
 =head2 Other Operations on Attributes
 
@@ -10794,10 +10938,12 @@ Return the values of the specified attributes of the current node as a list
 B<Example:>
 
 
-    ok -s $x eq '<a first="1" number="2" second="2"/>';                               
-  
-    is_deeply [$x->𝗮𝘁𝘁𝗿𝘀(qw(third second first ))], [undef, 2, 1];                
-  
+    ok -s $x eq '<a first="1" number="2" second="2"/>';
+
+
+    is_deeply [$x->attrs(qw(third second first ))], [undef, 2, 1];                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 attrCount($node, @exclude)
 
@@ -10810,12 +10956,16 @@ Return the number of attributes in the specified B<$node>, optionally ignoring t
 B<Example:>
 
 
-    ok -s $x eq '<a first="1" number="2" second="2"/>';                               
-  
-    ok $x->𝗮𝘁𝘁𝗿𝗖𝗼𝘂𝗻𝘁 == 3;                                                        
-  
-    ok $x->𝗮𝘁𝘁𝗿𝗖𝗼𝘂𝗻𝘁(qw(first second third)) == 1;                                
-  
+    ok -s $x eq '<a first="1" number="2" second="2"/>';
+
+
+    ok $x->attrCount == 3;                                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x->attrCount(qw(first second third)) == 1;                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 getAttrs($node)
 
@@ -10827,10 +10977,12 @@ Return a sorted list of all the attributes on the specified B<$node>.
 B<Example:>
 
 
-    ok -s $x eq '<a first="1" number="2" second="2"/>';                               
-  
-    is_deeply [$x->𝗴𝗲𝘁𝗔𝘁𝘁𝗿𝘀], [qw(first number second)];                          
-  
+    ok -s $x eq '<a first="1" number="2" second="2"/>';
+
+
+    is_deeply [$x->getAttrs], [qw(first number second)];                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 deleteAttr($node, $attr, $value)
 
@@ -10844,12 +10996,14 @@ Delete the named attribute in the specified B<$node>, optionally check its value
 B<Example:>
 
 
-    ok -s $x eq '<a delete="me" number="2"/>';                                    
-  
-    $x->𝗱𝗲𝗹𝗲𝘁𝗲𝗔𝘁𝘁𝗿(qq(delete));                                                   
-  
-    ok -s $x eq '<a number="2"/>';                                                 
-  
+    ok -s $x eq '<a delete="me" number="2"/>';
+
+
+    $x->deleteAttr(qq(delete));                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $x eq '<a number="2"/>';
+
 
 =head3 deleteAttrs($node, @attrs)
 
@@ -10862,12 +11016,14 @@ Delete the specified attributes of the specified B<$node> without checking their
 B<Example:>
 
 
-    ok -s $x eq '<a first="1" number="2" second="2"/>';                               
-  
-    $x->𝗱𝗲𝗹𝗲𝘁𝗲𝗔𝘁𝘁𝗿𝘀(qw(first second third number));                               
-  
-    ok -s $x eq '<a/>';                                                           
-  
+    ok -s $x eq '<a first="1" number="2" second="2"/>';
+
+
+    $x->deleteAttrs(qw(first second third number));                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $x eq '<a/>';
+
 
 =head3 deleteAttrsInTree($node, @attrs)
 
@@ -10880,7 +11036,7 @@ Delete the specified attributes of the specified B<$node> and all the nodes unde
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                           
+    ok -p $a eq <<END;
   <a class="2" id="0">
     <b class="1" id="1">
       <c class="0" id="0">
@@ -10893,10 +11049,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->deleteAttrsInTree_class;                                                  
-  
-    ok -p $a eq <<END                                                             
+
+    $a->deleteAttrsInTree_class;
+
+    ok -p $a eq <<END
   <a id="0">
     <b id="1">
       <c id="0">
@@ -10909,7 +11065,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 attrsNone($node, @context)
 
@@ -10931,7 +11087,7 @@ B<Example:>
     my $a = Data::Edit::Xml::new(q(<a><b/><c id="cc"/></a>));
     ok $a->first__attrsNone;
     ok !$a->last__attrsNone;
-  
+
 
 =head3 deleteAttrValueAtInTree($tree, $attribute, $value, @context)
 
@@ -10964,7 +11120,7 @@ B<Example:>
    </d>
   </a>
   END
-  
+
     $a->deleteAttrValueAtInTree_id_c_c_b;
     ok -p $a eq <<END;
   <a>
@@ -10978,7 +11134,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head3 renameAttr($node, $old, $new, @context)
 
@@ -10999,12 +11155,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $x->printAttributes eq qq( no="1" word="first");                            
-  
-    $x->𝗿𝗲𝗻𝗮𝗺𝗲𝗔𝘁𝘁𝗿(qw(no number));                                                
-  
-    ok $x->printAttributes eq qq( number="1" word="first");                        
-  
+    ok $x->printAttributes eq qq( no="1" word="first");
+
+
+    $x->renameAttr(qw(no number));                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->printAttributes eq qq( number="1" word="first");
+
 
 =head3 renameAttrXtr($node, @attr)
 
@@ -11027,12 +11185,12 @@ B<Example:>
     my @a = $a->renameAttrXtr_a_b_c;
     ok      -A $a eq q(a c="3" d="4" xtrc="1" xtrf="2");
     is_deeply [@a], [qw(c)];
-  
+
     my $b = Data::Edit::Xml::new(q(<b a="1" b="2" c="3"  d="4" xtrf="5"/>));
     my @b = $b->renameAttrXtr_a_b_c;
     ok      -A $b eq q(b b="2" c="3" d="4" xtrc="1" xtrf="5");
     is_deeply [@b], [qw(b c)];
-  
+
 
 =head3 changeAttr($node, $old, $new, @context)
 
@@ -11053,12 +11211,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $x->printAttributes eq qq( number="1" word="first");                        
-  
-    $x->𝗰𝗵𝗮𝗻𝗴𝗲𝗔𝘁𝘁𝗿(qw(number word));                                              
-  
-    ok $x->printAttributes eq qq( number="1" word="first");                        
-  
+    ok $x->printAttributes eq qq( number="1" word="first");
+
+
+    $x->changeAttr(qw(number word));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->printAttributes eq qq( number="1" word="first");
+
 
 =head3 changeOrDeleteAttr($node, $old, $new, @context)
 
@@ -11082,23 +11242,23 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a a="1"/>
   END
-  
+
     $a->changeOrDeleteAttr_a_b;
-  
+
     ok -p $a eq <<END;
   <a b="1"/>
   END
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <a a="1" b="2"/>
   END
-  
+
     $a->changeOrDeleteAttr_a_b;
-  
+
     ok -p $a eq <<END;
   <a b="2"/>
   END
-  
+
 
 =head3 renameAttrValue($node, $old, $oldValue, $new, $newValue, @context)
 
@@ -11121,12 +11281,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $x->printAttributes eq qq( number="1" word="first");                        
-  
-    $x->𝗿𝗲𝗻𝗮𝗺𝗲𝗔𝘁𝘁𝗿𝗩𝗮𝗹𝘂𝗲(qw(number 1 numeral I));                                  
-  
-    ok $x->printAttributes eq qq( numeral="I" word="first");                       
-  
+    ok $x->printAttributes eq qq( number="1" word="first");
+
+
+    $x->renameAttrValue(qw(number 1 numeral I));                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->printAttributes eq qq( numeral="I" word="first");
+
 
 =head3 changeAttrValue($node, $old, $oldValue, $new, $newValue, @context)
 
@@ -11149,16 +11311,20 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $x->printAttributes eq qq( numeral="I" word="first");                       
-  
-    $x->𝗰𝗵𝗮𝗻𝗴𝗲𝗔𝘁𝘁𝗿𝗩𝗮𝗹𝘂𝗲(qw(word second greek mono));                              
-  
-    ok $x->printAttributes eq qq( numeral="I" word="first");                      
-  
-    $x->𝗰𝗵𝗮𝗻𝗴𝗲𝗔𝘁𝘁𝗿𝗩𝗮𝗹𝘂𝗲(qw(word first greek mono));                               
-  
-    ok $x->printAttributes eq qq( greek="mono" numeral="I");                      
-  
+    ok $x->printAttributes eq qq( numeral="I" word="first");
+
+
+    $x->changeAttrValue(qw(word second greek mono));                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->printAttributes eq qq( numeral="I" word="first");
+
+
+    $x->changeAttrValue(qw(word first greek mono));                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->printAttributes eq qq( greek="mono" numeral="I");
+
 
 =head3 changeAttributeValue($node, $attribute, $sub, @context)
 
@@ -11179,16 +11345,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a aa="abc"/>
   END
-  
-    $a->𝗰𝗵𝗮𝗻𝗴𝗲𝗔𝘁𝘁𝗿𝗶𝗯𝘂𝘁𝗲𝗩𝗮𝗹𝘂𝗲(q(aa), sub{s(b) (B)});                               
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->changeAttributeValue(q(aa), sub{s(b) (B)});                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a aa="aBc"/>
   END
-  
+
 
 =head3 changeOrDeleteAttrValue($node, $old, $oldValue, $new, $newValue, @context)
 
@@ -11214,38 +11382,38 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a a="1"/>
   END
-  
+
     $a->changeOrDeleteAttrValue_a_0_b_1;
-  
+
     ok -p $a eq <<END;
   <a a="1"/>
   END
-  
+
     $a->changeOrDeleteAttrValue_a_1_b_3;
-  
+
     ok -p $a eq <<END;
   <a b="3"/>
   END
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <a a="1" b="2"/>
   END
-  
+
     $a->changeOrDeleteAttrValue_a_0_b_2;
     ok -p $a eq <<END;
   <a b="2"/>
   END
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <a a="1"/>
   END
-  
+
     $a->changeOrDeleteAttrValue_a_1_b_3;
-  
+
     ok -p $a eq <<END;
   <a b="3"/>
   END
-  
+
 
 =head3 copyAttrs($source, $target, @attr)
 
@@ -11259,36 +11427,40 @@ Copy all the attributes of the source node to the target node, or, just the name
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a a="1" b="2"/>
     <b b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    my ($a, $b, $c) = $x->contents;                                                
-  
-    $a->𝗰𝗼𝗽𝘆𝗔𝘁𝘁𝗿𝘀($b, qw(aa bb));                                                 
-  
-    ok <<END eq -p $x;                                                            
+
+    my ($a, $b, $c) = $x->contents;
+
+
+    $a->copyAttrs($b, qw(aa bb));                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    $a->𝗰𝗼𝗽𝘆𝗔𝘁𝘁𝗿𝘀($b);                                                            
-  
-    ok <<END eq -p $x;                                                            
+
+
+    $a->copyAttrs($b);                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b a="1" b="2" c="4"/>
     <c/>
   </x>
   END
-  
+
 
 =head3 copyAttrsFromParent($node, @attr)
 
@@ -11313,15 +11485,17 @@ B<Example:>
     <b b="b" id="a"/>
   </a>
   END
-  
-    $b->𝗰𝗼𝗽𝘆𝗔𝘁𝘁𝗿𝘀𝗙𝗿𝗼𝗺𝗣𝗮𝗿𝗲𝗻𝘁;
-  
+
+
+    $b->copyAttrsFromParent;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok <<END eq -p $a;
   <a a="a" id="a">
     <b a="a" b="b" id="a"/>
   </a>
   END
-  
+
 
 =head3 copyAttrsToParent($node, @attr)
 
@@ -11346,15 +11520,17 @@ B<Example:>
     <b b="b" id="b"/>
   </a>
   END
-  
-    $b->𝗰𝗼𝗽𝘆𝗔𝘁𝘁𝗿𝘀𝗧𝗼𝗣𝗮𝗿𝗲𝗻𝘁;
-  
+
+
+    $b->copyAttrsToParent;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok <<END eq -p $a;
   <a a="a" b="b" id="b">
     <b b="b" id="b"/>
   </a>
   END
-  
+
 
 =head3 copyNewAttrs($source, $target, @attr)
 
@@ -11368,36 +11544,40 @@ Copy all the attributes of the source node to the target node, or, just the name
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a a="1" b="2"/>
     <b b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    my ($a, $b, $c) = $x->contents;                                                
-  
-    $a->𝗰𝗼𝗽𝘆𝗡𝗲𝘄𝗔𝘁𝘁𝗿𝘀($b, qw(aa bb));                                              
-  
-    ok <<END eq -p $x;                                                            
+
+    my ($a, $b, $c) = $x->contents;
+
+
+    $a->copyNewAttrs($b, qw(aa bb));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    $a->𝗰𝗼𝗽𝘆𝗡𝗲𝘄𝗔𝘁𝘁𝗿𝘀($b);                                                         
-  
-    ok <<END eq -p $x;                                                            
+
+
+    $a->copyNewAttrs($b);                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b a="1" b="3" c="4"/>
     <c/>
   </x>
   END
-  
+
 
 =head3 moveAttrs($source, $target, @attr)
 
@@ -11411,36 +11591,40 @@ Move all the attributes of the source node to the target node, or, just the name
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a a="1" b="2"/>
     <b b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    my ($a, $b, $c) = $x->contents;                                                
-  
-    $a->𝗺𝗼𝘃𝗲𝗔𝘁𝘁𝗿𝘀($c, qw(aa bb));                                                 
-  
-    ok <<END eq -p $x;                                                            
+
+    my ($a, $b, $c) = $x->contents;
+
+
+    $a->moveAttrs($c, qw(aa bb));                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b a="1" b="2" c="4"/>
     <c/>
   </x>
   END
-  
-    $b->𝗺𝗼𝘃𝗲𝗔𝘁𝘁𝗿𝘀($c);                                                            
-  
-    ok <<END eq -p $x;                                                            
+
+
+    $b->moveAttrs($c);                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b/>
     <c a="1" b="2" c="4"/>
   </x>
   END
-  
+
 
 =head3 moveNewAttrs($source, $target, @attr)
 
@@ -11454,44 +11638,48 @@ Move all the attributes of the source node to the target node, or, just the name
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a a="1" b="2"/>
     <b b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    my ($a, $b, $c) = $x->contents;                                                
-  
-    $b->𝗺𝗼𝘃𝗲𝗡𝗲𝘄𝗔𝘁𝘁𝗿𝘀($c, qw(aa bb));                                              
-  
-    ok <<END eq -p $x;                                                            
+
+    my ($a, $b, $c) = $x->contents;
+
+
+    $b->moveNewAttrs($c, qw(aa bb));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b a="1" b="3" c="4"/>
     <c/>
   </x>
   END
-  
-    $b->𝗺𝗼𝘃𝗲𝗡𝗲𝘄𝗔𝘁𝘁𝗿𝘀($c);                                                         
-  
-    ok <<END eq -p $x;                                                             
+
+
+    $b->moveNewAttrs($c);                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b/>
     <c a="1" b="3" c="4"/>
   </x>
   END
-  
-    ok <<END eq -p $x;                                                             
+
+    ok <<END eq -p $x;
   <x>
     <c a="1" b="3" c="4"/>
     <b/>
     <a a="1" b="2"/>
   </x>
   END
-  
+
 
 =head1 Traversal
 
@@ -11512,7 +11700,7 @@ Post-order traversal of a L<parse|/parse> tree or sub tree calling the specified
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11522,9 +11710,11 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a->𝗯𝘆(sub{$s .= $_->tag}); ok $s eq "cbeda"                         
-  
+
+
+     {my $s; $a->by(sub{$s .= $_->tag}); ok $s eq "cbeda"                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 byX($node, $sub)
 
@@ -11545,7 +11735,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11555,15 +11745,19 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a->𝗯𝘆𝗫(sub{$s .= $_->tag}); ok $s eq "cbeda"                        
-  
-  sub 𝗯𝘆𝗫($$)                                                                    
+
+
+     {my $s; $a->byX(sub{$s .= $_->tag}); ok $s eq "cbeda"                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+  sub byX($$)                                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    {my ($node, $sub) = @_;                                                        # Start node, sub to call
     eval {$node->byX2($sub)};                                                     # Trap any errors that occur
     $node
    }
-  
+
 
 =head3 byList($node, @context)
 
@@ -11582,7 +11776,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                               
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11592,9 +11786,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok -c $e eq q(e d a);                                                          
-  
+
+    ok -c $e eq q(e d a);
+
     my $a = Data::Edit::Xml::new(<<END);
   <a>
    <b>
@@ -11608,12 +11802,14 @@ B<Example:>
    </f>
   </a>
   END
-  
-    ok q(c d b e g h f a) eq join ' ', map{-t $_} $a->𝗯𝘆𝗟𝗶𝘀𝘁;
+
+
+    ok q(c d b e g h f a) eq join ' ', map{-t $_} $a->byList;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok q(h g f e d c b a) eq join ' ', map{-t $_} $a->byReverseList;
     ok q(a b c d e f g h) eq join ' ', map{-t $_} $a->downList;
     ok q(a f h g e b d c) eq join ' ', map{-t $_} $a->downReverseList;
-  
+
 
 =head3 byReverse($node, $sub, @context)
 
@@ -11627,7 +11823,7 @@ Reverse post-order traversal of a L<parse|/parse> tree or sub tree calling the s
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11637,9 +11833,11 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a->𝗯𝘆𝗥𝗲𝘃𝗲𝗿𝘀𝗲(sub{$s .= $_->tag}); ok $s eq "edcba"                   
-  
+
+
+     {my $s; $a->byReverse(sub{$s .= $_->tag}); ok $s eq "edcba"                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 byReverseX($node, $sub, @context)
 
@@ -11653,7 +11851,7 @@ Reverse post-order traversal of a L<parse|/parse> tree or sub tree below the spe
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11663,9 +11861,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a->byReverse(sub{$s .= $_->tag}); ok $s eq "edcba"                   
-  
+
+     {my $s; $a->byReverse(sub{$s .= $_->tag}); ok $s eq "edcba"
+
 
 =head3 byReverseList($node, @context)
 
@@ -11684,7 +11882,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                               
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11694,11 +11892,13 @@ B<Example:>
     </d>
   </a>
   END
-  
-      my ($E, $D, $C, $B) = $a->𝗯𝘆𝗥𝗲𝘃𝗲𝗿𝘀𝗲𝗟𝗶𝘀𝘁;                                    
-  
-      ok -A $C eq q(c id="42" match="mm");                                        
-  
+
+
+      my ($E, $D, $C, $B) = $a->byReverseList;                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -A $C eq q(c id="42" match="mm");
+
     my $a = Data::Edit::Xml::new(<<END);
   <a>
    <b>
@@ -11712,12 +11912,14 @@ B<Example:>
    </f>
   </a>
   END
-  
+
     ok q(c d b e g h f a) eq join ' ', map{-t $_} $a->byList;
-    ok q(h g f e d c b a) eq join ' ', map{-t $_} $a->𝗯𝘆𝗥𝗲𝘃𝗲𝗿𝘀𝗲𝗟𝗶𝘀𝘁;
+
+    ok q(h g f e d c b a) eq join ' ', map{-t $_} $a->byReverseList;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok q(a b c d e f g h) eq join ' ', map{-t $_} $a->downList;
     ok q(a f h g e b d c) eq join ' ', map{-t $_} $a->downReverseList;
-  
+
 
 =head2 Pre-order
 
@@ -11735,8 +11937,10 @@ Pre-order traversal down through a L<parse|/parse> tree or sub tree calling the 
 B<Example:>
 
 
-     {my $s; $a->𝗱𝗼𝘄𝗻(sub{$s .= $_->tag}); ok $s eq "abcde"                        
-  
+
+     {my $s; $a->down(sub{$s .= $_->tag}); ok $s eq "abcde"                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 downX($node, $sub)
 
@@ -11751,14 +11955,16 @@ Returns the start node regardless of the outcome of calling B<sub>.
 B<Example:>
 
 
-     {my $s; $a->down(sub{$s .= $_->tag}); ok $s eq "abcde"                        
-  
-  sub 𝗱𝗼𝘄𝗻𝗫($$)                                                                  
+     {my $s; $a->down(sub{$s .= $_->tag}); ok $s eq "abcde"
+
+
+  sub downX($$)                                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    {my ($node, $sub) = @_;                                                        # Start node, sub to call
     eval {$node->downX2($sub)};                                                   # Trap any errors that occur
     $node
    }
-  
+
 
 =head3 downToDie($node, $sub)
 
@@ -11773,7 +11979,7 @@ Returns the start node regardless of the outcome of calling B<sub>.
 B<Example:>
 
 
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -11784,23 +11990,27 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     my @a;
-    $a->𝗱𝗼𝘄𝗻𝗧𝗼𝗗𝗶𝗲(sub
+
+    $a->downToDie(sub  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {confess if -t $_ eq q(b);
       push @a, -t $_;
      });
-  
+
     is_deeply [@a], [qw(a d e)];
-  
+
     my @b;
-    $a->𝗱𝗼𝘄𝗻𝗧𝗼𝗗𝗶𝗲(sub
+
+    $a->downToDie(sub  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {confess if -t $_ eq q(c);
       push @b, -t $_;
      });
-  
+
     is_deeply [@b], [qw(a b d e)];
-  
+
 
 =head3 downList($node, @context)
 
@@ -11832,12 +12042,14 @@ B<Example:>
    </f>
   </a>
   END
-  
+
     ok q(c d b e g h f a) eq join ' ', map{-t $_} $a->byList;
     ok q(h g f e d c b a) eq join ' ', map{-t $_} $a->byReverseList;
-    ok q(a b c d e f g h) eq join ' ', map{-t $_} $a->𝗱𝗼𝘄𝗻𝗟𝗶𝘀𝘁;
+
+    ok q(a b c d e f g h) eq join ' ', map{-t $_} $a->downList;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok q(a f h g e b d c) eq join ' ', map{-t $_} $a->downReverseList;
-  
+
 
 =head3 downReverse($node, $sub, @context)
 
@@ -11851,7 +12063,7 @@ Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree call
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11861,9 +12073,11 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a->𝗱𝗼𝘄𝗻𝗥𝗲𝘃𝗲𝗿𝘀𝗲(sub{$s .= $_->tag}); ok $s eq "adebc"                 
-  
+
+
+     {my $s; $a->downReverse(sub{$s .= $_->tag}); ok $s eq "adebc"                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 downReverseX($node, $sub, @context)
 
@@ -11877,7 +12091,7 @@ Reverse pre-order traversal down through a L<parse|/parse> tree or sub tree call
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -11887,9 +12101,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a->downReverse(sub{$s .= $_->tag}); ok $s eq "adebc"                 
-  
+
+     {my $s; $a->downReverse(sub{$s .= $_->tag}); ok $s eq "adebc"
+
 
 =head3 downReverseList($node, @context)
 
@@ -11921,12 +12135,14 @@ B<Example:>
    </f>
   </a>
   END
-  
+
     ok q(c d b e g h f a) eq join ' ', map{-t $_} $a->byList;
     ok q(h g f e d c b a) eq join ' ', map{-t $_} $a->byReverseList;
     ok q(a b c d e f g h) eq join ' ', map{-t $_} $a->downList;
-    ok q(a f h g e b d c) eq join ' ', map{-t $_} $a->𝗱𝗼𝘄𝗻𝗥𝗲𝘃𝗲𝗿𝘀𝗲𝗟𝗶𝘀𝘁;
-  
+
+    ok q(a f h g e b d c) eq join ' ', map{-t $_} $a->downReverseList;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 Pre and Post order
 
@@ -11945,10 +12161,12 @@ Traverse L<parse|/parse> tree visiting each node twice calling the specified sub
 B<Example:>
 
 
-     {my $s; my $n = sub{$s .= $_->tag}; $a->𝘁𝗵𝗿𝗼𝘂𝗴𝗵($n, $n);                      
-  
-      ok $s eq "abccbdeeda"                                                        
-  
+
+     {my $s; my $n = sub{$s .= $_->tag}; $a->through($n, $n);                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok $s eq "abccbdeeda"
+
 
 =head3 throughX($node, $before, $after, @context)
 
@@ -11963,10 +12181,10 @@ Identical to L<through|/through> except the B<$before, $after> subs are called i
 B<Example:>
 
 
-     {my $s; my $n = sub{$s .= $_->tag}; $a->through($n, $n);                      
-  
-      ok $s eq "abccbdeeda"                                                        
-  
+     {my $s; my $n = sub{$s .= $_->tag}; $a->through($n, $n);
+
+      ok $s eq "abccbdeeda"
+
 
 =head2 Range
 
@@ -11983,7 +12201,7 @@ Return a list consisting of the specified node and its following siblings option
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -12008,23 +12226,27 @@ B<Example:>
     </b>
   </a>
   END
-  
-     {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);                                
-  
-      my @f = $d->𝗳𝗿𝗼𝗺;                                                           
-  
-      ok @f == 4;                                                                 
-  
-      ok $d == $f[0];                                                             
-  
-      my @F = $d->𝗳𝗿𝗼𝗺(qw(c));                                                    
-  
-      ok @F == 2;                                                                 
-  
-      ok $F[1]->number == 12;                                                     
-  
-      ok $D == $t[-1];                                                            
-  
+
+     {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
+
+
+      my @f = $d->from;                                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok @f == 4;
+
+      ok $d == $f[0];
+
+
+      my @F = $d->from(qw(c));                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok @F == 2;
+
+      ok $F[1]->number == 12;
+
+      ok $D == $t[-1];
+
 
 =head3 to($end, @match)
 
@@ -12037,7 +12259,7 @@ Return a list of the sibling nodes preceding the specified node optionally inclu
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -12062,19 +12284,23 @@ B<Example:>
     </b>
   </a>
   END
-  
-     {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);                                
-  
-      my @t = $D->𝘁𝗼;                                                             
-  
-      ok @t == 4;                                                                 
-  
-      my @T = $D->𝘁𝗼(qw(c));                                                      
-  
-      ok @T == 2;                                                                 
-  
-      ok $T[1]->number == 7;                                                      
-  
+
+     {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
+
+
+      my @t = $D->to;                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok @t == 4;
+
+
+      my @T = $D->to(qw(c));                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok @T == 2;
+
+      ok $T[1]->number == 7;
+
 
 =head3 fromTo($start, $end, @match)
 
@@ -12088,7 +12314,7 @@ Return a list of the nodes between the specified start and end nodes optionally 
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -12113,23 +12339,31 @@ B<Example:>
     </b>
   </a>
   END
-  
-     {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);                                
-  
-      my @r = $d->𝗳𝗿𝗼𝗺𝗧𝗼($D);                                                     
-  
-      ok @r == 3;                                                                 
-  
-      my @R = $d->𝗳𝗿𝗼𝗺𝗧𝗼($D, qw(c));                                              
-  
-      ok @R == 1;                                                                 
-  
-      ok $R[0]->number == 7;                                                      
-  
-      ok !$D->𝗳𝗿𝗼𝗺𝗧𝗼($d);                                                         
-  
-      ok 1 == $d->𝗳𝗿𝗼𝗺𝗧𝗼($d);                                                     
-  
+
+     {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
+
+
+      my @r = $d->fromTo($D);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok @r == 3;
+
+
+      my @R = $d->fromTo($D, qw(c));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok @R == 1;
+
+      ok $R[0]->number == 7;
+
+
+      ok !$D->fromTo($d);                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+      ok 1 == $d->fromTo($d);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Location
 
@@ -12169,7 +12403,7 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok -p $a eq <<END;
   <test id="t1" xtrf="3.1:14">
     <title xtrf="4.2:8">Test_</title>
@@ -12192,17 +12426,19 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok $a->go_testbody_run_p__location eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     my $p = $a->go_testbody_run_p;
     $p->putNext(my $q = $p->newTag_hello);
-    ok $p->𝗹𝗶𝗻𝗲𝗟𝗼𝗰𝗮𝘁𝗶𝗼𝗻 eq q(on line 13 from 7 to 9);
-  
+
+    ok $p->lineLocation eq q(on line 13 from 7 to 9);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok $q->location eq q( in file: aaa.xml);
     ok $q->closestLocation == $p;
     ok $q->approxLocation eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     ok $q->formatOxygenMessage(q(E), q(), q(Hello detected)) eq <<END;
   Type: E
   Line: 13
@@ -12212,7 +12448,7 @@ B<Example:>
   AdditionalInfoURL:
   Description: Hello detected
   END
-  
+
 
 =head2 location($node, $file)
 
@@ -12249,7 +12485,7 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok -p $a eq <<END;
   <test id="t1" xtrf="3.1:14">
     <title xtrf="4.2:8">Test_</title>
@@ -12272,17 +12508,19 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok $a->go_testbody_run_p__location eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     my $p = $a->go_testbody_run_p;
     $p->putNext(my $q = $p->newTag_hello);
     ok $p->lineLocation eq q(on line 13 from 7 to 9);
-  
-    ok $q->𝗹𝗼𝗰𝗮𝘁𝗶𝗼𝗻 eq q( in file: aaa.xml);
+
+
+    ok $q->location eq q( in file: aaa.xml);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $q->closestLocation == $p;
     ok $q->approxLocation eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     ok $q->formatOxygenMessage(q(E), q(), q(Hello detected)) eq <<END;
   Type: E
   Line: 13
@@ -12292,7 +12530,7 @@ B<Example:>
   AdditionalInfoURL:
   Description: Hello detected
   END
-  
+
 
 =head2 closestLocation($node)
 
@@ -12328,7 +12566,7 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok -p $a eq <<END;
   <test id="t1" xtrf="3.1:14">
     <title xtrf="4.2:8">Test_</title>
@@ -12351,17 +12589,19 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok $a->go_testbody_run_p__location eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     my $p = $a->go_testbody_run_p;
     $p->putNext(my $q = $p->newTag_hello);
     ok $p->lineLocation eq q(on line 13 from 7 to 9);
-  
+
     ok $q->location eq q( in file: aaa.xml);
-    ok $q->𝗰𝗹𝗼𝘀𝗲𝘀𝘁𝗟𝗼𝗰𝗮𝘁𝗶𝗼𝗻 == $p;
+
+    ok $q->closestLocation == $p;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $q->approxLocation eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     ok $q->formatOxygenMessage(q(E), q(), q(Hello detected)) eq <<END;
   Type: E
   Line: 13
@@ -12371,7 +12611,7 @@ B<Example:>
   AdditionalInfoURL:
   Description: Hello detected
   END
-  
+
 
 =head2 approxLocation($node, $file)
 
@@ -12408,7 +12648,7 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok -p $a eq <<END;
   <test id="t1" xtrf="3.1:14">
     <title xtrf="4.2:8">Test_</title>
@@ -12431,17 +12671,19 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok $a->go_testbody_run_p__location eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     my $p = $a->go_testbody_run_p;
     $p->putNext(my $q = $p->newTag_hello);
     ok $p->lineLocation eq q(on line 13 from 7 to 9);
-  
+
     ok $q->location eq q( in file: aaa.xml);
     ok $q->closestLocation == $p;
-    ok $q->𝗮𝗽𝗽𝗿𝗼𝘅𝗟𝗼𝗰𝗮𝘁𝗶𝗼𝗻 eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
+    ok $q->approxLocation eq q( on line 13 from 7 to 9 in file: aaa.xml);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok $q->formatOxygenMessage(q(E), q(), q(Hello detected)) eq <<END;
   Type: E
   Line: 13
@@ -12451,7 +12693,7 @@ B<Example:>
   AdditionalInfoURL:
   Description: Hello detected
   END
-  
+
 
 =head2 formatOxygenMessage($node, $level, $url, @message)
 
@@ -12490,7 +12732,7 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok -p $a eq <<END;
   <test id="t1" xtrf="3.1:14">
     <title xtrf="4.2:8">Test_</title>
@@ -12513,18 +12755,20 @@ B<Example:>
     </testbody>
   </test>
   END
-  
+
     ok $a->go_testbody_run_p__location eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
+
     my $p = $a->go_testbody_run_p;
     $p->putNext(my $q = $p->newTag_hello);
     ok $p->lineLocation eq q(on line 13 from 7 to 9);
-  
+
     ok $q->location eq q( in file: aaa.xml);
     ok $q->closestLocation == $p;
     ok $q->approxLocation eq q( on line 13 from 7 to 9 in file: aaa.xml);
-  
-    ok $q->𝗳𝗼𝗿𝗺𝗮𝘁𝗢𝘅𝘆𝗴𝗲𝗻𝗠𝗲𝘀𝘀𝗮𝗴𝗲(q(E), q(), q(Hello detected)) eq <<END;
+
+
+    ok $q->formatOxygenMessage(q(E), q(), q(Hello detected)) eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   Type: E
   Line: 13
   Column: 7
@@ -12533,7 +12777,7 @@ B<Example:>
   AdditionalInfoURL:
   Description: Hello detected
   END
-  
+
 
 =head1 Position
 
@@ -12556,7 +12800,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c> <d/> </c>
@@ -12565,19 +12809,29 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(qw(b c -1 f))->𝗮𝘁(qw(f c b a));                                    
-  
-    ok  $a->go(qw(b c  1 e))->𝗮𝘁(undef, qr(c|d), undef, qq(a));                   
-  
-    ok $d->context eq q(d c b a);                                                  
-  
-    ok  $d->𝗮𝘁(qw(d c b), undef);                                                 
-  
-    ok !$d->𝗮𝘁(qw(d c b), undef, undef);                                          
-  
-    ok !$d->𝗮𝘁(qw(d e b));                                                        
-  
+
+
+    ok  $a->go(qw(b c -1 f))->at(qw(f c b a));                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a->go(qw(b c  1 e))->at(undef, qr(c|d), undef, qq(a));                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $d->context eq q(d c b a);
+
+
+    ok  $d->at(qw(d c b), undef);                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->at(qw(d c b), undef, undef);                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->at(qw(d e b));                                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 atText($node, $re, @context)
 
@@ -12597,10 +12851,10 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                             
+    my $a = Data::Edit::Xml::new(<<END);
   <a>abcdcba</a>
   END
-  
+
 
 =head2 atStringContentMatches($node, $re, @context)
 
@@ -12628,14 +12882,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->by(sub
      {my ($o) = @_;
       if (!$o->atStringContentMatches_dd)
        {$o->id = "no";
        }
      });
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -12644,7 +12898,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 atTop($node)
 
@@ -12659,10 +12913,12 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/></a>
   END
-  
-    ok  $a->𝗮𝘁𝗧𝗼𝗽;
+
+
+    ok  $a->atTop;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok !$a->first__atTop;
-  
+
 
 =head2 attrAt($node, $attribute, @context)
 
@@ -12682,7 +12938,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b c="C"/></a>));
     my $b = $a->first;
     ok !$a->attrAt_id;
@@ -12691,7 +12947,7 @@ B<Example:>
     ok !$b->attrValueAt_c_C_c_a;
     ok  $b->attrValueAt_c_C_b_a;
    }
-  
+
 
 =head2 attrValueAt($node, $attribute, $value, @context)
 
@@ -12712,7 +12968,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b c="C"/></a>));
     my $b = $a->first;
     ok !$a->attrAt_id;
@@ -12721,7 +12977,7 @@ B<Example:>
     ok !$b->attrValueAt_c_C_c_a;
     ok  $b->attrValueAt_c_C_b_a;
    }
-  
+
 
 =head2 not($node, @tags)
 
@@ -12734,14 +12990,14 @@ Return the specified B<$node> if it does not match any of the specified tags, el
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
   </a>
   END
-  
-    ok $a->first->not_a_c;                                                        
-  
+
+    ok $a->first->not_a_c;
+
 
 =head2 atOrBelow($start, @context)
 
@@ -12760,16 +13016,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $d->context eq q(d c b a);                                                  
-  
-    ok  $d->𝗮𝘁𝗢𝗿𝗕𝗲𝗹𝗼𝘄(qw(d c b a));                                               
-  
-    ok  $d->𝗮𝘁𝗢𝗿𝗕𝗲𝗹𝗼𝘄(qw(  c b a));                                               
-  
-    ok  $d->𝗮𝘁𝗢𝗿𝗕𝗲𝗹𝗼𝘄(qw(    b a));                                               
-  
-    ok !$d->𝗮𝘁𝗢𝗿𝗕𝗲𝗹𝗼𝘄(qw(  c   a));                                               
-  
+    ok $d->context eq q(d c b a);
+
+
+    ok  $d->atOrBelow(qw(d c b a));                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $d->atOrBelow(qw(  c b a));                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $d->atOrBelow(qw(    b a));                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->atOrBelow(qw(  c   a));                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 adjacent($first, $second)
 
@@ -12782,7 +13046,7 @@ Return the first node if it is adjacent to the second node else B<undef>.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -12797,13 +13061,17 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok !$a->𝗮𝗱𝗷𝗮𝗰𝗲𝗻𝘁($B);                                                         
-  
-    ok  $b->𝗮𝗱𝗷𝗮𝗰𝗲𝗻𝘁($B);                                                         
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok !$a->adjacent($B);                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $b->adjacent($B);                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 ancestry($node)
 
@@ -12815,9 +13083,9 @@ Return a list containing: (the specified B<$node>, its parent, its parent's pare
 B<Example:>
 
 
-    $a->numberTree;                                                                  
-  
-    ok $a->prettyStringNumbered eq <<END;                                             
+    $a->numberTree;
+
+    ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
       <A id="3"/>
@@ -12829,9 +13097,11 @@ B<Example:>
     </c>
   </a>
   END
-  
-    is_deeply [map {-t $_} $a->findByNumber(7)->𝗮𝗻𝗰𝗲𝘀𝘁𝗿𝘆], [qw(D c a)];           
-  
+
+
+    is_deeply [map {-t $_} $a->findByNumber(7)->ancestry], [qw(D c a)];             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 context($node)
 
@@ -12843,7 +13113,7 @@ Return a string containing the tag of the starting node and the tags of all its 
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -12853,9 +13123,11 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok $a->go(qw(d e))->𝗰𝗼𝗻𝘁𝗲𝘅𝘁 eq 'e d a';                                       
-  
+
+
+    ok $a->go(qw(d e))->context eq 'e d a';                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 containsSingleText($node, @context)
 
@@ -12874,12 +13146,16 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new("<a><b>bb</b><c>cc<d/>ee</c></a>");              
-  
-    ok  $a->go(q(b))->𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗧𝗲𝘅𝘁->text eq q(bb);                          
-  
-    ok !$a->go(q(c))->𝗰𝗼𝗻𝘁𝗮𝗶𝗻𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗧𝗲𝘅𝘁;                                         
-  
+   {my $a = Data::Edit::Xml::new("<a><b>bb</b><c>cc<d/>ee</c></a>");
+
+
+    ok  $a->go(q(b))->containsSingleText->text eq q(bb);                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->go(q(c))->containsSingleText;                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 depth($node)
 
@@ -12891,7 +13167,7 @@ Returns the depth of the specified B<$node>, the  depth of a root node is zero.
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -12916,14 +13192,18 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok 0 == $a->𝗱𝗲𝗽𝘁𝗵;                                                            
-  
-    ok 4 == $a->findByNumber(14)->𝗱𝗲𝗽𝘁𝗵;                                          
-  
-  if (1)                                                                            
+
+
+    ok 0 == $a->depth;                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok 4 == $a->findByNumber(14)->depth;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b><c><d/></c><e/></b></a>));
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -12934,19 +13214,25 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($d, $c, $e, $b) = $a->byList;
    ok $a->height == 4;
-   ok $a->𝗱𝗲𝗽𝘁𝗵  == 0;
-   ok $c->𝗱𝗲𝗽𝘁𝗵  == 2;
+
+   ok $a->depth  == 0;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   ok $c->depth  == 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok $c->height == 2;
-   ok $e->𝗱𝗲𝗽𝘁𝗵  == 2;
+
+   ok $e->depth  == 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok $e->height == 1;
-  
+
    is_deeply [$a->depthProfile], [qw(4 3 3 2 1)];
   }
-  
-  if (1)                                                                                 
+
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -12963,16 +13249,16 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -12984,15 +13270,15 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -13003,22 +13289,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head2 depthProfile($node)
 
@@ -13030,9 +13316,9 @@ Returns the depth profile of the tree rooted at the specified B<$node>.
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b><c><d/></c><e/></b></a>));
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -13043,7 +13329,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($d, $c, $e, $b) = $a->byList;
    ok $a->height == 4;
    ok $a->depth  == 0;
@@ -13051,11 +13337,13 @@ B<Example:>
    ok $c->height == 2;
    ok $e->depth  == 2;
    ok $e->height == 1;
-  
-   is_deeply [$a->𝗱𝗲𝗽𝘁𝗵𝗣𝗿𝗼𝗳𝗶𝗹𝗲], [qw(4 3 3 2 1)];
+
+
+   is_deeply [$a->depthProfile], [qw(4 3 3 2 1)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   }
-  
-  if (1)                                                                                 
+
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -13072,16 +13360,16 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -13093,15 +13381,15 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -13112,22 +13400,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head2 setDepthProfile($tree)
 
@@ -13139,7 +13427,7 @@ Sets the L<depthProfile|/depthProfile> for every node in the specified B<$tree>.
 B<Example:>
 
 
-  if (1)                                                                                 
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -13156,16 +13444,18 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
-   $a->𝘀𝗲𝘁𝗗𝗲𝗽𝘁𝗵𝗣𝗿𝗼𝗳𝗶𝗹𝗲;
-  
+
+
+   $a->setDepthProfile;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -13177,15 +13467,15 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -13196,22 +13486,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head2 height($node)
 
@@ -13223,9 +13513,9 @@ Returns the height of the tree rooted at the specified B<$node>.
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b><c><d/></c><e/></b></a>));
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -13236,19 +13526,25 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($d, $c, $e, $b) = $a->byList;
-   ok $a->𝗵𝗲𝗶𝗴𝗵𝘁 == 4;
+
+   ok $a->height == 4;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok $a->depth  == 0;
    ok $c->depth  == 2;
-   ok $c->𝗵𝗲𝗶𝗴𝗵𝘁 == 2;
+
+   ok $c->height == 2;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok $e->depth  == 2;
-   ok $e->𝗵𝗲𝗶𝗴𝗵𝘁 == 1;
-  
+
+   ok $e->height == 1;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    is_deeply [$a->depthProfile], [qw(4 3 3 2 1)];
   }
-  
-  if (1)                                                                                 
+
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -13265,16 +13561,16 @@ B<Example:>
     </B>
   </a>
   END
-  
+
    my $b = $a->first_b; my $B = $a->last_B;
    my $c = $b->first_c; my $C = $B->first_c;
    my $d = $c->first_d; my $D = $C->first_d;
-  
+
    $a->setDepthProfile;
-  
+
    ok $b->depthProfileLast eq q(3 3 3 2 1);
    ok $b->depthProfileLast eq $B->depthProfileLast;
-  
+
   # Represent using tags and text
    $a->setRepresentationAsTagsAndText;
    is_deeply [$b->stringTagsAndText],   [qw(cc d dd c b)];
@@ -13286,15 +13582,15 @@ B<Example:>
    ok dump($b->representationLast) ne dump($B->representationLast);
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $m  = $a->matchNodesByRepresentation;
-  
+
    my $bb = $b->representationLast;
    is_deeply $m->{$bb}, [$b];
-  
+
    my $cc = $c->representationLast;
    is_deeply $m->{$cc}, [$c, $C];
-  
+
   # Represent using just text
    $a->setRepresentationAsText;
    is_deeply [$b->stringText],          [qw(cc dd)];
@@ -13305,22 +13601,22 @@ B<Example:>
               $B->representationLast;
    is_deeply  $c->representationLast,
               $C->representationLast;
-  
+
    my $M  = $a->matchNodesByRepresentation;
    my $BB = $b->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    my $CC = $c->representationLast;
    is_deeply $M->{$BB}, [$c, $b, $C, $B];
-  
+
    ok $b->representationLast eq $c->representationLast;
   }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     ok $a->first->isOnlyChildText;
    }
-  
+
 
 =head2 isFirst($node, @context)
 
@@ -13342,7 +13638,7 @@ then receive a returned B<undef> or false result.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -13352,10 +13648,12 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok $a->go(q(b))->𝗶𝘀𝗙𝗶𝗿𝘀𝘁;                                                     
-  
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+
+
+    ok $a->go(q(b))->isFirst;                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13370,11 +13668,13 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok  $a->𝗶𝘀𝗙𝗶𝗿𝘀𝘁;                                                              
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok  $a->isFirst;                                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isNotFirst($node, @context)
 
@@ -13396,11 +13696,13 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/><c/><d/></a>
   END
-  
+
     my ($b, $c, $d) = $a->byList;
-    ok $c->𝗶𝘀𝗡𝗼𝘁𝗙𝗶𝗿𝘀𝘁;
+
+    ok $c->isNotFirst;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $b->isNotLast;
-  
+
 
 =head2 isFirstN($node, $N, @context)
 
@@ -13429,18 +13731,18 @@ B<Example:>
     <e/>
   </x>
   END
-  
+
     my ($a, $b, $c, $d, $e) = $x->byList;
-  
+
     is_deeply [$b->isFirstN_2_a_b_x], [$a, $b];
     ok !$b->isFirstN_2_b_x;
-  
+
     is_deeply [$d->isLastN_2_d_e_x], [$d, $e];
     ok !$d->isLastN_2_d_x;
-  
+
     is_deeply [$b->nextN_3_b_c_d], [$b, $c, $d];
     is_deeply [$d->prevN_3_b_c_d], [$b, $c, $d];
-  
+
 
 =head2 isFirstToDepth($node, $depth, @context)
 
@@ -13460,7 +13762,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13472,17 +13774,25 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $f, $e) = $a->byList;                                             
-  
-    ok  $d->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(4);                                                    
-  
-    ok !$f->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(2);                                                    
-  
-    ok  $f->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(1);                                                    
-  
-    ok !$f->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(3);                                                    
-  
+
+    my ($d, $c, $b, $f, $e) = $a->byList;
+
+
+    ok  $d->isFirstToDepth(4);                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$f->isFirstToDepth(2);                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $f->isFirstToDepth(1);                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$f->isFirstToDepth(3);                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 firstIs($node, @context)
 
@@ -13506,18 +13816,18 @@ B<Example:>
     <b/><c/><d/><e/>
   </a>
   END
-  
+
     ok  $a->go_c__nextIs_d;
     ok !$a->go_c__nextIs_c;
     ok  $a->go_c__prevIs_b;
     ok !$a->go_c__prevIs_e;
-  
+
     ok  $a->firstIs_b;
     ok !$a->firstIs_c;
-  
+
     ok  $a->lastIs_e;
     ok !$a->lastIs_d;
-  
+
 
 =head2 isLast($node, @context)
 
@@ -13539,7 +13849,7 @@ then receive a returned B<undef> or false result.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -13549,10 +13859,12 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok $a->go(q(d))->𝗶𝘀𝗟𝗮𝘀𝘁;                                                      
-  
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+
+
+    ok $a->go(q(d))->isLast;                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13567,11 +13879,13 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok  $a->𝗶𝘀𝗟𝗮𝘀𝘁;                                                               
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok  $a->isLast;                                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isNotLast($node, @context)
 
@@ -13593,11 +13907,13 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/><c/><d/></a>
   END
-  
+
     my ($b, $c, $d) = $a->byList;
     ok $c->isNotFirst;
-    ok $b->𝗶𝘀𝗡𝗼𝘁𝗟𝗮𝘀𝘁;
-  
+
+    ok $b->isNotLast;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isLastN($node, $N, @context)
 
@@ -13626,18 +13942,18 @@ B<Example:>
     <e/>
   </x>
   END
-  
+
     my ($a, $b, $c, $d, $e) = $x->byList;
-  
+
     is_deeply [$b->isFirstN_2_a_b_x], [$a, $b];
     ok !$b->isFirstN_2_b_x;
-  
+
     is_deeply [$d->isLastN_2_d_e_x], [$d, $e];
     ok !$d->isLastN_2_d_x;
-  
+
     is_deeply [$b->nextN_3_b_c_d], [$b, $c, $d];
     is_deeply [$d->prevN_3_b_c_d], [$b, $c, $d];
-  
+
 
 =head2 isLastToDepth($node, $depth, @context)
 
@@ -13657,7 +13973,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13669,17 +13985,25 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $f, $e) = $a->byList;                                             
-  
-    ok  $c->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(1);                                                     
-  
-    ok !$c->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(3);                                                     
-  
-    ok  $d->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(2);                                                     
-  
-    ok !$d->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗼𝗗𝗲𝗽𝘁𝗵(4);                                                     
-  
+
+    my ($d, $c, $b, $f, $e) = $a->byList;
+
+
+    ok  $c->isLastToDepth(1);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$c->isLastToDepth(3);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $d->isLastToDepth(2);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->isLastToDepth(4);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 lastIs($node, @context)
 
@@ -13703,18 +14027,18 @@ B<Example:>
     <b/><c/><d/><e/>
   </a>
   END
-  
+
     ok  $a->go_c__nextIs_d;
     ok !$a->go_c__nextIs_c;
     ok  $a->go_c__prevIs_b;
     ok !$a->go_c__prevIs_e;
-  
+
     ok  $a->firstIs_b;
     ok !$a->firstIs_c;
-  
+
     ok  $a->lastIs_e;
     ok !$a->lastIs_d;
-  
+
 
 =head2 nextIs($node, @context)
 
@@ -13738,18 +14062,18 @@ B<Example:>
     <b/><c/><d/><e/>
   </a>
   END
-  
+
     ok  $a->go_c__nextIs_d;
     ok !$a->go_c__nextIs_c;
     ok  $a->go_c__prevIs_b;
     ok !$a->go_c__prevIs_e;
-  
+
     ok  $a->firstIs_b;
     ok !$a->firstIs_c;
-  
+
     ok  $a->lastIs_e;
     ok !$a->lastIs_d;
-  
+
 
 =head2 nextN($node, $N, @context)
 
@@ -13778,18 +14102,18 @@ B<Example:>
     <e/>
   </x>
   END
-  
+
     my ($a, $b, $c, $d, $e) = $x->byList;
-  
+
     is_deeply [$b->isFirstN_2_a_b_x], [$a, $b];
     ok !$b->isFirstN_2_b_x;
-  
+
     is_deeply [$d->isLastN_2_d_e_x], [$d, $e];
     ok !$d->isLastN_2_d_x;
-  
+
     is_deeply [$b->nextN_3_b_c_d], [$b, $c, $d];
     is_deeply [$d->prevN_3_b_c_d], [$b, $c, $d];
-  
+
 
 =head2 prevIs($node, @context)
 
@@ -13813,18 +14137,18 @@ B<Example:>
     <b/><c/><d/><e/>
   </a>
   END
-  
+
     ok  $a->go_c__nextIs_d;
     ok !$a->go_c__nextIs_c;
     ok  $a->go_c__prevIs_b;
     ok !$a->go_c__prevIs_e;
-  
+
     ok  $a->firstIs_b;
     ok !$a->firstIs_c;
-  
+
     ok  $a->lastIs_e;
     ok !$a->lastIs_d;
-  
+
 
 =head2 prevN($node, $N, @context)
 
@@ -13853,18 +14177,18 @@ B<Example:>
     <e/>
   </x>
   END
-  
+
     my ($a, $b, $c, $d, $e) = $x->byList;
-  
+
     is_deeply [$b->isFirstN_2_a_b_x], [$a, $b];
     ok !$b->isFirstN_2_b_x;
-  
+
     is_deeply [$d->isLastN_2_d_e_x], [$d, $e];
     ok !$d->isLastN_2_d_x;
-  
+
     is_deeply [$b->nextN_3_b_c_d], [$b, $c, $d];
     is_deeply [$d->prevN_3_b_c_d], [$b, $c, $d];
-  
+
 
 =head2 isOnlyChild($node, @context)
 
@@ -13883,7 +14207,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13895,14 +14219,18 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $f, $e) = $a->byList;                                             
-  
-    ok  $d->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;                                                          
-  
-    ok !$d->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱(qw(b));                                                   
-  
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+
+    my ($d, $c, $b, $f, $e) = $a->byList;
+
+
+    ok  $d->isOnlyChild;                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->isOnlyChild(qw(b));                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13917,12 +14245,14 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok  $a->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;                                                          
-  
-    my $a = Data::Edit::Xml::new(<<END);                                           
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok  $a->isOnlyChild;                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13936,7 +14266,7 @@ B<Example:>
     </f>
   </a>
   END
-  
+
 
 =head2 isOnlyChildToDepth($node, $depth, @context)
 
@@ -13956,7 +14286,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -13968,15 +14298,21 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $f, $e) = $a->byList;                                             
-  
-    ok  $d->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(1, qw(d c b a));                                   
-  
-    ok  $d->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(2, qw(d c b a));                                   
-  
-    ok !$d->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(3, qw(d c b a));                                   
-  
+
+    my ($d, $c, $b, $f, $e) = $a->byList;
+
+
+    ok  $d->isOnlyChildToDepth(1, qw(d c b a));                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $d->isOnlyChildToDepth(2, qw(d c b a));                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->isOnlyChildToDepth(3, qw(d c b a));                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isOnlyChildN($node, $depth, @context)
 
@@ -13996,7 +14332,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                           
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -14010,7 +14346,7 @@ B<Example:>
     </f>
   </a>
   END
-  
+
 
 =head2 isOnlyChildText($node, @context)
 
@@ -14029,11 +14365,13 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
-    ok $a->first->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱𝗧𝗲𝘅𝘁;
+
+    ok $a->first->isOnlyChildText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    }
-  
+
 
 =head2 hasSingleChild($node, @context)
 
@@ -14052,22 +14390,26 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b   id="b" b="bb">
       <b id="c" c="cc"/>
     </b>
   </a>
   END
-  
-    my ($c, $b) = $a->byList;                                                      
-  
-    is_deeply [$b->id, $c->id], [qw(b c)];                                         
-  
-    ok $c == $b->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱;                                                   
-  
-    ok $b == $a->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱;                                                   
-  
+
+    my ($c, $b) = $a->byList;
+
+    is_deeply [$b->id, $c->id], [qw(b c)];
+
+
+    ok $c == $b->hasSingleChild;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b == $a->hasSingleChild;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 hasSingleChildText($node, @context)
 
@@ -14091,9 +14433,13 @@ B<Example:>
     <b>bb</b>
   </a>
   END
-    ok !$a->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱𝗧𝗲𝘅𝘁;
-    ok  $a->last->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱𝗧𝗲𝘅𝘁;
-  
+
+    ok !$a->hasSingleChildText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $a->last->hasSingleChildText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 hasSingleChildToDepth($node, $depth, @context)
 
@@ -14113,7 +14459,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -14133,21 +14479,29 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok $h == $g->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(1);                                        
-  
-    ok $i == $g->hasSingleChildToDepth_2_i_h_g;                                   
-  
-    ok      !$g->hasSingleChildToDepth_2_i_h_G;                                   
-  
-    ok      !$g->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(0);                                        
-  
-    ok      !$g->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(3);                                        
-  
-    ok $i == $i->𝗵𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱𝗧𝗼𝗗𝗲𝗽𝘁𝗵(0);                                        
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok $h == $g->hasSingleChildToDepth(1);                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $i == $g->hasSingleChildToDepth_2_i_h_g;
+
+    ok      !$g->hasSingleChildToDepth_2_i_h_G;
+
+
+    ok      !$g->hasSingleChildToDepth(0);                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok      !$g->hasSingleChildToDepth(3);                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $i == $i->hasSingleChildToDepth(0);                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isEmpty($node, @context)
 
@@ -14166,15 +14520,17 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                           
+    my $x = Data::Edit::Xml::new(<<END);
   <a>
-  
+
   </a>
   END
-  
-    ok $x->𝗶𝘀𝗘𝗺𝗽𝘁𝘆;                                                               
-  
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+
+
+    ok $x->isEmpty;                                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -14186,18 +14542,22 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $f, $e) = $a->byList;                                             
-  
-    ok  $d->𝗶𝘀𝗘𝗺𝗽𝘁𝘆;                                                              
-  
+
+    my ($d, $c, $b, $f, $e) = $a->byList;
+
+
+    ok  $d->isEmpty;                                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     my ($c, $b) = $a->byList;
-  
-    ok $c->𝗶𝘀𝗘𝗺𝗽𝘁𝘆;
+
+
+    ok $c->isEmpty;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $b->hasContent;
-  
+
 
 =head2 hasContent($node, @context)
 
@@ -14217,12 +14577,14 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     my ($c, $b) = $a->byList;
-  
+
     ok $c->isEmpty;
-    ok $b->𝗵𝗮𝘀𝗖𝗼𝗻𝘁𝗲𝗻𝘁;
-  
+
+    ok $b->hasContent;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 over($node, $re, @context)
 
@@ -14242,16 +14604,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(q(b))->𝗼𝘃𝗲𝗿(qr(d.+e));                                              
-  
+
+
+    ok $x->go(q(b))->over(qr(d.+e));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 over2($node, $re, @context)
 
@@ -14271,18 +14635,20 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(q(b))->𝗼𝘃𝗲𝗿𝟮(qr(\A c  d  e  f  g \Z));                              
-  
-    ok $x->go(q(b))->contentAsTags  eq q(c d e f g) ;                             
-  
+
+
+    ok $x->go(q(b))->over2(qr(\A c  d  e  f  g \Z));                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->go(q(b))->contentAsTags  eq q(c d e f g) ;
+
 
 =head2 overAllTags($node, @tags)
 
@@ -14295,7 +14661,7 @@ Return the specified b<$node> if all of it's child nodes L<match|/atPositionMatc
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14303,26 +14669,26 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok  $a->overAllTags_b_c_d;
     ok !$a->overAllTags_b_c;
     ok !$a->overAllTags_b_c_d_e;
     ok  $a->oat_b_c_d;
     ok !$a->oat_B_c_d;
-  
+
     ok  $a->overFirstTags_b_c_d;
     ok  $a->overFirstTags_b_c;
     ok !$a->overFirstTags_b_c_d_e;
     ok  $a->oft_b_c;
     ok !$a->oft_B_c;
-  
+
     ok  $a->overLastTags_b_c_d;
     ok  $a->overLastTags_c_d;
     ok !$a->overLastTags_b_c_d_e;
     ok  $a->olt_c_d;
     ok !$a->olt_C_d;
    }
-  
+
 
 B<oat> is a synonym for L<overAllTags|/overAllTags>.
 
@@ -14338,7 +14704,7 @@ Return the specified b<$node> if the first of it's child nodes L<match|/atPositi
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14346,26 +14712,26 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok  $a->overAllTags_b_c_d;
     ok !$a->overAllTags_b_c;
     ok !$a->overAllTags_b_c_d_e;
     ok  $a->oat_b_c_d;
     ok !$a->oat_B_c_d;
-  
+
     ok  $a->overFirstTags_b_c_d;
     ok  $a->overFirstTags_b_c;
     ok !$a->overFirstTags_b_c_d_e;
     ok  $a->oft_b_c;
     ok !$a->oft_B_c;
-  
+
     ok  $a->overLastTags_b_c_d;
     ok  $a->overLastTags_c_d;
     ok !$a->overLastTags_b_c_d_e;
     ok  $a->olt_c_d;
     ok !$a->olt_C_d;
    }
-  
+
 
 B<oft> is a synonym for L<overFirstTags|/overFirstTags>.
 
@@ -14381,7 +14747,7 @@ Return the specified b<$node> if the last of it's child nodes L<match|/atPositio
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14389,26 +14755,26 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok  $a->overAllTags_b_c_d;
     ok !$a->overAllTags_b_c;
     ok !$a->overAllTags_b_c_d_e;
     ok  $a->oat_b_c_d;
     ok !$a->oat_B_c_d;
-  
+
     ok  $a->overFirstTags_b_c_d;
     ok  $a->overFirstTags_b_c;
     ok !$a->overFirstTags_b_c_d_e;
     ok  $a->oft_b_c;
     ok !$a->oft_B_c;
-  
+
     ok  $a->overLastTags_b_c_d;
     ok  $a->overLastTags_c_d;
     ok !$a->overLastTags_b_c_d_e;
     ok  $a->olt_c_d;
     ok !$a->olt_C_d;
    }
-  
+
 
 B<olt> is a synonym for L<overLastTags|/overLastTags>.
 
@@ -14431,16 +14797,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(qw(b e))->𝗺𝗮𝘁𝗰𝗵𝗔𝗳𝘁𝗲𝗿  (qr(\Af g\Z));                                
-  
+
+
+    ok $x->go(qw(b e))->matchAfter  (qr(\Af g\Z));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 matchAfter2($node, $re, @context)
 
@@ -14460,16 +14828,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(qw(b e))->𝗺𝗮𝘁𝗰𝗵𝗔𝗳𝘁𝗲𝗿𝟮 (qr(\A f  g \Z));                             
-  
+
+
+    ok $x->go(qw(b e))->matchAfter2 (qr(\A f  g \Z));                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 matchBefore($node, $re, @context)
 
@@ -14489,16 +14859,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(qw(b e))->𝗺𝗮𝘁𝗰𝗵𝗕𝗲𝗳𝗼𝗿𝗲 (qr(\Ac d\Z));                                
-  
+
+
+    ok $x->go(qw(b e))->matchBefore (qr(\Ac d\Z));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 matchBefore2($node, $re, @context)
 
@@ -14518,16 +14890,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(qw(b e))->𝗺𝗮𝘁𝗰𝗵𝗕𝗲𝗳𝗼𝗿𝗲𝟮(qr(\A c  d \Z));                             
-  
+
+
+    ok $x->go(qw(b e))->matchBefore2(qr(\A c  d \Z));                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 parentage($node)
 
@@ -14548,11 +14922,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $c, $b) = $a->byList;
-  
+
     is_deeply $a->go_b_c_d__parentage, [$a, $b, $c, $d];
-  
+
 
 B<p> is a synonym for L<parentage|/parentage>.
 
@@ -14567,7 +14941,7 @@ Return a list of strings representing the path to a node from the root of the pa
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -14585,11 +14959,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    is_deeply [$x->go(qw(b d 1 e))->𝗽𝗮𝘁𝗵], [qw(b d 1 e)];                         
-  
-    $x->by(sub {ok $x->go($_->𝗽𝗮𝘁𝗵) == $_});                                      
-  
+
+
+    is_deeply [$x->go(qw(b d 1 e))->path], [qw(b d 1 e)];                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    $x->by(sub {ok $x->go($_->path) == $_});                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 pathString($node)
 
@@ -14601,7 +14979,7 @@ Return a string representing the L<path|/path> to the specified B<$node> from th
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -14626,9 +15004,11 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->findByNumber(9)->𝗽𝗮𝘁𝗵𝗦𝘁𝗿𝗶𝗻𝗴 eq 'b c 1 d e';                            
-  
+
+
+    ok $a->findByNumber(9)->pathString eq 'b c 1 d e';                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 Match
 
@@ -14652,7 +15032,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -14672,15 +15052,15 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $e == $d->an_d_e_b_a;                                                     
-  
-    ok  $f == $e->an_e;                                                           
-  
-    ok !$f->an_f;                                                                 
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+    ok  $e == $d->an_d_e_b_a;
+
+    ok  $f == $e->an_e;
+
+    ok !$f->an_f;
+
 
 =head3 ap($node, $current, @context)
 
@@ -14700,7 +15080,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -14720,15 +15100,15 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $c == $d->ap_d_c_b_a;                                                     
-  
-    ok  $c == $d->ap_d;                                                           
-  
-    ok !$c->ap_c;                                                                 
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+    ok  $c == $d->ap_d_c_b_a;
+
+    ok  $c == $d->ap_d;
+
+    ok !$c->ap_c;
+
 
 =head3 apn($node, $prev, $current, @context)
 
@@ -14750,7 +15130,7 @@ immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -14770,11 +15150,11 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    is_deeply[$c, $e], [$d->apn_c_d_e_b_a];                                       
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+    is_deeply[$c, $e], [$d->apn_c_d_e_b_a];
+
 
 =head3 matchesFirst($node, @sequence)
 
@@ -14787,7 +15167,7 @@ Return the specified B<$node> if its children L<match|/atPositionMatch> the spec
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14798,7 +15178,7 @@ B<Example:>
   </a>
   END
     my ($b, $c, $d, $e, $f) = $a->byList;
-  
+
     ok   $a->matchesFirst_b_c_d_e_f;
     ok  !$a->matchesFirst_c;
     ok   $a->matchesLast_f_e_d_c_b;
@@ -14808,7 +15188,7 @@ B<Example:>
     ok   $e->matchesPrev_d_c_b;
     ok  !$e->matchesPrev_d_c_b_a;
    }
-  
+
 
 =head3 matchesLast($node, @sequence)
 
@@ -14821,7 +15201,7 @@ Return the specified B<$node> if its children L<match|/atPositionMatch> the spec
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14832,7 +15212,7 @@ B<Example:>
   </a>
   END
     my ($b, $c, $d, $e, $f) = $a->byList;
-  
+
     ok   $a->matchesFirst_b_c_d_e_f;
     ok  !$a->matchesFirst_c;
     ok   $a->matchesLast_f_e_d_c_b;
@@ -14842,7 +15222,7 @@ B<Example:>
     ok   $e->matchesPrev_d_c_b;
     ok  !$e->matchesPrev_d_c_b_a;
    }
-  
+
 
 =head3 matchesNext($node, @sequence)
 
@@ -14855,7 +15235,7 @@ Return the specified B<$node> if its following siblings L<match|/atPositionMatch
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14866,7 +15246,7 @@ B<Example:>
   </a>
   END
     my ($b, $c, $d, $e, $f) = $a->byList;
-  
+
     ok   $a->matchesFirst_b_c_d_e_f;
     ok  !$a->matchesFirst_c;
     ok   $a->matchesLast_f_e_d_c_b;
@@ -14876,7 +15256,7 @@ B<Example:>
     ok   $e->matchesPrev_d_c_b;
     ok  !$e->matchesPrev_d_c_b_a;
    }
-  
+
 
 =head3 matchesPrev($node, @sequence)
 
@@ -14889,7 +15269,7 @@ Return the specified B<$node> if the siblings before $node L<match|/atPositionMa
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
@@ -14900,7 +15280,7 @@ B<Example:>
   </a>
   END
     my ($b, $c, $d, $e, $f) = $a->byList;
-  
+
     ok   $a->matchesFirst_b_c_d_e_f;
     ok  !$a->matchesFirst_c;
     ok   $a->matchesLast_f_e_d_c_b;
@@ -14910,7 +15290,7 @@ B<Example:>
     ok   $e->matchesPrev_d_c_b;
     ok  !$e->matchesPrev_d_c_b_a;
    }
-  
+
 
 =head2 Child of, Parent of, Sibling of
 
@@ -14934,7 +15314,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -14954,9 +15334,11 @@ B<Example:>
     </g>
   </a>
   END
-  
-    ok $e->𝗽𝗮𝗿𝗲𝗻𝘁𝗢𝗳($j);                                                          
-  
+
+
+    ok $e->parentOf($j);                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 childOf($child, $parent, @context)
 
@@ -14976,7 +15358,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -14996,9 +15378,11 @@ B<Example:>
     </g>
   </a>
   END
-  
-    ok $j->𝗰𝗵𝗶𝗹𝗱𝗢𝗳($e);                                                           
-  
+
+
+    ok $j->childOf($e);                                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 succeedingSiblingOf($child, $sibling, @context)
 
@@ -15032,22 +15416,34 @@ B<Example:>
    </B>
   </a>
   END
-  
+
     my ($c, $d, $e, $b, $C, $D, $B) = $a->byList;
-    ok !$e->𝘀𝘂𝗰𝗰𝗲𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($e);
-    ok  $e->𝘀𝘂𝗰𝗰𝗲𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($d);
-    ok  $e->𝘀𝘂𝗰𝗰𝗲𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($c);
-    ok !$e->𝘀𝘂𝗰𝗰𝗲𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($b);
-    ok !$e->𝘀𝘂𝗰𝗰𝗲𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($B);
-    ok !$e->𝘀𝘂𝗰𝗰𝗲𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($C);
-  
+
+    ok !$e->succeedingSiblingOf($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $e->succeedingSiblingOf($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $e->succeedingSiblingOf($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$e->succeedingSiblingOf($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$e->succeedingSiblingOf($B);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$e->succeedingSiblingOf($C);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok !$c->precedingSiblingOf($c);
     ok  $c->precedingSiblingOf($d);
     ok  $c->precedingSiblingOf($e);
     ok !$c->precedingSiblingOf($b);
     ok !$c->precedingSiblingOf($B);
     ok !$c->precedingSiblingOf($C);
-  
+
 
 =head3 precedingSiblingOf($child, $sibling, @context)
 
@@ -15081,7 +15477,7 @@ B<Example:>
    </B>
   </a>
   END
-  
+
     my ($c, $d, $e, $b, $C, $D, $B) = $a->byList;
     ok !$e->succeedingSiblingOf($e);
     ok  $e->succeedingSiblingOf($d);
@@ -15089,14 +15485,26 @@ B<Example:>
     ok !$e->succeedingSiblingOf($b);
     ok !$e->succeedingSiblingOf($B);
     ok !$e->succeedingSiblingOf($C);
-  
-    ok !$c->𝗽𝗿𝗲𝗰𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($c);
-    ok  $c->𝗽𝗿𝗲𝗰𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($d);
-    ok  $c->𝗽𝗿𝗲𝗰𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($e);
-    ok !$c->𝗽𝗿𝗲𝗰𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($b);
-    ok !$c->𝗽𝗿𝗲𝗰𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($B);
-    ok !$c->𝗽𝗿𝗲𝗰𝗲𝗱𝗶𝗻𝗴𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝗢𝗳($C);
-  
+
+
+    ok !$c->precedingSiblingOf($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $c->precedingSiblingOf($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $c->precedingSiblingOf($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$c->precedingSiblingOf($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$c->precedingSiblingOf($B);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$c->precedingSiblingOf($C);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Navigation
 
@@ -15113,7 +15521,7 @@ Return the node reached from the specified B<$node> via the specified L<path|/pa
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(my $s = <<END);                                   
+    my $x = Data::Edit::Xml::new(my $s = <<END);
   <aa>
     <a>
       <b/>
@@ -15122,15 +15530,23 @@ B<Example:>
     </a>
   </aa>
   END
-  
-    ok $x->𝗴𝗼(qw(a c))   ->id == 1;                                               
-  
-    ok $x->𝗴𝗼(qw(a c -2))->id == 3;                                               
-  
-    ok $x->𝗴𝗼(qw(a c *)) == 4;                                                    
-  
-    ok 1234 == join '', map {$_->id} $x->𝗴𝗼(qw(a c *));                           
-  
+
+
+    ok $x->go(qw(a c))   ->id == 1;                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x->go(qw(a c -2))->id == 3;                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x->go(qw(a c *)) == 4;                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok 1234 == join '', map {$_->id} $x->go(qw(a c *));                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 c($node, $tag)
 
@@ -15143,19 +15559,33 @@ Return an array of all the nodes with the specified tag below the specified B<$n
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
-    <b id="b1"><𝗰 id="1"/></b>
-    <d id="d1"><𝗰 id="2"/></d>
-    <e id="e1"><𝗰 id="3"/></e>
-    <b id="b2"><𝗰 id="4"/></b>
-    <d id="d2"><𝗰 id="5"/></d>
-    <e id="e2"><𝗰 id="6"/></e>
+
+    <b id="b1"><c id="1"/></b>  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    <d id="d1"><c id="2"/></d>  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    <e id="e1"><c id="3"/></e>  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    <b id="b2"><c id="4"/></b>  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    <d id="d2"><c id="5"/></d>  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    <e id="e2"><c id="6"/></e>  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   </a>
   END
-  
-    is_deeply [map{$_->id} $x->𝗰(q(d))],  [qw(d1 d2)];                             
-  
+
+
+    is_deeply [map{$_->id} $x->c(q(d))],  [qw(d1 d2)];                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 cText($node)
 
@@ -15180,17 +15610,25 @@ B<Example:>
     </e>
   </a>
   END
-  
+
     my (undef, $c, undef, $d, undef, $b, $f, $e) = $a->byList;
     is_deeply ["b".."f"], [map {-t $_} ($b, $c, $d, $e, $f)];
-  
-    ok  $b->𝗰𝗧𝗲𝘅𝘁 == 3;
-  
-    my @b = $b->𝗰𝗧𝗲𝘅𝘁;
+
+
+    ok  $b->cText == 3;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    my @b = $b->cText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok "b1 b2 b3" eq join " ", map {trim $_->text} @b;
-    ok !$e->𝗰𝗧𝗲𝘅𝘁;
-    ok !$a->𝗰𝗧𝗲𝘅𝘁;
-  
+
+    ok !$e->cText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$a->cText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 findById($node, $id)
 
@@ -15203,7 +15641,7 @@ Find a node in the parse tree under the specified B<$node> with the specified B<
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a id="i1">
     <b id="i2"/>
     <c id="i3"/>
@@ -15214,11 +15652,11 @@ B<Example:>
     <b id="i7"/>
   </a>
   END
-  
-    ok -t $a->findById_i4 eq q(B);                                                
-  
-    ok -t $a->findById_i5 eq q(c);                                                
-  
+
+    ok -t $a->findById_i4 eq q(B);
+
+    ok -t $a->findById_i5 eq q(c);
+
 
 =head2 matchesNode($first, $second, @attributes)
 
@@ -15232,7 +15670,7 @@ Return the B<$first> node if it matches the B<$second> node's tag and the specif
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a       id="1">
     <b     id="2"   name="b">
@@ -15245,26 +15683,30 @@ B<Example:>
     </c>
   </a>
   END
-  
+
     my ($c, $b, $C, $B) = $a->byList;
     ok  $b->id == 2;
     ok  $c->id == 3;
     ok  $B->id == 5;
     ok  $C->id == 6;
-    ok  $c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗡𝗼𝗱𝗲($C, qw(name));
-    ok !$c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗡𝗼𝗱𝗲($C, qw(id name));
+
+    ok  $c->matchesNode($C, qw(name));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$c->matchesNode($C, qw(id name));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok  $c->matchesSubTree($C, qw(name));
     ok  $b->matchesSubTree($B, qw(name));
     ok !$c->matchesSubTree($C, qw(id name));
     ok !$b->matchesSubTree($C, qw(name));
-  
+
     is_deeply [$a->findMatchingSubTrees($b, qw(name))], [$b, $B];
     is_deeply [$a->findMatchingSubTrees($c, qw(name))], [$c, $C];
     is_deeply [$a->findMatchingSubTrees(new(q(<c/>)))], [$c, $C];
     is_deeply [$a->findMatchingSubTrees(new(q(<b><c/></b>)))], [$b, $B];
     is_deeply [$a->findMatchingSubTrees(new(q(<b id="2"><c id="3"/></b>)), q(id))], [$b];
    }
-  
+
 
 =head2 matchesSubTree($first, $second, @attributes)
 
@@ -15278,7 +15720,7 @@ Return the B<$first> node if it L<matches|/matchesNode> the B<$second> node and 
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a       id="1">
     <b     id="2"   name="b">
@@ -15291,7 +15733,7 @@ B<Example:>
     </c>
   </a>
   END
-  
+
     my ($c, $b, $C, $B) = $a->byList;
     ok  $b->id == 2;
     ok  $c->id == 3;
@@ -15299,18 +15741,26 @@ B<Example:>
     ok  $C->id == 6;
     ok  $c->matchesNode($C, qw(name));
     ok !$c->matchesNode($C, qw(id name));
-    ok  $c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗦𝘂𝗯𝗧𝗿𝗲𝗲($C, qw(name));
-    ok  $b->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗦𝘂𝗯𝗧𝗿𝗲𝗲($B, qw(name));
-    ok !$c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗦𝘂𝗯𝗧𝗿𝗲𝗲($C, qw(id name));
-    ok !$b->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗦𝘂𝗯𝗧𝗿𝗲𝗲($C, qw(name));
-  
+
+    ok  $c->matchesSubTree($C, qw(name));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $b->matchesSubTree($B, qw(name));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$c->matchesSubTree($C, qw(id name));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$b->matchesSubTree($C, qw(name));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     is_deeply [$a->findMatchingSubTrees($b, qw(name))], [$b, $B];
     is_deeply [$a->findMatchingSubTrees($c, qw(name))], [$c, $C];
     is_deeply [$a->findMatchingSubTrees(new(q(<c/>)))], [$c, $C];
     is_deeply [$a->findMatchingSubTrees(new(q(<b><c/></b>)))], [$b, $B];
     is_deeply [$a->findMatchingSubTrees(new(q(<b id="2"><c id="3"/></b>)), q(id))], [$b];
    }
-  
+
 
 =head2 findMatchingSubTrees($node, $subTree, @attributes)
 
@@ -15324,7 +15774,7 @@ Find nodes in the parse tree whose sub tree matches the specified B<$subTree> ex
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a       id="1">
     <b     id="2"   name="b">
@@ -15337,7 +15787,7 @@ B<Example:>
     </c>
   </a>
   END
-  
+
     my ($c, $b, $C, $B) = $a->byList;
     ok  $b->id == 2;
     ok  $c->id == 3;
@@ -15349,14 +15799,24 @@ B<Example:>
     ok  $b->matchesSubTree($B, qw(name));
     ok !$c->matchesSubTree($C, qw(id name));
     ok !$b->matchesSubTree($C, qw(name));
-  
-    is_deeply [$a->𝗳𝗶𝗻𝗱𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗦𝘂𝗯𝗧𝗿𝗲𝗲𝘀($b, qw(name))], [$b, $B];
-    is_deeply [$a->𝗳𝗶𝗻𝗱𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗦𝘂𝗯𝗧𝗿𝗲𝗲𝘀($c, qw(name))], [$c, $C];
-    is_deeply [$a->𝗳𝗶𝗻𝗱𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗦𝘂𝗯𝗧𝗿𝗲𝗲𝘀(new(q(<c/>)))], [$c, $C];
-    is_deeply [$a->𝗳𝗶𝗻𝗱𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗦𝘂𝗯𝗧𝗿𝗲𝗲𝘀(new(q(<b><c/></b>)))], [$b, $B];
-    is_deeply [$a->𝗳𝗶𝗻𝗱𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗦𝘂𝗯𝗧𝗿𝗲𝗲𝘀(new(q(<b id="2"><c id="3"/></b>)), q(id))], [$b];
+
+
+    is_deeply [$a->findMatchingSubTrees($b, qw(name))], [$b, $B];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$a->findMatchingSubTrees($c, qw(name))], [$c, $C];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$a->findMatchingSubTrees(new(q(<c/>)))], [$c, $C];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$a->findMatchingSubTrees(new(q(<b><c/></b>)))], [$b, $B];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$a->findMatchingSubTrees(new(q(<b id="2"><c id="3"/></b>)), q(id))], [$b];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    }
-  
+
 
 =head2 First
 
@@ -15382,7 +15842,7 @@ then receive a returned B<undef> or false result.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -15412,13 +15872,19 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(q(b))->𝗳𝗶𝗿𝘀𝘁->id == 13;                                            
-  
-    ok  $a->go(q(b))->𝗳𝗶𝗿𝘀𝘁(qw(c b a));                                           
-  
-    ok !$a->go(q(b))->𝗳𝗶𝗿𝘀𝘁(qw(b a));                                             
-  
+
+
+    ok  $a->go(q(b))->first->id == 13;                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a->go(q(b))->first(qw(c b a));                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->go(q(b))->first(qw(b a));                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 firstn($node, $N, @context)
 
@@ -15438,7 +15904,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d/><e/><f/></c></b></a>
   END
@@ -15457,12 +15923,12 @@ B<Example:>
     ok  -t $a->firstn_1 eq q(b);
     ok  -t $a->firstn_2 eq q(c);
     ok  -t $a->firstn_3 eq q(d);
-  
+
     ok  -t $a->firstn_3__nextn_0 eq q(d);
     ok  -t $a->firstn_3__nextn_1 eq q(e);
     ok  -t $a->firstn_3__nextn_2 eq q(f);
    }
-  
+
 
 =head3 firstText($node, @context)
 
@@ -15506,7 +15972,7 @@ B<Example:>
     ok !$a->go_e__nextText;
     ok  $a->go_c__prevText_c__text eq q(BB);
     ok !$a->go_e__prevText;
-  
+
 
 =head3 firstTextMatches($node, $match, @context)
 
@@ -15526,25 +15992,33 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>bb<c>cc</c>BB
     </b>
   </a>
   END
-  
-    my ($bb, $cc, $c, $BB, $b) = $a->byList;                                       
-  
-    ok $bb->matchesText(qr(bb));                                                  
-  
-    ok $b->at_b_a &&  $b->𝗳𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(bb));                               
-  
-    ok                $b->𝗳𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(bb), qw(b a));                      
-  
-    ok $c->at_c_b &&  $c->𝗳𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(cc));                               
-  
-    ok $c->at_c_b && !$c->𝗳𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(bb));                               
-  
+
+    my ($bb, $cc, $c, $BB, $b) = $a->byList;
+
+    ok $bb->matchesText(qr(bb));
+
+
+    ok $b->at_b_a &&  $b->firstTextMatches(qr(bb));                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok                $b->firstTextMatches(qr(bb), qw(b a));                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $c->at_c_b &&  $c->firstTextMatches(qr(cc));                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $c->at_c_b && !$c->firstTextMatches(qr(bb));                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 firstBy($node, @tags)
 
@@ -15557,7 +16031,7 @@ Return a list of the first instance of each specified tag encountered in a post-
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -15587,11 +16061,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-     {my %f = $a->𝗳𝗶𝗿𝘀𝘁𝗕𝘆;                                                        
-  
-      ok $f{b}->id == 12;                                                         
-  
+
+
+     {my %f = $a->firstBy;                                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok $f{b}->id == 12;
+
 
 =head3 firstDown($node, @tags)
 
@@ -15604,10 +16080,12 @@ Return a list of the first instance of each specified tag encountered in a pre-o
 B<Example:>
 
 
-     {my %f = $a->𝗳𝗶𝗿𝘀𝘁𝗗𝗼𝘄𝗻;                                                      
-  
-      ok $f{b}->id == 15;                                                         
-  
+
+     {my %f = $a->firstDown;                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok $f{b}->id == 15;
+
 
 =head3 firstIn($node, @tags)
 
@@ -15620,7 +16098,7 @@ Return the first child node matching one of the named tags under the specified p
 B<Example:>
 
 
-    ok $a->prettyStringCDATA eq <<'END';                                                  
+    ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -15632,9 +16110,11 @@ B<Example:>
   <CDATA>  </CDATA>
   </a>
   END
-  
-    ok $a->𝗳𝗶𝗿𝘀𝘁𝗜𝗻(qw(b B c C))->tag eq qq(C);                                    
-  
+
+
+    ok $a->firstIn(qw(b B c C))->tag eq qq(C);                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 firstNot($node, @tags)
 
@@ -15647,7 +16127,7 @@ Return the first child node that does not match any of the named B<@tags> under 
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                 
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
     <c/>
@@ -15656,11 +16136,11 @@ B<Example:>
     <f/>
   </a>
   END
-  
-    my ($b, $c, $d, $e, $f) = $a->byList;                                                
-  
-    ok $c == $a->firstNot_a_b;                                                    
-  
+
+    my ($b, $c, $d, $e, $f) = $a->byList;
+
+    ok $c == $a->firstNot_a_b;
+
 
 =head3 firstInIndex($node, @context)
 
@@ -15679,7 +16159,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -15704,11 +16184,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->findByNumber (5)->𝗳𝗶𝗿𝘀𝘁𝗜𝗻𝗜𝗻𝗱𝗲𝘅;                                       
-  
-    ok !$a->findByNumber(7) ->𝗳𝗶𝗿𝘀𝘁𝗜𝗻𝗜𝗻𝗱𝗲𝘅;                                       
-  
+
+
+    ok  $a->findByNumber (5)->firstInIndex;                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->findByNumber(7) ->firstInIndex;                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 firstOf($node, @tags)
 
@@ -15721,12 +16205,14 @@ Return an array of the nodes that are continuously first under their specified p
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/><d/><d/><e/><d/><d/><c/></b></a>
   END
-  
-    is_deeply [qw(c d d)], [map {-t $_} $a->go(q(b))->𝗳𝗶𝗿𝘀𝘁𝗢𝗳(qw(c d))];          
-  
+
+
+    is_deeply [qw(c d d)], [map {-t $_} $a->go(q(b))->firstOf(qw(c d))];            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 firstWhile($node, @tags)
 
@@ -15762,25 +16248,25 @@ B<Example:>
   </a>
   END
     my ($f, $e, $d, $c, $b, $F, $E, $D, $C, $B) = $a->byList;
-  
+
     ok eval qq(-t \$$_ eq q($_)), $_ for qw(a b c d e f B C D E F);
-  
+
     ok  $d == $a->firstWhile_a_d_c_b;
     ok  $f == $a->firstWhile_a_d_c_b_e_f_g_h;
     ok !$b->firstWhile_a;
-  
+
     ok  $e == $a->firstUntil_e_d;
     ok       !$c->firstUntil_c;
     ok       !$b->firstUntil_a;
-  
+
     ok  $D == $a->lastWhile_a_D_C_B;
     ok  $F == $a->lastWhile_a_D_C_B_E_F_G_H;
     ok !$B->lastWhile_a;
-  
+
     ok  $E == $a->lastUntil_E_D;
     ok       !$C->lastUntil_C;
     ok !$B->lastUntil_a;
-  
+
 
 =head3 firstUntil($node, @context)
 
@@ -15822,25 +16308,25 @@ B<Example:>
   </a>
   END
     my ($f, $e, $d, $c, $b, $F, $E, $D, $C, $B) = $a->byList;
-  
+
     ok eval qq(-t \$$_ eq q($_)), $_ for qw(a b c d e f B C D E F);
-  
+
     ok  $d == $a->firstWhile_a_d_c_b;
     ok  $f == $a->firstWhile_a_d_c_b_e_f_g_h;
     ok !$b->firstWhile_a;
-  
+
     ok  $e == $a->firstUntil_e_d;
     ok       !$c->firstUntil_c;
     ok       !$b->firstUntil_a;
-  
+
     ok  $D == $a->lastWhile_a_D_C_B;
     ok  $F == $a->lastWhile_a_D_C_B_E_F_G_H;
     ok !$B->lastWhile_a;
-  
+
     ok  $E == $a->lastUntil_E_D;
     ok       !$C->lastUntil_C;
     ok !$B->lastUntil_a;
-  
+
 
 =head3 firstUntilText($node, @context)
 
@@ -15878,11 +16364,13 @@ B<Example:>
     </j>
   </a>
   END
-  
-    ok $a->𝗳𝗶𝗿𝘀𝘁𝗨𝗻𝘁𝗶𝗹𝗧𝗲𝘅𝘁->text =~ m(cccc)s;
+
+
+    ok $a->firstUntilText->text =~ m(cccc)s;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $a->lastUntilText ->text =~ m(mmmm)s;
-  
-  
+
+
 
 =head3 firstContextOf($node, @context)
 
@@ -15901,7 +16389,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                           
+    my $x = Data::Edit::Xml::new(<<END);
   <a        id="a1">
     <b1     id="b1">
        <c   id="c1">
@@ -15923,13 +16411,19 @@ B<Example:>
     </b3>
   </a>
   END
-  
-    ok $x->𝗳𝗶𝗿𝘀𝘁𝗖𝗼𝗻𝘁𝗲𝘅𝘁𝗢𝗳(qw(d c))         ->id     eq qq(d1);                    
-  
-    ok $x->𝗳𝗶𝗿𝘀𝘁𝗖𝗼𝗻𝘁𝗲𝘅𝘁𝗢𝗳(qw(e c b2))      ->id     eq qq(e2);                    
-  
-    ok $x->𝗳𝗶𝗿𝘀𝘁𝗖𝗼𝗻𝘁𝗲𝘅𝘁𝗢𝗳(qw(CDATA d c b2))->string eq qq(DD22);                  
-  
+
+
+    ok $x->firstContextOf(qw(d c))         ->id     eq qq(d1);                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x->firstContextOf(qw(e c b2))      ->id     eq qq(e2);                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x->firstContextOf(qw(CDATA d c b2))->string eq qq(DD22);                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 firstSibling($node, @context)
 
@@ -15948,7 +16442,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -15978,9 +16472,11 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(qw(b b))->𝗳𝗶𝗿𝘀𝘁𝗦𝗶𝗯𝗹𝗶𝗻𝗴->id == 13;                                   
-  
+
+
+    ok  $a->go(qw(b b))->firstSibling->id == 13;                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 Last
 
@@ -16006,7 +16502,7 @@ then receive a returned B<undef> or false result.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -16036,15 +16532,23 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(q(b))->𝗹𝗮𝘀𝘁 ->id == 22;                                            
-  
-    ok  $a->go(q(b))->𝗹𝗮𝘀𝘁(qw(g b a));                                            
-  
-    ok !$a->go(q(b))->𝗹𝗮𝘀𝘁(qw(b a));                                              
-  
-    ok !$a->go(q(b))->𝗹𝗮𝘀𝘁(qw(b a));                                              
-  
+
+
+    ok  $a->go(q(b))->last ->id == 22;                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a->go(q(b))->last(qw(g b a));                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->go(q(b))->last(qw(b a));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->go(q(b))->last(qw(b a));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastn($node, $N, @context)
 
@@ -16064,7 +16568,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d/><e/><f/></c></b>
      <B><C><D/><E/><F/></C></B></a>
@@ -16087,17 +16591,17 @@ B<Example:>
     </B>
   </a>
   END
-  
+
     ok  -t $a->lastn_0 eq q(a);
     ok  -t $a->lastn_1 eq q(B);
     ok  -t $a->lastn_2 eq q(C);
     ok  -t $a->lastn_3 eq q(F);
-  
+
     ok  -t $a->lastn_3__prevn_0 eq q(F);
     ok  -t $a->lastn_3__prevn_1 eq q(E);
     ok  -t $a->lastn_3__prevn_2 eq q(D);
    }
-  
+
 
 =head3 lastText($node, @context)
 
@@ -16141,7 +16645,7 @@ B<Example:>
     ok !$a->go_e__nextText;
     ok  $a->go_c__prevText_c__text eq q(BB);
     ok !$a->go_e__prevText;
-  
+
 
 =head3 lastTextMatches($node, $match, @context)
 
@@ -16161,25 +16665,33 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>bb<c>cc</c>BB
     </b>
   </a>
   END
-  
-    my ($bb, $cc, $c, $BB, $b) = $a->byList;                                       
-  
-    ok $BB->matchesText(qr(BB));                                                  
-  
-    ok $b->at_b_a &&  $b->𝗹𝗮𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(BB));                                
-  
-    ok                $b->𝗹𝗮𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(BB), qw(b a));                       
-  
-    ok $c->at_c_b &&  $c->𝗹𝗮𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(cc));                                
-  
-    ok $c->at_c_b && !$c->𝗹𝗮𝘀𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(bb));                                
-  
+
+    my ($bb, $cc, $c, $BB, $b) = $a->byList;
+
+    ok $BB->matchesText(qr(BB));
+
+
+    ok $b->at_b_a &&  $b->lastTextMatches(qr(BB));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok                $b->lastTextMatches(qr(BB), qw(b a));                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $c->at_c_b &&  $c->lastTextMatches(qr(cc));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $c->at_c_b && !$c->lastTextMatches(qr(bb));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastBy($node, @tags)
 
@@ -16192,7 +16704,7 @@ Return a list of the last instance of each specified tag encountered in a post-o
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -16222,11 +16734,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-     {my %l = $a->𝗹𝗮𝘀𝘁𝗕𝘆;                                                         
-  
-      ok $l{b}->id == 23;                                                         
-  
+
+
+     {my %l = $a->lastBy;                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok $l{b}->id == 23;
+
 
 =head3 lastDown($node, @tags)
 
@@ -16239,10 +16753,12 @@ Return a list of the last instance of each specified tag encountered in a pre-or
 B<Example:>
 
 
-     {my %l = $a->𝗹𝗮𝘀𝘁𝗗𝗼𝘄𝗻;                                                       
-  
-      ok $l{b}->id == 26;                                                         
-  
+
+     {my %l = $a->lastDown;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok $l{b}->id == 26;
+
 
 =head3 lastIn($node, @tags)
 
@@ -16255,7 +16771,7 @@ Return the last child node matching one of the named tags under the specified pa
 B<Example:>
 
 
-    ok $a->prettyStringCDATA eq <<'END';                                                  
+    ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -16267,9 +16783,11 @@ B<Example:>
   <CDATA>  </CDATA>
   </a>
   END
-  
-    ok $a->𝗹𝗮𝘀𝘁𝗜𝗻(qw(e E f F))->tag eq qq(E);                                     
-  
+
+
+    ok $a->lastIn(qw(e E f F))->tag eq qq(E);                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastNot($node, @tags)
 
@@ -16282,7 +16800,7 @@ Return the last child node that does not match any of the named B<@tags> under t
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                 
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
     <c/>
@@ -16291,11 +16809,11 @@ B<Example:>
     <f/>
   </a>
   END
-  
-    my ($b, $c, $d, $e, $f) = $a->byList;                                                
-  
-    ok $d == $a->lastNot_e_f;                                                     
-  
+
+    my ($b, $c, $d, $e, $f) = $a->byList;
+
+    ok $d == $a->lastNot_e_f;
+
 
 =head3 lastOf($node, @tags)
 
@@ -16308,12 +16826,14 @@ Return an array of the nodes that are continuously last under their specified pa
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/><d/><d/><e/><d/><d/><c/></b></a>
   END
-  
-    is_deeply [qw(d d c)], [map {-t $_} $a->go(q(b))->𝗹𝗮𝘀𝘁𝗢𝗳 (qw(c d))];          
-  
+
+
+    is_deeply [qw(d d c)], [map {-t $_} $a->go(q(b))->lastOf (qw(c d))];            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastInIndex($node, @context)
 
@@ -16332,7 +16852,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -16357,11 +16877,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->findByNumber(10)->𝗹𝗮𝘀𝘁𝗜𝗻𝗜𝗻𝗱𝗲𝘅;                                        
-  
-    ok !$a->findByNumber(7) ->𝗹𝗮𝘀𝘁𝗜𝗻𝗜𝗻𝗱𝗲𝘅;                                        
-  
+
+
+    ok  $a->findByNumber(10)->lastInIndex;                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->findByNumber(7) ->lastInIndex;                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastContextOf($node, @context)
 
@@ -16380,7 +16904,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                           
+    my $x = Data::Edit::Xml::new(<<END);
   <a        id="a1">
     <b1     id="b1">
        <c   id="c1">
@@ -16402,13 +16926,19 @@ B<Example:>
     </b3>
   </a>
   END
-  
-    ok $x-> 𝗹𝗮𝘀𝘁𝗖𝗼𝗻𝘁𝗲𝘅𝘁𝗢𝗳(qw(d c))         ->id     eq qq(d3);                    
-  
-    ok $x-> 𝗹𝗮𝘀𝘁𝗖𝗼𝗻𝘁𝗲𝘅𝘁𝗢𝗳(qw(e c b2     )) ->id     eq qq(e2);                    
-  
-    ok $x-> 𝗹𝗮𝘀𝘁𝗖𝗼𝗻𝘁𝗲𝘅𝘁𝗢𝗳(qw(CDATA e c b2))->string eq qq(EE22);                  
-  
+
+
+    ok $x-> lastContextOf(qw(d c))         ->id     eq qq(d3);                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x-> lastContextOf(qw(e c b2     )) ->id     eq qq(e2);                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $x-> lastContextOf(qw(CDATA e c b2))->string eq qq(EE22);                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastSibling($node, @context)
 
@@ -16427,7 +16957,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -16457,9 +16987,11 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(qw(b b))->𝗹𝗮𝘀𝘁𝗦𝗶𝗯𝗹𝗶𝗻𝗴 ->id == 22;                                   
-  
+
+
+    ok  $a->go(qw(b b))->lastSibling ->id == 22;                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 lastWhile($node, @tags)
 
@@ -16495,25 +17027,25 @@ B<Example:>
   </a>
   END
     my ($f, $e, $d, $c, $b, $F, $E, $D, $C, $B) = $a->byList;
-  
+
     ok eval qq(-t \$$_ eq q($_)), $_ for qw(a b c d e f B C D E F);
-  
+
     ok  $d == $a->firstWhile_a_d_c_b;
     ok  $f == $a->firstWhile_a_d_c_b_e_f_g_h;
     ok !$b->firstWhile_a;
-  
+
     ok  $e == $a->firstUntil_e_d;
     ok       !$c->firstUntil_c;
     ok       !$b->firstUntil_a;
-  
+
     ok  $D == $a->lastWhile_a_D_C_B;
     ok  $F == $a->lastWhile_a_D_C_B_E_F_G_H;
     ok !$B->lastWhile_a;
-  
+
     ok  $E == $a->lastUntil_E_D;
     ok       !$C->lastUntil_C;
     ok !$B->lastUntil_a;
-  
+
 
 =head3 lastUntil($node, @context)
 
@@ -16555,25 +17087,25 @@ B<Example:>
   </a>
   END
     my ($f, $e, $d, $c, $b, $F, $E, $D, $C, $B) = $a->byList;
-  
+
     ok eval qq(-t \$$_ eq q($_)), $_ for qw(a b c d e f B C D E F);
-  
+
     ok  $d == $a->firstWhile_a_d_c_b;
     ok  $f == $a->firstWhile_a_d_c_b_e_f_g_h;
     ok !$b->firstWhile_a;
-  
+
     ok  $e == $a->firstUntil_e_d;
     ok       !$c->firstUntil_c;
     ok       !$b->firstUntil_a;
-  
+
     ok  $D == $a->lastWhile_a_D_C_B;
     ok  $F == $a->lastWhile_a_D_C_B_E_F_G_H;
     ok !$B->lastWhile_a;
-  
+
     ok  $E == $a->lastUntil_E_D;
     ok       !$C->lastUntil_C;
     ok !$B->lastUntil_a;
-  
+
 
 =head3 lastUntilText($node, @context)
 
@@ -16611,11 +17143,13 @@ B<Example:>
     </j>
   </a>
   END
-  
+
     ok $a->firstUntilText->text =~ m(cccc)s;
-    ok $a->𝗹𝗮𝘀𝘁𝗨𝗻𝘁𝗶𝗹𝗧𝗲𝘅𝘁 ->text =~ m(mmmm)s;
-  
-  
+
+    ok $a->lastUntilText ->text =~ m(mmmm)s;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
 
 =head2 Next
 
@@ -16641,7 +17175,7 @@ then receive a returned B<undef> or false result.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -16671,13 +17205,19 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(qw(b b e))->𝗻𝗲𝘅𝘁 ->id == 19;                                       
-  
-    ok  $a->go(qw(b b e))->𝗻𝗲𝘅𝘁(qw(f b b a));                                     
-  
-    ok !$a->go(qw(b b e))->𝗻𝗲𝘅𝘁(qw(f b a));                                       
-  
+
+
+    ok  $a->go(qw(b b e))->next ->id == 19;                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a->go(qw(b b e))->next(qw(f b b a));                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->go(qw(b b e))->next(qw(f b a));                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 nextn($node, $N, @context)
 
@@ -16697,7 +17237,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d/><e/><f/></c></b></a>
   END
@@ -16716,12 +17256,12 @@ B<Example:>
     ok  -t $a->firstn_1 eq q(b);
     ok  -t $a->firstn_2 eq q(c);
     ok  -t $a->firstn_3 eq q(d);
-  
+
     ok  -t $a->firstn_3__nextn_0 eq q(d);
     ok  -t $a->firstn_3__nextn_1 eq q(e);
     ok  -t $a->firstn_3__nextn_2 eq q(f);
    }
-  
+
 
 =head3 nextText($node, @context)
 
@@ -16765,7 +17305,7 @@ B<Example:>
     ok !$a->go_e__nextText;
     ok  $a->go_c__prevText_c__text eq q(BB);
     ok !$a->go_e__prevText;
-  
+
 
 =head3 nextTextMatches($node, $match, @context)
 
@@ -16785,19 +17325,23 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>bb<c>cc</c>BB
     </b>
   </a>
   END
-  
-    ok $cc->matchesText(qr(cc));                                                   
-  
-    ok $c->at_c_b &&  $c->𝗻𝗲𝘅𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(BB));                                
-  
-    ok $b->at_b   && !$b->𝗻𝗲𝘅𝘁𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(BB));                                
-  
+
+    ok $cc->matchesText(qr(cc));
+
+
+    ok $c->at_c_b &&  $c->nextTextMatches(qr(BB));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b->at_b   && !$b->nextTextMatches(qr(BB));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 nextIn($node, @tags)
 
@@ -16810,7 +17354,7 @@ Return the nearest sibling after the specified B<$node> that matches one of the 
 B<Example:>
 
 
-    ok $a->prettyStringCDATA eq <<'END';                                                  
+    ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -16822,9 +17366,11 @@ B<Example:>
   <CDATA>  </CDATA>
   </a>
   END
-  
-    ok $a->firstIn(qw(b B c C))->𝗻𝗲𝘅𝘁𝗜𝗻(qw(A G))->tag eq qq(G);                   
-  
+
+
+    ok $a->firstIn(qw(b B c C))->nextIn(qw(A G))->tag eq qq(G);                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 nextOn($node, @tags)
 
@@ -16837,7 +17383,7 @@ Step forwards as far as possible from the specified B<$node> while remaining on 
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="1"/>
@@ -16848,17 +17394,23 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $c->id == 1;                                                                
-  
-    ok $e->id == 5;                                                                
-  
-    ok $c->𝗻𝗲𝘅𝘁𝗢𝗻(qw(d))  ->id == 2;                                              
-  
-    ok $c->𝗻𝗲𝘅𝘁𝗢𝗻(qw(c d))->id == 4;                                              
-  
-    ok $e->𝗻𝗲𝘅𝘁𝗢𝗻(qw(c d))     == $e;                                             
-  
+
+    ok $c->id == 1;
+
+    ok $e->id == 5;
+
+
+    ok $c->nextOn(qw(d))  ->id == 2;                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $c->nextOn(qw(c d))->id == 4;                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $e->nextOn(qw(c d))     == $e;                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 nextWhile($node, @tags)
 
@@ -16871,7 +17423,7 @@ Go to the next sibling of the specified B<$node> and continue forwards while the
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                 
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
     <c/>
@@ -16880,13 +17432,15 @@ B<Example:>
     <f/>
   </a>
   END
-  
-    my ($b, $c, $d, $e, $f) = $a->byList;                                                
-  
-    ok $e == $b->nextWhile_c_d;                                                   
-  
-    ok $c == $b->𝗻𝗲𝘅𝘁𝗪𝗵𝗶𝗹𝗲;                                                       
-  
+
+    my ($b, $c, $d, $e, $f) = $a->byList;
+
+    ok $e == $b->nextWhile_c_d;
+
+
+    ok $c == $b->nextWhile;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 nextUntil($node, @tags)
 
@@ -16899,7 +17453,7 @@ Go to the next sibling of the specified B<$node> and continue forwards until the
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                 
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
     <c/>
@@ -16908,13 +17462,15 @@ B<Example:>
     <f/>
   </a>
   END
-  
-    my ($b, $c, $d, $e, $f) = $a->byList;                                                
-  
-    ok $e == $b->nextUntil_e_f;                                                   
-  
-    ok      !$b->𝗻𝗲𝘅𝘁𝗨𝗻𝘁𝗶𝗹;                                                       
-  
+
+    my ($b, $c, $d, $e, $f) = $a->byList;
+
+    ok $e == $b->nextUntil_e_f;
+
+
+    ok      !$b->nextUntil;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 Prev
 
@@ -16940,7 +17496,7 @@ then receive a returned B<undef> or false result.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -16970,13 +17526,19 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok  $a->go(qw(b b e))->𝗽𝗿𝗲𝘃 ->id == 17;                                       
-  
-    ok  $a->go(qw(b b e))->𝗽𝗿𝗲𝘃(qw(d b b a));                                     
-  
-    ok !$a->go(qw(b b e))->𝗽𝗿𝗲𝘃(qw(d b a));                                       
-  
+
+
+    ok  $a->go(qw(b b e))->prev ->id == 17;                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a->go(qw(b b e))->prev(qw(d b b a));                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$a->go(qw(b b e))->prev(qw(d b a));                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 prevText($node, @context)
 
@@ -17020,7 +17582,7 @@ B<Example:>
     ok !$a->go_e__nextText;
     ok  $a->go_c__prevText_c__text eq q(BB);
     ok !$a->go_e__prevText;
-  
+
 
 =head3 prevn($node, $N, @context)
 
@@ -17040,7 +17602,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d/><e/><f/></c></b>
      <B><C><D/><E/><F/></C></B></a>
@@ -17063,17 +17625,17 @@ B<Example:>
     </B>
   </a>
   END
-  
+
     ok  -t $a->lastn_0 eq q(a);
     ok  -t $a->lastn_1 eq q(B);
     ok  -t $a->lastn_2 eq q(C);
     ok  -t $a->lastn_3 eq q(F);
-  
+
     ok  -t $a->lastn_3__prevn_0 eq q(F);
     ok  -t $a->lastn_3__prevn_1 eq q(E);
     ok  -t $a->lastn_3__prevn_2 eq q(D);
    }
-  
+
 
 =head3 prevTextMatches($node, $match, @context)
 
@@ -17093,19 +17655,23 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>bb<c>cc</c>BB
     </b>
   </a>
   END
-  
-    ok $cc->matchesText(qr(cc));                                                   
-  
-    ok $c->at_c_b &&  $c->𝗽𝗿𝗲𝘃𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(bb));                                
-  
-    ok $b->at_b   && !$b->𝗽𝗿𝗲𝘃𝗧𝗲𝘅𝘁𝗠𝗮𝘁𝗰𝗵𝗲𝘀(qr(bb));                                
-  
+
+    ok $cc->matchesText(qr(cc));
+
+
+    ok $c->at_c_b &&  $c->prevTextMatches(qr(bb));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b->at_b   && !$b->prevTextMatches(qr(bb));                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 prevIn($node, @tags)
 
@@ -17118,7 +17684,7 @@ Return the nearest sibling node before the specified B<$node> which matches one 
 B<Example:>
 
 
-    ok $a->prettyStringCDATA eq <<'END';                                                  
+    ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -17130,9 +17696,11 @@ B<Example:>
   <CDATA>  </CDATA>
   </a>
   END
-  
-    ok $a->lastIn(qw(e E f F))->𝗽𝗿𝗲𝘃𝗜𝗻(qw(A G))->tag eq qq(A);                    
-  
+
+
+    ok $a->lastIn(qw(e E f F))->prevIn(qw(A G))->tag eq qq(A);                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 prevOn($node, @tags)
 
@@ -17145,7 +17713,7 @@ Step backwards as far as possible while remaining on nodes with the specified ta
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="1"/>
@@ -17156,15 +17724,19 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $c->id == 1;                                                                
-  
-    ok $e->id == 5;                                                                
-  
-    ok $e->𝗽𝗿𝗲𝘃𝗢𝗻(qw(d))  ->id == 4;                                              
-  
-    ok $e->𝗽𝗿𝗲𝘃𝗢𝗻(qw(c d))     == $c;                                             
-  
+
+    ok $c->id == 1;
+
+    ok $e->id == 5;
+
+
+    ok $e->prevOn(qw(d))  ->id == 4;                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $e->prevOn(qw(c d))     == $c;                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 prevWhile($node, @tags)
 
@@ -17177,7 +17749,7 @@ Go to the previous sibling of the specified B<$node> and continue backwards whil
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                 
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
     <c/>
@@ -17186,13 +17758,15 @@ B<Example:>
     <f/>
   </a>
   END
-  
-    my ($b, $c, $d, $e, $f) = $a->byList;                                                
-  
-    ok $c == $f->prevWhile_e_d;                                                   
-  
-    ok $b == $c->𝗽𝗿𝗲𝘃𝗪𝗵𝗶𝗹𝗲;                                                       
-  
+
+    my ($b, $c, $d, $e, $f) = $a->byList;
+
+    ok $c == $f->prevWhile_e_d;
+
+
+    ok $b == $c->prevWhile;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 prevUntil($node, @tags)
 
@@ -17205,7 +17779,7 @@ Go to the previous sibling of the specified B<$node> and continue backwards unti
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                 
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
     <c/>
@@ -17214,13 +17788,15 @@ B<Example:>
     <f/>
   </a>
   END
-  
-    my ($b, $c, $d, $e, $f) = $a->byList;                                                
-  
-    ok $b == $f->prevUntil_a_b;                                                   
-  
-    ok      !$c->𝗽𝗿𝗲𝘃𝗨𝗻𝘁𝗶𝗹;                                                       
-  
+
+    my ($b, $c, $d, $e, $f) = $a->byList;
+
+    ok $b == $f->prevUntil_a_b;
+
+
+    ok      !$c->prevUntil;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 Up
 
@@ -17246,12 +17822,14 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d/></c></b></a>
   END
-  
+
     $a->by(sub
      {ok $a == $_->root;
-      ok $a == $_->𝘁𝗼𝗽;
+
+      ok $a == $_->top;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      });
-  
+
 
 =head3 up($node, @context)
 
@@ -17270,11 +17848,11 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><b><b><b><b><c/></b></b></b></b></c></b></a>
   END
-  
+
     $a->numberTree;
     ok -z $a eq <<END;
   <a id="1">
@@ -17293,7 +17871,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $c = $a->findByNumber(8);
     ok -t $c eq q(c);
     ok  $c->up_b__number == 7;
@@ -17301,11 +17879,11 @@ B<Example:>
     ok  $c->upWhile_b__number == 4;
     ok  $c->upWhile_a_b__number == 4;
     ok  $c->upWhile_b_c__number == 2;
-  
+
     ok  $c->upUntil__number == 8;
     ok  $c->upUntil_b_c__number == 4;
    }
-  
+
 
 =head3 upn($node, $levels, @context)
 
@@ -17325,11 +17903,11 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><b><b><b><b><c/></b></b></b></b></c></b></a>
   END
-  
+
     $a->numberTree;
     ok -z $a eq <<END;
   <a id="1">
@@ -17348,7 +17926,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $c = $a->findByNumber(8);
     ok -t $c eq q(c);
     ok  $c->up_b__number == 7;
@@ -17356,46 +17934,46 @@ B<Example:>
     ok  $c->upWhile_b__number == 4;
     ok  $c->upWhile_a_b__number == 4;
     ok  $c->upWhile_b_c__number == 2;
-  
+
     ok  $c->upUntil__number == 8;
     ok  $c->upUntil_b_c__number == 4;
    }
-  
-  if (1)                                                                          
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+
+  if (1)
+   {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d><e/></d></c></b></a>
   END
-  
-    my ($e, $d, $c, $b) = $a->byList;                                             
-  
-    ok $e = $e->upn_0_e_d_c_b_a;                                                  
-    ok $d = $e->upn_1_d_c_b_a;                                                    
-    ok $c = $e->upn_2_c_b_a;                                                      
-    ok $b = $e->upn_3_b_a;                                                        
-    ok $a = $e->upn_4_a;                                                          
-    ok     !$e->upn_5;                                                            
-  
+
+    my ($e, $d, $c, $b) = $a->byList;
+
+    ok $e = $e->upn_0_e_d_c_b_a;
+    ok $d = $e->upn_1_d_c_b_a;
+    ok $c = $e->upn_2_c_b_a;
+    ok $b = $e->upn_3_b_a;
+    ok $a = $e->upn_4_a;
+    ok     !$e->upn_5;
+
     is_deeply [$e, $d, $c, $b, $a], [$e->ancestry];
    }
-  
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+
+   {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><d><e/></d></c></b></a>
   END
-  
-    my ($e, $d, $c, $b) = $a->byList;                                             
-  
-    ok $e = $e->upn_0_e_d_c_b_a;                                                  
-  
-    ok $d = $e->upn_1_d_c_b_a;                                                    
-  
-    ok $c = $e->upn_2_c_b_a;                                                      
-  
-    ok $b = $e->upn_3_b_a;                                                        
-  
-    ok $a = $e->upn_4_a;                                                          
-  
-    ok     !$e->upn_5;                                                            
-  
+
+    my ($e, $d, $c, $b) = $a->byList;
+
+    ok $e = $e->upn_0_e_d_c_b_a;
+
+    ok $d = $e->upn_1_d_c_b_a;
+
+    ok $c = $e->upn_2_c_b_a;
+
+    ok $b = $e->upn_3_b_a;
+
+    ok $a = $e->upn_4_a;
+
+    ok     !$e->upn_5;
+
 
 =head3 upWhile($node, @tags)
 
@@ -17408,11 +17986,11 @@ Go up one level from the specified B<$node> and then continue up while each node
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><b><b><b><b><c/></b></b></b></b></c></b></a>
   END
-  
+
     $a->numberTree;
     ok -z $a eq <<END;
   <a id="1">
@@ -17431,7 +18009,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $c = $a->findByNumber(8);
     ok -t $c eq q(c);
     ok  $c->up_b__number == 7;
@@ -17439,11 +18017,11 @@ B<Example:>
     ok  $c->upWhile_b__number == 4;
     ok  $c->upWhile_a_b__number == 4;
     ok  $c->upWhile_b_c__number == 2;
-  
+
     ok  $c->upUntil__number == 8;
     ok  $c->upUntil_b_c__number == 4;
    }
-  
+
 
 =head3 upWhileFirst($node, @context)
 
@@ -17462,7 +18040,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17482,15 +18060,21 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $h == $i->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                   
-  
-    ok  $a == $c->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                   
-  
-    ok !$d->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                         
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $h == $i->upWhileFirst;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a == $c->upWhileFirst;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->upWhileFirst;                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 upWhileLast($node, @context)
 
@@ -17509,7 +18093,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17529,17 +18113,23 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $j == $j->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗟𝗮𝘀𝘁;                                                    
-  
-    ok  $a == $l->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗟𝗮𝘀𝘁;                                                    
-  
-    ok !$d->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗟𝗮𝘀𝘁;                                                          
-  
-    ok  $i == $k->upUntilLast;                                                    
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $j == $j->upWhileLast;                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $a == $l->upWhileLast;                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->upWhileLast;                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $i == $k->upUntilLast;
+
 
 =head3 upWhileIsOnlyChild($node, @context)
 
@@ -17558,7 +18148,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17578,15 +18168,21 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $h == $i->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗜𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;                                             
-  
-    ok  $j == $j->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗜𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;                                             
-  
-    ok !$d->𝘂𝗽𝗪𝗵𝗶𝗹𝗲𝗜𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;                                                   
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $h == $i->upWhileIsOnlyChild;                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $j == $j->upWhileIsOnlyChild;                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->upWhileIsOnlyChild;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 upUntil($node, @context)
 
@@ -17605,11 +18201,11 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c><b><b><b><b><c/></b></b></b></b></c></b></a>
   END
-  
+
     $a->numberTree;
     ok -z $a eq <<END;
   <a id="1">
@@ -17628,7 +18224,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $c = $a->findByNumber(8);
     ok -t $c eq q(c);
     ok  $c->up_b__number == 7;
@@ -17636,11 +18232,11 @@ B<Example:>
     ok  $c->upWhile_b__number == 4;
     ok  $c->upWhile_a_b__number == 4;
     ok  $c->upWhile_b_c__number == 2;
-  
+
     ok  $c->upUntil__number == 8;
     ok  $c->upUntil_b_c__number == 4;
    }
-  
+
 
 =head3 upUntilFirst($node, @context)
 
@@ -17659,7 +18255,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17679,11 +18275,13 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $b == $d->𝘂𝗽𝗨𝗻𝘁𝗶𝗹𝗙𝗶𝗿𝘀𝘁;                                                   
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $b == $d->upUntilFirst;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 upUntilLast($node, @context)
 
@@ -17702,7 +18300,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17722,9 +18320,9 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
 
 =head3 upUntilIsOnlyChild($node, @context)
 
@@ -17743,7 +18341,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17763,11 +18361,13 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $i == $k->𝘂𝗽𝗨𝗻𝘁𝗶𝗹𝗜𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;                                             
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $i == $k->upUntilIsOnlyChild;                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 upThru($node, @tags)
 
@@ -17780,7 +18380,7 @@ Go up the specified path from the specified B<$node> returning the node at the t
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17791,19 +18391,27 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $e, $f, $d, $b) = $a->byList;                                         
-  
-    ok -t $f                eq q(f);                                              
-  
-    ok -t $f->𝘂𝗽𝗧𝗵𝗿𝘂        eq q(f);                                              
-  
-    ok -t $f->𝘂𝗽𝗧𝗵𝗿𝘂(qw(d)) eq q(d);                                              
-  
-    ok -t eval{$f->𝘂𝗽𝗧𝗵𝗿𝘂(qw(d))->last->prev} eq q(e);                            
-  
-    ok !  eval{$f->𝘂𝗽𝗧𝗵𝗿𝘂(qw(d b))->next};                                        
-  
+
+    my ($c, $e, $f, $d, $b) = $a->byList;
+
+    ok -t $f                eq q(f);
+
+
+    ok -t $f->upThru        eq q(f);                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok -t $f->upThru(qw(d)) eq q(d);                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok -t eval{$f->upThru(qw(d))->last->prev} eq q(e);                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !  eval{$f->upThru(qw(d b))->next};                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 down
 
@@ -17826,7 +18434,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17846,17 +18454,25 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $k == $g->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                 
-  
-    ok  $c == $a->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                 
-  
-    ok  $c == $c->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                 
-  
-    ok       !$d->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗙𝗶𝗿𝘀𝘁;                                                 
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $k == $g->downWhileFirst;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $c == $a->downWhileFirst;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $c == $c->downWhileFirst;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok       !$d->downWhileFirst;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 B<firstLeaf> is a synonym for L<downWhileFirst|/downWhileFirst>.
 
@@ -17878,7 +18494,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                        
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -17898,15 +18514,21 @@ B<Example:>
     </g>
   </a>
   END
-  
-    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;                             
-  
-    ok  $l == $a->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗟𝗮𝘀𝘁;                                                  
-  
-    ok  $l == $g->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗟𝗮𝘀𝘁;                                                  
-  
-    ok       !$d->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗟𝗮𝘀𝘁;                                                  
-  
+
+    my ($c, $d, $j, $e, $f, $b, $k, $l, $i, $h, $g) = $a->byList;
+
+
+    ok  $l == $a->downWhileLast;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $l == $g->downWhileLast;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok       !$d->downWhileLast;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 B<lastLeaf> is a synonym for L<downWhileLast|/downWhileLast>.
 
@@ -17928,12 +18550,18 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok  $h == $g->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗛𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱;                                        
-  
-    ok  $h == $h->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗛𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱;                                        
-  
-    ok       !$i->𝗱𝗼𝘄𝗻𝗪𝗵𝗶𝗹𝗲𝗛𝗮𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱;                                        
-  
+
+    ok  $h == $g->downWhileHasSingleChild;                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $h == $h->downWhileHasSingleChild;                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok       !$i->downWhileHasSingleChild;                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Editing
 
@@ -17957,12 +18585,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new('<a/>');                                         
-  
-    $a->𝗰𝗵𝗮𝗻𝗴𝗲(qq(b));                                                            
-  
-    ok -s $a eq '<b/>';                                                           
-  
+   {my $a = Data::Edit::Xml::new('<a/>');
+
+
+    $a->change(qq(b));                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $a eq '<b/>';
+
 
 B<cc> is a synonym for L<change|/change>.
 
@@ -18009,9 +18639,11 @@ B<Example:>
     </j>
   </a>
   END
-  
-    $a->𝗰𝗵𝗮𝗻𝗴𝗲𝗞𝗶𝗱𝘀(q(B), qr(\A(b|j|k|l|m)\Z), q(a));
-  
+
+
+    $a->changeKids(q(B), qr(\A(b|j|k|l|m)\Z), q(a));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <B>
@@ -18033,9 +18665,9 @@ B<Example:>
     </B>
   </a>
   END
-  
+
     $a->go_f__changeKids_F;
-  
+
     ok -p $a eq <<END;
   <a>
     <B>
@@ -18057,7 +18689,7 @@ B<Example:>
     </B>
   </a>
   END
-  
+
 
 =head2 changeText($node, $rf, $rt, $flags, @context)
 
@@ -18079,10 +18711,10 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                             
+    my $a = Data::Edit::Xml::new(<<END);
   <a>abcdcba</a>
   END
-  
+
 
 =head2 changeTextToSpace($node, $re, @context)
 
@@ -18102,10 +18734,10 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                             
+    my $a = Data::Edit::Xml::new(<<END);
   <a>abcdcba</a>
   END
-  
+
 
 =head2 dupPutNext($tree, @context)
 
@@ -18134,9 +18766,9 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $a->first__dupPutNext_b;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18150,9 +18782,9 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $a->last__dupPutPrev_d;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18169,7 +18801,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 B<r> is a synonym for L<dupPutNext|/dupPutNext>.
 
@@ -18201,9 +18833,9 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $a->first__dupPutNext_b;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18217,9 +18849,9 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $a->last__dupPutPrev_d;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18236,7 +18868,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head2 dupPutNextN($node, $N, @context)
 
@@ -18268,9 +18900,9 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $a->go_b__dupPutNextN_2;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18289,7 +18921,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 B<rN> is a synonym for L<dupPutNextN|/dupPutNextN>.
 
@@ -18329,7 +18961,7 @@ B<Example:>
     $a->go_b_1__setSelectionStart;
     $a->go_d__setSelectionEnd;
     $a->first__moveSelectionBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18345,7 +18977,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d_e__setSelectionStart;
     $a->go_d_g__setSelectionEnd;
     $a->go_b_c__moveSelectionAfter;
@@ -18363,11 +18995,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_e__setSelectionStart;
     $a->go_b_f__setSelectionEnd;
     $a->last__moveSelectionFirst;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18382,11 +19014,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d__setSelectionStart;
     $a->last__setSelectionEnd;
     $a->go_b__moveSelectionLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18401,7 +19033,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<ss> is a synonym for L<setSelectionStart|/setSelectionStart>.
 
@@ -18441,7 +19073,7 @@ B<Example:>
     $a->go_b_1__setSelectionStart;
     $a->go_d__setSelectionEnd;
     $a->first__moveSelectionBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18457,7 +19089,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d_e__setSelectionStart;
     $a->go_d_g__setSelectionEnd;
     $a->go_b_c__moveSelectionAfter;
@@ -18475,11 +19107,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_e__setSelectionStart;
     $a->go_b_f__setSelectionEnd;
     $a->last__moveSelectionFirst;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18494,11 +19126,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d__setSelectionStart;
     $a->last__setSelectionEnd;
     $a->go_b__moveSelectionLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18513,7 +19145,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<se> is a synonym for L<setSelectionEnd|/setSelectionEnd>.
 
@@ -18553,7 +19185,7 @@ B<Example:>
     $a->go_b_1__setSelectionStart;
     $a->go_d__setSelectionEnd;
     $a->first__moveSelectionBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18569,7 +19201,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d_e__setSelectionStart;
     $a->go_d_g__setSelectionEnd;
     $a->go_b_c__moveSelectionAfter;
@@ -18587,11 +19219,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_e__setSelectionStart;
     $a->go_b_f__setSelectionEnd;
     $a->last__moveSelectionFirst;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18606,11 +19238,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d__setSelectionStart;
     $a->last__setSelectionEnd;
     $a->go_b__moveSelectionLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18625,7 +19257,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<mf> is a synonym for L<moveSelectionFirst|/moveSelectionFirst>.
 
@@ -18665,7 +19297,7 @@ B<Example:>
     $a->go_b_1__setSelectionStart;
     $a->go_d__setSelectionEnd;
     $a->first__moveSelectionBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18681,7 +19313,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d_e__setSelectionStart;
     $a->go_d_g__setSelectionEnd;
     $a->go_b_c__moveSelectionAfter;
@@ -18699,11 +19331,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_e__setSelectionStart;
     $a->go_b_f__setSelectionEnd;
     $a->last__moveSelectionFirst;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18718,11 +19350,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d__setSelectionStart;
     $a->last__setSelectionEnd;
     $a->go_b__moveSelectionLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18737,7 +19369,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<ma> is a synonym for L<moveSelectionAfter|/moveSelectionAfter>.
 
@@ -18777,7 +19409,7 @@ B<Example:>
     $a->go_b_1__setSelectionStart;
     $a->go_d__setSelectionEnd;
     $a->first__moveSelectionBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18793,7 +19425,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d_e__setSelectionStart;
     $a->go_d_g__setSelectionEnd;
     $a->go_b_c__moveSelectionAfter;
@@ -18811,11 +19443,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_e__setSelectionStart;
     $a->go_b_f__setSelectionEnd;
     $a->last__moveSelectionFirst;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18830,11 +19462,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d__setSelectionStart;
     $a->last__setSelectionEnd;
     $a->go_b__moveSelectionLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18849,7 +19481,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<mb> is a synonym for L<moveSelectionBefore|/moveSelectionBefore>.
 
@@ -18889,7 +19521,7 @@ B<Example:>
     $a->go_b_1__setSelectionStart;
     $a->go_d__setSelectionEnd;
     $a->first__moveSelectionBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18905,7 +19537,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d_e__setSelectionStart;
     $a->go_d_g__setSelectionEnd;
     $a->go_b_c__moveSelectionAfter;
@@ -18923,11 +19555,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_e__setSelectionStart;
     $a->go_b_f__setSelectionEnd;
     $a->last__moveSelectionFirst;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18942,11 +19574,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_d__setSelectionStart;
     $a->last__setSelectionEnd;
     $a->go_b__moveSelectionLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -18961,7 +19593,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<ml> is a synonym for L<moveSelectionLast|/moveSelectionLast>.
 
@@ -18987,22 +19619,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                            
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"/>
     </b>
   </a>
   END
-  
-      my $c = $a->go(qw(b c))->𝗰𝘂𝘁;                                                
-  
-      ok -p $a eq <<END;                                                          
+
+
+      my $c = $a->go(qw(b c))->cut;                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
   </a>
   END
-  
+
 
 B<x> is a synonym for L<cut|/cut>.
 
@@ -19033,7 +19667,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19044,7 +19678,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19066,9 +19700,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19076,7 +19710,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19085,7 +19719,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19095,7 +19729,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19106,8 +19740,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 putCutOutFirst($node, @context)
 
@@ -19135,7 +19769,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19146,7 +19780,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19168,17 +19802,19 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
-    $a->𝗽𝘂𝘁𝗖𝘂𝘁𝗢𝘂𝘁𝗙𝗶𝗿𝘀𝘁;
+
+
+    $a->putCutOutFirst;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <f/>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19187,7 +19823,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19197,7 +19833,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19208,8 +19844,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 cutLast($node, @context)
 
@@ -19237,7 +19873,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19248,7 +19884,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19270,9 +19906,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19280,7 +19916,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19289,7 +19925,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19299,7 +19935,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19310,8 +19946,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 putCutOutLast($node, @context)
 
@@ -19339,7 +19975,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19350,7 +19986,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19372,9 +20008,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19382,8 +20018,10 @@ B<Example:>
     <d/>
   </a>
   END
-  
-    $a->𝗽𝘂𝘁𝗖𝘂𝘁𝗢𝘂𝘁𝗟𝗮𝘀𝘁;
+
+
+    $a->putCutOutLast;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -19391,7 +20029,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19401,7 +20039,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19412,8 +20050,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 cutNext($node, @context)
 
@@ -19441,7 +20079,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19452,7 +20090,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19474,9 +20112,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19484,7 +20122,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19493,7 +20131,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19503,7 +20141,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19514,8 +20152,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 putCutOutNext($node, @context)
 
@@ -19543,7 +20181,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19554,7 +20192,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19576,9 +20214,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19586,7 +20224,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19595,7 +20233,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19605,8 +20243,10 @@ B<Example:>
     <b/>
   </a>
   END
-  
-    $d->𝗽𝘂𝘁𝗖𝘂𝘁𝗢𝘂𝘁𝗡𝗲𝘅𝘁;
+
+
+    $d->putCutOutNext;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -19616,8 +20256,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 cutPrev($node, @context)
 
@@ -19645,7 +20285,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19656,7 +20296,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19678,9 +20318,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19688,7 +20328,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19697,7 +20337,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutPrev;
     ok -p $a eq <<END;
   <a>
@@ -19707,7 +20347,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19718,8 +20358,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 putCutOutPrev($node, @context)
 
@@ -19747,7 +20387,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     my ($b, $c, $d, $e, $f) = $a->byList;
     $b->cutNext_c_a;
     ok -p $a eq <<END;
@@ -19758,7 +20398,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $f->cutPrev_e_a;
     ok -p $a eq <<END;
   <a>
@@ -19780,9 +20420,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok @saveLastCutOut == 4;
-  
+
     $a->putCutOutFirst;
     ok -p $a eq <<END;
   <a>
@@ -19790,7 +20430,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->putCutOutLast;
     ok -p $a eq <<END;
   <a>
@@ -19799,8 +20439,10 @@ B<Example:>
     <b/>
   </a>
   END
-  
-    $d->𝗽𝘂𝘁𝗖𝘂𝘁𝗢𝘂𝘁𝗣𝗿𝗲𝘃;
+
+
+    $d->putCutOutPrev;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -19809,7 +20451,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $d->putCutOutNext;
     ok -p $a eq <<END;
   <a>
@@ -19820,8 +20462,8 @@ B<Example:>
     <b/>
   </a>
   END
-  
-  
+
+
 
 =head3 cutIfEmpty($node, @context)
 
@@ -19848,11 +20490,13 @@ B<Example:>
     <e>ee</e>
   </a>
   END
-  
+
     my (undef, $b, $c, $d, undef, $e) = $a->byList;
     is_deeply [q(b)..q(e)], [map {-t $_} ($b, $c, $d, $e)];
-  
-    $c->𝗰𝘂𝘁𝗜𝗳𝗘𝗺𝗽𝘁𝘆;
+
+
+    $c->cutIfEmpty;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>bb</b>
@@ -19860,17 +20504,21 @@ B<Example:>
     <e>ee</e>
   </a>
   END
-  
-    $d->𝗰𝘂𝘁𝗜𝗳𝗘𝗺𝗽𝘁𝘆;
+
+
+    $d->cutIfEmpty;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>bb</b>
     <e>ee</e>
   </a>
   END
-  
-    ok !$_->𝗰𝘂𝘁𝗜𝗳𝗘𝗺𝗽𝘁𝘆 for $a, $b, $e;
-  
+
+
+    ok !$_->cutIfEmpty for $a, $b, $e;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 deleteContent($node, @context)
 
@@ -19889,21 +20537,23 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                              
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>bb<c>cc</c>BB
     </b>
   </a>
   END
-  
-    $b->𝗱𝗲𝗹𝗲𝘁𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁;                                                            
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $b->deleteContent;                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
+
 
 =head3 putFirst($old, $new, @context)
 
@@ -19923,25 +20573,27 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                            
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"/>
     </b>
   </a>
   END
-  
-      my $c = $a->go(qw(b c))->cut;                                                
-  
-      $a->𝗽𝘂𝘁𝗙𝗶𝗿𝘀𝘁($c);                                                           
-  
-      ok -p $a eq <<END;                                                           
+
+      my $c = $a->go(qw(b c))->cut;
+
+
+      $a->putFirst($c);                                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a id="aa">
     <c id="cc"/>
     <b id="bb"/>
   </a>
   END
-  
+
 
 =head3 putFirstCut($first, $second, @context)
 
@@ -19961,7 +20613,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -19969,12 +20621,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $d, $b) = $a->byList;                                                 
-  
-    $c->𝗽𝘂𝘁𝗙𝗶𝗿𝘀𝘁𝗖𝘂𝘁($d, qw(c b a));                                               
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $d, $b) = $a->byList;
+
+
+    $c->putFirstCut($d, qw(c b a));                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <c>
@@ -19983,7 +20637,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putLast($old, $new, @context)
 
@@ -20003,22 +20657,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                           
+      ok -p $a eq <<END;
   <a id="aa">
     <c id="cc"/>
     <b id="bb"/>
   </a>
   END
-  
-      $a->𝗽𝘂𝘁𝗟𝗮𝘀𝘁($a->go(qw(c))->cut);                                            
-  
-      ok -p $a eq <<END;                                                           
+
+
+      $a->putLast($a->go(qw(c))->cut);                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
     <c id="cc"/>
   </a>
   END
-  
+
 
 =head3 putLastCut($first, $second, @context)
 
@@ -20038,7 +20694,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -20046,12 +20702,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $d, $b) = $a->byList;                                                 
-  
-    $a->𝗽𝘂𝘁𝗟𝗮𝘀𝘁𝗖𝘂𝘁($d, qw(a));                                                    
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $d, $b) = $a->byList;
+
+
+    $a->putLastCut($d, qw(a));                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <c/>
@@ -20059,7 +20717,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head3 putNext($old, $new, @context)
 
@@ -20079,22 +20737,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                           
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
     <c id="cc"/>
   </a>
   END
-  
-      $a->go(qw(c))->𝗽𝘂𝘁𝗡𝗲𝘅𝘁($a->go(q(b))->cut);                                  
-  
-      ok -p $a eq <<END;                                                           
+
+
+      $a->go(qw(c))->putNext($a->go(q(b))->cut);                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a id="aa">
     <c id="cc"/>
     <b id="bb"/>
   </a>
   END
-  
+
 
 =head3 putNextCut($first, $second, @context)
 
@@ -20114,7 +20774,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -20122,12 +20782,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $d, $b) = $a->byList;                                                 
-  
-    $d->𝗽𝘂𝘁𝗡𝗲𝘅𝘁𝗖𝘂𝘁($c, qw(d b a));                                                
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $d, $b) = $a->byList;
+
+
+    $d->putNextCut($c, qw(d b a));                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <d/>
@@ -20135,7 +20797,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putPrev($old, $new, @context)
 
@@ -20155,22 +20817,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                           
+      ok -p $a eq <<END;
   <a id="aa">
     <c id="cc"/>
     <b id="bb"/>
   </a>
   END
-  
-      $a->go(qw(c))->𝗽𝘂𝘁𝗣𝗿𝗲𝘃($a->go(q(b))->cut);                                  
-  
-      ok -p $a eq <<END;                                                          
+
+
+      $a->go(qw(c))->putPrev($a->go(q(b))->cut);                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
     <c id="cc"/>
   </a>
   END
-  
+
 
 =head3 putPrevCut($first, $second, @context)
 
@@ -20190,7 +20854,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -20198,12 +20862,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $d, $b) = $a->byList;                                                 
-  
-    $c->𝗽𝘂𝘁𝗣𝗿𝗲𝘃𝗖𝘂𝘁($d, qw(c b a));                                                
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $d, $b) = $a->byList;
+
+
+    $c->putPrevCut($d, qw(c b a));                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <d/>
@@ -20211,7 +20877,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 Put Siblings or Contents
 
@@ -20239,10 +20905,12 @@ B<Example:>
     <b/><c/><d/><e/><f/>
   </a>
   END
-  
+
    my ($b, $c, $d, $e, $f) = $a->byList;
-  
-   $d->𝗽𝘂𝘁𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗙𝗶𝗿𝘀𝘁;
+
+
+   $d->putSiblingsFirst;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok -p $a eq <<END;
   <a>
     <d>
@@ -20253,7 +20921,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
 
 =head3 putSiblingsLast($node, @context)
 
@@ -20277,10 +20945,12 @@ B<Example:>
     <b/><c/><d/><e/><f/>
   </a>
   END
-  
+
    my ($b, $c, $d, $e, $f) = $a->byList;
-  
-   $d->𝗽𝘂𝘁𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗟𝗮𝘀𝘁;
+
+
+   $d->putSiblingsLast;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok -p $a eq <<END;
   <a>
     <b/>
@@ -20291,7 +20961,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head3 putSiblingsAfterParent($node, @context)
 
@@ -20317,11 +20987,13 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($c, $d, $e, $b) = $a->byList;
-  
-   $d->𝗽𝘂𝘁𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗔𝗳𝘁𝗲𝗿𝗣𝗮𝗿𝗲𝗻𝘁;
-  
+
+
+   $d->putSiblingsAfterParent;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -20331,7 +21003,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head3 putSiblingsBeforeParent($node, @context)
 
@@ -20357,11 +21029,13 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($c, $d, $e, $b) = $a->byList;
-  
-   $d->𝗽𝘂𝘁𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗕𝗲𝗳𝗼𝗿𝗲𝗣𝗮𝗿𝗲𝗻𝘁;
-  
+
+
+   $d->putSiblingsBeforeParent;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    ok -p $a eq <<END;
   <a>
     <c/>
@@ -20371,7 +21045,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putContentAfter($node, @context)
 
@@ -20397,10 +21071,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($c, $d, $b) = $a->byList;
-  
-   $b->𝗽𝘂𝘁𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗔𝗳𝘁𝗲𝗿;
+
+
+   $b->putContentAfter;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok -p $a eq <<END;
   <a>
     <b/>
@@ -20408,7 +21084,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head3 putContentBefore($node, @context)
 
@@ -20434,10 +21110,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    my ($c, $d, $b) = $a->byList;
-  
-   $b->𝗽𝘂𝘁𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗕𝗲𝗳𝗼𝗿𝗲;
+
+
+   $b->putContentBefore;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    ok -p $a eq <<END;
   <a>
     <c/>
@@ -20445,7 +21123,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
 
 =head2 Move
 
@@ -20471,11 +21149,13 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/><c/><d/></a>
   END
-  
+
     my ($b, $c, $d) = $a->byList;
-    $d->𝗺𝗼𝘃𝗲𝗙𝗶𝗿𝘀𝘁;
+
+    $d->moveFirst;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $b->moveLast;
-  
+
     ok -p $a eq <<END;
   <a>
     <d/>
@@ -20483,7 +21163,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
 
 =head3 moveLast($node, @context)
 
@@ -20505,11 +21185,13 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/><c/><d/></a>
   END
-  
+
     my ($b, $c, $d) = $a->byList;
     $d->moveFirst;
-    $b->𝗺𝗼𝘃𝗲𝗟𝗮𝘀𝘁;
-  
+
+    $b->moveLast;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <d/>
@@ -20517,7 +21199,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
 
 =head3 moveStartFirst($node, @context)
 
@@ -20545,10 +21227,12 @@ B<Example:>
    </d>
   </a>
   END
-  
+
     my ($b, $c, $e, $d) = $a->byList;
-  
-    $d->𝗺𝗼𝘃𝗲𝗦𝘁𝗮𝗿𝘁𝗙𝗶𝗿𝘀𝘁;
+
+
+    $d->moveStartFirst;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <d>
@@ -20558,7 +21242,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head3 moveStartAfter($node, $to, @context)
 
@@ -20587,10 +21271,12 @@ B<Example:>
    </d>
   </a>
   END
-  
+
     my ($b, $c, $e, $d) = $a->byList;
-  
-    $d->𝗺𝗼𝘃𝗲𝗦𝘁𝗮𝗿𝘁𝗔𝗳𝘁𝗲𝗿($b);
+
+
+    $d->moveStartAfter($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -20600,8 +21286,10 @@ B<Example:>
     </d>
   </a>
   END
-  
-    $d->𝗺𝗼𝘃𝗲𝗦𝘁𝗮𝗿𝘁𝗔𝗳𝘁𝗲𝗿($c);
+
+
+    $d->moveStartAfter($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -t $d eq q(d);
     ok -t $c eq q(c);
     ok -p $a eq <<END;
@@ -20613,8 +21301,10 @@ B<Example:>
     </d>
   </a>
   END
-  
-    $d->𝗺𝗼𝘃𝗲𝗦𝘁𝗮𝗿𝘁𝗔𝗳𝘁𝗲𝗿($e);
+
+
+    $d->moveStartAfter($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -20623,7 +21313,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head3 moveStartBefore($node, $to, @context)
 
@@ -20652,10 +21342,12 @@ B<Example:>
    </d>
   </a>
   END
-  
+
     my ($b, $c, $e, $d) = $a->byList;
-  
-    $d->𝗺𝗼𝘃𝗲𝗦𝘁𝗮𝗿𝘁𝗕𝗲𝗳𝗼𝗿𝗲($c);
+
+
+    $d->moveStartBefore($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -20665,8 +21357,10 @@ B<Example:>
     </d>
   </a>
   END
-  
-    $d->𝗺𝗼𝘃𝗲𝗦𝘁𝗮𝗿𝘁𝗕𝗲𝗳𝗼𝗿𝗲($e);
+
+
+    $d->moveStartBefore($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -t $d eq q(d);
     ok -t $e eq q(e);
     ok -p $a eq <<END;
@@ -20678,7 +21372,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $d->moveEndBefore($e);
     ok -t $d eq q(d);
     ok -t $e eq q(e);
@@ -20690,7 +21384,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head3 moveEndLast($node, @context)
 
@@ -20718,10 +21412,12 @@ B<Example:>
    <e/>
   </a>
   END
-  
+
     my ($c, $b, $d, $e) = $a->byList;
-  
-    $b->𝗺𝗼𝘃𝗲𝗘𝗻𝗱𝗟𝗮𝘀𝘁;
+
+
+    $b->moveEndLast;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -20731,7 +21427,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 moveEndAfter($node, $to, @context)
 
@@ -20760,10 +21456,12 @@ B<Example:>
    <e/>
   </a>
   END
-  
+
     my ($c,  $b, $d, $e) = $a->byList;
-  
-    $b->𝗺𝗼𝘃𝗲𝗘𝗻𝗱𝗔𝗳𝘁𝗲𝗿($d);
+
+
+    $b->moveEndAfter($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -20773,8 +21471,10 @@ B<Example:>
     <e/>
   </a>
   END
-  
-    $b->𝗺𝗼𝘃𝗲𝗘𝗻𝗱𝗔𝗳𝘁𝗲𝗿($c);
+
+
+    $b->moveEndAfter($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -20784,7 +21484,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head3 moveEndBefore($node, $to, @context)
 
@@ -20813,10 +21513,12 @@ B<Example:>
    <e/>
   </a>
   END
-  
+
     my ($c,  $b, $d, $e) = $a->byList;
-  
-    $b->𝗺𝗼𝘃𝗲𝗘𝗻𝗱𝗕𝗲𝗳𝗼𝗿𝗲($e);
+
+
+    $b->moveEndBefore($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -20826,8 +21528,10 @@ B<Example:>
     <e/>
   </a>
   END
-  
-    $b->𝗺𝗼𝘃𝗲𝗘𝗻𝗱𝗕𝗲𝗳𝗼𝗿𝗲($d);
+
+
+    $b->moveEndBefore($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -20837,7 +21541,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head3 putNextFirstCut($node, @context)
 
@@ -20864,11 +21568,11 @@ B<Example:>
     </c>
   </a>
   END
-  
+
     my ($b, $d, $c) = $a->byList;
-  
+
     ok !$b->putNextFirstCut_c_x;
-  
+
     $b->putNextFirstCut_c_a;
     ok  -p $a eq <<END;
   <a>
@@ -20878,7 +21582,7 @@ B<Example:>
     </c>
   </a>
   END
-  
+
 
 =head3 putNextFirstCut2($node, @context)
 
@@ -20905,13 +21609,13 @@ B<Example:>
     </c>
   </a>
   END
-  
+
     my ($b, $d, $c) = $a->byList;
-  
+
     ok !$b->putNextFirstCut2_c_a;
-  
+
     $b->putNextFirstCut2_d_c_a;
-  
+
     ok  -p $a eq <<END;
   <a>
     <c>
@@ -20921,7 +21625,7 @@ B<Example:>
     </c>
   </a>
   END
-  
+
 
 =head3 putPrevLastCut($node, @context)
 
@@ -20948,11 +21652,11 @@ B<Example:>
      <d/>
   </a>
   END
-  
+
     my ($c, $b, $d) = $a->byList;
-  
+
     ok !$d->putPrevLastCut_b_c;
-  
+
     $d->putPrevLastCut_b_a;
     ok  -p $a eq <<END;
   <a>
@@ -20962,7 +21666,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putPrevLastCut2($node, @context)
 
@@ -20989,11 +21693,11 @@ B<Example:>
      <d/>
   </a>
   END
-  
+
     my ($c, $b, $d) = $a->byList;
-  
+
     ok !$d->putPrevLastCut2_c_a;
-  
+
     $d->putPrevLastCut2_c_b_a;
     ok  -p $a eq <<END;
   <a>
@@ -21004,7 +21708,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putUpNextCut($node, @context)
 
@@ -21032,9 +21736,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->by(sub{$_->putUpNextCut_d_c_b_a});
-  
+
     ok -p $a eq <<END
   <a>
     <b>
@@ -21043,7 +21747,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putUpNextCut2($node, @context)
 
@@ -21071,9 +21775,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->by(sub{$_->putUpNextCut2_d_c_b_a});
-  
+
     ok -p $a eq <<END
   <a>
     <b>
@@ -21082,7 +21786,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head3 putUpPrevCut($node, @context)
 
@@ -21110,9 +21814,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->by(sub{$_->putUpPrevCut_d_c_b_a});
-  
+
     ok -p $a eq <<END
   <a>
     <b>
@@ -21121,7 +21825,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putUpPrevCut2($node, @context)
 
@@ -21149,9 +21853,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->by(sub{$_->putUpPrevCut2_d_c_b_a});
-  
+
     ok -p $a eq <<END
   <a>
     <d/>
@@ -21160,7 +21864,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 moveBlockFirst($start, $end, $parent, @context)
 
@@ -21195,9 +21899,11 @@ B<Example:>
   </x>
   END
     my ($a, $b, $c, $d, $e, $g, $f, $h) = $x->byList;
-  
-    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗶𝗿𝘀𝘁($d, $f, qw(c x));
-  
+
+
+    $c->moveBlockFirst($d, $f, qw(c x));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a/>
@@ -21211,7 +21917,7 @@ B<Example:>
     <h/>
   </x>
   END
-  
+
 
 =head3 moveBlockLast($start, $end, $parent, @context)
 
@@ -21246,9 +21952,11 @@ B<Example:>
   </x>
   END
     my ($a, $b, $c, $d, $e, $g, $f, $h) = $x->byList;
-  
-    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗟𝗮𝘀𝘁($d, $f, qw(c x));
-  
+
+
+    $c->moveBlockLast($d, $f, qw(c x));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a/>
@@ -21262,7 +21970,7 @@ B<Example:>
     <h/>
   </x>
   END
-  
+
 
 =head3 moveBlockAfter($start, $end, $after, @context)
 
@@ -21284,13 +21992,15 @@ B<Example:>
 
 
     my $x = Data::Edit::Xml::new(q(<x><a/><b/><c/><d/><e/><f/><g/><h/></x>));
-  
+
     my ($a, $b, $c, $d, $e, $f, $g, $h) = $x->byList;
-  
-    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗔𝗳𝘁𝗲𝗿($d, $f, qw(c x));
-  
+
+
+    $c->moveBlockAfter($d, $f, qw(c x));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -C $x eq q(<a/><b/><e/><f/><c/><d/><g/><h/>);
-  
+
 
 =head3 moveBlockBefore($start, $end, $before, @context)
 
@@ -21312,13 +22022,15 @@ B<Example:>
 
 
     my $x = Data::Edit::Xml::new(q(<x><a/><b/><c/><d/><e/><f/><g/><h/></x>));
-  
+
     my ($a, $b, $c, $d, $e, $f, $g, $h) = $x->byList;
-  
-    $f->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗕𝗲𝗳𝗼𝗿𝗲($g, $b, qw(f x));
-  
+
+
+    $f->moveBlockBefore($g, $b, qw(f x));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -C $x eq q(<a/><f/><g/><b/><c/><d/><e/><h/>);
-  
+
 
 =head3 moveBlockToLastFirst($start, $parent, @context)
 
@@ -21346,9 +22058,11 @@ B<Example:>
   </x>
   END
     my ($a, $b, $c) = $x->byList;
-  
-    $b->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗙𝗶𝗿𝘀𝘁($a);
-  
+
+
+    $b->moveBlockToLastFirst($a);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a>
@@ -21357,7 +22071,7 @@ B<Example:>
     </a>
   </x>
   END
-  
+
 
 =head3 moveBlockToLastLast($start, $parent, @context)
 
@@ -21392,9 +22106,11 @@ B<Example:>
   </x>
   END
     my ($b, $c, $d, $a, $f, $g, $h, $e) = $x->byList;
-  
-    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗟𝗮𝘀𝘁($e);
-  
+
+
+    $c->moveBlockToLastLast($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a>
@@ -21409,7 +22125,7 @@ B<Example:>
     </e>
   </x>
   END
-  
+
 
 =head3 moveBlockToLastAfter($start, $after, @context)
 
@@ -21440,9 +22156,11 @@ B<Example:>
   </x>
   END
     my ($b, $c, $d, $a, $e) = $x->byList;
-  
-    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗔𝗳𝘁𝗲𝗿($e);
-  
+
+
+    $c->moveBlockToLastAfter($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a>
@@ -21453,7 +22171,7 @@ B<Example:>
     <d/>
   </x>
   END
-  
+
 
 =head3 moveBlockToLastBefore($start, $before, @context)
 
@@ -21484,9 +22202,11 @@ B<Example:>
   </x>
   END
     my ($a, $c, $d, $e, $b) = $x->byList;
-  
-    $d->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗧𝗼𝗟𝗮𝘀𝘁𝗕𝗲𝗳𝗼𝗿𝗲($b);
-  
+
+
+    $d->moveBlockToLastBefore($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a/>
@@ -21497,7 +22217,7 @@ B<Example:>
     </b>
   </x>
   END
-  
+
 
 =head3 moveBlockFromFirstFirst($start, $parent, @context)
 
@@ -21532,9 +22252,11 @@ B<Example:>
   </x>
   END
     my ($b, $c, $d, $a, $f, $g, $h, $e) = $x->byList;
-  
-    $g->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗙𝗶𝗿𝘀𝘁($a);
-  
+
+
+    $g->moveBlockFromFirstFirst($a);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a>
@@ -21549,7 +22271,7 @@ B<Example:>
     </e>
   </x>
   END
-  
+
 
 =head3 moveBlockFromFirstLast($start, $parent, @context)
 
@@ -21577,9 +22299,11 @@ B<Example:>
   </x>
   END
     my ($a, $b, $c) = $x->byList;
-  
-    $b->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗟𝗮𝘀𝘁($c);
-  
+
+
+    $b->moveBlockFromFirstLast($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <c>
@@ -21588,7 +22312,7 @@ B<Example:>
     </c>
   </x>
   END
-  
+
 
 =head3 moveBlockFromFirstAfter($start, $after, @context)
 
@@ -21619,9 +22343,11 @@ B<Example:>
   </x>
   END
     my ($b, $c, $d, $a, $e) = $x->byList;
-  
-    $c->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗔𝗳𝘁𝗲𝗿($e);
-  
+
+
+    $c->moveBlockFromFirstAfter($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a>
@@ -21632,7 +22358,7 @@ B<Example:>
     <c/>
   </x>
   END
-  
+
 
 =head3 moveBlockFromFirstBefore($start, $before, @context)
 
@@ -21663,9 +22389,11 @@ B<Example:>
   </x>
   END
     my ($a, $c, $d, $e, $b) = $x->byList;
-  
-    $d->𝗺𝗼𝘃𝗲𝗕𝗹𝗼𝗰𝗸𝗙𝗿𝗼𝗺𝗙𝗶𝗿𝘀𝘁𝗕𝗲𝗳𝗼𝗿𝗲($b);
-  
+
+
+    $d->moveBlockFromFirstBefore($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $x eq <<END;
   <x>
     <a/>
@@ -21676,7 +22404,7 @@ B<Example:>
     </b>
   </x>
   END
-  
+
 
 =head2 Add selectively
 
@@ -21700,16 +22428,16 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::newTree(q(a));                                       
-  
-    $a->addFirst_b for 1..2;                                                      
-  
-    ok -p $a eq <<END;                                                             
+   {my $a = Data::Edit::Xml::newTree(q(a));
+
+    $a->addFirst_b for 1..2;
+
+    ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
+
 
 =head3 addNext($node, $tag, @context)
 
@@ -21729,23 +22457,23 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <b/>
     <e/>
   </a>
   END
-  
-    $a->addFirst_b__addNext_c;                                                    
-  
-    ok -p $a eq <<END;                                                             
+
+    $a->addFirst_b__addNext_c;
+
+    ok -p $a eq <<END;
   <a>
     <b/>
     <c/>
     <e/>
   </a>
   END
-  
+
 
 =head3 addPrev($node, $tag, @context)
 
@@ -21765,17 +22493,17 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <b/>
     <c/>
     <e/>
   </a>
   END
-  
-    $a->addLast_e__addPrev_d;                                                     
-  
-    ok -p $a eq <<END;                                                            
+
+    $a->addLast_e__addPrev_d;
+
+    ok -p $a eq <<END;
   <a>
     <b/>
     <c/>
@@ -21783,7 +22511,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head3 addLast($node, $tag, @context)
 
@@ -21803,21 +22531,23 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
-    $a->𝗮𝗱𝗱𝗟𝗮𝘀𝘁(qw(e)) for 1..2;                                                  
-  
-    ok -p $a eq <<END;                                                             
+
+
+    $a->addLast(qw(e)) for 1..2;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b/>
     <e/>
   </a>
   END
-  
+
 
 =head3 addWrapWith($node, $tag, @context)
 
@@ -21837,20 +22567,20 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(q(<a><b/></a>));                                 
-  
-    my $b = $a->first;                                                            
-  
-    $b->addWrapWith_c for 1..2;                                                   
-  
-    ok -p $a eq <<END;                                                             
+   {my $a = Data::Edit::Xml::new(q(<a><b/></a>));
+
+    my $b = $a->first;
+
+    $b->addWrapWith_c for 1..2;
+
+    ok -p $a eq <<END;
   <a>
     <c>
       <b/>
     </c>
   </a>
   END
-  
+
 
 =head3 addSingleChild($node, $tag, @context)
 
@@ -21870,17 +22600,17 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <c>
       <b/>
     </c>
   </a>
   END
-  
-    $a->addSingleChild_d for 1..2;                                                
-  
-    ok -p $a eq <<END;                                                            
+
+    $a->addSingleChild_d for 1..2;
+
+    ok -p $a eq <<END;
   <a>
     <d>
       <c>
@@ -21889,7 +22619,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head2 Add text selectively
 
@@ -21913,12 +22643,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::newTree(q(a));                                       
-  
-    $a->𝗮𝗱𝗱𝗙𝗶𝗿𝘀𝘁𝗔𝘀𝗧𝗲𝘅𝘁(q(aaaa)) for 1..2;                                         
-  
-    ok -s $a eq q(<a>aaaa</a>);                                                    
-  
+   {my $a = Data::Edit::Xml::newTree(q(a));
+
+
+    $a->addFirstAsText(q(aaaa)) for 1..2;                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $a eq q(<a>aaaa</a>);
+
 
 =head3 addNextAsText($node, $text, @context)
 
@@ -21938,17 +22670,19 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(q(<a><b/></a>));                                 
-  
-    $a->go(q(b))->𝗮𝗱𝗱𝗡𝗲𝘅𝘁𝗔𝘀𝗧𝗲𝘅𝘁(q(bbbb)) for 1..2;                                
-  
-    ok -p $a eq <<END;                                                             
+   {my $a = Data::Edit::Xml::new(q(<a><b/></a>));
+
+
+    $a->go(q(b))->addNextAsText(q(bbbb)) for 1..2;                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b/>
   bbbb
   </a>
   END
-  
+
 
 =head3 addPrevAsText($node, $text, @context)
 
@@ -21968,22 +22702,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <b/>
   bbbb
   </a>
   END
-  
-    $a->go(q(b))->𝗮𝗱𝗱𝗣𝗿𝗲𝘃𝗔𝘀𝗧𝗲𝘅𝘁(q(aaaa)) for 1..2;                                
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->go(q(b))->addPrevAsText(q(aaaa)) for 1..2;                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>aaaa
     <b/>
   bbbb
   </a>
   END
-  
+
 
 =head3 addLastAsText($node, $text, @context)
 
@@ -22003,12 +22739,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -s $a eq q(<a>aaaa</a>);                                                    
-  
-    $a->𝗮𝗱𝗱𝗟𝗮𝘀𝘁𝗔𝘀𝗧𝗲𝘅𝘁(q(dddd)) for 1..2;                                          
-  
-    ok -s $a eq q(<a>aaaadddd</a>);                                               
-  
+    ok -s $a eq q(<a>aaaa</a>);
+
+
+    $a->addLastAsText(q(dddd)) for 1..2;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -s $a eq q(<a>aaaadddd</a>);
+
 
 =head3 joinWithText($node, $text, $over, @context)
 
@@ -22036,9 +22774,9 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
     $a->joinWithText_CC_b_a;
-  
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -22048,7 +22786,7 @@ B<Example:>
     <b/>
   </a>
   END
-  
+
 
 =head2 Fission
 
@@ -22080,9 +22818,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_d__splitBefore;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -22094,7 +22832,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 splitAfter($node, @context)
 
@@ -22122,9 +22860,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_d__splitAfter;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -22136,7 +22874,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 Fusion
 
@@ -22160,7 +22898,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $s = <<END;                                                                     
+   {my $s = <<END;
   <a>
     <b>
       <A/>
@@ -22172,12 +22910,14 @@ B<Example:>
     </c>
   </a>
   END
-  
-    my $a = Data::Edit::Xml::new($s);                                              
-  
-    $a->go(q(b))->𝗰𝗼𝗻𝗰𝗮𝘁𝗲𝗻𝗮𝘁𝗲($a->go(q(c)));                                      
-  
-    my $t = <<END;                                                                
+
+    my $a = Data::Edit::Xml::new($s);
+
+
+    $a->go(q(b))->concatenate($a->go(q(c)));                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $t = <<END;
   <a>
     <b>
       <A/>
@@ -22187,9 +22927,9 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $t eq -p $a;                                                               
-  
+
+    ok $t eq -p $a;
+
 
 =head3 concatenateSiblings($node, @context)
 
@@ -22208,7 +22948,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                            
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="1"/>
@@ -22224,10 +22964,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->go(qw(b 3))->𝗰𝗼𝗻𝗰𝗮𝘁𝗲𝗻𝗮𝘁𝗲𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀;                                        
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->go(qw(b 3))->concatenateSiblings;                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="1"/>
@@ -22237,7 +22979,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 mergeDuplicateChildWithParent($parent, @context)
 
@@ -22256,30 +22998,32 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b   id="b" b="bb">
       <b id="c" c="cc"/>
     </b>
   </a>
   END
-  
-    my ($c, $b) = $a->byList;                                                      
-  
-    is_deeply [$b->id, $c->id], [qw(b c)];                                         
-  
-    ok $c == $b->hasSingleChild;                                                   
-  
-    $b->𝗺𝗲𝗿𝗴𝗲𝗗𝘂𝗽𝗹𝗶𝗰𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱𝗪𝗶𝘁𝗵𝗣𝗮𝗿𝗲𝗻𝘁;                                            
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $b) = $a->byList;
+
+    is_deeply [$b->id, $c->id], [qw(b c)];
+
+    ok $c == $b->hasSingleChild;
+
+
+    $b->mergeDuplicateChildWithParent;                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b b="bb" c="cc" id="b"/>
   </a>
   END
-  
-    ok $b == $a->hasSingleChild;                                                   
-  
+
+    ok $b == $a->hasSingleChild;
+
 
 =head2 Put as text
 
@@ -22303,24 +23047,26 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                            
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"/>
     </b>
   </a>
   END
-  
-    $x->go(qw(b c))->𝗽𝘂𝘁𝗙𝗶𝗿𝘀𝘁𝗔𝘀𝗧𝗲𝘅𝘁("<d id=\"dd\">DDDD</d>");                     
-  
-    ok -p $x eq <<END;                                                             
+
+
+    $x->go(qw(b c))->putFirstAsText("<d id=\"dd\">DDDD</d>");                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"><d id="dd">DDDD</d></c>
     </b>
   </a>
   END
-  
+
 
 =head3 putTextFirst($node, @text)
 
@@ -22334,14 +23080,16 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     my $b = $a->first;
-  
+
     $b->putTextPrev(qw(Before the B node));
     $b->putTextNext(qw(After the B node));
-    $b->𝗽𝘂𝘁𝗧𝗲𝘅𝘁𝗙𝗶𝗿𝘀𝘁(qw(First under the B node));
+
+    $b->putTextFirst(qw(First under the B node));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $b->putTextLast(qw(Last under the B node));
-  
+
     ok -p $a eq <<END;
   <a>Before the B node
     <b>First under the B node
@@ -22351,7 +23099,7 @@ B<Example:>
   After the B node
   </a>
   END
-  
+
 
 =head3 putLastAsText($node, $text, @context)
 
@@ -22371,24 +23119,26 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                             
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"><d id="dd">DDDD</d></c>
     </b>
   </a>
   END
-  
-    $x->go(qw(b c))->𝗽𝘂𝘁𝗟𝗮𝘀𝘁𝗔𝘀𝗧𝗲𝘅𝘁("<e id=\"ee\">EEEE</e>");                      
-  
-    ok -p $x eq <<END;                                                             
+
+
+    $x->go(qw(b c))->putLastAsText("<e id=\"ee\">EEEE</e>");                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
     </b>
   </a>
   END
-  
+
 
 =head3 putTextLast($node, @text)
 
@@ -22402,14 +23152,16 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     my $b = $a->first;
-  
+
     $b->putTextPrev(qw(Before the B node));
     $b->putTextNext(qw(After the B node));
     $b->putTextFirst(qw(First under the B node));
-    $b->𝗽𝘂𝘁𝗧𝗲𝘅𝘁𝗟𝗮𝘀𝘁(qw(Last under the B node));
-  
+
+    $b->putTextLast(qw(Last under the B node));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>Before the B node
     <b>First under the B node
@@ -22419,7 +23171,7 @@ B<Example:>
   After the B node
   </a>
   END
-  
+
 
 =head3 putNextAsText($node, $text, @context)
 
@@ -22439,17 +23191,19 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                             
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
     </b>
   </a>
   END
-  
-    $x->go(qw(b c))->𝗽𝘂𝘁𝗡𝗲𝘅𝘁𝗔𝘀𝗧𝗲𝘅𝘁("<n id=\"nn\">NNNN</n>");                      
-  
-    ok -p $x eq <<END;                                                              
+
+
+    $x->go(qw(b c))->putNextAsText("<n id=\"nn\">NNNN</n>");                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
@@ -22457,7 +23211,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putTextNext($node, @text)
 
@@ -22471,14 +23225,16 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     my $b = $a->first;
-  
+
     $b->putTextPrev(qw(Before the B node));
-    $b->𝗽𝘂𝘁𝗧𝗲𝘅𝘁𝗡𝗲𝘅𝘁(qw(After the B node));
+
+    $b->putTextNext(qw(After the B node));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $b->putTextFirst(qw(First under the B node));
     $b->putTextLast(qw(Last under the B node));
-  
+
     ok -p $a eq <<END;
   <a>Before the B node
     <b>First under the B node
@@ -22488,7 +23244,7 @@ B<Example:>
   After the B node
   </a>
   END
-  
+
 
 =head3 putPrevAsText($node, $text, @context)
 
@@ -22508,7 +23264,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                              
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
@@ -22516,10 +23272,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $x->go(qw(b c))->𝗽𝘂𝘁𝗣𝗿𝗲𝘃𝗔𝘀𝗧𝗲𝘅𝘁("<p id=\"pp\">PPPP</p>");                      
-  
-    ok -p $x eq <<END;                                                            
+
+
+    $x->go(qw(b c))->putPrevAsText("<p id=\"pp\">PPPP</p>");                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a id="aa">
     <b id="bb"><p id="pp">PPPP</p>
       <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
@@ -22527,7 +23285,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 putTextPrev($node, @text)
 
@@ -22541,14 +23299,16 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     my $b = $a->first;
-  
-    $b->𝗽𝘂𝘁𝗧𝗲𝘅𝘁𝗣𝗿𝗲𝘃(qw(Before the B node));
+
+
+    $b->putTextPrev(qw(Before the B node));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $b->putTextNext(qw(After the B node));
     $b->putTextFirst(qw(First under the B node));
     $b->putTextLast(qw(Last under the B node));
-  
+
     ok -p $a eq <<END;
   <a>Before the B node
     <b>First under the B node
@@ -22558,7 +23318,7 @@ B<Example:>
   After the B node
   </a>
   END
-  
+
 
 =head2 Put as tree
 
@@ -22582,20 +23342,22 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a/>));
-  
+
     ok -p $a eq <<END;
   <a/>
   END
-  
-    my $b = $a->𝗽𝘂𝘁𝗙𝗶𝗿𝘀𝘁𝗔𝘀𝗧𝗿𝗲𝗲(q(<b/>));
+
+
+    my $b = $a->putFirstAsTree(q(<b/>));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
+
     $b->putNextAsTree(q(<c/>));
     ok -p $a eq <<END;
   <a>
@@ -22603,7 +23365,7 @@ B<Example:>
     <c/>
   </a>
   END
-  
+
     my $e = $a->putLastAsTree(q(<e/>));
     ok -p $a eq <<END;
   <a>
@@ -22612,7 +23374,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
     $e->putPrevAsTree(q(<d/>));
     ok -p $a eq <<END;
   <a>
@@ -22623,7 +23385,7 @@ B<Example:>
   </a>
   END
    }
-  
+
 
 =head3 putLastAsTree($node, $text, @context)
 
@@ -22643,20 +23405,20 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a/>));
-  
+
     ok -p $a eq <<END;
   <a/>
   END
-  
+
     my $b = $a->putFirstAsTree(q(<b/>));
     ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
+
     $b->putNextAsTree(q(<c/>));
     ok -p $a eq <<END;
   <a>
@@ -22664,8 +23426,10 @@ B<Example:>
     <c/>
   </a>
   END
-  
-    my $e = $a->𝗽𝘂𝘁𝗟𝗮𝘀𝘁𝗔𝘀𝗧𝗿𝗲𝗲(q(<e/>));
+
+
+    my $e = $a->putLastAsTree(q(<e/>));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -22673,7 +23437,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
     $e->putPrevAsTree(q(<d/>));
     ok -p $a eq <<END;
   <a>
@@ -22684,7 +23448,7 @@ B<Example:>
   </a>
   END
    }
-  
+
 
 =head3 putNextAsTree($node, $text, @context)
 
@@ -22704,28 +23468,30 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a/>));
-  
+
     ok -p $a eq <<END;
   <a/>
   END
-  
+
     my $b = $a->putFirstAsTree(q(<b/>));
     ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
-    $b->𝗽𝘂𝘁𝗡𝗲𝘅𝘁𝗔𝘀𝗧𝗿𝗲𝗲(q(<c/>));
+
+
+    $b->putNextAsTree(q(<c/>));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
     <c/>
   </a>
   END
-  
+
     my $e = $a->putLastAsTree(q(<e/>));
     ok -p $a eq <<END;
   <a>
@@ -22734,7 +23500,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
     $e->putPrevAsTree(q(<d/>));
     ok -p $a eq <<END;
   <a>
@@ -22745,7 +23511,7 @@ B<Example:>
   </a>
   END
    }
-  
+
 
 =head3 putPrevAsTree($node, $text, @context)
 
@@ -22765,20 +23531,20 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                             
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a/>));
-  
+
     ok -p $a eq <<END;
   <a/>
   END
-  
+
     my $b = $a->putFirstAsTree(q(<b/>));
     ok -p $a eq <<END;
   <a>
     <b/>
   </a>
   END
-  
+
     $b->putNextAsTree(q(<c/>));
     ok -p $a eq <<END;
   <a>
@@ -22786,7 +23552,7 @@ B<Example:>
     <c/>
   </a>
   END
-  
+
     my $e = $a->putLastAsTree(q(<e/>));
     ok -p $a eq <<END;
   <a>
@@ -22795,8 +23561,10 @@ B<Example:>
     <e/>
   </a>
   END
-  
-    $e->𝗽𝘂𝘁𝗣𝗿𝗲𝘃𝗔𝘀𝗧𝗿𝗲𝗲(q(<d/>));
+
+
+    $e->putPrevAsTree(q(<d/>));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -22806,7 +23574,7 @@ B<Example:>
   </a>
   END
    }
-  
+
 
 =head2 Put as comment
 
@@ -22837,12 +23605,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->𝗽𝘂𝘁𝗙𝗶𝗿𝘀𝘁𝗔𝘀𝗖𝗼𝗺𝗺𝗲𝗻𝘁(q(First));
+
+
+    $a->putFirstAsComment(q(First));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $a->putLastAsComment (q(Last));
     $a->go_b_c->putPrevAsComment(q(Before C));
     $a->go_b_c->putNextAsComment(q(After C));
-  
+
     ok -p $a eq <<END;
   <a><!-- First -->
     <b><!-- Before C -->
@@ -22852,7 +23622,7 @@ B<Example:>
   <!-- Last -->
   </a>
   END
-  
+
 
 =head3 putLastAsComment($node, $text, @context)
 
@@ -22879,12 +23649,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->putFirstAsComment(q(First));
-    $a->𝗽𝘂𝘁𝗟𝗮𝘀𝘁𝗔𝘀𝗖𝗼𝗺𝗺𝗲𝗻𝘁 (q(Last));
+
+    $a->putLastAsComment (q(Last));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $a->go_b_c->putPrevAsComment(q(Before C));
     $a->go_b_c->putNextAsComment(q(After C));
-  
+
     ok -p $a eq <<END;
   <a><!-- First -->
     <b><!-- Before C -->
@@ -22894,7 +23666,7 @@ B<Example:>
   <!-- Last -->
   </a>
   END
-  
+
 
 =head3 putNextAsComment($node, $text, @context)
 
@@ -22921,12 +23693,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->putFirstAsComment(q(First));
     $a->putLastAsComment (q(Last));
     $a->go_b_c->putPrevAsComment(q(Before C));
-    $a->go_b_c->𝗽𝘂𝘁𝗡𝗲𝘅𝘁𝗔𝘀𝗖𝗼𝗺𝗺𝗲𝗻𝘁(q(After C));
-  
+
+    $a->go_b_c->putNextAsComment(q(After C));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a><!-- First -->
     <b><!-- Before C -->
@@ -22936,7 +23710,7 @@ B<Example:>
   <!-- Last -->
   </a>
   END
-  
+
 
 =head3 putPrevAsComment($node, $text, @context)
 
@@ -22963,12 +23737,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->putFirstAsComment(q(First));
     $a->putLastAsComment (q(Last));
-    $a->go_b_c->𝗽𝘂𝘁𝗣𝗿𝗲𝘃𝗔𝘀𝗖𝗼𝗺𝗺𝗲𝗻𝘁(q(Before C));
+
+    $a->go_b_c->putPrevAsComment(q(Before C));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $a->go_b_c->putNextAsComment(q(After C));
-  
+
     ok -p $a eq <<END;
   <a><!-- First -->
     <b><!-- Before C -->
@@ -22978,7 +23754,7 @@ B<Example:>
   <!-- Last -->
   </a>
   END
-  
+
 
 =head2 Break in and out
 
@@ -23001,7 +23777,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                           
+      ok -p $a eq <<END;
   <a>
     <d/>
     <b>
@@ -23016,10 +23792,12 @@ B<Example:>
     <d/>
   </a>
   END
-  
-      $a->go(qw(b 1))->𝗯𝗿𝗲𝗮𝗸𝗜𝗻;                                                   
-  
-      ok -p $a eq <<END;                                                          
+
+
+      $a->go(qw(b 1))->breakIn;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a>
     <b>
       <d/>
@@ -23032,7 +23810,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 breakInForwards($start, @context)
 
@@ -23051,7 +23829,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                          
+      ok -p $a eq <<END;
   <a>
     <d/>
     <b>
@@ -23066,10 +23844,12 @@ B<Example:>
     <d/>
   </a>
   END
-  
-      $a->go(q(b))->𝗯𝗿𝗲𝗮𝗸𝗜𝗻𝗙𝗼𝗿𝘄𝗮𝗿𝗱𝘀;                                              
-  
-      ok -p $a eq <<END;                                                          
+
+
+      $a->go(q(b))->breakInForwards;                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a>
     <d/>
     <b>
@@ -23082,7 +23862,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 breakInBackwards($start, @context)
 
@@ -23101,7 +23881,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                          
+      ok -p $a eq <<END;
   <a>
     <d/>
     <b>
@@ -23116,10 +23896,12 @@ B<Example:>
     <d/>
   </a>
   END
-  
-      $a->go(qw(b 1))->𝗯𝗿𝗲𝗮𝗸𝗜𝗻𝗕𝗮𝗰𝗸𝘄𝗮𝗿𝗱𝘀;                                          
-  
-      ok -p $a eq <<END;                                                          
+
+
+      $a->go(qw(b 1))->breakInBackwards;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a>
     <b>
       <d/>
@@ -23132,7 +23914,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head3 breakOut($parent, @tags)
 
@@ -23145,11 +23927,13 @@ Lift child nodes with the specified tags under the specified parent node splitti
 B<Example:>
 
 
-    my $A = Data::Edit::Xml::new("<a><b><d/><c/><c/><e/><c/><c/><d/></b></a>");   
-  
-      $a->go(q(b))->𝗯𝗿𝗲𝗮𝗸𝗢𝘂𝘁($a, qw(d e));                                        
-  
-      ok -p $a eq <<END;                                                           
+    my $A = Data::Edit::Xml::new("<a><b><d/><c/><c/><e/><c/><c/><d/></b></a>");
+
+
+      $a->go(q(b))->breakOut($a, qw(d e));                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $a eq <<END;
   <a>
     <d/>
     <b>
@@ -23164,7 +23948,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head3 breakOutChild($node, @context)
 
@@ -23192,10 +23976,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($c, $d, $e, $b) = $a->byList;
-    $d->𝗯𝗿𝗲𝗮𝗸𝗢𝘂𝘁𝗖𝗵𝗶𝗹𝗱;
-  
+
+    $d->breakOutChild;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23207,7 +23993,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 Split and Zip
 
@@ -23239,9 +24025,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_d__splitParentAfter;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23253,7 +24039,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<spa> is a synonym for L<splitParentAfter|/splitParentAfter>.
 
@@ -23284,9 +24070,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_d__splitParentBefore;
-  
+
     ok -p $a ne <<END;
   <a>
     <b>
@@ -23298,7 +24084,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<spb> is a synonym for L<splitParentBefore|/splitParentBefore>.
 
@@ -23332,13 +24118,19 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($e, $d, $c, $b) = $a->byList;
-  
-    ok !$a->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($a);
-    ok !$b->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($a);
-    ok  $e->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($b);
-  
+
+
+    ok !$a->splitTo($a);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$b->splitTo($a);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $e->splitTo($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23354,7 +24146,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -23366,13 +24158,19 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($e, $d, $c, $b) = $a->byList;
-  
-    ok !$a->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($a);
-    ok !$b->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($a);
-    ok  $e->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($b);
-  
+
+
+    ok !$a->splitTo($a);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$b->splitTo($a);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok  $e->splitTo($b);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23388,7 +24186,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     ok $e->zipDownOnce;                                                           # Invalidates b
     ok -p $a eq <<END;
   <a>
@@ -23403,10 +24201,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-   ok  $e->𝘀𝗽𝗹𝗶𝘁𝗧𝗼($a->first);                                                    # b invalidated by zipDownOnce
+
+
+   ok  $e->splitTo($a->first);                                                    # b invalidated by zipDownOnce  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    $e->zipDown;
-  
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -23418,7 +24218,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 adoptChild($parent, $child, @context)
 
@@ -23449,10 +24249,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($e, $d, $c, $b) = $a->byList;
-  
-    $a->𝗮𝗱𝗼𝗽𝘁𝗖𝗵𝗶𝗹𝗱($e);
+
+
+    $a->adoptChild($e);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23468,7 +24270,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $e->zipDown;
     ok -p $a eq <<END;
   <a>
@@ -23481,8 +24283,8 @@ B<Example:>
     </b>
   </a>
   END
-  
-  
+
+
 
 =head3 zipDownOnce($node, @context)
 
@@ -23512,13 +24314,13 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($e, $d, $c, $b) = $a->byList;
-  
+
     ok !$a->splitTo($a);
     ok !$b->splitTo($a);
     ok  $e->splitTo($b);
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23534,8 +24336,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $e->𝘇𝗶𝗽𝗗𝗼𝘄𝗻𝗢𝗻𝗰𝗲;                                                           # Invalidates b
+
+
+    ok $e->zipDownOnce;                                                           # Invalidates b  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23549,10 +24353,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-   ok  $e->splitTo($a->first);                                                    # b invalidated by 𝘇𝗶𝗽𝗗𝗼𝘄𝗻𝗢𝗻𝗰𝗲
+
+
+   ok  $e->splitTo($a->first);                                                    # b invalidated by zipDownOnce  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    $e->zipDown;
-  
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -23564,7 +24370,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 zipDown($node, @context)
 
@@ -23594,9 +24400,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($e, $d, $c, $b) = $a->byList;
-  
+
     $a->adoptChild($e);
     ok -p $a eq <<END;
   <a>
@@ -23613,8 +24419,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $e->𝘇𝗶𝗽𝗗𝗼𝘄𝗻;
+
+
+    $e->zipDown;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23626,8 +24434,8 @@ B<Example:>
     </b>
   </a>
   END
-  
-  
+
+
     my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -23639,13 +24447,13 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($e, $d, $c, $b) = $a->byList;
-  
+
     ok !$a->splitTo($a);
     ok !$b->splitTo($a);
     ok  $e->splitTo($b);
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -23661,7 +24469,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     ok $e->zipDownOnce;                                                           # Invalidates b
     ok -p $a eq <<END;
   <a>
@@ -23676,10 +24484,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
    ok  $e->splitTo($a->first);                                                    # b invalidated by zipDownOnce
-   $e->𝘇𝗶𝗽𝗗𝗼𝘄𝗻;
-  
+
+   $e->zipDown;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    ok -p $a eq <<END;
   <a>
     <b>
@@ -23691,7 +24501,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 splitAndWrapFromStart($parent, $split, $wrap, %attributes)
 
@@ -23712,7 +24522,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  
+
     my $A = Data::Edit::Xml::new(<<END);
   <a>
     <PP/>
@@ -23730,10 +24540,12 @@ B<Example:>
     <SS/>
   </a>
   END
-  
+
     my $a = $A->clone;
-    ok 3 == $a->𝘀𝗽𝗹𝗶𝘁𝗔𝗻𝗱𝗪𝗿𝗮𝗽𝗙𝗿𝗼𝗺𝗦𝘁𝗮𝗿𝘁(qw(b B));
-  
+
+    ok 3 == $a->splitAndWrapFromStart(qw(b B));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <B>
@@ -23757,11 +24569,11 @@ B<Example:>
     <SS/>
   </a>
   END
-  
-  
+
+
     my $b = $A->clone;
     ok 3 == $b->splitAndWrapToEnd(qw(b B));
-  
+
     ok -p $b eq <<END;
   <a>
     <PP/>
@@ -23785,7 +24597,7 @@ B<Example:>
     </B>
   </a>
   END
-  
+
 
 =head3 splitAndWrapToEnd($parent, $split, $wrap, %attributes)
 
@@ -23806,7 +24618,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  
+
     my $A = Data::Edit::Xml::new(<<END);
   <a>
     <PP/>
@@ -23824,10 +24636,10 @@ B<Example:>
     <SS/>
   </a>
   END
-  
+
     my $a = $A->clone;
     ok 3 == $a->splitAndWrapFromStart(qw(b B));
-  
+
     ok -p $a eq <<END;
   <a>
     <B>
@@ -23851,11 +24663,13 @@ B<Example:>
     <SS/>
   </a>
   END
-  
-  
+
+
     my $b = $A->clone;
-    ok 3 == $b->𝘀𝗽𝗹𝗶𝘁𝗔𝗻𝗱𝗪𝗿𝗮𝗽𝗧𝗼𝗘𝗻𝗱(qw(b B));
-  
+
+    ok 3 == $b->splitAndWrapToEnd(qw(b B));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $b eq <<END;
   <a>
     <PP/>
@@ -23879,7 +24693,7 @@ B<Example:>
     </B>
   </a>
   END
-  
+
 
 =head2 Replace
 
@@ -23903,12 +24717,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-     {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));               
-  
-      $x->go(qw(b c))->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗪𝗶𝘁𝗵($x->newTag(qw(d id dd)));                      
-  
-      ok -s $x eq '<a><b><d id="dd"/></b></a>';                                   
-  
+     {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));
+
+
+      $x->go(qw(b c))->replaceWith($x->newTag(qw(d id dd)));                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -s $x eq '<a><b><d id="dd"/></b></a>';
+
 
 =head3 replaceWithText($old, $text, @context)
 
@@ -23928,12 +24744,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-     {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));               
-  
-      $x->go(qw(b c))->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗪𝗶𝘁𝗵𝗧𝗲𝘅𝘁(qq(BBBB));                                 
-  
-      ok -s $x eq '<a><b>BBBB</b></a>';                                           
-  
+     {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));
+
+
+      $x->go(qw(b c))->replaceWithText(qq(BBBB));                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -s $x eq '<a><b>BBBB</b></a>';
+
 
 =head3 replaceWithBlank($old, @context)
 
@@ -23952,12 +24770,14 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-     {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));               
-  
-      $x->go(qw(b c))->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗪𝗶𝘁𝗵𝗕𝗹𝗮𝗻𝗸;                                          
-  
-      ok -s $x eq '<a><b> </b></a>';                                              
-  
+     {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));
+
+
+      $x->go(qw(b c))->replaceWithBlank;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -s $x eq '<a><b> </b></a>';
+
 
 =head3 replaceContentWithMovedContent($node, @nodes)
 
@@ -23970,7 +24790,7 @@ Replace the content of a specified target node with the contents of the specifie
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                          
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
        <b1/>
@@ -23986,12 +24806,14 @@ B<Example:>
     </d>
   </a>
   END
-  
-    my ($b, $c, $d) = $a->contents;                                               
-  
-    $d->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗪𝗶𝘁𝗵𝗠𝗼𝘃𝗲𝗱𝗖𝗼𝗻𝘁𝗲𝗻𝘁($c, $b);                                   
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($b, $c, $d) = $a->contents;
+
+
+    $d->replaceContentWithMovedContent($c, $b);                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b/>
     <c/>
@@ -24003,8 +24825,8 @@ B<Example:>
     </d>
   </a>
   END
-  
-    my $a = Data::Edit::Xml::new(<<END);                                          
+
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <d>
        <b>
@@ -24018,14 +24840,16 @@ B<Example:>
     </d>
   </a>
   END
-  
-    my ($d)     = $a->contents;                                                   
-  
-    my ($b, $c) = $d->contents;                                                   
-  
-    $d->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗪𝗶𝘁𝗵𝗠𝗼𝘃𝗲𝗱𝗖𝗼𝗻𝘁𝗲𝗻𝘁($c, $b);                                   
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($d)     = $a->contents;
+
+    my ($b, $c) = $d->contents;
+
+
+    $d->replaceContentWithMovedContent($c, $b);                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <d>
       <c1/>
@@ -24035,7 +24859,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head3 replaceContentWith($node, @content)
 
@@ -24048,12 +24872,14 @@ Replace the content of a node with the specified nodes and return the replaced c
 B<Example:>
 
 
-     {my $x = Data::Edit::Xml::new(qq(<a><b/><c/></a>));                          
-  
-      $x->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗪𝗶𝘁𝗵(map {$x->newTag($_)} qw(B C));                       
-  
-      ok -s $x eq '<a><B/><C/></a>';                                              
-  
+     {my $x = Data::Edit::Xml::new(qq(<a><b/><c/></a>));
+
+
+      $x->replaceContentWith(map {$x->newTag($_)} qw(B C));                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -s $x eq '<a><B/><C/></a>';
+
 
 =head3 replaceContentWithText($node, @text)
 
@@ -24066,12 +24892,14 @@ Replace the content of a node with the specified texts and return the replaced c
 B<Example:>
 
 
-     {my $x = Data::Edit::Xml::new(qq(<a><b/><c/></a>));                          
-  
-      $x->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗪𝗶𝘁𝗵𝗧𝗲𝘅𝘁(qw(b c));                                        
-  
-      ok -s $x eq '<a>bc</a>';                                                    
-  
+     {my $x = Data::Edit::Xml::new(qq(<a><b/><c/></a>));
+
+
+      $x->replaceContentWithText(qw(b c));                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -s $x eq '<a>bc</a>';
+
 
 =head2 Swap
 
@@ -24094,7 +24922,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b id="b">
       <c id="c">
@@ -24104,10 +24932,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->first->𝗶𝗻𝘃𝗲𝗿𝘁;                                                            
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->first->invert;                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <c id="c">
       <b id="b">
@@ -24117,10 +24947,12 @@ B<Example:>
     </c>
   </a>
   END
-  
-    $a->first->𝗶𝗻𝘃𝗲𝗿𝘁;                                                            
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->first->invert;                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b id="b">
       <c id="c">
@@ -24130,7 +24962,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 invertFirst($parent, @context)
 
@@ -24149,7 +24981,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -24161,8 +24993,8 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok -p $a eq <<END;                                                             
+
+    ok -p $a eq <<END;
   <a>
     <c>
       <d/>
@@ -24174,7 +25006,7 @@ B<Example:>
     </c>
   </a>
   END
-  
+
 
 =head3 invertLast($parent, @context)
 
@@ -24193,7 +25025,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -24205,8 +25037,8 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok -p $a eq <<END;                                                             
+
+    ok -p $a eq <<END;
   <a>
     <c>
       <d/>
@@ -24218,8 +25050,8 @@ B<Example:>
     </c>
   </a>
   END
-  
-    ok -p $a eq <<END;                                                            
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <c>
@@ -24231,7 +25063,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 swap($first, $second, @context)
 
@@ -24251,24 +25083,26 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok <<END eq -p $x;                                                             
+    ok <<END eq -p $x;
   <x>
     <a a="1" b="2"/>
     <b/>
     <c a="1" b="3" c="4"/>
   </x>
   END
-  
-    $a->𝘀𝘄𝗮𝗽($c);                                                                 
-  
-    ok <<END eq -p $x;                                                             
+
+
+    $a->swap($c);                                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $x;
   <x>
     <c a="1" b="3" c="4"/>
     <b/>
     <a a="1" b="2"/>
   </x>
   END
-  
+
 
 =head3 swapFirstSibling($node, @context)
 
@@ -24297,9 +25131,9 @@ B<Example:>
     <g/>
   </a>
   END
-  
+
     $a->go_f__swapFirstSibling;
-  
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -24310,9 +25144,9 @@ B<Example:>
     <g/>
   </a>
   END
-  
+
     $a->go_c__swapLastSibling;
-  
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -24323,7 +25157,7 @@ B<Example:>
     <c/>
   </a>
   END
-  
+
 
 B<sfs> is a synonym for L<swapFirstSibling|/swapFirstSibling>.
 
@@ -24358,12 +25192,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $e, $c, $g, $f, $b) = $a->byList;
-  
+
     ok -t $b eq q(b);
-  
-    $d->𝘀𝘄𝗮𝗽𝗡𝗲𝘅𝘁; $g->swapPrev;
+
+
+    $d->swapNext; $g->swapPrev;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $d->after($e);
     ok -p $a eq <<END;
   <a>
@@ -24378,8 +25214,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $d->swapPrev; $c->𝘀𝘄𝗮𝗽𝗡𝗲𝘅𝘁;
+
+
+    $d->swapPrev; $c->swapNext;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $f->before($c);
     ok -p $a eq <<END;
   <a>
@@ -24394,7 +25232,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<sn> is a synonym for L<swapNext|/swapNext>.
 
@@ -24429,12 +25267,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $e, $c, $g, $f, $b) = $a->byList;
-  
+
     ok -t $b eq q(b);
-  
-    $d->swapNext; $g->𝘀𝘄𝗮𝗽𝗣𝗿𝗲𝘃;
+
+
+    $d->swapNext; $g->swapPrev;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $d->after($e);
     ok -p $a eq <<END;
   <a>
@@ -24449,8 +25289,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $d->𝘀𝘄𝗮𝗽𝗣𝗿𝗲𝘃; $c->swapNext;
+
+
+    $d->swapPrev; $c->swapNext;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $f->before($c);
     ok -p $a eq <<END;
   <a>
@@ -24465,7 +25307,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<sp> is a synonym for L<swapPrev|/swapPrev>.
 
@@ -24497,9 +25339,9 @@ B<Example:>
     <g/>
   </a>
   END
-  
+
     $a->go_f__swapFirstSibling;
-  
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -24510,9 +25352,9 @@ B<Example:>
     <g/>
   </a>
   END
-  
+
     $a->go_c__swapLastSibling;
-  
+
     ok -p $a eq <<END;
   <a>
     <f/>
@@ -24523,7 +25365,7 @@ B<Example:>
     <c/>
   </a>
   END
-  
+
 
 B<sls> is a synonym for L<swapLastSibling|/swapLastSibling>.
 
@@ -24553,8 +25395,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->𝘀𝘄𝗮𝗽𝗧𝗮𝗴𝘀($a->first);
+
+
+    $a->swapTags($a->first);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <b>
     <a>
@@ -24562,7 +25406,7 @@ B<Example:>
     </a>
   </b>
   END
-  
+
     my ($C, $A) = $a->downWhileFirst->swapTagWithParent;
     ok -t $A eq q(a);
     ok -t $C eq q(c);
@@ -24573,7 +25417,7 @@ B<Example:>
     </c>
   </b>
   END
-  
+
 
 =head3 swapTagWithParent($node, @context)
 
@@ -24599,7 +25443,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->swapTags($a->first);
     ok -p $a eq <<END;
   <b>
@@ -24608,8 +25452,10 @@ B<Example:>
     </a>
   </b>
   END
-  
-    my ($C, $A) = $a->downWhileFirst->𝘀𝘄𝗮𝗽𝗧𝗮𝗴𝗪𝗶𝘁𝗵𝗣𝗮𝗿𝗲𝗻𝘁;
+
+
+    my ($C, $A) = $a->downWhileFirst->swapTagWithParent;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -t $A eq q(a);
     ok -t $C eq q(c);
     ok -p $a eq <<END;
@@ -24619,7 +25465,7 @@ B<Example:>
     </c>
   </b>
   END
-  
+
 
 =head3 reorder($node, $first, $second, @context)
 
@@ -24650,9 +25496,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->by(sub {$_->reorder_b_d_a});
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -24663,9 +25509,9 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     $a->by(sub {$_->reorder_b_d_a});
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -24676,7 +25522,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
 
 =head2 Wrap and unwrap
 
@@ -24698,17 +25544,19 @@ Wrap the specified B<$node> in a new node created from the specified B<$tag> in 
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                            
+    ok -p $x eq <<END;
   <a>
     <b>
       <c id="11"/>
     </b>
   </a>
   END
-  
-    $x->go(qw(b c))->𝘄𝗿𝗮𝗽𝗪𝗶𝘁𝗵(qw(C));                                             
-  
-    ok -p $x eq <<END;                                                            
+
+
+    $x->go(qw(b c))->wrapWith(qw(C));                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a>
     <b>
       <C>
@@ -24717,7 +25565,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapWithDup($node, @context)
 
@@ -24733,10 +25581,12 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/></b></a>
   END
-  
+
     my ($c, $b) = $a->byList;
-  
-    $c->𝘄𝗿𝗮𝗽𝗪𝗶𝘁𝗵𝗗𝘂𝗽->id = 'c';
+
+
+    $c->wrapWithDup->id = 'c';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -24746,7 +25596,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $b->wrapContentWithDup->id = 'b';
     ok -p $a eq <<END;
   <a>
@@ -24759,7 +25609,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapUp($node, @tags)
 
@@ -24772,18 +25622,20 @@ Wrap the specified B<$node> in a sequence of new nodes created from the specifie
 B<Example:>
 
 
-    my $c = Data::Edit::Xml::newTree("c", id=>33);                                
-  
-    my ($b, $a) = $c->𝘄𝗿𝗮𝗽𝗨𝗽(qw(b a));                                            
-  
-    ok -p $a eq <<'END';                                                          
+    my $c = Data::Edit::Xml::newTree("c", id=>33);
+
+
+    my ($b, $a) = $c->wrapUp(qw(b a));                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<'END';
   <a>
     <b>
       <c id="33"/>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapWithN($node, $N, @context)
 
@@ -24808,10 +25660,10 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     ok !$a->go_d__wrapWithN_2_c_b_a;
     $a->by(sub{$_->wrapWithN_2_c_b_d_a});
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -24821,7 +25673,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapWithAll($node, @tags)
 
@@ -24845,9 +25697,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->go_d__wrapWithAll_c_b;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -24857,12 +25709,12 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $a = Data::Edit::Xml::new(q(<a id="c4"/>));
     my $b = Data::Edit::Xml::new(q(<a id="c5"/>));
-  
+
     ok -M $a eq -M $b;
-  
+
 
 B<ww> is a synonym for L<wrapWithAll|/wrapWithAll>.
 
@@ -24878,18 +25730,20 @@ Wrap the content of the specified B<$node> in a sequence of new nodes forcing th
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::newTree("a", id=>33);                                
-  
-    my ($b, $c) = $a->𝘄𝗿𝗮𝗽𝗗𝗼𝘄𝗻(qw(b c));                                          
-  
-    ok -p $a eq <<END;                                                            
+    my $a = Data::Edit::Xml::newTree("a", id=>33);
+
+
+    my ($b, $c) = $a->wrapDown(qw(b c));                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a id="33">
     <b>
       <c/>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapContentWith($old, $tag, %attributes)
 
@@ -24905,7 +25759,7 @@ Returns the new wrapping node.
 B<Example:>
 
 
-    ok -p $x eq <<END;                                                            
+    ok -p $x eq <<END;
   <a>
     <b>
       <c/>
@@ -24914,10 +25768,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $x->go(q(b))->𝘄𝗿𝗮𝗽𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗪𝗶𝘁𝗵(qw(D id DD));                                   
-  
-    ok -p $x eq <<END;                                                            
+
+
+    $x->go(q(b))->wrapContentWith(qw(D id DD));                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <a>
     <b>
       <D id="DD">
@@ -24928,8 +25784,8 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok -p $a eq <<END;                                                            
+
+    ok -p $a eq <<END;
   <a>
     <b id="1"/>
     <c id="2"/>
@@ -24943,7 +25799,7 @@ B<Example:>
     <f id="10"/>
   </a>
   END
-  
+
 
 B<wcw> is a synonym for L<wrapContentWith|/wrapContentWith>.
 
@@ -24962,9 +25818,9 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/></b></a>
   END
-  
+
     my ($c, $b) = $a->byList;
-  
+
     $c->wrapWithDup->id = 'c';
     ok -p $a eq <<END;
   <a>
@@ -24975,8 +25831,10 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $b->𝘄𝗿𝗮𝗽𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝗪𝗶𝘁𝗵𝗗𝘂𝗽->id = 'b';
+
+
+    $b->wrapContentWithDup->id = 'b';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -24988,7 +25846,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapSiblingsBefore($node, $tag, %attributes)
 
@@ -25004,13 +25862,15 @@ Returns B<undef> if the specified B<$node> is the first node under its parent.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));                         
-  
-    my ($b, $c, $d) = $a->byList;                                                 
-  
-    $c->𝘄𝗿𝗮𝗽𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗕𝗲𝗳𝗼𝗿𝗲(q(X));                                                 
-  
-    ok -p $a eq <<END;                                                            
+   {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));
+
+    my ($b, $c, $d) = $a->byList;
+
+
+    $c->wrapSiblingsBefore(q(X));                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <X>
       <b/>
@@ -25019,7 +25879,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head4 wrapFromFirst($node, $tag, %attributes)
 
@@ -25033,9 +25893,9 @@ Wrap this B<$node> and any preceding siblings with a new node created from the s
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));
-  
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -25043,7 +25903,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->go_c->wrapFromFirst_B;
     ok -p $a eq <<END;
   <a>
@@ -25055,7 +25915,7 @@ B<Example:>
   </a>
   END
    }
-  
+
 
 =head4 wrapFromFirstOrLastIn($node, $tag, @targets)
 
@@ -25072,7 +25932,7 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/><c/><d/><e/><f/></a>
   END
-  
+
     $a->go_d__wrapFromFirstOrLastIn_g_a_b_c;
     ok -p $a eq <<END;
   <a>
@@ -25085,7 +25945,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
     $a->go_e__wrapFromFirstOrLastIn_i_A_B_C;
     ok -p $a eq <<END;
   <a>
@@ -25100,7 +25960,7 @@ B<Example:>
     <f/>
   </a>
   END
-  
+
 
 =head4 wrapFirstN($node, $N, $tag, @context)
 
@@ -25122,9 +25982,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->wrapFirstN_2_Z;
-  
+
     ok -p $a eq <<END;
   <a>
     <Z>
@@ -25134,7 +25994,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head4 wrapSiblingsBetween($first, $last, $tag, %attributes)
 
@@ -25149,13 +26009,15 @@ If there are any siblings between the specified B<$node>s, wrap them with a new 
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));                         
-  
-    my ($b, $c, $d) = $a->byList;                                                 
-  
-    $b->𝘄𝗿𝗮𝗽𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗕𝗲𝘁𝘄𝗲𝗲𝗻($d, q(Y));                                            
-  
-    ok -p $a eq <<END;                                                            
+   {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));
+
+    my ($b, $c, $d) = $a->byList;
+
+
+    $b->wrapSiblingsBetween($d, q(Y));                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b/>
     <Y>
@@ -25164,7 +26026,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head4 wrapSiblingsAfter($node, $tag, %attributes)
 
@@ -25180,13 +26042,15 @@ Returns B<undef> if the specified B<$node> is the last node under its parent.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));                         
-  
-    my ($b, $c, $d) = $a->byList;                                                 
-  
-    $c->𝘄𝗿𝗮𝗽𝗦𝗶𝗯𝗹𝗶𝗻𝗴𝘀𝗔𝗳𝘁𝗲𝗿(q(Y));                                                  
-  
-    ok -p $a eq <<END;                                                            
+   {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));
+
+    my ($b, $c, $d) = $a->byList;
+
+
+    $c->wrapSiblingsAfter(q(Y));                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b/>
     <c/>
@@ -25195,7 +26059,7 @@ B<Example:>
     </Y>
   </a>
   END
-  
+
 
 =head4 wrapNext($node, $tag, @context)
 
@@ -25216,9 +26080,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     my ($b, $c, $d) = $a->byList;
-  
+
     $b->wrapNext_e;
     ok  -p $a eq <<END;
   <a>
@@ -25229,7 +26093,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head4 wrapNextN($node, $N, $tag, @context)
 
@@ -25252,9 +26116,9 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
     $a->go_c__wrapNextN_2_Z;
-  
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -25265,7 +26129,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head4 wrapPrev($node, $tag, @context)
 
@@ -25286,9 +26150,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     my ($b, $c, $d) = $a->byList;
-  
+
     $c->wrapPrev_e;
     ok  -p $a eq <<END;
   <a>
@@ -25299,7 +26163,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
 
 =head4 wrapPrevN($node, $N, $tag, @context)
 
@@ -25322,9 +26186,9 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
     $a->go_d__wrapPrevN_2_Z;
-  
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -25335,7 +26199,7 @@ B<Example:>
     <e/>
   </a>
   END
-  
+
 
 =head4 wrapToLast($node, $tag, %attributes)
 
@@ -25349,9 +26213,9 @@ Wrap this B<$node> and any following siblings with a new node created from the s
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a><b/><c/><d/></a>));
-  
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -25359,7 +26223,7 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->go_c->wrapToLast_D;
     ok -p $a eq <<END;
   <a>
@@ -25371,7 +26235,7 @@ B<Example:>
   </a>
   END
    }
-  
+
 
 =head4 wrapToLastOrFirstIn($node, $tag, @targets)
 
@@ -25388,7 +26252,7 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b/><c/><d/><e/><f/></a>
   END
-  
+
     $a->go_e__wrapToLastOrFirstIn_g_h;
     ok -p $a eq <<END;
   <a>
@@ -25401,7 +26265,7 @@ B<Example:>
     </g>
   </a>
   END
-  
+
     $a->go_d__wrapToLastOrFirstIn_h_g_c;
     ok -p $a eq <<END;
   <a>
@@ -25416,7 +26280,7 @@ B<Example:>
     </h>
   </a>
   END
-  
+
     $a->go_c__wrapToLastOrFirstIn_i_c;
     ok -p $a eq <<END;
   <a>
@@ -25433,7 +26297,7 @@ B<Example:>
     </i>
   </a>
   END
-  
+
 
 =head4 wrapLastN($node, $N, $tag, @context)
 
@@ -25455,9 +26319,9 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
     $a->wrapLastN_2_Z;
-  
+
     ok -p $a eq <<END;
   <a>
     <b/>
@@ -25467,7 +26331,7 @@ B<Example:>
     </Z>
   </a>
   END
-  
+
 
 =head4 wrapTo($start, $end, $tag, %attributes)
 
@@ -25484,7 +26348,7 @@ Return B<undef> if the B<$start> and B<$end> nodes are not siblings - they must 
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(my $s = <<END);                                   
+    my $x = Data::Edit::Xml::new(my $s = <<END);
   <aa>
     <a>
       <b/>
@@ -25493,10 +26357,12 @@ B<Example:>
     </a>
   </aa>
   END
-  
-    $x->go(qw(a c))->𝘄𝗿𝗮𝗽𝗧𝗼($x->go(qw(a c -1)), qq(C), id=>1234);                 
-  
-    ok -p $x eq <<END;                                                            
+
+
+    $x->go(qw(a c))->wrapTo($x->go(qw(a c -1)), qq(C), id=>1234);                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <aa>
     <a>
       <b/>
@@ -25510,12 +26376,14 @@ B<Example:>
     </a>
   </aa>
   END
-  
-    my $C = $x->go(qw(a C));                                                      
-  
-    $C->𝘄𝗿𝗮𝗽𝗧𝗼($C, qq(D));                                                        
-  
-    ok -p $x eq <<END;                                                            
+
+    my $C = $x->go(qw(a C));
+
+
+    $C->wrapTo($C, qq(D));                                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $x eq <<END;
   <aa>
     <a>
       <b/>
@@ -25531,8 +26399,8 @@ B<Example:>
     </a>
   </aa>
   END
-  
-    ok -p $a eq <<END;                                                            
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <D id="DD">
@@ -25548,7 +26416,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head4 wrapFrom($end, $start, $tag, %attributes)
 
@@ -25563,21 +26431,23 @@ Wrap all the nodes from the B<$start> node to the B<$end> node with a new node c
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(my $s = <<END);                                  
+   {my $a = Data::Edit::Xml::new(my $s = <<END);
   <a>
     <b>
       <c id="0"/><c id="1"/><c id="2"/><c id="3"/>
     </b>
   </a>
   END
-  
-    my $b = $a->first;                                                            
-  
-    my @c = $b->contents;                                                         
-  
-    $c[1]->𝘄𝗿𝗮𝗽𝗙𝗿𝗼𝗺($c[0], qw(D id DD));                                          
-  
-    ok -p $a eq <<END;                                                            
+
+    my $b = $a->first;
+
+    my @c = $b->contents;
+
+
+    $c[1]->wrapFrom($c[0], qw(D id DD));                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <D id="DD">
@@ -25589,7 +26459,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head3 Unwrap
 
@@ -25612,15 +26482,17 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $x = Data::Edit::Xml::new(q(<a>A<b/>B</a>));
     my $b = $x->go_b;
     $b->putFirst($x->newText(' c '));
     ok -s $x eq q(<a>A<b> c </b>B</a>);
-    $b->𝘂𝗻𝘄𝗿𝗮𝗽;
+
+    $b->unwrap;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -s $x eq q(<a>A c B</a>);
    }
-  
+
 
 B<u> is a synonym for L<unwrap|/unwrap>.
 
@@ -25649,15 +26521,17 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->go_b_c->𝘂𝗻𝘄𝗿𝗮𝗽𝗣𝗮𝗿𝗲𝗻𝘁𝗢𝗳𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;
-  
+
+
+    $a->go_b_c->unwrapParentOfOnlyChild;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <c/>
   </a>
   END
-  
+
 
 =head4 unwrapOnlyChild($node, @context)
 
@@ -25684,9 +26558,11 @@ B<Example:>
     <d/>
   </a>
   END
-  
-    $a->go_b->𝘂𝗻𝘄𝗿𝗮𝗽𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;
-  
+
+
+    $a->go_b->unwrapOnlyChild;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -25695,16 +26571,18 @@ B<Example:>
     <d/>
   </a>
   END
-  
-    $a->go_b_c->𝘂𝗻𝘄𝗿𝗮𝗽𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱;
-  
+
+
+    $a->go_b_c->unwrapOnlyChild;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b/>
     <d/>
   </a>
   END
-  
+
 
 =head4 unwrapParentsWithSingleChild($node, @context)
 
@@ -25723,7 +26601,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -25733,16 +26611,18 @@ B<Example:>
     <e/>
   </a>
   END
-  
-    $a->go(qw(b c d))->𝘂𝗻𝘄𝗿𝗮𝗽𝗣𝗮𝗿𝗲𝗻𝘁𝘀𝗪𝗶𝘁𝗵𝗦𝗶𝗻𝗴𝗹𝗲𝗖𝗵𝗶𝗹𝗱;                              
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->go(qw(b c d))->unwrapParentsWithSingleChild;                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <d/>
     <e/>
   </a>
   END
-  
+
 
 =head4 unwrapContentsKeepingText($node, @context)
 
@@ -25761,7 +26641,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-      ok -p $x eq <<END;                                                          
+      ok -p $x eq <<END;
   <a>
     <b>
       <c>
@@ -25772,15 +26652,17 @@ B<Example:>
     </b>
   </a>
   END
-  
-      $x->go(qw(b))->𝘂𝗻𝘄𝗿𝗮𝗽𝗖𝗼𝗻𝘁𝗲𝗻𝘁𝘀𝗞𝗲𝗲𝗽𝗶𝗻𝗴𝗧𝗲𝘅𝘁;                                   
-  
-      ok -p $x eq <<END;                                                          
+
+
+      $x->go(qw(b))->unwrapContentsKeepingText;                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok -p $x eq <<END;
   <a>
     <b>  DD EE FF  </b>
   </a>
   END
-  
+
 
 =head4 wrapRuns($node, $wrap, @context)
 
@@ -25800,7 +26682,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a id="i1">
     <b id="i2"/>
     <c id="i3"/>
@@ -25811,10 +26693,12 @@ B<Example:>
     <b id="i7"/>
   </a>
   END
-  
-    $a->𝘄𝗿𝗮𝗽𝗥𝘂𝗻𝘀(q(B));                                                           
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->wrapRuns(q(B));                                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a id="i1">
     <B>
       <b id="i2"/>
@@ -25829,7 +26713,7 @@ B<Example:>
     </B>
   </a>
   END
-  
+
 
 =head1 Contents
 
@@ -25853,7 +26737,7 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b id="b1"><c id="1"/></b>
     <d id="d1"><c id="2"/></d>
@@ -25863,9 +26747,11 @@ B<Example:>
     <e id="e2"><c id="6"/></e>
   </a>
   END
-  
-    is_deeply [map{$_->id} $x->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝘀], [qw(b1 d1 e1 b2 d2 e2)];                 
-  
+
+
+    is_deeply [map{$_->id} $x->contents], [qw(b1 d1 e1 b2 d2 e2)];                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 contentAfter($node, @context)
 
@@ -25885,16 +26771,18 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok 'f g' eq join ' ', map {$_->tag} $x->go(qw(b e))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗔𝗳𝘁𝗲𝗿;            
-  
+
+
+    ok 'f g' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentAfter;              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 B<ca> is a synonym for L<contentAfter|/contentAfter>.
 
@@ -25917,16 +26805,18 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok 'c d' eq join ' ', map {$_->tag} $x->go(qw(b e))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗕𝗲𝗳𝗼𝗿𝗲;           
-  
+
+
+    ok 'c d' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentBefore;             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 B<cb> is a synonym for L<contentBefore|/contentBefore>.
 
@@ -25949,16 +26839,18 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(q(b))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗔𝘀𝗧𝗮𝗴𝘀 eq 'c d e f g';                                
-  
+
+
+    ok $x->go(q(b))->contentAsTags eq 'c d e f g';                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 contentAsTags2($node, @context)
 
@@ -25978,8 +26870,10 @@ immediately.
 B<Example:>
 
 
-    ok $x->go(q(b))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗔𝘀𝗧𝗮𝗴𝘀𝟮 eq q( c  d  e  f  g );                        
-  
+
+    ok $x->go(q(b))->contentAsTags2 eq q( c  d  e  f  g );                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 contentAfterAsTags($node, @context)
 
@@ -25999,18 +26893,20 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok 'f g' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentAfter;            
-  
-    ok $x->go(qw(b e))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗔𝗳𝘁𝗲𝗿𝗔𝘀𝗧𝗮𝗴𝘀 eq 'f g';                              
-  
+
+    ok 'f g' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentAfter;
+
+
+    ok $x->go(qw(b e))->contentAfterAsTags eq 'f g';                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 contentAfterAsTags2($node, @context)
 
@@ -26030,16 +26926,18 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(qw(b e))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗔𝗳𝘁𝗲𝗿𝗔𝘀𝗧𝗮𝗴𝘀𝟮 eq q( f  g );                         
-  
+
+
+    ok $x->go(qw(b e))->contentAfterAsTags2 eq q( f  g );                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 contentBeforeAsTags($node, @context)
 
@@ -26059,18 +26957,20 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok 'c d' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentBefore;           
-  
-    ok $x->go(qw(b e))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗕𝗲𝗳𝗼𝗿𝗲𝗔𝘀𝗧𝗮𝗴𝘀 eq 'c d';                             
-  
+
+    ok 'c d' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentBefore;
+
+
+    ok $x->go(qw(b e))->contentBeforeAsTags eq 'c d';                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 contentBeforeAsTags2($node, @context)
 
@@ -26090,16 +26990,18 @@ immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                                       
+   {my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/><d/><e/><f/><g/>
     </b>
   </a>
   END
-  
-    ok $x->go(qw(b e))->𝗰𝗼𝗻𝘁𝗲𝗻𝘁𝗕𝗲𝗳𝗼𝗿𝗲𝗔𝘀𝗧𝗮𝗴𝘀𝟮 eq q( c  d );                        
-  
+
+
+    ok $x->go(qw(b e))->contentBeforeAsTags2 eq q( c  d );                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 position($node)
 
@@ -26111,7 +27013,7 @@ Return the index of the specified B<$node> in the content of the parent of the B
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -26141,11 +27043,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->go(qw(b 1 b))->id == 26;                                               
-  
-    ok $a->go(qw(b 1 b))->𝗽𝗼𝘀𝗶𝘁𝗶𝗼𝗻 == 2;                                          
-  
+
+    ok $a->go(qw(b 1 b))->id == 26;
+
+
+    ok $a->go(qw(b 1 b))->position == 2;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 index($node)
 
@@ -26157,7 +27061,7 @@ Return the index of the specified B<$node> in its parent index. Use L<position|/
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                                   
+    my $a = Data::Edit::Xml::new(<<END);
   <a         id="11">
     <b       id="12">
        <c    id="13"/>
@@ -26187,11 +27091,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->go(qw(b 1))->id == 23;                                                 
-  
-    ok $a->go(qw(b 1))->𝗶𝗻𝗱𝗲𝘅 == 1;                                               
-  
+
+    ok $a->go(qw(b 1))->id == 23;
+
+
+    ok $a->go(qw(b 1))->index == 1;                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 present($node, @names)
 
@@ -26204,8 +27110,10 @@ Return the count of the number of the specified tag types present immediately un
 B<Example:>
 
 
-    is_deeply {$a->first->𝗽𝗿𝗲𝘀𝗲𝗻𝘁}, {c=>2, d=>2, e=>1};                           
-  
+
+    is_deeply {$a->first->present}, {c=>2, d=>2, e=>1};                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 editText($node, @context)
 
@@ -26227,16 +27135,18 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <a><b>bbbb</b><c/></a>
   END
-  
-    $a->by(sub{$_->𝗲𝗱𝗶𝘁𝗧𝗲𝘅𝘁 =~ s(bbbb) (BBBB)gs});
-  
+
+
+    $a->by(sub{$_->editText =~ s(bbbb) (BBBB)gs});  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>BBBB</b>
     <c/>
   </a>
   END
-  
+
 
 =head2 isText($node, @context)
 
@@ -26255,20 +27165,24 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $a->prettyStringCDATA eq <<END;                                              
+    ok $a->prettyStringCDATA eq <<END;
   <a>
       <b><CDATA> </CDATA></b>
   </a>
   END
-  
-    ok $b->first->𝗶𝘀𝗧𝗲𝘅𝘁;                                                         
-  
-    ok $b->first->𝗶𝘀𝗧𝗲𝘅𝘁(qw(b a));                                                
-  
-    my $a = Data::Edit::Xml::new(<<END);                                             
+
+
+    ok $b->first->isText;                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b->first->isText(qw(b a));                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $a = Data::Edit::Xml::new(<<END);
   <a>abcdcba</a>
   END
-  
+
 
 =head2 isFirstText($node, @context)
 
@@ -26287,7 +27201,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a>aaa
       <b>bbb</b>
@@ -26297,19 +27211,27 @@ B<Example:>
     </a>
   </x>
   END
-  
-    my $a = $x->first;                                                            
-  
-    my ($ta, $b, $tc, $d, $te) = $a->contents;                                    
-  
-    ok $ta      ->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁(qw(a x));                                           
-  
-    ok $b->first->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁(qw(b a x));                                         
-  
-    ok $b->prev ->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁(qw(a x));                                           
-  
-    ok $d->last ->𝗶𝘀𝗙𝗶𝗿𝘀𝘁𝗧𝗲𝘅𝘁(qw(d a x));                                         
-  
+
+    my $a = $x->first;
+
+    my ($ta, $b, $tc, $d, $te) = $a->contents;
+
+
+    ok $ta      ->isFirstText(qw(a x));                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b->first->isFirstText(qw(b a x));                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b->prev ->isFirstText(qw(a x));                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $d->last ->isFirstText(qw(d a x));                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isLastText($node, @context)
 
@@ -26328,7 +27250,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
     <a>aaa
       <b>bbb</b>
@@ -26338,13 +27260,19 @@ B<Example:>
     </a>
   </x>
   END
-  
-    ok $d->next ->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗲𝘅𝘁 (qw(a x));                                           
-  
-    ok $d->last ->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗲𝘅𝘁 (qw(d a x));                                         
-  
-    ok $te      ->𝗶𝘀𝗟𝗮𝘀𝘁𝗧𝗲𝘅𝘁 (qw(a x));                                           
-  
+
+
+    ok $d->next ->isLastText (qw(a x));                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $d->last ->isLastText (qw(d a x));                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $te      ->isLastText (qw(a x));                                             # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 matchTree($node, @match)
 
@@ -26363,7 +27291,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
@@ -26378,14 +27306,22 @@ B<Example:>
   </a>
   END
     my ($c, $d, $b, $g, $f, $e) = $a->byList;
-  
-    is_deeply [$b, $c, $d], [$b->𝗺𝗮𝘁𝗰𝗵𝗧𝗿𝗲𝗲(qw(b c d))];
-    is_deeply [$e, $f, $g], [$e->𝗺𝗮𝘁𝗰𝗵𝗧𝗿𝗲𝗲(qr(\Ae\Z), [qw(f g)])];
-    is_deeply [$c],         [$c->𝗺𝗮𝘁𝗰𝗵𝗧𝗿𝗲𝗲(qw(c))];
+
+
+    is_deeply [$b, $c, $d], [$b->matchTree(qw(b c d))];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$e, $f, $g], [$e->matchTree(qr(\Ae\Z), [qw(f g)])];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$c],         [$c->matchTree(qw(c))];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     is_deeply [$a, $b, $c, $d, $e, $f, $g],
-              [$a->𝗺𝗮𝘁𝗰𝗵𝗧𝗿𝗲𝗲({a=>1}, [qw(b c d)], [qw(e), [qw(f g)]])];
+
+              [$a->matchTree({a=>1}, [qw(b c d)], [qw(e), [qw(f g)]])];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    }
-  
+
 
 =head2 matchesText($node, $re, @context)
 
@@ -26405,24 +27341,32 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                          
+    my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>CDECD</c>
     </b>
   </a>
   END
-  
-    my $c = $x->go(qw(b c))->first;                                               
-  
-    ok !$c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗧𝗲𝘅𝘁(qr(\AD));                                                 
-  
-    ok  $c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗧𝗲𝘅𝘁(qr(\AC), qw(c b a));                                      
-  
-    ok !$c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗧𝗲𝘅𝘁(qr(\AD), qw(c b a));                                      
-  
-    is_deeply [qw(E)], [$c->𝗺𝗮𝘁𝗰𝗵𝗲𝘀𝗧𝗲𝘅𝘁(qr(CD(.)CD))];                            
-  
+
+    my $c = $x->go(qw(b c))->first;
+
+
+    ok !$c->matchesText(qr(\AD));                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $c->matchesText(qr(\AC), qw(c b a));                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$c->matchesText(qr(\AD), qw(c b a));                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    is_deeply [qw(E)], [$c->matchesText(qr(CD(.)CD))];                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isBlankText($node, @context)
 
@@ -26441,14 +27385,16 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok $a->prettyStringCDATA eq <<END;                                              
+    ok $a->prettyStringCDATA eq <<END;
   <a>
       <b><CDATA> </CDATA></b>
   </a>
   END
-  
-    ok $b->first->𝗶𝘀𝗕𝗹𝗮𝗻𝗸𝗧𝗲𝘅𝘁;                                                    
-  
+
+
+    ok $b->first->isBlankText;                                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isAllBlankText($node, @context)
 
@@ -26467,7 +27413,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -26477,17 +27423,23 @@ B<Example:>
     <d/>
   </a>
   END
-  
-    $a->by(sub{$_->replaceWithBlank(qw(z))});                                     
-  
-    my ($b, $c, $d) = $a->firstBy(qw(b c d));                                     
-  
-    ok  $c->𝗶𝘀𝗔𝗹𝗹𝗕𝗹𝗮𝗻𝗸𝗧𝗲𝘅𝘁;                                                       
-  
-    ok  $c->𝗶𝘀𝗔𝗹𝗹𝗕𝗹𝗮𝗻𝗸𝗧𝗲𝘅𝘁(qw(c b a));                                            
-  
-    ok !$c->𝗶𝘀𝗔𝗹𝗹𝗕𝗹𝗮𝗻𝗸𝗧𝗲𝘅𝘁(qw(c a));                                              
-  
+
+    $a->by(sub{$_->replaceWithBlank(qw(z))});
+
+    my ($b, $c, $d) = $a->firstBy(qw(b c d));
+
+
+    ok  $c->isAllBlankText;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $c->isAllBlankText(qw(c b a));                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$c->isAllBlankText(qw(c a));                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 isOnlyChildBlankText($node, @context)
 
@@ -26506,16 +27458,20 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a>aaaa</a>));
     $a->first->text = q( );
     ok  $a->prettyStringCDATA eq qq(<a><CDATA> </CDATA></a>
 );
-    ok  $a->first->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱𝗕𝗹𝗮𝗻𝗸𝗧𝗲𝘅𝘁;
-    ok !$a->𝗶𝘀𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱𝗕𝗹𝗮𝗻𝗸𝗧𝗲𝘅𝘁;
+
+    ok  $a->first->isOnlyChildBlankText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$a->isOnlyChildBlankText;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
    }
-  
-  if (1)                                                                          
+
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<a/>));
     my $b = $a->new(q(<b/>));
     ok -p $a eq qq(<a/>
@@ -26523,7 +27479,7 @@ B<Example:>
     ok -p $b eq qq(<b/>
 );
    }
-  
+
 
 =head2 bitsNodeTextBlank($node)
 
@@ -26535,7 +27491,7 @@ Return a bit string that shows if there are any non text nodes, text nodes or bl
 B<Example:>
 
 
-    ok $x->prettyStringCDATA eq <<END;                                            
+    ok $x->prettyStringCDATA eq <<END;
   <a>
       <b>
           <C/>
@@ -26554,17 +27510,17 @@ B<Example:>
       <e/>
   </a>
   END
-  
-    ok '100' eq -B $x;                                                            
-  
-    ok '100' eq -B $x->go(q(b));                                                  
-  
-    ok '110' eq -B $x->go(q(c));                                                  
-  
-    ok '111' eq -B $x->go(q(d));                                                  
-  
-    ok !-B $x->go(qw(e));                                                         
-  
+
+    ok '100' eq -B $x;
+
+    ok '100' eq -B $x->go(q(b));
+
+    ok '110' eq -B $x->go(q(c));
+
+    ok '111' eq -B $x->go(q(d));
+
+    ok !-B $x->go(qw(e));
+
 
 =head1 Number
 
@@ -26581,11 +27537,11 @@ Find the node with the specified number as made visible by L<prettyStringNumbere
 B<Example:>
 
 
-  if (1)                                                                            
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/></b><d><e/></d></a>
   END
-  
+
     $a->numberTree;
     ok -z $a eq <<END;
   <a id="1">
@@ -26597,14 +27553,14 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     ok -t $a->findByNumber_4 eq q(d);
     ok    $a->findByNumber_3__up__number == 2;
    }
-  
-    $a->numberTree;                                                                  
-  
-    ok $a->prettyStringNumbered eq <<END;                                             
+
+    $a->numberTree;
+
+    ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
       <A id="3"/>
@@ -26616,9 +27572,11 @@ B<Example:>
     </c>
   </a>
   END
-  
-    ok q(D) eq -t $a->𝗳𝗶𝗻𝗱𝗕𝘆𝗡𝘂𝗺𝗯𝗲𝗿(7);                                            
-  
+
+
+    ok q(D) eq -t $a->findByNumber(7);                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 findByNumbers($node, @numbers)
 
@@ -26631,9 +27589,9 @@ Find the nodes with the specified numbers as made visible by L<prettyStringNumbe
 B<Example:>
 
 
-    $a->numberTree;                                                                  
-  
-    ok $a->prettyStringNumbered eq <<END;                                             
+    $a->numberTree;
+
+    ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
       <A id="3"/>
@@ -26645,9 +27603,11 @@ B<Example:>
     </c>
   </a>
   END
-  
-    is_deeply [map {-t $_} $a->𝗳𝗶𝗻𝗱𝗕𝘆𝗡𝘂𝗺𝗯𝗲𝗿𝘀(1..3)], [qw(a b A)];                 
-  
+
+
+    is_deeply [map {-t $_} $a->findByNumbers(1..3)], [qw(a b A)];                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 numberTree($node)
 
@@ -26659,9 +27619,11 @@ Number the nodes in a L<parse|/parse> tree in pre-order so they are numbered in 
 B<Example:>
 
 
-    $a->𝗻𝘂𝗺𝗯𝗲𝗿𝗧𝗿𝗲𝗲;                                                                
-  
-    ok -z $a eq <<END;                                                             
+
+    $a->numberTree;                                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="42" match="mm"/>
@@ -26671,13 +27633,15 @@ B<Example:>
     </d>
   </a>
   END
-  
-  if (1)                                                                            
+
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/></b><d><e/></d></a>
   END
-  
-    $a->𝗻𝘂𝗺𝗯𝗲𝗿𝗧𝗿𝗲𝗲;
+
+
+    $a->numberTree;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -z $a eq <<END;
   <a id="1">
     <b id="2">
@@ -26688,11 +27652,11 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     ok -t $a->findByNumber_4 eq q(d);
     ok    $a->findByNumber_3__up__number == 2;
    }
-  
+
 
 =head2 indexIds($node)
 
@@ -26704,7 +27668,7 @@ Return a map of the ids at and below the specified B<$node>.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a id="A">
     <b id="B">
       <c id="C"/>
@@ -26715,13 +27679,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my $i = $a->𝗶𝗻𝗱𝗲𝘅𝗜𝗱𝘀;                                                         
-  
-    ok $i->{C}->tag eq q(c);                                                      
-  
-    ok $i->{E}->tag eq q(e);                                                      
-  
+
+
+    my $i = $a->indexIds;                                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $i->{C}->tag eq q(c);
+
+    ok $i->{E}->tag eq q(e);
+
 
 =head2 numberTreesJustIds($node, $prefix)
 
@@ -26734,7 +27700,7 @@ Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are n
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>A
     <b id="bb">B
       <c/>
@@ -26749,10 +27715,12 @@ B<Example:>
     H
   </a>
   END
-  
-    $a->𝗻𝘂𝗺𝗯𝗲𝗿𝗧𝗿𝗲𝗲𝘀𝗝𝘂𝘀𝘁𝗜𝗱𝘀(q(T));                                                 
-  
-    my $A = Data::Edit::Xml::new(<<END);                                          
+
+
+    $a->numberTreesJustIds(q(T));                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $A = Data::Edit::Xml::new(<<END);
   <a id="T1">A
     <b id="bb">B
       <c id="T2"/>
@@ -26767,9 +27735,9 @@ B<Example:>
     H
   </a>
   END
-  
-    ok -p $a eq -p $A;                                                            
-  
+
+    ok -p $a eq -p $A;
+
 
 =head1 Forest Numbers
 
@@ -26786,7 +27754,7 @@ Number the ids of the nodes in a L<parse|/parse> tree in pre-order so they are n
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b id="b">
       <c/>
@@ -26797,12 +27765,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my $e = $a->go(qw(b -1 e));                                                   
-  
-    $e->𝗳𝗼𝗿𝗲𝘀𝘁𝗡𝘂𝗺𝗯𝗲𝗿𝗧𝗿𝗲𝗲𝘀(1);                                                     
-  
-    ok -p $a eq <<END;                                                             
+
+    my $e = $a->go(qw(b -1 e));
+
+
+    $e->forestNumberTrees(1);                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a id="1_1">
     <b id="1_2">
       <c id="1_3"/>
@@ -26813,7 +27783,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 findByForestNumber($node, $tree, $id)
 
@@ -26827,7 +27797,7 @@ Find the node with the specified L<forest number|/forestNumberTrees> as made vis
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a id="1_1">
     <b id="1_2">
       <c id="1_3"/>
@@ -26838,11 +27808,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my $B = $e->𝗳𝗶𝗻𝗱𝗕𝘆𝗙𝗼𝗿𝗲𝘀𝘁𝗡𝘂𝗺𝗯𝗲𝗿(1, 4);                                         
-  
-    is_deeply [$B->getLabels], ["B"];                                             
-  
+
+
+    my $B = $e->findByForestNumber(1, 4);                                           # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply [$B->getLabels], ["B"];
+
 
 =head1 Order
 
@@ -26866,7 +27838,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -26884,17 +27856,21 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $b->id eq 'b1';                                                             
-  
-    ok $e->id eq "e1";                                                                    
-  
-    ok $E->id eq "e2";                                                                 
-  
-    ok  $b->𝗮𝗯𝗼𝘃𝗲($e);                                                            
-  
-    ok !$E->𝗮𝗯𝗼𝘃𝗲($e);                                                            
-  
+
+    ok $b->id eq 'b1';
+
+    ok $e->id eq "e1";
+
+    ok $E->id eq "e2";
+
+
+    ok  $b->above($e);                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$E->above($e);                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 abovePath($first, $second)
 
@@ -26907,7 +27883,7 @@ Return the nodes along the path from the first node down to the second node when
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -26925,13 +27901,17 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($a, $b, $c, $d, $e) = $x->firstDown(@tags);                                
-  
-    is_deeply [$b, $d, $e], [$b->𝗮𝗯𝗼𝘃𝗲𝗣𝗮𝘁𝗵($e)];                                  
-  
-    is_deeply [],   [$c->𝗮𝗯𝗼𝘃𝗲𝗣𝗮𝘁𝗵($d)];                                          
-  
+
+    my ($a, $b, $c, $d, $e) = $x->firstDown(@tags);
+
+
+    is_deeply [$b, $d, $e], [$b->abovePath($e)];                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    is_deeply [],   [$c->abovePath($d)];                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 below($first, $second, @context)
 
@@ -26951,7 +27931,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -26969,13 +27949,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $d->id eq 'd1';                                                             
-  
-    ok $e->id eq "e1";                                                                    
-  
-    ok !$d->𝗯𝗲𝗹𝗼𝘄($e);                                                            
-  
+
+    ok $d->id eq 'd1';
+
+    ok $e->id eq "e1";
+
+
+    ok !$d->below($e);                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 belowPath($first, $second)
 
@@ -26988,7 +27970,7 @@ Return the nodes along the path from the first node up to the second node when t
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -27006,13 +27988,17 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($a, $b, $c, $d, $e) = $x->firstDown(@tags);                                
-  
-    is_deeply [$e, $d, $b], [$e->𝗯𝗲𝗹𝗼𝘄𝗣𝗮𝘁𝗵($b)];                                  
-  
-    is_deeply [$c], [$c->𝗯𝗲𝗹𝗼𝘄𝗣𝗮𝘁𝗵($c)];                                          
-  
+
+    my ($a, $b, $c, $d, $e) = $x->firstDown(@tags);
+
+
+    is_deeply [$e, $d, $b], [$e->belowPath($b)];                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    is_deeply [$c], [$c->belowPath($c)];                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 after($first, $second, @context)
 
@@ -27032,7 +28018,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -27050,13 +28036,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $c->id eq 'c1';                                                             
-  
-    ok $e->id eq "e1";                                                                    
-  
-    ok $e->𝗮𝗳𝘁𝗲𝗿($c);                                                             
-  
+
+    ok $c->id eq 'c1';
+
+    ok $e->id eq "e1";
+
+
+    ok $e->after($c);                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 before($first, $second, @context)
 
@@ -27076,7 +28064,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -27094,13 +28082,15 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $e->id eq "e1";                                                                    
-  
-    ok $E->id eq "e2";                                                                 
-  
-    ok $e->𝗯𝗲𝗳𝗼𝗿𝗲($E);                                                            
-  
+
+    ok $e->id eq "e1";
+
+    ok $E->id eq "e2";
+
+
+    ok $e->before($E);                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 disordered($node, @nodes)
 
@@ -27113,7 +28103,7 @@ Return the first node that is out of the specified order when performing a pre-o
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -27131,21 +28121,27 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $b->id eq 'b1';                                                             
-  
-    ok $c->id eq 'c1';                                                             
-  
-    ok $d->id eq 'd1';                                                             
-  
-    ok $e->id eq "e1";                                                                    
-  
-    ok  $e->𝗱𝗶𝘀𝗼𝗿𝗱𝗲𝗿𝗲𝗱($c        )->id eq "c1";                                   
-  
-    ok  $b->𝗱𝗶𝘀𝗼𝗿𝗱𝗲𝗿𝗲𝗱($c, $e, $d)->id eq "d1";                                   
-  
-    ok !$c->𝗱𝗶𝘀𝗼𝗿𝗱𝗲𝗿𝗲𝗱($e);                                                       
-  
+
+    ok $b->id eq 'b1';
+
+    ok $c->id eq 'c1';
+
+    ok $d->id eq 'd1';
+
+    ok $e->id eq "e1";
+
+
+    ok  $e->disordered($c        )->id eq "c1";                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $b->disordered($c, $e, $d)->id eq "d1";                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$c->disordered($e);                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 commonAncestor($node, @nodes)
 
@@ -27158,7 +28154,7 @@ Find the most recent common ancestor of the specified nodes or B<undef> if there
 B<Example:>
 
 
-    ok -z $a eq <<END;                                                                   
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="3">
@@ -27183,17 +28179,25 @@ B<Example:>
     </b>
   </a>
   END
-  
-     {my ($b, $e, @n) = $a->findByNumbers(2, 4, 6, 9);                            
-  
-      ok $e == $e->𝗰𝗼𝗺𝗺𝗼𝗻𝗔𝗻𝗰𝗲𝘀𝘁𝗼𝗿;                                                
-  
-      ok $e == $e->𝗰𝗼𝗺𝗺𝗼𝗻𝗔𝗻𝗰𝗲𝘀𝘁𝗼𝗿($e);                                            
-  
-      ok $b == $e->𝗰𝗼𝗺𝗺𝗼𝗻𝗔𝗻𝗰𝗲𝘀𝘁𝗼𝗿($b);                                            
-  
-      ok $b == $e->𝗰𝗼𝗺𝗺𝗼𝗻𝗔𝗻𝗰𝗲𝘀𝘁𝗼𝗿(@n);                                            
-  
+
+     {my ($b, $e, @n) = $a->findByNumbers(2, 4, 6, 9);
+
+
+      ok $e == $e->commonAncestor;                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+      ok $e == $e->commonAncestor($e);                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+      ok $b == $e->commonAncestor($b);                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+      ok $b == $e->commonAncestor(@n);                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 commonAdjacentAncestors($first, $second)
 
@@ -27206,7 +28210,7 @@ Given two nodes, find a pair of adjacent ancestral siblings if such a pair exist
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -27221,11 +28225,13 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    is_deeply [$d->𝗰𝗼𝗺𝗺𝗼𝗻𝗔𝗱𝗷𝗮𝗰𝗲𝗻𝘁𝗔𝗻𝗰𝗲𝘀𝘁𝗼𝗿𝘀($C)], [$b, $B];                                                       
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    is_deeply [$d->commonAdjacentAncestors($C)], [$b, $B];                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 ordered($node, @nodes)
 
@@ -27238,7 +28244,7 @@ Return the first node if the specified nodes are all in order when performing a 
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                                  
+    my $x = Data::Edit::Xml::new(<<END);
   <a       id='a1'>
     <b     id='b1'>
       <c   id='c1'/>
@@ -27256,19 +28262,27 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $e->id eq "e1";                                                                    
-  
-    ok $E->id eq "e2";                                                                 
-  
-    ok  $e->𝗼𝗿𝗱𝗲𝗿𝗲𝗱($E);                                                          
-  
-    ok !$E->𝗼𝗿𝗱𝗲𝗿𝗲𝗱($e);                                                          
-  
-    ok  $e->𝗼𝗿𝗱𝗲𝗿𝗲𝗱($e);                                                          
-  
-    ok  $e->𝗼𝗿𝗱𝗲𝗿𝗲𝗱;                                                              
-  
+
+    ok $e->id eq "e1";
+
+    ok $E->id eq "e2";
+
+
+    ok  $e->ordered($E);                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$E->ordered($e);                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $e->ordered($e);                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok  $e->ordered;                                                                # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Patching
 
@@ -27285,7 +28299,7 @@ Create a patch that moves the source L<parse|/parse> tree to the target L<parse|
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>Aaaaa
     <b b1="b1" b2="b2">Bbbbb
       <c c1="c1" />Ccccc
@@ -27300,8 +28314,8 @@ B<Example:>
     Hhhhhh
   </a>
   END
-  
-    my $A = Data::Edit::Xml::new(<<END);                                           
+
+    my $A = Data::Edit::Xml::new(<<END);
   <a>AaaAaaA
     <b b1="b1" b3="B3">BbbBbbB
       <c c1="C1" />Ccccc
@@ -27316,19 +28330,21 @@ B<Example:>
     Hhhhhh
   </a>
   END
-  
-    $a->numberTreesJustIds(q(a));                                                  
-  
-    $A->numberTreesJustIds(q(a));                                                  
-  
-    my $patches = $a->𝗰𝗿𝗲𝗮𝘁𝗲𝗣𝗮𝘁𝗰𝗵($A);                                             
-  
-    $patches->install($a);                                                         
-  
-    ok !$a->diff  ($A);                                                            
-  
-    ok  $a->equals($A);                                                            
-  
+
+    $a->numberTreesJustIds(q(a));
+
+    $A->numberTreesJustIds(q(a));
+
+
+    my $patches = $a->createPatch($A);                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    $patches->install($a);
+
+    ok !$a->diff  ($A);
+
+    ok  $a->equals($A);
+
 
 =head2 Data::Edit::Xml::Patch::install($patches, $a)
 
@@ -27341,7 +28357,7 @@ Replay a patch created by L<createPatch|/createPatch> against a L<parse|/parse> 
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                           
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>Aaaaa
     <b b1="b1" b2="b2">Bbbbb
       <c c1="c1" />Ccccc
@@ -27356,8 +28372,8 @@ B<Example:>
     Hhhhhh
   </a>
   END
-  
-    my $A = Data::Edit::Xml::new(<<END);                                           
+
+    my $A = Data::Edit::Xml::new(<<END);
   <a>AaaAaaA
     <b b1="b1" b3="B3">BbbBbbB
       <c c1="C1" />Ccccc
@@ -27372,19 +28388,19 @@ B<Example:>
     Hhhhhh
   </a>
   END
-  
-    $a->numberTreesJustIds(q(a));                                                  
-  
-    $A->numberTreesJustIds(q(a));                                                  
-  
-    my $patches = $a->createPatch($A);                                             
-  
-    $patches->install($a);                                                         
-  
-    ok !$a->diff  ($A);                                                            
-  
-    ok  $a->equals($A);                                                            
-  
+
+    $a->numberTreesJustIds(q(a));
+
+    $A->numberTreesJustIds(q(a));
+
+    my $patches = $a->createPatch($A);
+
+    $patches->install($a);
+
+    ok !$a->diff  ($A);
+
+    ok  $a->equals($A);
+
 
 =head1 Propogating
 
@@ -27408,7 +28424,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b b="B">
       <b c="C">
@@ -27423,17 +28439,19 @@ B<Example:>
     </b>
   </a>
   END
-  
-    $a->𝗽𝗿𝗼𝗽𝗮𝗴𝗮𝘁𝗲(q(b));                                                          
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->propagate(q(b));                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <c b="B" c="C"/>
     <d b="B" c="C" d="D"/>
     <e b="B" c="C" d="D" e="E"/>
   </a>
   END
-  
+
 
 =head1 Table of Contents
 
@@ -27450,7 +28468,7 @@ Table of Contents number the nodes in a L<parse|/parse> tree.
 B<Example:>
 
 
-    ok $a->prettyStringNumbered eq <<END;                                             
+    ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
       <A id="3"/>
@@ -27462,25 +28480,27 @@ B<Example:>
     </c>
   </a>
   END
-  
-      my $t = $a->𝘁𝗼𝗰𝗡𝘂𝗺𝗯𝗲𝗿𝘀();                                                   
-  
-      is_deeply {map {$_=>$t->{$_}->tag} keys %$t},                               
-  
-       {"1"  =>"b",                                                               
-  
-        "1 1"=>"A",                                                               
-  
-        "1 2"=>"B",                                                               
-  
-        "2"  =>"c",                                                               
-  
-        "2 1"=> "C",                                                              
-  
-        "2 2"=>"D"                                                                
-  
-       }                                                                          
-  
+
+
+      my $t = $a->tocNumbers();                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      is_deeply {map {$_=>$t->{$_}->tag} keys %$t},
+
+       {"1"  =>"b",
+
+        "1 1"=>"A",
+
+        "1 2"=>"B",
+
+        "2"  =>"c",
+
+        "2 1"=> "C",
+
+        "2 2"=>"D"
+
+       }
+
 
 =head1 Labels
 
@@ -27497,18 +28517,22 @@ Add the named labels to the specified B<$node> and return the number of labels a
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';                                                
-  
-    my $b = $x->go(q(b));                                                            
-  
-    ok $b->countLabels == 0;                                                        
-  
-    $b->𝗮𝗱𝗱𝗟𝗮𝗯𝗲𝗹𝘀(1..2);                                                             
-  
-    $b->𝗮𝗱𝗱𝗟𝗮𝗯𝗲𝗹𝘀(3..4);                                                             
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';                                 
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';
+
+    my $b = $x->go(q(b));
+
+    ok $b->countLabels == 0;
+
+
+    $b->addLabels(1..2);                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    $b->addLabels(3..4);                                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
+
 
 =head2 countLabels($node)
 
@@ -27520,20 +28544,24 @@ Return the count of the number of labels at a node.
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';                                                
-  
-    my $b = $x->go(q(b));                                                            
-  
-    ok $b->𝗰𝗼𝘂𝗻𝘁𝗟𝗮𝗯𝗲𝗹𝘀 == 0;                                                        
-  
-    $b->addLabels(1..2);                                                             
-  
-    $b->addLabels(3..4);                                                             
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';                                 
-  
-    ok $b->𝗰𝗼𝘂𝗻𝘁𝗟𝗮𝗯𝗲𝗹𝘀 == 4;                                                      
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';
+
+    my $b = $x->go(q(b));
+
+
+    ok $b->countLabels == 0;                                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    $b->addLabels(1..2);
+
+    $b->addLabels(3..4);
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
+
+
+    ok $b->countLabels == 4;                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 labelsInTree($tree)
 
@@ -27545,7 +28573,7 @@ Return a hash of all the labels in a tree
 B<Example:>
 
 
-    ok -p (new $A->stringExtendingIdsWithLabels) eq <<END;                         
+    ok -p (new $A->stringExtendingIdsWithLabels) eq <<END;
   <a id="aa, a, a5">
     <b id="bb, b, b2">
       <c id="cc, c, c1"/>
@@ -27555,11 +28583,13 @@ B<Example:>
     </b>
   </a>
   END
-  
-    is_deeply [sort keys %{$A->𝗹𝗮𝗯𝗲𝗹𝘀𝗜𝗻𝗧𝗿𝗲𝗲}],                                    
-  
-      ["B", "C", "a", "a5", "b", "b2", "b4", "c", "c1", "c3"];                    
-  
+
+
+    is_deeply [sort keys %{$A->labelsInTree}],                                      # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ["B", "C", "a", "a5", "b", "b2", "b4", "c", "c1", "c3"];
+
 
 =head2 getLabels($node)
 
@@ -27571,20 +28601,22 @@ Return the names of all the labels set on a node.
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';                                                
-  
-    my $b = $x->go(q(b));                                                            
-  
-    ok $b->countLabels == 0;                                                        
-  
-    $b->addLabels(1..2);                                                             
-  
-    $b->addLabels(3..4);                                                             
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';                                 
-  
-    is_deeply [1..4], [$b->𝗴𝗲𝘁𝗟𝗮𝗯𝗲𝗹𝘀];                                            
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b><c/></b></a>';
+
+    my $b = $x->go(q(b));
+
+    ok $b->countLabels == 0;
+
+    $b->addLabels(1..2);
+
+    $b->addLabels(3..4);
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
+
+
+    is_deeply [1..4], [$b->getLabels];                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 deleteLabels($node, @labels)
 
@@ -27597,12 +28629,14 @@ Delete the specified labels in the specified B<$node> or all labels if no labels
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c id="1, 2, 3, 4"/></b></a>';              
-  
-    $b->𝗱𝗲𝗹𝗲𝘁𝗲𝗟𝗮𝗯𝗲𝗹𝘀(1,4) for 1..2;                                               
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="2, 3"><c id="1, 2, 3, 4"/></b></a>';                    
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c id="1, 2, 3, 4"/></b></a>';
+
+
+    $b->deleteLabels(1,4) for 1..2;                                                 # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="2, 3"><c id="1, 2, 3, 4"/></b></a>';
+
 
 =head2 copyLabels($source, $target)
 
@@ -27615,12 +28649,14 @@ Copy all the labels from the source node to the target node and return the sourc
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';                                 
-  
-    $b->𝗰𝗼𝗽𝘆𝗟𝗮𝗯𝗲𝗹𝘀($c) for 1..2;                                                  
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c id="1, 2, 3, 4"/></b></a>';              
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
+
+
+    $b->copyLabels($c) for 1..2;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="1, 2, 3, 4"><c id="1, 2, 3, 4"/></b></a>';
+
 
 =head2 moveLabels($source, $target)
 
@@ -27633,12 +28669,14 @@ Move all the labels from the source node to the target node and return the sourc
 B<Example:>
 
 
-    ok $x->stringReplacingIdsWithLabels eq '<a><b id="2, 3"><c id="1, 2, 3, 4"/></b></a>';                    
-  
-    $b->𝗺𝗼𝘃𝗲𝗟𝗮𝗯𝗲𝗹𝘀($c) for 1..2;                                                  
-  
-    ok $x->stringReplacingIdsWithLabels eq '<a><b><c id="1, 2, 3, 4"/></b></a>';                             
-  
+    ok $x->stringReplacingIdsWithLabels eq '<a><b id="2, 3"><c id="1, 2, 3, 4"/></b></a>';
+
+
+    $b->moveLabels($c) for 1..2;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $x->stringReplacingIdsWithLabels eq '<a><b><c id="1, 2, 3, 4"/></b></a>';
+
 
 =head2 copyLabelsAndIdsInTree($source, $target)
 
@@ -27651,7 +28689,7 @@ Copy all the labels and ids in the source parse tree to the matching nodes in th
 B<Example:>
 
 
-    ok -p (new $a->stringExtendingIdsWithLabels) eq <<END;                         
+    ok -p (new $a->stringExtendingIdsWithLabels) eq <<END;
   <a id="a, a5">
     <b id="b, b2">
       <c id="c, c1"/>
@@ -27661,8 +28699,8 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok -p (new $A->stringExtendingIdsWithLabels) eq <<END;                        
+
+    ok -p (new $A->stringExtendingIdsWithLabels) eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"/>
@@ -27672,10 +28710,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->𝗰𝗼𝗽𝘆𝗟𝗮𝗯𝗲𝗹𝘀𝗔𝗻𝗱𝗜𝗱𝘀𝗜𝗻𝗧𝗿𝗲𝗲($A) == 10;                                      
-  
-    ok -p (new $A->stringExtendingIdsWithLabels) eq <<END;                         
+
+
+    ok $a->copyLabelsAndIdsInTree($A) == 10;                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p (new $A->stringExtendingIdsWithLabels) eq <<END;
   <a id="aa, a, a5">
     <b id="bb, b, b2">
       <c id="cc, c, c1"/>
@@ -27685,7 +28725,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 giveEveryIdAGuid($tree, $genGuid)
 
@@ -27698,7 +28738,7 @@ Give a guid to every node in the specified B<$tree> that has an id attribute, sa
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a id="a">
     <b id="b">
@@ -27708,11 +28748,13 @@ B<Example:>
   </a>
   END
     my $n  =0;
-    $a->𝗴𝗶𝘃𝗲𝗘𝘃𝗲𝗿𝘆𝗜𝗱𝗔𝗚𝘂𝗶𝗱(sub
+
+    $a->giveEveryIdAGuid(sub  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {my ($n, $o) = @_;
       qq(GUID-$n)
      });
-  
+
     ok -p $a eq <<END;
   <a id="GUID-3">
     <b id="GUID-2">
@@ -27721,12 +28763,12 @@ B<Example:>
     <d/>
   </a>
   END
-  
+
    ok $a->stringReplacingIdsWithLabels eq q(<a id="a"><b id="b"><c id="c"/></b><d/></a>);
    ok $a->stringExtendingIdsWithLabels eq q(<a id="GUID-3, a"><b id="GUID-2, b"><c id="GUID-1, c"/></b><d/></a>);
-  
+
    }
-  
+
 
 =head2 createGuidId($node, @context)
 
@@ -27752,9 +28794,11 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->𝗰𝗿𝗲𝗮𝘁𝗲𝗚𝘂𝗶𝗱𝗜𝗱->id eq q(GUID-390bf05d-8f56-71cc-6a47-71834840d695);
-  
+
+
+    ok $a->createGuidId->id eq q(GUID-390bf05d-8f56-71cc-6a47-71834840d695);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Operators
 
@@ -27823,14 +28867,14 @@ Operator access to methods use the assign versions to avoid 'useless use of oper
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                           
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b><c>ccc</c></b>
     <d><e>eee</e></d>
   </a>
   END
-  
-    my $a = Data::Edit::Xml::new(<<END);                                               
+
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -27840,28 +28884,28 @@ B<Example:>
     </d>
   </a>
   END
-  
-    my ($c, $b, $e, $d) = $a->byList;                                             
-  
-    ok $c->printNode eq q(c id="42" match="mm");                                   
-  
-    ok -A $c eq q(c id="42" match="mm");                                          
-  
-    ok -b $e;                                                                     
-  
-    ok -c $e eq q(e d a);                                                          
-  
-    ok -f $b eq $c;                                                               
-  
-    ok -l $a eq $d;                                                               
-  
-    ok -O $a, q( b  d );                                                          
-  
-    ok -o $a, q(b d);                                                             
-  
-    ok -w $a eq q('<a><b><c id="42" match="mm"/></b><d><e/></d></a>');            
-  
-    ok -p $a eq <<END;                                                                          
+
+    my ($c, $b, $e, $d) = $a->byList;
+
+    ok $c->printNode eq q(c id="42" match="mm");
+
+    ok -A $c eq q(c id="42" match="mm");
+
+    ok -b $e;
+
+    ok -c $e eq q(e d a);
+
+    ok -f $b eq $c;
+
+    ok -l $a eq $d;
+
+    ok -O $a, q( b  d );
+
+    ok -o $a, q(b d);
+
+    ok -w $a eq q('<a><b><c id="42" match="mm"/></b><d><e/></d></a>');
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -27871,14 +28915,14 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok -s $a eq '<a><b><c id="42" match="mm"/></b><d><e/></d></a>';                
-  
-    ok -t $a eq 'a';                                                              
-  
-    $a->numberTree;                                                                
-  
-    ok -z $a eq <<END;                                                             
+
+    ok -s $a eq '<a><b><c id="42" match="mm"/></b><d><e/></d></a>';
+
+    ok -t $a eq 'a';
+
+    $a->numberTree;
+
+    ok -z $a eq <<END;
   <a id="1">
     <b id="2">
       <c id="42" match="mm"/>
@@ -27888,20 +28932,20 @@ B<Example:>
     </d>
   </a>
   END
-  
-  if (1)                                                                           
+
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <concept/>
   END
-  
+
     ok $a->ditaPrettyPrintWithHeaders eq <<END;
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd" []>
   <concept/>
   END
-  
+
    }
-  
+
 
 =head2 opContents($node)
 
@@ -27913,21 +28957,21 @@ B<Example:>
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                           
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b><c>ccc</c></b>
     <d><e>eee</e></d>
   </a>
   END
-  
-    my ($b, $d) =  @$a;                                                           
-  
-    ok -c $b eq q(b a);                                                           
-  
-    my ($c)     =  @$b;                                                           
-  
-    ok -c $c eq q(c b a);                                                         
-  
+
+    my ($b, $d) =  @$a;
+
+    ok -c $b eq q(b a);
+
+    my ($c)     =  @$b;
+
+    ok -c $c eq q(c b a);
+
 
 =head2 opAt($node, $context)
 
@@ -27940,7 +28984,7 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -27950,9 +28994,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok (($a >= [qw(d e)]) <= [qw(e d a)]);                                         
-  
+
+    ok (($a >= [qw(d e)]) <= [qw(e d a)]);
+
 
 =head2 opNew($node, $text)
 
@@ -27965,12 +29009,12 @@ B<Example:>
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new("<a/>");                                         
-  
-    my $b = $a ** q(b);                                                           
-  
-    ok -s $b eq "<b/>";                                                           
-  
+    my $a = Data::Edit::Xml::new("<a/>");
+
+    my $b = $a ** q(b);
+
+    ok -s $b eq "<b/>";
+
 
 =head2 opPutFirst($node, $text)
 
@@ -27983,18 +29027,18 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                            
+    ok -p $a eq <<END;
   <a/>
   END
-  
-    my $f = $a >> qq(first);                                                      
-  
-    ok -p $a eq <<END;                                                             
+
+    my $f = $a >> qq(first);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
   </a>
   END
-  
+
 
 =head2 opPutFirstAssign($node, $text)
 
@@ -28007,18 +29051,18 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                            
+    ok -p $a eq <<END;
   <a/>
   END
-  
-    $a >>= qq(first);                                                             
-  
-    ok -p $a eq <<END;                                                             
+
+    $a >>= qq(first);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
   </a>
   END
-  
+
 
 =head2 opPutLast($node, $text)
 
@@ -28031,21 +29075,21 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <first/>
   </a>
   END
-  
-    my $l = $a << qq(last);                                                       
-  
-    ok -p $a eq <<END;                                                             
+
+    my $l = $a << qq(last);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
     <last/>
   </a>
   END
-  
+
 
 =head2 opPutLastAssign($node, $text)
 
@@ -28058,21 +29102,21 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <first/>
   </a>
   END
-  
-    $a <<= qq(last);                                                              
-  
-    ok -p $a eq <<END;                                                             
+
+    $a <<= qq(last);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
     <last/>
   </a>
   END
-  
+
 
 =head2 opPutNext($node, $text)
 
@@ -28085,23 +29129,23 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <first/>
     <last/>
   </a>
   END
-  
-    $f += qq(next);                                                               
-  
-    ok -p $a eq <<END;                                                              
+
+    $f += qq(next);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
     <next/>
     <last/>
   </a>
   END
-  
+
 
 =head2 opPutNextAssign($node, $text)
 
@@ -28114,25 +29158,25 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <first/>
     <last/>
   </a>
   END
-  
-    my $f = -f $a;                                                                
-  
-    $f += qq(next);                                                               
-  
-    ok -p $a eq <<END;                                                              
+
+    my $f = -f $a;
+
+    $f += qq(next);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
     <next/>
     <last/>
   </a>
   END
-  
+
 
 =head2 opPutPrev($node, $text)
 
@@ -28145,17 +29189,17 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                              
+    ok -p $a eq <<END;
   <a>
     <first/>
     <next/>
     <last/>
   </a>
   END
-  
-    $l -= qq(prev);                                                               
-  
-    ok -p $a eq <<END;                                                            
+
+    $l -= qq(prev);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
     <next/>
@@ -28163,7 +29207,7 @@ B<Example:>
     <last/>
   </a>
   END
-  
+
 
 =head2 opPutPrevAssign($node, $text)
 
@@ -28176,19 +29220,19 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                              
+    ok -p $a eq <<END;
   <a>
     <first/>
     <next/>
     <last/>
   </a>
   END
-  
-    my $l = -l $a;                                                                
-  
-    $l -= qq(prev);                                                               
-  
-    ok -p $a eq <<END;                                                            
+
+    my $l = -l $a;
+
+    $l -= qq(prev);
+
+    ok -p $a eq <<END;
   <a>
     <first/>
     <next/>
@@ -28196,7 +29240,7 @@ B<Example:>
     <last/>
   </a>
   END
-  
+
 
 =head2 opBy($node, $code)
 
@@ -28209,7 +29253,7 @@ x= : Traverse a L<parse|/parse> tree in post-order.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -28219,9 +29263,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-     {my $s; $a x= sub{$s .= -t $_}; ok $s eq "cbeda"                             
-  
+
+     {my $s; $a x= sub{$s .= -t $_}; ok $s eq "cbeda"
+
 
 =head2 opGo($node, $go)
 
@@ -28234,7 +29278,7 @@ B<Example:>
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                                          
+    ok -p $a eq <<END;
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -28244,9 +29288,9 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok (($a >= [qw(d e)]) <= [qw(e d a)]);                                         
-  
+
+    ok (($a >= [qw(d e)]) <= [qw(e d a)]);
+
 
 =head2 opAttr($node, $attr)
 
@@ -28259,10 +29303,10 @@ B<Example:>
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new('<a number="1"/>');                              
-  
-    ok $a %  qq(number) == 1;                                                     
-  
+    my $a = Data::Edit::Xml::new('<a number="1"/>');
+
+    ok $a %  qq(number) == 1;
+
 
 =head2 opWrapWith($node, $tag)
 
@@ -28275,16 +29319,16 @@ B<Example:>
 B<Example:>
 
 
-    my $c = Data::Edit::Xml::new("<c/>");                                         
-  
-    my $b = $c / qq(b);                                                           
-  
-    ok -s $b eq "<b><c/></b>";                                                    
-  
-    my $a = $b / qq(a);                                                           
-  
-    ok -s $a eq "<a><b><c/></b></a>";                                             
-  
+    my $c = Data::Edit::Xml::new("<c/>");
+
+    my $b = $c / qq(b);
+
+    ok -s $b eq "<b><c/></b>";
+
+    my $a = $b / qq(a);
+
+    ok -s $a eq "<a><b><c/></b></a>";
+
 
 =head2 opWrapContentWith($node, $tag)
 
@@ -28297,7 +29341,7 @@ B<Example:>
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -28305,12 +29349,12 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $d, $b) = $a->byList;                                                 
-  
-    $b *= q(B);                                                                   
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $d, $b) = $a->byList;
+
+    $b *= q(B);
+
+    ok -p $a eq <<END;
   <a>
     <b>
       <B>
@@ -28320,7 +29364,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 opCut($node)
 
@@ -28332,20 +29376,20 @@ B<Example:>
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                          
+    my $x = Data::Edit::Xml::new(<<END);
   <a>
     <b><c/></b>
   </a>
   END
-  
-    my $b = $x >= qq(b);                                                          
-  
-     --$b;                                                                        
-  
-    ok -s $x eq "<a/>";                                                           
-  
-    ok -s $b eq "<b><c/></b>";                                                    
-  
+
+    my $b = $x >= qq(b);
+
+     --$b;
+
+    ok -s $x eq "<a/>";
+
+    ok -s $b eq "<b><c/></b>";
+
 
 =head2 opUnwrap($node)
 
@@ -28357,7 +29401,7 @@ B<Example:>
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
@@ -28365,18 +29409,18 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($c, $d, $b) = $a->byList;                                                 
-  
-    $b++;                                                                         
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($c, $d, $b) = $a->byList;
+
+    $b++;
+
+    ok -p $a eq <<END;
   <a>
     <c/>
     <d/>
   </a>
   END
-  
+
 
 =head1 Reuse
 
@@ -28400,9 +29444,11 @@ B<Example:>
    <d>dd</d>
   </a>
   END
-  
-    is_deeply [$a->first->𝘀𝘂𝗯𝗠𝗱𝟱𝗧𝗿𝗲𝗲], [q(21ad0bd836b90d08f4cf640b4c298e7c), q(bb)];
-  
+
+
+    is_deeply [$a->first->subMd5Tree], [q(21ad0bd836b90d08f4cf640b4c298e7c), q(bb)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     is_deeply subMd5($a, map {$_=>1} qw(b c)),
      {b => {"21ad0bd836b90d08f4cf640b4c298e7c" => {    bb      => 1},
             "95c1bde7f88ced04c1b1fbcab120ed96" => {"<c>bb</c>" => 1},
@@ -28410,7 +29456,7 @@ B<Example:>
       c => {"21ad0bd836b90d08f4cf640b4c298e7c" => {    bb      => 1}},
      };
   # owf(q(/home/phil/z/z/z/out.xml), dump(subMd5($a, map{$_=>1} qw(b c))));
-  
+
 
 =head2 subMd5($node, %tags)
 
@@ -28431,17 +29477,21 @@ B<Example:>
    <d>dd</d>
   </a>
   END
-  
+
     is_deeply [$a->first->subMd5Tree], [q(21ad0bd836b90d08f4cf640b4c298e7c), q(bb)];
-  
-    is_deeply 𝘀𝘂𝗯𝗠𝗱𝟱($a, map {$_=>1} qw(b c)),
+
+
+    is_deeply subMd5($a, map {$_=>1} qw(b c)),  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {b => {"21ad0bd836b90d08f4cf640b4c298e7c" => {    bb      => 1},
             "95c1bde7f88ced04c1b1fbcab120ed96" => {"<c>bb</c>" => 1},
             },
       c => {"21ad0bd836b90d08f4cf640b4c298e7c" => {    bb      => 1}},
      };
-  # owf(q(/home/phil/z/z/z/out.xml), dump(𝘀𝘂𝗯𝗠𝗱𝟱($a, map{$_=>1} qw(b c))));
-  
+
+  # owf(q(/home/phil/z/z/z/out.xml), dump(subMd5($a, map{$_=>1} qw(b c))));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Statistics
 
@@ -28458,14 +29508,16 @@ Return the count of the number of instances of the specified tags under the spec
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(<<END);                                           
+    my $x = Data::Edit::Xml::new(<<END);
   <a>
-  
+
   </a>
   END
-  
-    ok $x->𝗰𝗼𝘂𝗻𝘁 == 0;                                                            
-  
+
+
+    ok $x->count == 0;                                                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 countTags($node)
 
@@ -28477,16 +29529,18 @@ Count the number of tags in a L<parse|/parse> tree.
 B<Example:>
 
 
-      ok -p $a eq <<END;                                                            
+      ok -p $a eq <<END;
   <a id="aa">
     <b id="bb">
       <c id="cc"/>
     </b>
   </a>
   END
-  
-      ok $a->𝗰𝗼𝘂𝗻𝘁𝗧𝗮𝗴𝘀 == 3;                                                      
-  
+
+
+      ok $a->countTags == 3;                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 countTagNames($node, @exclude)
 
@@ -28511,19 +29565,21 @@ B<Example:>
     </b>
   </a>
   END
-  
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗧𝗮𝗴𝗡𝗮𝗺𝗲𝘀,
+
+
+    is_deeply $x->countTagNames,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {a => 1, b => 2, c => 3};
-  
+
     is_deeply $x->countAttrNames,
      {A => 1, B => 3, C => 4};
-  
+
     is_deeply $x->countAttrValues,
      {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
-  
+
     is_deeply $x->countAttrNamesAndValues,
      {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
-  
+
 
 =head2 countNonEmptyTags($node, @exclude)
 
@@ -28545,10 +29601,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    is_deeply $a->𝗰𝗼𝘂𝗻𝘁𝗡𝗼𝗻𝗘𝗺𝗽𝘁𝘆𝗧𝗮𝗴𝘀(qw(c)), {a=>1, b=>1};
-    is_deeply $a->go_b->𝗰𝗼𝘂𝗻𝘁𝗡𝗼𝗻𝗘𝗺𝗽𝘁𝘆𝗧𝗮𝗴𝘀,  {b=>1, c=>1};
-  
+
+
+    is_deeply $a->countNonEmptyTags(qw(c)), {a=>1, b=>1};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply $a->go_b->countNonEmptyTags,  {b=>1, c=>1};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 countTexts($node)
 
@@ -28566,9 +29626,11 @@ B<Example:>
     <conbody/>
   </concept>
   END
-  
-    is_deeply $a->𝗰𝗼𝘂𝗻𝘁𝗧𝗲𝘅𝘁𝘀, {};
-  
+
+
+    is_deeply $a->countTexts, {};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 countAttrNames($node, $count)
 
@@ -28593,19 +29655,21 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     is_deeply $x->countTagNames,
      {a => 1, b => 2, c => 3};
-  
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗡𝗮𝗺𝗲𝘀,
+
+
+    is_deeply $x->countAttrNames,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {A => 1, B => 3, C => 4};
-  
+
     is_deeply $x->countAttrValues,
      {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
-  
+
     is_deeply $x->countAttrNamesAndValues,
      {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
-  
+
 
 =head2 countAttrNamesOnTagExcluding($node, @attr)
 
@@ -28618,8 +29682,8 @@ Count the number of attributes owned by the specified B<$node> that are not in t
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(q(<a a="1" b="2" c="3" d="4" e="5"/>));          
-  
+   {my $a = Data::Edit::Xml::new(q(<a a="1" b="2" c="3" d="4" e="5"/>));
+
 
 =head2 countAttrValues($node, $count)
 
@@ -28644,19 +29708,21 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     is_deeply $x->countTagNames,
      {a => 1, b => 2, c => 3};
-  
+
     is_deeply $x->countAttrNames,
      {A => 1, B => 3, C => 4};
-  
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗩𝗮𝗹𝘂𝗲𝘀,
+
+
+    is_deeply $x->countAttrValues,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
-  
+
     is_deeply $x->countAttrNamesAndValues,
      {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
-  
+
 
 =head2 countAttrNamesAndValues($node, $count)
 
@@ -28681,19 +29747,21 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     is_deeply $x->countTagNames,
      {a => 1, b => 2, c => 3};
-  
+
     is_deeply $x->countAttrNames,
      {A => 1, B => 3, C => 4};
-  
+
     is_deeply $x->countAttrValues,
      {A1 => 1, B1 => 2, B2 => 1, C1 => 3, C2 => 1};
-  
-    is_deeply $x->𝗰𝗼𝘂𝗻𝘁𝗔𝘁𝘁𝗿𝗡𝗮𝗺𝗲𝘀𝗔𝗻𝗱𝗩𝗮𝗹𝘂𝗲𝘀,
+
+
+    is_deeply $x->countAttrNamesAndValues,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      {A => {A1 => 1}, B => {B1 => 2, B2 => 1}, C => {C1 => 3, C2 => 1}};
-  
+
 
 =head2 countOutputClasses($node, $count)
 
@@ -28706,10 +29774,12 @@ Count instances of outputclass attributes
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::newTree("a", id=>1, class=>2, href=>3, outputclass=>4); 
-  
-    is_deeply { 4 => 1 }, $a->𝗰𝗼𝘂𝗻𝘁𝗢𝘂𝘁𝗽𝘂𝘁𝗖𝗹𝗮𝘀𝘀𝗲𝘀;                                 
-  
+    my $a = Data::Edit::Xml::newTree("a", id=>1, class=>2, href=>3, outputclass=>4);
+
+
+    is_deeply { 4 => 1 }, $a->countOutputClasses;                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 countReport($node, @context)
 
@@ -28729,9 +29799,11 @@ B<Example:>
     <c>aaa AAA</c>
   </a>
   END
-  
-    my $t = $a->𝗰𝗼𝘂𝗻𝘁𝗥𝗲𝗽𝗼𝗿𝘁;
-  
+
+
+    my $t = $a->countReport;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok $t eq <<END;
      Tag  Count
   1    3  CDATA
@@ -28739,7 +29811,7 @@ B<Example:>
   3    1  b
   4    2  c
   END
-  
+
 
 B<cr> is a synonym for L<countReport|/countReport>.
 
@@ -28764,12 +29836,16 @@ Provide a specification to select L<change reason comments|/crc> to be inserted 
 B<Example:>
 
 
-    𝗰𝗵𝗮𝗻𝗴𝗲𝗥𝗲𝗮𝘀𝗼𝗻𝗖𝗼𝗺𝗺𝗲𝗻𝘁𝗦𝗲𝗹𝗲𝗰𝘁𝗶𝗼𝗻𝗦𝗽𝗲𝗰𝗶𝗳𝗶𝗰𝗮𝘁𝗶𝗼𝗻 = {ccc=>1, ddd=>1};                  
-  
-    𝗰𝗵𝗮𝗻𝗴𝗲𝗥𝗲𝗮𝘀𝗼𝗻𝗖𝗼𝗺𝗺𝗲𝗻𝘁𝗦𝗲𝗹𝗲𝗰𝘁𝗶𝗼𝗻𝗦𝗽𝗲𝗰𝗶𝗳𝗶𝗰𝗮𝘁𝗶𝗼𝗻 = undef;                             
-  
 
-This is a static method and so should be invoked as:
+    changeReasonCommentSelectionSpecification = {ccc=>1, ddd=>1};                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    changeReasonCommentSelectionSpecification = undef;                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::changeReasonCommentSelectionSpecification
 
@@ -28792,31 +29868,35 @@ Returns the specified B<$node>.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new("<a><b/></a>");                                  
-  
-    my ($b) = $a->contents;                                                       
-  
-    changeReasonCommentSelectionSpecification = {ccc=>1, ddd=>1};                  
-  
-    $b->putFirst(my $c = $b->newTag(q(c)));                                       
-  
-    $c->𝗰𝗿𝗰($_) for qw(aaa ccc);                                                  
-  
-    ok <<END eq -p $a;                                                            
+   {my $a = Data::Edit::Xml::new("<a><b/></a>");
+
+    my ($b) = $a->contents;
+
+    changeReasonCommentSelectionSpecification = {ccc=>1, ddd=>1};
+
+    $b->putFirst(my $c = $b->newTag(q(c)));
+
+
+    $c->crc($_) for qw(aaa ccc);                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $a;
   <a>
     <b><!--ccc-->
       <c/>
     </b>
   </a>
   END
-  
-    changeReasonCommentSelectionSpecification = undef;                             
-  
-    $c->putFirst(my $d = $c->newTag(q(d)));                                       
-  
-    $d->𝗰𝗿𝗰($_) for qw(aaa ccc);                                                  
-  
-    ok <<END eq -p $a;                                                            
+
+    changeReasonCommentSelectionSpecification = undef;
+
+    $c->putFirst(my $d = $c->newTag(q(d)));
+
+
+    $d->crc($_) for qw(aaa ccc);                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok <<END eq -p $a;
   <a>
     <b><!--ccc-->
       <c>
@@ -28825,7 +29905,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 howFirst($node)
 
@@ -28837,7 +29917,7 @@ Return the depth to which the specified B<$node> is L<first|/isFirst> else B<0>.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -28852,11 +29932,13 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok $d->𝗵𝗼𝘄𝗙𝗶𝗿𝘀𝘁     == 4;                                                     
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok $d->howFirst     == 4;                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 howLast($node)
 
@@ -28868,7 +29950,7 @@ Return the depth to which the specified B<$node> is L<last|/isLast> else B<0>.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -28883,11 +29965,13 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok $f->𝗵𝗼𝘄𝗟𝗮𝘀𝘁      == 3;                                                     
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok $f->howLast      == 3;                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 howOnlyChild($node)
 
@@ -28899,7 +29983,7 @@ Return the depth to which the specified B<$node> is an L<only child|/isOnlyChild
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -28914,11 +29998,13 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok $d->𝗵𝗼𝘄𝗢𝗻𝗹𝘆𝗖𝗵𝗶𝗹𝗱 == 2;                                                     
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok $d->howOnlyChild == 2;                                                       # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 howFar($first, $second)
 
@@ -28931,7 +30017,7 @@ Return how far the first node is from the second node along a path through their
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -28946,21 +30032,31 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    is_deeply [$d->commonAdjacentAncestors($C)], [$b, $B];                                                       
-  
-    ok $d->𝗵𝗼𝘄𝗙𝗮𝗿($d) == 0;                                                       
-  
-    ok $d->𝗵𝗼𝘄𝗙𝗮𝗿($a) == 3;                                                       
-  
-    ok $b->𝗵𝗼𝘄𝗙𝗮𝗿($B) == 1;                                                       
-  
-    ok $d->𝗵𝗼𝘄𝗙𝗮𝗿($f) == 5;                                                       
-  
-    ok $d->𝗵𝗼𝘄𝗙𝗮𝗿($C) == 4;                                                       
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+    is_deeply [$d->commonAdjacentAncestors($C)], [$b, $B];
+
+
+    ok $d->howFar($d) == 0;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $d->howFar($a) == 3;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $b->howFar($B) == 1;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $d->howFar($f) == 5;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok $d->howFar($C) == 4;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 howFarAbove($above, $below)
 
@@ -28973,7 +30069,7 @@ Return how far the first node is  L<above|/above> the second node is or B<0> if 
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -28988,13 +30084,17 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok  $a->𝗵𝗼𝘄𝗙𝗮𝗿𝗔𝗯𝗼𝘃𝗲($d) == 3;                                                 
-  
-    ok !$d->𝗵𝗼𝘄𝗙𝗮𝗿𝗔𝗯𝗼𝘃𝗲($c);                                                      
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok  $a->howFarAbove($d) == 3;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$d->howFarAbove($c);                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 howFarBelow($below, $above)
 
@@ -29007,7 +30107,7 @@ Return how far the first node is  L<below|/below> the second node is or B<0> if 
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                                       
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -29022,13 +30122,17 @@ B<Example:>
     </e>
   </a>
   END
-  
-    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;                                              
-  
-    ok  $d->𝗵𝗼𝘄𝗙𝗮𝗿𝗕𝗲𝗹𝗼𝘄($a) == 3;                                                 
-  
-    ok !$c->𝗵𝗼𝘄𝗙𝗮𝗿𝗕𝗲𝗹𝗼𝘄($d);                                                      
-  
+
+    my ($d, $c, $b, $C, $B, $f, $e) = $a->byList;
+
+
+    ok  $d->howFarBelow($a) == 3;                                                   # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    ok !$c->howFarBelow($d);                                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head1 Required clean up
 
@@ -29047,7 +30151,7 @@ Returns the specified B<$node>.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -29056,12 +30160,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    my ($b) = $a->contents;                                                       
-  
-    $b->𝗿𝗲𝗾𝘂𝗶𝗿𝗲𝗱𝗖𝗹𝗲𝗮𝗻𝗨𝗽(q(33));                                                   
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($b) = $a->contents;
+
+
+    $b->requiredCleanUp(q(33));                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <required-cleanup outputclass="33">&lt;b&gt;
     &lt;c&gt;
@@ -29071,7 +30177,7 @@ B<Example:>
   </required-cleanup>
   </a>
   END
-  
+
 
 =head2 replaceWithRequiredCleanUp($node, @text)
 
@@ -29084,22 +30190,24 @@ Replace a B<$node> with required cleanup B<@text> and return the new node
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
   </a>
   END
-  
-    my ($b) = $a->contents;                                                       
-  
-    $b->𝗿𝗲𝗽𝗹𝗮𝗰𝗲𝗪𝗶𝘁𝗵𝗥𝗲𝗾𝘂𝗶𝗿𝗲𝗱𝗖𝗹𝗲𝗮𝗻𝗨𝗽(q(bb));                                        
-  
-    ok -p $a eq <<END;                                                            
+
+    my ($b) = $a->contents;
+
+
+    $b->replaceWithRequiredCleanUp(q(bb));                                          # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>bb</required-cleanup>
   </a>
   END
-  
+
 
 =head2 putFirstRequiredCleanUp($node, @text)
 
@@ -29112,23 +30220,25 @@ Place a required cleanup first under a specified B<$node> using the specified B<
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b/>
   </a>
   END
-  
-    $a->𝗽𝘂𝘁𝗙𝗶𝗿𝘀𝘁𝗥𝗲𝗾𝘂𝗶𝗿𝗲𝗱𝗖𝗹𝗲𝗮𝗻𝗨𝗽(qq(1111
-));                                      
-  
-    ok -p $a eq <<END;                                                             
+
+
+    $a->putFirstRequiredCleanUp(qq(1111
+));                                        # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
     <b/>
   </a>
   END
-  
+
 
 =head2 putLastRequiredCleanUp($node, @text)
 
@@ -29141,18 +30251,20 @@ Place a required cleanup last under a specified B<$node> using the specified B<@
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
     <b/>
   </a>
   END
-  
-    $a->𝗽𝘂𝘁𝗟𝗮𝘀𝘁𝗥𝗲𝗾𝘂𝗶𝗿𝗲𝗱𝗖𝗹𝗲𝗮𝗻𝗨𝗽(qq(4444
-));                                       
-  
-    ok -p $a eq <<END;                                                             
+
+
+    $a->putLastRequiredCleanUp(qq(4444
+));                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
@@ -29161,7 +30273,7 @@ B<Example:>
   </required-cleanup>
   </a>
   END
-  
+
 
 =head2 putNextRequiredCleanUp($node, @text)
 
@@ -29174,7 +30286,7 @@ Place a required cleanup next after a specified B<$node> using the specified B<@
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
@@ -29183,11 +30295,13 @@ B<Example:>
   </required-cleanup>
   </a>
   END
-  
-    $a->go(q(b))->𝗽𝘂𝘁𝗡𝗲𝘅𝘁𝗥𝗲𝗾𝘂𝗶𝗿𝗲𝗱𝗖𝗹𝗲𝗮𝗻𝗨𝗽(qq(3333
-));                             
-  
-    ok -p $a eq <<END;                                                              
+
+
+    $a->go(q(b))->putNextRequiredCleanUp(qq(3333
+));                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
@@ -29198,7 +30312,7 @@ B<Example:>
   </required-cleanup>
   </a>
   END
-  
+
 
 =head2 putPrevRequiredCleanUp($node, $text)
 
@@ -29211,7 +30325,7 @@ Place a required cleanup before a specified B<$node> using the specified B<@text
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                              
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
@@ -29222,11 +30336,13 @@ B<Example:>
   </required-cleanup>
   </a>
   END
-  
-    $a->go(q(b))->𝗽𝘂𝘁𝗣𝗿𝗲𝘃𝗥𝗲𝗾𝘂𝗶𝗿𝗲𝗱𝗖𝗹𝗲𝗮𝗻𝗨𝗽(qq(2222
-));                             
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->go(q(b))->putPrevRequiredCleanUp(qq(2222
+));                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <required-cleanup>1111
   </required-cleanup>
@@ -29239,11 +30355,11 @@ B<Example:>
   </required-cleanup>
   </a>
   END
-  
+
 
 =head1 Conversions
 
-Methods useful for conversions from word, L<html|https://en.wikipedia.org/wiki/HTML> and L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
+Methods useful for conversions from word, L<HTML|https://en.wikipedia.org/wiki/HTML> and L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>.
 
 =head2 Dita Conversions
 
@@ -29270,17 +30386,19 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $target = fpe($dir, qw(target xml));
     owf($target, -p $a);
-  
-    my $b = 𝗱𝗶𝘁𝗮𝗚𝗲𝘁𝗖𝗼𝗻𝗥𝗲𝗳("target.xml#a/b", $dir);
+
+
+    my $b = ditaGetConRef("target.xml#a/b", $dir);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $b eq <<END;
   <b id="b">
     <c/>
   </b>
   END
-  
+
     my $A = Data::Edit::Xml::new(<<END);
   <a>
     <b id="B" conref="target.xml#a/b"/>
@@ -29288,13 +30406,13 @@ B<Example:>
   END
     my $target2 = fpe($dir, qw(target2 xml));
     owf($target2, -p $A);
-  
+
     my $B = Data::Edit::Xml::new(<<END);
   <a>
     <b id="C" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     $B->ditaExpandAllConRefs($dir);
     ok -p $B eq <<END;
   <a>
@@ -29303,15 +30421,15 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $CF = owf(fpe($dir, qw(source xml)), <<END);
   <a>
     <b id="D" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     my $C = Data::Edit::Xml::new($CF);
-  
+
     $C->first__ditaReplaceAnyConref;
     ok -p $C eq <<END;
   <a>
@@ -29320,28 +30438,28 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $DF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="E" conref="target2.xml#a/B"/>
   END
-  
+
     my $D = Data::Edit::Xml::new($DF);
-  
+
     $D->ditaReplaceAnyConref;
     ok -p $D eq <<END;
   <b id="E">
     <c/>
   </b>
   END
-  
+
     my $EF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="F" conref="target2.xml"/>
   END
-  
+
     my $E = Data::Edit::Xml::new($EF);
-  
+
     $E->ditaReplaceAnyConref;
-  
+
     ok -p $E eq <<END;
   <a id="F">
     <b id="B">
@@ -29349,11 +30467,11 @@ B<Example:>
     </b>
   </a>
   END
-  
-    clearFolder($dir, 3);
-  
 
-This is a static method and so should be invoked as:
+    clearFolder($dir, 3);
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::ditaGetConRef
 
@@ -29377,17 +30495,17 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $target = fpe($dir, qw(target xml));
     owf($target, -p $a);
-  
+
     my $b = ditaGetConRef("target.xml#a/b", $dir);
     ok -p $b eq <<END;
   <b id="b">
     <c/>
   </b>
   END
-  
+
     my $A = Data::Edit::Xml::new(<<END);
   <a>
     <b id="B" conref="target.xml#a/b"/>
@@ -29395,13 +30513,13 @@ B<Example:>
   END
     my $target2 = fpe($dir, qw(target2 xml));
     owf($target2, -p $A);
-  
+
     my $B = Data::Edit::Xml::new(<<END);
   <a>
     <b id="C" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     $B->ditaExpandAllConRefs($dir);
     ok -p $B eq <<END;
   <a>
@@ -29410,15 +30528,15 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $CF = owf(fpe($dir, qw(source xml)), <<END);
   <a>
     <b id="D" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     my $C = Data::Edit::Xml::new($CF);
-  
+
     $C->first__ditaReplaceAnyConref;
     ok -p $C eq <<END;
   <a>
@@ -29427,28 +30545,28 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $DF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="E" conref="target2.xml#a/B"/>
   END
-  
+
     my $D = Data::Edit::Xml::new($DF);
-  
+
     $D->ditaReplaceAnyConref;
     ok -p $D eq <<END;
   <b id="E">
     <c/>
   </b>
   END
-  
+
     my $EF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="F" conref="target2.xml"/>
   END
-  
+
     my $E = Data::Edit::Xml::new($EF);
-  
+
     $E->ditaReplaceAnyConref;
-  
+
     ok -p $E eq <<END;
   <a id="F">
     <b id="B">
@@ -29456,9 +30574,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     clearFolder($dir, 3);
-  
+
 
 =head3 ditaReplaceAnyConref($node, @context)
 
@@ -29479,17 +30597,17 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $target = fpe($dir, qw(target xml));
     owf($target, -p $a);
-  
+
     my $b = ditaGetConRef("target.xml#a/b", $dir);
     ok -p $b eq <<END;
   <b id="b">
     <c/>
   </b>
   END
-  
+
     my $A = Data::Edit::Xml::new(<<END);
   <a>
     <b id="B" conref="target.xml#a/b"/>
@@ -29497,13 +30615,13 @@ B<Example:>
   END
     my $target2 = fpe($dir, qw(target2 xml));
     owf($target2, -p $A);
-  
+
     my $B = Data::Edit::Xml::new(<<END);
   <a>
     <b id="C" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     $B->ditaExpandAllConRefs($dir);
     ok -p $B eq <<END;
   <a>
@@ -29512,15 +30630,15 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $CF = owf(fpe($dir, qw(source xml)), <<END);
   <a>
     <b id="D" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     my $C = Data::Edit::Xml::new($CF);
-  
+
     $C->first__ditaReplaceAnyConref;
     ok -p $C eq <<END;
   <a>
@@ -29529,28 +30647,32 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $DF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="E" conref="target2.xml#a/B"/>
   END
-  
+
     my $D = Data::Edit::Xml::new($DF);
-  
-    $D->𝗱𝗶𝘁𝗮𝗥𝗲𝗽𝗹𝗮𝗰𝗲𝗔𝗻𝘆𝗖𝗼𝗻𝗿𝗲𝗳;
+
+
+    $D->ditaReplaceAnyConref;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $D eq <<END;
   <b id="E">
     <c/>
   </b>
   END
-  
+
     my $EF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="F" conref="target2.xml"/>
   END
-  
+
     my $E = Data::Edit::Xml::new($EF);
-  
-    $E->𝗱𝗶𝘁𝗮𝗥𝗲𝗽𝗹𝗮𝗰𝗲𝗔𝗻𝘆𝗖𝗼𝗻𝗿𝗲𝗳;
-  
+
+
+    $E->ditaReplaceAnyConref;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $E eq <<END;
   <a id="F">
     <b id="B">
@@ -29558,9 +30680,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     clearFolder($dir, 3);
-  
+
 
 =head3 ditaReplaceAnyConrefIdeallyWithMatchingTag($node, @context)
 
@@ -29580,44 +30702,46 @@ B<Example:>
     <b id="b"/>
   </a>
   END
-  
+
     owf(fpe($dir, qw(target xml)), -p $target);
-  
+
     my $s = Data::Edit::Xml::new(q(<a conref="target.xml#a/b"/>));
     $s->inputFile = fpe($dir, qw(source xml));
-  
+
     my $s1 = $s->clone->change_c;
-       $s1->𝗱𝗶𝘁𝗮𝗥𝗲𝗽𝗹𝗮𝗰𝗲𝗔𝗻𝘆𝗖𝗼𝗻𝗿𝗲𝗳𝗜𝗱𝗲𝗮𝗹𝗹𝘆𝗪𝗶𝘁𝗵𝗠𝗮𝘁𝗰𝗵𝗶𝗻𝗴𝗧𝗮𝗴;
+
+       $s1->ditaReplaceAnyConrefIdeallyWithMatchingTag;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $s1 eq <<END;
   <c id="b"/>
   END
-  
+
     my  $s2 = $s->clone->change_b;
     ok !$s2->ditaReplaceAnyConrefInContext(qr(\Ac A\Z));
         $s2->ditaReplaceAnyConrefInContext(qr(\Ac a\Z));
     ok -p $s2 eq <<END;
   <c id="b"/>
   END
-  
+
     my $b = ditaGetConRef("target.xml#a/b", $dir, qr(\Ab\Z));
     ok -p $b eq <<END;
   <b id="b"/>
   END
-  
+
     my $c = ditaGetConRef("target.xml#a/b", $dir, qr(\Ac a\Z));
     ok -p $c eq <<END;
   <c id="b"/>
   END
-  
+
     my $d = ditaGetConRef("target.xml#a/b", $dir, qr(\Ad\Z));
     ok -p $c eq <<END;
   <c id="b"/>
   END
-  
+
     ok !ditaGetConRef("target.xml#a/b", $dir, qr(\A(d|e)\Z), 1);
-  
+
     clearFolder($dir, 3);
-  
+
 
 =head3 ditaReplaceAnyConrefInContext($node, $context, @context)
 
@@ -29638,44 +30762,48 @@ B<Example:>
     <b id="b"/>
   </a>
   END
-  
+
     owf(fpe($dir, qw(target xml)), -p $target);
-  
+
     my $s = Data::Edit::Xml::new(q(<a conref="target.xml#a/b"/>));
     $s->inputFile = fpe($dir, qw(source xml));
-  
+
     my $s1 = $s->clone->change_c;
        $s1->ditaReplaceAnyConrefIdeallyWithMatchingTag;
     ok -p $s1 eq <<END;
   <c id="b"/>
   END
-  
+
     my  $s2 = $s->clone->change_b;
-    ok !$s2->𝗱𝗶𝘁𝗮𝗥𝗲𝗽𝗹𝗮𝗰𝗲𝗔𝗻𝘆𝗖𝗼𝗻𝗿𝗲𝗳𝗜𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁(qr(\Ac A\Z));
-        $s2->𝗱𝗶𝘁𝗮𝗥𝗲𝗽𝗹𝗮𝗰𝗲𝗔𝗻𝘆𝗖𝗼𝗻𝗿𝗲𝗳𝗜𝗻𝗖𝗼𝗻𝘁𝗲𝘅𝘁(qr(\Ac a\Z));
+
+    ok !$s2->ditaReplaceAnyConrefInContext(qr(\Ac A\Z));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+        $s2->ditaReplaceAnyConrefInContext(qr(\Ac a\Z));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $s2 eq <<END;
   <c id="b"/>
   END
-  
+
     my $b = ditaGetConRef("target.xml#a/b", $dir, qr(\Ab\Z));
     ok -p $b eq <<END;
   <b id="b"/>
   END
-  
+
     my $c = ditaGetConRef("target.xml#a/b", $dir, qr(\Ac a\Z));
     ok -p $c eq <<END;
   <c id="b"/>
   END
-  
+
     my $d = ditaGetConRef("target.xml#a/b", $dir, qr(\Ad\Z));
     ok -p $c eq <<END;
   <c id="b"/>
   END
-  
+
     ok !ditaGetConRef("target.xml#a/b", $dir, qr(\A(d|e)\Z), 1);
-  
+
     clearFolder($dir, 3);
-  
+
 
 =head3 ditaExpandAllConRefs($tree, $sourceFile)
 
@@ -29696,17 +30824,17 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $target = fpe($dir, qw(target xml));
     owf($target, -p $a);
-  
+
     my $b = ditaGetConRef("target.xml#a/b", $dir);
     ok -p $b eq <<END;
   <b id="b">
     <c/>
   </b>
   END
-  
+
     my $A = Data::Edit::Xml::new(<<END);
   <a>
     <b id="B" conref="target.xml#a/b"/>
@@ -29714,14 +30842,16 @@ B<Example:>
   END
     my $target2 = fpe($dir, qw(target2 xml));
     owf($target2, -p $A);
-  
+
     my $B = Data::Edit::Xml::new(<<END);
   <a>
     <b id="C" conref="target2.xml#a/B"/>
   </a>
   END
-  
-    $B->𝗱𝗶𝘁𝗮𝗘𝘅𝗽𝗮𝗻𝗱𝗔𝗹𝗹𝗖𝗼𝗻𝗥𝗲𝗳𝘀($dir);
+
+
+    $B->ditaExpandAllConRefs($dir);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $B eq <<END;
   <a>
     <b id="C">
@@ -29729,15 +30859,15 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $CF = owf(fpe($dir, qw(source xml)), <<END);
   <a>
     <b id="D" conref="target2.xml#a/B"/>
   </a>
   END
-  
+
     my $C = Data::Edit::Xml::new($CF);
-  
+
     $C->first__ditaReplaceAnyConref;
     ok -p $C eq <<END;
   <a>
@@ -29746,28 +30876,28 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $DF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="E" conref="target2.xml#a/B"/>
   END
-  
+
     my $D = Data::Edit::Xml::new($DF);
-  
+
     $D->ditaReplaceAnyConref;
     ok -p $D eq <<END;
   <b id="E">
     <c/>
   </b>
   END
-  
+
     my $EF = owf(fpe($dir, qw(source xml)), <<END);
   <a id="F" conref="target2.xml"/>
   END
-  
+
     my $E = Data::Edit::Xml::new($EF);
-  
+
     $E->ditaReplaceAnyConref;
-  
+
     ok -p $E eq <<END;
   <a id="F">
     <b id="B">
@@ -29775,9 +30905,9 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     clearFolder($dir, 3);
-  
+
 
 =head3 ditaAbsoluteHref($node, $sourceFile)
 
@@ -29794,9 +30924,11 @@ B<Example:>
   <a href="bbb.txt">
   </a>
   END
-  
-    ok $a->𝗱𝗶𝘁𝗮𝗔𝗯𝘀𝗼𝗹𝘂𝘁𝗲𝗛𝗿𝗲𝗳(q(/home/aaa/)) eq q(/home/aaa/bbb.txt);
-  
+
+
+    ok $a->ditaAbsoluteHref(q(/home/aaa/)) eq q(/home/aaa/bbb.txt);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 ditaListToChoices($list, @context)
 
@@ -29825,8 +30957,10 @@ B<Example:>
     </li>
   </ol>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗟𝗶𝘀𝘁𝗧𝗼𝗖𝗵𝗼𝗶𝗰𝗲𝘀;
+
+
+    $a->ditaListToChoices;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <choices>
     <choice>
@@ -29837,7 +30971,7 @@ B<Example:>
     </choice>
   </choices>
   END
-  
+
 
 =head3 ditaListToSteps($list, @context)
 
@@ -29856,7 +30990,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                              
+    ok -p $a eq <<END;
   <dita>
     <ol>
       <li>
@@ -29868,10 +31002,12 @@ B<Example:>
     </ol>
   </dita>
   END
-  
-    $a->first->𝗱𝗶𝘁𝗮𝗟𝗶𝘀𝘁𝗧𝗼𝗦𝘁𝗲𝗽𝘀;                                                   
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->first->ditaListToSteps;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <dita>
     <steps>
       <step>
@@ -29883,7 +31019,7 @@ B<Example:>
     </steps>
   </dita>
   END
-  
+
 
 =head3 ditaListToStepsUnordered($list, @context)
 
@@ -29902,7 +31038,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                             
+    ok -p $a eq <<END;
   <dita>
     <ol>
       <li>aaa</li>
@@ -29910,10 +31046,12 @@ B<Example:>
     </ol>
   </dita>
   END
-  
-    $a->first->𝗱𝗶𝘁𝗮𝗟𝗶𝘀𝘁𝗧𝗼𝗦𝘁𝗲𝗽𝘀𝗨𝗻𝗼𝗿𝗱𝗲𝗿𝗲𝗱;                                          
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->first->ditaListToStepsUnordered;                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <dita>
     <steps-unordered>
       <step>
@@ -29925,7 +31063,7 @@ B<Example:>
     </steps-unordered>
   </dita>
   END
-  
+
 
 =head3 ditaListToSubSteps($list, @context)
 
@@ -29944,7 +31082,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <dita>
     <ol>
       <li>aaa</li>
@@ -29952,10 +31090,12 @@ B<Example:>
     </ol>
   </dita>
   END
-  
-    $a->first->𝗱𝗶𝘁𝗮𝗟𝗶𝘀𝘁𝗧𝗼𝗦𝘂𝗯𝗦𝘁𝗲𝗽𝘀;                                                
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->first->ditaListToSubSteps;                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <dita>
     <substeps>
       <substep>
@@ -29967,7 +31107,7 @@ B<Example:>
     </substeps>
   </dita>
   END
-  
+
 
 =head3 ditaStepsToList($steps, $tag, @context)
 
@@ -29987,7 +31127,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    ok -p $a eq <<END;                                                              
+    ok -p $a eq <<END;
   <dita>
     <ol>
       <li>
@@ -29999,10 +31139,12 @@ B<Example:>
     </ol>
   </dita>
   END
-  
-    $a->first->𝗱𝗶𝘁𝗮𝗦𝘁𝗲𝗽𝘀𝗧𝗼𝗟𝗶𝘀𝘁;                                                   
-  
-    ok -p $a eq <<END;                                                             
+
+
+    $a->first->ditaStepsToList;                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <dita>
     <ol>
       <li>aaa</li>
@@ -30010,7 +31152,7 @@ B<Example:>
     </ol>
   </dita>
   END
-  
+
 
 =head3 ditaStepsToChoices($steps, @context)
 
@@ -30051,9 +31193,11 @@ B<Example:>
     </step>
   </steps>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗦𝘁𝗲𝗽𝘀𝗧𝗼𝗖𝗵𝗼𝗶𝗰𝗲𝘀;
-  
+
+
+    $a->ditaStepsToChoices;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <choices>
     <choice>
@@ -30068,7 +31212,7 @@ B<Example:>
     </choice>
   </choices>
   END
-  
+
 
 =head3 ditaConvertSubStepsToSteps($substeps, @context)
 
@@ -30097,9 +31241,11 @@ B<Example:>
     </substep>
   </substeps>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝘂𝗯𝗦𝘁𝗲𝗽𝘀𝗧𝗼𝗦𝘁𝗲𝗽𝘀;
-  
+
+
+    $a->ditaConvertSubStepsToSteps;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <steps>
     <step>
@@ -30110,7 +31256,7 @@ B<Example:>
     </step>
   </steps>
   END
-  
+
 
 =head3 ditaListToTable($node, @context)
 
@@ -30129,7 +31275,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <ul id="Table3" outputclass="fcRowList">
       <li>
@@ -30158,7 +31304,9 @@ B<Example:>
       </li>
   </ul>
   END
-    $a->𝗱𝗶𝘁𝗮𝗟𝗶𝘀𝘁𝗧𝗼𝗧𝗮𝗯𝗹𝗲;
+
+    $a->ditaListToTable;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok nws(-p $a) eq nws(<<END)
   <table id="Table3" outputclass="fcRowList">
     <tgroup cols="5">
@@ -30206,7 +31354,7 @@ B<Example:>
   </table>
   END
    }
-  
+
 
 =head3 ditaMergeLists($node, @context)
 
@@ -30225,7 +31373,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <li id="1"/>
     <ol/>
@@ -30235,10 +31383,12 @@ B<Example:>
     </ol>
   </a>
   END
-  
-    $a x= sub{$_->𝗱𝗶𝘁𝗮𝗠𝗲𝗿𝗴𝗲𝗟𝗶𝘀𝘁𝘀};                                                
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a x= sub{$_->ditaMergeLists};                                                  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <ol>
       <li id="1"/>
@@ -30247,7 +31397,7 @@ B<Example:>
     </ol>
   </a>
   END
-  
+
 
 =head3 mergeLikeElements($node, @context)
 
@@ -30269,7 +31419,7 @@ B<Example:>
     my $a = Data::Edit::Xml::new(<<END);
   <x><a>aa</a><b>bb</b><b>cc</b><b>dd</b><b>ee</b></x>
   END
-  
+
     ok -p $a eq <<END;
   <x>
     <a>aa</a>
@@ -30279,16 +31429,18 @@ B<Example:>
     <b>ee</b>
   </x>
   END
-  
-    $a->by(sub{$_->𝗺𝗲𝗿𝗴𝗲𝗟𝗶𝗸𝗲𝗘𝗹𝗲𝗺𝗲𝗻𝘁𝘀});
+
+
+    $a->by(sub{$_->mergeLikeElements});  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <x>
     <a>aa</a>
     <b>bb cc dd ee</b>
   </x>
   END
-  
-  
+
+
 
 =head3 mergeLikeNext($node, @context)
 
@@ -30313,15 +31465,17 @@ B<Example:>
     <b>dd</b>
   </a>
   END
-  
-    $a->first->𝗺𝗲𝗿𝗴𝗲𝗟𝗶𝗸𝗲𝗡𝗲𝘅𝘁;
-  
+
+
+    $a->first->mergeLikeNext;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>bb dd</b>
   </a>
   END
-  
+
 
 B<mln> is a synonym for L<mergeLikeNext|/mergeLikeNext>.
 
@@ -30349,15 +31503,17 @@ B<Example:>
     <b>dd</b>
   </a>
   END
-  
-    $a->last->𝗺𝗲𝗿𝗴𝗲𝗟𝗶𝗸𝗲𝗣𝗿𝗲𝘃;
-  
+
+
+    $a->last->mergeLikePrev;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <a>
     <b>bb dd</b>
   </a>
   END
-  
+
 
 B<mlp> is a synonym for L<mergeLikePrev|/mergeLikePrev>.
 
@@ -30389,7 +31545,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_c__mergeOnlyChildLikeNext;
     ok -p $a eq <<END;
   <a>
@@ -30398,7 +31554,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<mocln> is a synonym for L<mergeOnlyChildLikeNext|/mergeOnlyChildLikeNext>.
 
@@ -30430,7 +31586,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     $a->go_b_1_c__mergeOnlyChildLikePrev;
     ok -p $a eq <<END;
   <a>
@@ -30439,7 +31595,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 B<moclp> is a synonym for L<mergeOnlyChildLikePrev|/mergeOnlyChildLikePrev>.
 
@@ -30467,7 +31623,7 @@ B<Example:>
     <b>    <d>2</d></b>
   </a>
   END
-  
+
     my $c = $a->last__last__mergeOnlyChildLikePrevLast;
     ok -p $a eq <<END;
   <a>
@@ -30477,11 +31633,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     ok -p $c eq <<END
   <d>1 2</d>
   END
-  
+
 
 =head3 ditaMaximumNumberOfEntriesInATGroupRow($tgroup)
 
@@ -30519,11 +31675,13 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     my $g = $a->go_tgroup;
-  
-    ok $g->𝗱𝗶𝘁𝗮𝗠𝗮𝘅𝗶𝗺𝘂𝗺𝗡𝘂𝗺𝗯𝗲𝗿𝗢𝗳𝗘𝗻𝘁𝗿𝗶𝗲𝘀𝗜𝗻𝗔𝗧𝗚𝗿𝗼𝘂𝗽𝗥𝗼𝘄 == 3;
-  
+
+
+    ok $g->ditaMaximumNumberOfEntriesInATGroupRow == 3;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 1,
@@ -30536,9 +31694,9 @@ B<Example:>
     minHead => 1,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
+
     $g->ditaRemoveTGroupTrailingEmptyEntries;
-  
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="1">
@@ -30562,7 +31720,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 ditaTGroupStatistics($tgroup)
 
@@ -30600,12 +31758,14 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     my $g = $a->go_tgroup;
-  
+
     ok $g->ditaMaximumNumberOfEntriesInATGroupRow == 3;
-  
-    is_deeply $g->𝗱𝗶𝘁𝗮𝗧𝗚𝗿𝗼𝘂𝗽𝗦𝘁𝗮𝘁𝗶𝘀𝘁𝗶𝗰𝘀,
+
+
+    is_deeply $g->ditaTGroupStatistics,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   bless({
     colsAttribute => 1,
     colSpec => 1,
@@ -30617,9 +31777,9 @@ B<Example:>
     minHead => 1,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
+
     $g->ditaRemoveTGroupTrailingEmptyEntries;
-  
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="1">
@@ -30643,7 +31803,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 ditaAddColSpecToTGroup($tgroup, $number)
 
@@ -30656,7 +31816,7 @@ Add the specified B<$number> of column specification to a specified B<$tgroup> w
 B<Example:>
 
 
-  if (1)                                                                           
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <table>
     <tgroup>
@@ -30670,10 +31830,12 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     ok 3 == $a->go_tgroup->ditaMaximumNumberOfEntriesInATGroupRow;
-    $a->first->𝗱𝗶𝘁𝗮𝗔𝗱𝗱𝗖𝗼𝗹𝗦𝗽𝗲𝗰𝗧𝗼𝗧𝗚𝗿𝗼𝘂𝗽(3);
-  
+
+    $a->first->ditaAddColSpecToTGroup(3);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END
   <table>
     <tgroup cols="3">
@@ -30703,7 +31865,7 @@ B<Example:>
   </table>
   END
    }
-  
+
 
 =head3 ditaFixTGroupColSpec($tgroup)
 
@@ -30715,7 +31877,7 @@ Fix the colspec attribute and colspec nodes of the specified B<$tgroup>.
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <table>
     <tgroup>
@@ -30737,9 +31899,11 @@ B<Example:>
    </tgroup>
   </table>
   END
-  
-    $a->go_tgroup->𝗱𝗶𝘁𝗮𝗙𝗶𝘅𝗧𝗚𝗿𝗼𝘂𝗽𝗖𝗼𝗹𝗦𝗽𝗲𝗰;
-  
+
+
+    $a->go_tgroup->ditaFixTGroupColSpec;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END
   <table>
     <tgroup cols="3">
@@ -30785,7 +31949,7 @@ B<Example:>
   </table>
   END
    }
-  
+
 
 =head3 ditaRemoveTGroupTrailingEmptyEntries($tgroup)
 
@@ -30823,11 +31987,11 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     my $g = $a->go_tgroup;
-  
+
     ok $g->ditaMaximumNumberOfEntriesInATGroupRow == 3;
-  
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 1,
@@ -30840,9 +32004,11 @@ B<Example:>
     minHead => 1,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
-    $g->𝗱𝗶𝘁𝗮𝗥𝗲𝗺𝗼𝘃𝗲𝗧𝗚𝗿𝗼𝘂𝗽𝗧𝗿𝗮𝗶𝗹𝗶𝗻𝗴𝗘𝗺𝗽𝘁𝘆𝗘𝗻𝘁𝗿𝗶𝗲𝘀;
-  
+
+
+    $g->ditaRemoveTGroupTrailingEmptyEntries;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="1">
@@ -30866,7 +32032,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 fixTGroup($tgroup)
 
@@ -30907,11 +32073,11 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     my $g = $a->go_tgroup;
-  
+
     $g->ditaAddPadEntriesToTGroupRows(2);
-  
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 1,
@@ -30924,9 +32090,11 @@ B<Example:>
     minHead => 2,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
-    $g->𝗳𝗶𝘅𝗧𝗚𝗿𝗼𝘂𝗽;
-  
+
+
+    $g->fixTGroup;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="2">
@@ -30955,7 +32123,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 2,
@@ -30967,9 +32135,9 @@ B<Example:>
     minBody => 2,
     minHead => 2,
     rows    => 4,
-  
+
   }, "Data::Edit::Xml::Table::Statistics");
-  
+
     $a->fixTable;
     is_deeply $g->ditaTGroupStatistics,
   bless({
@@ -30983,8 +32151,8 @@ B<Example:>
     minHead => 2,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
-  
+
+
 
 =head3 fixTable($table)
 
@@ -31019,11 +32187,11 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     my $g = $a->go_tgroup;
-  
+
     $g->ditaAddPadEntriesToTGroupRows(2);
-  
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 1,
@@ -31036,9 +32204,9 @@ B<Example:>
     minHead => 2,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
+
     $g->fixTGroup;
-  
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="2">
@@ -31067,7 +32235,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 2,
@@ -31079,10 +32247,12 @@ B<Example:>
     minBody => 2,
     minHead => 2,
     rows    => 4,
-  
+
   }, "Data::Edit::Xml::Table::Statistics");
-  
-    $a->𝗳𝗶𝘅𝗧𝗮𝗯𝗹𝗲;
+
+
+    $a->fixTable;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 2,
@@ -31095,8 +32265,8 @@ B<Example:>
     minHead => 2,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
-  
+
+
 
 =head3 fixEntryColSpan($entry)
 
@@ -31138,15 +32308,17 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     $a->by(sub
      {my ($e) = @_;
       if ($e->at_entry)
-       {$e->𝗳𝗶𝘅𝗘𝗻𝘁𝗿𝘆𝗖𝗼𝗹𝗦𝗽𝗮𝗻;
+
+       {$e->fixEntryColSpan;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
         $e->fixEntryRowSpan;
        }
      });
-  
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="7">
@@ -31177,7 +32349,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 fixEntryRowSpan($entry)
 
@@ -31219,15 +32391,17 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     $a->by(sub
      {my ($e) = @_;
       if ($e->at_entry)
        {$e->fixEntryColSpan;
-        $e->𝗳𝗶𝘅𝗘𝗻𝘁𝗿𝘆𝗥𝗼𝘄𝗦𝗽𝗮𝗻;
+
+        $e->fixEntryRowSpan;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
        }
      });
-  
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="7">
@@ -31258,7 +32432,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 ditaConvertDlToUl($dl)
 
@@ -31270,16 +32444,18 @@ Convert a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content
 B<Example:>
 
 
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <dl>
     <dlentry><dt>A</dt><dt>B</dt><dt>C</dt></dlentry>
     <dlentry><dd>a</dd><dd>b</dd><dd>b</dd></dlentry>
   </dl>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗗𝗹𝗧𝗼𝗨𝗹;
-  
+
+
+    $a->ditaConvertDlToUl;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <ul>
     <li>A</li>
@@ -31290,15 +32466,17 @@ B<Example:>
     <li>b</li>
   </ul>
   END
-  
+
     my $b = Data::Edit::Xml::new(<<END);
   <dl>
     <dlentry><dt>A</dt><dd>a</dd></dlentry>
   </dl>
   END
-  
-    ok !$a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗗𝗹𝗧𝗼𝗨𝗹;
-  
+
+
+    ok !$a->ditaConvertDlToUl;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 ditaConvertOlToSubSteps($ol, @context)
 
@@ -31318,9 +32496,11 @@ B<Example:>
     <li>C</li>
   </ol>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗢𝗹𝗧𝗼𝗦𝘂𝗯𝗦𝘁𝗲𝗽𝘀;
-  
+
+
+    $a->ditaConvertOlToSubSteps;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <substeps>
     <substep>
@@ -31334,7 +32514,7 @@ B<Example:>
     </substep>
   </substeps>
   END
-  
+
 
 =head3 ditaConvertUlToSubSteps($ul, @context)
 
@@ -31354,9 +32534,11 @@ B<Example:>
     <li>C</li>
   </ul>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗨𝗹𝗧𝗼𝗦𝘂𝗯𝗦𝘁𝗲𝗽𝘀;
-  
+
+
+    $a->ditaConvertUlToSubSteps;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <substeps>
     <substep>
@@ -31370,7 +32552,7 @@ B<Example:>
     </substep>
   </substeps>
   END
-  
+
 
 =head3 ditaConvertFromHtmlDl($dl)
 
@@ -31395,9 +32577,11 @@ B<Example:>
     <dd>d32</dd>
   </dl>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗙𝗿𝗼𝗺𝗛𝘁𝗺𝗹𝗗𝗹;
-  
+
+
+    $a->ditaConvertFromHtmlDl;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <dl>
     <dlentry>
@@ -31417,7 +32601,7 @@ B<Example:>
     </dlentry>
   </dl>
   END
-  
+
 
 =head3 ditaConvertSimpleTableToTable($simpleTable)
 
@@ -31441,9 +32625,11 @@ B<Example:>
         </strow>
       </simpletable>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗶𝗺𝗽𝗹𝗲𝗧𝗮𝗯𝗹𝗲𝗧𝗼𝗧𝗮𝗯𝗹𝗲;
-  
+
+
+    $a->ditaConvertSimpleTableToTable;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="2">
@@ -31464,7 +32650,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 ditaCouldConvertConceptToTask($concept)
 
@@ -31491,9 +32677,9 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     my $r = $c->ditaConvertConceptToReference;
-  
+
     ok -p $c eq <<END;
   <reference id="c1">
     <title>Title Text</title>
@@ -31513,7 +32699,7 @@ B<Example:>
     </refbody>
   </reference>
   END
-  
+
     my $C = $c->ditaConvertReferenceToConcept;
     ok -p $C eq <<END;
   <concept id="c1">
@@ -31526,9 +32712,11 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
-    ok !$C->𝗱𝗶𝘁𝗮𝗖𝗼𝘂𝗹𝗱𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗧𝗮𝘀𝗸;
-  
+
+
+    ok !$C->ditaCouldConvertConceptToTask;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     my $ref = Data::Edit::Xml::new(<<END);
   <reference id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
       <title>Testing the S3 Feature for PM 4 1</title>
@@ -31547,9 +32735,9 @@ B<Example:>
       </refbody>
   </reference>
   END
-  
+
     my $concept = $ref->ditaConvertReferenceToConcept;
-  
+
     ok -p $concept eq <<END;
   <concept id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31566,10 +32754,12 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
-    ok $concept->𝗱𝗶𝘁𝗮𝗖𝗼𝘂𝗹𝗱𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗧𝗮𝘀𝗸;
+
+
+    ok $concept->ditaCouldConvertConceptToTask;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my $task = $concept->ditaConvertConceptToTask;
-  
+
     ok -p $task eq <<END
   <task id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31589,7 +32779,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 =head3 ditaConvertConceptToTask($node, @context)
 
@@ -31626,9 +32816,11 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
-   $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗧𝗮𝘀𝗸;
-  
+
+
+   $a->ditaConvertConceptToTask;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    ok nws(-p $a) eq nws(<<END);
   <task id="x1">
     <title/>
@@ -31684,11 +32876,11 @@ B<Example:>
       <result>
         <p>results</p>
       </result>
-  
+
     </taskbody>
   </task>
   END
-  
+
     my $ref = Data::Edit::Xml::new(<<END);
   <reference id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
       <title>Testing the S3 Feature for PM 4 1</title>
@@ -31707,9 +32899,9 @@ B<Example:>
       </refbody>
   </reference>
   END
-  
+
     my $concept = $ref->ditaConvertReferenceToConcept;
-  
+
     ok -p $concept eq <<END;
   <concept id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31726,10 +32918,12 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     ok $concept->ditaCouldConvertConceptToTask;
-    my $task = $concept->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗧𝗮𝘀𝗸;
-  
+
+    my $task = $concept->ditaConvertConceptToTask;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $task eq <<END
   <task id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31749,7 +32943,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 B<ct> is a synonym for L<ditaConvertConceptToTask|/ditaConvertConceptToTask>.
 
@@ -31782,9 +32976,11 @@ B<Example:>
       </refbody>
   </reference>
   END
-  
-    my $concept = $ref->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗥𝗲𝗳𝗲𝗿𝗲𝗻𝗰𝗲𝗧𝗼𝗖𝗼𝗻𝗰𝗲𝗽𝘁;
-  
+
+
+    my $concept = $ref->ditaConvertReferenceToConcept;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $concept eq <<END;
   <concept id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31801,10 +32997,10 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     ok $concept->ditaCouldConvertConceptToTask;
     my $task = $concept->ditaConvertConceptToTask;
-  
+
     ok -p $task eq <<END
   <task id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31824,7 +33020,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 =head3 ditaConvertReferenceToTask($reference)
 
@@ -31854,9 +33050,11 @@ B<Example:>
       </refbody>
   </reference>
   END
-  
-    my $task = $ref->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗥𝗲𝗳𝗲𝗿𝗲𝗻𝗰𝗲𝗧𝗼𝗧𝗮𝘀𝗸;
-  
+
+
+    my $task = $ref->ditaConvertReferenceToTask;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $task eq <<END
   <task id="GUID-0cab6472-6f2a-e46a-9b6d-16649416ab53">
     <title>Testing the S3 Feature for PM 4 1</title>
@@ -31876,7 +33074,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 =head3 ditaConvertConceptToReference($concept)
 
@@ -31903,9 +33101,11 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
-    my $r = $c->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗥𝗲𝗳𝗲𝗿𝗲𝗻𝗰𝗲;
-  
+
+
+    my $r = $c->ditaConvertConceptToReference;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $c eq <<END;
   <reference id="c1">
     <title>Title Text</title>
@@ -31925,7 +33125,7 @@ B<Example:>
     </refbody>
   </reference>
   END
-  
+
     my $C = $c->ditaConvertReferenceToConcept;
     ok -p $C eq <<END;
   <concept id="c1">
@@ -31938,9 +33138,9 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     ok !$C->ditaCouldConvertConceptToTask;
-  
+
 
 =head3 ditaConvertTopicToTask($x)
 
@@ -31961,9 +33161,11 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
-   $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗧𝗼𝗽𝗶𝗰𝗧𝗼𝗧𝗮𝘀𝗸;
-  
+
+
+   $a->ditaConvertTopicToTask;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
    ok nws(-p $a) eq nws(<<END);
   <task id="c1">
     <title/>
@@ -31981,7 +33183,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 =head3 ditaConvertSectionToConcept($section)
 
@@ -31999,8 +33201,10 @@ B<Example:>
     <p>text</p>
   </section>
   END
-  
-    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗖𝗼𝗻𝗰𝗲𝗽𝘁 eq <<END;
+
+
+    ok -p $a->ditaConvertSectionToConcept eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <concept id="a">
     <title>title</title>
     <conbody>
@@ -32008,14 +33212,14 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
+
     ok -p $a->ditaConvertConceptToSection eq <<END;
   <section id="a">
     <title>title</title>
     <p>text</p>
   </section>
   END
-  
+
 
 B<sc> is a synonym for L<ditaConvertSectionToConcept|/ditaConvertSectionToConcept>.
 
@@ -32036,7 +33240,7 @@ B<Example:>
     <p>text</p>
   </section>
   END
-  
+
     ok -p $a->ditaConvertSectionToConcept eq <<END;
   <concept id="a">
     <title>title</title>
@@ -32045,14 +33249,16 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
-    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗖𝗼𝗻𝗰𝗲𝗽𝘁𝗧𝗼𝗦𝗲𝗰𝘁𝗶𝗼𝗻 eq <<END;
+
+
+    ok -p $a->ditaConvertConceptToSection eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <section id="a">
     <title>title</title>
     <p>text</p>
   </section>
   END
-  
+
 
 B<cs> is a synonym for L<ditaConvertConceptToSection|/ditaConvertConceptToSection>.
 
@@ -32073,8 +33279,10 @@ B<Example:>
     <p>text</p>
   </section>
   END
-  
-    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗥𝗲𝗳𝗲𝗿𝗲𝗻𝗰𝗲 eq <<END
+
+
+    ok -p $a->ditaConvertSectionToReference eq <<END  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <reference id="a">
     <title>title</title>
     <refbody>
@@ -32084,7 +33292,7 @@ B<Example:>
     </refbody>
   </reference>
   END
-  
+
 
 =head3 ditaConvertSectionToTask($section)
 
@@ -32105,8 +33313,10 @@ B<Example:>
     </ol>
   </section>
   END
-  
-    ok -p $a->𝗱𝗶𝘁𝗮𝗖𝗼𝗻𝘃𝗲𝗿𝘁𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝗧𝗼𝗧𝗮𝘀𝗸 eq <<END
+
+
+    ok -p $a->ditaConvertSectionToTask eq <<END  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <task id="a">
     <title>title</title>
     <taskbody>
@@ -32123,7 +33333,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 =head3 ditaObviousChanges($node)
 
@@ -32135,7 +33345,7 @@ Make obvious changes to a L<parse|/parse> tree to make it look more like L<Dita|
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <dita>
     <ol>
       <li><para>aaa</para></li>
@@ -32143,10 +33353,12 @@ B<Example:>
     </ol>
   </dita>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗢𝗯𝘃𝗶𝗼𝘂𝘀𝗖𝗵𝗮𝗻𝗴𝗲𝘀;                                                       
-  
-    ok -p $a eq <<END;                                                              
+
+
+    $a->ditaObviousChanges;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <dita>
     <ol>
       <li>
@@ -32158,7 +33370,7 @@ B<Example:>
     </ol>
   </dita>
   END
-  
+
 
 =head3 ditaXrefs($x)
 
@@ -32175,9 +33387,11 @@ B<Example:>
    <xref href="http://www.org">a</xref>
   </body>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗫𝗿𝗲𝗳𝘀;
-  
+
+
+    $a->ditaXrefs;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <body>
     <p>
@@ -32185,7 +33399,7 @@ B<Example:>
     </p>
   </body>
   END
-  
+
 
 =head3 ditaSampleConcept(@options)
 
@@ -32197,7 +33411,9 @@ Sample concept
 B<Example:>
 
 
-    ok Data::Edit::Xml::𝗱𝗶𝘁𝗮𝗦𝗮𝗺𝗽𝗹𝗲𝗖𝗼𝗻𝗰𝗲𝗽𝘁
+
+    ok Data::Edit::Xml::ditaSampleConcept  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      (title=>q(New Concept),
      )->prettyString eq <<END;
   <concept id="GUID-a5405560-67e7-0cd1-9188-9a2546d13a37">
@@ -32207,9 +33423,9 @@ B<Example:>
     </conbody>
   </concept>
   END
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::ditaSampleConcept
 
@@ -32224,7 +33440,9 @@ Sample task
 B<Example:>
 
 
-    ok Data::Edit::Xml::𝗱𝗶𝘁𝗮𝗦𝗮𝗺𝗽𝗹𝗲𝗧𝗮𝘀𝗸
+
+    ok Data::Edit::Xml::ditaSampleTask  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      (title=>q(New Task),
      )->prettyString eq <<END;
   <task id="GUID-2ac5c2a6-2475-d5d4-4ce6-d68fdf2102e3">
@@ -32236,9 +33454,9 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::ditaSampleTask
 
@@ -32253,8 +33471,10 @@ Sample bookmap
 B<Example:>
 
 
-  
-    my $a = Data::Edit::Xml::𝗱𝗶𝘁𝗮𝗦𝗮𝗺𝗽𝗹𝗲𝗕𝗼𝗼𝗸𝗠𝗮𝗽
+
+
+    my $a = Data::Edit::Xml::ditaSampleBookMap  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      (author=>q(mim),
       chapters=>Data::Edit::Xml::new(<<END));
   <a>
@@ -32263,10 +33483,10 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     ok $a->isADitaMap;
     ok !$a->first->isADitaMap;
-  
+
     ok -p $a eq <<END;
   <bookmap id="GUID-3b04e859-bc04-ac2d-e4bb-f0f99b2a8f90">
     <booktitle>
@@ -32329,9 +33549,9 @@ B<Example:>
     </reltable>
   </bookmap>
   END
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::ditaSampleBookMap
 
@@ -32346,7 +33566,7 @@ Return the specified B<$node> if this node is a L<Dita|http://docs.oasis-open.or
 B<Example:>
 
 
-  
+
     my $a = Data::Edit::Xml::ditaSampleBookMap
      (author=>q(mim),
       chapters=>Data::Edit::Xml::new(<<END));
@@ -32356,10 +33576,14 @@ B<Example:>
     </b>
   </a>
   END
-  
-    ok $a->𝗶𝘀𝗔𝗗𝗶𝘁𝗮𝗠𝗮𝗽;
-    ok !$a->first->𝗶𝘀𝗔𝗗𝗶𝘁𝗮𝗠𝗮𝗽;
-  
+
+
+    ok $a->isADitaMap;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$a->first->isADitaMap;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <bookmap id="GUID-3b04e859-bc04-ac2d-e4bb-f0f99b2a8f90">
     <booktitle>
@@ -32422,7 +33646,7 @@ B<Example:>
     </reltable>
   </bookmap>
   END
-  
+
 
 =head3 ditaRoot($node)
 
@@ -32435,9 +33659,13 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<concept><a/></concept>));
-    ok  $a->𝗱𝗶𝘁𝗮𝗥𝗼𝗼𝘁;
-    ok !$a->first->𝗱𝗶𝘁𝗮𝗥𝗼𝗼𝘁;
-  
+
+    ok  $a->ditaRoot;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok !$a->first->ditaRoot;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head3 ditaTopicHeaders($node, $String)
 
@@ -32450,11 +33678,13 @@ Add L<Xml|https://en.wikipedia.org/wiki/XML> headers for the dita document type 
 B<Example:>
 
 
-    ok Data::Edit::Xml::new(q(<concept/>))->𝗱𝗶𝘁𝗮𝗧𝗼𝗽𝗶𝗰𝗛𝗲𝗮𝗱𝗲𝗿𝘀 eq <<END;            
+
+    ok Data::Edit::Xml::new(q(<concept/>))->ditaTopicHeaders eq <<END;              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd" []>
   END
-  
+
 
 =head3 ditaPrettyPrintWithHeaders($node)
 
@@ -32466,16 +33696,18 @@ Add L<Xml|https://en.wikipedia.org/wiki/XML> headers for the dita document type 
 B<Example:>
 
 
-  if (1)                                                                          
+  if (1)
    {my $a = Data::Edit::Xml::new(q(<concept/>));
-  
-    ok $a->𝗱𝗶𝘁𝗮𝗣𝗿𝗲𝘁𝘁𝘆𝗣𝗿𝗶𝗻𝘁𝗪𝗶𝘁𝗵𝗛𝗲𝗮𝗱𝗲𝗿𝘀 eq <<END;
+
+
+    ok $a->ditaPrettyPrintWithHeaders eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd" []>
   <concept/>
   END
    }
-  
+
 
 =head3 ditaCutTopicmetaFromAClassificationMap($node, @context)
 
@@ -32503,8 +33735,10 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗔𝗱𝗱𝗧𝗼𝗽𝗶𝗰𝗥𝗲𝗽𝗼𝗿𝘁(q(Please note the following discrepancies));
+
+
+    $a->ditaAddTopicReport(q(Please note the following discrepancies));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok -p $a eq <<END;
   <task id="c1">
     <title/>
@@ -32515,7 +33749,7 @@ B<Example:>
     </taskbody>
   </task>
   END
-  
+
 
 =head3 help($node)
 
@@ -32533,20 +33767,24 @@ B<Example:>
     <dd/>
   </a>
   END
-  
-    my $u = $a->go_dd->𝗵𝗲𝗹𝗽;
+
+
+    my $u = $a->go_dd->help;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $u =~ m(\Ahttp://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmltd.html#cmltd__dd\Z);
-  
-    my $U = $a->go_steps->𝗵𝗲𝗹𝗽;
+
+
+    my $U = $a->go_steps->help;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $U =~ m(\Ahttp://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__steps\Z);
-  
+
 
 B<h> is a synonym for L<help|/help>.
 
 
 =head2 Html and word conversions
 
-Methods useful for converting Word and L<html|https://en.wikipedia.org/wiki/HTML> to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>
+Methods useful for converting Word and L<HTML|https://en.wikipedia.org/wiki/HTML> to L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>
 
 =head3 htmlHeadersToSections($tree)
 
@@ -32558,7 +33796,7 @@ Position sections just before html header tags so that subsequently the document
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
   <h1>h1</h1>
     H1
@@ -32574,24 +33812,26 @@ B<Example:>
     H4
   </x>
   END
-  
-  $x->𝗵𝘁𝗺𝗹𝗛𝗲𝗮𝗱𝗲𝗿𝘀𝗧𝗼𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝘀;                                                       
-  
-    $x->divideDocumentIntoSections(sub                                             
-  
-     {my ($topicref, $section) = @_;                                               
-  
-      my $file = keys %file;                                                       
-  
-      $topicref->href = $file;                                                     
-  
-      $file{$file} = -p $section;                                                  
-  
-      $section->cut;                                                               
-  
-     });                                                                           
-  
-    ok -p $x eq <<END;                                                             
+
+
+  $x->htmlHeadersToSections;                                                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    $x->divideDocumentIntoSections(sub
+
+     {my ($topicref, $section) = @_;
+
+      my $file = keys %file;
+
+      $topicref->href = $file;
+
+      $file{$file} = -p $section;
+
+      $section->cut;
+
+     });
+
+    ok -p $x eq <<END;
   <x>
     <topicref href="0">
       <topicref href="1">
@@ -32604,7 +33844,7 @@ B<Example:>
     </topicref>
   </x>
   END
-  
+
 
 =head3 divideDocumentIntoSections($node, $cutSub)
 
@@ -32617,7 +33857,7 @@ Divide a L<parse|/parse> tree into sections by moving non B<section> tags into t
 B<Example:>
 
 
-   {my $x = Data::Edit::Xml::new(<<END);                                           
+   {my $x = Data::Edit::Xml::new(<<END);
   <x>
   <h1>h1</h1>
     H1
@@ -32633,24 +33873,26 @@ B<Example:>
     H4
   </x>
   END
-  
-  $x->htmlHeadersToSections;                                                       
-  
-    $x->𝗱𝗶𝘃𝗶𝗱𝗲𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝗜𝗻𝘁𝗼𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝘀(sub                                             
-  
-     {my ($topicref, $section) = @_;                                               
-  
-      my $file = keys %file;                                                       
-  
-      $topicref->href = $file;                                                     
-  
-      $file{$file} = -p $section;                                                  
-  
-      $section->cut;                                                               
-  
-     });                                                                           
-  
-    ok -p $x eq <<END;                                                             
+
+  $x->htmlHeadersToSections;
+
+
+    $x->divideDocumentIntoSections(sub                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+     {my ($topicref, $section) = @_;
+
+      my $file = keys %file;
+
+      $topicref->href = $file;
+
+      $file{$file} = -p $section;
+
+      $section->cut;
+
+     });
+
+    ok -p $x eq <<END;
   <x>
     <topicref href="0">
       <topicref href="1">
@@ -32663,7 +33905,7 @@ B<Example:>
     </topicref>
   </x>
   END
-  
+
 
 =head3 divideHtmlDocumentIntoSections($tree)
 
@@ -32675,7 +33917,7 @@ Divide a L<parse|/parse> tree representing an html document into sections based 
 B<Example:>
 
 
-  
+
     my $a = Data::Edit::Xml::new(<<END);
   <a>
     <h1>HH11</h1>    text1
@@ -32685,9 +33927,11 @@ B<Example:>
       <h1>HH11</h1>  text5
   </a>
   END
-  
-    $a->𝗱𝗶𝘃𝗶𝗱𝗲𝗛𝘁𝗺𝗹𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝗜𝗻𝘁𝗼𝗦𝗲𝗰𝘁𝗶𝗼𝗻𝘀;
-  
+
+
+    $a->divideHtmlDocumentIntoSections;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok nws(-p $a) eq nws(<<END);
   <a>
     <section outputclass="1">
@@ -32712,7 +33956,7 @@ B<Example:>
     </section>
   </a>
   END
-  
+
 
 =head3 ditaParagraphToNote($node, $wrapNoteContentWithParagaph)
 
@@ -32725,22 +33969,24 @@ Convert all <p> nodes to <note> if the paragraph starts with 'Note:', optionally
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <p> Note: see over for details.</p>
   </a>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗣𝗮𝗿𝗮𝗴𝗿𝗮𝗽𝗵𝗧𝗼𝗡𝗼𝘁𝗲(1);                                                   
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->ditaParagraphToNote(1);                                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <a>
     <note>
       <p>See over for details.</p>
     </note>
   </a>
   END
-  
+
 
 =head3 wordStyles($x)
 
@@ -32752,18 +33998,20 @@ Extract style information from a parse tree representing a word document.
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
    <text:list-style style:name="aa">
      <text:list-level-style-bullet text:level="2"/>
    </text:list-style>
   </a>
   END
-  
-    my $styles = $a->𝘄𝗼𝗿𝗱𝗦𝘁𝘆𝗹𝗲𝘀;                                                  
-  
-    is_deeply $styles, {bulletedList=>{aa=>{2=>1}}};                              
-  
+
+
+    my $styles = $a->wordStyles;                                                    # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    is_deeply $styles, {bulletedList=>{aa=>{2=>1}}};
+
 
 =head3 htmlTableToDita($table)
 
@@ -32775,7 +34023,7 @@ Convert an L<html table> to a L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/o
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
    <table>
      <thead>
       <tr>
@@ -32798,10 +34046,12 @@ B<Example:>
      </tbody>
   </table>
   END
-  
-    $a->𝗵𝘁𝗺𝗹𝗧𝗮𝗯𝗹𝗲𝗧𝗼𝗗𝗶𝘁𝗮;                                                          
-  
-    ok -p $a eq <<END;                                                            
+
+
+    $a->htmlTableToDita;                                                            # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok -p $a eq <<END;
   <table>
     <tgroup cols="4">
       <colspec colname="c1" colnum="1" colwidth="1*"/>
@@ -32830,7 +34080,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
 
 =head3 ditaSyntaxDiagramFromDocBookCmdSynopsis({package ditaSyntaxDiagramFromDocBookCmdSynopsis;)
 
@@ -32893,9 +34143,11 @@ B<Example:>
     </arg>
   </cmdsynopsis>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗦𝘆𝗻𝘁𝗮𝘅𝗗𝗶𝗮𝗴𝗿𝗮𝗺𝗙𝗿𝗼𝗺𝗗𝗼𝗰𝗕𝗼𝗼𝗸𝗖𝗺𝗱𝗦𝘆𝗻𝗼𝗽𝘀𝗶𝘀;
-  
+
+
+    $a->ditaSyntaxDiagramFromDocBookCmdSynopsis;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok -p $a eq <<END;
   <syntaxdiagram>
     <groupseq>
@@ -32958,27 +34210,27 @@ B<Example:>
     </groupseq>
   </syntaxdiagram>
   END
-  
+
     $a->ditaSyntaxDiagramToBasicRepresentation;
-  
+
     ok nws(-p $a) eq nws(<<END);
   <p>
     <cmdname>fs</cmdname>
     <codeph>list</codeph>
-  
+
    [ <codeph>--pending</codeph> | <codeph>--running</codeph> ]
-  
+
    [ <codeph>--online</codeph> |
      <codeph> --offline </codeph> { <codeph>http</codeph> | <codeph>https</codeph>  | <codeph>ftp</codeph>  | <codeph>ssh</codeph> }  |
      <codeph>--special</codeph> |
      <codeph>--snap</codeph>
    ]
-  
+
    [ <codeph>--real</codeph> |
      <codeph>--virtual</codeph> |
      <codeph>--absolute</codeph>
    ]
-  
+
    [ <codeph>--titled</codeph> ]
    [ <codeph>--total</codeph>  |  <codeph>--space</codeph> ]
    [ <codeph> --rename </codeph>  <userinput>new-name</userinput> ]
@@ -32989,7 +34241,7 @@ B<Example:>
    [ <userinput>files</userinput> <codeph>…</codeph> ]
   </p>
   END
-  
+
 
 =head3 ditaSyntaxDiagramToBasicRepresentation($x)
 
@@ -33052,9 +34304,9 @@ B<Example:>
     </arg>
   </cmdsynopsis>
   END
-  
+
     $a->ditaSyntaxDiagramFromDocBookCmdSynopsis;
-  
+
     ok -p $a eq <<END;
   <syntaxdiagram>
     <groupseq>
@@ -33117,27 +34369,29 @@ B<Example:>
     </groupseq>
   </syntaxdiagram>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗦𝘆𝗻𝘁𝗮𝘅𝗗𝗶𝗮𝗴𝗿𝗮𝗺𝗧𝗼𝗕𝗮𝘀𝗶𝗰𝗥𝗲𝗽𝗿𝗲𝘀𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻;
-  
+
+
+    $a->ditaSyntaxDiagramToBasicRepresentation;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok nws(-p $a) eq nws(<<END);
   <p>
     <cmdname>fs</cmdname>
     <codeph>list</codeph>
-  
+
    [ <codeph>--pending</codeph> | <codeph>--running</codeph> ]
-  
+
    [ <codeph>--online</codeph> |
      <codeph> --offline </codeph> { <codeph>http</codeph> | <codeph>https</codeph>  | <codeph>ftp</codeph>  | <codeph>ssh</codeph> }  |
      <codeph>--special</codeph> |
      <codeph>--snap</codeph>
    ]
-  
+
    [ <codeph>--real</codeph> |
      <codeph>--virtual</codeph> |
      <codeph>--absolute</codeph>
    ]
-  
+
    [ <codeph>--titled</codeph> ]
    [ <codeph>--total</codeph>  |  <codeph>--space</codeph> ]
    [ <codeph> --rename </codeph>  <userinput>new-name</userinput> ]
@@ -33148,7 +34402,7 @@ B<Example:>
    [ <userinput>files</userinput> <codeph>…</codeph> ]
   </p>
   END
-  
+
 
 =head3 ditaWrapWithPUnderConbody($conbody)
 
@@ -33164,16 +34418,18 @@ B<Example:>
   <conbody>text<q>quote</q><p>new paragraph</p>
   more text</conbody>
   END
-  
-    $a->𝗱𝗶𝘁𝗮𝗪𝗿𝗮𝗽𝗪𝗶𝘁𝗵𝗣𝗨𝗻𝗱𝗲𝗿𝗖𝗼𝗻𝗯𝗼𝗱𝘆;
-  
+
+
+    $a->ditaWrapWithPUnderConbody;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     my $b = new(<<END);
   <conbody><p>text<q>quote</q></p><p>new paragraph
   more text</p></conbody>
   END
-  
+
     ok $a->equals($b);
-  
+
 
 =head1 PCD
 
@@ -33206,14 +34462,16 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $c, $b) = $a->byList;
-  
-    $d->𝗽𝘂𝘁𝗡𝗼𝗱𝗲𝗔𝘀(q(D));
+
+
+    $d->putNodeAs(q(D));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     ok $a->getNodeAs(q(D)) == $d;
     %Data::Edit::Xml::savedNodes = ();
     ok $a->getNodeAs(q(D)) == $a;
-  
+
     ok $a->reportNode_AAAA eq <<END;
   AAAA
   <a>
@@ -33227,7 +34485,7 @@ B<Example:>
     ok $d->reportNodeAttributes_BBBB eq q(BBBB  id="d");
     ok $d->reportNodeAttributes_CCCC eq q(CCCC  id="d");
     ok $d->reportNodeContext_DDDD    eq q(DDDD d c b a);
-  
+
 
 B<put> is a synonym for L<putNodeAs|/putNodeAs>.
 
@@ -33259,14 +34517,18 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $c, $b) = $a->byList;
-  
+
     $d->putNodeAs(q(D));
-    ok $a->𝗴𝗲𝘁𝗡𝗼𝗱𝗲𝗔𝘀(q(D)) == $d;
+
+    ok $a->getNodeAs(q(D)) == $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     %Data::Edit::Xml::savedNodes = ();
-    ok $a->𝗴𝗲𝘁𝗡𝗼𝗱𝗲𝗔𝘀(q(D)) == $a;
-  
+
+    ok $a->getNodeAs(q(D)) == $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     ok $a->reportNode_AAAA eq <<END;
   AAAA
   <a>
@@ -33280,7 +34542,7 @@ B<Example:>
     ok $d->reportNodeAttributes_BBBB eq q(BBBB  id="d");
     ok $d->reportNodeAttributes_CCCC eq q(CCCC  id="d");
     ok $d->reportNodeContext_DDDD    eq q(DDDD d c b a);
-  
+
 
 B<get> is a synonym for L<getNodeAs|/getNodeAs>.
 
@@ -33312,14 +34574,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $c, $b) = $a->byList;
-  
+
     $d->putNodeAs(q(D));
     ok $a->getNodeAs(q(D)) == $d;
     %Data::Edit::Xml::savedNodes = ();
     ok $a->getNodeAs(q(D)) == $a;
-  
+
     ok $a->reportNode_AAAA eq <<END;
   AAAA
   <a>
@@ -33333,7 +34595,7 @@ B<Example:>
     ok $d->reportNodeAttributes_BBBB eq q(BBBB  id="d");
     ok $d->reportNodeAttributes_CCCC eq q(CCCC  id="d");
     ok $d->reportNodeContext_DDDD    eq q(DDDD d c b a);
-  
+
 
 B<rna> is a synonym for L<reportNodeAttributes|/reportNodeAttributes>.
 
@@ -33365,14 +34627,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $c, $b) = $a->byList;
-  
+
     $d->putNodeAs(q(D));
     ok $a->getNodeAs(q(D)) == $d;
     %Data::Edit::Xml::savedNodes = ();
     ok $a->getNodeAs(q(D)) == $a;
-  
+
     ok $a->reportNode_AAAA eq <<END;
   AAAA
   <a>
@@ -33386,7 +34648,7 @@ B<Example:>
     ok $d->reportNodeAttributes_BBBB eq q(BBBB  id="d");
     ok $d->reportNodeAttributes_CCCC eq q(CCCC  id="d");
     ok $d->reportNodeContext_DDDD    eq q(DDDD d c b a);
-  
+
 
 B<rnc> is a synonym for L<reportNodeContext|/reportNodeContext>.
 
@@ -33418,14 +34680,14 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my ($d, $c, $b) = $a->byList;
-  
+
     $d->putNodeAs(q(D));
     ok $a->getNodeAs(q(D)) == $d;
     %Data::Edit::Xml::savedNodes = ();
     ok $a->getNodeAs(q(D)) == $a;
-  
+
     ok $a->reportNode_AAAA eq <<END;
   AAAA
   <a>
@@ -33439,7 +34701,7 @@ B<Example:>
     ok $d->reportNodeAttributes_BBBB eq q(BBBB  id="d");
     ok $d->reportNodeAttributes_CCCC eq q(CCCC  id="d");
     ok $d->reportNodeContext_DDDD    eq q(DDDD d c b a);
-  
+
 
 B<rn> is a synonym for L<reportNode|/reportNode>.
 
@@ -33460,9 +34722,9 @@ B<Example:>
 
 
     my $a = Data::Edit::Xml::new(q(<a><b><c/></b></a>));
-  
+
     $a->go_b_c__sss_aa_bb_cc;
-  
+
     ok -p $a eq <<END;
   <a>
     <b>
@@ -33471,7 +34733,7 @@ B<Example:>
     </b>
   </a>
   END
-  
+
 
 =head2 printAttributes($node)
 
@@ -33483,12 +34745,14 @@ Print the attributes of a node.
 B<Example:>
 
 
-    my $x = Data::Edit::Xml::new(my $s = <<END);                                  
+    my $x = Data::Edit::Xml::new(my $s = <<END);
   <a no="1" word="first"/>
   END
-  
-    ok $x->𝗽𝗿𝗶𝗻𝘁𝗔𝘁𝘁𝗿𝗶𝗯𝘂𝘁𝗲𝘀 eq qq( no="1" word="first");                            
-  
+
+
+    ok $x->printAttributes eq qq( no="1" word="first");                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 printAttributesHtml($node)
 
@@ -33510,7 +34774,7 @@ B<Example:>
     </d>
   </a>
   END
-  
+
     ok $a->prettyStringHtml eq <<END;
   <div class="xmlLine"><span class="xmlLineStartTag"></span><span class="xmlLt">&lt;</span><span class="xmlTag">a</span> <span class="xmlAttr">id</span><span class="xmlEquals">=</span><span class="xmlValue">"1"</span><span class="xmlGt">&gt;</span></div>
   <div class="xmlLine"><span class="xmlLineStartTag">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="xmlLt">&lt;</span><span class="xmlTag">b</span> <span class="xmlAttr">b</span><span class="xmlEquals">=</span><span class="xmlValue">"B"</span> <span class="xmlAttr">id</span><span class="xmlEquals">=</span><span class="xmlValue">"2"</span><span class="xmlGt">&gt;</span></div>
@@ -33519,7 +34783,7 @@ B<Example:>
   <div class="xmlLine"><span class="xmlLineStartTag">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="xmlLt">&lt;</span><span class="xmlTag">d</span> <span class="xmlAttr">d</span><span class="xmlEquals">=</span><span class="xmlValue">"D"</span> <span class="xmlAttr">id</span><span class="xmlEquals">=</span><span class="xmlValue">"3"</span><span class="xmlGt">&gt;</span><span class="xmlText">Some text</span><span class="xmlLtSlash">&lt;/</span><span class="xmlTag">d</span><span class="xmlGt">&gt;</span></div>
   <div class="xmlLine"><span class="xmlLineStartTag"></span><span class="xmlLtSlash">&lt;/</span><span class="xmlTag">a</span><span class="xmlGt">&gt;</span></div>
   END
-  
+
 
 =head2 printStack($node, @context)
 
@@ -33547,9 +34811,11 @@ B<Example:>
     </b>
   </a>
   END
-  
+
     my $d = $a->firstUntil_d;
-    ok $d->𝗽𝗿𝗶𝗻𝘁𝗦𝘁𝗮𝗰𝗸 eq <<END;
+
+    ok $d->printStack eq <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   a id="a"
     b id="b"
       c
@@ -33561,7 +34827,7 @@ B<Example:>
       c
         d id="d"
   END
-  
+
 
 =head2 printNode($node, @context)
 
@@ -33580,7 +34846,7 @@ B<$node> is not in this context then this method returns B<undef> immediately.
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(<<END);                                               
+    my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c id="42" match="mm"/>
@@ -33590,9 +34856,11 @@ B<Example:>
     </d>
   </a>
   END
-  
-    ok $c->𝗽𝗿𝗶𝗻𝘁𝗡𝗼𝗱𝗲 eq q(c id="42" match="mm");                                   
-  
+
+
+    ok $c->printNode eq q(c id="42" match="mm");                                     # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 printNodeAsSingleton($node, @context)
 
@@ -33616,9 +34884,11 @@ B<Example:>
     <b/>
   </a>
   END
-  
-    ok $a->𝗽𝗿𝗶𝗻𝘁𝗡𝗼𝗱𝗲𝗔𝘀𝗦𝗶𝗻𝗴𝗹𝗲𝘁𝗼𝗻 eq q(<a id="a" outputclass="aa"/>);
-  
+
+
+    ok $a->printNodeAsSingleton eq q(<a id="a" outputclass="aa"/>);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
 
 =head2 goFish($node, @path)
 
@@ -33651,7 +34921,7 @@ Parameters:
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c>
@@ -33662,15 +34932,17 @@ B<Example:>
     <b/>
   </a>
   END
-  
-      my ($good, $fail, $possible) = $a->𝗴𝗼𝗙𝗶𝘀𝗵(qw(b c D));                       
-  
-      ok  $fail eq q(D);                                                          
-  
-      is_deeply $good,     [qw(b c)];                                             
-  
-      is_deeply $possible, [q(d)];                                                
-  
+
+
+      my ($good, $fail, $possible) = $a->goFish(qw(b c D));                         # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      ok  $fail eq q(D);
+
+      is_deeply $good,     [qw(b c)];
+
+      is_deeply $possible, [q(d)];
+
 
 =head1 Validation
 
@@ -33697,7 +34969,7 @@ B<Example:>
         type         The type of the column
         description  A description of the purpose of the column
         edit ?       A regular expression to edit the column data
-  
+
       reference *    References from this table
         name         The name of the reference
         table        The name of the referenced table
@@ -33705,7 +34977,9 @@ B<Example:>
       row *          Row of data to be loaded inot the table
         col +        Column value
   END
-   is_deeply 𝗰𝗵𝗲𝗰𝗸𝗔𝗹𝗹𝗣𝗮𝘁𝗵𝘀($paths),
+
+   is_deeply checkAllPaths($paths),  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     {"name"                        => [1, "name of the database"],
      "table"                       => ["+", "The table to be created"],
      "table column"                => ["+", "Columns in this table"],
@@ -33722,7 +34996,7 @@ B<Example:>
      "table row"                   => ["*", "Row of data to be loaded inot the table"],
      "table row col"               => ["+", "Column value"]
     };
-  
+
     my $xml = <<'END';
   <database>
     <name>test</name>
@@ -33739,7 +35013,7 @@ B<Example:>
       <row><col>Saturn Samurai   </col><col>junior</col><col>Male  </col><col>Saturn University    </col><col>West </col><col>ss@coaches.com</col></row>
       <row><col>Jovial Journeymen</col><col>junior</col><col>Male  </col><col>University of Jupiter</col><col>South</col><col>jj@coaches.com</col></row>
     </table>
-  
+
     <table>
       <name>field</name>
       <column>   <name>name  </name> <type>varchar(255)</type> <description>Name of the field                 </description></column>
@@ -33752,7 +35026,7 @@ B<Example:>
       <row><col>Small Diamond</col><col>3 Ash Street </col><col>Ioville     </col><col>72754</col><col>Saturn University    </col></row>
       <row><col>Large Oval   </col><col>4 Pine Street</col><col>GanymedeCity</col><col>76334</col><col>University of Jupiter</col></row>
     </table>
-  
+
     <table>
       <name>matches</name>
       <column>   <name>date        </name> <type>date         </type> <description>Time of match                     </description></column>
@@ -33768,7 +35042,7 @@ B<Example:>
       <row><col>2020-04-22</col><col>1</col><col>13</col><col>0</col><col>0</col><col>1</col><col>3</col><col>2</col></row>
       <row><col>2020-04-25</col><col>1</col><col>13</col><col>0</col><col>0</col><col>1</col><col>3</col><col>2</col></row>
     </table>
-  
+
     <table>
       <name>auth</name> <hide/>
       <column>   <name>state     </name> <type>varchar(16) </type>  <description>The unique state number which connects a random number on the browser to a unique github userid on the server </description></column>
@@ -33787,11 +35061,11 @@ B<Example:>
     </table>
   </database>
   END
-  
+
     my $dd = xmlToPerl($xml, $paths);
     my %table  = map {$_->name => $_}                                    $dd->table->@*;
     my %column = map {$_->name => {map {$_->name => $_} $_->column->@*}} $dd->table->@*;
-  
+
     ok $table{auth}->hide;
     ok $column{matches}{coachAgree}{type} eq q(boolean);
     is_deeply $column{field}{street},
@@ -33799,9 +35073,9 @@ B<Example:>
              name        => "street",
              type        => "varchar(255)",
             }, "database::table::column");
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::checkAllPaths
 
@@ -33828,7 +35102,7 @@ B<Example:>
         type         The type of the column
         description  A description of the purpose of the column
         edit ?       A regular expression to edit the column data
-  
+
       reference *    References from this table
         name         The name of the reference
         table        The name of the referenced table
@@ -33853,7 +35127,7 @@ B<Example:>
      "table row"                   => ["*", "Row of data to be loaded inot the table"],
      "table row col"               => ["+", "Column value"]
     };
-  
+
     my $xml = <<'END';
   <database>
     <name>test</name>
@@ -33870,7 +35144,7 @@ B<Example:>
       <row><col>Saturn Samurai   </col><col>junior</col><col>Male  </col><col>Saturn University    </col><col>West </col><col>ss@coaches.com</col></row>
       <row><col>Jovial Journeymen</col><col>junior</col><col>Male  </col><col>University of Jupiter</col><col>South</col><col>jj@coaches.com</col></row>
     </table>
-  
+
     <table>
       <name>field</name>
       <column>   <name>name  </name> <type>varchar(255)</type> <description>Name of the field                 </description></column>
@@ -33883,7 +35157,7 @@ B<Example:>
       <row><col>Small Diamond</col><col>3 Ash Street </col><col>Ioville     </col><col>72754</col><col>Saturn University    </col></row>
       <row><col>Large Oval   </col><col>4 Pine Street</col><col>GanymedeCity</col><col>76334</col><col>University of Jupiter</col></row>
     </table>
-  
+
     <table>
       <name>matches</name>
       <column>   <name>date        </name> <type>date         </type> <description>Time of match                     </description></column>
@@ -33899,7 +35173,7 @@ B<Example:>
       <row><col>2020-04-22</col><col>1</col><col>13</col><col>0</col><col>0</col><col>1</col><col>3</col><col>2</col></row>
       <row><col>2020-04-25</col><col>1</col><col>13</col><col>0</col><col>0</col><col>1</col><col>3</col><col>2</col></row>
     </table>
-  
+
     <table>
       <name>auth</name> <hide/>
       <column>   <name>state     </name> <type>varchar(16) </type>  <description>The unique state number which connects a random number on the browser to a unique github userid on the server </description></column>
@@ -33918,11 +35192,13 @@ B<Example:>
     </table>
   </database>
   END
-  
-    my $dd = 𝘅𝗺𝗹𝗧𝗼𝗣𝗲𝗿𝗹($xml, $paths);
+
+
+    my $dd = xmlToPerl($xml, $paths);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my %table  = map {$_->name => $_}                                    $dd->table->@*;
     my %column = map {$_->name => {map {$_->name => $_} $_->column->@*}} $dd->table->@*;
-  
+
     ok $table{auth}->hide;
     ok $column{matches}{coachAgree}{type} eq q(boolean);
     is_deeply $column{field}{street},
@@ -33930,9 +35206,9 @@ B<Example:>
              name        => "street",
              type        => "varchar(255)",
             }, "database::table::column");
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::xmlToPerl
 
@@ -33956,14 +35232,16 @@ Write the parse tree starting at B<$node> as compressed L<Xml|https://en.wikiped
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(q(<a>).(q(<b>𝝱</b>)x1e3).q(</a>));                
-  
-    my $file = $a->𝘄𝗿𝗶𝘁𝗲𝗖𝗼𝗺𝗽𝗿𝗲𝘀𝘀𝗲𝗱𝗙𝗶𝗹𝗲(q(zzz.xml.zip));                            
-  
-    my $A = readCompressedFile($file);                                             
-  
-    ok $a->equals($A);                                                             
-  
+    my $a = Data::Edit::Xml::new(q(<a>).(q(<b>𝝱</b>)x1e3).q(</a>));
+
+
+    my $file = $a->writeCompressedFile(q(zzz.xml.zip));                              # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    my $A = readCompressedFile($file);
+
+    ok $a->equals($A);
+
 
 =head2 readCompressedFile($file)
 
@@ -33975,16 +35253,18 @@ Read the specified B<$file> containing compressed L<Xml|https://en.wikipedia.org
 B<Example:>
 
 
-    my $a = Data::Edit::Xml::new(q(<a>).(q(<b>𝝱</b>)x1e3).q(</a>));                
-  
-    my $file = $a->writeCompressedFile(q(zzz.xml.zip));                            
-  
-    my $A = 𝗿𝗲𝗮𝗱𝗖𝗼𝗺𝗽𝗿𝗲𝘀𝘀𝗲𝗱𝗙𝗶𝗹𝗲($file);                                             
-  
-    ok $a->equals($A);                                                             
-  
+    my $a = Data::Edit::Xml::new(q(<a>).(q(<b>𝝱</b>)x1e3).q(</a>));
 
-This is a static method and so should be invoked as:
+    my $file = $a->writeCompressedFile(q(zzz.xml.zip));
+
+
+    my $A = readCompressedFile($file);                                               # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    ok $a->equals($A);
+
+
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::readCompressedFile
 
@@ -34001,33 +35281,33 @@ Allow methods with constant parameters to be called as B<method_p1_p2>...(variab
 B<Example:>
 
 
-   {my $a = Data::Edit::Xml::new(<<END);                                          
+   {my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c/>
     </b>
   </a>
   END
-  
-    my ($c, $b) = $a->byList;                                                     
-  
-    ok  $c->at_c_b_a;                                                             
-  
-    ok !$c->at_b;                                                                 
-  
-    ok  -t $c->change_d_c_b eq q(d);                                              
-  
-    ok !   $c->change_d_b;                                                        
-  
-  if (1)                                                                          
+
+    my ($c, $b) = $a->byList;
+
+    ok  $c->at_c_b_a;
+
+    ok !$c->at_b;
+
+    ok  -t $c->change_d_c_b eq q(d);
+
+    ok !   $c->change_d_b;
+
+  if (1)
    {my $a = Data::Edit::Xml::new(<<END);
   <a><b><c/><d/><e/><f/></b></a>
   END
-  
+
     ok -t $a->first_b__first_c__next__next_e__next eq q(f);
     ok   !$a->first_b__first_c__next__next_f;
    }
-  
+
 
 
 =head2 Data::Edit::Xml Definition
@@ -34041,75 +35321,145 @@ Well known attributes useful in respect to L<Xml|https://en.wikipedia.org/wiki/X
 =head3 Output fields
 
 
-B<attributes> - The attributes of the specified B<$node>, see also: L</Attributes>.  The frequently used attributes: class, id, href, outputclass can be accessed by an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method as in: $node->id = 'c1'.
+=head4 attributes
 
-B<audience> - Attribute B<audience> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<audienceX()> to return B<q()> rather than B<undef>.
+The attributes of the specified B<$node>, see also: L</Attributes>.  The frequently used attributes: class, id, href, outputclass can be accessed by an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method as in: $node->id = 'c1'.
 
-B<class> - Attribute B<class> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<classX()> to return B<q()> rather than B<undef>.
+=head4 audience
 
-B<conditions> - Conditional strings attached to a node, see L</Conditions>.
+Attribute B<audience> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<audienceX()> to return B<q()> rather than B<undef>.
 
-B<content> - Content of command: the nodes immediately below the specified B<$node> in the order in which they appeared in the source text, see also L</Contents>.
+=head4 class
 
-B<data> - A hash added to the node for use by the programmer during transformations. The data in this hash will not be printed by any of the L<printed|/Print> methods and so can be used to add data to the L<parse|/parse> tree that will not be seen in any output L<Xml|https://en.wikipedia.org/wiki/XML> produced from the L<parse|/parse> tree.
+Attribute B<class> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<classX()> to return B<q()> rather than B<undef>.
 
-B<depthProfileLast> - The last known depth profile for this node as set by L<setDepthProfiles|/setDepthProfiles>.
+=head4 conditions
 
-B<errorsFile> - Error listing file. Use this parameter to explicitly set the name of the file that will be used to write any L<parse|/parse> errors to. By default this file is named: B<zzzParseErrors/out.data>.
+Conditional strings attached to a node, see L</Conditions>.
 
-B<forestNumbers> - Index to node by forest number as set by L<numberForest|/numberForest>.
+=head4 content
 
-B<guid> - Attribute B<guid> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<guidX()> to return B<q()> rather than B<undef>.
+Content of command: the nodes immediately below the specified B<$node> in the order in which they appeared in the source text, see also L</Contents>.
 
-B<href> - Attribute B<href> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<hrefX()> to return B<q()> rather than B<undef>.
+=head4 data
 
-B<id> - Attribute B<id> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.          Use B<idX()> to return B<q()> rather than B<undef>.
+A hash added to the node for use by the programmer during transformations. The data in this hash will not be printed by any of the L<printed|/Print> methods and so can be used to add data to the L<parse|/parse> tree that will not be seen in any output L<Xml|https://en.wikipedia.org/wiki/XML> produced from the L<parse|/parse> tree.
 
-B<indexes> - Indexes to sub commands by tag in the order in which they appeared in the source text.
+=head4 depthProfileLast
 
-B<input> - Source of the L<parse|/parse> if this is the L<parser|/parse> root node. Use this parameter to specify some input either as a string or as a file name for the L<parser|/parse> to convert into a L<parse|/parse> tree.
+The last known depth profile for this node as set by L<setDepthProfiles|/setDepthProfiles>.
 
-B<inputFile> - Source file of the L<parse|/parse> if this is the L<parser|/parse> root node. Use this parameter to explicitly set the file to be L<parsed|/parse>.
+=head4 errorsFile
 
-B<inputString> - Source string of the L<parse|/parse> if this is the L<parser|/parse> root node. Use this parameter to explicitly set the string to be L<parsed|/parse>.
+Error listing file. Use this parameter to explicitly set the name of the file that will be used to write any L<parse|/parse> errors to. By default this file is named: B<zzzParseErrors/out.data>.
 
-B<labels> - The labels attached to a node to provide addressability from other nodes, see: L</Labels>.
+=head4 forestNumbers
 
-B<lang> - Attribute B<lang> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<langX()> to return B<q()> rather than B<undef>.
+Index to node by forest number as set by L<numberForest|/numberForest>.
 
-B<lineNumbers> - If true then save the line number.column number at which tag starts and ends on the xtrf attribute of each node.
+=head4 guid
 
-B<navtitle> - Attribute B<navtitle> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<navtitleX()> to return B<q()> rather than B<undef>.
+Attribute B<guid> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<guidX()> to return B<q()> rather than B<undef>.
 
-B<number> - Number of the specified B<$node>, see L<findByNumber|/findByNumber>.
+=head4 href
 
-B<numbering> - Last number used to number a node in this L<parse|/parse> tree.
+Attribute B<href> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<hrefX()> to return B<q()> rather than B<undef>.
 
-B<numbers> - Nodes by number.
+=head4 id
 
-B<otherprops> - Attribute B<otherprops> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.  Use B<otherpropsX()> to return B<q()> rather than B<undef>.
+Attribute B<id> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.          Use B<idX()> to return B<q()> rather than B<undef>.
 
-B<outputclass> - Attribute B<outputclass> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>. Use B<outputclassX()> to return B<q()> rather than B<undef>.
+=head4 indexes
 
-B<parent> - Parent node of the specified B<$node> or B<undef> if the L<parser|/parse> root node. See also L</Traversal> and L</Navigation>. Consider as read only.
+Indexes to sub commands by tag in the order in which they appeared in the source text.
 
-B<parser> - L<Parser|/parse> details: the root node of a tree is the L<parser|/parse> node for that tree. Consider as read only.
+=head4 input
 
-B<props> - Attribute B<props> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<propsX()> to return B<q()> rather than B<undef>.
+Source of the L<parse|/parse> if this is the L<parser|/parse> root node. Use this parameter to specify some input either as a string or as a file name for the L<parser|/parse> to convert into a L<parse|/parse> tree.
 
-B<representationLast> - The last representation set for this node by one of: L<setRepresentationAsTagsAndText|/setRepresentationAsTagsAndText>.
+=head4 inputFile
 
-B<style> - Attribute B<style> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<styleX()> to return B<q()> rather than B<undef>.
+Source file of the L<parse|/parse> if this is the L<parser|/parse> root node. Use this parameter to explicitly set the file to be L<parsed|/parse>.
 
-B<tag> - Tag name for the specified B<$node>, see also L</Traversal> and L</Navigation>. Consider as read only.
+=head4 inputString
 
-B<text> - Text of the specified B<$node> but only if it is a text node otherwise B<undef>, i.e. the tag is cdata() <=> L</isText> is true.
+Source string of the L<parse|/parse> if this is the L<parser|/parse> root node. Use this parameter to explicitly set the string to be L<parsed|/parse>.
 
-B<type> - Attribute B<type> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<typeX()> to return B<q()> rather than B<undef>.
+=head4 labels
 
-B<xtrc> - Attribute B<xtrc> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
+The labels attached to a node to provide addressability from other nodes, see: L</Labels>.
 
-B<xtrf> - Attribute B<xtrf> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
+=head4 lang
+
+Attribute B<lang> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<langX()> to return B<q()> rather than B<undef>.
+
+=head4 lineNumbers
+
+If true then save the line number.column number at which tag starts and ends on the xtrf attribute of each node.
+
+=head4 navtitle
+
+Attribute B<navtitle> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.    Use B<navtitleX()> to return B<q()> rather than B<undef>.
+
+=head4 number
+
+Number of the specified B<$node>, see L<findByNumber|/findByNumber>.
+
+=head4 numbering
+
+Last number used to number a node in this L<parse|/parse> tree.
+
+=head4 numbers
+
+Nodes by number.
+
+=head4 otherprops
+
+Attribute B<otherprops> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.  Use B<otherpropsX()> to return B<q()> rather than B<undef>.
+
+=head4 outputclass
+
+Attribute B<outputclass> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>. Use B<outputclassX()> to return B<q()> rather than B<undef>.
+
+=head4 parent
+
+Parent node of the specified B<$node> or B<undef> if the L<parser|/parse> root node. See also L</Traversal> and L</Navigation>. Consider as read only.
+
+=head4 parser
+
+L<Parser|/parse> details: the root node of a tree is the L<parser|/parse> node for that tree. Consider as read only.
+
+=head4 props
+
+Attribute B<props> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<propsX()> to return B<q()> rather than B<undef>.
+
+=head4 representationLast
+
+The last representation set for this node by one of: L<setRepresentationAsTagsAndText|/setRepresentationAsTagsAndText>.
+
+=head4 style
+
+Attribute B<style> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.       Use B<styleX()> to return B<q()> rather than B<undef>.
+
+=head4 tag
+
+Tag name for the specified B<$node>, see also L</Traversal> and L</Navigation>. Consider as read only.
+
+=head4 text
+
+Text of the specified B<$node> but only if it is a text node otherwise B<undef>, i.e. the tag is cdata() <=> L</isText> is true.
+
+=head4 type
+
+Attribute B<type> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<typeX()> to return B<q()> rather than B<undef>.
+
+=head4 xtrc
+
+Attribute B<xtrc> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
+
+=head4 xtrf
+
+Attribute B<xtrf> for a node as an L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.        Use B<classX()> to return B<q()> rather than B<undef>.
 
 
 
@@ -34124,15 +35474,25 @@ Description of a pcd method
 =head3 Output fields
 
 
-B<also> - See also
+=head4 also
 
-B<before> - Before file content minus root tag which will be added as <a>
+See also
 
-B<code> - Pcd code
+=head4 before
 
-B<doc> - One line summary
+Before file content minus root tag which will be added as <a>
 
-B<method> - Method
+=head4 code
+
+Pcd code
+
+=head4 doc
+
+One line summary
+
+=head4 method
+
+Method
 
 
 
@@ -34147,23 +35507,41 @@ Statistics about a table
 =head3 Output fields
 
 
-B<colSpec> - Number of colspec entries
+=head4 colSpec
 
-B<colsAttribute> - Column attribute
+Number of colspec entries
 
-B<maxBody> - Maximum number of entries in a body row regardless of padding rows
+=head4 colsAttribute
 
-B<maxBodyMinusPadding> - Maximum number of entries in a body row after an padding entries have been removed
+Column attribute
 
-B<maxHead> - Maximum number of entries in a head row regardless of padding rows
+=head4 maxBody
 
-B<maxHeadMinusPadding> - Maximum number of entries in a head row after an padding entries have been removed
+Maximum number of entries in a body row regardless of padding rows
 
-B<minBody> - Maximum number of entries in a body row regardless of padding rows
+=head4 maxBodyMinusPadding
 
-B<minHead> - Maximum number of entries in a head row regardless of padding rows
+Maximum number of entries in a body row after an padding entries have been removed
 
-B<rows> - Number of rows
+=head4 maxHead
+
+Maximum number of entries in a head row regardless of padding rows
+
+=head4 maxHeadMinusPadding
+
+Maximum number of entries in a head row after an padding entries have been removed
+
+=head4 minBody
+
+Maximum number of entries in a body row regardless of padding rows
+
+=head4 minHead
+
+Maximum number of entries in a head row regardless of padding rows
+
+=head4 rows
+
+Number of rows
 
 
 
@@ -34178,7 +35556,7 @@ default value supplied for this attribute by this package.
 =head2 Replaceable Attribute List
 
 
-DESTROY 
+DESTROY
 
 
 =head2 DESTROY
@@ -34240,7 +35618,7 @@ Normalize white space, remove comments DOCTYPE and L<Xml|https://en.wikipedia.or
      Parameter  Description
   1  $string    String to normalize
 
-This is a static method and so should be invoked as:
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::normalizeWhiteSpace
 
@@ -34336,7 +35714,7 @@ Parse a line location
      Parameter  Description
   1  $loc       Location
 
-This is a static method and so should be invoked as:
+This is a static method and so should either be imported or invoked as:
 
   Data::Edit::Xml::parseLineLocation
 
@@ -34397,11 +35775,13 @@ B<Example:>
     <c>aaa AAA</c>
   </a>
   END
-  
-    my $t = $a->𝗰𝗼𝘂𝗻𝘁𝗪𝗼𝗿𝗱𝘀;
-  
+
+
+    my $t = $a->countWords;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     is_deeply $t, { AAA => 2, aaa => 2, bbb => 1, BBB => 1, CCC => 1, ccc => 1 };
-  
+
 
 =head2 createRequiredCleanUp($node, @text)
 
@@ -34459,11 +35839,13 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     my $g = $a->go_tgroup;
-  
-    $g->𝗱𝗶𝘁𝗮𝗔𝗱𝗱𝗣𝗮𝗱𝗘𝗻𝘁𝗿𝗶𝗲𝘀𝗧𝗼𝗧𝗚𝗿𝗼𝘂𝗽𝗥𝗼𝘄𝘀(2);
-  
+
+
+    $g->ditaAddPadEntriesToTGroupRows(2);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 1,
@@ -34476,9 +35858,9 @@ B<Example:>
     minHead => 2,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
+
     $g->fixTGroup;
-  
+
     ok -p $a eq <<END;
   <table>
     <tgroup cols="2">
@@ -34507,7 +35889,7 @@ B<Example:>
     </tgroup>
   </table>
   END
-  
+
     is_deeply $g->ditaTGroupStatistics,
   bless({
     colsAttribute => 2,
@@ -34519,9 +35901,9 @@ B<Example:>
     minBody => 2,
     minHead => 2,
     rows    => 4,
-  
+
   }, "Data::Edit::Xml::Table::Statistics");
-  
+
     $a->fixTable;
     is_deeply $g->ditaTGroupStatistics,
   bless({
@@ -34535,8 +35917,8 @@ B<Example:>
     minHead => 2,
     rows    => 4,
   }, "Data::Edit::Xml::Table::Statistics");
-  
-  
+
+
 
 =head2 topicTypeAndBody($type)
 
@@ -35482,9 +36864,9 @@ B<x> is a synonym for L<cut|/cut> - Cut out and return the specified B<$node> so
 
 373 L<nextIs|/nextIs> - Return the specified B<$node> if there is a following node with the specified B<@context>.
 
-374 L<nextn|/nextn> - Return the B<$n>'th next node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+374 L<nextN|/nextN> - Return B<$N> nodes as an array starting at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
 
-375 L<nextN|/nextN> - Return B<$N> nodes as an array starting at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
+375 L<nextn|/nextn> - Return the B<$n>'th next node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
 376 L<nextOn|/nextOn> - Step forwards as far as possible from the specified B<$node> while remaining on nodes with the specified tags.
 
@@ -35640,7 +37022,7 @@ B<x> is a synonym for L<cut|/cut> - Cut out and return the specified B<$node> so
 
 426 L<prettyStringEnd|/prettyStringEnd> - Return a readable string representing a node of a L<parse|/parse> tree and all the nodes below it as a here document
 
-427 L<prettyStringHtml|/prettyStringHtml> - Return a string of L<html|https://en.wikipedia.org/wiki/HTML> representing a node of a L<parse|/parse> tree and all the nodes below it if the node is in the specified context.
+427 L<prettyStringHtml|/prettyStringHtml> - Return a string of L<HTML|https://en.wikipedia.org/wiki/HTML> representing a node of a L<parse|/parse> tree and all the nodes below it if the node is in the specified context.
 
 428 L<prettyStringHtml2|/prettyStringHtml2> - Return a string of html representing a node of a L<parse|/parse> tree and all the nodes below it.
 
@@ -35652,9 +37034,9 @@ B<x> is a synonym for L<cut|/cut> - Cut out and return the specified B<$node> so
 
 432 L<prevIs|/prevIs> - Return the specified B<$node> if there is a previous node with the specified B<@context>.
 
-433 L<prevn|/prevn> - Return the B<$n>'th previous node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
+433 L<prevN|/prevN> - Return B<$N> nodes as an array ending at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
 
-434 L<prevN|/prevN> - Return B<$N> nodes as an array ending at B<$node> inclusive if they match the first B<$N> tags of B<@context>.
+434 L<prevn|/prevn> - Return the B<$n>'th previous node after the specified B<$node> optionally checking its context or B<undef> if there is no such node.
 
 435 L<prevOn|/prevOn> - Step backwards as far as possible while remaining on nodes with the specified tags.
 

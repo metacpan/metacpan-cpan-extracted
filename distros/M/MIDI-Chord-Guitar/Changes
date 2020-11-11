@@ -1,0 +1,72 @@
+Revision history for MIDI-Chord-Guitar
+
+0.0304 2020-11-08 11:09:43
+    - Fix-up eg/ programs a bit.
+    - Improve documentation.
+
+0.0303 2020-11-08 07:09:16
+    - Add an example of Travis picking.
+
+0.0302 2020-11-08 05:01:57
+    - Use strictures & namespace::clean.
+    - Improve documentation slightly.
+
+0.0301 2020-11-07 06:14:45
+    - Update the eg/ programs.
+    - Get rid of the postfix deref.
+
+0.0300 2020-11-06 06:20:04
+    - Add the link to where I got the chord shapes!
+    - Improve documentation.
+    - Make the ->transform method return all transformed voicings if no variation is given.
+    - Add the eg/voicing-stat program to analyze chords statistically.
+
+0.0202 2020-10-30 06:05:52
+    - Specify minimum List::Util version to use.
+
+0.0201 2020-10-29 05:51:30
+    - Allow the "midi" ->voicings format as well.
+
+0.0200 2020-10-29 05:27:32
+    - Show ->voicings as ISO notes if requested.
+
+0.0110 2020-10-28 12:37:49
+    - Improve documentation.
+    - Improve the eg/autumn_Leaves program.
+
+0.0109 2020-10-28 06:54:19
+    - Simplify syntax.
+    - Improve documentation.
+
+0.0108 2020-10-27 16:16:24
+    - Simplify syntax.
+    - Improve documentation.
+    - Add tests.
+
+0.0107 2020-10-27 11:43:29
+    - Improve documentation.
+
+0.0106 2020-10-27 10:10:16
+    - Add the eg/autumn_Leaves program to illustrate real life usage.
+
+0.0105 2020-10-27 09:26:56
+    - "Normalize" got/expect syntax in the test.
+    - Re-add the MIDI pitch numbers diagram.
+    - Improve documentation.
+
+0.0104 2020-10-27 08:42:19
+    - Improve layout of HTML-in-POD.
+    - Add the known chord names to the documentation.
+
+0.0103 2020-10-27 08:22:31
+    - Attempt to fix the HTML image URLs once again...
+
+0.0102 2020-10-27 08:17:33
+    - Fix HTML image URLs.
+
+0.0101 2020-10-27 08:12:19
+    - Fix NAME, SYNOPSIS and SEE ALSO POD sections.
+    - Add test.
+
+0.0100 2020-10-27 08:01:34
+    - Mint with Dist::Zilla.

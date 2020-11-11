@@ -27,6 +27,12 @@ my $b = Module::Build->new(
     'Test2::API'      => 0,
      utf8             => 0,
    },
+  meta_merge =>
+   {resources =>
+     {repository => 'https://github.com/philiprbrenan/DataTableText',
+      bugtracker => 'https://github.com/philiprbrenan/DataTableText/issues'
+     }
+   },
  );
 
 $b->create_build_script();

@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.06    2020-11-01
+        [BUGFIXES]
+         * When restoring an HELEM we should sv_setsv() on it rather than
+           hv_store() so as not to create a new SV
+         * Ensure that `dynamically HELEM` preserves the svref identity of
+           existing elements (RT132545)
+         * Avoid upsetting -DDEBUGGING perls with complaints about SVs_PADTMP
+
 0.05    2020-07-06
         [CHANGES]
          * Added explicit use VERSION declarations to every perl file

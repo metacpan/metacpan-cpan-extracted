@@ -17,7 +17,7 @@
 # Boston, MA 02111-1307, USA.
 
 package Lingua::NATools::Client;
-our $VERSION = '0.7.10';
+our $VERSION = '0.7.12';
 
 use 5.006;
 use strict;

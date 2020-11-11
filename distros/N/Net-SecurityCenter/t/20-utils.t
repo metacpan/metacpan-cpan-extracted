@@ -13,8 +13,6 @@ foreach my $id ( sort { $a <=> $b } keys %{$Net::SecurityCenter::Utils::NESSUS_S
 
 cmp_ok( Net::SecurityCenter::Utils::trim(' trimmed '), 'eq', 'trimmed', 'Trimmed text' );
 
-cmp_ok( Net::SecurityCenter::Utils::decamelize('SecurityCenter'), 'eq', 'security_center', 'Decamelize text' );
-
 subtest(
     'SC Schedule' => sub {
 

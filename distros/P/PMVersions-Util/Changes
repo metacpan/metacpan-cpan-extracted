@@ -1,3 +1,9 @@
-0.001    2018-06-07 (PERLANCAR)
+0.002   2020-11-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] [ux] When pmversions file is not found,
+	  warn instead of die.
+
+
+0.001    2018-06-07  Released-By: PERLANCAR
 
          - First release, extracted from DZP-Prereqs-EnsureVersion.

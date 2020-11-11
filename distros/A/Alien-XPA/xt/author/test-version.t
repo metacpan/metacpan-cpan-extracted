@@ -11,7 +11,7 @@ my $params = {
     is_strict      => 0,
     has_version    => 1,
     multiple       => 0,
-
+    filename_match => [ 'XPA.pm' ],
 };
 
 push @imports, $params

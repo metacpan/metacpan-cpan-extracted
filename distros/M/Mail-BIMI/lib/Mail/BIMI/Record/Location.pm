@@ -1,6 +1,6 @@
 package Mail::BIMI::Record::Location;
 # ABSTRACT: Class to model a BIMI location
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -73,7 +73,7 @@ Mail::BIMI::Record::Location - Class to model a BIMI location
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -118,6 +118,10 @@ Is the location relevant
 is=rw
 
 Is this Location record valid
+
+=head2 warnings
+
+is=rw
 
 =head1 CONSUMES
 

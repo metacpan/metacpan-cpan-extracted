@@ -6,14 +6,14 @@ CLASSES
     Indent::Block - Class for block indenting.
     Indent::Data - Class for data indenting.
     Indent::String - Class for text indenting.
-    Indent::Word - Class for word indenting.
     Indent::Utils - Utilities for Indent classes.
+    Indent::Word - Class for word indenting.
 
 EXAMPLES
     See man pages of each class or module.
 
 REPOSITORY
-    <https://github.com/tupinek/Indent>
+    <https://github.com/michal-josef-spacek/Indent>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -21,8 +21,9 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2005-2018 Michal Josef Špaček
+    © 2005-2020 Michal Josef Špaček
+
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.07

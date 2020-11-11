@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.6.0'; # VERSION
+our $VERSION = 'v1.7.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -11,21 +11,16 @@ use warnings;
 use Carp;
 use Time::HiRes qw< gettimeofday tv_interval >;
 
-# From the O'Reilly Regular Expressions Cookbook 2E, sorta
-# https://www.safaribooksonline.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
-my $iso8601_timestamp = qr/^(?:
-    (?P<year>[0-9]{4})(?P<hyphen>-)?
-    (?P<month>1[0-2]|0[1-9])(?(<hyphen>)-)
+my $rfc3339_timestamp = qr/^(?:
+    (?P<year>[0-9]{4})-
+    (?P<month>1[0-2]|0[1-9])-
     (?P<day>3[01]|0[1-9]|[12][0-9])
-    (?:
-        [T ]
-        (?P<hour>2[0-3]|[01][0-9])(?(<hyphen>):)
-        (?P<minute>[0-5][0-9])(?(<hyphen>):)
-        (?P<second>[0-5][0-9])
-        (?: \. (?P<ms>\d+) )?
-    )?
-    | (?P<year>[0-9]{4})(?P<hyphen>-)?(?P<month>1[0-2]|0[1-9])
-    | (?P<year>[0-9]{4})
+    [tT ]
+    (?P<hour>2[0-3]|[01][0-9]):
+    (?P<minute>[0-5][0-9]):
+    (?P<second>[0-5][0-9]|60)
+    (?: \. (?P<ms>[0-9]+) )?
+    (?<tz> [-+][0-9]{2}:[0-9]{2} | [zZ] )
 )$/x;
 
 #pod =head1 SYNOPSIS
@@ -314,7 +309,9 @@ sub check {
 #pod
 #pod =item timestamp
 #pod
-#pod Expected to look like an ISO8601 timestamp.
+#pod Expected to look like an
+#pod L<RFC 3339 timestamp|https://tools.ietf.org/html/rfc3339>
+#pod which is a more strict subset of an ISO8601 timestamp.
 #pod
 #pod =back
 #pod
@@ -417,7 +414,7 @@ sub _summarize {
 
     if ( exists $result->{timestamp} ) {
         my $ts = $result->{timestamp};
-        unless ( defined $ts and $ts =~ /$iso8601_timestamp/ ) {
+        unless ( defined $ts and $ts =~ /$rfc3339_timestamp/ ) {
             my $disp_timestamp
                 = defined $ts
                 ? "invalid timestamp '$ts'"
@@ -465,7 +462,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.6.0
+version v1.7.0
 
 =head1 SYNOPSIS
 
@@ -686,7 +683,9 @@ lowercase ascii letters, numbers, and underscores.
 
 =item timestamp
 
-Expected to look like an ISO8601 timestamp.
+Expected to look like an
+L<RFC 3339 timestamp|https://tools.ietf.org/html/rfc3339>
+which is a more strict subset of an ISO8601 timestamp.
 
 =back
 

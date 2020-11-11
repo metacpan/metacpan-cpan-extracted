@@ -13,7 +13,7 @@ Alien::Base::Authoring - Authoring an Alien distribution using Alien::Base
 
 =head1 VERSION
 
-version 2.33
+version 2.37
 
 =head1 SYNOPSIS
 

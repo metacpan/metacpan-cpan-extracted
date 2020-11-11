@@ -14,7 +14,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime linker class
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 $ffi_prefix = 'wasmtime_linker_';
@@ -153,7 +153,7 @@ Wasm::Wasmtime::Linker - Wasmtime linker class
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

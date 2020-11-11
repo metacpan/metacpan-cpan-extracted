@@ -21,5 +21,7 @@ no_index:
     - inc
 requires:
   Tk: '800.022'
-version: '1.25'
+resources:
+  repository: https://github.com/asb-capfan/Tk-TableMatrix.git
+version: '1.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

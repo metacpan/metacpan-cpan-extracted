@@ -3,7 +3,7 @@ package Markdent::Regexes;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use List::AllUtils qw( uniq );
 
@@ -11,7 +11,8 @@ use base 'Exporter';
 
 our %EXPORT_TAGS = (
     block => [
-        qw( $HorizontalWS
+        qw(
+            $HorizontalWS
             $EmptyLine
             $EmptyLines
             $BlockStart

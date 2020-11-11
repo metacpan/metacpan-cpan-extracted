@@ -1,7 +1,7 @@
 ---
 abstract: 'Install the Map::Tube concrete metro modules.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
   Test::More: 0
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,42 +22,50 @@ no_index:
     - t
     - xt
 requires:
+  Map::Tube::Athens: 0.01
   Map::Tube::Barcelona: 0.37
   Map::Tube::Beijing: 0.01
   Map::Tube::Berlin: 0.14
+  Map::Tube::Bielefeld: 2020.033
   Map::Tube::Bucharest: 0.08
   Map::Tube::Budapest: 0.04
+  Map::Tube::Copenhagen: 0.04
   Map::Tube::Delhi: 0.43
   Map::Tube::Dnipropetrovsk: 0.05
+  Map::Tube::Frankfurt: 0.04
   Map::Tube::Glasgow: 0.07
   Map::Tube::Kazan: 0.04
   Map::Tube::Kharkiv: 0.05
   Map::Tube::Kiev: 0.05
   Map::Tube::KoelnBonn: 0.09
+  Map::Tube::Kolkatta: 0.33
   Map::Tube::KualaLumpur: 0.05
-  Map::Tube::London: 0.75
+  Map::Tube::London: 0.76
   Map::Tube::Lyon: 0.06
+  Map::Tube::Madrid: 0.39
   Map::Tube::Malaga: 0.15
+  Map::Tube::Milan: 0.005
   Map::Tube::Minsk: 0.05
   Map::Tube::Moscow: 0.07
   Map::Tube::NYC: 0.33
   Map::Tube::Nanjing: 0.04
   Map::Tube::NizhnyNovgorod: 0.03
   Map::Tube::Novosibirsk: 0.03
+  Map::Tube::Nuremberg: 0.06
   Map::Tube::Prague: 0.13
   Map::Tube::SaintPetersburg: 0.06
   Map::Tube::Samara: 0.06
   Map::Tube::Singapore: 0.03
-  Map::Tube::Sofia: 0.07
+  Map::Tube::Sofia: 0.08
   Map::Tube::Tbilisi: 0.04
-  Map::Tube::Tokyo: 0.22
-  Map::Tube::Vienna: 0.07
-  Map::Tube::Warsaw: 0.06
+  Map::Tube::Tokyo: 0.59
+  Map::Tube::Vienna: 0.08
+  Map::Tube::Warsaw: 0.07
   Map::Tube::Yekaterinburg: 0.05
   perl: 5.6.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Map-Tube-Metro
-  homepage: https://github.com/tupinek/Task-Map-Tube-Metro
+  homepage: https://github.com/michal-josef-spacek/Task-Map-Tube-Metro
   license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: git://github.com/tupinek/Task-Map-Tube-Metro
-version: '0.12'
+  repository: git://github.com/michal-josef-spacek/Task-Map-Tube-Metro
+version: '0.13'

@@ -45,13 +45,13 @@ no_index:
 provides:
   WWW::Mechanize:
     file: lib/WWW/Mechanize.pm
-    version: '2.02'
+    version: '2.03'
   WWW::Mechanize::Image:
     file: lib/WWW/Mechanize/Image.pm
-    version: '2.02'
+    version: '2.03'
   WWW::Mechanize::Link:
     file: lib/WWW/Mechanize/Link.pm
-    version: '2.02'
+    version: '2.03'
 requires:
   Carp: '0'
   Getopt::Long: '0'
@@ -76,7 +76,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/WWW-Mechanize/issues
   homepage: https://github.com/libwww-perl/WWW-Mechanize
   repository: https://github.com/libwww-perl/WWW-Mechanize.git
-version: '2.02'
+version: '2.03'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -365,7 +365,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.047'
@@ -373,7 +373,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.28.0
+          git_version: 2.29.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -469,7 +469,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -482,11 +482,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.02
+          tag: v2.03
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -524,7 +524,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -538,7 +538,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.047'

@@ -1,0 +1,50 @@
+=head1 NAME
+
+PerlIO::via::xz - PerlIO layer for XZ (de)compression
+
+=head1 SYNOPSIS
+
+    open my $fh, "<:via(xz)", "compressed_file";
+    my $uncompressed_data = <$fh>;
+
+    open my $fh, ">:via(xz)", "compressed_file";
+    print { $fh } $uncompressed_data;
+
+=head1 COPYING
+
+Recent changes can be (re)viewed in the public GIT repository at
+https://github.com/Tux/PerlIO-via-xz
+Feel free to clone your own copy:
+
+ $ git clone https://github.com/Tux/PerlIO-via-xz PerlIO-via-xz
+
+or get it as a tgz:
+
+ $ wget --output-document= PerlIO-via-xz.tgz \
+       https://github.com/Tux/ PerlIO-via-xz/archive/master.tar.gz
+
+=head1 PREREQUISITES
+
+perl5.12.0, IO::Compress::Xz, and IO::Uncompress::UnXz. Preferably
+a recent version.
+
+=head1 RESTRICTIONS
+
+This version can not deal with C<$/ = undef;>
+
+=head1 DESCRIPTION
+
+See C<perldoc PerlIO::via::xz>.
+
+=head1 AUTHOR
+
+H.Merijn Brand <hmbrand@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020-2020 H.Merijn Brand. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

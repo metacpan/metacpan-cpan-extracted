@@ -17,7 +17,7 @@ WriteMakefile(
         'Test::Pod' => '1.0',
         'Test::Pod::Coverage' => '1.08',
     },
-    AUTHOR         => 'Alex Becker <c a p f a n _a-t_ g m x write_Adot-here d e - i n v a l l i d>',
+    AUTHOR         => 'Alex Becker <asb@cpan.org>',
     LICENSE        => 'perl_5',
     dist           => { COMPRESS => "gzip", SUFFIX => "gz" },
     META_MERGE     => {

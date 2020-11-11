@@ -21,7 +21,7 @@ name: Parallel-ForkManager-Segmented
 provides:
   Parallel::ForkManager::Segmented:
     file: lib/Parallel/ForkManager/Segmented.pm
-    version: v0.10.0
+    version: v0.10.1
 requires:
   Parallel::ForkManager: '0'
   Parallel::ForkManager::Segmented::Base: v0.4.0
@@ -33,10 +33,10 @@ resources:
   bugtracker: https://github.com/shlomif/parallel-forkmanager-segmented/issues
   homepage: http://metacpan.org/release/Parallel-ForkManager-Segmented
   repository: https://github.com/shlomif/perl-Parallel-ForkManager-Segmented.git
-version: 0.10.0
+version: 0.10.1
 x_Dist_Zilla:
   perl:
-    version: '5.030003'
+    version: '5.032000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -91,7 +91,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '9'
       name: '@Filter/RunExtraTests'
       version: '0.029'
     -
@@ -146,7 +146,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ModuleBuild
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '9'
       name: '@Filter/ModuleBuild'
       version: '6.015'
     -
@@ -384,6 +384,6 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.015'
-x_generated_by_perl: v5.30.3
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

@@ -893,6 +893,44 @@ Args:
     is $stdout, $expected;
 };
 
+subtest 'command help hash' => sub {
+    local @ARGV;
+    push @ARGV, qw(register --help);
+
+    my $kingpin = Getopt::Kingpin->new;
+    $kingpin->terminate(sub {return @_});
+    my $verbose = $kingpin->flag("verbose", "set verbose mode")->bool;
+
+    my $register = $kingpin->command('register', 'Register a new user.');
+    $register->flag('test1', 'Test 1.')->string_hash;
+    $register->flag('test2', 'Test 2.')->placeholder('VAL')->string_hash;
+    $register->flag('test3', 'Test 3.')->placeholder('K=V')->string_hash;
+    $register->arg('test4', 'Test 4.')->string_hash;
+
+    my $expected = sprintf <<'...', basename($0);
+usage: %s register [<flags>] [<KEY=test4>]
+
+Register a new user.
+
+Flags:
+  --help             Show context-sensitive help.
+  --verbose          set verbose mode
+  --test1 KEY=VALUE  Test 1.
+  --test2 KEY=VAL    Test 2.
+  --test3 K=V        Test 3.
+
+Args:
+  [<KEY=test4>]  Test 4.
+
+...
+
+    my ($stdout, $stderr, $ret, $exit) = capture {
+        $kingpin->parse;
+    };
+    is $exit, 0;
+    is $stdout, $expected;
+};
+
 
 done_testing;
 

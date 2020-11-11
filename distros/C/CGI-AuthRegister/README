@@ -1,8 +1,5 @@
-<? read_starfish_conf(); echo &readme_line(); !>
-#+
-CGI::AuthRegister version 1.1
+CGI::AuthRegister version 1.4
 =============================
-#-
 
 The CGI::AuthRegister module provides a simple, transparent, and
 flexible framework for authentication and registration of users
@@ -31,7 +28,7 @@ No significant dependencies.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2012-18 Vlado Keselj http://web.cs.dal.ca/~vlado
+Copyright 2012-20 Vlado Keselj http://vlado.ca
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under

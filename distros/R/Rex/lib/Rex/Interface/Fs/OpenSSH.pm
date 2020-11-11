@@ -6,10 +6,11 @@
 
 package Rex::Interface::Fs::OpenSSH;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Rex::Helper::File::Stat;
 use Rex::Interface::Exec;

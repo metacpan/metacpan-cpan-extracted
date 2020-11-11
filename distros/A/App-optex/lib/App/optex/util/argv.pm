@@ -18,9 +18,33 @@ sub argv (&) {
     @$argv = $sub->(@$argv);
 }
 
+my %options = (
+    "move"   => "\$<move(\$<shift>)>",
+    "remove" => "\$<remove(\$<shift>)>",
+    "copy"   => "\$<copy(\$<shift>)>",
+    "exch"   => "\$<move(1,1)>",
+    "times"     => "-M__PACKAGE__::times(count=\$<shift>) \$<move>",
+    "reverse"   => "-M__PACKAGE__::reverse() \$<move>",
+    "collect"   => "-M__PACKAGE__::collect(index=\$<shift>) \$<move>",
+    );
+
+sub enable {
+    my %opt = @_;
+    if ($opt{':all'}) {
+	map { $opt{$_} //= 1 } keys %options;
+    }
+    for my $name (keys %opt) {
+	my $value = $options{$name} or next;
+	if ($opt{$name} ne "1") {
+	    $name = $opt{$name};
+	}
+	$mod->setopt("--$name", $value);
+    }
+}
+
 =head1 NAME
 
-util - optex argument utility modules
+util::argv - optex argument utility modules
 
 =head1 SYNOPSIS
 
@@ -37,7 +61,7 @@ is assigned for the name without value.
 
 In this example,
 
-    optex -Mutil::function(debug,message=hello,count=3)
+    optex -Mutil::argv::function(debug,message=hello,count=3)
 
 option I<debug> has value 1, I<message> has string "hello", and
 I<count> also has string "3".
@@ -53,11 +77,12 @@ I<count> also has string "3".
 
 sub times {
     my %opt = @_;
-    my $count = $opt{count} // 2;
+    my $count  = $opt{count}  // 2;
+    my $suffix = $opt{suffix} // '';
+    my $prefix = $opt{prefix} // '';
     argv {
 	map {
-	    my $dup = $opt{suffix} // '';
-	    ( $_, ($_ . $dup) x ($count - 1) );
+	    ( $_, ($prefix.$_.$suffix) x ($count - 1) );
 	} @_;
     }
 }
@@ -66,12 +91,12 @@ sub times {
 
 Multiply each arguments.  Default I<count> is 2.
 
-    % optex echo -Mutil::times(count=3) 1 2 3
+    % optex echo -Mutil::argv::times(count=3) 1 2 3
     1 1 1 2 2 2 3 3 3
 
 Put I<suffix> to duplicated arguments.
 
-    % optex echo -Mutil::times(suffix=.bak) a b c
+    % optex echo -Mutil::argv::times(suffix=.bak) a b c
     a a.bak b b.bak c c.bak
 
 =cut
@@ -85,6 +110,28 @@ sub reverse {
 =item B<reverse>()
 
 Reverse arguments.
+
+=cut
+
+######################################################################
+
+sub collect {
+    my %opt = @_;
+    my @index = $opt{index} =~ /\d+/g;
+    argv {
+	@_[ grep { $_ <= $#_ } map { $_ - 1 } @index ];
+    };
+}
+
+=item B<collect>(index=2:4:6)
+
+Collect arguments.
+
+    % optex echo -Mutil::argv::collect(index=2:4:6) 1 2 3 4 5 6
+
+will print:
+
+    2 4 6
 
 =cut
 
@@ -113,10 +160,72 @@ Process substitution.
 
     % optex diff -Mutil::argv::proc= '<(date)' '<(date -u)'
 
+=back
+
 =cut
 
 ######################################################################
 ######################################################################
+
+=head1 OPTIONS
+
+Several options are prepared and enabled by request.  To enable
+specific option, use B<enable> function like this to enable B<--move>
+and B<--copy> options.
+
+    -Mutil::argv::enable=move,copy
+
+Parameter B<:all> can be used to enable everything.
+
+    -Mutil::argv::enable=:all
+
+You can use alternative names:
+
+    -Mutil::argv::enable(move=mynove,copy=mycopy)
+
+=over 4
+
+=item B<--move>   I<param>
+
+=item B<--remove> I<param>
+
+=item B<--copy>   I<param>
+
+These options are converted C<< $<command(param)> >> notation, where
+I<param> is B<offset> or B<offset>,B<length>.
+
+B<--move 0> moves all following arguments there, B<--remove 0> just
+removes them, and B<--copy 0> copies them.
+
+B<--move 0,1> moves following argument (which does not change
+anything), and B<--move 1,1> moves second argument (exchange following
+two).
+
+B<--move -1> moves the last argument.
+
+B<--copy 0,1> duplicates the next.
+
+=item B<--exch>
+
+Exchanges following two arguments.  This is same as B<--move 1,1>.
+
+    optex -Mutil::argv::enable=exch echo --exch foo bar
+
+will print:
+
+    bar foo
+
+=back
+
+Following options are interface for builtin functions.
+
+=over 4
+
+=item B<--times> I<count>
+
+=item B<--reverse>
+
+=item B<--collect> I<index>
 
 =back
 

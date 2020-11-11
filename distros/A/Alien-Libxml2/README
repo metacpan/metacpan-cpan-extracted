@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.16
+    version 0.17
 
 SYNOPSIS
 
@@ -16,7 +16,7 @@ SYNOPSIS
      WriteMakefile(
        Alien::Base::Wrapper->new('Alien::Libxml2')->mm_args2(
          # MakeMaker args
-         NAME => 'Kafka::Librd',
+         NAME => 'My::XS',
          ...
        ),
      );

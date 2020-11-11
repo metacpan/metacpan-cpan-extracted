@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.13.0';
+$Git::Hooks::CheckReference::VERSION = '2.14.0';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -133,7 +133,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.13.0
+version 2.14.0
 
 =head1 SYNOPSIS
 
@@ -159,7 +159,7 @@ may configure it in a Git configuration file like this:
     acl = allow CRUD ^refs/tags/ by @cms
 
     # Users may maintain personal branches under user/<username>/
-    acl = allow CRUD ^refs/heads/user/{USER}/
+    acl = allow CRUD ^refs/heads/user/{GITHOOKS_AUTHENTICATED_USER}/
 
     # Users may only update the vetted branch names
     acl = allow U    ^refs/heads/(?:feature|release|hotfix)/

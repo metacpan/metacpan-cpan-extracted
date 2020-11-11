@@ -19,19 +19,19 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.45'
+    version: '0.46'
   Future::AsyncAwait::Awaitable:
     file: lib/Future/AsyncAwait/Awaitable.pm
-    version: '0.45'
+    version: '0.46'
   Test::Future::AsyncAwait::Awaitable:
     file: lib/Test/Future/AsyncAwait/Awaitable.pm
-    version: '0.45'
+    version: '0.46'
 requires:
-  Future: '0'
+  Future: '0.43'
   XS::Parse::Sublike: '0.10'
   perl: '5.016'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.45'
+version: '0.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

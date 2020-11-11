@@ -24,10 +24,11 @@ With this module you can define hostgroups out of an DBI source.
 
 package Rex::Group::Lookup::DBI;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Rex -base;
 use Carp;

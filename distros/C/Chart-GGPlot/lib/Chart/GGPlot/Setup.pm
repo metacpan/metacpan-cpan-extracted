@@ -5,7 +5,7 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.0009'; # VERSION
+our $VERSION = '0.0011'; # VERSION
 
 use utf8;
 use feature ':5.16';
@@ -28,7 +28,7 @@ use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
 use MooseX::Aliases           ();
-use MooseX::MungeHas          ();
+use MooseX::MungeHas 0.011;
 use MooseX::StrictConstructor ();
 use boolean                   ();
 
@@ -165,7 +165,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.0009
+version 0.0011
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

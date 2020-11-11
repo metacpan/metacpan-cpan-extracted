@@ -15,19 +15,21 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '20200218'
+    version: '20201031'
   ditaSyntaxDiagramFromDocBookCmdSynopsis:
     file: lib/Data/Edit/Xml.pm
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20200218'
+  Data::Table::Text: '20201029'
   Storable: '0'
   Test2::API: '0'
   Test::More: '0'
   XML::Parser: '0'
   utf8: '0'
 resources:
+  bugtracker: https://github.com/philiprbrenan/DataEditXml/issues
   license: http://dev.perl.org/licenses/
-version: '20200218'
+  repository: https://github.com/philiprbrenan/DataEditXml
+version: '20201031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

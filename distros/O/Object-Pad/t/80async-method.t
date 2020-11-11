@@ -56,4 +56,16 @@ BEGIN {
    is( $fret->get, "result", '$fret for await in async method' );
 }
 
+# RT133564
+{
+   # Hard to test this one but running the test itself shouldn't produce any
+   # warnings of "Attempt to free unreferenced scalar ..."
+   my $thunker = Thunker->new;
+   eval {
+      my $f = $thunker->thunk( Future->new );
+      die "Oopsie\n";
+   };
+   ok( 1, "No segfault for RT133564 test" );
+}
+
 done_testing;

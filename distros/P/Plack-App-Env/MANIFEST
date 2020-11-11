@@ -20,5 +20,6 @@ README
 SIGNATURE
 t/Plack-App-Env/01-use.t
 t/Plack-App-Env/02-version.t
+t/Plack-App-Env/03-general.t
 xt/Plack-App-Env/01-pod_coverage.t
 xt/Plack-App-Env/02-pod.t

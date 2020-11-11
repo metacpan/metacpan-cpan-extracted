@@ -3,7 +3,14 @@ abstract: 'Send notifications to Google Chat Rooms'
 author:
   - 'I Gibbs (igibbs@cpan.org)'
 build_requires:
+  Data::Dump: '0'
+  Encode: '0'
   ExtUtils::MakeMaker: '0'
+  Test2::Bundle::More: '0'
+  Test2::Tools::Class: '0'
+  Test2::Tools::ClassicCompare: '0'
+  Test2::Tools::Exception: '0'
+  Test::HTTP::MockServer: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,6 +25,10 @@ no_index:
     - t
     - inc
 requires:
-  Test::Simple: '0.44'
-version: '0.02'
+  Class::Tiny: '0'
+  Data::Validate::URI: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Try::Tiny: '0'
+version: '0.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

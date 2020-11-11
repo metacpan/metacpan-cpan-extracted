@@ -35,6 +35,9 @@ subtest parse_getopt_long_opt_spec => sub {
         parse_getopt_long_opt_spec('inc+'),
         {dash_prefix=>'', opts=>['inc'], is_inc=>1});
     is_deeply(
+        parse_getopt_long_opt_spec('num:1'),
+        {dash_prefix=>'', opts=>['num'], optnum=>1, type=>'i', desttype=>''});
+    is_deeply(
         parse_getopt_long_opt_spec('<>'),
         {is_arg=>1, dash_prefix=>'', opts=>[]});
 };

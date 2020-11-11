@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::Depends: '0.405'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/chocolateboy/true/issues
   repository: https://github.com/chocolateboy/true
-version: v1.0.1
+version: v1.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

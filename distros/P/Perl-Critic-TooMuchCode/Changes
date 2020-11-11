@@ -1,6 +1,13 @@
+0.14
+	- Released at 2020-10-29T09:26:59+0900
+	- ProhibitUnusedImport: Make %special_modules settable via an ignored_modules attribute. Github PR #17
+	- ProhibitUnusedImport: Allow for is_ and to_ prefixes with Moose type imports. Github PR #16
+	- ProhibitUnusedImport: Recognize subroutine references as used imports. Github PR #15
+        - ProhibitUnusedImport: Ignore a few modules for good. Github PR #12, #17.
+
 0.13
 	- Released at 2019-12-16T10:07:08+0900
-        - New policy: ProhibitDuplicateLiteral
+	- New policy: ProhibitDuplicateLiteral
 
 0.12
 	- Released at 2019-01-11T16:57:36+0900

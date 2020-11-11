@@ -59,7 +59,7 @@ the unit file. For details, see above.
 Units listed in this option will be started if the configuring unit is. However, if the listed
 units fail to start or cannot be added to the transaction, this has no impact on the validity of the
 transaction as a whole, and this unit will still be started. This is the recommended way to hook
-start-up of one unit to the start-up of another unit.
+the start-up of one unit to the start-up of another unit.
 
 Note that requirement dependencies do not influence the order in which services are started or
 stopped. This has to be configured independently with the C<After> or
@@ -175,7 +175,7 @@ unit that is conflicted is stopped. I< Optional. Type list of uniline.  >
 These two settings expect a space-separated list of unit names. They may be specified
 more than once, in which case dependencies for all listed names are created.
 
-Those two setttings configure ordering dependencies between units. If unit
+Those two settings configure ordering dependencies between units. If unit
 C<foo.service> contains the setting C<Before=bar.service> and both
 units are being started, C<bar.service>'s start-up is delayed until
 C<foo.service> has finished starting up. C<After> is the inverse
@@ -184,7 +184,7 @@ is started before the listed unit begins starting up, C<After> ensures the oppos
 that the listed unit is fully started up before the configured unit is started.
 
 When two units with an ordering dependency between them are shut down, the inverse of the
-start-up order is applied. i.e. if a unit is configured with C<After> on another
+start-up order is applied. I.e. if a unit is configured with C<After> on another
 unit, the former is stopped before the latter if both are shut down. Given two units with any
 ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
 is ordered before the start-up. It doesn't matter if the ordering dependency is
@@ -195,20 +195,25 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success.
+success. Note that this does includes C<ExecStartPost> (or
+C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
 configured by C<Requires>, C<Wants>, C<Requisite>,
 or C<BindsTo>. It is a common pattern to include a unit name in both the
 C<After> and C<Wants> options, in which case the unit listed will
-be started before the unit that is configured with these options. I< Optional. Type list of uniline.  > 
+be started before the unit that is configured with these options.
+
+Note that C<Before> dependencies on device units have no effect and are not
+supported.  Devices generally become available as a result of an external hotplug event, and systemd
+creates the corresponding device unit without delay. I< Optional. Type list of uniline.  > 
 
 =head2 After
 
 These two settings expect a space-separated list of unit names. They may be specified
 more than once, in which case dependencies for all listed names are created.
 
-Those two setttings configure ordering dependencies between units. If unit
+Those two settings configure ordering dependencies between units. If unit
 C<foo.service> contains the setting C<Before=bar.service> and both
 units are being started, C<bar.service>'s start-up is delayed until
 C<foo.service> has finished starting up. C<After> is the inverse
@@ -217,7 +222,7 @@ is started before the listed unit begins starting up, C<After> ensures the oppos
 that the listed unit is fully started up before the configured unit is started.
 
 When two units with an ordering dependency between them are shut down, the inverse of the
-start-up order is applied. i.e. if a unit is configured with C<After> on another
+start-up order is applied. I.e. if a unit is configured with C<After> on another
 unit, the former is stopped before the latter if both are shut down. Given two units with any
 ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
 is ordered before the start-up. It doesn't matter if the ordering dependency is
@@ -228,13 +233,18 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success.
+success. Note that this does includes C<ExecStartPost> (or
+C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
 configured by C<Requires>, C<Wants>, C<Requisite>,
 or C<BindsTo>. It is a common pattern to include a unit name in both the
 C<After> and C<Wants> options, in which case the unit listed will
-be started before the unit that is configured with these options. I< Optional. Type list of uniline.  > 
+be started before the unit that is configured with these options.
+
+Note that C<Before> dependencies on device units have no effect and are not
+supported.  Devices generally become available as a result of an external hotplug event, and systemd
+creates the corresponding device unit without delay. I< Optional. Type list of uniline.  > 
 
 =head2 OnFailure
 
@@ -307,7 +317,7 @@ L<systemctl(1)>'s
 C<--job-mode=> option for details on the
 possible values. If this is set to C<isolate>,
 only a single unit may be listed in
-C<OnFailure>.. I< Optional. Type uniline.  > 
+C<OnFailure>. I< Optional. Type uniline.  > 
 
 Note: OnFailureJobMode is migrated with 'C<$unit>' and with: 
 
@@ -323,11 +333,10 @@ C<$unit> => C<- OnFailureIsolate>
 
 =head2 IgnoreOnIsolate
 
-Takes a boolean argument. If C<true>, this unit
-will not be stopped when isolating another unit. Defaults to
-C<false> for service, target, socket, busname, timer, and path
-units, and C<true> for slice, scope, device, swap, mount, and
-automount units. I< Optional. Type boolean.  > 
+Takes a boolean argument. If C<true>, this unit will not be stopped
+when isolating another unit. Defaults to C<false> for service, target, socket, timer,
+and path units, and C<true> for slice, scope, device, swap, mount, and automount
+units. I< Optional. Type boolean.  > 
 
 =head2 StopWhenUnneeded
 
@@ -477,9 +486,9 @@ I< Optional. Type uniline.  >
 =head2 StartLimitAction
 
 Configure an additional action to take if the rate limit configured with
-C<StartLimitIntervalSec> and C<StartLimitBurst> is hit.  Takes the same
-values as the setting C<FailureAction>/C<SuccessAction> settings and executes
-the same actions. If C<none> is set, hitting the rate limit will trigger no action besides that
+C<StartLimitIntervalSec> and C<StartLimitBurst> is hit. Takes the same
+values as the C<FailureAction>/C<SuccessAction> settings. If
+C<none> is set, hitting the rate limit will trigger no action except that
 the start will not be permitted. Defaults to C<none>. I< Optional. Type enum. choice: 'none', 'reboot', 'reboot-force', 'reboot-immediate', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'exit', 'exit-force'.  > 
 
 =head2 SourcePath
@@ -560,6 +569,7 @@ C<docker>,
 C<podman>,
 C<rkt>,
 C<wsl>,
+C<proot>,
 C<acrn> to test
 against a specific implementation, or
 C<private-users> to check whether we are running in a user namespace. See
@@ -603,6 +613,20 @@ fixes from newer upstream kernels into older versions provided by distributions.
 is inherently unportable and should not be used for units which may be used on different
 distributions. I< Optional. Type list of uniline.  > 
 
+=head2 ConditionEnvironment
+
+C<ConditionEnvironment> may be used to check whether a specific
+environment variable is set (or if prefixed with the exclamation mark — unset) in the service
+manager's environment block.
+The argument may be a single word, to check if the variable with this name is defined in the
+environment block, or an assignment
+(C<name=value>), to check if
+the variable with this exact value is defined. Note that the environment block of the service
+manager itself is checked, i.e. not any variables defined with C<Environment> or
+C<EnvironmentFile>, as described above. This is particularly useful when the
+service manager runs inside a containerized environment or as per-user service manager, in order to
+check for variables passed in by the enclosing container manager or PAM. I< Optional. Type list of uniline.  > 
+
 =head2 ConditionSecurity
 
 C<ConditionSecurity> may be used to check whether the given
@@ -633,7 +657,7 @@ disconnected from a power source. I< Optional. Type list of uniline.  >
 =head2 ConditionNeedsUpdate
 
 Takes one of C</var> or C</etc> as argument,
-possibly prefixed with a C<!> (to inverting the condition). This condition may be
+possibly prefixed with a C<!> (to invert the condition). This condition may be
 used to conditionalize units on whether the specified directory requires an update because
 C</usr>'s modification time is newer than the stamp file
 C<.updated> in the specified directory. This is useful to implement offline
@@ -642,7 +666,14 @@ of C</etc> or C</var> on the next following boot. Units making
 use of this condition should order themselves before
 L<systemd-update-done.service(8)>,
 to make sure they run before the stamp file's modification time gets reset indicating a completed
-update. I< Optional. Type list of enum.  > 
+update.
+
+If the C<systemd.condition-needs-update=> option is specified on the kernel
+command line (taking a boolean), it will override the result of this condition check, taking
+precedence over any file modification time checks. If it is used
+C<systemd-update-done.service> will not have immediate effect on any following
+C<ConditionNeedsUpdate> checks, until the system is rebooted where the kernel
+command line option is not specified anymore. I< Optional. Type list of enum.  > 
 
 =head2 ConditionFirstBoot
 
@@ -650,7 +681,11 @@ Takes a boolean argument. This condition may be used to conditionalize units on
 whether the system is booting up with an unpopulated C</etc> directory
 (specifically: an C</etc> with no C</etc/machine-id>). This may
 be used to populate C</etc> on the first boot after factory reset, or when a new
-system instance boots up for the first time. I< Optional. Type list of boolean.  > 
+system instance boots up for the first time.
+
+If the C<systemd.condition-first-boot=> option is specified on the kernel
+command line (taking a boolean), it will override the result of this condition check, taking
+precedence over C</etc/machine-id> existence checks. I< Optional. Type list of boolean.  > 
 
 =head2 ConditionPathExists
 
@@ -689,6 +724,15 @@ point. I< Optional. Type list of uniline.  >
 C<ConditionPathIsReadWrite> is similar to
 C<ConditionPathExists> but verifies that the underlying file system is readable
 and writable (i.e. not mounted read-only). I< Optional. Type list of uniline.  > 
+
+=head2 ConditionPathIsEncrypted
+
+C<ConditionPathIsEncrypted> is similar to
+C<ConditionPathExists> but verifies that the underlying file system's backing
+block device is encrypted using dm-crypt/LUKS. Note that this check does not cover ext4
+per-directory encryption, and only detects block level encryption. Moreover, if the specified path
+resides on a file system on top of a loopback block device, only encryption above the loopback device is
+detected. It is not detected whether the file system backing the loopback block device is encrypted. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionDirectoryNotEmpty
 

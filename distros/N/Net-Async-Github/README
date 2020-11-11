@@ -85,6 +85,22 @@ METHODS
 
     Resolves to the current status.
 
+ create_pr
+
+    Creates a new pull request.
+
+    Takes the following named parameters:
+
+      * owner - which organisation owns the target repository
+
+      * repo - the repository to raise the PR against
+
+      * head - head commit starting point, typically the latest commit on
+      your fork's branch
+
+      * base - base commit this PR applies changes to typically you'd want
+      the target repo master
+
  user
 
     Returns information about the given user.

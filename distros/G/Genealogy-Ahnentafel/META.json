@@ -4,13 +4,13 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Genealogy-Ahnentafel",
    "no_index" : {
@@ -41,6 +41,13 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "v1.0.1"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/genealogy-ahnentafel.git",
+         "web" : "https://github.com/davorg/genealogy-ahnentafel"
+      }
+   },
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

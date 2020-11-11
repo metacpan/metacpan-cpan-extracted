@@ -5,13 +5,13 @@ use strict;
 use warnings;
 
 require Exporter;
-require DynaLoader;
+use XSLoader ();
 
 use vars qw/ @ISA $VERSION @EXPORT_OK @EXPORT /;
 
-@ISA = qw(Exporter DynaLoader);
+@ISA = qw(Exporter);
 
-$VERSION = 1.800;
+$VERSION = 2.000;
 
 # Items to export into caller's namespace by default
 @EXPORT = qw(crc32);
@@ -19,6 +19,6 @@ $VERSION = 1.800;
 # Other items we are prepared to export if requested
 @EXPORT_OK = qw();
 
-bootstrap String::CRC32;
+XSLoader::load( 'String::CRC32', $VERSION );
 
 1;

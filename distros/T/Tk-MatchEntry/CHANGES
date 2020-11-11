@@ -1,0 +1,50 @@
+Release 0.5     2020-10-29
+
+* added code to Github repo
+* reworked Makefile.PL to reduce Makefile complexity and make dependencies known
+* fix RT #14054: documentation issues, incl.  sample code
+* fix RT #130554: Undeclared configure_requires dependency Tk::MMutil
+* improve POD and README
+* minor code updates (replace use vars, use strict in Makefile)
+
+
+Release 0.4     2005-06-30
+
+* Applied a patch by Ingo Herschmann which fixes a bug with unquoted regexes
+
+
+Release 0.3     2005-03-14
+
+* Added support for current Perl/Tk version. (RT #7351)
+* Minor metadata updates
+
+
+Release 0.2     2003-04-08
+
+* Added multi-match mode which allows auto-completion on a per-word 
+  base instead of the all-or-nothing auto-completion in regular mode.
+* Added -sortcmd callback which can be used to sort the choices array
+  instead of the default alphabetical sorting.
+  This change also includes the new options "-autosort" and 
+  "-sorttrigger" as well as the new method "resort()".
+* Added the "-matchprefix" option which allows matching a choice like
+  http://www.cpan.org by just typing www.cpan.org or cpan.org . See
+  documentation for examples.
+* Added the "-wraparound" option which influences the behavior of 
+  using the cursor up/down keys when already at begin/end of the
+  popup listbox. Also added two additional callbacks, "-bottomcmd"
+  and "-topcmd", which are called if the user presses cursor-down
+  while being already at bottom of the listbox, or presses
+  cursor-up while being at the top entry already, respectively.
+* Please have a look at the documentation for details and examples.
+
+
+Release 0.1     2003-01-30
+
+* Improved support for case-insensitive matching, added 0/1-length callbacks
+* added auto-completion and auto-popup functionality,
+* added callbacks for enter and tab,
+* basic keyboard event bindings done
+* basic entry + listbox functionality added, based on Tk::BrowseEntry source
+* Added POD, added <FocusOut> bind
+* initial version/commit 2003/01/25 10:42:19

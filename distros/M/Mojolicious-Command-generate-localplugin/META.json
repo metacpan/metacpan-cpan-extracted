@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Command-generate-localplugin",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "Mojolicious::Command::Author::generate::localplugin" : {
          "file" : "lib/Mojolicious/Command/Author/generate/localplugin.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -52,7 +52,7 @@
          "web" : "http://github.com/reneeb/Mojolicious-Command-generate-localplugin"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

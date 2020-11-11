@@ -9,7 +9,7 @@ use Moo;
 
 use Text::ASCIITable 0.22;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has cols => (
     is  => 'rwp',
@@ -63,6 +63,9 @@ sub parse {
         my @rows = map{
             $_ =~ s{\A\|\s+}{};
             $_ =~ s{\s+\|$}{};
+
+            $_ .= ' ' if '|' eq substr $_, -1;
+
             [ split /\s+\|\s+/, $_ ];
         } @lines;
 
@@ -123,7 +126,7 @@ Markdown::Table - Create and parse tables in Markdown
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

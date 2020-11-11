@@ -9,7 +9,7 @@ use Test::More;
 {
   require Net::Curl;
   my %libcurl = map { split '/' } split ' ', Net::Curl::version;
-  unless ( grep /SSL/i, keys %libcurl ) {
+  unless ( grep /(SSL|TLS)/i, keys %libcurl ) {
     plan skip_all => 'libcurl not built with SSL support';
   }
 }
@@ -24,7 +24,7 @@ sub client_start {
   DEBUG and warn "client starting...\n";
 
   my $secure_request = GET(
-    'https://thirdlobe.com/',
+    'https://www.google.com/',
     Connection => 'close',
   );
   $kernel->post(
@@ -56,7 +56,7 @@ sub client_got_response {
     warn "`", '-' x 78, "\n";
   };
 
-  is ($http_response->code, 200, 'Got OK response');
+  like ($http_response->code, qr/^[23]\d{2}$/, 'Got OK response');
 
   $kernel->post( weeble => 'shutdown' );
 }

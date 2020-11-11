@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -168,16 +168,20 @@ __END__
 =head1 SYNOPSIS
 
  use Indent::Word;
- my $indent = Indent::Word->new(%parameters);
- $indent->indent('text text text');
+
+ my $obj = Indent::Word->new(%parameters);
+ my $string = $obj->indent('text text text');
+ my @data = $obj->indent('text text text');
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Indent::Word->new(%parameters);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -203,13 +207,20 @@ __END__
 
 =back
 
-=item C<indent($data, [$indent, $non_indent])>
+=head2 C<indent>
 
- Indent text by words to line_size block size.
+ my $string = $obj->indent('text text text');
+
+or
+
+ my @data = $obj->indent('text text text');
+
+Indent text by words to line_size block size.
+
  $act_indent - Actual indent string. Will be in each output string.
  $non_indent - Is flag for non indenting. Default is 0.
 
-=back
+Returns string or array with data to print.
 
 =head1 ERRORS
 
@@ -304,7 +315,7 @@ line wrapping to form simple paragraphs
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Indent>
+L<https://github.com/michal-josef-spacek/Indent>
 
 =head1 AUTHOR
 
@@ -314,11 +325,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2005-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

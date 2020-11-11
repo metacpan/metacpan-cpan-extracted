@@ -42,15 +42,16 @@
             "Modern::Perl" : "0",
             "Module::Load" : "0",
             "Moose" : "0",
+            "Sort::Naturally" : "0",
             "Time::localtime" : "0",
-            "Util::Medley" : "0",
             "YAML" : "0",
             "YAML::Tiny" : "1.73",
+            "namespace::autoclean" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.65,
+   "version" : 0.68,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

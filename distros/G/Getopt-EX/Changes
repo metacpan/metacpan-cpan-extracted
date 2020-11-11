@@ -1,5 +1,17 @@
 Revision history for Perl extension Getopt-EX
 
+v1.21.0 2020-11-07T12:23:35Z
+
+    - Official release of new function interface.
+
+v1.20_2 2020-10-29T08:14:22Z
+
+    - Release test.
+
+v1.020_001 2020-10-29T08:02:39Z
+
+    - Allow nested parenthesis in funciton parameter value.
+
 v1.20.0 2020-10-07T01:48:46Z
 
     - Add 'mode' section in Module.pm document.

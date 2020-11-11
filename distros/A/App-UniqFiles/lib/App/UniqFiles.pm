@@ -1,9 +1,9 @@
 package App::UniqFiles;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-28'; # DATE
+our $DATE = '2020-06-01'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.131'; # VERSION
+our $VERSION = '0.132'; # VERSION
 
 use 5.010001;
 use strict;
@@ -176,7 +176,7 @@ Some Digest algorithms require arguments, you can pass them here.
 _
             cmdline_aliases => {A=>{}},
         },
-        count => {
+        show_count => {
             schema => [bool => {default=>0}],
             summary => "Whether to return each file content's ".
                 "number of occurence",
@@ -186,7 +186,7 @@ _
 duplicate, and so on.
 
 _
-            cmdline_aliases => {c=>{}},
+            cmdline_aliases => {count=>{}, c=>{}},
         },
     },
     examples => [
@@ -243,7 +243,7 @@ sub uniq_files {
     my $recurse          = $args{recurse};
     my $report_unique    = $args{report_unique}    // 1;
     my $report_duplicate = $args{report_duplicate} // 2;
-    my $count            = $args{count}            // 0;
+    my $show_count       = $args{show_count}       // 0;
     my $show_digest      = $args{show_digest}      // 0;
     my $show_size        = $args{show_size}        // 0;
     my $digest_args      = $args{digest_args};
@@ -375,13 +375,13 @@ sub uniq_files {
 
         # add separator row
         if ($group_by_digest && defined $last_digest && $digest ne $last_digest) {
-            push @rows, ($count || $show_digest || $show_size) ? {} : '';
+            push @rows, ($show_count || $show_digest || $show_size) ? {} : '';
         }
 
         my $row;
-        if ($count || $show_digest || $show_size) {
+        if ($show_count || $show_digest || $show_size) {
             $row = {file=>$f};
-            $row->{count} = $file_counts{$f} if $count;
+            $row->{count} = $file_counts{$f} if $show_count;
             $row->{digest} = $file_digests{$f} if $show_digest;
             $row->{size} = $file_sizes{$f} if $show_size;
         } else {
@@ -411,7 +411,7 @@ App::UniqFiles - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.131 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2020-05-28.
+This document describes version 0.132 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2020-06-01.
 
 =head1 SYNOPSIS
 
@@ -452,13 +452,6 @@ means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
 
-=item * B<count> => I<bool> (default: 0)
-
-Whether to return each file content's number of occurence.
-
-1 means the file content is only encountered once (unique), 2 means there is one
-duplicate, and so on.
-
 =item * B<digest_args> => I<array>
 
 Some Digest algorithms require arguments, you can pass them here.
@@ -497,6 +490,13 @@ If set to 0, duplicate items will not be returned.
 =item * B<report_unique> => I<bool> (default: 1)
 
 Whether to return unique items.
+
+=item * B<show_count> => I<bool> (default: 0)
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
 
 =item * B<show_digest> => I<bool>
 

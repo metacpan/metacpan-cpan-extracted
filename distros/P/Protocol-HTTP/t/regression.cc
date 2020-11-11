@@ -9,6 +9,7 @@
 
 const string ROOT = "t/regression/";
 
+#ifndef WIN32
 inline std::set<string> read_directory (const string& name = ".") {
     DIR* dirp = opendir(name.c_str());
     struct dirent* dp;
@@ -20,6 +21,7 @@ inline std::set<string> read_directory (const string& name = ".") {
     closedir(dirp);
     return v;
 }
+#endif
 
 TEST("additional final chunk before other chunks") {
     RequestParser p;
@@ -119,6 +121,7 @@ TEST("google response 0") {
     CHECK(result.response->http_version == 11);
 }
 
+#ifndef WIN32
 TEST("google response 1") {
     ResponseParser p;
     RequestSP req = new Request();
@@ -137,3 +140,4 @@ TEST("google response 1") {
     CHECK(result.state == State::done);
     CHECK(result.response->http_version == 11);
 }
+#endif

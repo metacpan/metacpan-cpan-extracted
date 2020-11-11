@@ -1,9 +1,9 @@
 package Regexp::Pattern::Filename::Media;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Media'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ Regexp::Pattern::Filename::Media - Media (image/audio/video) filename
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Media (from Perl distribution Regexp-Pattern-Filename-Media), released on 2020-04-01.
+This document describes version 0.002 of Regexp::Pattern::Filename::Media (from Perl distribution Regexp-Pattern-Filename-Media), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -68,15 +68,21 @@ Examples:
 
 No extension.
 
- "foo" =~ re("Filename::Media::filename_media");  # doesn't match
+ "foo" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
 
 Not an extension.
 
- "mp4" =~ re("Filename::Media::filename_media");  # doesn't match
+ "mp4" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
+
+Example #3.
 
  "foo.jpg" =~ re("Filename::Media::filename_media");  # matches
 
+Example #4.
+
  "foo.mp3" =~ re("Filename::Media::filename_media");  # matches
+
+Example #5.
 
  "foo.mp4" =~ re("Filename::Media::filename_media");  # matches
 
@@ -86,9 +92,11 @@ Case insensitive.
 
 Regex is anchored.
 
- "foo.MKV is the file" =~ re("Filename::Media::filename_media");  # doesn't match
+ "foo.MKV is the file" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
 
- "foo.txt" =~ re("Filename::Media::filename_media");  # doesn't match
+Example #8.
+
+ "foo.txt" =~ re("Filename::Media::filename_media");  # DOESN'T MATCH
 
 =back
 
@@ -110,9 +118,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Filename::Media>
+
 L<Regexp::Pattern>
 
-L<Filename::Media>
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
 
 =head1 AUTHOR
 

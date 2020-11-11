@@ -17,6 +17,16 @@ my $b = AudioFile::Info::Build->new(
     },
     create_makefile_pl => 'traditional',
     dynamic_config => 1,
+    meta_merge => {
+      'meta-spec' => { version => 2 },
+      resources => {
+        repository => {
+          type => 'git',
+          url  => 'git://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl.git',
+          web  => 'https://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl',
+       },
+      },
+    },
 );
 
 $b->create_build_script;

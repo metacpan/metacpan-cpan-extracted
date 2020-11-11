@@ -8,7 +8,7 @@ use GraphViz2::Parse::Yacc;
 
 my $graph = GraphViz2->new(
 	edge   => {color => 'grey'},
-	global => {directed => 1},
+	global => {directed => 1, combine_node_and_port => 0},
 	graph  => {concentrate => 1, rankdir => 'TB'},
 	node   => {color => 'blue', shape => 'oval'},
 );

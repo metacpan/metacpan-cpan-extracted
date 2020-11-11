@@ -2,7 +2,6 @@ use strict;
 use warnings FATAL => 'all';
 use 5.006;
 use lib 'inc';
-use ExtUtils::HasCompiler qw(can_compile_loadable_object);
 
 my %META = (
   name => 'Class-C3',
@@ -51,18 +50,32 @@ my %META = (
 );
 
 my %MM_ARGS = (
-  TEST_REQUIRES => {
-    ( $] < 5.009_005 and is_smoker() )
-      ? ( 'Devel::Hide' => 0 ) : ()
-  },
   PREREQ_PM => {
-    ( $] < 5.009_005 and can_compile_loadable_object(quiet => 1) )
+    ( $] < 5.009_005 and want_xs() )
       ? ( 'Class::C3::XS'  => '0.13' ) : ()
   },
 );
 
-sub is_smoker {
-  return ( $ENV{AUTOMATED_TESTING} && ! $ENV{PERL5_CPANM_IS_RUNNING} && ! $ENV{RELEASE_TESTING} )
+sub parse_args {
+  require Text::ParseWords;
+  require ExtUtils::MakeMaker;
+  # copied from EUMM
+  my $tmp = {};
+  ExtUtils::MakeMaker::parse_args(
+    $tmp,
+    Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),
+    @ARGV,
+  );
+  return $tmp->{ARGS} || {};
+}
+
+sub want_xs {
+  my $explicit_pp = defined $ENV{PUREPERL_ONLY} ? $ENV{PUREPERL_ONLY} : parse_args()->{PUREPERL_ONLY};
+  return !$explicit_pp
+    if defined $explicit_pp;
+
+  require ExtUtils::HasCompiler;
+  return ExtUtils::HasCompiler::can_compile_loadable_object(quiet => 1)
 }
 
 ## BOILERPLATE ###############################################################
@@ -84,6 +97,9 @@ $MM_ARGS{NO_MYMETA} = 1
   if $mymeta_broken;
 $MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
   unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
 
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';

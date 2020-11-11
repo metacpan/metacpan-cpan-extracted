@@ -13,17 +13,12 @@ sub new
     return $self;
 }
 
-#    AX_CHECK_LIB_FLAGS([log4cplus], [stdc++,stdc++ unwind], [log4cplus_initialize();], [
-#    AC_INCLUDES_DEFAULT
-##include <log4cplus/clogger.h>
-#      ], [log4cplus >= 2.0.0], [
-
 sub check_paramsutil_prerequisites
 {
     my $self = shift->_get_instance();
 
-    $self->{config}->{cc}                    or $self->check_prog_cc();
-    $self->check_produce_loadable_xs_build() or die "Can't produce loadable XS module";
+    $self->{config}->{cc} or $self->check_prog_cc();
+    return $self->check_produce_loadable_xs_build();
 }
 
 1;

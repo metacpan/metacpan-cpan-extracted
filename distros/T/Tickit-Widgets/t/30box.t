@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -15,6 +15,8 @@ my $win = mk_window;
 my( $child_lines, $child_cols );
 my $child_render_rect;
 
+$child_lines = 3; $child_cols = 10;
+
 my $widget = Tickit::Widget::Box->new
    ->set_child( my $child = TestWidget->new );
 
@@ -22,8 +24,6 @@ ok( defined $widget, 'defined $widget' );
 
 is( scalar $widget->children, 1, 'scalar $widget->children' );
 identical( ( $widget->children )[0], $widget->child, '$widget->children[0]' );
-
-$child_lines = 3; $child_cols = 10;
 
 is( $widget->lines,  3, '$widget->lines with no bounds' );
 is( $widget->cols,  10, '$widget->cols with no bounds' );
@@ -107,16 +107,15 @@ $widget->set_child( undef );
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.09;
+class TestWidget extends Tickit::Widget {
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use base qw( Tickit::Widget );
-use constant WIDGET_PEN_FROM_STYLE => 1;
+   method render_to_rb
+   {
+      $child_render_rect = $self->window->rect;
+   }
 
-sub render_to_rb
-{
-   my $self = shift;
-   $child_render_rect = $self->window->rect;
+   method lines { $child_lines }
+   method cols  { $child_cols }
 }
-
-sub lines { $child_lines }
-sub cols  { $child_cols }

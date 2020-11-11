@@ -38,6 +38,14 @@ is(exception { Dict->inline_check(q/$xyz/) }, undef, "Inlining Dict doesn't thro
 ok(!Dict->has_coercion, "Dict doesn't have a coercion");
 ok(Dict->is_parameterizable, "Dict is parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,
@@ -198,12 +206,13 @@ ok( !$type3->my_hashref_allows_value('123', qr//),  '!my_hashref_allows_value("1
 #
 
 my $type4 = Dict[
-	foo => Types::Standard::Int,
+	foo => Types::Standard::Int->where(sub { $_ % 2 == 0 }),
 	bar => Optional[ Types::Standard::RegexpRef ],
 	slurpy Map[ Types::Standard::Int, Types::Standard::ArrayRef ],
 ];
 
 should_pass( { foo => 42, bar => qr// }, $type4 );
+should_fail( { foo => 41, bar => qr// }, $type4 );
 should_fail( { foo => [], bar => qr// }, $type4 );
 should_fail( { foo => 42, bar => 1234 }, $type4 );
 should_fail( { foo => [], bar => 1234 }, $type4 );
@@ -223,7 +232,8 @@ ok( !$type4->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("ba
 ok(  $type4->my_hashref_allows_key('123'),  'my_hashref_allows_key("123")' );
 ok(  $type4->my_hashref_allows_value('123', []),  'my_hashref_allows_value("123", [])' );
 ok( !$type4->my_hashref_allows_value('123', qr//),  '!my_hashref_allows_value("123", qr//)' );
-
+ok(  $type4->my_hashref_allows_value('foo', 20), 'my_hashref_allows_value("foo", 20)' );
+ok( !$type4->my_hashref_allows_value('foo', 21), '!my_hashref_allows_value("foo", 21)' );
 
 #
 # Simple deep coercion

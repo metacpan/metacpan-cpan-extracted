@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/Sub-SymMethod>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005	2020-10-28
+
+ [ Packaging ]
+ - Fix dynamic config logic which would in some circumstances require a
+   version of Sub::Name as a prerequisite which hasn't even been released
+   yet.
+
 0.004	2020-10-12
 
  - Use `before_apply` instead of `after_apply` hook when copying symmethods

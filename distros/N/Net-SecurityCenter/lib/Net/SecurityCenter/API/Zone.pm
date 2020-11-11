@@ -5,11 +5,11 @@ use strict;
 
 use Carp;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -42,15 +42,16 @@ sub list {
     };
 
     my $params = sc_check_params( $tmpl, \%args );
+    my $raw    = delete( $params->{'raw'} );
     my $zones  = $self->client->get( '/zone', $params );
 
     return if ( !$zones );
 
-    my $raw = delete( $params->{'raw'} );
+    if ($raw) {
+        return wantarray ? @{$zones} : $zones;
+    }
 
-    return $zones if ($raw);
-
-    return sc_normalize_array($zones);
+    return wantarray ? @{ sc_normalize_array($zones) } : sc_normalize_array($zones);
 
 }
 

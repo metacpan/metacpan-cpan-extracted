@@ -1,0 +1,7 @@
+Release history for URI-Signature-Tiny
+
+1.001 Tue 29 Oct 2020
+	- Correct tests under Carp versions before 1.25
+
+1.000 Wed 28 Oct 2020
+	- Initial release

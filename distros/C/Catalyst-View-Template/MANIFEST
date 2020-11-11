@@ -22,3 +22,4 @@ t/lib/MyApp/alt_root/test_dynamic_path.tt
 t/lib/MyApp/root/heart.tt
 t/lib/MyApp/root/specified.tt
 t/lib/MyApp/root/test.tt
+t/lib/MyApp/root/test_args.tt

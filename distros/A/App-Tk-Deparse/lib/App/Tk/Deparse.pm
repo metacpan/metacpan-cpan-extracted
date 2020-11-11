@@ -5,13 +5,14 @@ use 5.008;
 
 use Browser::Open qw(open_browser open_browser_cmd);
 use Path::Tiny qw(path);
+use Capture::Tiny qw(capture);
 
 use Tk;
 use Tk::Dialog;
 use Tk::HyperText;
 use Tk::BrowseEntry;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # TODO: make fonts more readable
 # TODO: Clear the output when we change the input (or maybe rerun the deparse process?)
@@ -106,7 +107,7 @@ sub show_about {
          Perl $]<br>
          <p>
          Create by Gabor Szabo<br>
-         Source code on <a href="https://github.com/szabgab/App-PerlTidy-Tk">GitHub</a><br>
+         Source code on <a href="https://github.com/szabgab/App-Tk-Deparse">GitHub</a><br>
          Thanks to my <a href="https://www.patreon.com/szabgab">Patreon</a> supporters<br>
 
 <h2>Supporters</h2>
@@ -167,6 +168,12 @@ sub onResource {
     }
 }
 
+sub changed {
+    my ($self, $event) = @_;
+    # TODO can we delay this and only run the deparse process if there were no changes for some time (e.g. 1 sec)
+    $self->deparse;
+    #print("changed\n");
+}
 
 sub create_app {
     my ($self) = @_;
@@ -175,6 +182,9 @@ sub create_app {
         -font  => ['fixed', 12],
         -bg    => 'white',
     );
+    $self->{incode}->bindtags([$self->{incode}, 'Tk::Text', $self->{top}, 'all']);
+    #$self->{incode}->bind('<<Modified>>' => sub { I could not get this working
+    $self->{incode}->bind('<Any-KeyPress>' => sub { $self->changed(shift); });
     $self->{incode}->pack(-fill => 'both', -expand => 1);
 
     $self->{flags} = $self->{top}->Frame();
@@ -235,12 +245,16 @@ sub deparse {
         $cmd .= ",-s$self->{s_flag}"
     }
 
-    # TODO: handle STDERR
-    # TODO: handle exit code
-    my $out = qx{$cmd $temp};
+    my ($stdout, $stderr, $exit) = capture { system("$cmd $temp"); };
     $self->{outcode}->configure('state' => 'normal');
     $self->{outcode}->delete("0.0", 'end');
-    $self->{outcode}->insert("0.0", $out);
+    if ($exit) {
+        $self->{outcode}->configure('fg' => 'red');
+        $self->{outcode}->insert("0.0", $stderr);
+    } else {
+        $self->{outcode}->configure('fg' => 'black');
+        $self->{outcode}->insert("0.0", $stdout);
+    }
     $self->{outcode}->configure('state' => 'disabled');
 }
 

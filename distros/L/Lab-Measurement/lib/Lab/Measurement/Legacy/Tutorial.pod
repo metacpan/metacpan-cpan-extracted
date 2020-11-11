@@ -14,7 +14,7 @@ Lab::Measurement::Legacy::Tutorial - Old Tutorial on using the historical/deprec
 
 =head1 VERSION
 
-version 3.722
+version 3.730
 
 =head1 Introduction
 

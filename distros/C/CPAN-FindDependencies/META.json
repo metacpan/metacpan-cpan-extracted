@@ -33,15 +33,25 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "CPAN::Meta" : "0",
             "Capture::Tiny" : "0.05",
             "Devel::CheckOS" : "1.52",
+            "File::Find::Rule" : "0",
+            "File::Path" : "2.17",
             "File::Temp" : "0.19",
-            "LWP::UserAgent" : "0",
-            "Module::CoreList" : "2.9",
+            "File::Type" : "0",
+            "LWP::Protocol::https" : "6.09",
+            "LWP::Simple" : "0",
+            "Module::CoreList" : "5.20200920",
             "Parse::CPAN::Packages" : "2.31",
             "Scalar::Util" : "1.14",
-            "URI::file" : "4.13",
-            "YAML::Tiny" : "1.57"
+            "Test::Differences" : "0",
+            "Test::More" : "0.88",
+            "Test::Time" : "0",
+            "Text::Diff" : "0",
+            "URI::file" : "4.13"
          }
       }
    },
@@ -54,6 +64,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-CPAN-FindDependencies"
       }
    },
-   "version" : "2.49",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -3,16 +3,20 @@
 use strict;
 use warnings;
 
-use Indent::Word;
+use Indent::Data;
 
-# Object.
-my $i = Indent::Word->new(
-        'line_size' => 20,
+# Indent::Data object.
+my $i = Indent::Data->new(
+       'line_size' => '10',
+       'next_indent' => '  ',
+       'output_separator' => "|\n",
 );
 
-# Indent.
-print $i->indent(join(' ', ('text') x 7))."\n";
+# Print indented text.
+print $i->indent('text text text text text text')."|\n";
 
 # Output:
-# text text text text
-# <--tab->text text text
+# text text |
+#   text tex|
+#   t text t|
+#   ext|

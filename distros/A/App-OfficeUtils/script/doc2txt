@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-26'; # DATE
+our $DATE = '2020-10-27'; # DATE
 our $DIST = 'App-OfficeUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ doc2txt - Convert Office word-processor format file (.doc, .docx, .odt, etc) to 
 
 =head1 VERSION
 
-This document describes version 0.004 of doc2txt (from Perl distribution App-OfficeUtils), released on 2020-10-26.
+This document describes version 0.005 of doc2txt (from Perl distribution App-OfficeUtils), released on 2020-10-27.
 
 =head1 SYNOPSIS
 

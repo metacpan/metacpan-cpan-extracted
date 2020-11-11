@@ -14,8 +14,8 @@ my %META = (
 			Digest::SHA             0
 			JSON::WebToken          0
 			MIME::Base64            0
-			Net::OAuth2Server       0
-			parent                  0
+			Role::Tiny                   0
+			Class::Method::Modifiers     0
 		)} },
 	},
 	dynamic_config => 0,
@@ -25,7 +25,7 @@ my %META = (
 	},
 );
 
-sub MY::postamble { <<'' }
+sub MY::postamble { -f 'META.yml' ? return : <<'' }
 create_distdir : MANIFEST
 MANIFEST :
 	( git ls-files ':!README.pod' . ; echo MANIFEST ) > MANIFEST

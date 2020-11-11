@@ -3,14 +3,13 @@
 #
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::CheckButton;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::Widget::CheckButton 0.31;
+class Tickit::Widget::CheckButton
+   extends Tickit::Widget;
+
 use Tickit::Style;
-
-our $VERSION = '0.30';
 
 use Carp;
 
@@ -139,31 +138,29 @@ Optional. Callback function to invoke when the check state is changed.
 
 =cut
 
-sub new
+has $_label;
+has $_on_toggle;
+
+has $_active;
+
+BUILD
 {
-   my $class = shift;
-   my %args = @_;
+   my %params = @_;
 
-   my $self = $class->SUPER::new( %args );
-
-   $self->set_label( $args{label} ) if defined $args{label};
-   $self->set_on_toggle( $args{on_toggle} ) if $args{on_toggle};
-
-   return $self;
+   $self->set_label( $params{label} ) if defined $params{label};
+   $self->set_on_toggle( $params{on_toggle} ) if $params{on_toggle};
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    return 1;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    return textwidth( $self->get_style_values( "check" ) ) +
           $self->get_style_values( "spacing" ) +
-          textwidth( $self->{label} );
+          textwidth( $_label );
 }
 
 =head1 ACCESSORS
@@ -182,16 +179,11 @@ Returns or sets the label text of the button.
 
 =cut
 
-sub label
-{
-   my $self = shift;
-   return $self->{label};
-}
+method label { $_label }
 
-sub set_label
+method set_label
 {
-   my $self = shift;
-   ( $self->{label} ) = @_;
+   $_label = $_[0];
    $self->reshape;
    $self->redraw;
 }
@@ -202,11 +194,7 @@ sub set_label
 
 =cut
 
-sub on_toggle
-{
-   my $self = shift;
-   return $self->{on_toggle};
-}
+method on_toggle { $_on_toggle }
 
 =head2 set_on_toggle
 
@@ -219,10 +207,9 @@ changed.
 
 =cut
 
-sub set_on_toggle
+method set_on_toggle
 {
-   my $self = shift;
-   ( $self->{on_toggle} ) = @_;
+   $_on_toggle = $_[0];
 }
 
 =head1 METHODS
@@ -237,12 +224,11 @@ Sets this button's active state to true.
 
 =cut
 
-sub activate
+method activate
 {
-   my $self = shift;
-   $self->{active} = 1;
+   $_active = 1;
    $self->set_style_tag( active => 1 );
-   $self->{on_toggle}->( $self, 1 ) if $self->{on_toggle};
+   $_on_toggle->( $self, 1 ) if $_on_toggle;
 }
 
 =head2 deactivate
@@ -253,18 +239,16 @@ Sets this button's active state to false.
 
 =cut
 
-sub deactivate
+method deactivate
 {
-   my $self = shift;
-   $self->{active} = 0;
+   $_active = 0;
    $self->set_style_tag( active => 0 );
-   $self->{on_toggle}->( $self, 0 ) if $self->{on_toggle};
+   $_on_toggle->( $self, 0 ) if $_on_toggle;
 }
 
 *key_toggle = \&toggle;
-sub toggle
+method toggle
 {
-   my $self = shift;
    $self->is_active ? $self->deactivate : $self->activate;
    return 1;
 }
@@ -277,16 +261,10 @@ Returns this button's active state.
 
 =cut
 
-sub is_active
-{
-   my $self = shift;
-   return !!$self->{active};
-}
+method is_active { !!$_active }
 
-sub reshape
+method reshape
 {
-   my $self = shift;
-
    my $win = $self->window or return;
 
    my $check = $self->get_style_values( "check" );
@@ -294,9 +272,8 @@ sub reshape
    $win->cursor_at( 0, ( textwidth( $check )-1 ) / 2 );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->clear;
@@ -307,13 +284,12 @@ sub render_to_rb
 
    $rb->text( my $check = $self->get_style_values( "check" ), $self->get_style_pen( "check" ) );
    $rb->erase( $self->get_style_values( "spacing" ) );
-   $rb->text( $self->{label} );
+   $rb->text( $self->label );
    $rb->erase_to( $rect->right );
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    return unless $args->type eq "press" and $args->button == 1;

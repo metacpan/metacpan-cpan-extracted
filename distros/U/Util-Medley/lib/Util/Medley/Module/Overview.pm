@@ -1,5 +1,5 @@
 package Util::Medley::Module::Overview;
-$Util::Medley::Module::Overview::VERSION = '0.052';
+$Util::Medley::Module::Overview::VERSION = '0.053';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ Util::Medley::Module::Overview
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =cut
 

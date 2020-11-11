@@ -1,4 +1,140 @@
-20181129.0.0  2018-11-29 (PERLANCAR)
+20201028.0.1  2020-11-03  Released-By: PERLANCAR; Urgency: medium
+
+              - No data update.
+
+	      - Bump prereq version
+		Perinci::Sub::Gen::AccessTable::Simple=0.002 (RT#133645).
+
+	      - Didn't get archive checked in because of .gitignore
+		misconfiguration.
+
+
+20201028.0.0  2020-10-28  Released-By: PERLANCAR
+
+          - New firms:
+            + AGAR (Asia Sejahtera Mina Tbk.)
+            + AMAN (Makmur Berkah Amanda Tbk.)
+            + AMAR (Bank Amar Indonesia Tbk.)
+            + AMOR (Ashmore Asset Management Indon)
+            + ARKA (Arkha Jayanti Persada Tbk.)
+            + ASPI (Andalan Sakti Primaindo Tbk.)
+            + AYLS (Agro Yasa Lestari Tbk.)
+            + BAPI (Bhakti Agung Propertindo Tbk.)
+            + BBSI (Bank Bisnis Internasional Tbk.)
+            + BBSS (Bumi Benowo Sukses Sejahtera T)
+            + BEEF (Estika Tata Tiara Tbk.)
+            + BESS (Batulicin Nusantara Maritim Tb)
+            + BHAT (Bhakti Multi Artha Tbk.)
+            + BLUE (Berkah Prima Perkasa Tbk.)
+            + BOLA (Bali Bintang Sejahtera Tbk.)
+            + CARE (Metro Healthcare Indonesia Tbk)
+            + CASH (Cashlez Worldwide Indonesia Tb)
+            + CBMF (Cahaya Bintang Medan Tbk.)
+            + CCSI (Communication Cable Systems In)
+            + CLAY (Citra Putra Realty Tbk.)
+            + COCO (Wahana Interfood Nusantara Tbk)
+            + CPRI (Capri Nusa Satu Properti Tbk.)
+            + CSMI (Cipta Selera Murni Tbk.)
+            + CSRA (Cisadane Sawit Raya Tbk.)
+            + DADA (Diamond Citra Propertindo Tbk.)
+            + DMMX (Digital Mediatama Maxima Tbk.)
+            + DMND (Diamond Food Indonesia Tbk.)
+            + EAST (Eastparc Hotel Tbk.)
+            + ENVY (Envy Technologies Indonesia Tb)
+            + ENZO (Morenzo Abadi Perkasa Tbk.)
+            + EPAC (Megalestari Epack Sentosaraya )
+            + ESIP (Sinergi Inti Plastindo Tbk.)
+            + ESTA (Esta Multi Usaha Tbk.)
+            + FITT (Hotel Fitra International Tbk.)
+            + FOOD (Sentra Food Indonesia Tbk.)
+            + FUJI (Fuji Finance Indonesia Tbk.)
+            + GGRP (Gunung Raja Paksi Tbk.)
+            + GLVA (Galva Technologies Tbk.)
+            + HDIT (Hensel Davest Indonesia Tbk.)
+            + HOMI (Grand House Mulia Tbk.)
+            + HRME (Menteng Heritage Realty Tbk.)
+            + IFII (Indonesia Fibreboard Industry )
+            + IFSH (Ifishdeco Tbk.)
+            + IKAN (Era Mandiri Cemerlang Tbk.)
+            + INDO (Royalindo Investa Wijaya Tbk.)
+            + INOV (Inocycle Technology Group Tbk.)
+            + IPTV (MNC Vision Networks Tbk.)
+            + IRRA (Itama Ranoraya Tbk.)
+            + ITIC (Indonesian Tobacco Tbk.)
+            + JAST (Jasnita Telekomindo Tbk.)
+            + JAYA (Armada Berjaya Trans Tbk.)
+            + KAYU (Darmi Bersaudara Tbk.)
+            + KBAG (Karya Bersama Anugerah Tbk.)
+            + KEEN (Kencana Energi Lestari Tbk.)
+            + KEJU (Mulia Boga Raya Tbk.)
+            + KJEN (Krida Jaringan Nusantara Tbk.)
+            + KMDS (Kurniamitra Duta Sentosa Tbk.)
+            + KOTA (DMS Propertindo Tbk.)
+            + LIFE (Asuransi Jiwa Sinarmas MSIG Tb)
+            + MTPS (Meta Epsi Tbk.)
+            + NATO (Nusantara Properti Internasion)
+            + NZIA (Nusantara Almazia Tbk.)
+            + OPMS (Optima Prima Metal Sinergi Tbk)
+            + PAMG (Bima Sakti Pertiwi Tbk.)
+            + PEHA (Phapros Tbk.)
+            + PGJO (Tourindo Guide Indonesia Tbk.)
+            + PGUN (Pradiksi Gunatama Tbk.)
+            + PLAN (Planet Properindo Jaya Tbk.)
+            + PMJS (Putra Mandiri Jembar Tbk.)
+            + PNGO (Pinago Utama Tbk.)
+            + POLI (Pollux Investasi Internasional)
+            + POLU (Golden Flower Tbk.)
+            + POSA (Bliss Properti Indonesia Tbk.)
+            + PPGL (Prima Globalindo Logistik Tbk.)
+            + PSGO (Palma Serasih Tbk.)
+            + PTPW (Pratama Widya Tbk.)
+            + PURA (Putra Rajawali Kencana Tbk.)
+            + PURE (Trinitan Metals and Minerals T)
+            + PURI (Puri Global Sukses Tbk.)
+            + REAL (Repower Asia Indonesia Tbk.)
+            + ROCK (Rockfields Properti Indonesia )
+            + RONY (Aesler Grup Internasional Tbk.)
+            + SAMF (Saraswanti Anugerah Makmur Tbk)
+            + SBAT (Sejahtera Bintang Abadi Textil)
+            + SCNP (Selaras Citra Nusantara Perkas)
+            + SFAN (Surya Fajar Capital Tbk.)
+            + SGER (Sumber Global Energy Tbk.)
+            + SINI (Singaraja Putra Tbk.)
+            + SLIS (Gaya Abadi Sempurna Tbk.)
+            + SMKL (Satyamitra Kemas Lestari Tbk.)
+            + SOFA (Boston Furniture Industries Tb)
+            + SOHO (Soho Global Health Tbk.)
+            + SOTS (Satria Mega Kencana Tbk.)
+            + TAMA (Lancartama Sejati Tbk.)
+            + TEBE (Dana Brata Luhur Tbk.)
+            + TECH (Indosterling Technomedia Tbk.)
+            + TFAS (Telefast Indonesia Tbk.)
+            + TOYS (Sunindo Adipersada Tbk.)
+            + TRIN (Perintis Triniti Properti Tbk.)
+            + TRJA (Transkon Jaya Tbk.)
+            + UANG (Pakuan Tbk.)
+            + UCID (Uni-Charm Indonesia Tbk.)
+            + URBN (Urban Jakarta Propertindo Tbk.)
+            + WOWS (Ginting Jaya Energi Tbk.)
+            + ZONE (Mega Perintis Tbk.)
+
+          - Delisted firms:
+            + APOL (Arpeni Pratama Ocean Line Tbk.)
+            + ATPK (Bara Jaya Internasional Tbk.)
+            + BBNP (Bank Nusantara Parahyangan Tbk)
+            + BORN (Borneo Lumbung Energi & Metal )
+            + CKRA (Cakra Mineral Tbk.)
+            + GMCW (Grahamas Citrawisata Tbk.)
+            + ITTG (Leo Investments Tbk.)
+            + NAGA (Bank Mitraniaga Tbk.)
+            + SCBD (Danayasa Arthatama Tbk.)
+            + SIAP (Sekawan Intipratama Tbk)
+            + TMPI (Sigmagold Inti Perkasa Tbk.)
+
+          - Total firms now 709 (from 615)
+
+
+20181129.0.0  2018-11-29  Released-By: PERLANCAR
 
           - Update data.
 
@@ -30,7 +166,7 @@
           - Total firms now 615 (from 598)
 
 
-20181012.0.0  2018-10-12 (PERLANCAR)
+20181012.0.0  2018-10-12  Released-By: PERLANCAR
 
           - Update data.
 
@@ -54,21 +190,21 @@
           - Total firms now 607 (from 598).
 
 
-20180907.1.1  2018-09-08 (PERLANCAR)
+20180907.1.1  2018-09-08  Released-By: PERLANCAR
 
 	      - No data changes.
 
 	      - [build] Rebuild to fix repository URL.
 
 
-20180907.1.0  2018-09-08 (PERLANCAR)
+20180907.1.0  2018-09-08  Released-By: PERLANCAR
 
 	      - No data changes.
 
 	      - Add $data_mtime.
 
 
-20180907.0.1  2018-09-08 (PERLANCAR)
+20180907.0.1  2018-09-08  Released-By: PERLANCAR
 
 	      - No data changes.
 
@@ -79,6 +215,6 @@
               - [doc] Remove Rinci metadata and Synopsis to reduce duplication.
 
 
-20180907.0.0  2018-09-07 (PERLANCAR)
+20180907.0.0  2018-09-07  Released-By: PERLANCAR
 
               - First release.

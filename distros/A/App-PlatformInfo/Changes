@@ -1,3 +1,16 @@
+0.006   2020-11-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix regression introduced in 0.005 by using 'use'
+	  instead of the correct 'require'.
+
+	- Pack JSON::PP into script, so we can run on older perls.
+
+
+0.005   2020-10-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Print result as JSON for output portability.
+
+
 0.004   2020-10-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid the use of non-core module IPC::System::Options.

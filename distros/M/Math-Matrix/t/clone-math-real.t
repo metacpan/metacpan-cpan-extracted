@@ -3,10 +3,12 @@
 use strict;
 use warnings;
 
+use Test::More;
+
 use lib 't/lib';
 use Math::Matrix::Real;
 
-use Test::More tests => 22;
+plan tests => 22;
 
 my $xdata = [[1, 2, 3], [4, 5, 6]];
 
@@ -27,8 +29,8 @@ my ($nrow, $ncol) = $x -> size();
 
 # Modify the new object, and verify that the original matrix is unmodified.
 
-for (my $i = 0 ; $i < $nrow ; ++$i) {
-    for (my $j = 0 ; $j < $ncol ; ++$j) {
+for my $i (0 .. $nrow - 1) {
+    for my $j (0 .. $ncol - 1) {
         is(ref($y->[$i][$j]), 'Math::Real',
            "\$y->[$i][$j] is a Math::Real");
         my $oldval = $x->[$i][$j];

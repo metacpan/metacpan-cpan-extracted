@@ -271,8 +271,8 @@ use DateTime;
 
 {
     my $dt = DateTime->new(
-        year => 50, month  => 2,
-        hour => 3,  minute => 20, second => 5,
+        year      => 50, month  => 2,
+        hour      => 3,  minute => 20, second => 5,
         time_zone => 'UTC',
     );
 
@@ -498,6 +498,63 @@ SKIP:
     warnings_like(
         sub { $dt->locale('en_US') }, qr/is a read-only/,
         'locale() is read-only'
+    );
+}
+
+{
+    my $dt = DateTime->new(
+        year      => 2020,
+        month     => 11,
+        day       => 6,
+        hour      => 9,
+        minute    => 20,
+        second    => 48,
+        time_zone => 'UTC',
+    );
+    is(
+        $dt->rfc3339, '2020-11-06T09:20:48Z',
+        '->rfc3339 with UTC'
+    );
+
+    $dt = DateTime->new(
+        year      => 2020,
+        month     => 11,
+        day       => 6,
+        hour      => 9,
+        minute    => 20,
+        second    => 48,
+        time_zone => 'America/Chicago',
+    );
+    is(
+        $dt->rfc3339, '2020-11-06T09:20:48-06:00',
+        '->rfc3339 with America/Chicago'
+    );
+
+    $dt = DateTime->new(
+        year      => 2020,
+        month     => 11,
+        day       => 6,
+        hour      => 9,
+        minute    => 20,
+        second    => 48,
+        time_zone => '+02:15:32',
+    );
+    is(
+        $dt->rfc3339, '2020-11-06T09:20:48+02:15:32',
+        '->rfc3339 with raw offset time zone'
+    );
+
+    $dt = DateTime->new(
+        year   => 2020,
+        month  => 11,
+        day    => 6,
+        hour   => 9,
+        minute => 20,
+        second => 48,
+    );
+    is(
+        $dt->rfc3339, '2020-11-06T09:20:48',
+        '->rfc3339 with no offset when tz is floating'
     );
 }
 

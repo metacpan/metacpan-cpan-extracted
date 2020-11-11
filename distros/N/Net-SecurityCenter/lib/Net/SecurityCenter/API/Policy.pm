@@ -4,13 +4,12 @@ use warnings;
 use strict;
 
 use Carp;
-use English qw( -no_match_vars );
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -51,9 +50,13 @@ sub list {
     my $raw      = delete( $params->{'raw'} );
     my $policies = $self->client->get( '/policy', $params );
 
-    return           if ( !$policies );
-    return $policies if ($raw);
-    return sc_merge($policies);
+    return if ( !$policies );
+
+    if ($raw) {
+        return wantarray ? @{$policies} : $policies;
+    }
+
+    return wantarray ? @{ sc_merge($policies) } : sc_merge($policies);
 
 }
 
@@ -101,12 +104,12 @@ sub download {
     return $policy_data if ( !$filename );
 
     open my $fh, '>', $filename
-        or croak("Could not open file '$filename': $OS_ERROR");
+        or croak("Could not open file '$filename': $!");
 
     print $fh $policy_data;
 
     close $fh
-        or carp("Failed to close file '$filename': $OS_ERROR");
+        or carp("Failed to close file '$filename': $!");
 
     return 1;
 

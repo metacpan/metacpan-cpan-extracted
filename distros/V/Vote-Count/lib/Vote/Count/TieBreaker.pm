@@ -12,13 +12,13 @@ use List::Util qw( min max sum );
 use Path::Tiny;
 # use Data::Dumper;
 
-our $VERSION='1.08';
+our $VERSION='1.09';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.08
+=head1 VERSION 1.09
 
 =head1 Synopsis
 

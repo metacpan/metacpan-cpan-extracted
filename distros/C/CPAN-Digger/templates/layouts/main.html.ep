@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+    <title><%= $title %></title>
+  </head>
+  <body>
+   <%= content %>
+
+<hr>
+% my $timestamp = localtime;
+Last updated: <%= $timestamp %> <a href="https://github.com/szabgab/Cpan-Digger">Source</a>
+Supported via <a href="https://www.patreon.com/szabgab">Patreon</a>
+  </body>
+</html>

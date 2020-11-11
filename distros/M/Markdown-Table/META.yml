@@ -17,7 +17,7 @@ name: Markdown-Table
 provides:
   Markdown::Table:
     file: lib/Markdown/Table.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Moo: '2.0'
   Text::ASCIITable: '0.22'
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/perlservices/Markdown-Table/issues
   homepage: https://github.com/perlservices/Markdown-Table
   repository: git://github.com/perlservices/Markdown-Table.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

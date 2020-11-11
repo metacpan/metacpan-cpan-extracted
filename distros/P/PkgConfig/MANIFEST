@@ -6,6 +6,7 @@ gen_multi_tests.pl
 ignore.txt
 lib/PkgConfig.pm
 LICENSE
+maint/cip-before-install
 maint/releaseprep
 Makefile.PL
 MANIFEST			This list of files
@@ -638,6 +639,7 @@ t/par_packer.t
 t/pcfiledir.t
 t/perl_version.t
 t/PkgConfigTest.pm
+t/print_errors.t
 t/quote.t
 t/strawberry.t
 t/version_class.t

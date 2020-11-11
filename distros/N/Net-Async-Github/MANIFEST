@@ -31,7 +31,7 @@ lib/Net/Async/Github/Team.pm
 lib/Net/Async/Github/Team.pod
 lib/Net/Async/Github/User.pm
 lib/Net/Async/Github/User.pod
-mkobj.pl
+scripts/mkobj.pl
 share/endpoints.json
 t/00-check-deps.t
 t/00-compile.t

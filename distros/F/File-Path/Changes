@@ -1,5 +1,9 @@
 Revision history for Perl extension File::Path.
 
+2.18 Wed Nov  4 20:21:01 EST 2020
+    - Silence two warnings in t/Path.t when run on Win32
+      (RT 133671 - thanks to Tony Cook).
+
 2.17 2020-07-18
     - Eliminate one line of debugging code which was generating
       a warning.

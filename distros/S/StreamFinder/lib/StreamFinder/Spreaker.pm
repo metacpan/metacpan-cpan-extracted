@@ -18,11 +18,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::Spreaker;
 
-	my $podcast = new StreamFinder::Spreaker(<url>);
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $podcast = new StreamFinder::Spreaker($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($podcast);
 
@@ -101,10 +105,11 @@ One or more stream URLs can be returned for each podcast.
 
 =item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
 
-Accepts a widgets.spreaker.com podcast ID or URL and creates and returns a 
+Accepts a spreaker.com podcast ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
 are found.  The URL can be the full URL, ie. 
-https://widget.spreaker.com/player?episode_id=B<podcast-id>, or just 
+https://widget.spreaker.com/player?episode_id=B<podcast-id>, 
+https://www.spreaker.com/user/B<user-id>/B<podcast-id-string>, or just 
 I<podcast-id>.
 
 =item $podcast->B<get>()
@@ -114,18 +119,7 @@ Returns an array of strings representing all stream URLs found.
 =item $podcast->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
-the first valid stream found.  
-
-Current options are:  I<"random">, I<"nopls">, and I<"noplaylists">.  
-By default, the first ("best"?) stream is returned.  If I<"random"> is 
-specified, then a random one is selected from the list of streams found.  
-If I<"nopls"> is specified, and the stream to be returned is a ".pls" playlist, 
-it is first fetched and the first entry (or a random entry if I<"random"> is 
-specified) is returned.  This is needed by Fauxdacious Mediaplayer.
-If I<"noplaylists"> is specified, and the stream to be returned is a 
-"playlist" (either .pls or .m3u? extension), it is first fetched and the first 
-entry (or a random entry if I<"random"> is specified) in the playlist 
-is returned.
+the first valid stream found.  There currently are no valid I<options>.
 
 =item $podcast->B<count>()
 
@@ -351,14 +345,23 @@ sub new
 		}
 	}
 
+	my $urlroot = '';
 	$url =~ s#\\##g;
 	(my $url2fetch = $url);
-	if ($url =~ /^https?\:/) {
-		$self->{'id'} = $1  if ($url2fetch =~ m#\?\w+?\_id\=([\d]+)#);
+
+	if ($url =~ m#^(https?\:\/\/([^\/]+))#) {
+		$urlroot = $1;
+		if ($url2fetch =~ m#\?\w+?\_id\=([\d]+)#) {
+			$self->{'id'} = $1;
+		} else {  #WE'RE A FULL URL, IE. "https://www.spreaker.com/user/<user-id>/<podcast-id-string>"
+		          #OR https://www.spreaker.com/show/<podcast-id>
+			$self->{'id'} = ($url2fetch =~ m#([^\/]+)$#) ? $1 : '';
+		}
 	} else {
 		$self->{'id'} = $url;
 		$url2fetch = "https://widget.spreaker.com/player?episode_id=$url";
 	}
+
 	my $html = '';
 	print STDERR "-0(Spreaker): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
@@ -380,24 +383,57 @@ sub new
 	$self->{'created'} = '';
 	$self->{'year'} = '';
 	$self->{'streams'} = [];
+
 	while ($html =~ s#\"(?:playback|download)\_url\"\:\"([^\"]+)\"##gso) {
 		(my $s = $1) =~ s#\\##g;;
 		push @{$self->{'streams'}}, $s;
 		$self->{'cnt'}++;
 	}
+	while ($html =~ s#\s+id\=\"track\_download\"\s+href\=\"([^\"]+)\"##gso) {
+		(my $s = $1) =~ s#\\##g;;
+		push @{$self->{'streams'}}, $s;
+		$self->{'cnt'}++;
+	}
 	return undef  unless ($self->{'cnt'} > 0);
+
 	$self->{'title'} = ($html =~ s#\,\"title\"\:\"([^\"]+)\"##s) ? $1 : '';
-	$self->{'description'} = ($html =~ s#\,\"description\"\:\"([^\"]+)\"##s) ? $1 : '';
+	$self->{'title'} ||= $1  if ($html =~ s#\<meta\s+name\=\"(?:twitter\:)?title\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
+	$self->{'title'} ||= $1  if ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:title\"\s+content\=\"([^\"]+)\"\s*\/"\>##s);
+	if ($html =~ s#\<TITLE\>\s*([^\|\<]+)##s) {
+		my $title_artist = $1;
+		$self->{'artist'} = $1  if ($title_artist =~ s/\s*\|\s+(.+)//);
+		$self->{'title'} ||= $title_artist;
+	}
+	$self->{'description'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s) ? $1 : '';
+	$self->{'description'} ||= $1  if ($html =~ s#\,\"description\"\:\"([^\"]+)\"##s);
+	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"(?:twitter\:)?description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'year'} = ($html =~ s#\,\"published_at\"\:\"(\d\d\d\d)##s) ? $1 : '';
-		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
-		$self->{'description'} = uri_unescape($self->{'description'});
+
+	if (! $self->{'year'} && $html =~ m#   Copyright\s+([^\<]+)#) {
+		my $copyright = $1;
+		$self->{'year'} = $1  if ($copyright =~ /(\d\d\d\d)/s);
+	}
+	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+	$self->{'description'} = uri_unescape($self->{'description'});
 	$self->{'title'} =~ s#\\u0027#\"#g;
 	$self->{'description'} =~ s#\\u0027#\"#g;
 	$self->{'iconurl'} = ($html =~ s#\,\"image_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'iconurl'} =~ s#\\##g;
+	unless ($self->{'iconurl'}) {
+		if ($html =~ s#\s+class\=\"track\_head\_image\"\>(.+?)\<\/span\>##s) {
+			my $imagehtml = $1;
+			$self->{'iconurl'} = $1  if ($imagehtml =~ m#\s+src\=\"([^\"]+)\"#s);
+		}
+	}
+	if ($html =~ s#\s+class\=\"track\_head\_info\_show\"\>(.+?)\<\/span\>##s) {
+		my $albumartisthtml = $1;
+		$self->{'albumartist'} = $urlroot . $1  if ($albumartisthtml =~ s#^.+?\s+href\=\"([^\"]+)\"\s*\>?\s*##s);
+		($self->{'artist'} = $albumartisthtml) =~ s/\<.+$//s;
+	}
 	$self->{'imageurl'} = ($html =~ s#\,\"image_original_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'imageurl'} =~ s#\\##g;
-	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
+	$self->{'total'} = $self->{'cnt'};
+	print STDERR "-(all)count=".$self->{'total'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!

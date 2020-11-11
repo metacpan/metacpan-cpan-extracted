@@ -3,7 +3,7 @@ package CGI::Application::Plugin::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.103.2';
+our $VERSION = 'v0.103.3';
 
 use syntax 'maybe';
 
@@ -13,9 +13,7 @@ use OpenTracing::GlobalTracer;
 use Carp qw( croak carp );
 use HTTP::Headers;
 use HTTP::Status;
-use NEXT;
 use Scalar::Util qw( refaddr );
-use Sub::Name;
 use Time::HiRes qw( gettimeofday );
 
 use constant CGI_LOAD_TMPL => 'cgi_application_load_tmpl';
@@ -45,12 +43,12 @@ sub import {
     $caller->add_callback( error     => \&error     );
     
 
-    my $full_name = $caller . '::run';
-    my $run_glob  = do { no strict 'refs'; \*$full_name };
+    my $run_glob = do { no strict 'refs'; \*{ $caller . '::run' } };
     my $run_orig
         = defined &$run_glob
         ? \&run_glob
-        : subname $full_name => sub { my $self = shift; $self->NEXT::run(@_) };
+        : eval "package $caller;"  # SUPER works based on the package it's defined in
+             . 'sub { my $self = shift; $self->SUPER::run(@_) }';
     no warnings 'redefine';
     *$run_glob = _wrap_run($run_orig);
 

@@ -1,16 +1,35 @@
 Important things here and in code flagged with XXX
 
-1.03
+Ctrl-Home/End for top/bottom. -Pgup/PgDn (konsole) for file next/prev?
 
-IPP	Consolidate special inputs? (multichar,abort &search, &write_buffer);
-	(delete &search, \d)
+2.10
+IPP	Use alternate screen buffer?
+	
+IPP	MS Windows
+IPP		scrolling commands are wonky, therefore we currently waste
+IPP		cycles refreshing... but it works! Fix?
+IPP		https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#viewport-positioning
+
+IPP		more.com exits at EOF. Tests should be longer, or warn of this?
+IPP		or set $ENV{PAGER}='IO::Pager::less' if $^O =~ /MSWin/
+
+	MakeMaker __VERSION__?
+
+2.00
+IPP	Fix interaction with KDE konsole RT#133662
+IPP	Check xterm, rxvt, gde-term, etc.
+IPP		Goofy term sizes (and WINCH)
+
+1.03
+IPP	grep scrolling is borked
+IPP	dialog, refresh if _grep instead of specific row refresh
+IPP		modify calls to line() to pass row? keep a buffer of
+IPP		{_row}->[$row]=$line?
+IPP	use screen as buffer: scroll-up decrement cursor until match/top & emit
 
 Lesskey     #command
-!!          &         filter          #super-nifty! built-in grep
 !!          -         toggle-option   #switch toggle_* to this?!
 !           _         display-option
-            :e        examine         #open new file
-            E         examine         
             \eu       undo-hilite     #toggle higlight of current search term
             F         forw-forever    #tail
 
@@ -20,41 +39,19 @@ IPP	bel,blink,bold,rev,smul[underline],sgr0[reset]
 IPP	kcub1[left],kcuf1[right],kcuu1[up],kcud1[down],kLFT[S-left],kRIT[S-right]
 IPP	kprv,knxt,khome,kend,kbs[backspace],kf1(help?),kich1(insert as mark?)
 
-IPP	fix infinite scroll if invalid jump (bogus user entry or unmapped key)
-
 1.02
-IPP	rename tp to ppp ("pure" perl pager)? (except stty/tput, and ReadKey)
+IPP	Rearchitect around String::Tagged::Terminal? Term::Screen?
 
-IPP	return if $Squeeze and $me->{_text}-[cur] eq '' and
-IPP			$me->{_text}->[prev] eq ''
+IPP	Move squeeze from input to logical display to allow runtime toggle?
 IPP	Document line numbering impacts?! (perf, RAM...)
+IPP		 okay for jumping, awkward for x-ref file in an editor
 
-IPP	Alt _fncRE  join '' map {"^\Q$_\n"};//m
-
-IPP	Term:Screen
-IPP	https://metacpan.org/release/Term-Screen/source/lib/Term/Screen.pm#L474
-IPP		getch: reimplement (versus #use#, misalignments with forking)
-IPP		sysread vs. Term::ReadKey, as $^O alt for getc() in ReadMode()?
-IPP
-IPP		get_fn_keys aliases
-
-IPP	WINCH reflow
-IPP		keep cursor at same content?
-IPP		_cursor = int(_cursor * oldCols / newCols)-1
-
-IPP	-rows makes smaller screen, but scrolling down fails.
-IPP	Scrollng back up seems fine(ish) though.
+IPP	WINCH reflow: keep cursor at same content?
 
 IPP	Display filename in status line?
 
-IPP	Clear buffer for multiple files? OTOH, while different,
-IPP		all-in-one is kind of a unique and nifty feature.
-IPP	But can we offer discontinuous numbering?
-
-IPP	Rearchitect around String::Tagged::Terminal?
 
 1.01
-IPP	Check ref() eq 'CODE' before running
 
 IPP	ioctl() for cbreak to replace stty? May not be so cross-platform
 
@@ -64,33 +61,15 @@ IPP	TERM=vt100; also Term::Size::Win32 or Win32::Readch
 
 1.00
 IPP			#Consolidate _cursor+{rows} and _end??
-IPP	resize	126  $me->{_end} = $me->{rows} - 1; #NOOP
-IPP	new	113    $me->{_end} = $me->{rows} - 1; #NOOP, just setting up
-IPP	line	507    $me->{_end} = $n;        #Advance past pause!!
-IPP	down_ln	518    if( $me->{_end} >= $me->{_txtN}-1 ){ #detect EOF!!
-IPP	down_ln 522      if(length($me->{pause}) && $me->{_end}<$me->{rows}-1){
-IPP	down_ln 523    print $t->Tgoto('cm',  0, $me->{_end}+1 ); } # move!
-IPP	down_ln 532      $me->line( ++$me->{_end} ); #print!
-IPP	up_line 552      $me->{_end}--;         #NOOP, just keeping up
-IPP	jump	609  $me->{_end}   = $me->{_cursor} + $me->{rows}; #NOOP
-IPP	search	671    $me->{_end}    = $me->{_cursor} + $me->{rows}; # - 1;
-IPP	search	678    $me->{_end}   -= $x;     #NOOP, just keeping up
-
 
 IPP	Pause bugs
-IPP		extra scroll forwards required after backed up over pauses
-
 IPP		Left/right when paused causes vertical scrolling
 IPP		(horiz. scroll trigeering a form forward, how to prevent?!)
-
-IPP		We get an extra chunk of output after menu closing
 
 IPP	Add more IO::Pager::Perl involved tests, scripted interaction?
 IPP		read from pipe, file
 IPP		navigation
 IPP		search
-
-IPP	$0 as name in status line?
 
 IPP	Wrap up tp for PerlTools?
 
@@ -104,13 +83,6 @@ IPP	Wrap up tp for PerlTools?
 	   print() on unopened filehandle STDOUT at Term/Pager.pm line 330
 	   print() on unopened filehandle STDOUT at Term/Pager.pm line 395..399
 
-	Test functionality w/|w/o Term::ReadKey
-
-	Fix IO::Pager and IO::Pager::less PODs (remove cuts)
-
-0.40
-	Push previous versions to github
-
 0.35
 	Odd failure of test 11 under tcsh and win-bash because
 	*reference* has extra trailing newline.
@@ -123,3 +95,6 @@ IPP	Wrap up tp for PerlTools?
 		new/open each class
 		scalar vs. glob vs. OO
 		(non-)fully qualified subclass name
+
+IPP		w/|w/o Term::ReadKey
+

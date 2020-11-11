@@ -1315,12 +1315,12 @@ check_width(PCachedFont self, int len)
 #define UPDATE_OVERHANGS(_len,_flags)                                             \
 	if ( i == 0) {                                                            \
 		if (( _flags & toAddOverhangs ) && glyph. x > 0) ret += glyph. x; \
-		if ( overhangs) overhangs-> x = glyph. x;                         \
+		if ( overhangs) overhangs-> x = (glyph.x > 0) ? glyph. x : 0;     \
 	}                                                                         \
 	if ( i == _len - 1) {                                                     \
 		int c = glyph. xOff - glyph. width + glyph. x;                    \
 		if ( (_flags & toAddOverhangs) && c < 0) ret -= c;                \
-		if ( overhangs) overhangs-> y = -c;                               \
+		if ( overhangs) overhangs-> y = (c < 0) ? -c : 0;                 \
 	}
 
 int
@@ -2529,8 +2529,10 @@ prima_xft_text_shaper_harfbuzz( Handle self, PTextShapeRec r)
 	buf = hb_buffer_create();
 	hb_buffer_add_utf32(buf, r->text, r->len, 0, -1);
 
+#if HB_VERSION_MAJOR >= 1
 #if HB_VERSION_ATLEAST(1,0,3)
 	hb_buffer_set_cluster_level(buf, HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS);
+#endif
 #endif
 	hb_buffer_set_direction(buf, (r->flags & toRTL) ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
 /*

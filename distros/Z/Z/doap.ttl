@@ -41,7 +41,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Z";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Z/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Z/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-z>;
@@ -60,7 +60,7 @@
 <http://purl.org/NET/cpan-uri/dist/Z/v_0-002>
 	a                    doap:Version;
 	dc:identifier        "Z-0.002"^^xsd:string;
-	dc:issued            "2019-09-18"^^xsd:date;
+	dc:issued            "2020-09-18"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Packaging;
@@ -74,7 +74,7 @@
 <http://purl.org/NET/cpan-uri/dist/Z/v_0-003>
 	a                    doap:Version;
 	dc:identifier        "Z-0.003"^^xsd:string;
-	dc:issued            "2019-09-18"^^xsd:date;
+	dc:issued            "2020-09-18"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Addition;
@@ -88,7 +88,7 @@
 <http://purl.org/NET/cpan-uri/dist/Z/v_0-004>
 	a                    doap:Version;
 	dc:identifier        "Z-0.004"^^xsd:string;
-	dc:issued            "2019-09-20"^^xsd:date;
+	dc:issued            "2020-09-20"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Addition;
@@ -105,7 +105,7 @@
 <http://purl.org/NET/cpan-uri/dist/Z/v_0-005>
 	a                    doap:Version;
 	dc:identifier        "Z-0.005"^^xsd:string;
-	dc:issued            "2019-09-20"^^xsd:date;
+	dc:issued            "2020-09-20"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Bugfix;
@@ -119,7 +119,7 @@
 <http://purl.org/NET/cpan-uri/dist/Z/v_0-006>
 	a                    doap:Version;
 	dc:identifier        "Z-0.006"^^xsd:string;
-	dc:issued            "2019-09-27"^^xsd:date;
+	dc:issued            "2020-09-27"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Packaging;
@@ -140,7 +140,7 @@
 	a                    doap:Version;
 	rdfs:label           "Bond, James Bond";
 	dc:identifier        "Z-0.007"^^xsd:string;
-	dc:issued            "2019-09-29"^^xsd:date;
+	dc:issued            "2020-09-29"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Addition;
@@ -150,6 +150,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Z/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Z-0.008"^^xsd:string;
+	dc:issued            "2020-11-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Load IO::Handle.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 2.33
+version 2.37
 
 =head1 SYNOPSIS
 
@@ -297,7 +297,7 @@ L<Alien::Build::Plugin::PkgConfig::Negotiate>, it may choose to use
 command line tools, a pure Perl implementation (L<PkgConfig>), or 
 libpkgconf, depending on what is available).  When using negotiation 
 plugins you may omit the C<::Negotiate> suffix.  So as you can see using 
-the plugin here is an advantage because it is more reliable that just 
+the plugin here is an advantage because it is more reliable than just 
 specifying a command which may not be installed!
 
 Next we use the download negotiation plugin.  This is also better than 
@@ -561,7 +561,7 @@ alien will work with any XS modules that are going to use it:
  
  alien_ok 'Alien::Libfoo';
  
- xs_ok { local $/; <DATA> }, with_subtest {
+ xs_ok do { local $/; <DATA> }, with_subtest {
    is Foo::something(), 1, 'Foo::something() returns 1';
  };
  

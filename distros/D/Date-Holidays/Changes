@@ -1,5 +1,20 @@
 Changes file for Date-Holidays
 
+1.28 2020-11-11 Maintenance release, update not required
+
+- We need to specify the requirement of Test::MockModule to version 0.13, since redefined not introduced until this version
+
+1.27 2020-11-09 Bug fix release, update recommended
+
+- Fixed a bug in the mock introduced in release 1.27. Had added it to the cpanfile, but not the proper prerequisites and the mocking was not correct syntax
+
+- Made adjustments to the tar-ball generation, way to much non-distribution related material included
+
+1.26 2020-11-09 Bug fix release, update not required
+
+- I am implementing an example application and I came across a minor bug in the adapter for Date::Holidays::SK
+  Reported as issue #45
+
 1.25 2020-09-27 Maintenance release, update recommended
 
 - Introduced some issues with references and test suite for the new addition Date::Holidays::AW

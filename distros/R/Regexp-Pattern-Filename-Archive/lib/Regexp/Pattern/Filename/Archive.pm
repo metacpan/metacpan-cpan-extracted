@@ -1,9 +1,9 @@
 package Regexp::Pattern::Filename::Archive;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Archive'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -51,7 +51,7 @@ Regexp::Pattern::Filename::Archive - Archive filename
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Archive (from Perl distribution Regexp-Pattern-Filename-Archive), released on 2020-04-01.
+This document describes version 0.002 of Regexp::Pattern::Filename::Archive (from Perl distribution Regexp-Pattern-Filename-Archive), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -74,11 +74,13 @@ Examples:
 
 No extension.
 
- "foo" =~ re("Filename::Archive::filename_archive");  # doesn't match
+ "foo" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
 
 Not an extension.
 
- "zip" =~ re("Filename::Archive::filename_archive");  # doesn't match
+ "zip" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
+
+Example #3.
 
  "foo.zip" =~ re("Filename::Archive::filename_archive");  # matches
 
@@ -92,9 +94,11 @@ Case insensitive.
 
 Regex is anchored.
 
- "foo.ARJ is the file" =~ re("Filename::Archive::filename_archive");  # doesn't match
+ "foo.ARJ is the file" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
 
- "foo.txt" =~ re("Filename::Archive::filename_archive");  # doesn't match
+Example #7.
+
+ "foo.txt" =~ re("Filename::Archive::filename_archive");  # DOESN'T MATCH
 
 =back
 
@@ -116,9 +120,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Filename::Archive>
+
 L<Regexp::Pattern>
 
-L<Filename::Archive>
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
 
 =head1 AUTHOR
 

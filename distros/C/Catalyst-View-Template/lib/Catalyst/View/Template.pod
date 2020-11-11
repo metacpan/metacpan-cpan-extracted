@@ -211,21 +211,15 @@ or maybe to not throw an exception on error.
 =head2 C<process>
 
  $view->process( $c )
- $view->process( $c, $template )
- $view->process( $c, $template, ... )
 
 This decides which template to call L</render> on,
 then calls it with a copy of the C<< $c->stash >>.
 The template name is taken from C<< $c->action->reverse >> by default,
-or from C<< $c->stash->{'template'} >> if that has been set,
-or from the C<$template> passed explicitly if one was.
+or from C<< $c->stash->{'template'} >> if that has been set.
 
 On success it then calls L</process_output> on the output.
 If template execution fails it calls L</process_error>.
 It returns whatever the called method returns.
-
-Any trailing extra arguments you pass this method will be passed
-to all of L</render>, L</process_output> and L</process_error>.
 
 You might want to override this method in your view class
 if you want additional steps taken when the view is forwarded to,
@@ -239,7 +233,7 @@ but which should not be taken when L</render> is called directly.
 This renders the template named by C<$template> and the L</template_ext>
 configuration option into C<$output>, passing it the values from C<\%vars>,
 and returns true on success.
-In other words, the default implementation is a shorthand for this:
+In other words, the default implementation means it is a shorthand for this:
 
  $view->template->process( $template . $view->template_ext, \%vars, \$output )
 

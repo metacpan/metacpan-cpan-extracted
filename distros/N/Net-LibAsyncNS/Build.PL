@@ -1,19 +1,34 @@
 use strict;
 use warnings;
 
-use Module::Build;
+use Module::Build::Using::PkgConfig;
 
-eval { require ExtUtils::PkgConfig; } or
-   die "OS unsupported - no ExtUtils::PkgConfig\n";
+my $build = Module::Build::Using::PkgConfig->new(
+   module_name => 'Net::LibAsyncNS',
+   configure_requires => {
+      'ExtUtils::CChecker' => '0.05',
+      'ExtUtils::PkgConfig' => 0,
+      'Module::Build' => '0.88', # test_requires
+      'Module::Build::Using::PkgConfig' => 0,
+   },
+   requires => {
+      'Exporter' => '5.57',
+   },
+   test_requires => {
+      'Test::More' => 0,
+      'Test::Identity' => 0,
+      'Test::Refcount' => 0,
+   },
+   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   license => 'perl',
+   create_license => 1,
+   create_readme  => 1,
+);
 
-eval { ExtUtils::PkgConfig->find("libasyncns"); } or
-   die "OS unsupported - pkg-config cannot find libasyncns\n";
-
-my $version = ExtUtils::PkgConfig->modversion("libasyncns");
-$version >= 0.6 or die "OS unsupported - libasyncns too old ($version)\n";
-
-my $cflags = ExtUtils::PkgConfig->cflags("libasyncns");
-my $libs   = ExtUtils::PkgConfig->libs("libasyncns");
+$build->use_pkgconfig( "libasyncns",
+   atleast_version => "0.6",
+   alien           => "Alien::Libasyncns", # yes, capitalised differently
+);
 
 eval { require ExtUtils::CChecker; 1 } or
    die "OS unsupported - missing ExtUtils::CChecker";
@@ -41,30 +56,6 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-my $build = $cc->new_module_build(
-   module_name => 'Net::LibAsyncNS',
-   extra_compiler_flags => [ split( m/ /, $cflags ) ],
-   extra_linker_flags   => [ split( m/ /, $libs ) ],
-   configure_requires => {
-      'ExtUtils::CChecker' => '0.05',
-      'ExtUtils::PkgConfig' => 0,
-   },
-   requires => {
-      'Exporter' => '5.57',
-   },
-   build_requires => {
-      'ExtUtils::PkgConfig' => 0,
-      'Module::Build' => 0,
-      'Module::Build::Compat' => 0,
-      'Test::More' => 0,
-      'Test::Identity' => 0,
-      'Test::Refcount' => 0,
-   },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
-   license => 'perl',
-   create_makefile_pl => 'small',
-   create_license => 1,
-   create_readme  => 1,
-);
+$build->push_extra_compiler_flags( @{ $cc->extra_compiler_flags } );
 
 $build->create_build_script;

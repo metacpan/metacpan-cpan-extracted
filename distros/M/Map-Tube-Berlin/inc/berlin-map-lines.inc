@@ -22,5 +22,4 @@
   <line id="U7"      name="U7"      color="#009BD9" />
   <line id="U8"      name="U8"      color="#00599A" />
   <line id="U9"      name="U9"      color="#F28700" />
-  <line id="U55"     name="U55"     color="#C39275" />
 </lines>

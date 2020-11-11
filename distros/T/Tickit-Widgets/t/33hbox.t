@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -157,6 +157,17 @@ is_display( [ [BLANK(2),
                BLANK(7),
                TEXT("New Widget")] ],
             'Display after set_child' );
+
+# add with options
+{
+   my $child = Tickit::Widget::Static->new( text => "" );
+
+   $widget->add_children( { child => $child, force_size => 20 } );
+
+   is_deeply( { $widget->child_opts( $child ) },
+      { expand => 0, force_size => 20 },
+      '->add_children accepts hashes with extra opts' );
+}
 
 $widget->set_window( undef );
 

@@ -14,7 +14,7 @@ HealthCheck::WritingADiagnostic - How to write a diagnostic
 
 =head1 VERSION
 
-version v1.6.0
+version v1.7.0
 
 =head1 What is a HealthCheck Diagnostic?
 

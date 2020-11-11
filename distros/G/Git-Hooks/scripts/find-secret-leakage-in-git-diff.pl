@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: find-secret-leakage-in-git-diff.pl
+# ABSTRACT: find secrets leaking in a Git repository
 ## no critic (RequireCarping)
 
 use 5.016;
@@ -74,11 +75,11 @@ __END__
 
 =head1 NAME
 
-find-secret-leakage-in-git-diff.pl
+find-secret-leakage-in-git-diff.pl - find secrets leaking in a Git repository
 
 =head1 VERSION
 
-version 2.13.0
+version 2.14.0
 
 =head1 SYNOPSIS
 

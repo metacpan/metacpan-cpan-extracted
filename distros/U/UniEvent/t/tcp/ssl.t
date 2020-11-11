@@ -3,9 +3,6 @@ use lib 't/lib';
 use MyTest;
 use Net::SockAddr;
 use Net::SSLeay;
-use Test::Catch;
-
-catch_run('[ssl]');
 
 my $SERV_CERT = "t/cert/ca.pem";
 my $serv_ctx = Net::SSLeay::CTX_new();

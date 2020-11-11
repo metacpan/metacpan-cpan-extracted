@@ -1,7 +1,7 @@
 ---
 abstract: 'AuthRegister Module for Simple CGI Authentication and Registration in Perl'
 author:
-  - 'Vlado Keselj http://web.cs.dal.ca/~vlado'
+  - 'Vlado Keselj (cpan:vlado vlado.ca http://vlado.ca)'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -17,5 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '1.1'
+requires:
+  CGI: '0'
+  HTTP::Request::Common: '0'
+resources:
+  repository: https://github.com/vkeselj/CGI-AuthRegister.git
+version: '1.402'

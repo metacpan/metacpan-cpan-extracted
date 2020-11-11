@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::Util 6.015;
+package Dist::Zilla::Util 6.017;
 # ABSTRACT: random snippets of code that Dist::Zilla wants
 
 use Carp ();
@@ -171,7 +171,7 @@ Dist::Zilla::Util - random snippets of code that Dist::Zilla wants
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 METHODS
 

@@ -7,7 +7,7 @@ use Tk;
 use Tk::widgets qw/ Frame Derived Widget Label Entry Button /;
 use base qw/ Tk::Derived Tk::Frame /;
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 Construct Tk::Widget 'FileEntry';
 
@@ -22,10 +22,10 @@ Tk::FileEntry - FileEntry widget with optional file selection box
     use Tk::FileEntry;
 
     $fileentry = $parent->FileEntry(
-				-filebitmap	=> BITMAP,
-				-command	=> CALLBACK,
-				-variable	=> SCALARREF,
-				);
+        -filebitmap	=> BITMAP,
+        -command	=> CALLBACK,
+        -variable	=> SCALARREF,
+	);
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ It features a L<Tk::Label>, L<Tk::Entry>, and a L<Tk::Button>.
 
 When the button is clicked, a dialog for choosing a file will show up.
 The path of the chosen file will be inserted into the entry widget.
-The label is intended as caption fot the entry widget.
+The label is intended as caption for the entry widget.
 
 This is useful if you want to provide a convenient way to select a
 file path.
@@ -230,16 +230,16 @@ fileentry, tix, widget, file selector
 
 =head1 AUTHOR
 
-Alex Becker, E<lt>c a p f a n `a`t` g m x `d`o`t` d e - i n v a l i dE<gt>
+Alexander Becker, E<lt>asb@cpan.orgE<gt>
 
-Original Author was Achim Bohnet <ach@mpe.mpg.de>.
+Original Author was Achim Bohnet E<lt>ach@mpe.mpg.deE<gt>.
 
 This code is inspired by the documentation of FileEntry.n of the Tix4.1.0 distribution by Ioi Lam.
 The bitmap data are also from Tix4.1.0. For everything else:
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013 by Alex Becker
+Copyright (C) 2013-2020 by Alexander Becker
 
 Copyright (c) 1997-1998 Achim Bohnet. All rights reserved.
 

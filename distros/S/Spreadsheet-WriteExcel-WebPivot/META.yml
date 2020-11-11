@@ -1,0 +1,31 @@
+---
+abstract: 'generates an MS Excel Web Pivot table for IE '
+author:
+  - 'Nathan Lewis <nathanl@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-WriteExcel-WebPivot
+requires:
+  DBI: '0'
+  Exporter: '0'
+  FileHandle: '0'
+  POSIX: '0'
+  Switch: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cpan-janitor/Spreadsheet-WriteExcel-WebPivot/issues
+  homepage: https://github.com/cpan-janitor/Spreadsheet-WriteExcel-WebPivot
+  repository: https://github.com/cpan-janitor/Spreadsheet-WriteExcel-WebPivot.git
+version: '0.02'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

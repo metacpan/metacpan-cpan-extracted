@@ -11,7 +11,7 @@ plan tests => 1;
 pod_coverage_ok(
         "PostScript::PPD",
         { also_private => [ 
-                    qr/^_.+$/,
+                    qr/^_.+$/, "DEBUG"
                 ], 
         },
         "PostScript::PPD, ignoring private functions",

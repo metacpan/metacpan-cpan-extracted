@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.90-1-g29c7f8b
+# git description: v0.91-10-g426c706
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.91';
+$TAP::DOM::VERSION = '0.92';
 use 5.006;
 use strict;
 use warnings;
@@ -75,6 +75,35 @@ our %EXPORT_TAGS = (constants => [ qw( $IS_PLAN
                                        $HAS_SKIP
                                        $HAS_TODO
                                     ) ] );
+
+# TAP severity level definition:
+#
+# |--------+-------+----------+--------------+----------+------------+----------|
+# | *type* | is_ok | has_todo | is_actual_ok | has_skip | *mnemonic* | *tapcon* |
+# |--------+-------+----------+--------------+----------+------------+----------|
+# | plan   | undef |    undef |        undef |        1 | ok_skip    |        3 |
+# |--------+-------+----------+--------------+----------+------------+----------|
+# | test   |     1 |        0 |            0 |        0 | ok         |        1 |
+# | test   |     1 |        1 |            1 |        0 | ok_todo    |        2 |
+# | test   |     1 |        0 |            0 |        1 | ok_skip    |        3 |
+# | test   |     1 |        1 |            0 |        0 | notok_todo |        4 |
+# | test   |     0 |        0 |            0 |        0 | notok      |        5 |
+# | test   |     0 |        0 |            0 |        1 | notok_skip |        6 |
+# |--------+-------+----------+--------------+----------+------------+----------|
+# |        |       |          |              |          | missing    |        0 |
+# |--------+-------+----------+--------------+----------+------------+----------|
+
+our $severity = {};
+#
+#          {type} {is_ok} {has_todo} {is_actual_ok} {has_skip} = $severity;
+#
+$severity->{plan}    {''}        {0}            {0}        {1} = 3; # ok_skip
+$severity->{test}     {1}        {0}            {0}        {0} = 1; # ok
+$severity->{test}     {1}        {1}            {1}        {0} = 2; # ok_todo
+$severity->{test}     {1}        {0}            {0}        {1} = 3; # ok_skip
+$severity->{test}     {1}        {1}            {0}        {0} = 4; # notok_todo
+$severity->{test}     {0}        {0}            {0}        {0} = 5; # notok
+$severity->{test}     {0}        {0}            {0}        {1} = 6; # notok_skip
 
 our $obvious_tap_line = qr/(1\.\.|ok\s|not\s+ok\s|#|\s|tap\s+version|pragma|Bail out!)/i;
 
@@ -205,12 +234,12 @@ sub new {
                 $entry->{is_has} = 0 if $USEBITSETS;
 
                 # test info
-                foreach (qw(raw as_string )) {
+                foreach (qw(type raw as_string )) {
                         $entry->{$_} = $result->$_ unless $IGNORE{$_};
                 }
 
                 if ($result->is_test) {
-                        foreach (qw(type directive explanation number description )) {
+                        foreach (qw(directive explanation number description )) {
                                 $entry->{$_} = $result->$_ unless $IGNORE{$_};
                         }
                         foreach (qw(is_ok is_unplanned )) {
@@ -225,6 +254,9 @@ sub new {
                 # plan
                 if ($result->is_plan) {
                   $plan = $result->as_string;
+                  foreach (qw(directive explanation)) {
+                          $entry->{$_} = $result->$_ unless $IGNORE{$_};
+                  }
 
                   # save Dangling kv_data to plan entry. The situation
                   # that we already collected kv_data but haven't got
@@ -312,6 +344,18 @@ sub new {
                         }
                         $document_data{$key} = $value unless $lines[-1]->is_test && $DISABLE_GLOBAL_KV_DATA;
                 }}
+
+                # calculate severity
+                if ($entry->{is_test} or $entry->{is_plan}) {
+                  no warnings 'uninitialized';
+                  $entry->{severity} = $severity
+                    ->{$entry->{type}}
+                    ->{$entry->{is_ok}}
+                    ->{$entry->{has_todo}}
+                    ->{$entry->{is_actual_ok}}
+                    ->{$entry->{has_skip}};
+                }
+                $entry->{severity} = 0 if not defined $entry->{severity};
 
                 # yaml and comments are taken as children of the line before
                 if ($result->is_yaml or $result->is_comment and @lines)
@@ -745,6 +789,7 @@ yourself.
                'is_yaml'      => 0,
                'has_skip'     => 0,
                'has_todo'     => 0,
+               'severity'     => 0,
                'raw'          => 'TAP version 13'
                'as_string'    => 'TAP version 13',
               },
@@ -760,6 +805,7 @@ yourself.
                 'is_yaml'      => 0,
                 'has_skip'     => 0,
                 'has_todo'     => 0,
+                'severity'     => 0,
                 'raw'          => '1..6'
                 'as_string'    => '1..6',
               },
@@ -778,6 +824,7 @@ yourself.
                 'has_skip'     => 0,
                 'has_todo'     => 0,
                 'number'       => '1',                   # <---
+                'severity'     => 1,
                 'type'         => 'test',
                 'raw'          => 'ok 1 - use Data::DPath;'
                 'as_string'    => 'ok 1 - use Data::DPath;',
@@ -842,6 +889,7 @@ yourself.
                 'type'         => 'test',
                 'description'  => '- KEYs + PARENT',
                 'directive'    => '',
+                'severity'     => 1,
                 'raw'          => 'ok 2 - KEYs + PARENT'
                 'as_string'    => 'ok 2 - KEYs + PARENT',
               },
@@ -1110,6 +1158,52 @@ structure looks like this:
 =head2 tests_run
 
 =head2 version
+
+=head1 ATTRIBUTES
+
+=head2 severity
+
+The C<severity> describes the combination of C<ok>/C<not ok> and
+C<todo>/C<skip> directives as one single numeric value.
+
+This allows to handle the otherwise I<nominal> values as I<ordinal>
+value, i.e., with a particular order.
+
+This order is explained as this:
+
+=over 4
+
+=item * 0 - represents the 'missing' severity.
+
+It is used for all things that are not a test or as fallback when the
+other attributes appear in illegal combinations (like saying both SKIP
+and TODO).
+
+=item * 1 - straight ok.
+
+=item * 2 - ok with a C<#TODO>
+
+That's slightly worse than a straight ok because of the directive
+
+=item * 3 - ok with a C<#SKIP>
+
+That's one step worse because the ok is not from actual test
+execution, as that's what skip means.
+
+=item * 4 - not_ok with a C<#TODO>
+
+That's worse as it represets a fail but it's a known issue.
+
+=item * 5 - straight not_ok.
+
+A straight fail as the worst real-world value.
+
+=item * 6 - forbidden combination of a not_ok with a C<#SKIP>.
+
+How can it fail when it was skipped? That's why it's even worse than
+worst.
+
+=back
 
 =head1 AUTHOR
 

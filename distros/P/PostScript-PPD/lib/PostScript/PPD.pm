@@ -9,7 +9,9 @@ use Carp qw( carp croak confess cluck );
 use Storable qw( dclone );
 use IO::File;
 
-our $VERSION = '0.0206';
+our $VERSION = '0.0300';
+
+sub DEBUG () { 0 }
 
 ################################################
 sub new
@@ -33,8 +35,8 @@ sub load
     delete @{ $self }{ keys %$self };
 
     local $self->{__read_state};
+    local $self->{__position} = { file=>$file, line=>0};
 
-    my $linenum = 0;
     eval {
         if( $file =~ /\.gz$/ ) {
             my $gz = gzopen( $file, "rb" );
@@ -43,7 +45,7 @@ sub load
 
             my( $line, $size );
             while( $size = $gz->gzreadline( $line ) ) {
-                $linenum++;
+                $self->{__position}{line}++;
                 $self->__read_line( $line );
             }
         }
@@ -52,14 +54,33 @@ sub load
             croak "Unable to read $file: $!" unless $fh;
             $self->{file} = $file;
             while( <$fh> ) {
-                $DB::single = 1 if $. == 109;
-                $linenum++;
+                $self->{__position}{line}++;
                 $self->__read_line( $_ );
             }
         }
     };
     if( $@ ) {
-        die "File $file line $linenum: $@";
+        die "File $self->{__position}{file} line $self->{__position}{line}: $@";
+    }
+}
+
+################################################
+sub parse
+{
+    my( $self, $text ) = @_;
+
+    delete @{ $self }{ keys %$self };
+
+    local $self->{__read_state};
+    local $self->{__position} = { file=>'string', line=>0};
+    eval {
+        foreach my $line ( split /\n/, $text ) {
+            $self->{__position}{line}++;
+            $self->__read_line( $line );
+        }
+    };
+    if( $@ ) {
+        die "String line $self->{__position}{line}: $@";
     }
 }
 
@@ -75,7 +96,6 @@ sub __read_line
                               };
     my $S = $self->{__read_state};
 
-#    $DB::single = 1 if $line =~ /CloseUI \*HPCollateSupported/;
     if( $S->{key} ) {
         $self->__append( $line );
         return;
@@ -110,21 +130,22 @@ sub __read_line
         return;
     }
     # New tupple
-    if( $line =~ /^(\*([^:]+):\s*)/ ) {
+    if( $line =~ /^(\*\s*([^:]+):\s*)/ ) {
         $S->{key} = $2;
         $S->{value} = '';
-        $self->__append( substr $line, length $1 );
+        my $used=length $1;
+        $self->__append( substr $line, $used );
         return;
     }
     return unless $line =~ /\S/;
     
-    warn "What's with line '$line'";
+    warn "What's with line '$line' at $self->{__position}{file} line $self->{__position}{line}";
 }
 
 ################################################
 sub __append
 {
-    my( $self, $line, $len ) = @_;
+    my( $self, $line ) = @_;
 
     my $S = $self->{__read_state};
     my $exit = 0;
@@ -135,13 +156,13 @@ sub __append
     }    
     elsif( $line =~ m/^"/ ) {
         $exit = ( 0 != length $S->{value} );
+#        $line =~ s/^"\s+$//;
     }
     elsif( not $S->{value} ) {
         $line =~ s/\s+$//;
     }
-
-    if( $line =~ /"\s*$/ and $line ne qq("\n) ) {
-        $exit = 1;
+    if( $line =~ /"\s*$/ and not $line =~ m/^"\s*$/ ) {
+        $exit = 1; # ( 0 != length $S->{value} );
     }
     if( $line =~ s/&&\s*$// ) {
         $exit = 0;
@@ -213,9 +234,23 @@ sub __new_option
 
     $self->__new_key( $key );
 
-    $C->{$key} ||= {
+    if( $C->{$key} ) {
+        unless( 'HASH' eq ref $C->{$key} ) {
+            # Promote *foo: "something" to *foo _: "something"
+            # wish I had a better name for _
+            $C->{$key} = { '_' => {  __name => '_',
+                                     __text => '_',
+                                     value => $C->{$key} 
+                                    }
+                         };
+        }
+    }
+    else {
+        $C->{$key} = {
                        __sorted => []
                    };
+    }
+    DEBUG and warn "new option key=$key tname=$tname";
 
     $C->{$key}{$tname} = { __name => $tname,
                            __text => $text,
@@ -316,10 +351,17 @@ sub AUTOLOAD
 sub get
 {
     my( $self, $D, $name, $subkey ) = @_;
+    if( @_ == 2 ) {
+        $name = $D;
+        $D = $self;
+    }
 
     return unless exists $D->{$name};
     my $ret = $D->{$name};
     if( ref $ret ) {
+        if( not $subkey and 'HASH' eq ref $ret and $ret->{"_"} ) {
+            $subkey = "_";
+        }
         if( $subkey ) {
             $D = $ret;
             $name = $subkey;
@@ -579,6 +621,12 @@ Create the object, optionally loading C<$ppdfile>.
 
 Load a PPD file.
 
+=head2 parse
+
+    $ppd->parse( $text );
+
+Parses a PPD as a string.  Uses C<"\n"> as line sepperators.
+
 =head2 get
 
     my $value = $ppd->get( $name );
@@ -696,7 +744,7 @@ Philip Gwyn, E<lt>gwyn-at-cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2011 by Philip Gwyn
+Copyright (C) 2008-2020 by Philip Gwyn
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

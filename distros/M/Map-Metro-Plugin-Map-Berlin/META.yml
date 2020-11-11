@@ -26,5 +26,5 @@ requires:
   Types::Path::Tiny: '0'
 resources:
   repository: https://github.com/eserte/Map-Metro-Plugin-Map-Berlin.git
-version: '2019.1215'
+version: '2020.1101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

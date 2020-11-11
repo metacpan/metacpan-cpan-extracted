@@ -33,6 +33,7 @@ BOOT {
         cbn.on_fs_poll  = nullptr;
         cbn.on_fs_start = nullptr;
     });
+    unievent::register_perl_class(FsPoll::TYPE, stash);
 }
 
 FsPoll* FsPoll::new (LoopSP loop = {}) {

@@ -3,15 +3,14 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Entry;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::Widget::Entry 0.31;
+class Tickit::Widget::Entry
+   extends Tickit::Widget;
+
 use Tickit::Style;
 Tickit::Window->VERSION( '0.39' ); # expose_after_scroll default on
-
-our $VERSION = '0.30';
 
 use Tickit::Utils qw( textwidth chars2cols cols2chars substrwidth );
 
@@ -178,23 +177,26 @@ Optional. Callback function to invoke when the C<< <Enter> >> key is pressed.
 
 =cut
 
-sub new
+has $_text;
+has $_pos_ch;
+has $_scrolloffs_co = 0;
+has $_overwrite     = 0;
+has %_keybindings;
+has $_on_enter;
+
+BUILD
 {
-   my $class = shift;
    my %params = @_;
 
-   my $self = $class->SUPER::new( %params );
+   $_text = defined $params{text} ? $params{text} : "";
+   $_pos_ch = defined $params{position} ? $params{position} : 0;
 
-   $self->{text} = defined $params{text} ? $params{text} : "";
-   $self->{pos_ch} = defined $params{position} ? $params{position} : 0;
+   my $textlen = length $_text;
+   $_pos_ch = $textlen if $_pos_ch > $textlen;
 
-   my $textlen = length $self->{text};
-   $self->{pos_ch} = $textlen if $self->{pos_ch} > $textlen;
-
-   $self->{scrolloffs_co} = 0;
-   $self->{overwrite} = 0;
-
-   $self->{keybindings} = {
+   # TODO: It'd be nice to get this out of Object::Pad but it's a list on a
+   #   hash and thus not const
+   %_keybindings = (
       'C-a' => "key_beginning_of_line",
       'C-e' => "key_end_of_line",
       'C-k' => "key_delete_line",
@@ -216,68 +218,58 @@ sub new
       'C-Left'      => "key_backward_word",
       'Right'       => "key_forward_char",
       'C-Right'     => "key_forward_word",
-   };
+   );
 
    $self->set_on_enter( $params{on_enter} ) if defined $params{on_enter};
 
    # Since we take keyboard input we almost certainly want to take focus here
    $self->take_focus;
-
-   return $self;
 }
 
-sub lines { 1 }
-sub cols  { 5 }
+method lines { 1 }
+method cols  { 5 }
 
-sub char2col
+method char2col
 {
-   my $self = shift;
    my ( $ch ) = @_;
 
-   return scalar chars2cols $self->{text}, $ch;
+   return scalar chars2cols $_text, $ch;
 }
 
-sub pretext_width
+method pretext_width
 {
-   my $self = shift;
-
-   return 0 if $self->{scrolloffs_co} == 0;
+   return 0 if $_scrolloffs_co == 0;
    return textwidth( $self->get_style_values( "more_left" ) );
 }
 
-sub pretext_render
+method pretext_render
 {
-   my $self = shift;
    my ( $rb ) = @_;
 
    $rb->text_at( 0, 0, $self->get_style_values( "more_left" ), $self->get_style_pen( "more" ) );
 }
 
-sub posttext_width
+method posttext_width
 {
-   my $self = shift;
-
-   return 0 if textwidth( $self->text ) <= $self->{scrolloffs_co} + $self->window->cols;
+   return 0 if textwidth( $self->text ) <= $_scrolloffs_co + $self->window->cols;
    return textwidth( $self->get_style_values( "more_right" ) );
 }
 
-sub posttext_render
+method posttext_render
 {
-   my $self = shift;
    my ( $rb ) = @_;
 
    $rb->text_at( 0, 0, $self->get_style_values( "more_right" ), $self->get_style_pen( "more" ) );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my $cols = $self->window->cols;
 
    if( $rect->top == 0 ) {
-      my $text = substrwidth( $self->text, $self->{scrolloffs_co}, $cols );
+      my $text = substrwidth( $self->text, $_scrolloffs_co, $cols );
 
       $rb->goto( 0, 0 );
       $rb->text( $text ) if length $text;
@@ -310,13 +302,12 @@ sub render_to_rb
    $self->reposition_cursor;
 }
 
-sub _recalculate_scroll
+method _recalculate_scroll
 {
-   my $self = shift;
    my ( $pos_ch ) = @_;
 
    my $pos_co = $self->char2col( $pos_ch );
-   my $off_co = $self->{scrolloffs_co};
+   my $off_co = $_scrolloffs_co;
 
    my $pos_x = $pos_co - $off_co;
 
@@ -337,33 +328,31 @@ sub _recalculate_scroll
       $pos_x = $pos_co - $off_co;
    }
 
-   return $off_co if $off_co != $self->{scrolloffs_co};
+   return $off_co if $off_co != $_scrolloffs_co;
    return undef;
 }
 
-sub reposition_cursor
+method reposition_cursor
 {
-   my $self = shift;
    my ( $pos_ch ) = @_;
 
    my $win = $self->window or return;
 
-   $self->{pos_ch} = $pos_ch if defined $pos_ch;
+   $_pos_ch = $pos_ch if defined $pos_ch;
 
-   my $new_scrolloffs = $self->_recalculate_scroll( $self->{pos_ch} );
+   my $new_scrolloffs = $self->_recalculate_scroll( $_pos_ch );
    if( defined $new_scrolloffs ) {
-      $self->{scrolloffs_co} = $new_scrolloffs;
+      $_scrolloffs_co = $new_scrolloffs;
       $self->redraw;
    }
 
-   my $pos_x = $self->char2col( $self->{pos_ch} ) - $self->{scrolloffs_co};
+   my $pos_x = $self->char2col( $_pos_ch ) - $_scrolloffs_co;
 
    $win->cursor_at( 0, $pos_x );
 }
 
-sub _text_spliced
+method _text_spliced
 {
-   my $self = shift;
    my ( $pos_ch, $deleted, $inserted, $at_end ) = @_;
 
    my $win = $self->window;
@@ -375,7 +364,7 @@ sub _text_spliced
    my $delta_co = $insertedlen_co - $deletedlen_co;
 
    my $pos_co = $self->char2col( $pos_ch );
-   my $pos_x  = $pos_co - $self->{scrolloffs_co};
+   my $pos_x  = $pos_co - $_scrolloffs_co;
 
    # Don't bother at all if the affected range is scrolled off the right
    return if $pos_x >= $width;
@@ -413,7 +402,7 @@ sub _text_spliced
       }
    }
 
-   if( $delta_co < 0 and $self->{scrolloffs_co} + $width < textwidth $self->text ) {
+   if( $delta_co < 0 and $_scrolloffs_co + $width < textwidth $self->text ) {
       # Add extra damage to redraw the trashed posttext marker
       my $rhs_x = -$delta_co + $self->posttext_width;
 
@@ -423,9 +412,8 @@ sub _text_spliced
    }
 }
 
-sub on_key
+method on_key
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    return 0 unless $self->window->is_focused;
@@ -433,7 +421,7 @@ sub on_key
    my $type = $args->type;
    my $str  = $args->str;
 
-   if( $type eq "key" and my $code = $self->{keybindings}{$str} ) {
+   if( $type eq "key" and my $code = $_keybindings{$str} ) {
       $self->$code( $str );
       return 1;
    }
@@ -445,22 +433,20 @@ sub on_key
    return 0;
 }
 
-sub on_text
+method on_text
 {
-   my $self = shift;
    my ( $text ) = @_;
 
-   $self->text_splice( $self->{pos_ch}, $self->{overwrite} ? 1 : 0, $text );
+   $self->text_splice( $_pos_ch, $_overwrite ? 1 : 0, $text );
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    return unless $args->type eq "press" and $args->button == 1;
 
-   my $pos_ch = scalar cols2chars $self->{text}, $args->col + $self->{scrolloffs_co};
+   my $pos_ch = scalar cols2chars $_text, $args->col + $_scrolloffs_co;
    $self->set_position( $pos_ch );
 }
 
@@ -471,14 +457,6 @@ sub on_mouse
 =head2 on_enter
 
    $on_enter = $entry->on_enter
-
-=cut
-
-sub on_enter
-{
-   my $self = shift;
-   return $self->{on_enter};
-}
 
 =head2 set_on_enter
 
@@ -491,10 +469,11 @@ action is invoked; usually bound to the C<Enter> key.
 
 =cut
 
-sub set_on_enter
+method on_enter { $_on_enter }
+
+method set_on_enter
 {
-   my $self = shift;
-   ( $self->{on_enter} ) = @_;
+   ( $_on_enter ) = @_;
 }
 
 =head2 position
@@ -505,11 +484,7 @@ Returns the current entry position, in terms of characters within the text.
 
 =cut
 
-sub position
-{
-   my $self = shift;
-   return $self->{pos_ch};
-}
+method position { $_pos_ch }
 
 =head2 set_position
 
@@ -519,13 +494,12 @@ Set the text entry position, moving the cursor
 
 =cut
 
-sub set_position
+method set_position
 {
-   my $self = shift;
    my ( $pos_ch ) = @_;
 
    $pos_ch = 0 if $pos_ch < 0;
-   $pos_ch = length $self->{text} if $pos_ch > length $self->{text};
+   $pos_ch = length $_text if $pos_ch > length $_text;
 
    $self->reposition_cursor( $pos_ch );
 }
@@ -550,18 +524,17 @@ will remove it.
 
 =cut
 
-sub bind_keys
+method bind_keys
 {
-   my $self = shift;
    while( @_ ) {
       my $str   = shift;
       my $value = shift;
 
       if( defined $value ) {
-         $self->{keybindings}{$str} = $value;
+         $_keybindings{$str} = $value;
       }
       else {
-         delete $self->{keybindings}{$str};
+         delete $_keybindings{$str};
       }
    }
 }
@@ -582,11 +555,7 @@ Returns the currently entered text.
 
 =cut
 
-sub text
-{
-   my $self = shift;
-   return $self->{text};
-}
+method text { $_text }
 
 =head2 set_text
 
@@ -599,13 +568,12 @@ C<text_splice>.
 
 =cut
 
-sub set_text
+method set_text
 {
-   my $self = shift;
    my ( $text ) = @_;
 
-   $self->{text} = $text;
-   $self->{pos_ch} = length $text if $self->{pos_ch} > length $text;
+   $_text = $text;
+   $_pos_ch = length $text if $_pos_ch > length $text;
 
    $self->redraw;
 }
@@ -618,9 +586,8 @@ Insert the given text at the given character position.
 
 =cut
 
-sub text_insert
+method text_insert
 {
-   my $self = shift;
    my ( $text, $pos_ch ) = @_;
 
    $self->text_splice( $pos_ch, 0, $text );
@@ -634,9 +601,8 @@ Delete the given section of text. Returns the deleted text.
 
 =cut
 
-sub text_delete
+method text_delete
 {
-   my $self = shift;
    my ( $pos_ch, $len_ch ) = @_;
 
    return $self->text_splice( $pos_ch, $len_ch, "" );
@@ -651,26 +617,25 @@ text deleted from the section.
 
 =cut
 
-sub text_splice
+method text_splice
 {
-   my $self = shift;
    my ( $pos_ch, $len_ch, $text ) = @_;
 
    my $textlen_ch = length($text);
 
    my $delta_ch = $textlen_ch - $len_ch;
 
-   my $at_end = ( $pos_ch == length $self->{text} );
+   my $at_end = ( $pos_ch == length $_text );
 
-   my $deleted = substr( $self->{text}, $pos_ch, $len_ch, $text );
+   my $deleted = substr( $_text, $pos_ch, $len_ch, $text );
 
    my $new_pos_ch;
 
-   if( $self->{pos_ch} >= $pos_ch + $len_ch ) {
+   if( $_pos_ch >= $pos_ch + $len_ch ) {
       # Cursor after splice; move to suit
       $new_pos_ch = $self->position + $delta_ch;
    }
-   elsif( $self->{pos_ch} >= $pos_ch ) {
+   elsif( $_pos_ch >= $pos_ch ) {
       # Cursor within splice; move to end
       $new_pos_ch = $pos_ch + $textlen_ch;
    }
@@ -681,7 +646,7 @@ sub text_splice
       $self->_text_spliced( $pos_ch, $deleted, $text, $at_end );
    }
 
-   $self->reposition_cursor( $new_pos_ch ) if defined $new_pos_ch and $new_pos_ch != $self->{pos_ch};
+   $self->reposition_cursor( $new_pos_ch ) if defined $new_pos_ch and $new_pos_ch != $_pos_ch;
 
    return $deleted;
 }
@@ -696,9 +661,8 @@ C<$else>.
 
 =cut
 
-sub find_bow_forward
+method find_bow_forward
 {
-   my $self = shift;
    my ( $pos, $else ) = @_;
 
    my $posttext = substr( $self->text, $pos );
@@ -716,9 +680,8 @@ the string.
 
 =cut
 
-sub find_eow_forward
+method find_eow_forward
 {
-   my $self = shift;
    my ( $pos ) = @_;
 
    my $posttext = substr( $self->text, $pos );
@@ -737,9 +700,8 @@ returns 0.
 
 =cut
 
-sub find_bow_backward
+method find_bow_backward
 {
-   my $self = shift;
    my ( $pos ) = @_;
 
    my $pretext = substr( $self->text, 0, $pos );
@@ -757,9 +719,8 @@ C<undef>.
 
 =cut
 
-sub find_eow_backward
+method find_eow_backward
 {
-   my $self = shift;
    my ( $pos ) = @_;
 
    my $pretext = substr( $self->text, 0, $pos + 1 ); # +1 to allow if cursor is on the space
@@ -769,121 +730,92 @@ sub find_eow_backward
 
 ## Key binding methods
 
-sub key_backward_char
+method key_backward_char
 {
-   my $self = shift;
-
-   if( $self->{pos_ch} > 0 ) {
-      $self->set_position( $self->{pos_ch} - 1 );
+   if( $_pos_ch > 0 ) {
+      $self->set_position( $_pos_ch - 1 );
    }
 }
 
-sub key_backward_delete_char
+method key_backward_delete_char
 {
-   my $self = shift;
-
-   if( $self->{pos_ch} > 0 ) {
-      $self->text_delete( $self->{pos_ch} - 1, 1 );
+   if( $_pos_ch > 0 ) {
+      $self->text_delete( $_pos_ch - 1, 1 );
    }
 }
 
-sub key_backward_delete_line
+method key_backward_delete_line
 {
-   my $self = shift;
-
-   $self->text_delete( 0, $self->{pos_ch} );
+   $self->text_delete( 0, $_pos_ch );
 }
 
-sub key_backward_delete_word
+method key_backward_delete_word
 {
-   my $self = shift;
-
-   my $bow = $self->find_bow_backward( $self->{pos_ch} );
-   $self->text_delete( $bow, $self->{pos_ch} - $bow );
+   my $bow = $self->find_bow_backward( $_pos_ch );
+   $self->text_delete( $bow, $_pos_ch - $bow );
 }
 
-sub key_backward_word
+method key_backward_word
 {
-   my $self = shift;
-
-   if( $self->{pos_ch} > 0 ) {
-      $self->set_position( $self->find_bow_backward( $self->{pos_ch} ) );
+   if( $_pos_ch > 0 ) {
+      $self->set_position( $self->find_bow_backward( $_pos_ch ) );
    }
 }
 
-sub key_beginning_of_line
+method key_beginning_of_line
 {
-   my $self = shift;
-
    $self->set_position( 0 );
 }
 
-sub key_delete_line
+method key_delete_line
 {
-   my $self = shift;
-
    $self->text_delete( 0, length $self->text );
 }
 
-sub key_end_of_line
+method key_end_of_line
 {
-   my $self = shift;
-
-   $self->set_position( length $self->{text} );
+   $self->set_position( length $_text );
 }
 
-sub key_enter_line
+method key_enter_line
 {
-   my $self = shift;
-
    my $text = $self->text;
    return unless length $text;
 
-   my $on_enter = $self->{on_enter} or return;
-   $on_enter->( $self, $text );
+   $_on_enter->( $self, $text ) if $_on_enter;
 }
 
-sub key_forward_char
+method key_forward_char
 {
-   my $self = shift;
-
-   if( $self->{pos_ch} < length $self->{text} ) {
-      $self->set_position( $self->{pos_ch} + 1 );
+   if( $_pos_ch < length $_text ) {
+      $self->set_position( $_pos_ch + 1 );
    }
 }
 
 # Renamed from readline's "delete-char" because this one doesn't have the EOF
 # behaviour if input line is empty
-sub key_forward_delete_char
+method key_forward_delete_char
 {
-   my $self = shift;
-
-   if( $self->{pos_ch} < length $self->{text} ) {
-      $self->text_delete( $self->{pos_ch}, 1 );
+   if( $_pos_ch < length $_text ) {
+      $self->text_delete( $_pos_ch, 1 );
    }
 }
 
-sub key_forward_delete_word
+method key_forward_delete_word
 {
-   my $self = shift;
-
-   my $bow = $self->find_bow_forward( $self->{pos_ch}, length $self->text );
-   $self->text_delete( $self->{pos_ch}, $bow - $self->{pos_ch} );
+   my $bow = $self->find_bow_forward( $_pos_ch, length $self->text );
+   $self->text_delete( $_pos_ch, $bow - $_pos_ch );
 }
 
-sub key_forward_word
+method key_forward_word
 {
-   my $self = shift;
-
-   my $bow = $self->find_bow_forward( $self->{pos_ch}, length $self->text );
+   my $bow = $self->find_bow_forward( $_pos_ch, length $self->text );
    $self->set_position( $bow );
 }
 
-sub key_overwrite_mode
+method key_overwrite_mode
 {
-   my $self = shift;
-
-   $self->{overwrite} = !$self->{overwrite};
+   $_overwrite = !$_overwrite;
 }
 
 =head1 TODO

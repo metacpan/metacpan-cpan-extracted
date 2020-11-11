@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'Promise::XS',
-    VERSION_FROM      => 'lib/Promise/XS/Loader.pm', # finds $VERSION
+    VERSION_FROM      => 'lib/Promise/XS.pm', # finds $VERSION
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Promise/XS.pm', # retrieve abstract from module
        AUTHOR         => [

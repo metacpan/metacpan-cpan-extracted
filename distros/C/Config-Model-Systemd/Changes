@@ -1,3 +1,13 @@
+0.246.1 2020-11-08
+
+  Model update:
+    * update parameters from systemd 246 source
+    * model doc now provides URL links from systemd doc
+
+  Model generator (parse-man.pl) changes:
+    * parse-man: fix doc parsing
+    * parse-man: translate URL in pod links
+
 0.244.1 2019-12-15
 
   Model update:

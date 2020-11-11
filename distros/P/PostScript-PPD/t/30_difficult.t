@@ -6,11 +6,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/..";
 
-use Test::More ( tests => 18 );
+use Test::More ( tests => 24 );
 use Data::Dumper;
 
 use t::ChkUtil;
-dualvar_or_skip 17;
+dualvar_or_skip 24;
 
 use_ok( 'PostScript::PPD' );
 
@@ -40,6 +40,8 @@ my $la = $it->LineArt;
 # warn $la->Dump;
 is( $la->name, 'LineArt', " ... name" );
 is( $la->text, '"Line Art"', " ... text" );
+is( $la->honk, undef );
+
 
 ##########################################
 $ppd->load( "t/ppd/LJ4L.ppd" );
@@ -87,3 +89,29 @@ is( "$A", q,
 $ppd->load( "t/ppd/lj4515.ppd" );
 pass( "Loaded LJ 4L ppd" );
 
+$ppd->load( "t/ppd/stlin.ppd" );
+pass( "Loaded Lexmark T641 ppd" );
+
+my $oid = $ppd->OIDOptDuplex;
+isa_ok( $oid, "PostScript::PPD::Subkey", "OID promoted to subkey" ) or die Dumper $oid;
+is( $oid->value, ".1.3.6.1.2.1.43.13.4.1.10.1.2", " ... value" );
+
+my $proc = $ppd->DefaultScreenProc;
+is( $proc, 'Dot', "* DefaultScreenProc" );
+
+my $ps = $ppd->FontList;
+is( $ps, "
+\tsave
+\t2 dict begin
+\t\t/sv exch def
+\t\t/str 128 string def
+\t\tFontDirectory { pop == } bind forall flush
+\t\t/filenameforall where
+\t\t{ pop save (fonts/*)
+\t\t\t{ dup length 6 sub 6 exch getinterval cvn == } bind
+\t\t\tstr filenameforall flush restore
+\t\t} if
+\t\t(*) = flush
+\t\tsv
+\tend
+\trestore", "Multiline" ) or warn "'$ps'";

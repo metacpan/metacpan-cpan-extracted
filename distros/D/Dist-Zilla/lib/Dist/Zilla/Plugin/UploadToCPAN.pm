@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::UploadToCPAN 6.015;
+package Dist::Zilla::Plugin::UploadToCPAN 6.017;
 # ABSTRACT: upload the dist to CPAN
 
 use Moose;
@@ -222,6 +222,32 @@ has upload_uri => (
   predicate => 'has_upload_uri',
 );
 
+#pod =attr retries
+#pod
+#pod The number of retries to perform on upload failure (5xx response). The default
+#pod is set to 3 by this plugin. This option will be passed to L<CPAN::Uploader>.
+#pod
+#pod =cut
+
+has retries => (
+  is => 'ro',
+  isa => 'Int',
+  default => 3,
+);
+
+#pod =attr retry_delay
+#pod
+#pod The number of seconds to wait between retries. The default is set to 5 seconds
+#pod by this plugin. This option will be passed to L<CPAN::Uploader>.
+#pod
+#pod =cut
+
+has retry_delay => (
+  is => 'ro',
+  isa => 'Int',
+  default => 5,
+);
+
 has uploader => (
   is   => 'ro',
   isa  => 'CPAN::Uploader',
@@ -240,6 +266,10 @@ has uploader => (
            ? (subdir => $self->subdir) : ()),
       ($self->has_upload_uri
            ? (upload_uri => $self->upload_uri) : ()),
+      ($self->retries
+           ? (retries => $self->retries) : ()),
+      ($self->retry_delay
+           ? (retry_delay => $self->retry_delay) : ()),
     });
 
     $uploader->{'Dist::Zilla'}{plugin} = $self;
@@ -285,7 +315,7 @@ Dist::Zilla::Plugin::UploadToCPAN - upload the dist to CPAN
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 SYNOPSIS
 
@@ -359,6 +389,16 @@ which to upload.  Using this option is not recommended.
 If given, this specifies an alternate URI for the PAUSE upload form.  By
 default, the default supplied by L<CPAN::Uploader> is used.  Using this option
 is not recommended in most cases.
+
+=head2 retries
+
+The number of retries to perform on upload failure (5xx response). The default
+is set to 3 by this plugin. This option will be passed to L<CPAN::Uploader>.
+
+=head2 retry_delay
+
+The number of seconds to wait between retries. The default is set to 5 seconds
+by this plugin. This option will be passed to L<CPAN::Uploader>.
 
 =head1 AUTHOR
 

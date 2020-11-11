@@ -4,18 +4,19 @@
       "Dave Cross <dave@mag-sol.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parse-RPM-Spec",
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0"
          }
       },
@@ -34,15 +35,20 @@
    "provides" : {
       "Parse::RPM::Spec" : {
          "file" : "lib/Parse/RPM/Spec.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/parse-rpm-spec.git",
+         "web" : "https://github.com/davorg/parse-rpm-spec"
+      }
    },
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

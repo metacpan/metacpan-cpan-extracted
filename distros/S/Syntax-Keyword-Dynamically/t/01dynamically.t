@@ -68,11 +68,16 @@ subtest "array element" => sub {
 subtest "hash element" => sub {
    my %hash = ( key => "old" );
 
+   # RT132545
+   my $svref = \$hash{key};
+
    {
       dynamically $hash{key} = "new";
       is( $hash{key}, "new", 'new value within scope' );
+      is( $$svref, "new", 'new value by SV ref' );
    }
    is( $hash{key}, "old", 'value restored after block leave' );
+   is( $$svref, "old", 'old value by SV ref is restored' );
 
    {
       dynamically $hash{newkey} = "val";

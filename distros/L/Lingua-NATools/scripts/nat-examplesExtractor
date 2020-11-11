@@ -6,7 +6,7 @@ use strict;
 use POSIX qw(locale_h);
 use IPC::Open2;
 
-setlocale(LC_CTYPE, "pt_PT");
+setlocale(LC_CTYPE, "pt_PT.UTF-8");
 use locale;
 use Data::Dumper;
 use Lingua::NATools;

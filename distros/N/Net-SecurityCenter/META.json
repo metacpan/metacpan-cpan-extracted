@@ -35,7 +35,8 @@
             "JSON" : "0",
             "LWP::UserAgent" : "6.04",
             "Time::Piece" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -53,6 +54,6 @@
          "web" : "https://github.com/giterlizzi/perl-Net-SecurityCenter"
       }
    },
-   "version" : "0.206",
+   "version" : "0.300",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

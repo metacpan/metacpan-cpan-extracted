@@ -8,7 +8,17 @@ my $build = Module::Build->new(
         Template        => 0,
         AudioFile::Info => '2.0.1',
     },
-    create_makefile_pl => 'traditional'
+    create_makefile_pl => 'traditional',
+    meta_merge => {
+        'meta-spec' => { version => 2 },
+        resources  => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/davorg/template-plugin-audiofile-info.git',
+                web  => 'https://github.com/davorg/template-plugin-audiofile-info',
+            },
+        },
+    },
 );
 
 $build->create_build_script;

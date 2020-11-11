@@ -1,3 +1,22 @@
+3.04    2020-11-08      Script args can be --args, to be a bit more conventional
+
+3.03    2020-10-29      There are more exciting ways in which perldoc can be
+                          missing
+
+3.02    2020-10-28      Patch to force perldoc to not use a pager when the
+                          scripts use it to show help
+
+3.01    2020-10-27      Patch for broken systems that don't have perldoc
+
+3.00    2020-10-27      configure_requires is now on by default (and can't be
+                          switched off either);
+                        Support multiple CPAN mirrors;
+                        CPAN indices are only cached for three minutes instead
+                          of for the life of your process;
+                        maxdepth 0 now works;
+                        Add cpandeps-diff script;
+                        Add extra doco re dynamic dependencies
+
 2.49    2019-10-23      Support for configure_requires
 
 2.48    2018-05-24      search.cpan.org is going away so switch to using

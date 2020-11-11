@@ -1,9 +1,9 @@
 package App::OfficeUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-26'; # DATE
+our $DATE = '2020-10-27'; # DATE
 our $DIST = 'App-OfficeUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,24 +41,24 @@ _
     },
 );
 
-our %arg1_output_file_or_dir = (
-    output_file_or_dir => {
-        summary => 'Path to output file or directory',
-        schema => 'pathname*',
-        req => 1,
-        pos => 1,
-        description => <<'_',
-
-If not specified, will output to stdout.
-
-_
-    },
-);
-
 our %argopt_overwrite = (
     overwrite => {
         schema => 'bool*',
         cmdline_aliases => {O=>{}},
+    },
+);
+
+our %argopt_return_output_file = (
+    return_output_file => {
+        summary => 'Return the path of output file instead',
+        schema => 'bool*',
+        description => <<'_',
+
+This is useful when you do not specify an output file but do not want to show
+the converted document to stdout, but instead want to get the path to a
+temporary output file.
+
+_
     },
 );
 
@@ -77,17 +77,7 @@ _
         %arg1_output_file,
         %argopt_overwrite,
         %args_libreoffice,
-        return_output_file => {
-            summary => 'Return the path of output file instead',
-            schema => 'bool*',
-            description => <<'_',
-
-This is useful when you do not specify an output file but do not want to show
-the converted document to stdout, but instead want to get the path to a
-temporary output file.
-
-_
-        },
+        %argopt_return_output_file,
         fmt => {
             summary => 'Run Unix fmt over the txt output',
             schema => 'bool*',
@@ -167,165 +157,6 @@ sub officewp2txt {
     [412, "No backend available"];
 }
 
-$SPEC{officess2csv} = {
-    v => 1.1,
-    summary => 'Convert Office spreadsheet format file (.ods, .xls, .xlsx) to one or more CSV files',
-    description => <<'_',
-
-This utility uses <pm:Spreadsheet::XLSX> to extract cell values of worksheets
-and put them in one or more CSV file(s). If spreadsheet format is not .xlsx
-(e.g. .ods or .xls), it will be converted to .xlsx first using Libreoffice
-(headless mode).
-
-You can select one or more worksheets to export. If unspecified, the default is
-the first worksheet only. If you specify more than one worksheets, you need to
-specify output *directory* instead of *output* file.
-
-_
-    args => {
-        %arg0_input_file,
-        %arg1_output_file_or_dir,
-        %argopt_overwrite,
-        %args_libreoffice,
-        # XXX option to merge all csvs as a single file?
-        worksheets => {
-            summary => 'Select which worksheet(s) to convert',
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'worksheet',
-            schema => ['array*', of=>'str*'],
-            cmdline_aliases => {s=>{}},
-        },
-        all_worksheets => {
-            summary => 'Convert all worksheets in the workbook',
-            schema => 'true*',
-            cmdline_aliases => {a=>{}},
-        },
-        always_dir => {
-            summary => 'Assume output_file_or_dir is a directory even though there is only one worksheet',
-            schema => 'bool*',
-        },
-    },
-};
-sub officess2csv {
-    my %args = @_;
-
-    my $input_file = $args{input_file} or return [400, "Please specify input_file"];
-    my $output_file_or_dir = $args{output_file_or_dir} or return [400, "Please specify output_file_or_dir"];
-
-    if (-e $output_file_or_dir && !$args{overwrite}) {
-        return [412, "Output file/dir '$output_file_or_dir' already exists, not overwriting unless you specify --overwrite"];
-    }
-
-  CONVERT_TO_XLSX: {
-        last if $input_file =~ /\.xlsx\z/i;
-        require File::Copy;
-        require File::Temp;
-        require File::Which;
-        require IPC::System::Options;
-
-        my $libreoffice_path = $args{libreoffice_path} //
-            File::Which::which("libreoffice") //
-              File::Which::which("soffice");
-        unless (defined $libreoffice_path) {
-            log_debug "libreoffice is not in PATH, skipped trying to use libreoffice";
-            last;
-        }
-
-        $input_file =~ /(.+)\.(\w+)\z/ or return [412, "Please supply input file with extension in its name (e.g. foo.doc instead of foo)"];
-        my ($name, $ext) = ($1, $2);
-
-        my $tempdir = File::Temp::tempdir(CLEANUP => !$ENV{DEBUG});
-        my ($temp_fh, $temp_file) = File::Temp::tempfile(undef, SUFFIX => ".$ext", DIR => $tempdir);
-        (my $temp_out_file = $temp_file) =~ s/\.\w+\z/.xlsx/;
-        File::Copy::copy($input_file, $temp_file) or do {
-            return [500, "Can't copy '$input_file' to '$temp_file': $!"];
-        };
-        log_debug "Converting $input_file -> $temp_out_file ...";
-        IPC::System::Options::system(
-            {die=>1, log=>1},
-            $libreoffice_path, "--headless", "--convert-to", "xlsx", $temp_file, "--outdir", $tempdir);
-
-        $input_file = $temp_out_file;
-        log_trace "input xlsx file=$input_file";
-    }
-
-    #require Text::Iconv;
-    #my $converter = Text::Iconv->new("utf-8", "windows-1251");
-    my $converter;
-
-    require Spreadsheet::XLSX;
-    my $xlsx = Spreadsheet::XLSX->new($input_file, $converter);
-    my @all_worksheets = map { $_->{Name} } @{ $xlsx->{Worksheet} };
-    log_debug "Available worksheets in this workbook: %s", \@all_worksheets;
-    my @worksheets;
-    if ($args{all_worksheets}) {
-        @worksheets = @all_worksheets;
-        log_debug "Will be exporting all worksheet(s): %s", \@worksheets;
-    } elsif ($args{worksheets}) {
-        @worksheets = @{ $args{worksheets} };
-        log_debug "Will be exporting these worksheet(s): %s", \@worksheets;
-    } else {
-        log_debug "Will only be exporting the first worksheet ($all_worksheets[0])";
-        @worksheets = ($all_worksheets[0]);
-    }
-
-    my @output_files;
-    if (@worksheets == 1 && !$args{always_dir}) {
-        @output_files = ($output_file_or_dir);
-    } else {
-        unless (-d $output_file_or_dir) {
-            log_debug "Creating directory $output_file_or_dir ...";
-            mkdir $output_file_or_dir or do {
-                return [500, "Can't mkdir $output_file_or_dir: $!, bailing out"];;
-            };
-        }
-        for (@worksheets) {
-            # XXX convert to safe filename
-            push @output_files, "$output_file_or_dir/$_.csv";
-        }
-    }
-
-    require Text::CSV_XS;
-    my $csv = Text::CSV_XS->new({binary=>1});
-  WRITE_WORKSHEET: {
-        for my $i (0..$#worksheets) {
-            my $worksheet = $worksheets[$i];
-            my $output_file = $output_files[$i];
-            log_debug "Outputting worksheet $worksheet to $output_file ...";
-
-            my $sheet;
-            for my $sheet0 (@{ $xlsx->{Worksheet} }) {
-                if ($sheet0->{Name} eq $worksheet) {
-                    $sheet = $sheet0; last;
-                }
-            }
-            unless ($sheet) {
-                log_error "Cannot find worksheet $worksheet, skipped";
-                next WRITE_WORKSHEET;
-            }
-
-            open my $fh, ">", $output_file or do {
-                log_error "Cannot open output file '$output_file': $!, skipped";
-                next WRITE_WORKSHEET;
-            };
-
-            $sheet -> {MaxRow} ||= $sheet -> {MinRow};
-            for my $row ($sheet->{MinRow} .. $sheet->{MaxRow}) {
-                $sheet->{MaxCol} ||= $sheet->{MinCol};
-                my @row;
-                foreach my $col ($sheet->{MinCol} ..  $sheet->{MaxCol}) {
-                    my $cell = $sheet->{Cells}[$row][$col];
-                    push @row, $cell ? $cell->{Val} : undef;
-                }
-                $csv->combine(@row);
-                print $fh $csv->string, "\n";
-            }
-        }
-    }
-
-    [200, "OK"];
-}
-
 1;
 # ABSTRACT: Utilities related to Office suite files (.doc, .docx, .odt, .xls, .xlsx, .ods, etc)
 
@@ -341,7 +172,7 @@ App::OfficeUtils - Utilities related to Office suite files (.doc, .docx, .odt, .
 
 =head1 VERSION
 
-This document describes version 0.004 of App::OfficeUtils (from Perl distribution App-OfficeUtils), released on 2020-10-26.
+This document describes version 0.005 of App::OfficeUtils (from Perl distribution App-OfficeUtils), released on 2020-10-27.
 
 =head1 DESCRIPTION
 
@@ -351,76 +182,9 @@ This distributions provides the following command-line utilities:
 
 =item * L<doc2txt>
 
-=item * L<xls2csv>
-
 =back
 
 =head1 FUNCTIONS
-
-
-=head2 officess2csv
-
-Usage:
-
- officess2csv(%args) -> [status, msg, payload, meta]
-
-Convert Office spreadsheet format file (.ods, .xls, .xlsx) to one or more CSV files.
-
-This utility uses L<Spreadsheet::XLSX> to extract cell values of worksheets
-and put them in one or more CSV file(s). If spreadsheet format is not .xlsx
-(e.g. .ods or .xls), it will be converted to .xlsx first using Libreoffice
-(headless mode).
-
-You can select one or more worksheets to export. If unspecified, the default is
-the first worksheet only. If you specify more than one worksheets, you need to
-specify output I<directory> instead of I<output> file.
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<all_worksheets> => I<true>
-
-Convert all worksheets in the workbook.
-
-=item * B<always_dir> => I<bool>
-
-Assume output_file_or_dir is a directory even though there is only one worksheet.
-
-=item * B<input_file>* => I<filename>
-
-Path to input file.
-
-=item * B<libreoffice_path> => I<filename>
-
-=item * B<output_file_or_dir>* => I<pathname>
-
-Path to output file or directory.
-
-If not specified, will output to stdout.
-
-=item * B<overwrite> => I<bool>
-
-=item * B<worksheets> => I<array[str]>
-
-Select which worksheet(s) to convert.
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
 
 
 =head2 officewp2txt
@@ -485,11 +249,12 @@ that contains extra information.
 
 Return value:  (any)
 
-=head1 ENVIRONMENT
+=head1 FAQ
 
-=head2 DEBUG
+=head2 Where is officess2* (e.g. officess2csv)?
 
-If set to true, will not clean up temporary directories.
+To convert a spreadsheet to CSV, you can use L<xls2csv> from
+L<Spreadsheet::Read>.
 
 =head1 HOMEPAGE
 
@@ -510,6 +275,8 @@ feature.
 =head1 SEE ALSO
 
 L<App::MSOfficeUtils>, L<App::LibreOfficeUtils>
+
+L<Spreadsheet::Read>
 
 =head1 AUTHOR
 

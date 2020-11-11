@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -42,48 +42,45 @@ is_oneref( $widget, '$widget has refcount 1 at EOF' );
 
 done_testing;
 
-package TestWidget;
+use Object::Pad 0.09;
+class TestWidget extends Tickit::Widget {
+   use Tickit::Style;
 
-use base qw( Tickit::Widget );
-use Tickit::Style;
+   use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use constant WIDGET_PEN_FROM_STYLE => 1;
+   use constant CAN_FOCUS => 1;
 
-use constant CAN_FOCUS => 1;
+   method lines  { 1 }
+   method cols   { 1 }
 
-sub lines  { 1 }
-sub cols   { 1 }
+   method render_to_rb {}
 
-sub render_to_rb {}
+   method window_gained
+   {
+      my ( $win ) = @_;
+      $self->SUPER::window_gained( $win );
 
-sub window_gained
-{
-   my $self = shift;
-   my ( $win ) = @_;
-   $self->SUPER::window_gained( $win );
+      $win->cursor_at( 0, 0 );
+   }
 
-   $win->cursor_at( 0, 0 );
-}
+   use constant KEYPRESSES_FROM_STYLE => 1;
 
-use constant KEYPRESSES_FROM_STYLE => 1;
+   BEGIN {
+      style_definition base =>
+         '<Enter>' => 'do_thing';
+   }
 
-BEGIN {
-   style_definition base =>
-      '<Enter>' => 'do_thing';
-}
+   method key_do_thing { $do_something_counter++ }
 
-sub key_do_thing { $do_something_counter++ }
+   method on_key
+   {
+      my ( $args ) = @_;
+      push @key_events, [ $args->type => $args->str ];
+   }
 
-sub on_key
-{
-   my $self = shift;
-   my ( $args ) = @_;
-   push @key_events, [ $args->type => $args->str ];
-}
-
-sub on_mouse
-{
-   my $self = shift;
-   my ( $args ) = @_;
-   push @mouse_events, [ $args->type => $args->button, $args->line, $args->col ];
+   method on_mouse
+   {
+      my ( $args ) = @_;
+      push @mouse_events, [ $args->type => $args->button, $args->line, $args->col ];
+   }
 }

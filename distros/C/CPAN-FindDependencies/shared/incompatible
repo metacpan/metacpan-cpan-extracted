@@ -1,0 +1,14 @@
+=head1 INCOMPATIBLE CHANGES
+
+Up to version 2.49 you used the C<02packages> argument to specify where a
+cached C<02packages.details.txt.gz> could be found. That argument no longer
+exists as of version 3.00, use the C<mirror> argument instead.
+
+Up to version 2.49, C<maxdepth =E<gt> 0> would incorrectly return the whole
+tree. From version 3.00 it cuts the tree off at its root so will only return
+the module that you asked about. Not very useful, but correct.
+
+In version 2.49 you used the C<configreqs> argument to specify that you were
+interested in configure-time requirements as well as build- and run-time
+requirements. That option no longer exists as of version 3.00, it will always
+report on configure, build, test, and run-time requirements.

@@ -11,6 +11,7 @@ namespace xs { namespace protocol { namespace http {
 
     void fill (Request*,  const Hash&);
     void fill (Response*, const Hash&);
+    void fill_form(Request*, const Sv&);
 
     void set_headers          (Message*,  const Hash&);
     void set_method           (Request*,  const Sv&);

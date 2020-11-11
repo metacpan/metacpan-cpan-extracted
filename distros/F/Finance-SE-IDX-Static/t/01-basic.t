@@ -16,17 +16,17 @@ my $res;
 subtest list_idx_boards => sub {
     $res = list_idx_boards();
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 2);
+    is(scalar(@{ $res->[2] }), 3) or diag explain $res->[2];
 };
 
 subtest list_idx_firms => sub {
     $res = list_idx_firms();
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 615);
+    is(scalar(@{ $res->[2] }), 709);
 
     $res = list_idx_firms(sector => "AGRI", board => "PENGEMBANGAN");
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 5);
+    is(scalar(@{ $res->[2] }), 9);
 };
 
 subtest list_idx_sectors => sub {

@@ -1,10 +1,9 @@
 package jacode;
-$support_jcode_package_too = 1;
 ######################################################################
 #
 # jacode.pl: Perl program for Japanese character code conversion
 #
-# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
 #
 # The latest version is available here:
 #
@@ -13,8 +12,8 @@ $support_jcode_package_too = 1;
 # *** ATTENTION ***
 # This software is not "jcode.pl"
 # Thus don't redistribute this software renaming as "jcode.pl"
-# Moreover, this software IS NOT "jacode4e.pl"
-# If you want "jacode4e.pl", search it on CPAN again.
+# Moreover, this software IS NOT "Jacode4e"
+# If you want "Jacode4e", search it on CPAN again.
 #
 # Original version `jcode.pl' is ...
 #
@@ -44,10 +43,6 @@ $support_jcode_package_too = 1;
 #
 #   ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
 #
-$VERSION = '2.13.4.23';
-$VERSION = $VERSION;
-$rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
-
 ######################################################################
 #
 # INTERFACE for newcomers
@@ -378,6 +373,141 @@ $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 1
 #
 ######################################################################
 
+# Perl4 and also Perl5 script
+sub BEGIN {
+    eval q{ use strict; };
+    eval q{
+        use vars (
+            '$ASCII_IN',
+            '$INPUT_encoding',
+            '$JIS_Kanji_IN',
+            '$OUTPUT_encoding',
+            '$VERSION',
+            '$ascii',
+            '$c',
+            '$c1',
+            '$c2',
+            '$c3',
+            '$c4',
+            '$cache',
+            '$code',
+            '$conv_func',
+            '$conv_opt',
+            '$debug',
+            '$dynamic',
+            '$encoding',
+            '$eol',
+            '$esc',
+            '$esc_0208',
+            '$esc_0212',
+            '$esc_asc',
+            '$esc_kana',
+            '$euc',
+            '$file',
+            '$from',
+            '$h',
+            '$h2z',
+            '$h2z_high',
+            '$jis',
+            '$k',
+            '$matched',
+            '$n',
+            '$option',
+            '$prev_from',
+            '$prev_opt',
+            '$prev_to',
+            '$previous',
+            '$rcsid',
+            '$re_ascii',
+            '$re_bin',
+            '$re_esc_asc',
+            '$re_esc_jis0208',
+            '$re_esc_jis0208_1978',
+            '$re_esc_jis0208_1983',
+            '$re_esc_jis0208_1990',
+            '$re_esc_jis0212',
+            '$re_esc_jis0213_2000_plane1',
+            '$re_esc_jis0213_2004_plane1',
+            '$re_esc_jp',
+            '$re_esc_kana',
+            '$re_euc_0212',
+            '$re_euc_c',
+            '$re_euc_kana',
+            '$re_sjis_ank',
+            '$re_sjis_c',
+            '$re_sjis_kana',
+            '$re_utf8_c',
+            '$re_utf8_kana',
+            '$re_utf8_not_kana',
+            '$re_utf8_rfc3629_c',
+            '$re_utf8_rfc3629_c_ja_JP',
+            '$re_utf8_voiced_kana',
+            '$s',
+            '$show_encoding',
+            '$show_seq',
+            '$sjis',
+            '$support_jcode_package_too',
+            '$to',
+            '$u',
+            '$undef_euc',
+            '$undef_sjis',
+            '$undef_utf8',
+            '$usage',
+            '$utf8',
+            '$v',
+            '$version',
+            '$z',
+            '%JP170559',
+            '%Ken_Lunde_CJKV_AppA_euc2sjis1st',
+            '%Ken_Lunde_CJKV_AppA_euc2sjis2nd_even',
+            '%Ken_Lunde_CJKV_AppA_euc2sjis2nd_odd',
+            '%Ken_Lunde_CJKV_AppA_sjis2euc1st_a',
+            '%Ken_Lunde_CJKV_AppA_sjis2euc1st_b',
+            '%Ken_Lunde_CJKV_AppA_sjis2euc2nd_a',
+            '%Ken_Lunde_CJKV_AppA_sjis2euc2nd_b',
+            '%_z2h_utf8',
+            '%convf',
+            '%e2s',
+            '%e2u',
+            '%encoding_name',
+            '%eol',
+            '%esc_0208',
+            '%h2z',
+            '%h2z_utf8',
+            '%h2zf',
+            '%k2u',
+            '%kana2utf8',
+            '%opt',
+            '%s2e',
+            '%s2u',
+            '%sjis2utf8_1',
+            '%sjis2utf8_2',
+            '%table',
+            '%u2e',
+            '%u2k',
+            '%u2s',
+            '%utf82sjis_1',
+            '%utf82sjis_2',
+            '%z2h',
+            '%z2h_euc',
+            '%z2h_sjis',
+            '%z2h_utf8',
+            '%z2hf',
+            '@from',
+            '@read_ahead',
+            '@to',
+        );
+    };
+    $INC{'warnings.pm'} = '' if $] < 5.006;
+    eval q{ use warnings; };
+}
+
+$support_jcode_package_too = 1;
+
+$VERSION = '2.13.4.24';
+$VERSION = $VERSION;
+$rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
+
 #
 # Call initialize function if not called yet.  This sounds strange
 # but this makes easy to embed the jacode.pl at the script.  Call
@@ -670,6 +800,7 @@ sub init {
       . '|[\xf0-\xf0][\x90-\xbf][\x80-\xbf][\x80-\xbf]'
       . '|[\xf1-\xf3][\x80-\xbf][\x80-\xbf][\x80-\xbf]'
       . '|[\xf4-\xf4][\x80-\x8f][\x80-\xbf][\x80-\xbf]';
+    $re_utf8_rfc3629_c = $re_utf8_rfc3629_c; # avoid: Name "jacode::re_utf8_rfc3629_c" used only once
 
     # optimized RFC 3629 for ja_JP
     $re_utf8_rfc3629_c_ja_JP =
@@ -11698,16 +11829,7 @@ this a more useful tool, please let everyone share it.
   2018 Perl5.28                   |          |        Born            Born        
   2019 Perl5.30                   |          |         |               |          
   2020 Perl5.32                   :          :         :               :          
-  2030 Perl5.52                   :          :         :               :          
-  2040 Perl5.72                   :          :         :               :          
-  2050 Perl5.92                   :          :         :               :          
-  2060 Perl5.112                  :          :         :               :          
-  2070 Perl5.132                  :          :         :               :          
-  2080 Perl5.152                  :          :         :               :          
-  2090 Perl5.172                  :          :         :               :          
-  2100 Perl5.192                  :          :         :               :          
-  2110 Perl5.212                  :          :         :               :          
-  2120 Perl5.232                  :          :         :               :          
+  2021 Perl7.XX                   :          :         :               :          
     :     :                       V          V         V               V          
   --------------------------------------------------------------------------------
 
@@ -11737,7 +11859,7 @@ This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
+Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
 
 The latest version is available here:
 
@@ -11746,8 +11868,8 @@ L<http://search.cpan.org/dist/jacode/>
  *** ATTENTION ***
  This software is not "jcode.pl"
  Thus don't redistribute this software renaming as "jcode.pl"
- Moreover, this software IS NOT "jacode4e.pl"
- If you want "jacode4e.pl", search it on CPAN again.
+ Moreover, this software IS NOT "Jacode4e"
+ If you want "Jacode4e", search it on CPAN again.
 
 Original version `jcode.pl' is ...
 
@@ -11789,6 +11911,12 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  T1008901040810 ZASSHI 08901-4
  http://ascii.asciimw.jp/books/books/detail/978-4-7561-5008-0.shtml
 
+ PERL PUROGURAMINGU
+ Larry Wall, Randal L.Schwartz, Yoshiyuki Kondo
+ December 1997
+ ISBN 4-89052-384-7
+ http://www.context.co.jp/~cond/books/old-books.html
+
  Programming Perl, Second Edition
  By Larry Wall, Tom Christiansen, Randal L. Schwartz
  October 1996
@@ -11803,6 +11931,20 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  ISBN 10: 0-596-00027-8 | ISBN 13: 9780596000271
  http://shop.oreilly.com/product/9780596000271.do
 
+ The Perl Language Reference Manual (for Perl version 5.12.1)
+ by Larry Wall and others
+ Paperback (6"x9"), 724 pages
+ Retail Price: $39.95 (pound 29.95 in UK)
+ ISBN-13: 978-1-906966-02-7
+ https://dl.acm.org/doi/book/10.5555/1893028
+
+ Perl Pocket Reference, 5th Edition
+ By Johan Vromans
+ Publisher: O'Reilly Media
+ Released: July 2011
+ Pages: 102
+ http://shop.oreilly.com/product/0636920018476.do
+
  Programming Perl, 4th Edition
  By: Tom Christiansen, brian d foy, Larry Wall, Jon Orwant
  Publisher: O'Reilly Media
@@ -11813,6 +11955,13 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  Print ISBN: 978-0-596-00492-7 | ISBN 10: 0-596-00492-3
  Ebook ISBN: 978-1-4493-9890-3 | ISBN 10: 1-4493-9890-1
  http://shop.oreilly.com/product/9780596004927.do
+
+ Perl Cookbook
+ By Tom Christiansen, Nathan Torkington
+ August 1998
+ Pages: 800
+ ISBN 10: 1-56592-243-3 | ISBN 13: 978-1-56592-243-3
+ http://shop.oreilly.com/product/9781565922433.do
 
  Perl Cookbook, Second Edition
  By Tom Christiansen, Nathan Torkington
@@ -11844,10 +11993,33 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  Ebook ISBN:978-0-596-10316-3 | ISBN 10: 0-596-10316-6
  http://shop.oreilly.com/product/9780596520113.do
 
+ Learning Perl, 6th Edition
+ By Randal L. Schwartz, brian d foy, Tom Phoenix
+ June 2011
+ Pages: 390
+ ISBN-10: 1449303587 | ISBN-13: 978-1449303587
+ http://shop.oreilly.com/product/0636920018452.do
+
+ Advanced Perl Programming, 2nd Edition
+ By Simon Cozens
+ June 2005
+ Pages: 300
+ ISBN-10: 0-596-00456-7 | ISBN-13: 978-0-596-00456-9
+ http://shop.oreilly.com/product/9780596004569.do
+
  Perl RESOURCE KIT UNIX EDITION
  Futato, Irving, Jepson, Patwardhan, Siever
  ISBN 10: 1-56592-370-7
  http://shop.oreilly.com/product/9781565923706.do
+
+ Perl Resource Kit -- Win32 Edition
+ Erik Olson, Brian Jepson, David Futato, Dick Hardt
+ ISBN 10:1-56592-409-6
+ http://shop.oreilly.com/product/9781565924093.do
+
+ Announcing Perl 7
+ Jun 24, 2020 by brian d foy
+ https://www.perl.com/article/announcing-perl-7/
 
  Understanding Japanese Information Processing
  By Ken Lunde
@@ -11877,6 +12049,13 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  Ebook ISBN: 978-0-596-15782-1 | ISBN 10:0-596-15782-7
  http://shop.oreilly.com/product/9780596514471.do
 
+ DB2 GIJUTSU ZENSHO
+ By BM Japan Systems Engineering Co.,Ltd. and IBM Japan, Ltd.
+ 2004/05
+ Pages: 887
+ ISBN-10: 4756144659 | ISBN-13: 978-4756144652
+ https://iss.ndl.go.jp/books/R100000002-I000007400836-00
+
  Mastering Regular Expressions, Second Edition
  By Jeffrey E. F. Friedl
  Second Edition  July 2002
@@ -11898,11 +12077,12 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  ISBN 10:0-596-52068-9 | ISBN 13: 978-0-596-52068-7
  http://shop.oreilly.com/product/9780596520694.do
 
- PERL PUROGURAMINGU
- Larry Wall, Randal L.Schwartz, Yoshiyuki Kondo
- December 1997
- ISBN 4-89052-384-7
- http://www.context.co.jp/~cond/books/old-books.html
+ Regular Expressions Cookbook, 2nd Edition
+ By Steven Levithan, Jan Goyvaerts
+ Released August 2012
+ Pages: 612
+ ISBN: 9781449327453
+ https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/
 
  JIS KANJI JITEN
  Kouji Shibano
@@ -11916,6 +12096,18 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  T1008901080816 ZASSHI 08901-8
  http://ascii.asciimw.jp/books/books/detail/978-4-7561-5008-0.shtml
 
+ Shell Script Magazine vol.41
+ 2016 September
+ Pages: 64
+ https://shell-mag.com/
+
+ LINUX NIHONGO KANKYO
+ By YAMAGATA Hiroo, Stephen J. Turnbull, Craig Oda, Robert J. Bickel
+ June, 2000
+ Pages: 376
+ ISBN 4-87311-016-5
+ https://www.oreilly.co.jp/books/4873110165/
+
  MacPerl Power and Ease
  By Vicki Brown, Chris Nandor
  April 1998
@@ -11924,13 +12116,16 @@ L<ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/>
  http://www.amazon.com/Macperl-Power-Ease-Vicki-Brown/dp/1881957322
 
  Other Tools
- http://search.cpan.org/dist/Char/
- http://search.cpan.org/dist/Char-Sjis/
- http://search.cpan.org/dist/Modern-Open/
- http://search.cpan.org/dist/jacode4e/
+ https://metacpan.org/release/Perl7-Handy
+ https://metacpan.org/release/Modern-Open
+ https://metacpan.org/release/UTF8-R2
+ https://metacpan.org/release/mb
 
  BackPAN
  http://backpan.perl.org/authors/id/I/IN/INA/
+
+ Recent Perl packages by "INABA Hitoshi"
+ http://code.activestate.com/ppm/author:INABA-Hitoshi/
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -11940,6 +12135,17 @@ I am thankful to all persons.
 
  Larry Wall, Perl
  http://www.perl.org/
+
+ Jesse Vincent, Compatibility is a virtue
+ https://www.nntp.perl.org/group/perl.perl5.porters/2010/05/msg159825.html
+
+ Kazumasa Utashiro, jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+ https://metacpan.org/author/UTASHIRO
+ ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+ http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+ ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+ http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+ https://twitter.com/uta46/status/11578906320
 
  mikeneko creator club, Private manual of jcode.pl
  http://mikeneko.creator.club.ne.jp/~lab/kcode/jcode.html
@@ -11957,8 +12163,8 @@ I am thankful to all persons.
  http://white.niu.ne.jp/yapw/yapw.cgi/jcode.pl%A4%CE%A5%A8%A5%E9%A1%BC%CD%DE%C0%A9
 
  Dan Kogai, Jcode module and Encode module
- http://search.cpan.org/dist/Jcode/
- http://search.cpan.org/dist/Encode/
+ https://metacpan.org/release/Encode
+ https://metacpan.org/release/Jcode
  http://blog.livedoor.jp/dankogai/archives/50116398.html
  http://blog.livedoor.jp/dankogai/archives/51004472.html
 
@@ -11980,12 +12186,39 @@ I am thankful to all persons.
  TechLION vol.26
  https://type.jp/et/feature/1569
 
- jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
- ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
- http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
- ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
- http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
- https://twitter.com/uta46/status/11578906320
+ Kaoru Maeda, Perl's history Perl 1,2,3,4
+ https://www.slideshare.net/KaoruMaeda/perl-perl-1234
+
+ nurse, What is "string"
+ https://naruse.hateblo.jp/entries/2014/11/07#1415355181
+
+ NISHIO Hirokazu, What's meant "string as a sequence of characters"?
+ https://nishiohirokazu.hatenadiary.org/entry/20141107/1415286729
+
+ Rick Yamashita, Shift_JIS
+ https://shino.tumblr.com/post/116166805/%E5%B1%B1%E4%B8%8B%E8%89%AF%E8%94%B5%E3%81%A8%E7%94%B3%E3%81%97%E3%81%BE%E3%81%99-%E7%A7%81%E3%81%AF1981%E5%B9%B4%E5%BD%93%E6%99%82us%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%BD%E3%83%95%E3%83%88%E3%81%A7%E3%82%B7%E3%83%95%E3%83%88jis%E3%81%AE%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%92%E6%8B%85%E5%BD%93
+ http://www.wdic.org/w/WDIC/%E3%82%B7%E3%83%95%E3%83%88JIS
+
+ nurse, History of Japanese EUC 22:00
+ https://naruse.hateblo.jp/entries/2009/03/08
+
+ Ricardo Signes, Perl 5.14 for Pragmatists
+ https://www.slideshare.net/rjbs/perl-514-8809465
+
+ Ricardo Signes, What's New in Perl? v5.10 - v5.16 #'
+ https://www.slideshare.net/rjbs/whats-new-in-perl-v510-v516
+
+ Causes and countermeasures for garbled Japanese characters in perl
+ https://prozorec.hatenablog.com/entry/2018/03/19/080000
+
+ Impressions of talking of Larry Wall at LL Future
+ https://hnw.hatenablog.com/entry/20080903
+
+ About Windows and Japanese text
+ https://blogs.windows.com/japan/2020/02/20/about-windows-and-japanese-text/
+
+ About Windows diagnostic data
+ https://blogs.windows.com/japan/2019/12/05/about-windows-diagnostic-data/
 
  jacode - Perl program for Japanese character code conversion
  https://metacpan.org/search?q=jacode.pl

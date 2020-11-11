@@ -47,7 +47,7 @@ use constant {
 
     ## this mapping fines a set of modules with behaviour that introduce
     ## new words as subroutine names or method names when they are `use`ed
-    ## without argumnets.
+    ## without arguments.
     #### for mod in $(perlbrew list-modules) Test2::V0; do perl -M${mod} -l -e 'if (my @e = grep /\A\w+\z/, (@'$mod'::EXPORT) ) { print "### \x27'$mod'\x27 => [qw(@e)],"; }' \;  2>/dev/null | grep '^### ' | cut -c 5- ; done
     DEFAULT_EXPORT => {
         'App::ModuleBuildTiny'         => [qw(modulebuildtiny)],
@@ -246,12 +246,12 @@ TooMuchCode::ProhibitUnusedInclude -- Find unused include statements.
 
 This critic policy scans for unused include statement according to their documentation.
 
-For example, L<Try::Tiny> implicity introduce a C<try> subroutine that takes a block. Therefore, a
+For example, L<Try::Tiny> implicitly introduce a C<try> subroutine that takes a block. Therefore, a
 lonely C<use Try::Tiny> statement without a C<try { .. }> block somewhere in its scope is considered
 to be an "Unused Include".
 
 Notice: This module use a hard-coded list of commonly-used CPAN
-modules with symbols exported from them. Althoug it is relatively
+modules with symbols exported from them. Although it is relatively
 static, it needs to be revised from time to time.
 
 =cut

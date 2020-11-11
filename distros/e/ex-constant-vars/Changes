@@ -1,5 +1,10 @@
 Revision history for Perl module ex::constant::vars
 
+0.07 2020-11-03 JANITOR
+    - Transferred maintenance to CPAN Janitor
+    - Switched to github issues instead of RT
+    - Documentation tells people to use Const::Fast
+
 0.06 2015-10-21 NEILB
     - Switched to Dist::Zilla
     - Switched URL for repo to reflect my changed github username

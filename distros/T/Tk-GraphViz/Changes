@@ -1,4 +1,14 @@
-Revision history for Perl extension Tk::GraphViz.
+1.04 2020-11-08
+- tests only run when can do display stuff, avoiding false negatives
+- no install if no DOT
+
+1.03 2020-11-08
+- support a GraphViz2 object as input
+
+1.02 2020-11-07
+- parsing improvements to account for DOT 2.43 changing output format a bit
+- parsing fix from RT#79377 - thanks @geoffhart
+- ->show also calls MainWindow->update just in case - RT#64089
 
 1.01  Mon Dec  8 21:32:21 MST 2008
 	- Added 'folder' and 'component' node shapes (Jogi Kuenstner)

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Digest::SHA qw( sha1_hex );
 use Encode qw( encode );
@@ -419,7 +419,7 @@ sub _match_blockquote {
 
     $self->_send_event('StartBlockquote');
 
-    $bq =~ s/^>(?: \p{SpaceSeparator} | \t )?//gxm;
+    $bq =~ s/^>$HorizontalWS?//gxm;
 
     # Even if the blockquote is inside a list, we want to look for paragraphs,
     # not list items.
@@ -430,10 +430,7 @@ sub _match_blockquote {
     # well. If we treat each change of blockquote level as starting a new
     # sub-document, we get the same behavior.
     for my $chunk (
-        $self->_split_chunks_on_regex(
-            $bq, qr/^>(?: \p{SpaceSeparator} | \t )*\S/xm
-        )
-    ) {
+        $self->_split_chunks_on_regex( $bq, qr/^>$HorizontalWS*\S/xm ) ) {
 
         $self->_parse_text( \$chunk );
     }
@@ -757,7 +754,7 @@ sub _match_paragraph {
                                 (?:$EmptyLines)?
                                 ((?:
                                   ^
-                                  \p{SpaceSeparator}*
+                                  $HorizontalWS*
                                   \S
                                   .*
                                   \n
@@ -808,7 +805,7 @@ Markdent::Parser::BlockParser - Block parser for standard Markdown
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

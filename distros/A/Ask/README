@@ -2,7 +2,8 @@ NAME
     Ask - ask your users about stuff
 
 SYNOPSIS
-       use 5.010;
+    Object-oriented style:
+
        use Ask;
    
        my $ask = Ask->detect;
@@ -11,6 +12,16 @@ SYNOPSIS
        and $ask->question(text => "Do you know it?")
        and $ask->question(text => "Really want to show it?")) {
           $ask->info(text => "Then clap your hands!");
+       }
+
+    Functional style:
+
+       use Ask ':all';
+   
+       if (question("Are you happy?")
+       and question("Do you know it?")
+       and question("Really want to show it?")) {
+          info("Then clap your hands!");
        }
 
 DESCRIPTION
@@ -23,6 +34,10 @@ DESCRIPTION
     to interact with the user.
 
   Class Methods
+    `Ask->instance`
+        Singleton pattern. Can also be passed an argument to use it as a
+        setter.
+
     `Ask->detect(%arguments)`
         A constructor, sort of. It inspects the program's environment and
         returns an object that implements the Ask API (see below).

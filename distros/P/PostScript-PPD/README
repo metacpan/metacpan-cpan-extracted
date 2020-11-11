@@ -1,7 +1,7 @@
 PostScript-PPD version 0.01
 ===========================
 
-Parse PostScript Printer Definition files.
+Parse PostScript Printer Definition (PPD) files.
 
 INSTALLATION
 
@@ -18,7 +18,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2011 by Philip Gwyn
+Copyright (C) 2008-2020 by Philip Gwyn
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

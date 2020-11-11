@@ -14,7 +14,8 @@ my $graph = GraphViz2->new(
 );
 my $g = GraphViz2::Parse::Regexp->new(graph => $graph);
 
-$g->create(regexp => '(([abcd0-9])|(foo))');
+my $re = '^(([abcd0-9])|(foo)n?)x*y{1,2}';
+$g->create(regexp => $re);
 
 if (@ARGV) {
   my($format)      = shift || 'svg';
@@ -25,6 +26,9 @@ if (@ARGV) {
   require Test::More;
   require Test::Snapshot;
   local our $TODO = 'seems to vary by Perl version';
+  my $gd = GraphViz2::Parse::Regexp::to_graph($re);
+  my $gvre = GraphViz2::Parse::Regexp->new(as_graph => $gd);
+  Test::Snapshot::is_deeply_snapshot($gvre->graph->dot_input, 'dot file');
   Test::Snapshot::is_deeply_snapshot($graph->dot_input, 'dot file');
   Test::More::done_testing();
 }

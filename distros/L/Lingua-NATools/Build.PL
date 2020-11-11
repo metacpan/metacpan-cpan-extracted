@@ -22,6 +22,12 @@ my $builder = MyBuilder->new
    module_name    => 'Lingua::NATools',
    license        => 'perl',
    dist_author    => ['Alberto Simões <ambs@cpan.org>'],
+   meta_merge => {
+       resources => {
+           repository => 'https://natura.di.uminho.pt/svn/main/Lingua/NATools/',
+           bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-NATools',
+       }
+   },
    needs_compiler => 1,
    recursive_test_files => 1,
    requires => {

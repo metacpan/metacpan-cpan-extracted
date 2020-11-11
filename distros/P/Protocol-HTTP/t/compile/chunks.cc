@@ -11,6 +11,17 @@ TEST("chunked message force version 1.1") {
     );
 }
 
+TEST("final chunk with payload") {
+    auto req = Request::Builder().chunked().http_version(10).build();
+    string s = "hello world";
+    auto c = req->final_chunk(s);
+    CHECK(c.size() == 3);
+    CHECK(c[0] == "b\r\n");
+    CHECK(c[1] == s);
+    CHECK(c[1].data() == s.data()); // payload doesn't get copied
+    CHECK(c[2] == "\r\n0\r\n\r\n");
+}
+
 TEST("generating chunks later") {
     auto req = Request::Builder().chunked().build();
 

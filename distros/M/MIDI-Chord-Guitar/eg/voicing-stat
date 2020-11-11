@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper;
+use MIDI::Chord::Guitar;
+use Statistics::Basic qw(median);
+
+my $mcg = MIDI::Chord::Guitar->new;
+
+for my $spec (
+    [qw(C3  m7)],
+    [qw(F3  7)],
+    [qw(Bb2 maj7)],
+    [qw(Eb3 maj7)],
+    [qw(A3  dim7)],
+    [qw(D3  7)],
+    [qw(G2  m)],
+) {
+    my $chords = $mcg->transform(@$spec);
+#warn Dumper($chords);
+
+    my $x = [map { '' . median(@$_) } @$chords];
+warn "@$spec: @$x\n";
+}

@@ -52,6 +52,9 @@ sub closure {
 ## funcname(arg1,arg2,arg3=val3)
 ## funcname=arg1,arg2,arg3=val3
 ##
+
+my $paren_re = qr/( \( (?: [^()]++ | (?-1) )*+ \) )/x;
+
 sub parse_func {
     my $opt = ref $_[0] eq 'HASH' ? shift : {};
     local $_ = shift;
@@ -70,17 +73,10 @@ sub parse_func {
 	croak "Unexpected result from eval.\n" if ref $sub ne 'CODE';
 	@func = ($sub);
     }
-    elsif (m{
-	^ &?
-	  (?<name>[\w:]+)
-	  (?:
-	    (?: (?<P>[(]) | = )  ## start with '(' or '='
-	    (?<arg> [^)]* )      ## optional arg list
-	    (?(<P>) [)] | )      ## close ')' or none
-	  )?
-	$
-    }x) {
-	my($name, $arg) = @+{"name", "arg"};
+    elsif (m{^ &? (?<name> [\w:]+ ) (?<arg> $paren_re | =.* )? $}x) {
+	my $name = $+{name};
+	my $arg = $+{arg} // '';
+	$arg =~ s/^ (?| \( (.*) \) | = (.*) ) $/$1/x;
 	my $pkg = $opt->{PACKAGE} || $caller;
 	$name =~ s/^/$pkg\::/ unless $name =~ /::/;
 	@func = ($name, arg2kvlist($arg));
@@ -96,10 +92,21 @@ sub parse_func {
 ## convert "key1,key2,key3=val3" to (key1=>1, key2=>1, key3=>"val3")
 ##
 sub arg2kvlist {
-    map  { /=/ ? split(/=/, $_, 2) : ($_, 1) }
-    map  { split /, */ }
-    grep { defined }
-    @_;
+    my @kv;
+    for (@_) {
+	while (/\G
+	       (?<k> [\w:]+ )
+	       (?: = (?<v> (?: [^,()]++ | ${paren_re} )*+ ) )?
+	       ,*/xgc
+	    ) {
+	    push @kv, ( $+{k}, $+{v} // 1 );
+	}
+	my $pos = pos() // 0;
+	if ($pos != length) {
+	    die "parse error in \"$_\".\n";
+	}
+    }
+    @kv;
 }
 
 1;

@@ -23,3 +23,7 @@
 ^MYMETA.json$
 ^MYMETA.yml$
 ^Makefile$
+
+#Build-related
+^version$
+^RoadMap$

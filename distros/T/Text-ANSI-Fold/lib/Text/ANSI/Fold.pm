@@ -4,8 +4,9 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.01";
+our $VERSION = "2.05";
 
+use Data::Dumper;
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
 
@@ -28,8 +29,9 @@ sub ansi_fold {
 ######################################################################
 
 my $alphanum_re = qr{ [_\d\p{Latin}] }x;
-my $reset_re    = qr{ \e \[ [0;]* m (?: \e \[ [0;]* [mK])* }x;
-my $color_re    = qr{ \e \[ [\d;]* [mK] }x;
+my $reset_re    = qr{ \e \[ [0;]* m }x;
+my $color_re    = qr{ \e \[ [\d;]* m }x;
+my $erase_re    = qr{ \e \[ [\d;]* K }x;
 my $control_re  = qr{
     # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
     \e \]			# osc
@@ -91,6 +93,7 @@ sub new {
 	runout    => $DEFAULT_RUNOUT_WIDTH,
 	expand    => 0,
 	tabstop   => 8,
+	keep_el   => 1,
     }, $class;
 
     $obj->configure(@_) if @_;
@@ -141,11 +144,14 @@ sub configure {
 }
 
 my @color_stack;
+my @bg_stack;
 my @reset;
 sub put_reset { @reset = shift };
 sub pop_reset {
     @reset ? do { @color_stack = (); pop @reset } : '';
 }
+
+use List::Util qw(pairgrep);
 
 sub fold {
     my $obj = ref $_[0] ? $_[0] : do {
@@ -154,20 +160,9 @@ sub fold {
     shift;
 
     local $_ = shift // '';
-    my %opt = @_;
+    my %opt = ( %$obj, pairgrep { defined $b } @_ );
 
-    my $width     = $opt{width}     // $obj->{width};
-    my $boundary  = $opt{boundary}  // $obj->{boundary};
-    my $padding   = $opt{padding}   // $obj->{padding};
-    my $padchar   = $opt{padchar}   // $obj->{padchar};
-    my $ambiguous = $opt{ambiguous} // $obj->{ambiguous};
-    my $margin    = $opt{margin}    // $obj->{margin};
-    my $linebreak = $opt{linebreak} // $obj->{linebreak};
-    my $runin     = $opt{runin}     // $obj->{runin};
-    my $runout    = $opt{runout}    // $obj->{runout};
-    my $expand    = $opt{expand}    // $obj->{expand};
-    my $tabstop   = $opt{tabstop}   // $obj->{tabstop};
-
+    my $width = $opt{width} // die;
     if ($width < 0) {
 	$width = ~0 >> 1; # INT_MAX
     }
@@ -176,36 +171,49 @@ sub fold {
 	croak "invalid width";
     }
 
-    if ($width <= $margin) {
+    if ($width <= $opt{margin}) {
 	croak "invalid margin";
     }
-    $width -= $margin;
+    $width -= $opt{margin};
 
-    $Text::VisualWidth::PP::EastAsian = $ambiguous eq 'wide';
+    $Text::VisualWidth::PP::EastAsian = $opt{ambiguous} eq 'wide';
 
     my $folded = '';
     my $eol = '';
     my $room = $width;
-    @color_stack = @reset = ();
-    my $yield_re = $expand ? qr/[^\e\n\f\r\t]/ : qr/[^\e\n\f\r]/;
+    @bg_stack = @color_stack = @reset = ();
+    my $yield_re = $opt{expand} ? qr/[^\e\n\f\r\t]/ : qr/[^\e\n\f\r]/;
+
+  FOLD:
     while (length) {
 
+	# newline
 	if (s/\A(\r*\n)//) {
 	    $eol = $1;
 	    last;
 	}
+	# formfeed / carriage return
 	if (s/\A([\f\r]+)//) {
 	    last if length == 0;
 	    $folded .= $1;
 	    $room = $width;
 	    next;
 	}
+	# ECMA-48 OPERATING SYSTEM COMMAND
 	if (s/\A($control_re)//) {
 	    $folded .= $1;
 	    next;
 	}
-	if (s/\A($reset_re)//) {
+	# erase line (assume 0)
+	if (s/\A($erase_re)//) {
+	    $folded .= $1 if $obj->{keep_el};
+	    @bg_stack = @color_stack;
+	    next;
+	}
+	# reset
+	if (s/\A($reset_re+($erase_re*))//) {
 	    put_reset($1);
+	    @bg_stack = () if $2;
 	    next;
 	}
 
@@ -216,19 +224,42 @@ sub fold {
 	    $folded .= pop_reset();
 	}
 
+	# ANSI color sequence
 	if (s/\A($color_re)//) {
 	    $folded .= $1;
 	    push @color_stack, $1;
 	    next;
 	}
 
-	if ($expand and s/\A(\t+)//) {
-	    my $space = $tabstop * length($1) - ($width - $room) % $tabstop;
+	# tab
+	if ($opt{expand} and s/\A(\t+)//) {
+	    my $space =
+		$opt{tabstop} * length($1) - ($width - $room) % $opt{tabstop};
 	    $_ = ' ' x $space . $_;
 	    next;
 	}
 
-	if (s/\A(\e*${yield_re}+)//) {
+	# backspace
+	my $bs = 0;
+	while (s/\A(?:\X\cH+)++(?<c>\X|\z)//p) {
+	    my $w = vwidth($+{c});
+	    if ($w > $room) {
+		if ($folded eq '') {
+		    $folded .= ${^MATCH};
+		    $room -= $w;
+		} else {
+		    $_ = ${^MATCH} . $_;
+		}
+		last FOLD;
+	    }
+	    $folded .= ${^MATCH};
+	    $room -= $w;
+	    $bs++;
+	    last if $room < 1;
+	}
+	next if $bs;
+
+	if (s/\A(\e*(?:${yield_re}(?!\cH))+)//) {
 	    my $s = $1;
 	    if ((my $w = vwidth($s)) <= $room) {
 		$folded .= $s;
@@ -247,11 +278,11 @@ sub fold {
 	}
     }
 
-    if ($boundary eq 'word'
+    if ($opt{boundary} eq 'word'
 	and my($tail) = /^(${alphanum_re}+)/o
 	and $folded =~ m{
 		^
-		( (?: [^\e]* ${color_re} ) *+ )
+		( (?: [^\e]* (?:${color_re}|${erase_re}) ) *+ )
 		( .*? )
 		( ${alphanum_re}+ )
 		\z
@@ -271,11 +302,11 @@ sub fold {
     ## RUN-OUT
     ##
     if ($_ ne ''
-	and $linebreak & LINEBREAK_RUNOUT and $runout > 0
+	and $opt{linebreak} & LINEBREAK_RUNOUT and $opt{runout} > 0
 	and $folded =~ m{ (?<color>  (?! ${reset_re}) ${color_re}*+ )
 			  (?<runout> $prohibition_re{end}+ ) \z }xp
 	and ${^PREMATCH} ne ''
-	and (my $w = vwidth $+{runout}) <= $runout) {
+	and (my $w = vwidth $+{runout}) <= $opt{runout}) {
 	$folded = ${^PREMATCH};
 	$_ = join '', ${^MATCH}, @reset, $_;
 	pop_reset() if $+{color};
@@ -284,14 +315,14 @@ sub fold {
 
     $folded .= pop_reset() if @reset;
 
-    $room += $margin;
+    $room += $opt{margin};
 
     ##
     ## RUN-IN
     ##
-    if ($linebreak & LINEBREAK_RUNIN and $runin > 0) {
+    if ($opt{linebreak} & LINEBREAK_RUNIN and $opt{runin} > 0) {
 	my @runin;
-	my $m = $runin;
+	my $m = $opt{runin};
 	while ($m > 0 and
 	       m{\A (?<color> ${color_re}*+)
 	            (?<runin> $prohibition_re{head})
@@ -313,8 +344,12 @@ sub fold {
 	$_ = join '', @color_stack, $_ if $_ ne '';
     }
 
-    if ($padding and $room > 0) {
-	$folded .= $padchar x $room;
+    if ($opt{padding} and $room > 0) {
+	my $padding = $opt{padchar} x $room;
+	if (@bg_stack) {
+	    $padding = join '', @bg_stack, $padding, SGR_RESET;
+	}
+	$folded .= $padding;
     }
 
     ($folded . $eol, $_, $width - $room);
@@ -404,7 +439,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.01
+Version 2.05
 
 =head1 SYNOPSIS
 
@@ -570,10 +605,14 @@ width.
 =item B<padding> => I<bool>
 
 If B<padding> option is given with true value, margin space is filled
-up with space character.  Next code fills spaces if the given text is
-shorter than 80.
+up with space character.  Default is 0.  Next code fills spaces if the
+given text is shorter than 80.
 
     ansi_fold($text, 80, padding => 1);
+
+If an ANSI B<Erase Line> sequence is found in the string, color status
+at the position is remembered, and padding string is produced in that
+color.
 
 =item B<padchar> => I<char>
 
@@ -587,6 +626,12 @@ given width.
 Tells how to treat Unicode East Asian ambiguous characters.  Default
 is "narrow" which means single column.  Set "wide" to tell the module
 to treat them as wide character.
+
+=item B<keep_el> => I<bool>
+
+Keep sole ANSI Erase Line sequence or not.  Default is 1.  If not
+true, individual Erase Line sequence is not kept in the result string.
+Erase Line right after RESET sequence is always kept.
 
 =item B<linebreak> => I<mode>
 

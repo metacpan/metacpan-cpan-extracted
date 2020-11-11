@@ -2,63 +2,65 @@ use 5.008008;
 use strict;
 use warnings;
 
-{
-	package Ask::STDIO;
+package Ask::STDIO;
+
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.015';
+
+use Moo;
+use namespace::autoclean;
+
+with 'Ask::API';
+
+sub is_usable {
+	my ( $self ) = @_;
+	-t STDIN and -t STDOUT;
+}
+
+sub quality {
+	( -t STDIN and -t STDOUT ) ? 80 : 20;
+}
+
+sub entry {
+	my ( $self, %o ) = @_;
+	$self->info( text => $o{text} ) if exists $o{text};
 	
-	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.012';
+	my ( $line, $tio );
 	
-	use Moo;
-	use namespace::autoclean;
-	
-	with 'Ask::API';
-	
-	sub is_usable {
-		my ($self) = @_;
-		-t STDIN and -t STDOUT;
+	if (
+		$o{hide_text}
+		and do { require POSIX; $tio = 'POSIX::Termios'->new }
+		)
+	{
+		require POSIX;
+		my $tio = POSIX::Termios->new;
+		$tio->getattr( 0 );
+		$tio->setlflag( $tio->getlflag & ~POSIX::ECHO() );
+		$tio->setattr( 0 );
+		chomp( $line = <STDIN> );
+		$tio->setlflag( $tio->getlflag | POSIX::ECHO() );
+		$tio->setattr( 0 );
+	} #/ if ( $o{hide_text} and...)
+	else {
+		chomp( $line = <STDIN> );
 	}
 	
-	sub quality {
-		(-t STDIN and -t STDOUT) ? 80 : 20;
-	}
-	
-	sub entry {
-		my ($self, %o) = @_;
-		$self->info(text => $o{text}) if exists $o{text};
-		
-		my ( $line, $tio );
-		
-		if ( $o{hide_text} and do { require POSIX; $tio = 'POSIX::Termios'->new } ) {
-			require POSIX;
-			my $tio = POSIX::Termios->new;
-			$tio->getattr(0);
-			$tio->setlflag($tio->getlflag & ~POSIX::ECHO());
-			$tio->setattr(0);
-			chomp( $line = <STDIN> );
-			$tio->setlflag($tio->getlflag | POSIX::ECHO());
-			$tio->setattr(0);
-		}
-		else {
-			chomp( $line = <STDIN> );
-		}
-		
-		return $line;
-	}
-	
-	sub info {
-		my ($self, %o) = @_;
-		print STDOUT "$o{text}\n";
-	}
-	
-	sub warning {
-		my ($self, %o) = @_;
-		print STDERR "WARNING: $o{text}\n";
-	}
-	
-	sub error {
-		my ($self, %o) = @_;
-		print STDERR "ERROR: $o{text}\n";
-	}
+	return $line;
+} #/ sub entry
+
+sub info {
+	my ( $self, %o ) = @_;
+	print STDOUT "$o{text}\n";
+}
+
+sub warning {
+	my ( $self, %o ) = @_;
+	print STDERR "WARNING: $o{text}\n";
+}
+
+sub error {
+	my ( $self, %o ) = @_;
+	print STDERR "ERROR: $o{text}\n";
 }
 
 1;
@@ -103,4 +105,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

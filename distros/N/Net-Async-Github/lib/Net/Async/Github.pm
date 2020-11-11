@@ -3,7 +3,7 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -161,16 +161,10 @@ sub reopen {
     $uri->path(
         join '/', 'repos', $args{owner}, $args{repo}, 'pulls', $args{id}
     );
-    $self->request(
-        PATCH => $uri,
-        $json->encode({
+    $self->http_patch(
+        uri => $uri,
+        data => {
             state => 'open',
-        }),
-        content_type => 'application/json',
-        user => $self->api_key,
-        pass => '',
-        headers => {
-            'Accept' => 'application/vnd.github.v3.full+json',
         },
     )
 }
@@ -249,6 +243,43 @@ sub Net::Async::Github::Repository::grant_team {
         ),
         data => {
             permission => $args{permission},
+        },
+    )
+}
+
+=head2 create_pr
+
+Creates a new pull request.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<head> - head commit starting point, typically the latest commit on your fork's branch
+
+=item * C<base> - base commit this PR applies changes to typically you'd want the target repo C<master>
+
+=back
+
+=cut
+
+sub create_pr {
+    my ($self, %args) = @_;
+    my $gh = $self->github;
+    $gh->validate_args(%args);
+    $self->github->http_post(
+        uri => $self->github->endpoint(
+            'pull_request',
+            owner => $args{owner},
+            repo  => $args{repo},
+        ),
+        data => {
+            head => $args{head},
+            base => $args{base},
         },
     )
 }
@@ -510,13 +541,8 @@ sub head {
     $uri->path(
         join '/', 'repos', $args{owner}, $args{repo}, qw(git refs heads), $args{branch}
     );
-    $self->request(
-        GET => $uri,
-        user => $self->api_key,
-        pass => '',
-        headers => {
-            'Accept' => 'application/vnd.github.v3.full+json',
-        },
+    $self->http_get(
+        uri => $uri
     )
 }
 
@@ -532,16 +558,12 @@ sub update {
     $uri->path(
         join '/', 'repos', $args{owner}, $args{repo}, qw(merges)
     );
-    $self->request(
-        POST => $uri,
-        $json->encode({
+    $self->http_post(
+        uri => $uri,
+        data => {
             head           => $args{head},
             base           => $args{branch},
             commit_message => "Merge branch 'master' into " . $args{branch},
-        }),
-        content_type => 'application/json',
-        headers => {
-            'Accept' => 'application/vnd.github.v3.full+json',
         },
     )
 }
@@ -895,6 +917,7 @@ sub http_delete {
 sub http_put {
     my ($self, %args) = @_;
     my %auth = $self->auth_info;
+    my $method = delete $args{method} || 'PUT';
 
     if(my $hdr = delete $auth{headers}) {
         $args{headers}{$_} //= $hdr->{$_} for keys %$hdr
@@ -903,9 +926,9 @@ sub http_put {
 
     my $uri = delete $args{uri};
     my $data = delete $args{data};
-    $log->tracef("PUT %s { %s } <= %s", $uri->as_string, \%args, $data);
+    $log->tracef("%s %s { %s } <= %s", $method, $uri->as_string, \%args, $data);
     $data = $json->encode($data) if ref $data;
-    $self->http->PUT(
+    $self->http->$method(
         $uri,
         $data,
         content_type => 'application/json',
@@ -951,6 +974,11 @@ sub http_put {
         }
         Future->fail(@_);
     })
+}
+
+sub http_patch {
+    my ($self, %args) = @_;
+    return $self->http_put(%args, method => 'PATCH');
 }
 
 sub http_post {

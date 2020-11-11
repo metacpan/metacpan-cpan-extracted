@@ -1,24 +1,36 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.4.1';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.6.0';
 use Moo;
 use Getopt::Long qw/ GetOptions /;
 use Pod::Usage qw/ pod2usage /;
 use Math::Random::MT ();
-use List::Util 1.34 qw/ any /;
+use List::Util 1.34 qw/ any max /;
 
 extends('Exporter');
 
 has [
-    '_active_record',  '_active_task',
-    '_board_cards',    '_board_lines',
-    '_board_values',   '_init_foundation',
-    '_init_queue',     '_init_tasks_configs',
-    '_is_good_diff',   '_prelude',
-    '_prelude_iter',   '_prelude_string',
-    '_talon_cards',    '_positions',
-    '_quiet',          '_output_handle',
-    '_output_fn',      '_tasks',
-    '_tasks_by_names', '_task_idx',
+    '_active_record',
+    '_active_task',
+    '_board_cards',
+    '_board_lines',
+    '_board_values',
+    '_init_foundation',
+    '_init_queue',
+    '_init_tasks_configs',
+    '_is_good_diff',
+    '_maximal_num_played_cards__from_all_tasks',
+    '_prelude',
+    '_prelude_iter',
+    '_prelude_string',
+    '_talon_cards',
+    '_positions',
+    '_quiet',
+    '_output_handle',
+    '_output_fn',
+    '_should_show_maximal_num_played_cards',
+    '_tasks',
+    '_tasks_by_names',
+    '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -63,9 +75,22 @@ sub _calc_lines
     return;
 }
 
+sub _update_max_num_played_cards
+{
+    my $self = shift;
+
+    foreach my $task ( @{ $self->_tasks } )
+    {
+        $self->_update_max_reached_depths_stack_len($task);
+    }
+
+    return;
+}
+
 sub _trace_solution
 {
     my ( $self, $final_state ) = @_;
+    $self->_update_max_num_played_cards();
     my $output_handle = $self->_output_handle;
     $output_handle->print("Solved!\n");
 
@@ -96,6 +121,15 @@ LOOP:
     return;
 }
 
+sub get_max_num_played_cards
+{
+    my $self = shift;
+
+    $self->_update_max_num_played_cards();
+
+    return $self->_maximal_num_played_cards__from_all_tasks() - 1;
+}
+
 sub _my_exit
 {
     my ( $self, $verdict, ) = @_;
@@ -104,6 +138,13 @@ sub _my_exit
     if ( !$verdict )
     {
         $output_handle->print("Unsolved!\n");
+    }
+    if ( $self->_should_show_maximal_num_played_cards() )
+    {
+        $output_handle->printf(
+            "At most %u cards could be played.\n",
+            $self->get_max_num_played_cards()
+        );
     }
 
     if ( defined( $self->_output_fn ) )
@@ -192,6 +233,7 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
+    $self->_should_show_maximal_num_played_cards(0);
     my $quiet = '';
     my $output_fn;
     my ( $help, $man, $version );
@@ -234,6 +276,11 @@ sub _process_cmd_line
         "seed=i" => sub {
             my ( undef, $val ) = @_;
             $tasks[-1]->{seed} = $val;
+            return;
+        },
+        "show-max-num-played-cards!" => sub {
+            my ( undef, $val ) = @_;
+            $self->_should_show_maximal_num_played_cards($val);
             return;
         },
         'help|h|?' => \$help,
@@ -283,6 +330,7 @@ sub _process_cmd_line
 sub _set_up_tasks
 {
     my ($self) = @_;
+    $self->_maximal_num_played_cards__from_all_tasks(0);
 
     my @tasks;
     my %tasks_by_names;
@@ -295,13 +343,13 @@ sub _set_up_tasks
             Games::Solitaire::BlackHole::Solver::App::Base::Task->new(
             {
                 _name            => $name,
-                _queue           => [ @{ $self->_init_queue } ],
                 _seed            => $iseed,
                 _gen             => Math::Random::MT->new( $iseed || 1 ),
                 _remaining_iters => 100,
                 _task_idx        => $_task_idx,
             }
             );
+        $task_obj->_push_to_queue( $self->_init_queue );
         push @tasks, $task_obj;
         if ( exists $tasks_by_names{$name} )
         {
@@ -354,6 +402,20 @@ sub _set_up_tasks
     return;
 }
 
+sub _update_max_reached_depths_stack_len
+{
+    my ( $self, $task ) = @_;
+
+    $self->_maximal_num_played_cards__from_all_tasks(
+        max(
+            $self->_maximal_num_played_cards__from_all_tasks,
+            $task->_max_reached_depths_stack_len
+        )
+    );
+
+    return;
+}
+
 sub _next_task
 {
     my ($self) = @_;
@@ -363,6 +425,7 @@ sub _next_task
         my $task  = $alloc->_task;
         if ( !@{ $task->_queue } )
         {
+            $self->_update_max_reached_depths_stack_len($task);
             return $self->_next_task;
         }
         $task->_remaining_iters( $alloc->_quota );
@@ -388,7 +451,15 @@ sub _get_next_state
 {
     my ($self) = @_;
 
-    return pop( @{ $self->_active_task->_queue } );
+    my $l     = @{ $self->_active_task->_queue };
+    my $ret   = pop( @{ $self->_active_task->_queue } );
+    my $stack = $self->_active_task->_depths_stack;
+    while ( @$stack and ( $stack->[-1] == $l ) )
+    {
+        pop @$stack;
+    }
+    push @$stack, ( $l - 1 );
+    return $ret;
 }
 
 sub _get_next_state_wrapper
@@ -416,7 +487,7 @@ sub _process_pending_items
     if (@$_pending)
     {
         $self->_shuffle( $task->_gen, $_pending ) if $task->_seed;
-        push @{ $task->_queue }, map { $_->[0] } @$_pending;
+        $task->_push_to_queue( [ map { $_->[0] } @$_pending ] );
         $rec->[3] += ( scalar grep { !$_->[1] } @$_pending );
     }
     else
@@ -497,14 +568,32 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.4.1';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.6.0';
 use Moo;
 
-has [ '_queue', '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
+has '_queue'        => ( is => 'ro', default => sub { return []; }, );
+has '_depths_stack' => ( is => 'ro', default => sub { return []; }, );
+has '_max_reached_depths_stack_len' => ( is => 'rw', default => 0 );
+has [ '_gen', '_task_idx', '_name', '_remaining_iters', '_seed', ] =>
     ( is => 'rw' );
 
+sub _push_to_queue
+{
+    my ( $self, $items ) = @_;
+    die if not @$items;
+    push @{ $self->_queue },        @$items;
+    push @{ $self->_depths_stack }, scalar( @{ $self->_queue } );
+    my $l = @{ $self->_depths_stack };
+    if ( $l > $self->_max_reached_depths_stack_len() )
+    {
+        $self->_max_reached_depths_stack_len($l);
+    }
+
+    return;
+}
+
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.4.1';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.6.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -523,13 +612,19 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.4.1
+version 0.6.0
 
 =head1 METHODS
 
 =head2 new
 
 For internal use.
+
+=head2 get_max_num_played_cards
+
+Returns the maximal number of played cards.
+
+Added in version 0.6.0.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

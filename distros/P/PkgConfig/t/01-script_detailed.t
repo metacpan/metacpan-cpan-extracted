@@ -2,10 +2,6 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Basename;
-use Data::Dumper;
-use File::Spec;
-use Config;
 use FindBin;
 use lib $FindBin::Bin;
 use PkgConfigTest;

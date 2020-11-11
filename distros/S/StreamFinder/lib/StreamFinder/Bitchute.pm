@@ -18,11 +18,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::Bitchute;
 
-	my $video = new StreamFinder::Bitchute(<url>);
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $video = new StreamFinder::Bitchute($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($video);
 

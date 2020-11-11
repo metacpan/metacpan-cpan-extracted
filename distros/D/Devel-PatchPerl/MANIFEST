@@ -22,3 +22,4 @@ t/lib/Devel/PatchPerl/Plugin/TEST.pm
 t/modern/patchlevel.h
 t/old/patchlevel.h
 tools/audit_hints.pl
+tools/check_patchperl.pl

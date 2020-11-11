@@ -3,15 +3,14 @@
 #
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::VSplit;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget::LinearSplit );
+package Tickit::Widget::VSplit 0.31;
+class Tickit::Widget::VSplit
+   extends Tickit::Widget::LinearSplit;
+
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
-
-our $VERSION = '0.30';
 
 use Carp;
 
@@ -115,39 +114,32 @@ L</set_right_child> methods.
 
 =cut
 
-sub new
+BUILD
 {
-   my $class = shift;
    my %args = @_;
 
-   my $self = $class->SUPER::new( %args );
-
-   Carp::carp( "The 'left_child' constructor argument to $class is discouraged; use ->set_left_child instead" ) and
+   Carp::carp( "The 'left_child' constructor argument to ${\ref $self} is discouraged; use ->set_left_child instead" ) and
       $self->set_left_child ( $args{left_child}  ) if $args{left_child};
 
-   Carp::carp( "The 'right_child' constructor argument to $class is discouraged; use ->set_right_child instead" ) and
+   Carp::carp( "The 'right_child' constructor argument to ${\ref $self} is discouraged; use ->set_right_child instead" ) and
       $self->set_right_child( $args{right_child} ) if $args{right_child};
-
-   return $self;
 }
 
-sub lines
+method lines
 {
-   my $self = shift;
    return max(
-      $self->{A_child} ? $self->{A_child}->requested_lines : 1,
-      $self->{B_child} ? $self->{B_child}->requested_lines : 1,
+      $self->left_child  ? $self->left_child->requested_lines  : 1,
+      $self->right_child ? $self->right_child->requested_lines : 1,
    );
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
    my $spacing = $self->get_style_values( "spacing" );
    return sum(
-      $self->{A_child} ? $self->{A_child}->requested_cols : 1,
+      $self->left_child  ? $self->left_child->requested_cols  : 1,
       $spacing,
-      $self->{B_child} ? $self->{B_child}->requested_cols : 1,
+      $self->right_child ? $self->right_child->requested_cols : 1,
    );
 }
 
@@ -195,39 +187,37 @@ constructor arguments, which are now discouraged.
 *right_child     = __PACKAGE__->can( "B_child" );
 *set_right_child = __PACKAGE__->can( "set_B_child" );
 
-sub _make_child_geom
+method _make_child_geom
 {
-   my $self = shift;
    my ( $start, $len ) = @_;
    return ( 0, $start, $self->window->lines, $len );
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
-   my $split_len = $self->{split_len};
+   my $split_len = $self->_split_len;
+   my $split_at  = $self->_split_at;
 
    my $lines = $self->window->lines;
 
    $rb->setpen( $self->get_style_pen( "split" ) );
 
-   $rb->vline_at( 0, $lines-1, $self->{split_at}, LINE_SINGLE, undef, CAP_BOTH );
+   $rb->vline_at( 0, $lines-1, $split_at, LINE_SINGLE, undef, CAP_BOTH );
 
    if( $split_len > 2 ) {
       foreach my $line ( $rect->linerange ) {
-         $rb->erase_at( $line, $self->{split_at} + 1, $split_len - 2 );
+         $rb->erase_at( $line, $split_at + 1, $split_len - 2 );
       }
    }
    if( $split_len > 1 ) {
-      $rb->vline_at( 0, $lines-1, $self->{split_at} + $split_len - 1, LINE_SINGLE, undef, CAP_BOTH );
+      $rb->vline_at( 0, $lines-1, $split_at + $split_len - 1, LINE_SINGLE, undef, CAP_BOTH );
    }
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    if( $args->type ne "wheel" and $args->button == 1 ) {

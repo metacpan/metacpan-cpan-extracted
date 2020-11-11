@@ -1177,6 +1177,22 @@ DESCRIPTION
         MooX::Press supports the Moo-specific `clearer => 1` and will
         translate it if you're using Moose or Mouse.
 
+    `default` *(CodeRef|~Ref|Overloaded|ScalarRef)*
+        Coderefs and non-reference values can be used as defaults the same as
+        in Moo/Moose/Mouse.
+
+        Blessed Ask::Question objects are additionally supported as defaults.
+        The `type` of the attribute will automatically be injected as the
+        target type of the question if the target type is missing.
+
+        A scalarref is converted to an Ask::Question object so:
+
+          has age => ( is => 'ro', type => 'Int', default => \"Enter age" );
+
+        Will require age to be an integer, and if it's not provided to the
+        constructor, Ask will prompt the user via STDIN/STDOUT, a GUI dialogue
+        box, or whatever other method is available.
+
    Method Signatures
     Most places where a coderef is expected, MooX::Press will also accept a
     hashref of the form:

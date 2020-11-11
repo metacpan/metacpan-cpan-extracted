@@ -3,18 +3,16 @@
 #
 #  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Static;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::Widget::Static 0.52;
+class Tickit::Widget::Static
+   extends Tickit::Widget;
+
 use Tickit::Style;
-use Tickit::RenderBuffer;
 
 use Tickit::WidgetRole::Alignable name => 'align',  dir => 'h';
 use Tickit::WidgetRole::Alignable name => 'valign', dir => 'v';
-
-our $VERSION = '0.51';
 
 use List::Util qw( max );
 use Tickit::Utils qw( textwidth substrwidth );
@@ -91,19 +89,18 @@ For more details see the accessors below.
 
 =cut
 
-sub new
+has @_lines;
+has $_on_click;
+
+BUILD
 {
-   my $class = shift;
-   my %args = @_;
+   my %params = @_;
 
-   my $self = $class->SUPER::new( %args );
+   $self->set_text( $params{text} );
+   $self->set_align( $params{align} || 0 );
+   $self->set_valign( $params{valign} || 0 );
 
-   $self->{lines} = [];
-   $self->set_text( $args{text} );
-   $self->set_align( $args{align} || 0 );
-   $self->set_valign( $args{valign} || 0 );
-
-   $self->set_on_click( $args{on_click} );
+   $self->set_on_click( $params{on_click} );
 
    return $self;
 }
@@ -112,16 +109,14 @@ sub new
 
 =cut
 
-sub lines
+method lines
 {
-   my $self = shift;
-   return scalar @{ $self->{lines} };
+   return scalar @_lines;
 }
 
-sub cols
+method cols
 {
-   my $self = shift;
-   return max map { textwidth $_ } @{ $self->{lines} }
+   return max map { textwidth $_ } @_lines;
 }
 
 =head2 text
@@ -130,10 +125,9 @@ sub cols
 
 =cut
 
-sub text
+method text
 {
-   my $self = shift;
-   return join "\n", @{ $self->{lines} };
+   return join "\n", @_lines;
 }
 
 =head2 set_text
@@ -144,18 +138,16 @@ Accessor for C<text> property; the actual text on display in the widget
 
 =cut
 
-sub set_text
+method set_text
 {
-   my $self = shift;
    my ( $text ) = @_;
 
    my $waslines = $self->lines;
    my $wascols  = $self->cols;
 
-   my @lines = split m/\n/, $text;
+   @_lines = split m/\n/, $text;
    # split on empty string returns empty list
-   @lines = ( "" ) if !@lines;
-   $self->{lines} = \@lines;
+   @_lines = ( "" ) if !@_lines;
 
    $self->resized if $self->lines != $waslines or $self->cols != $wascols;
 
@@ -181,17 +173,13 @@ See also L<Tickit::WidgetRole::Alignable>.
 
 =cut
 
-sub set_on_click
+method set_on_click
 {
-   my $self = shift;
-   my ( $on_click ) = @_;
-
-   $self->{on_click} = $on_click;
+   ( $_on_click ) = @_;
 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    my $win = $self->window;
@@ -202,7 +190,7 @@ sub render_to_rb
    my ( $above, $lines ) = $self->_valign_allocation( $self->lines, $win->lines );
 
    foreach my $line ( 0 .. $lines - 1 ) {
-      my $text = $self->{lines}[$line];
+      my $text = $_lines[$line];
 
       my ( $left, $textwidth ) = $self->_align_allocation( textwidth( $text ), $cols );
 
@@ -210,15 +198,14 @@ sub render_to_rb
    }
 }
 
-sub on_mouse
+method on_mouse
 {
-   my $self = shift;
    my ( $args ) = @_;
 
    return unless $args->type eq "press" and $args->button == 1;
-   return unless my $on_click = $self->{on_click};
+   return unless $_on_click;
 
-   $on_click->( $self, $args->line, $args->col );
+   $_on_click->( $self, $args->line, $args->col );
 }
 
 =head1 AUTHOR

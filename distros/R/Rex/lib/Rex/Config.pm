@@ -32,10 +32,11 @@ While it's possible to use the methods below to set a configuration option direc
 
 package Rex::Config;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Rex::Helper::File::Spec;
 use Rex::Logger;

@@ -1,13 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 
-BEGIN {
-    use_ok('Algorithm::C3');
-}
+use Algorithm::C3;
 
 =pod
 
@@ -15,39 +11,39 @@ Just like 006_complex_merge, but with the caching turned on.
 
 This example is taken from: http://rt.cpan.org/Public/Bug/Display.html?id=20879
 
-               ---     ---     ---
-Level 5     8 | A | 9 | B | A | C |    (More General)
-               ---     ---     ---       V
-                  \     |     /          |
-                   \    |    /           |
-                    \   |   /            |
-                     \  |  /             |
-                       ---               |
-Level 4             7 | D |              |
-                       ---               |
-                      /   \              |
-                     /     \             |
-                  ---       ---          |
-Level 3        4 | G |   6 | E |         |
-                  ---       ---          |
-                   |         |           |
-                   |         |           |
-                  ---       ---          |
-Level 2        3 | H |   5 | F |         |
-                  ---       ---          |
-                      \   /  |           |
-                       \ /   |           |
-                        \    |           |
-                       / \   |           |
-                      /   \  |           |
-                  ---       ---          |
-Level 1        1 | J |   2 | I |         |
-                  ---       ---          |
-                    \       /            |
-                     \     /             |
-                       ---               v
-Level 0             0 | K |            (More Specialized)
-                       ---
+                   ---     ---     ---
+    Level 5     8 | A | 9 | B | A | C |    (More General)
+                   ---     ---     ---       V
+                      \     |     /          |
+                       \    |    /           |
+                        \   |   /            |
+                         \  |  /             |
+                           ---               |
+    Level 4             7 | D |              |
+                           ---               |
+                          /   \              |
+                         /     \             |
+                      ---       ---          |
+    Level 3        4 | G |   6 | E |         |
+                      ---       ---          |
+                       |         |           |
+                       |         |           |
+                      ---       ---          |
+    Level 2        3 | H |   5 | F |         |
+                      ---       ---          |
+                          \   /  |           |
+                           \ /   |           |
+                            \    |           |
+                           / \   |           |
+                          /   \  |           |
+                      ---       ---          |
+    Level 1        1 | J |   2 | I |         |
+                      ---       ---          |
+                        \       /            |
+                         \     /             |
+                           ---               v
+    Level 0             0 | K |            (More Specialized)
+                           ---
 
 
 0123456789A
@@ -66,28 +62,28 @@ KJIHGFEDABC
     sub x { 1 }
 
     package Test::D;
-    use base qw/Test::A Test::B Test::C/;
+    our @ISA = qw(Test::A Test::B Test::C);
 
     package Test::E;
-    use base qw/Test::D/;
+    our @ISA = qw(Test::D);
 
     package Test::F;
-    use base qw/Test::E/;
+    our @ISA = qw(Test::E);
 
     package Test::G;
-    use base qw/Test::D/;
+    our @ISA = qw(Test::D);
 
     package Test::H;
-    use base qw/Test::G/;
+    our @ISA = qw(Test::G);
 
     package Test::I;
-    use base qw/Test::H Test::F/;
+    our @ISA = qw(Test::H Test::F);
 
     package Test::J;
-    use base qw/Test::F/;
+    our @ISA = qw(Test::F);
 
     package Test::K;
-    use base qw/Test::J Test::I/;
+    our @ISA = qw(Test::J Test::I);
 }
 
 sub supers {

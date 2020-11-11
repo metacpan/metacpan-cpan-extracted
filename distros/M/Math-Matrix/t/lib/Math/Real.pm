@@ -464,7 +464,7 @@ use overload
 
   '=' => sub {
       my ($x, $y, $swap) = @_;
-      return $x;
+      return $x -> clone();
   },
 
   ;

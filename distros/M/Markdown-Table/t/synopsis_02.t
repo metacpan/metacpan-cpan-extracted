@@ -40,4 +40,23 @@ is $tables[1]->get_table, '| ID | Dists |
 '
 ;
 
+is_deeply $tables[0]->cols, [
+    'Id', 'Name', 'Role'
+];
+
+is_deeply $tables[1]->cols, [
+    'ID', 'Dists'
+];
+
+is_deeply $tables[0]->rows, [
+    [ 1, 'John Smith', 'Testrole' ],
+    [ 2, 'Jane Smith', 'Admin' ],
+];
+
+is_deeply $tables[1]->rows, [
+    [ 1, 198 ],
+    [ 2, 53 ],
+    [ 3, 21 ],
+];
+
 done_testing();

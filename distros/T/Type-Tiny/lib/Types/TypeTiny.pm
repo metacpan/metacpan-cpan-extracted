@@ -4,11 +4,17 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.010006';
+our $VERSION   = '1.012000';
 
 $VERSION =~ tr/_//d;
 
 use Scalar::Util qw< blessed refaddr weaken >;
+
+BEGIN {
+	*__XS = eval { require Type::Tiny::XS; 'Type::Tiny::XS'->VERSION('0.022'); 1 }
+		? sub () { !!1 }
+		: sub () { !!0 };
+};
 
 our @EXPORT_OK = (
 	map(@{[ $_, "is_$_", "assert_$_" ]}, __PACKAGE__->type_names),
@@ -39,15 +45,32 @@ sub import
 	my $class = shift;                            # uncoverable statement
 	my $opts  = { ref($_[0]) ? %{+shift} : () };  # uncoverable statement
 	$opts->{into} ||= scalar(caller);             # uncoverable statement
+	_mkall();                                     # uncoverable statement
 	return $class->$next($opts, @_);              # uncoverable statement
 }
 
-for (__PACKAGE__->type_names) {
-	eval qq{
-		sub is_$_     { $_()->check(shift) }
-		sub assert_$_ { $_()->assert_return(shift) }
-	};
-}
+for (__PACKAGE__->type_names) {                      # uncoverable statement
+	eval qq{                                          # uncoverable statement
+		sub is_$_     { $_()->check(shift) }           # uncoverable statement
+		sub assert_$_ { $_()->assert_return(shift) }   # uncoverable statement
+	};                                                # uncoverable statement
+}                                                    # uncoverable statement
+
+sub _reinstall_subs {
+	# uncoverable subroutine
+	my $type = shift;                                    # uncoverable statement
+	no strict 'refs';                                    # uncoverable statement
+	no warnings 'redefine';                              # uncoverable statement
+	*{'is_'     . $type->name} = $type->compiled_check;  # uncoverable statement
+	*{'assert_' . $type->name} = \&$type;                # uncoverable statement
+	$type;                                               # uncoverable statement
+}                                                       # uncoverable statement
+
+sub _mkall {
+	# uncoverable subroutine
+	return unless $INC{'Type/Tiny.pm'};                    # uncoverable statement
+	__PACKAGE__->get_type($_) for __PACKAGE__->type_names; # uncoverable statement
+}                                                         # uncoverable statement
 
 sub meta
 {
@@ -139,52 +162,219 @@ sub _get_check_overload_sub {
 
 sub StringLike ()
 {
+	return $cache{StringLike} if defined $cache{StringLike};
 	require Type::Tiny;
-	$cache{StringLike} ||= "Type::Tiny"->new(
+	my %common = (
 		name       => "StringLike",
+		library    => __PACKAGE__,
 		constraint => sub {    defined($_   ) && !ref($_   ) or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[""])  },
 		inlined    => sub { qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/ },
-		library    => __PACKAGE__,
 	);
+	if ( __XS ) {
+		my $xsub     = Type::Tiny::XS::get_coderef_for('StringLike');
+		my $xsubname = Type::Tiny::XS::get_subname_for('StringLike');
+		my $inlined  = $common{inlined};
+		$cache{StringLike} = "Type::Tiny"->new(
+			%common,
+			compiled_type_constraint => $xsub,
+			inlined => sub {
+				# uncoverable subroutine
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
+			},
+		);
+		_reinstall_subs $cache{StringLike};
+	}
+	else {
+		$cache{StringLike} = "Type::Tiny"->new(%common);
+	}
 }
 
-sub HashLike ()
+sub HashLike (;@)
 {
+	return $cache{HashLike} if defined($cache{HashLike}) && !@_;
 	require Type::Tiny;
-	$cache{HashLike} ||= "Type::Tiny"->new(
+	my %common = (
 		name       => "HashLike",
+		library    => __PACKAGE__,
 		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[%{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/ },
-		library    => __PACKAGE__,
+		constraint_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			my $check = $param->compiled_check;
+			sub {
+				my %hash = %$_;
+				for my $key (sort keys %hash) {
+					$check->($hash{$key}) or return 0;
+				}
+				return 1;
+			};
+		},
+		inline_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			return unless $param->can_be_inlined;
+			sub {
+				my $var  = pop;
+				my $code = sprintf(
+					'do { my $ok=1; my %%h = %%{%s}; for my $k (sort keys %%h) { ($ok=0,next) unless (%s) }; $ok }',
+					$var,
+					$param->inline_check('$h{$k}'),
+				);
+				return (undef, $code);
+			};
+		},
+		coercion_generator => sub {
+			my ($parent, $child, $param) = @_;
+			return unless $param->has_coercion;
+			my $coercible = $param->coercion->_source_type_union->compiled_check;
+			my $C = "Type::Coercion"->new(type_constraint => $child);
+			$C->add_type_coercions(
+				$parent => sub {
+					my $origref = @_ ? $_[0] : $_;
+					my %orig    = %$origref;
+					my %new;
+					for my $k (sort keys %orig) {
+						return $origref unless $coercible->($orig{$k});
+						$new{$k} = $param->coerce($orig{$k});
+					}
+					\%new;
+				},
+			);
+			return $C;
+		},
 	);
+	if ( __XS ) {
+		my $xsub     = Type::Tiny::XS::get_coderef_for('HashLike');
+		my $xsubname = Type::Tiny::XS::get_subname_for('HashLike');
+		my $inlined  = $common{inlined};
+		$cache{HashLike} = "Type::Tiny"->new(
+			%common,
+			compiled_type_constraint => $xsub,
+			inlined => sub {
+				# uncoverable subroutine
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
+			},
+		);
+		_reinstall_subs $cache{HashLike};
+	}
+	else {
+		$cache{HashLike} = "Type::Tiny"->new(%common);
+	}
+	
+	@_ ? $cache{HashLike}->parameterize(@{$_[0]}) : $cache{HashLike};
 }
 
-sub ArrayLike ()
+sub ArrayLike (;@)
 {
+	return $cache{ArrayLike} if defined($cache{ArrayLike}) && !@_;
 	require Type::Tiny;
-	$cache{ArrayLike} ||= "Type::Tiny"->new(
+	my %common = (
 		name       => "ArrayLike",
+		library    => __PACKAGE__,
 		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[@{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/ },
-		library    => __PACKAGE__,
+		constraint_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			my $check = $param->compiled_check;
+			sub {
+				my @arr = @$_;
+				for my $val (@arr) {
+					$check->($val) or return 0;
+				}
+				return 1;
+			};
+		},
+		inline_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			return unless $param->can_be_inlined;
+			sub {
+				my $var  = pop;
+				my $code = sprintf(
+					'do { my $ok=1; for my $v (@{%s}) { ($ok=0,next) unless (%s) }; $ok }',
+					$var,
+					$param->inline_check('$v'),
+				);
+				return (undef, $code);
+			};
+		},
+		coercion_generator => sub {
+			my ($parent, $child, $param) = @_;
+			return unless $param->has_coercion;
+			my $coercible = $param->coercion->_source_type_union->compiled_check;
+			my $C = "Type::Coercion"->new(type_constraint => $child);
+			$C->add_type_coercions(
+				$parent => sub {
+					my $origref = @_ ? $_[0] : $_;
+					my @orig    = @$origref;
+					my @new;
+					for my $v (@orig) {
+						return $origref unless $coercible->($v);
+						push @new, $param->coerce($v);
+					}
+					\@new;
+				},
+			);
+			return $C;
+		},
 	);
+	if ( __XS ) {
+		my $xsub     = Type::Tiny::XS::get_coderef_for('ArrayLike');
+		my $xsubname = Type::Tiny::XS::get_subname_for('ArrayLike');
+		my $inlined  = $common{inlined};
+		$cache{ArrayLike} = "Type::Tiny"->new(
+			%common,
+			compiled_type_constraint => $xsub,
+			inlined => sub {
+				# uncoverable subroutine
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
+			},
+		);
+		_reinstall_subs $cache{ArrayLike};
+	}
+	else {
+		$cache{ArrayLike} = "Type::Tiny"->new(%common);
+	}
+	
+	@_ ? $cache{ArrayLike}->parameterize(@{$_[0]}) : $cache{ArrayLike};
+}
+
+if ( $] ge '5.014' ) {
+	&Scalar::Util::set_prototype($_, ';$') for \&HashLike, \&ArrayLike;
 }
 
 sub CodeLike ()
 {
+	return $cache{CodeLike} if $cache{CodeLike};
 	require Type::Tiny;
-	$cache{CodeLike} ||= "Type::Tiny"->new(
+	my %common = (
 		name       => "CodeLike",
 		constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[&{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/ },
 		library    => __PACKAGE__,
 	);
+	if ( __XS ) {
+		my $xsub     = Type::Tiny::XS::get_coderef_for('CodeLike');
+		my $xsubname = Type::Tiny::XS::get_subname_for('CodeLike');
+		my $inlined  = $common{inlined};
+		$cache{CodeLike} = "Type::Tiny"->new(
+			%common,
+			compiled_type_constraint => $xsub,
+			inlined => sub {
+				# uncoverable subroutine
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
+			},
+		);
+		_reinstall_subs $cache{CodeLike};
+	}
+	else {
+		$cache{CodeLike} = "Type::Tiny"->new(%common);
+	}
 }
 
 sub TypeTiny ()
 {
+	return $cache{TypeTiny} if defined $cache{TypeTiny};
 	require Type::Tiny;
-	$cache{TypeTiny} ||= "Type::Tiny"->new(
+	my %common = (
 		name       => "TypeTiny",
 		constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
 		inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
@@ -195,12 +385,30 @@ sub TypeTiny ()
 			$c->freeze;
 		},
 	);
+	if ( 0 and __XS ) {  # causes fails in 03-leak.t
+		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
+		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
+		my $inlined  = $common{inlined};
+		$cache{TypeTiny} = "Type::Tiny"->new(
+			%common,
+			compiled_type_constraint => $xsub,
+			inlined    => sub {
+				# uncoverable subroutine
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
+			},
+		);
+		_reinstall_subs $cache{TypeTiny};
+	}
+	else {
+		$cache{TypeTiny} = "Type::Tiny"->new(%common);
+	}
 }
 
 sub _ForeignTypeConstraint ()
 {
+	return $cache{_ForeignTypeConstraint} if defined $cache{_ForeignTypeConstraint};
 	require Type::Tiny;
-	$cache{_ForeignTypeConstraint} ||= "Type::Tiny"->new(
+	$cache{_ForeignTypeConstraint} = "Type::Tiny"->new(
 		name       => "_ForeignTypeConstraint",
 		constraint => \&_is_ForeignTypeConstraint,
 		inlined    => sub { qq/ref($_[1]) && do { require Types::TypeTiny; Types::TypeTiny::_is_ForeignTypeConstraint($_[1]) }/ },
@@ -357,7 +565,7 @@ sub _TypeTinyFromMoose_parameterizable
 	my ($class, $opts) = _TypeTinyFromMoose_baseclass($t);
 	$opts->{constraint_generator} = sub {
 		# convert args into Moose native types; not strictly necessary
-		my @args = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
+		my @args = map { is_TypeTiny($_) ? $_->moose_type : $_ } @_;
 		_TypeTinyFromMoose( $t->parameterize(@args) );
 	};
 	return ($class, $opts);
@@ -474,7 +682,7 @@ sub _TypeTinyFromMouse
 	if ($t->{'constraint_generator'}) {
 		$opts{constraint_generator} = sub {
 			# convert args into Moose native types; not strictly necessary
-			my @args    = map { TypeTiny->check($_) ? $_->mouse_type : $_ } @_;
+			my @args    = map { is_TypeTiny($_) ? $_->mouse_type : $_ } @_;
 			_TypeTinyFromMouse( $t->parameterize(@args) );
 		};
 	}
@@ -559,32 +767,50 @@ designed for use within Type::Tiny, may be more generally useful.
 
 =over
 
-=item C<< StringLike >>
+=item *
+
+B<< StringLike >>
 
 Accepts strings and objects overloading stringification.
 
-=item C<< HashLike >>
+=item *
+
+B<< HashLike[`a] >>
 
 Accepts hashrefs and objects overloading hashification.
 
-=item C<< ArrayLike >>
+Since Types::TypeTiny 1.012, may be parameterized with another type
+constraint like B<< HashLike[Int] >>.
+
+=item *
+
+B<< ArrayLike[`a] >>
 
 Accepts arrayrefs and objects overloading arrayfication.
 
-=item C<< CodeLike >>
+Since Types::TypeTiny 1.012, may be parameterized with another type
+constraint like B<< ArrayLike[Int] >>.
+
+=item *
+
+B<< CodeLike >>
 
 Accepts coderefs and objects overloading codification.
 
-=item C<< TypeTiny >>
+=item *
+
+B<< TypeTiny >>
 
 Accepts blessed L<Type::Tiny> objects.
 
-=item C<< _ForeignTypeConstraint >>
+=item *
+
+B<< _ForeignTypeConstraint >>
 
 Any reference which to_TypeTiny recognizes as something that can be coerced
 to a Type::Tiny object.
 
-Yeah, the underscore is included.
+Yes, the underscore is included.
 
 =back
 

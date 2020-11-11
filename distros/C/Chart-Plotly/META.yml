@@ -4,7 +4,6 @@ author:
   - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
 build_requires:
   Module::Build: '0.3601'
-  PDL: '0'
   Test::Exception: '0'
   Test::File::ShareDir: '0'
   Test::More: '0'
@@ -25,6 +24,7 @@ name: Chart-Plotly
 recommends:
   Chart::Kaleido::Plotly: '0.005'
   Devel::IPerl: '0.009'
+  PDL: '0'
 requires:
   Chart::Kaleido::Plotly: '0.005'
   Exporter: '0'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.040'
+version: '0.041'
 x_contributors:
   - 'Roy Storey <kiwiroy@users.noreply.github.com>'
   - 'Stephan Loyd <stephanloyd9@gmail.com>'

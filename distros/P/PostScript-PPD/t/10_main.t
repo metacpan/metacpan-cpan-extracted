@@ -6,11 +6,11 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/..";
 
-use Test::More ( tests => 68 );
+use Test::More ( tests => 69 );
 use Data::Dumper;
 
 use t::ChkUtil;
-dualvar_or_skip 68;
+dualvar_or_skip 69;
 
 use_ok( 'PostScript::PPD' );
 
@@ -27,6 +27,7 @@ is( $ppd->Manufacturer, "HP", " ... Manufacturer" );
 is( $ppd->ModelName, "HP LaserJet 4L", " ... ModelName" );
 ok( !$ppd->ColorDevice, " ... not ColourDevice" );
 ok( $ppd->cupsManualCopies, " ... cupsManualCopies" );
+is( $ppd->get( 'cupsManualCopies'), $ppd->cupsManualCopies, " ... and get" );
 
 my $ps = $ppd->PSVersion;
 is_deeply( $ps, [

@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Tree::Ops;
-our $VERSION = 20200725;
+our $VERSION = 20201030;
 require v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -759,7 +759,7 @@ END
 Tree operations.
 
 
-Version 20200725.
+Version 20201030.
 
 
 The following sections describe the methods in each functional area of this
@@ -2323,19 +2323,13 @@ B<Example:>
 
     is_deeply $a->brackets, 'a(b(c)ed(fgh(i(j))))';
   
-  
-    $d->stepBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $d->stepBack;
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
   
-  
-    $b->stepEnd;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $b->stepEnd;
     is_deeply $a->brackets, 'a(b(cd(efgh(i(j)))))';
   
-  
-    $b->stepEndBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $b->stepEndBack;
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
   
 
@@ -2364,9 +2358,7 @@ B<Example:>
 
     is_deeply $a->brackets, 'a(b(cd(efgh(i(j)))))';
   
-  
-    $b->stepEndBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $b->stepEndBack;
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
   
 
@@ -2608,12 +2600,8 @@ B<Example:>
       my @path = $c->pathFrom($b);
       my $C = $B->go(@path);
       is_deeply $c->key, $C->key;
-  
-      is_deeply $c->{transcribedTo},   $C;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-      is_deeply $C->{transcribedFrom}, $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+      is_deeply $c->{transcribedTo},   $C;
+      is_deeply $C->{transcribedFrom}, $c;
      });
   
     is_deeply $B->print, <<END;
@@ -2737,9 +2725,7 @@ B<Example:>
     g
   END
   
-  
-    $c->parent->unwrap;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $c->parent->unwrap;
   
     is_deeply $a->print, <<END;
   Key      Value
@@ -2752,9 +2738,7 @@ B<Example:>
     g
   END
   
-  
-    $c->wrapChildren("Z");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $c->wrapChildren("Z");
   
     is_deeply $a->print, <<END;
   Key        Value
@@ -2883,9 +2867,7 @@ B<Example:>
             j
   END
   
-  
-    $f->parent->mergeLikePrev;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $f->parent->mergeLikePrev;
     is_deeply $a->print, <<END;
   Key          Value
   a
@@ -2903,9 +2885,7 @@ B<Example:>
             j
   END
   
-  
-    $g->parent->mergeLikeNext;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    $g->parent->mergeLikeNext;
     is_deeply $a->print, <<END;
   Key          Value
   a
@@ -3776,22 +3756,14 @@ B<Example:>
      '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
   
     is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
-  
-    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
   
     is_deeply [$a->parents],            [$a->parentsPostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-  
-    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-  
-    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
   
   
     ok !$j->parents;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
@@ -4077,9 +4049,7 @@ B<Example:>
   
     is_deeply [$e->path],         [0,1,0];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  
-    is_deeply [$g->pathFrom($d)], [0,1];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
+    is_deeply [$g->pathFrom($d)], [0,1];
   
     is_deeply $b->dup->print, <<END;
   Key      Value

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.940.1
+    version v0.940.2
 
 SYNOPSIS
 
@@ -146,6 +146,12 @@ DESCRIPTION
     in the constructor to enable features like max ID recalculation or
     chunk resizing.
 
+    If you're not going to include any min/max statements for
+    "calculate_ranges", you will need to set "min_id" and "max_id"
+    yourself, either in the constructor or before the "execute" call. Using
+    "construct_and_execute" is also not an option in this case, as this
+    tries to call "calculate_ranges" without a way to do so.
+
   TL;DR Version
 
         $stmt                             = Active DBI Processing
@@ -182,12 +188,12 @@ ATTRIBUTES
         retry_handler = Coderef that returns true to continue to retry or false to re-throw
                         the last exception
 
-    The default is to use DBIC's built-in retry options, the same way
-    "dbh_do" in DBIx::Class::Storage::DBI does it, which will retry once if
-    the DB connection was disconnected. If you specify any options, even a
-    blank hashref, BatchChunker will fill in a default max_attempts of 10,
-    and an always-true retry_handler. This is similar to
-    DBIx::Connector::Retry's defaults.
+    The default is to let the DBIC storage engine handle its own
+    protection, which will retry once if the DB connection was
+    disconnected. If you specify any options, even a blank hashref,
+    BatchChunker will fill in a default max_attempts of 10, and an
+    always-true retry_handler. This is similar to DBIx::Connector::Retry's
+    defaults.
 
     Under the hood, these are options that are passed to the
     as-yet-undocumented DBIx::Class::Storage::BlockRunner. The
@@ -437,94 +443,11 @@ ATTRIBUTES
     and deployment. Instead, use "calculate_ranges" to fill in these values
     right before running the loop.
 
- Private Attributes
+  loop_state
 
-  _loop_state
-
-    These variables exist solely for the processing loop. They should be
-    cleared out after use. Most of the complexity is needed for chunk
-    resizing.
-
-    timer
-
-      Timer for debug messages. Always spans the time between debug
-      messages.
-
-    start
-
-      The real start ID that the loop is currently on. May continue to
-      exist within iterations if chunk resizing is trying to find a valid
-      range. Otherwise, this value will become undef when a chunk is
-      finally processed.
-
-    end
-
-      The real end ID that the loop is currently looking at. This is always
-      redefined at the beginning of the loop.
-
-    prev_end
-
-      Last "processed" value of end. This also includes skipped blocks.
-      Used in start calculations and to determine if the end of the loop
-      has been reached.
-
-    max_end
-
-      The maximum ending ID. This will be $DB_MAX_ID if "process_past_max"
-      is set.
-
-    last_range
-
-      A hashref of keys used for the bisecting of one block. Cleared out
-      after a block has been processed or skipped.
-
-    last_timings
-
-      An arrayref of hashrefs, containing data for the previous 5 runs.
-      This data is used for runtime targeting.
-
-    multiplier_range
-
-      The range (in units of "chunk_size") between the start and end IDs.
-      This starts at 1 (at the beginning of the loop), but may expand or
-      shrink depending on chunk count checks. Resets after block
-      processing.
-
-    multiplier_step
-
-      Determines how fast multiplier_range increases, so that chunk
-      resizing happens at an accelerated pace. Speeds or slows depending on
-      what kind of limits the chunk count checks are hitting. Resets after
-      block processing.
-
-    checked_count
-
-      A check counter to make sure the chunk resizing isn't taking too
-      long. After ten checks, it will give up, assuming the block is safe
-      to process.
-
-    chunk_size
-
-      The current chunk size, which might be adjusted by runtime targeting.
-
-    chunk_count
-
-      Records the results of the COUNT(*) query for chunk resizing.
-
-    prev_check
-
-      A short string recording what happened during the last chunk resizing
-      check. Exists purely for debugging purposes.
-
-    prev_runtime
-
-      The number of seconds the previously processed chunk took to run, not
-      including sleep time.
-
-    progress_bar
-
-      The progress bar being used in the loop. This may be different than
-      "progress_bar", since it could be auto-generated.
+    A DBIx::BatchChunker::LoopState object designed to hold variables
+    during the processing loop. The object will be cleared out after use.
+    Most of the complexity is needed for chunk resizing.
 
 CONSTRUCTORS
 
@@ -675,7 +598,7 @@ PRIVATE METHODS
 
     Prints out a standard debug status line, if debug is enabled. What it
     prints is generally uniform, but it depends on the processing action.
-    Most of the data is pulled from "_loop_state".
+    Most of the data is pulled from "loop_state".
 
 SEE ALSO
 

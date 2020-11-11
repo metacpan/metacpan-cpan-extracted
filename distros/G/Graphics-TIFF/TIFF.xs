@@ -1,7 +1,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-
+#include <math.h>
 #include <tiffperl.h>
 
 MODULE = Graphics::TIFF		PACKAGE = Graphics::TIFF	  PREFIX = tiff_
@@ -279,13 +279,14 @@ tiff_GetField (tif, tag)
                 TIFF            *tif
                 uint32          tag
 	INIT:
-                uint16          ui16, ui16_2, *aui16;
+                uint16          ui16, ui16_2, *aui16, *aui16_2, *aui16_3;
                 uint32          ui32;
                 uint64          *aui;
                 float           f;
                 float           *af;
                 int             vector_length, nvals;
         PPCODE:
+/* See http://www.libtiff.org/man/TIFFGetField.3t.html */
                 switch (tag) {
                     /* single uint16 */
 		    case TIFFTAG_BITSPERSAMPLE:
@@ -333,6 +334,29 @@ tiff_GetField (tif, tag)
                         }
                         break;
 
+                    /* three array of uint16 */
+		    case TIFFTAG_COLORMAP:
+                        if (TIFFGetField (tif, tag, &aui16, &aui16_2, &aui16_3)) {
+                          if ((aui16 != (uint16 *) NULL)
+                              && (aui16_2 != (uint16 *) NULL)
+                              && (aui16_3 != (uint16 *) NULL)) {
+                            AV* rav = newAV();
+                            AV* gav = newAV();
+                            AV* bav = newAV();
+                            mXPUSHs(newRV_noinc((SV*)rav));
+                            mXPUSHs(newRV_noinc((SV*)gav));
+                            mXPUSHs(newRV_noinc((SV*)bav));
+                            TIFFGetField (tif, TIFFTAG_BITSPERSAMPLE, &ui16);
+                            int i;
+                            for (i=0; i < (ssize_t) pow(2.0, (double) ui16); i++) {
+                              av_push(rav, newSViv(aui16[i]));
+                              av_push(gav, newSViv(aui16_2[i]));
+                              av_push(bav, newSViv(aui16_3[i]));
+                            }
+                          }
+                        }
+                        break;
+
                     /* array of uint64 */
                     case TIFFTAG_TILEOFFSETS:
                     case TIFFTAG_TILEBYTECOUNTS:
@@ -377,7 +401,7 @@ tiff_GetFieldDefaulted (tif, tag)
                 TIFF            *tif
                 uint32          tag
 	INIT:
-                uint16          ui16, ui16_2, *aui16;
+                uint16          ui16, ui16_2, *aui16, *aui16_2, *aui16_3;
                 uint32          ui32;
                 uint64          *aui;
                 float           f;
@@ -427,6 +451,29 @@ tiff_GetFieldDefaulted (tif, tag)
                             int i;
 			    for (i = 0; i < ui16; ++i)
                                 XPUSHs(sv_2mortal(newSViv(aui16[i])));
+                        }
+                        break;
+
+                    /* three array of uint16 */
+		    case TIFFTAG_COLORMAP:
+                        if (TIFFGetFieldDefaulted (tif, tag, &aui16, &aui16_2, &aui16_3)) {
+                          if ((aui16 != (uint16 *) NULL)
+                              && (aui16_2 != (uint16 *) NULL)
+                              && (aui16_3 != (uint16 *) NULL)) {
+                            AV* rav = newAV();
+                            AV* gav = newAV();
+                            AV* bav = newAV();
+                            mXPUSHs(newRV_noinc((SV*)rav));
+                            mXPUSHs(newRV_noinc((SV*)gav));
+                            mXPUSHs(newRV_noinc((SV*)bav));
+                            TIFFGetFieldDefaulted (tif, TIFFTAG_BITSPERSAMPLE, &ui16);
+                            int i;
+                            for (i=0; i < (ssize_t) pow(2.0, (double) ui16); i++) {
+                              av_push(rav, newSViv(aui16[i]));
+                              av_push(gav, newSViv(aui16_2[i]));
+                              av_push(bav, newSViv(aui16_3[i]));
+                            }
+                          }
                         }
                         break;
 

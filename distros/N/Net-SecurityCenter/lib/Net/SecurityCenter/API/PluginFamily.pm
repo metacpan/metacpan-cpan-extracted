@@ -5,11 +5,11 @@ use strict;
 
 use Carp;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -105,7 +105,8 @@ sub list {
     my $response = $self->client->get( '/pluginFamily', $params );
 
     return if ( !$response );
-    return $response;
+
+    return wantarray ? @{ sc_normalize_array($response) } : sc_normalize_array($response);
 
 }
 

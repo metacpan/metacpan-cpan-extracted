@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-26'; # DATE
+our $DATE = '2020-10-27'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,8 +11,15 @@ use warnings;
 use Log::ger;
 #use Log::ger::Screen;
 
+use File::chdir;
 use File::Temp qw(tempdir);
+use File::Which qw(which);
 use Getopt::Long;
+use IPC::System::Options 'system', -log=>1, -die=>1;
+
+unless (which "xls2csv") {
+    die "diff-xls-text: This tool requires xls2csv from CPAN module Spreadsheet::Read\n";
+}
 
 my @files;
 Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
@@ -21,9 +28,10 @@ my @diff_argv;
 my $code_push_opt     = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @diff_argv, (length($optname) > 1 ? "--" : "-").$optname };
 my $code_push_opt_val = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @diff_argv, (length($optname) > 1 ? "--" : "-").$optname, $optval };
 my $fail;
+my $opt_transpose_csv;
 
 my $tempdir;
-my %dirnames;
+my %basenames;
 
 GetOptions(
     normal => $code_push_opt,
@@ -75,6 +83,9 @@ GetOptions(
     'help' => $code_push_opt,
     'version|v' => $code_push_opt,
 
+    # our own options
+    'transpose-csv' => \$opt_transpose_csv,
+
     '<>' => sub {
         my $filename = $_[0];
         unless (-f $filename) {
@@ -87,31 +98,27 @@ GetOptions(
             $tempdir = File::Temp::tempdir(CLEANUP => !$ENV{DEBUG});
         }
 
-        (my $dirname0 = $filename) =~ s!.+/!!;
-        my $dirname;
+        (my $basename0 = $filename) =~ s!.+/!!;
+        my $basename;
         my $i = 0;
         while (1) {
-            $dirname = $dirname0 . ($i++ ? ".$i" : "");
-            last unless $dirnames{ $dirname }++;
+            $basename = $basename0 . ($i++ ? ".$i" : "");
+            last unless $basenames{ $basename }++;
         }
 
-        require App::OfficeUtils;
-        my $res = App::OfficeUtils::officess2csv(
-            input_file => $filename,
-            always_dir => 1,
-            overwrite => 1,
-            all_worksheets => 1,
-            output_file_or_dir => "$tempdir/$dirname",
-        );
-        my $file;
-        if ($res->[0] == 304) {
-            $file = $_[0];
-        } elsif ($res->[0] == 200) {
-            $file = $res->[2];
-        } else {
-            die "Can't convert xls '$_[0]' to csv: $res->[0] - $res->[1]";
+        mkdir "$tempdir/$basename";
+        system "xls2csv", "-A", "-o", "$tempdir/$basename/workbook", $filename;
+        push @diff_argv, "$tempdir/$basename";
+
+        if ($opt_transpose_csv) {
+            log_trace "Transposing CSV files in $tempdir/$basename ...";
+            local $CWD = "$tempdir/$basename";
+            for my $file (glob "*.csv") {
+                (my $newfile = $file) =~ s/\.csv$/.transpose.csv/;
+                system({shell=>1}, "csv-transpose", $file, \">", $newfile);
+                unlink $file;
+            }
         }
-        push @diff_argv, "$tempdir/$dirname";
     },
 );
 
@@ -143,7 +150,7 @@ diff-xls-text - Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as 
 
 =head1 VERSION
 
-This document describes version 0.001 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2020-10-26.
+This document describes version 0.003 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2020-10-27.
 
 =head1 SYNOPSIS
 
@@ -153,11 +160,27 @@ Use like you would use the Unix command B<diff>:
 
 =head1 DESCRIPTION
 
-This is a wrapper for the Unix command B<diff>. It assumes that each file is an
-Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to a
-directory of CSV files (where each CSV file is converted from single a
-worksheet). It then passes the converted directories to C<< diff -ruN >>
-command.
+This is a wrapper for the Unix command B<diff>. It assumes that each input file
+is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
+a directory of CSV files (where each CSV file is converted from a single
+worksheet) using L<xls2csv>. It then passes the converted directories to C<<
+diff -ruN >> command.
+
+=head1 OPTIONS
+
+These are options that are interpreted by B<diff-xls-text> and not passed to
+B<diff>.
+
+B<Please specify these options before file names.>
+
+=over
+
+=item * --transpose-csv
+
+Transpose CSV first using L<csv-transpose> from L<App::CSVUtils>. This allows
+you to do column-based instead of row-based diff.
+
+=back
 
 =head1 ENVIRONMENT
 
@@ -190,7 +213,10 @@ feature.
 
 Unix command L<diff>.
 
-L<App::OfficeUtils> and the included CLI L<xls2csv>.
+L<ssdiff> from L<Spreadsheet::Read> which also diffs two spreadsheets but
+presents the result differently.
+
+L<xls2csv> from L<Spreadsheet::Read>
 
 =head1 AUTHOR
 

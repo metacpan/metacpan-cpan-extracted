@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Result;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0105';
+our $VERSION = '0.0107';
 
 use parent 'DBIx::Class::Candy';
 use String::CamelCase;
@@ -44,7 +44,7 @@ DBIx::Class::Smooth::Result - Short intro
 
 =head1 VERSION
 
-Version 0.0105, released 2020-09-20.
+Version 0.0107, released 2020-10-28.
 
 =head1 SOURCE
 

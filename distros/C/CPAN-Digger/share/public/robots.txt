@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /src
-Disallow: /query
-Disallow: /m

@@ -1,6 +1,6 @@
 Date-Holidays-BY
 
-Determine Belarus official holidays and business days in 2017-2020
+Determine Belarus official holidays and business days
 
 Source https://ru.wikipedia.org/wiki/Праздники_Белоруссии
 
@@ -37,10 +37,9 @@ Do something with code and test:
 	(don't forget change release in dist.init)
 	carton exec dzil build
 	(git commit/push)
-	carton exec dzil release
-Clean:
-	carton exec dzil clean (build)
-	perl dev/clean-dev.pl (dependencies)
+	carton exec dzil release (sets the tag verstion in git)
+Clean dependencies and build:
+	perl dev/clean-dev.pl
 
 
 SUPPORT AND DOCUMENTATION

@@ -1,9 +1,9 @@
 package WordList::Tables;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
+our $DATE = '2020-11-10'; # DATE
 our $DIST = 'WordList-Tables'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -15,16 +15,8 @@ our %PARAMS = (
     table => {
         summary => 'Tables::* module name without the prefix, e.g. Locale::US::States '.
             'for Tables::Locale::US::States',
-        schema => 'perl::modname*',
+        schema => 'perl::tables::modname_with_optional_args*',
         req => 1,
-        completion => sub {
-            my %args = @_;
-            require Complete::Module;
-            Complete::Module::complete_module(
-                word => $args{word},
-                ns_prefix => 'Tables',
-            );
-        },
     },
     column => {
         summary => 'Column name to retrieve from the table',
@@ -34,12 +26,12 @@ our %PARAMS = (
 );
 
 sub new {
+    require Module::Load::Util;
+
     my $class = shift;
     my $self = $class->SUPER::new(@_);
-    my $mod = "Tables::$self->{params}{table}";
-    (my $mod_pm = "$mod.pm") =~ s!::!/!g;
-    require $mod_pm;
-    $self->{_table} = $mod->new;
+    $self->{_table} = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefix=>"Tables"}, $self->{params}{table});
     my @columns = $self->{_table}->get_column_names;
     my $found;
     for my $i (0..$#columns) {
@@ -50,7 +42,7 @@ sub new {
             last;
         }
     }
-    die "Unknown column '$self->{params}{column}' in table module $mod, ".
+    die "Unknown column '$self->{params}{column}' in table $self->{param}{table}, ".
         "available columns are: ".join(", ", @columns) unless $found;
     $self;
 }
@@ -82,7 +74,7 @@ WordList::Tables - Wordlist from a column of table from Tables::* module
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::Tables (from Perl distribution WordList-Tables), released on 2020-06-01.
+This document describes version 0.003 of WordList::Tables (from Perl distribution WordList-Tables), released on 2020-11-10.
 
 =head1 SYNOPSIS
 
@@ -90,6 +82,18 @@ This document describes version 0.001 of WordList::Tables (from Perl distributio
 
  my $wl = WordList::Tables->new(table => 'Locale::US::States', column => 'name');
  say $wl->first_word; # Alaska
+
+On the command-line, using the L<wordlist> CLI:
+
+ % wordlist -w Tables=table,Locale::US::States,column,name
+ Alaska
+ Alabama
+ ...
+
+ % wordlist -w Tables=table,Locale::US::States,column,code
+ AK
+ AL
+ ...
 
 =head1 DESCRIPTION
 
@@ -102,7 +106,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/WordList-T
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-WordList-Tables>.
+Source repository is at L<https://github.com/repos/perl-WordList-Tables>.
 
 =head1 BUGS
 

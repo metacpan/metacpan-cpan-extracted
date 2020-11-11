@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.3.3'; # VERSION
+our $VERSION = '0.3.4'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
@@ -139,6 +139,10 @@ sub are_isomorphic
     my @nauty_graph2 = _nauty_graph( $graph2, $color_sub );
 
     return 0 if $nauty_graph1[0]->{nv} != $nauty_graph2[0]->{nv};
+
+    # aresame_sg() seemingly segfaults with empty graphs, thus this is
+    # a getaround to avoid it:
+    return 1 if $nauty_graph1[0]->{nv} == 0;
 
     my $statsblk1 = sparsenauty( @nauty_graph1, { getcanon => 1 } );
     my $statsblk2 = sparsenauty( @nauty_graph2, { getcanon => 1 } );

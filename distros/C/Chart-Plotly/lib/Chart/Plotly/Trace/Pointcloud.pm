@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Pointcloud::Hoverlabel;
 use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
 
-our $VERSION = '0.040';    # VERSION
+our $VERSION = '0.041';    # VERSION
 
 # ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
@@ -253,7 +253,7 @@ Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

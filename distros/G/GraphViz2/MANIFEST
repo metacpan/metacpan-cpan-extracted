@@ -1,4 +1,3 @@
-.travis.yml
 Changes
 lib/GraphViz2.pm
 lib/GraphViz2/Parse/Regexp.pm

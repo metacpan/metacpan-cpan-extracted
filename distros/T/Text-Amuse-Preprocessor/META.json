@@ -46,6 +46,6 @@
          "url" : "https://github.com/melmothx/text-amuse-preprocessor"
       }
    },
-   "version" : "0.62",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.64",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -65,7 +65,7 @@ my %TEST_DEPS = (
     'Storable'   => 0,
     'Test::More' => 0.96,
 );
-my @XS_FILES = qw(Util.xs);
+my @XS_FILES = ($loadable_xs ? qw(Util.xs) : ());
 
 WriteMakefile1(
     META_MERGE => {

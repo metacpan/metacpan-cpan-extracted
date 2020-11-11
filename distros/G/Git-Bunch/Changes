@@ -1,3 +1,10 @@
+0.627   2020-10-30  Released-By: PERLANCAR; Urgency: medium
+
+        [subcommand check]
+
+        - [ux] Exit non-zero when there is unclean repo.
+
+
 0.626   2020-01-31  Released-By: PERLANCAR; Urgency: low
 
 	- Avoid the use of From_str::alami date coercion for now as

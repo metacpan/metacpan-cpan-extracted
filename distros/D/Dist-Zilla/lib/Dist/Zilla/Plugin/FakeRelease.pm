@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FakeRelease 6.015;
+package Dist::Zilla::Plugin::FakeRelease 6.017;
 # ABSTRACT: fake plugin to test release
 
 use Moose;
@@ -73,7 +73,7 @@ Dist::Zilla::Plugin::FakeRelease - fake plugin to test release
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 SYNOPSIS
 

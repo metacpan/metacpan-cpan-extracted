@@ -1,6 +1,17 @@
 Release history for Mojolicious::Plugin::FormFieldsFromJSON
 ===========================================================
 
+1.02 2020-11-08
+
+  * Fix internal pod links. (PR #8, thanks to Håkon Hægland)
+  * Fixed perlcritic level 5 badness - "return" statement followed by "sort" (PR #9, thanks to Lubos Kolouch)
+  * Fixed fail report by adding missing prereq Mojo::File. (PR #7, thanks to Mohammad S Anwar)
+
+1.01 2019-03-30
+
+  * Improve kwalitee (Thanks to Onufriev Anton)
+  * Fix tests
+
 1.00 2018-02-19
 
   [IMPROVEMENT]

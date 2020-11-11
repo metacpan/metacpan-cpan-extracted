@@ -1,22 +1,32 @@
-#include <execinfo.h>
 #include <regex>
 #include <functional>
 #include <cxxabi.h>
 #include <memory>
+
+#if PANDA_HAS_EXECINFO
+
+#include <execinfo.h>
+#define PANDA_GET_BACKTRACE ::backtrace
+
+#else
+#include <libunwind.h>
+#define PANDA_GET_BACKTRACE ::unw_backtrace
+
+#endif
 
 namespace panda {
 
 #if defined (__linux__)
 
 static RawTraceProducer get_default_raw_producer() noexcept {
-    return ::backtrace;
+    return PANDA_GET_BACKTRACE;
 }
 
 #else
 
 // ::backtrace returns size_t on *BSD, and int on linux
 static int bt_adapter(void **dst, int sz) {
-    auto r = ::backtrace(dst, sz);
+    auto r = PANDA_GET_BACKTRACE(dst, sz);
     return (int)r;
 }
 
@@ -100,18 +110,30 @@ struct GlibcBacktrace : BacktraceBackend {
     ~GlibcBacktrace() { if (symbols) { free(symbols); } }
 
     void gather() noexcept {
+#if PANDA_HAS_EXECINFO
         auto& buffer = raw_traces.buffer;
-        symbols = ::backtrace_symbols(buffer.data(), buffer.size());
+        symbols = ::backtrace_symbols((void**)buffer.data(), buffer.size());
         if (symbols) { size = buffer.size(); }
         gathered  = true;
+#else
+        size = raw_traces.buffer.size();
+#endif
     }
 
     bool produce_frame(StackFrames& frames, size_t i) override {
         if (!gathered) gather();
-        if (i >= size) throw std::out_of_range("invalind frame index");
+#if PANDA_HAS_EXECINFO
+        if (i >= size) throw std::out_of_range("invalid frame index");
         auto frame = as_frame(symbols[i]);
         if (frame) frames.emplace_back(std::move(frame));
         return (bool) frame;
+#else
+        if (i >= size) throw std::out_of_range("invalid frame index");
+        StackframeSP frame = new Stackframe();
+        frame->address = (std::uint64_t)raw_traces.buffer.at(i);
+        frames.emplace_back(std::move(frame));
+        return (bool) frame;
+#endif
     }
 };
 

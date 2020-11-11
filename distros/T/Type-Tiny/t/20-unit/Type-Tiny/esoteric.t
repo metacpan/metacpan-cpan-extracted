@@ -82,6 +82,11 @@ ok(
 	'$type->__is_parameterized',
 );
 
+ok(
+	(ArrayRef[Int])->has_parameterized_from && !Int->has_parameterized_from,
+	'$type->has_parameterized_from',
+);
+
 my $Int = Int->create_child_type;
 $Int->_add_type_coercions(Num, q[int($_)]);
 is(
@@ -94,6 +99,12 @@ is(
 	Int->_as_string,
 	'Types::Standard::Int',
 	'$type->_as_string',
+);
+
+like(
+	Int->_stringify_no_magic,
+	qr/^Type::Tiny=HASH\(0x[0-9a-f]+\)$/i,
+	'$type->_stringify_no_magic',
 );
 
 is(
@@ -111,6 +122,36 @@ my $union = Int->_unite(ArrayRef);
 ok(
 	$union->equals( Int | ArrayRef ),
 	'$type->_unite',
+);
+
+{
+	
+	package Type::Tiny::Subclass;
+	our @ISA = qw( Type::Tiny );
+	sub assert_return {
+		my ( $self ) = ( shift );
+		++( $self->{ __PACKAGE__ . '::count' } ||= 0 );
+		$self->SUPER::assert_return( @_ );
+	}
+	sub counter {
+		my ( $self ) = ( shift );
+		$self->{ __PACKAGE__ . '::count' };
+	}
+}
+
+my $child = 'Type::Tiny::Subclass'->new(
+	parent     => Int,
+	constraint => sub { $_ % 3 },
+);
+
+ok  exception { $child->( 6 ) }, 'overridden assert_return works (failing value)';
+ok !exception { $child->( 7 ) }, 'overridden assert_return works (passing value)';
+is( $child->counter, 2, 'overridden assert_return is used by &{} overload' );
+
+is_deeply(
+	eval( '[' . Int->____make_key( [1..4], { quux => \"abc" }, undef ) . ']' ),
+	[ Int, [1..4], { quux => \"abc" }, undef ],
+	'$type->____make_key'
 );
 
 done_testing;

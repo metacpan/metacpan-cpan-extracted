@@ -7,38 +7,41 @@ use warnings;
 use Carp;
 use GIS::Distance;
 
+use overload (
+	'==' => \&equal,
+	'!=' => \&not_equal,
+	'""' => \&as_string,
+	bool => sub { 1 },
+	fallback => 1	# So that boolean tests don't cause as_string to be called
+);
+
 =head1 NAME
 
-Geo::Location::Point -
-Location information
+Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
+
+Geo::Location::Point stores a place.
 
     use Geo::Location::Point;
 
     my $location = Geo::Location::Point->new();
 
-=head1 DESCRIPTION
-
-Geo::Location::Point stores a place.
-
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 new
 
     $location = Geo::Location::Point->new();
 
 =cut
-
-use Data::Dumper;
 
 sub new {
 	my $proto = shift;
@@ -104,6 +107,41 @@ sub distance {
 	$self->{'gis'} //= GIS::Distance->new();
 
 	return $self->{'gis'}->distance($self->{'lat'}, $self->{'long'}, $location->lat(), $location->long());
+}
+
+=head2	equal
+
+Are two points the same?
+
+    my $loc1 = location->new(lat => 2, long => 2);
+    my $loc2 = location->new(lat => 2, long => 2);
+    print ($loc1 == $loc2), "\n";	# Prints 1
+
+=cut
+
+sub equal {
+	my $self = shift;
+	my $other = shift;
+
+	# return ($self->distance($other) <= 1e-9);
+	return((abs($self->lat() - $other->lat()) <= 1e-9) && (abs(($self->long() - $other->long())) <= 1e-9));
+}
+
+=head2	not_equal
+
+Are two points different same?
+
+    my $loc1 = location->new(lat => 2, long => 2);
+    my $loc2 = location->new(lat => 2, long => 2);
+    print ($loc1 != $loc2), "\n";	# Prints 0
+
+=cut
+
+sub not_equal {
+	my $self = shift;
+	my $other = shift;
+
+	return(!$self->equal($other));
 }
 
 =head2	as_string
@@ -179,16 +217,16 @@ sub as_string {
 sub _sortoutcase {
 	my $self = shift;
 	my $field = lc(shift);
-	my $ret;
+	my $rc;
 
 	foreach (split(/ /, $field)) {
-		if($ret) {
-			$ret .= ' ';
+		if($rc) {
+			$rc .= ' ';
 		}
-		$ret .= ucfirst($_);
+		$rc .= ucfirst($_);
 	}
 
-	$ret;
+	return $rc;
 }
 
 =head2	attr
@@ -198,6 +236,7 @@ Get/set location attributes, e.g. city
     $location->city('London');
     $location->country('UK');
     print $location->as_string(), "\n";
+    print "$location\n";	# Calls as_string
 
 =cut
 
@@ -234,7 +273,7 @@ L<Geo::Point>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Nigel Horne.
+Copyright 2019-2020 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

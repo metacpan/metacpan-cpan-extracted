@@ -4,33 +4,45 @@ use warnings;
 use Carp 'verbose'; local $SIG{__DIE__} = sub { Carp::confess(@_) }; use Data::Dumper;
 use PDF::Table;
 # -------------
+# -A or -B on command line to select preferred library (if available)
+# then look for PDFpref file and read A or B forms
 my ($PDFpref, $rcA, $rcB); # which is available?
 my $prefFile = "./PDFpref";
 my $prefDefault = "B"; # PDF::Builder default if no prefFile, or both installed
-if (-f $prefFile && -r $prefFile) {
-    open my $FH, '<', $prefFile or die "error opening $prefFile: $!\n";
-    $PDFpref = <$FH>;
-    if      ($PDFpref =~ m/^A/i) {
-	# something starting with A, assume want PDF::API2
-	$PDFpref = 'A';
-    } elsif ($PDFpref =~ m/^B/i) {
-	# something starting with B, assume want PDF::Builder
-	$PDFpref = 'B';
-    } elsif ($PDFpref =~ m/^PDF:{1,2}A/i) {
-	# something starting with PDF:A or PDF::A, assume want PDF::API2
-	$PDFpref = 'A';
-    } elsif ($PDFpref =~ m/^PDF:{1,2}B/i) {
-	# something starting with PDF:B or PDF::B, assume want PDF::Builder
-	$PDFpref = 'B';
+if (@ARGV) {
+    # A or -A argument: set PDFpref to A else B
+    if ($ARGV[0] =~ m/^-?([AB])/i) {
+	$PDFpref = uc($1);
     } else {
-	print STDERR "Don't see A... or B..., default to $prefDefault\n";
-	$PDFpref = $prefDefault;
+	print STDERR "Unknown command line flag $ARGV[0] ignored.\n";
     }
-    close $FH;
-} else {
-    # no preference expressed, default to PDF::Builder
-    print STDERR "No preference file found, so default to $prefDefault\n";
-    $PDFpref = $prefDefault;
+}
+if (!defined $PDFpref) {
+    if (-f $prefFile && -r $prefFile) {
+        open my $FH, '<', $prefFile or die "error opening $prefFile: $!\n";
+        $PDFpref = <$FH>;
+        if      ($PDFpref =~ m/^A/i) {
+	    # something starting with A, assume want PDF::API2
+	    $PDFpref = 'A';
+        } elsif ($PDFpref =~ m/^B/i) {
+	    # something starting with B, assume want PDF::Builder
+	    $PDFpref = 'B';
+        } elsif ($PDFpref =~ m/^PDF:{1,2}A/i) {
+	    # something starting with PDF:A or PDF::A, assume want PDF::API2
+	    $PDFpref = 'A';
+        } elsif ($PDFpref =~ m/^PDF:{1,2}B/i) {
+	    # something starting with PDF:B or PDF::B, assume want PDF::Builder
+	    $PDFpref = 'B';
+        } else {
+	    print STDERR "Don't see A... or B..., default to $prefDefault\n";
+	    $PDFpref = $prefDefault;
+        }
+        close $FH;
+    } else {
+        # no preference expressed, default to PDF::Builder
+        print STDERR "No preference file found, so default to $prefDefault\n";
+        $PDFpref = $prefDefault;
+    }
 }
 foreach (1 .. 2) {
     if ($PDFpref eq 'A') { # A(PI2) preferred
@@ -57,8 +69,8 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '0.12'; # VERSION
-my $LAST_UPDATE = '0.12'; # manually update whenever code is changed
+our $VERSION = '1.001'; # VERSION
+my $LAST_UPDATE = '1.000'; # manually update whenever code is changed
 
 my $outfile = $0;
 $outfile =~ s/\.pl$/.pdf/;
@@ -147,7 +159,7 @@ http://dejavu.sourceforge.net/samples/DejaVuSans.pdf
     $font = $pdf->corefont('Helvetica-Bold' ); # default to Latin-1 encoding
     $text->font( $font, 14 );   $text->translate( 50, 700 );
     $text->text("In core font: $passed_text\n");
-    print "$dir$passed_font_name..ttf\n";
+    print "$dir$passed_font_name.ttf\n";
     my $ttfont;
     if ($passed_font_name eq '') {
 	$ttfont =  $pdf->ttfont($dir.'DejaVuSans'.'.ttf');
@@ -224,14 +236,14 @@ http://dejavu.sourceforge.net/samples/DejaVuSans.pdf
      #   padding       => 5,
       #  padding_right => 10,
 #     background_color_odd  => "gray",
-#     background_color_even => "lightblue", #cell background color for even rows
+#     background_color_even => "lightblue", # cell background color for even rows
     );
     $some_data = [ ['true type font: '. $passed_text], ];
     $left_edge_of_table = 50;
     if ($passed_font_name) {
-        $pdftable->table( $pdf, $page, $some_data, x  => $left_edge_of_table, w  => 500, start_y => 200, start_h => 300, font => $ttfont , );
+        $pdftable->table( $pdf, $page, $some_data, x  => $left_edge_of_table, w  => 500, start_y => 500, start_h => 300, font => $ttfont , );
     } else {  # go to default font 
-        $pdftable->table( $pdf, $page, $some_data, x  => $left_edge_of_table, w  => 500, start_y => 200, start_h => 300, );
+        $pdftable->table( $pdf, $page, $some_data, x  => $left_edge_of_table, w  => 500, start_y => 500, start_h => 300, );
     }
    # Save the PDF
    $pdf->saveas($file);

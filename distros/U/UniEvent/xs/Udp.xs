@@ -46,6 +46,7 @@ BOOT {
         cbn.on_receive = nullptr;
         cbn.on_send    = nullptr;
     });
+    unievent::register_perl_class(Udp::TYPE, s);
 }
 
 Udp* Udp::new (Loop* loop = Loop::default_loop()) {

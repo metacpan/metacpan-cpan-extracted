@@ -5,14 +5,13 @@ use strict;
 
 use Carp;
 use MIME::Base64;
-use English qw( -no_match_vars );
 use Params::Check qw(allow);
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -118,10 +117,13 @@ sub list {
     my $raw     = delete( $params->{'raw'} );
     my $plugins = $self->client->get( '/plugin', $params );
 
-    return          if ( !$plugins );
-    return $plugins if ($raw);
+    return if ( !$plugins );
 
-    return sc_normalize_array($plugins);
+    if ($raw) {
+        return wantarray ? @{$plugins} : $plugins;
+    }
+
+    return wantarray ? @{ sc_normalize_array($plugins) } : sc_normalize_array($plugins);
 
 }
 
@@ -170,12 +172,12 @@ sub download {
     return $plugin_source if ( !$filename );
 
     open my $fh, '>', $filename
-        or croak("Could not open file '$filename': $OS_ERROR");
+        or croak("Could not open file '$filename': $!");
 
     print $fh $plugin_source;
 
     close $fh
-        or carp("Failed to close file '$filename': $OS_ERROR");
+        or carp("Failed to close file '$filename': $!");
 
     return 1;
 

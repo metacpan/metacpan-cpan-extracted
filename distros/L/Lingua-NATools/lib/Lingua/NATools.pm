@@ -1,14 +1,16 @@
 package Lingua::NATools;
 
-our $VERSION = '0.7.10';
+our $VERSION = '0.7.12';
 
 use 5.006;
+#use v5.20;
 use strict;
 use warnings;
+use utf8;
 
 # locale stuff
 use POSIX qw(locale_h);
-setlocale(LC_CTYPE, "pt_PT");
+setlocale(LC_CTYPE, "pt_PT.UTF-8");
 use locale;
 
 use Data::Dumper;
@@ -418,12 +420,12 @@ sub split_corpus_simple {
             
             my $next = 0;
             
-            $next = 1 if $_ =~ m!^\s*$!;
+            $next = 1 if $_ =~ m!^\s*$!u;
             $_ = join " ", atomiza($_) if $tokenize;
             s/\$/_\$/g;
 
             chomp(my $b = <B>);
-            $next = 1 if $b =~ m!^\s*$!;
+            $next = 1 if $b =~ m!^\s*$!u;
 
             $b = join " ", atomiza($b) if $tokenize;
             $b =~ s/\$/_\$/g;
@@ -1092,8 +1094,8 @@ sub tmx2files {
             for ($t1,$t2) {
                 s/\$/_DOLLAR_/g;
                 $_ = mytokenize($_);
-                s/^[\s\n]+//g;
-                s/[\s\n]+$//g;
+                s/^[\s\n]+//ug;
+                s/[\s\n]+$//ug;
             }
             print F1 "$t1\n\$\n";
             print F2 "$t2\n\$\n";
@@ -1108,8 +1110,10 @@ sub tmx2files {
 
 sub mytokenize {
     my $string = shift;
-    my $punct='[\.:;,!?\'"]';
-    $string =~ s/(\w)($punct)/$1 $2/g;
+#    my $punct='[\.:;,!?\'"]';
+    my $punct='[.:;,!?\'"—“‘’”\x{200B}«»()]';
+    $string =~ s/(\w)($punct)/$1 $2/ug;
+    $string =~ s/($punct)(\w)/$1 $2/ug;
     return $string;
 }
 

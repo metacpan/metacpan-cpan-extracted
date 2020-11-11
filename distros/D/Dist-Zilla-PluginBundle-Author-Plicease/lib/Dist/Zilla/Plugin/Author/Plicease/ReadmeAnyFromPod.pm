@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.57 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.58 {
 
   use 5.014;
   use Moose;
@@ -14,6 +14,33 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.57 {
   has travis_user => (
     is      => 'ro',
     default => 'plicease',
+  );
+
+  has travis_com => (
+    is      => 'ro',
+    default => 0,
+  );
+
+  has travis_base => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+      my($self) = @_;
+      $self->travis_com
+        ? 'https://travis-ci.com/github'
+        : 'https://travis-ci.org',
+    },
+  );
+
+  has travis_image_base => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+      my($self) = @_;
+      $self->travis_com
+        ? 'https://api.travis-ci.com'
+        : 'https://travis-ci.org',
+    },
   );
 
   has cirrus_user => (
@@ -77,7 +104,7 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.57 {
 
       my $status = '';
       $status .= " [![Build Status](https://api.cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name.svg)](https://cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name)" if $cirrus_status;
-      $status .= " [![Build Status](https://travis-ci.org/@{[ $self->travis_user ]}/$name.svg)](http://travis-ci.org/@{[ $self->travis_user ]}/$name)" if $self->travis_status;
+      $status .= " [![Build Status](@{[ $self->travis_image_base ]}/@{[ $self->travis_user ]}/$name.svg?branch=@{[ $self->default_branch ]})](@{[ $self->travis_base ]}/@{[ $self->travis_user ]}/$name)" if $self->travis_status;
       $status .= " [![Build status](https://ci.appveyor.com/api/projects/status/@{[ $self->appveyor ]}/branch/@{[ $self->default_branch ]}?svg=true)](https://ci.appveyor.com/project/@{[ $self->appveyor_user ]}/$name/branch/@{[ $self->default_branch ]})" if $self->appveyor;
 
       foreach my $workflow (@{ $self->workflow })
@@ -109,7 +136,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.57
+version 2.58
 
 =head1 SYNOPSIS
 

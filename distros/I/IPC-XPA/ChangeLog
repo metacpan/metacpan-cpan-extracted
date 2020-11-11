@@ -1,0 +1,244 @@
+2011-03-29 09:57 -0400  djerius  <djerius@cfa.harvard.edu>  (e31ba9aaa0d3 [tip])
+
+	* XPA.xs:
+	don't free pointers if there were no servers
+
+2009-11-10 13:21 -0500  djerius  <djerius@cfa.harvard.edu>  (3e1021bc9239)
+
+	* .hgtags:
+	Added tag 0.09 for changeset 939b3416ae69
+
+2009-11-10 13:15 -0500  djerius  <djerius@cfa.harvard.edu>  (939b3416ae69 [0.09])
+
+	* ChangeLog, Changes, XPA.pm:
+	update log and version for release
+
+2009-11-10 13:15 -0500  djerius  <djerius@cfa.harvard.edu>  (aadeed3802e9)
+
+	* README:
+	remove explicit version to make more future proof
+
+2009-11-10 13:05 -0500  djerius  <djerius@cfa.harvard.edu>  (dde19bd9fd24)
+
+	* LICENSE, README, XPA.pm, XPA.xs, test.pl, util.c, util.h:
+	update license to GPL3
+
+2009-11-10 12:56 -0500  djerius  <djerius@cfa.harvard.edu>  (5e932cf3ec4b)
+
+	* XPA.xs:
+	cleanup whitespace
+
+2008-01-18 15:00 -0500  djerius  <djerius@cfa.harvard.edu>  (7ba5fdec29ce)
+
+	* INSTALL: deleted file.
+	* INSTALL:
+	remove useless file
+
+2008-01-18 14:59 -0500  djerius  <djerius@cfa.harvard.edu>  (b4d84a5fe57a)
+
+	* .hgtags:
+	Added tag 0.08_01 for changeset 03c8732b7355
+
+2008-01-18 14:59 -0500  djerius  <djerius@cfa.harvard.edu>  (03c8732b7355 [0.08_01])
+
+	* ChangeLog, Changes, XPA.pm:
+	update for release
+
+2008-01-18 14:57 -0500  djerius  <djerius@cfa.harvard.edu>  (603c5d7545f2)
+
+	* Makefile.PL:
+	hack in pkg-config support for xpa
+
+2008-01-18 14:50 -0500  djerius  <djerius@cfa.harvard.edu>  (03d37f82f56c)
+
+	* GNUmakefile: deleted file.
+	* GNUmakefile:
+	remove obsolete file
+
+2007-12-22 04:39 +0000  dj  <dj>  (781d0e62cf45)
+
+	* ChangeLog: new file.
+	* ChangeLog:
+	added ChangeLog
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (97b3ab7fcf1c)
+
+	* .hgtags:
+	Added tag V0_08 for changeset f2ecfa4c6b4d
+
+2002-09-25 21:40 +0000  dj  <dj>  (f2ecfa4c6b4d [V0_08])
+
+	* XPA.pm:
+	Empty changelog
+
+2002-09-23 15:04 +0000  dj  <dj>  (d38a8c64ebd4)
+
+	* Changes, XPA.pm, test.pl:
+	the buf argument to Set may be a scalar ref as well as a scalar
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (c5fc96494cfc)
+
+	* .hgtags:
+	Added tag V0_07 for changeset 12631ed96fde
+
+2002-04-12 20:55 +0000  dj  <dj>  (12631ed96fde [V0_07])
+
+	* Changes, XPA.pm, test.pl:
+	code + doc cleanups
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (d5f1491d7755)
+
+	* .hgtags:
+	Added tag V0_06 for changeset 05f6bdf1a43b
+
+2002-01-29 14:59 +0000  dj  <dj>  (05f6bdf1a43b [V0_06])
+
+	* MANIFEST.SKIP: new file.
+	* Changes, MANIFEST.SKIP, README:
+	Empty changelog
+
+2002-01-28 22:05 +0000  dj  <dj>  (bf951ee03285)
+
+	* test.pl:
+	cleanup, track new Access changes
+
+2002-01-28 22:05 +0000  dj  <dj>  (3ed833a54b22)
+
+	* Makefile.PL:
+	Empty changelog
+
+2002-01-28 22:05 +0000  dj  <dj>  (818fbb206cba)
+
+	* LICENSE:
+	switch to GPL
+
+2002-01-28 22:05 +0000  dj  <dj>  (c8237501211d)
+
+	* XPA.pm:
+	track new API for NSLookup and Access. cleanup.
+
+2002-01-28 22:04 +0000  dj  <dj>  (fb620deec2bf)
+
+	* XPA.xs:
+	track new API for NSLookup and Access
+
+2002-01-28 20:31 +0000  dj  <dj>  (b9391ef12186)
+
+	* util.c, util.h:
+	track NSLookup API changes
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (15e9cdc1ec7e)
+
+	* .hgtags:
+	Added tag V0_05 for changeset 4196e892dc3e
+
+2000-09-09 01:00 +0000  dj  <dj>  (4196e892dc3e [V0_05])
+
+	* Changes, XPA.pm, typemap:
+	0.05 Fri Sep 8 20:54:43 EDT 2000
+	        - missing typemap cast caused warnings from gcc
+
+	 - removed AUTOLOAD stuff; not needed
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (e81d39ea61d3)
+
+	* .hgtags:
+	Added tag V0_04 for changeset 94208ef020de
+
+2000-08-02 16:23 +0000  dj  <dj>  (94208ef020de [V0_04])
+
+	* Changes, XPA.pm, XPA.xs, test.pl, typemap:
+	Empty changelog
+
+2000-07-06 13:33 +0000  dj  <dj>  (832f42677470)
+
+	* Changes, test.pl:
+	Empty changelog
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (67f886974a5b)
+
+	* .hgtags:
+	Added tag V0_03 for changeset 89cc92b7dfc3
+
+2000-07-05 15:35 +0000  dj  <dj>  (89cc92b7dfc3 [V0_03])
+
+	* CONTRIB: new file.
+	* CONTRIB:
+	Empty changelog
+
+2000-06-30 21:45 +0000  dj  <dj>  (6e4b172d3b90)
+
+	* README:
+	Empty changelog
+
+2000-06-30 20:21 +0000  dj  <dj>  (fb0353b1bd1a)
+
+	* Makefile.PL:
+	Empty changelog
+
+2000-05-11 17:53 +0000  dj  <dj>  (72650d42c83c)
+
+	* Changes, XPA.pm, XPA.xs, typemap:
+	- nullXPA() was was returning something which caused the
+	XS routines to complain about undef'd values. it was
+	moved into XS land, and a more sophisticated (kludgy?)
+	thing was done to check for undef and mapping it correctly
+	to NULL.
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (2975d448e304)
+
+	* .hgtags:
+	Added tag V0_02 for changeset 7329a029d346
+
+2000-05-09 20:59 +0000  dj  <dj>  (7329a029d346 [V0_02])
+
+	* Changes, Makefile.PL, XPA.pm, test.pl:
+	Empty changelog
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (eba42adf4c19)
+
+	* .hgtags:
+	Added tag V0_01 for changeset dc31838b3d1c
+
+2000-05-04 01:46 +0000  dj  <dj>  (dc31838b3d1c [V0_01])
+
+	* GNUmakefile, INSTALL: new file.
+	* GNUmakefile, INSTALL:
+	Empty changelog
+
+2000-04-25 19:13 +0000  dj  <dj>  (e54d061e7612)
+
+	* XPA.pm:
+	Empty changelog
+
+2000-04-25 00:02 +0000  dj  <dj>  (521856679a38)
+
+	* LICENSE, README, XPA.pm, XPA.xs, util.c, util.h:
+	Empty changelog
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (e85b9d8ffa5f)
+
+	* .hgtags: new file.
+	* .hgtags:
+	Added tag initial for changeset 8406f65641b7
+
+2000-04-24 23:35 +0000  dj  <dj>  (8406f65641b7 [initial])
+
+	* LICENSE, README: new file.
+	* LICENSE, README:
+	Initial revision
+
+2000-04-24 23:35 +0000  dj  <dj>  (b436df9d42dd)
+
+	* Changes, MANIFEST, Makefile.PL, XPA.pm, XPA.xs, test.pl, typemap,
+	util.c, util.h: new file.
+	* Changes, MANIFEST, Makefile.PL, XPA.pm, XPA.xs, test.pl, typemap,
+	util.c, util.h:
+	Empty changelog
+
+2007-12-22 01:17 -0500  djerius  <djerius@cfa.harvard.edu>  (78f81d8b43c5)
+
+	* .hgignore: new file.
+	* .hgignore:
+	Tailor preparing to convert repo by adding .hgignore
+

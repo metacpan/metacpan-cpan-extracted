@@ -5,10 +5,16 @@ TODO: maybe avoid the reblessing and better support readonly objects.
 TODO: how to cope with tagged values and standard json decoders
 TODO: investigate magic (Eric Brine)
 TODO: [PATCH] Types::Serialiser: Inline true(), false() and error() functions
+TODO: replace bool_stash by BOOL_STASH seems to work with mod_perl, make a compile time option?
+
+4.03 Tue Oct 27 19:05:01 CET 2020
+	- when parsing comments in relaxed mode, JSON::XS would detect garbage
+          after the JSON text if the comment is after the end and does not end in
+          a newline (reported by Felipe Gasper).
 
 4.02 Wed Mar  6 08:31:24 CET 2019
 	- undo the fix from 4.01, it breaks more things than it fixes
-          (another tetscase by Wesley Schwengle).
+          (another testcase by Wesley Schwengle).
         - try a proper fix this time.
 
 4.01 Sun Feb 24 05:03:30 CET 2019
@@ -17,7 +23,7 @@ TODO: [PATCH] Types::Serialiser: Inline true(), false() and error() functions
 
 4.0  Fri Nov 16 00:06:54 CET 2018
 	- SECURITY IMPLICATION: this release enables allow_nonref by default
-          for compatibnility with RFC 7159 and newer. See "old" vs. "new"
+          for compatibility with RFC 7159 and newer. See "old" vs. "new"
           JSON under SECURITY CONSIDERATIONS.
         - reworked the "old" vs. "new" JSON section.
         - add ->boolean_values to provide the values to which booleans

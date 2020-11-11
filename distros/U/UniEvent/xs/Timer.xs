@@ -29,6 +29,7 @@ BOOT {
     stash.inherit("UniEvent::Handle");
     stash.add_const_sub("TYPE", Simple(Timer::TYPE.name));
     xs::at_perl_destroy([]() { cbn.on_timer = nullptr; });
+    unievent::register_perl_class(Timer::TYPE, stash);
 }
 
 Timer* Timer::new (LoopSP loop = {}) {

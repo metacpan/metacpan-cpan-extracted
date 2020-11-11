@@ -1,94 +1,23 @@
 ==================================================
-Changes from 2010-08-19 00:00:00 +0000 to present.
+Changes from 2015-11-12 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.14 at 2015-08-18 09:22:15 +0000
+version 0.16 at 2020-11-10 04:07:07 +0000
 -----------------------------------------
 
-  Change: 79dba8497640d272435ee656d1a94e2a09ceeb39
+  Change: fdafdc8999faf28a779756f47e89efa8b06a080c
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-08-18 10:22:15 +0000
+  Date : 2020-11-10 04:07:07 +0000
 
-    Fix the overlooked ssl tests for Net::Curl 
+    Detect GnuTLS in SSL test as well 
 
------------------------------------------
-version 0.12 at 2015-08-18 09:08:47 +0000
------------------------------------------
-
-  Change: 469c9c8202b56d7c4c592acce0be74cc14ab28cd
+  Change: 7e338545908e9089ad673f0e41040fe3edcff136
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-08-18 10:08:47 +0000
+  Date : 2020-04-30 10:51:22 +0000
 
-    Switched to use Net::Curl instead of WWW::Curl 
+    Changed ssl test to use google.com 
 
------------------------------------------
-version 0.10 at 2014-03-15 19:11:05 +0000
------------------------------------------
-
-  Change: 3e7e7802d1ff43fd34f2a9c70cb424d9c8ff9907
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-15 19:11:05 +0000
-
-    Added test for the Expect header fix 
-
------------------------------------------
-version 0.08 at 2014-03-12 17:58:19 +0000
------------------------------------------
-
-  Change: eb61e45c0d74de71a105e869e9668add399e8fd0
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-12 17:58:19 +0000
-
-    Resolve issue with unexpected Expect: in headers 
-
------------------------------------------
-version 0.06 at 2014-03-10 22:26:17 +0000
------------------------------------------
-
-  Change: d15dfc17e4c1a1c9b26b57f8deea2a505cdea0fe
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-10 22:26:17 +0000
-
-    Added progress handler interface from PoCo-Client-HTTP
-
-    Bug fix for POST content handling. 
-
------------------------------------------
-version 0.04 at 2013-04-24 20:39:47 +0000
------------------------------------------
-
-  Change: 44f124add5f05cb061bac561ca32e8c39a638eee
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-24 21:39:47 +0000
-
-    Bumpity version 
-
-  Change: 262df7902e47c77698b7c1eb5a7240d642bad95f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-24 21:36:29 +0000
-
-    Resolve spurious undefined errors
-
-    HEAD requests have no body so check for that situation. Mentioned by
-    Getty. 
-
------------------------------------------
-version 0.02 at 2013-04-01 14:24:45 +0000
------------------------------------------
-
-  Change: f38c9f950bd82e0e51e882d502214b151faa3772
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-01 15:24:45 +0000
-
-    Initial gitification of the project 
-
-  Change: e072c8f9d596f7de4ffec9d2cc72cfc27a299bbd
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-03-20 23:45:54 +0000
-
-    Hello 
-
-================
-End of releases.
-================
+================================================
+Plus 7 releases after 2015-11-12 00:00:00 +0000.
+================================================

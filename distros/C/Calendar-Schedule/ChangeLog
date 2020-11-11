@@ -1,7 +1,37 @@
 Revision history for Perl extension Calendar::Schedule.
 
+1.19 Tue Nov 10 06:54:28 AST 2020
+ - addressing some issues reported by testers, thanks to Alexandr Ciornii
+   1. use of uninitialize value in comparisons, lines 1386 and 1208
+   2. issue with Windows behaviour (spliting CL arguments within quotes)
+
+1.18 Sun Nov  8 15:33:57 AST 2020
+ - fixing bug in test t/02.t; added an option to bin/cal2html to make
+   the test independent of locale and the current date
+ - added option --ColLabel to cal2html to specify column label
+ - test t/02.t now uses "cal2html --ColLabel='weekday %w'" to avoid depending
+   on local weekday names, and the current time
+
+1.17 Sat Nov  7 10:16:22 AST 2020
+ - thanks to Gabor Szabo for GitHub PR to add files for CI
+ - thanks to Slaven Rezic for reporting the bug re locale
+   The bug is fixed by setting LC_ALL=C just for test t/02.t
+ - documentation improvements
+
+1.16 Fri Nov  6 15:50:06 AST 2020
+ - add script bin/cal2html to EXE_FILES in Makefile.PL
+
+1.15 Fri Nov  6 15:29:10 AST 2020
+ - documentation improvements, minor fixes of the README file
+
+1.14 Fri Nov  6 14:43:54 AST 2020
+ - documentation improvements
+ - removing $Revision and $Version variables
+ - added bin/cal2html program
+ - added t/02.t test with sample input and output
+
 1.13 Sun Jul 19 18:07:08 ADT 2020
- - documentation (ChangeLog) mistake in 1.12
+ - fix documentation (ChangeLog) mistake in 1.12
 
 1.12 Sun Jul 19 17:52:16 ADT 2020
  - documentation improvements
@@ -88,3 +118,7 @@ Revision history for Perl extension Calendar::Schedule.
 0.01 2002  Vlado Keselj vlado@dnlp.ca
  - initial version
  - coding started in 2000, 5 Jun 2002, but the module was not named
+ - Emacs settings:
+ # Local Variables:
+ # mode: Fundamental;
+ # End:

@@ -4,15 +4,14 @@
 #  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
 #  Original render code by Tom Molesworth
 
-package Tickit::Widget::Placegrid;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget );
+package Tickit::Widget::Placegrid 0.31;
+class Tickit::Widget::Placegrid
+   extends Tickit::Widget;
+
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_THICK );
-
-our $VERSION = '0.30';
 
 use Tickit::Utils qw( textwidth );
 
@@ -70,23 +69,20 @@ dimensions in the centre of the grid.
 
 =cut
 
-sub new
+has $_title;
+
+BUILD
 {
-   my $class = shift;
-   my %args = @_;
-   my $self = $class->SUPER::new( %args );
+   my %params = @_;
 
-   $self->{title} = $args{title};
-
-   return $self;
+   $_title = $params{title};
 }
 
-sub lines { 1 }
-sub cols  { 1 }
+method lines { 1 }
+method cols  { 1 }
 
-sub render_to_rb
+method render_to_rb
 {
-   my $self = shift;
    my ( $rb, $rect ) = @_;
 
    $rb->clear($self->pen);
@@ -103,7 +99,7 @@ sub render_to_rb
 
    $rb->setpen($self->pen);
 
-   if(defined(my $title = $self->{title})) {
+   if(defined(my $title = $_title)) {
       $rb->text_at(($h / 2) - 1, (1 + $w - textwidth($title)) / 2, $title);
    }
 

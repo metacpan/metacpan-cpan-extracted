@@ -3,9 +3,9 @@ NAME
     DataTables plugin
 
 VERSION
-    This document describes version 0.003 of Text::Table::HTML::DataTables
+    This document describes version 0.007 of Text::Table::HTML::DataTables
     (from Perl distribution Text-Table-HTML-DataTables), released on
-    2020-09-09.
+    2020-11-08.
 
 SYNOPSIS
      use Text::Table::HTML::DataTables;
@@ -26,7 +26,19 @@ DESCRIPTION
     (<http://datatables.net>) from the local filesystem (distribution shared
     directory), so you can filter and sort the table in the browser.
 
-    The example shown in the SYNOPSIS generates the following table:
+    The datatables bundled in this distribution has the following
+    characteristics:
+
+    *   Support negative search using dash prefix syntax ("-foo") a la
+        Google
+
+        To search for table rows that contain "foo", "bar" (in no particular
+        order) and not "baz", you can enter in the search box:
+
+         foo bar -baz
+
+    The example shown in the SYNOPSIS generates HTML code like the
+    following:
 
      <link rel="stylesheet" type="text/css" href="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/datatables-1.10.13/css/jquery.dataTables.min.css">
      <script src="file:///home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/auto/share/dist/Text-Table-HTML-DataTables/jquery-2.2.4/jquery-2.2.4.min.js"></script>
@@ -75,6 +87,8 @@ SEE ALSO
     Text::Table::HTML
 
     See also Bencher::Scenario::TextTableModules.
+
+    <https://datatables.net>
 
 AUTHOR
     perlancar <perlancar@cpan.org>

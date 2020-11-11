@@ -9,6 +9,7 @@ use GraphQL::Schema;
 use GraphQL::Execution qw(execute);
 use GraphQL::Subscription qw(subscribe);
 use GraphQL::Type::Scalar qw($Int $Float $String $Boolean);
+use GraphQL::Type::InputObject;
 use GraphQL::Type::Object;
 use GraphQL::Type::Interface;
 
@@ -191,6 +192,28 @@ EOF
   });
 };
 
+subtest 'mutations in order' => sub {
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+type Query { q: String }
+type Mutation {
+  hello(arg: String): String
+}
+EOF
+  my @m;
+  run_test([
+    $schema, <<'EOF',
+mutation m {
+  h1: hello(arg: "Hi")
+  h2: hello(arg: "Hi2")
+}
+EOF
+    { hello => sub { push @m, $_[0]{arg}; $_[0]{arg} } }
+  ], {
+    'data' => { h1 => "Hi", h2 => "Hi2" },
+  });
+  is_deeply \@m, [ qw(Hi Hi2) ];
+};
+
 subtest 'list in query params' => sub {
   my $stringlist = GraphQL::Type::List->new(of => $String);
   is $stringlist->is_valid([ 'string' ]), 1, 'is_valid works';
@@ -208,6 +231,41 @@ subtest 'list in query params' => sub {
   run_test([
     $schema, 'query q($a: [String]) {hello(arg: $a)}', { hello => "yo" },
     undef, { a => [ 'there' ] },
+  ], {
+    'data' => { 'hello' => "yo" },
+  });
+};
+
+subtest 'list/inputobject default value in Perl' => sub {
+  my $schema = GraphQL::Schema->new(
+    query => GraphQL::Type::Object->new(
+      name => 'Query',
+      fields => {
+        hello => {
+          type => $String,
+          args => { arg => { type => $String->list, default_value => ["yo"] } }
+        },
+        field2 => {
+          type => $String,
+          args => {
+            f2arg => {
+              type => GraphQL::Type::InputObject->new(
+                name => 'TestInputObject',
+                fields => {
+                  b => { type => $String->list },
+                },
+              ),
+              default_value => { b => 'b' },
+            },
+          },
+        },
+      }
+    ),
+  );
+  lives_ok { $schema->to_doc } 'can get SDL ok';
+  run_test([
+    $schema, 'query q($a: [String]) {hello(arg: $a)}',
+    { hello => sub { $_[0]->{arg}[0] } },
   ], {
     'data' => { 'hello' => "yo" },
   });
@@ -290,6 +348,7 @@ subtest 'test Scalar methods' => sub {
   throws_ok { $scalar->parse_value->('string') } qr{Fake}, 'fake parse_value';
   is $scalar->to_doc, qq{"d"\nscalar s\n}, 'to_doc';
   is $Boolean->serialize->(1), 1, 'Boolean serialize';
+  is $Boolean->serialize->(JSON->true), 1, 'Boolean serialize blessed';
   is $Boolean->parse_value->(JSON->true), 1, 'Boolean parse_value';
   for my $type ($Int, $Float, $String, $Boolean) {
     is $type->$_->(undef), undef, join(' ', $type->name, $_, 'null')

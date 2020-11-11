@@ -1,7 +1,7 @@
 package TAP::DOM::Archive;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Handle TAP:Archive files
-$TAP::DOM::Archive::VERSION = '0.91';
+$TAP::DOM::Archive::VERSION = '0.92';
 use 5.006;
 use strict;
 use warnings;

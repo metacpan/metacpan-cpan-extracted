@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.26      2020-11-08 12:18:30-08:00 America/Los_Angeles
+        - IPv6 support via IP instead of INET (Thank you: Bruno Meneguele)
+
 1.25      2019-07-17 09:43:58-07:00 America/Los_Angeles
         - Fix Karma plugin's help text
 

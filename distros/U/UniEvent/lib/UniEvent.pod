@@ -7,14 +7,21 @@ UniEvent - Object-oriented, fast and extendable event loop abstraction framework
 =head1 DESCRIPTION
 
 UniEvent is an extendable object-oriented event loop framework. It's also an abstraction layer on top of event loop which
-provides engine-independent API (like L<Any::Event>). It's written fully in C++ and is very fast.
+provides engine-independent API (like L<AnyEvent>). It's written fully in C++ and is very fast.
 
-The main feature is that it supports implementing third-party plugins (protocol adapters) in C++ (XS) and therefore without any
-perfomance penalties. UniEvent support multiple backends (libuv is the only implemented at the moment).
+The main feature is that it supports implementing third-party plugins (protocol adapters) in C++/XS 
+(see L<XS::Manifesto>)  and therefore without any perfomance penalties. UniEvent support multiple backends 
+(libuv is the only implemented at the moment).
 
 =head1 SYNOPSIS
 
 Documentation will be available later
+
+=SEE ALSO
+
+L<AnyEvent>
+
+L<libuv|http://libuv.org/>
 
 =head1 AUTHOR
 

@@ -1,0 +1,41 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "31",
+            "initiator": "FeedUpdate",
+            "action": "end",
+            "type": "feed",
+            "time": "1424709857",
+            "target": {
+                "id": -1,
+                "name": "",
+                "description": ""
+            },
+            "changes": null,
+            "effects": [],
+            "status": "sent",
+            "text": "Feed Update job completed."
+        },
+        {
+            "id": "39",
+            "initiator": "Scan",
+            "action": "end",
+            "type": "scan",
+            "time": "1427230966",
+            "target": {
+                "id": "15",
+                "name": "Weekly Scan",
+                "description": ""
+            },
+            "changes": null,
+            "effects": [],
+            "status": "sent",
+            "text": "The Scan completed normally."
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1425923484
+}

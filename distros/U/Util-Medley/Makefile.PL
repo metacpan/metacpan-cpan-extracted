@@ -48,6 +48,7 @@ my %WriteMakefileArgs = (
     "File::Which" => 0,
     "FileHandle" => 0,
     "Getopt::Long" => 0,
+    "Hash::Merge" => 0,
     "IPC::Run3" => 0,
     "Kavorka" => 0,
     "List::Compare" => 0,
@@ -82,7 +83,7 @@ my %WriteMakefileArgs = (
     "File::RandomGenerator" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.052",
+  "VERSION" => "0.053",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -112,6 +113,7 @@ my %FallbackPrereqs = (
   "File::Which" => 0,
   "FileHandle" => 0,
   "Getopt::Long" => 0,
+  "Hash::Merge" => 0,
   "IPC::Run3" => 0,
   "Kavorka" => 0,
   "List::Compare" => 0,

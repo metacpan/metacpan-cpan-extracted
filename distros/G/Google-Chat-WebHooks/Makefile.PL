@@ -12,8 +12,21 @@ my %WriteMakefileArgs = (
     ABSTRACT            => 'Send notifications to Google Chat Rooms',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'Test::Simple' => 0.44,
+        'LWP::UserAgent' => 0,
+        'Class::Tiny' => 0,
+        'JSON' => 0,
+        'Try::Tiny' => 0,
+        'Data::Validate::URI' => 0
     },
+    TEST_REQUIRES		=> {
+		'Test2::Bundle::More' => 0,
+		'Test2::Tools::Class' => 0,
+		'Test2::Tools::Exception' => 0,
+		'Test2::Tools::ClassicCompare' => 0,
+		'Test::HTTP::MockServer' => 0,
+		'Data::Dump' => 0,
+		'Encode' => 0
+	},
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,

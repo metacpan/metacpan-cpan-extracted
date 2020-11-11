@@ -23,8 +23,8 @@ is_deeply([ @$y ], $xdata, '$y has the same values as $x');
 
 my ($nrow, $ncol) = $x -> size();
 
-for (my $i = 0 ; $i < $nrow ; ++$i) {
-    for (my $j = 0 ; $j < $ncol ; ++$j) {
+for my $i (0 .. $nrow - 1) {
+    for my $j (0 .. $ncol - 1) {
         my $oldval = $x->[$i][$j];
         ++$y->[$i][$j];
         cmp_ok($y->[$i][$j], "==", $oldval + 1,

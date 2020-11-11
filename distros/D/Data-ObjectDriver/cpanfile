@@ -23,3 +23,33 @@ on develop => sub {
 on test => sub {
     requires 'version';
 };
+
+feature 'test_sqlite', 'Test SQLite' => sub {
+    requires 'DBD::SQLite';
+};
+
+feature 'test_mysql', 'Test MySQL' => sub {
+    requires 'DBD::mysql';
+    requires 'Test::mysqld';
+    requires 'SQL::Translator';
+};
+
+feature 'test_mariadb', 'Test MariaDB' => sub {
+    requires 'DBD::MariaDB';
+    requires 'Test::mysqld';
+    requires 'SQL::Translator';
+};
+
+feature 'test_postgresql', 'Test PostgreSQL' => sub {
+    requires 'DBD::Pg';
+    requires 'Test::PostgreSQL';
+    requires 'SQL::Translator';
+};
+
+feature 'test_fork', 'Test Fork' => sub {
+    requires 'DBI', '1.614';
+    requires 'Parallel::ForkManager';
+    requires 'POSIX::AtFork';
+    requires 'Scalar::Util';
+    requires 'Test::SharedFork';
+};

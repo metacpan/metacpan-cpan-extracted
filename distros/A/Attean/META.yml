@@ -42,6 +42,7 @@ requires:
   Module::Pluggable: 0
   Moo: 2.000002
   MooX::Log::Any: 0
+  PerlIO::Layers: 0
   Role::Tiny: 2.000003
   Set::Scalar: 0
   Sub::Install: 0
@@ -50,6 +51,7 @@ requires:
   Test::Moose: 0
   Test::Roo: 0
   Text::CSV: 0
+  Text::Table: 0
   Try::Tiny: 0
   Type::Tiny: 0
   URI::Escape: 1.36
@@ -60,7 +62,7 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#perlrdf
   bugtracker: https://github.com/kasei/attean/issues
-  homepage: http://search.cpan.org/dist/Attean/
+  homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/kasei/attean/
-version: '0.026'
+  repository: https://github.com/kasei/attean/
+version: '0.027'

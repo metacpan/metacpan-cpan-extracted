@@ -7,8 +7,8 @@ build_requires:
   Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,14 @@ name: Algorithm-C3
 no_index:
   directory:
     - t
-    - inc
+    - xt
 requires:
   Carp: '0.01'
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-C3
-  repository: git://git.shadowcat.co.uk/gitmo/Algorithm-C3.git
-version: '0.10'
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/moose/Algorithm-C3.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

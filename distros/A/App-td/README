@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.100 of App::td (from Perl distribution
-    App-td), released on 2020-05-29.
+    This document describes version 0.101 of App::td (from Perl distribution
+    App-td), released on 2020-11-08.
 
 FUNCTIONS
   td
@@ -51,6 +51,9 @@ FUNCTIONS
 
      # Convert table data (which might be hash, aos, or aoaos) to aohos form
      % list-files -l --json | td as-aohos
+
+     # Display table data on the browser using datatables (to allow interactive sorting and filtering)
+     % osnames -l | td cat --format html+datatables
 
      # Convert table data to CSV
      % list-files -l --json | td as-csv

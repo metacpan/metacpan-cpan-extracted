@@ -1,3 +1,7 @@
+1.1.0     30.10.2020
+           - c-ares update
+           - c++ part moved to XS::libunievent
+           - add streamer adapters
 1.0.2     19.06.2020
            - not specified because no docs yet
            - fix valgrind complains

@@ -25,7 +25,7 @@ use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 #use Future::IO;
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 our @CARP_NOT;
 
 # add Browser.setPermission , .grantPermission for
@@ -2631,6 +2631,8 @@ at L<https://bugs.chromium.org/p/chromium/issues/detail?id=849972>.
 
 sub _set_extra_headers_future( $self, %headers ) {
     $self->log('debug',"Setting additional headers", \%headers);
+    # force-stringify all header values
+    for (values %headers) { $_ = "$_" };
     $self->target->send_message('Network.setExtraHTTPHeaders',
         headers => \%headers
     );
@@ -2991,7 +2993,7 @@ sub text {
 
     # Waugh - this is highly inefficient but conveniently short to write
     # Maybe this should skip SCRIPT nodes...
-    join '', map { $_->get_attribute('textContent') } $self->xpath('//body', single => 1 );
+    join '', map { $_->get_attribute('innerText') } $self->xpath('//body', single => 1 );
 }
 
 =head2 C<< $mech->captureSnapshot_future() >>

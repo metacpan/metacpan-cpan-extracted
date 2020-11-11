@@ -6,12 +6,13 @@
 
 package Rex::Shared::Var::Scalar;
 
+use 5.010001;
 use strict;
 use warnings;
 
 use Rex::Shared::Var::Common qw/__lock __store __retrieve/;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 sub TIESCALAR {
   my $self = { varname => $_[1], };

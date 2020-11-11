@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseDataDumper
   homepage: https://metacpan.org/release/Log-ger-UseDataDumper
   repository: git://github.com/perlancar/perl-Log-ger-UseDataDumper.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -1,0 +1,27 @@
+
+			SAORD Contributed Software
+
+
+Title: IPC::XPA
+
+Synopsis: Perl module interfacing Perl to XPA library
+
+Retrieval Location(s): www.cpan.org
+
+Web Information Page:
+
+Revision: 0.03
+
+Date: 5 July 2000
+
+Author/Contact: Diab Jerius
+
+Contact E-mail: djerius@cfa.harvard.edu
+
+Institution: Smithsonian Astrophysical Observatory
+
+Full Description:
+
+IPC::XPA is an interface to the XPA library.  This release provides an
+interface to most of the client side routines.
+

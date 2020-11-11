@@ -80,8 +80,15 @@ ENDOFJSON
     GeneratePlotAndComparePlotAndJSON($json_without_layout);
 }
 
-{
-    use PDL;
+SKIP: {
+    eval {
+        require PDL;
+        PDL->import;
+    };
+    if ($@) {
+        skip( "Have not PDL", 1 );
+    }
+
     my $plot = Chart::Plotly::Plot->new(
                  traces => [ Chart::Plotly::Trace::Scatter->new( x => pdl( [ 0, 1, 2 ] ), y => pdl( [ 0, 1, 2 ] ) ) ] );
 

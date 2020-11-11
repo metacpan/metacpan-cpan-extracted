@@ -4,6 +4,13 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.730 2020-11-04
+  * Support Tektronix TBS1000C oscilloscope
+  * Support Rigol DG5000 series waveform generator
+  * OI_IPS: Set default communications protocol to "extended resolution"
+  * OI_IPS: fix error reporting
+  * Tutorial: Document refresh type 'block'
+
 3.722 2020-10-16
   * Agilent34460A: New driver
   * Countdown: Never sleep with a negative time

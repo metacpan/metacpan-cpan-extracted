@@ -47,8 +47,12 @@ const Module* get_module_by_namespace () {
                 }
             }
         }
+        if (!name.length()) break; // stop after main::
         auto pos = name.rfind("::");
-        if (pos == string_view::npos) break;
+        if (pos == string_view::npos) { // look in main::
+            name = "";
+            continue;
+        }
         name = name.substr(0, pos);
     }
 

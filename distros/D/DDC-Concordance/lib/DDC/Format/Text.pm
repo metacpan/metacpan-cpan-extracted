@@ -30,6 +30,7 @@ BEGIN {
 ##     highlight=>[$pre,$post],  ##-- highlighting substrings
 ##     columns=>$ncols,          ##-- for text wrapping [default=80]
 ##     useMatchIds=>$bool,       ##-- whether to use match-ids if available; undef (default) if non-trivial match-ids are specified
+##     wsAttr=>$attr,            ##-- token attribute to use for preceding whitespace (default='ws')
 ##    )
 sub new {
   my $that = shift;
@@ -37,6 +38,7 @@ sub new {
 		highlight=>['__','__'],
 		columns=>80,
 		useMatchIds=>undef,
+		wsAttr=>'ws',
 		@_
 	       }, ref($that)||$that;
 }
@@ -51,6 +53,12 @@ sub reset {
 ##======================================================================
 ## Helper functions
 
+## $wsStr = $fmt->wsStr($token)
+sub wsStr {
+  my ($fmt,$w) = @_;
+  return (!$fmt->{wsAttr} || !ref($w) || !defined($w->{$fmt->{wsAttr}}) || $w->{$fmt->{wsAttr}} ? ' ' : '');
+}
+
 ## $hitStr = $fmt->hitString($hit, $fieldName, $hitNumber, $useMatchIds)
 sub hitString {
   my ($fmt,$hit,$fkey,$hnum,$useMatchIds) = @_;
@@ -58,13 +66,18 @@ sub hitString {
   $hnum =  0  if (!$hnum);
   $Text::Wrap::columns = $fmt->{columns};
   my $ctx    = $hit->{ctx_};
-  my $ctxstr = join(' ',
-		    (map {ref($_) ? $_->{$fkey} : $_} @{$ctx->[0]}),
-		    ' ',
-		    (map { $_->{hl_} ? "__$_->{$fkey}__".($useMatchIds ? "/$_->{hl_}" : '') : $_->{$fkey} } @{$ctx->[1]}),
-		    ' ',
-		    (map {ref($_) ? $_->{$fkey} : $_} @{$ctx->[2]}),
-		   );
+  my $ctxstr = (
+		join(' ', map {ref($_) ? $_->{$fkey} : $_} @{$ctx->[0]})
+		.' '
+		.join('',
+		      map {
+			$fmt->wsStr($_).($_->{hl_} ? "__$_->{$fkey}__".($useMatchIds ? "/$_->{hl_}" : '') : $_->{$fkey})
+			} @{$ctx->[1]}
+		     )
+		.' '
+		.join(' ', map {ref($_) ? $_->{$fkey} : $_} @{$ctx->[2]})
+	       );
+  $ctxstr =~ s{(?:^\s+)|(?:\s*$)}{};
   return ("${hnum}: "
 	  .wrap('',(' ' x length("$hnum")).'  ', $ctxstr)."\n"
 	  .join('',
@@ -166,6 +179,8 @@ Accepted keywords in %args:
     start=>$previous_hit_num, ##-- pre-initial hit number (default=0)
     highlight=>[$pre,$post],  ##-- highlighting substrings
     columns=>$ncols,          ##-- for text wrapping [default=80]
+    useMatchIds=>$bool,       ##-- whether to use match-ids if available; undef (default) if non-trivial match-ids are specified
+    wsAttr=>$attr,            ##-- token attribute to use for preceding whitespace (default='ws')
    )
 
 =item reset
@@ -231,7 +246,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2016 by Bryan Jurish
+Copyright (C) 2006-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

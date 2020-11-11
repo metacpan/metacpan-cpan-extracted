@@ -3,6 +3,12 @@ package Promise::XS;
 use strict;
 use warnings;
 
+our $VERSION;
+
+BEGIN {
+    $VERSION = '0.11';
+}
+
 =encoding utf-8
 
 =head1 NAME
@@ -104,14 +110,15 @@ values.
 
 =head2 Empty or uninitialized rejection values
 
-Promise rejections fulfill the same role in asynchronous code that exceptions
-do in synchronous code. Perl helpfully warns (under the C<warnings> pragma,
-anyhow) when you C<die(undef)> since an uninitialized value isn’t useful as
-an error report and likely indicates a problem.
+Perl helpfully warns (under the C<warnings> pragma, anyhow) when you
+C<die(undef)> since an uninitialized value isn’t useful as an error report
+and likely indicates a problem in the error-handling logic.
 
-Promise::XS mimics this behavior by warning if a rejection value list lacks
-a defined value. This can happen if the value list is either empty or
-contains exclusively uninitialized values.
+Promise rejections fulfill the same role in asynchronous code that
+exceptions do in synchronous code. Thus, Promise::XS mimics Perl’s behavior:
+if a rejection value list lacks a defined value, a warning is thrown. This
+can happen if the value list is either empty or contains exclusively
+uninitialized values.
 
 =head2 C<finally()>
 

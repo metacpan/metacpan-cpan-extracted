@@ -1,26 +1,38 @@
 Revision history for Algorithm-SixDegrees
 
-0.03	Sun Mar  6 16:45:23 CST 2005 (svn r29)
-    [ENHANCEMENTS]
-	Added support for additional arguments to subroutines.
-	Added simple test for argument support.
-	Added Build.PL support.
-
-0.02	Thu Mar  3 20:50:00 CST 2005 (svn r21)
-    [ENHANCEMENTS]
-	Added error() method.
-	Optimized the two-source case where the starting and ending
-	     element share a common relationship.
-	Added two samples.
-	Made some error messages more descriptive.
-	Improved documentation.
-	Added extra test: t/errors.t
-	Improved test coverage in other tests
+1.01 Wed Nov  4 14:07:21 CST 2020
     [BUGS]
-	Fixed an issue where the origin keys were polluting internal
-	    tables when an alternate source was defined.
+        Fixed dependency in build scripts (even though it's core
+            in v5.8, Scalar::Util is needed for v5.6)
 
-0.01    Sat Feb  5 00:57:45 CST 2005 (svn r6)
+1.00 Wed Nov  4 13:49:26 CST 2020
+    [BUGS]
+        Fixed versioning of 5.6 to 5.006
+        Removed explicit import of UNIVERSAL
+        Bumped module version to reflect official release
+            (15 years in beta should be enough...?)
+
+0.03 Sun Mar  6 16:45:23 CST 2005 (svn r29)
+    [ENHANCEMENTS]
+        Added support for additional arguments to subroutines.
+        Added simple test for argument support.
+        Added Build.PL support.
+
+0.02 Thu Mar  3 20:50:00 CST 2005 (svn r21)
+    [ENHANCEMENTS]
+        Added error() method.
+        Optimized the two-source case where the starting and ending
+             element share a common relationship.
+        Added two samples.
+        Made some error messages more descriptive.
+        Improved documentation.
+        Added extra test: t/errors.t
+        Improved test coverage in other tests
+    [BUGS]
+        Fixed an issue where the origin keys were polluting internal
+            tables when an alternate source was defined.
+
+0.01 Sat Feb  5 00:57:45 CST 2005 (svn r6)
     [NOTES]
         First version, released on an unsuspecting world.
 

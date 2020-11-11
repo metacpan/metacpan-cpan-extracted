@@ -14,6 +14,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 scripts/pure-perl-make
+t/00-report-prereqs.t
 t/94-version.t
 t/95-tidyall.t
 t/96-perl-critic.t

@@ -6,7 +6,6 @@ lib/Net/LibAsyncNS.pm
 lib/Net/LibAsyncNS.xs
 lib/Net/LibAsyncNS/Constants.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

@@ -34,15 +34,20 @@
    "provides" : {
       "Template::Plugin::XML::Feed" : {
          "file" : "lib/Template/Plugin/XML/Feed.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/template-plugin-xml-feed.git",
+         "web" : "https://github.com/davorg/template-plugin-xml-feed"
+      }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

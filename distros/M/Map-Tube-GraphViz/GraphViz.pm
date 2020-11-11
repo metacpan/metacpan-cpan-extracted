@@ -1,10 +1,8 @@
 package Map::Tube::GraphViz;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
@@ -13,8 +11,7 @@ use List::MoreUtils qw(none);
 use Map::Tube::GraphViz::Utils qw(node_color);
 use Scalar::Util qw(blessed);
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -27,14 +24,20 @@ sub new {
 	$self->{'callback_edge'} = sub {
 		my ($self, $from, $to) = @_;
 		$self->{'g'}->add_edge(
-			'from' => $from,
-			'to' => $to,
+			'from' => $self->{'callback_node_id'}->($self, $from),
+			'to' => $self->{'callback_node_id'}->($self, $to),
 		);
 		return;
 	};
 
 	# Node callback.
 	$self->{'callback_node'} = \&node_color;
+
+	# Node id callback.
+	$self->{'callback_node_id'} = sub {
+		my ($self, $node) = @_;
+		return $node->name;
+	};
 
 	# Driver.
 	$self->{'driver'} = 'neato';
@@ -107,9 +110,7 @@ sub new {
 	if (! defined $self->{'output'}) {
 		err "Parameter 'output' is required.";
 	}
-	if (none { $self->{'output'} eq $_ }
-		keys %{$self->{'g'}->valid_attributes->{'output_format'}}) {
-
+	if (! exists $self->{'g'}->valid_output_format->{$self->{'output'}}) {
 		err "Unsupported 'output' parameter '$self->{'output'}'.";
 	}
 
@@ -120,8 +121,10 @@ sub new {
 # Get graph.
 sub graph {
 	my ($self, $output_file) = @_;
+	my $node_cache_hr = {};
 	foreach my $node (values %{$self->{'tube'}->nodes}) {
 		$self->{'callback_node'}->($self, $node);
+		$node_cache_hr->{$node->id} = $node;
 	}
 	my @processed;
 	foreach my $node (values %{$self->{'tube'}->nodes}) {
@@ -132,8 +135,15 @@ sub graph {
 				($_->[0] eq $link && $_->[1] eq $node->id)
 				} @processed) {
 
-				$self->{'callback_edge'}->($self, $node->id,
-					$link);
+				# Skip link to myself.
+				my $link_node = $node_cache_hr->{$link};
+				if ($self->{'callback_node_id'}->($self, $node)
+					ne $self->{'callback_node_id'}
+					->($self, $link_node)) {
+
+					$self->{'callback_edge'}->($self, $node,
+						$link_node);
+				}
 				push @processed, [$node->id, $link];
 			}
 		}
@@ -166,6 +176,7 @@ Map::Tube::GraphViz - GraphViz output for Map::Tube.
 =head1 SYNOPSIS
 
  use Map::Tube::GraphViz;
+
  my $obj = Map::Tube::GraphViz->new(%params);
  $obj->graph($output_file);
 
@@ -263,11 +274,9 @@ Map::Tube::GraphViz - GraphViz output for Map::Tube.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English;
  use Error::Pure qw(err);
  use Map::Tube::GraphViz;
@@ -313,19 +322,17 @@ Map::Tube::GraphViz - GraphViz output for Map::Tube.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex1.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex1.png" alt="Berlin" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex1.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex1.png" alt="Berlin" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English;
  use Error::Pure qw(err);
  use Map::Tube::GraphViz;
@@ -373,19 +380,17 @@ Map::Tube::GraphViz - GraphViz output for Map::Tube.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex2.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex2.png" alt="Berlin" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex2.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex2.png" alt="Berlin" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English;
  use Error::Pure qw(err);
  use GraphViz2;
@@ -444,19 +449,17 @@ Map::Tube::GraphViz - GraphViz output for Map::Tube.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex3.png" alt="Berlin" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex3.png" alt="Berlin" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English;
  use Error::Pure qw(err);
  use Map::Tube::GraphViz;
@@ -504,8 +507,8 @@ Map::Tube::GraphViz - GraphViz output for Map::Tube.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex4.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-GraphViz/master/images/ex4.png" alt="Berlin" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex4.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-GraphViz/master/images/ex4.png" alt="Berlin" width="300px" height="300px" />
 </a>
 
 =end html
@@ -522,21 +525,29 @@ L<Scalar::Util>.
 
 =head1 SEE ALSO
 
-L<Map::Tube>,
-L<Map::Tube::Graph>,
-L<Map::Tube::Plugin::Graph>,
-L<Map::Tube::Text::Table>,
-L<Task::Map::Tube>.
+=over
 
-L<Map::Metro::Graph>.
+=item L<Map::Metro::Graph>
+
+Map::Metro graph.
+
+=item L<Task::Map::Tube>
+
+Install the Map::Tube modules.
+
+=item L<Task::Map::Tube::Metro>
+
+Install the Map::Tube concrete metro modules.
+
+=back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-GraphViz>
+L<https://github.com/michal-josef-spacek/Map-Tube-GraphViz>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
@@ -550,12 +561,14 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

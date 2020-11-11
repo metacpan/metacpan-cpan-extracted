@@ -1,0 +1,332 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-11'; # DATE
+our $DIST = 'App-Tables-CLI'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $prefix = "/App/Tables/CLI/";
+
+Perinci::CmdLine::Any->new(
+    url => "$prefix",
+    subcommands => {
+        ls        => { url => "${prefix}list_installed_tables_modules" },
+        show      => { url => "${prefix}show_tables_module" },
+        info      => { url => "${prefix}get_tables_module_info" },
+    },
+)->run;
+
+# ABSTRACT: Manipulate Tables::* modules
+# PODNAME: tables
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tables - Manipulate Tables::* modules
+
+=head1 VERSION
+
+This document describes version 0.003 of tables (from Perl distribution App-Tables-CLI), released on 2020-11-11.
+
+=head1 SYNOPSIS
+
+List all installed Tables::* modules:
+
+ % tables ls
+ % tables ls -l
+
+Show contents of a Tables::* module:
+
+ % tables show Locale::US::States
+ % tables show Locale::US::States --as aohos
+ % tables show Locale::US::States --as csv
+
+Show information about a Tables::* module:
+
+ % tables info Locale::US::States
+
+To manipulate table data further, you can use L<td> from L<App::td>, e.g.:
+
+ # select a few columns
+ % tables show Locale::US::States | td select name code
+
+ # grep rows using Perl code
+ % tables show Locale::US::States --as aohos | td grep '$_->{name} =~ /al/i'
+
+=head1 SUBCOMMANDS
+
+=head2 B<info>
+
+Show information about a Tables::* module.
+
+=head2 B<ls>
+
+List installed Tables::* modules.
+
+=head2 B<show>
+
+Show contents of a Tables::* module.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Options for subcommand info
+
+=over
+
+=item B<--table>=I<s>*
+
+Tables::* module name without the prefix, e.g. Locale::US::States for Tables::Locale::US::States.
+
+=back
+
+=head2 Options for subcommand ls
+
+=over
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand show
+
+=over
+
+=item B<--as>=I<s>
+
+Default value:
+
+ "aoaos"
+
+Valid values:
+
+ ["aoaos","aohos","csv"]
+
+=item B<--table>=I<s>*
+
+Tables::* module name without the prefix, e.g. Locale::US::States for Tables::Locale::US::States.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C tables tables
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete tables 'p/*/`tables`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/tables.conf>, F<~/tables.conf>, or F</etc/tables.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand info
+
+ table (see --table)
+
+=head2 Configuration for subcommand ls
+
+ detail (see --detail)
+
+=head2 Configuration for subcommand show
+
+ as (see --as)
+ table (see --table)
+
+=head1 ENVIRONMENT
+
+=head2 TABLES_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/tables.conf>
+
+F<~/tables.conf>
+
+F</etc/tables.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-Tables-CLI>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-Tables-CLI>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Tables-CLI>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Tables>
+
+L<td> from L<App::td>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

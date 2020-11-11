@@ -7,7 +7,7 @@ alien_ok 'Alien::Libxml2';
 
 if($^O eq 'MSWin32' && $Config{ccname} eq 'cl')
 {
-  eval q{
+  my $code = q{
     package Alien::Libxml2;
     sub libs_static
     {
@@ -17,6 +17,7 @@ if($^O eq 'MSWin32' && $Config{ccname} eq 'cl')
       $str;
     }
   };
+  eval $code;    ## no critic (BuiltinFunctions::ProhibitStringyEval)
   die $@ if $@;
 }
 

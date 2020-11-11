@@ -1134,6 +1134,7 @@ sub profile_default
 		knobBreadth    => 12,
 		tickAlign      => tka::Normal,
 		vertical       => 0,
+		scheme         => ss::Gauge,
 	}
 }
 
@@ -1211,14 +1212,44 @@ sub on_paint
 	}
 	$sb = ( $v ? $size[0] : $size[1]) / 6 unless $sb;
 	$sb = 2 unless $sb;
+
+	my ($br, $bh, $mw, $bw);
+	if ( $v ) {
+		$bh = $canvas-> font-> height;
+		$br = $size[1] - 2 * $bh - 2;
+	} else {
+		$mw = $canvas-> font-> width;
+		$bw = $mw + $self-> {borderWidth};
+		$br  = $size[0] - 2 * $bw - 2;
+	}
+
+	# do we have to remove small dashes?
+	my $remove_dashes_shorter_than = 0;
+	my $check_dashes = sub {
+		my ( $height, $set_threshold ) = @_;
+		my $lastval = -1_000_000;
+		for ( my $i = 1; $i < scalar @{$tval} - 1; $i++) {
+			next if $$tlen[$i] > $height || $$tlen[$i] < $remove_dashes_shorter_than;
+			my $val = int( abs( $$tval[$i] - $min) * ( $br - 3) / $range + .5);
+			$remove_dashes_shorter_than = $set_threshold, last if abs($val - $lastval) < 4;
+			$lastval = $val;
+		}
+	};
+	if ( $self->{scheme} == ss::Thermometer || $self->{scheme} == ss::Axis ) {
+		$check_dashes->(5, 5);
+		$check_dashes->(12, 12);
+	} elsif ( $self->{scheme} == ss::Axis ) {
+		$check_dashes->(3, 3);
+	} else {
+		$check_dashes->(12, 12);
+	}
+
 	if ( $v) {
-		my $bh = $canvas-> font-> height;
 		my $bw  = ( $size[0] - $sb) / 2;
 		return if $size[1] <= $kb * ($self-> {readOnly} ? 1 : 0) + 2 * $bh + 2;
 
 		$canvas-> translate((( $ta == 1) ? 1 : -1) * ( $bw - $sb - $kb), 0)
 			if $ta < 3;
-		my $br  = $size[1] - 2 * $bh - 2;
 		$canvas-> rect3d(
 			$bw, $bh, $bw + $sb - 1, $bh + $br - 1, 1,
 			@c3d, $cht[1]
@@ -1247,6 +1278,10 @@ sub on_paint
 			for ( $i = 0; $i < scalar @{$tval}; $i++) {
 				my $val = $bh + 1 + abs( $$tval[$i] - $min) * ( $br - 3) / $range;
 				if ( $$tlen[ $i]) {
+					next if
+						defined($remove_dashes_shorter_than) &&
+						$remove_dashes_shorter_than > $$tlen[$i] &&
+						$i != 0 && $i != $#$tval;
 					$canvas-> line(
 						$bw + $sb + 3, $val,
 						$bw + $sb + $$tlen[ $i] + 3, $val
@@ -1282,15 +1317,12 @@ sub on_paint
 			$canvas-> line($bw - 3, $jp[7]-1, $jp[6]-1, $jp[7]-1);
 		}
 	} else {
-		my $mw = $canvas-> font-> width;
-		my $bw = $mw + $self-> {borderWidth};
 		my $bh  = ( $size[1] - $sb) / 2;
 		my $fh = $canvas-> font-> height;
 		return if $size[0] <= $kb * ($self-> {readOnly} ? 1 : 0) + 2 * $bw + 2;
 
 		$canvas-> translate( 0, (( $ta == 1) ? -1 : 1) * ( $bh - $sb - $kb))
 			if $ta < 3;
-		my $br  = $size[0] - 2 * $bw - 2;
 		$canvas-> rect3d( $bw, $bh, $bw + $br - 1, $bh + $sb - 1, 1, @c3d, $cht[1]), return
 			unless $range;
 		my $val = $bw + 1 + abs( $self-> {value} - $min) * ( $br - 3) / $range;
@@ -1317,6 +1349,10 @@ sub on_paint
 			for ( $i = 0; $i < scalar @{$tval}; $i++) {
 				my $val = int( 1 + $bw + abs( $$tval[$i] - $min) * ( $br - 3) / $range + .5);
 				if ( $$tlen[ $i]) {
+					next if
+						defined($remove_dashes_shorter_than) &&
+						$remove_dashes_shorter_than > $$tlen[$i] &&
+						$i != 0 && $i != $#$tval;
 					$canvas-> line( $val, $bh + $sb + 3, $val, $bh + $sb + $$tlen[ $i] + 3)
 						if $ta & 1;
 					$canvas-> line( $val, $bh - 4, $val, $bh - 4 - $$tlen[ $i])
@@ -2282,11 +2318,12 @@ sub repaint_circle
 {
 	my $self = shift;
 	$self-> {singlePaint} = 1;
+	my $radius = $self->{radius} // 0;
 	my @clip = (
-		int( $self-> {circX} - $self-> {radius}),
-		int( $self-> {circY} - $self-> {radius}),
-		int( $self-> {circX} + $self-> {radius}),
-		int( $self-> {circY} + $self-> {radius}),
+		int( $self-> {circX} - $radius),
+		int( $self-> {circY} - $radius),
+		int( $self-> {circX} + $radius),
+		int( $self-> {circY} + $radius),
 	);
 	$self-> {expectedClip} = \@clip;
 	$self-> invalidate_rect( @clip[0..1], $clip[2]+1, $clip[3]+1);
@@ -2331,6 +2368,221 @@ sub buttonWidth
 	$self-> repaint;
 }
 
+package Prima::ProgressBar;
+use vars qw(@ISA);
+@ISA = qw(Prima::Widget);
+
+my $TIMER_SILENT_PERIOD = 2000;
+my $TIMER_ACTIVE_PERIOD = 10;
+my $TAB_STEP            = 10;
+my $INDENT              = 1;
+
+sub profile_default
+{
+	return {
+		%{$_[ 0]-> SUPER::profile_default},
+		buffered  => 1,
+		color     => cl::Green,
+		max       => 100,
+		min       => 0,
+		value     => 0,
+	}
+}
+
+sub init
+{
+	my $self = shift;
+	$self->{$_} = 0 for qw( value min max );
+	$self->{cache} = {
+		size    => [0,0],
+	};
+	$self->{tabmode} = 'silent';
+	$self->{tabpos}  = 0;
+	my %profile = $self-> SUPER::init(@_);
+	$self->$_($profile{$_}) for qw( min max value);
+
+	$self->insert( 'Prima::Timer' =>
+		name        => 'Timer',
+		delegations => ['Tick'],
+	);
+	$self-> next_tick if $self-> visible;
+
+	return %profile;
+}
+
+sub mask2icon
+{
+	my ( $mask, $color ) = @_;
+	my $bits = Prima::Image->new(
+		size => [ $mask-> size ],
+		type => im::Byte,
+		backColor => $color,
+	);
+	$bits-> clear;
+	my $icon = Prima::Icon-> create_combined($bits, $mask);
+	$icon->premultiply_alpha;
+	return $icon;
+}
+
+sub create_tab
+{
+	my ( $self, $x, $y ) = @_;
+
+	my $tab_mask = Prima::Image->new(
+		size      => [ int($x / 5 + .5), 1 ],
+		type      => im::Byte,
+		backColor => cl::White,
+	);
+	$tab_mask-> clear;
+	$tab_mask-> put_image(0,0,$tab_mask,rop::SrcOut | rop::DstAlpha | ( 128 << rop::DstAlphaShift ) );
+
+	my $tabend_mask = Prima::Image->new(
+		size => [ $y * 2, 1 ],
+		type => im::Byte,
+		color => cl::Black,
+	);
+	$tabend_mask->new_gradient(
+		palette => [cl::Black, cl::White, cl::Black],
+	)->bar(0, 0, $y * 2, 1, 1);
+	my $tabend = mask2icon( $tabend_mask, cl::Black );
+
+	$tab_mask-> put_image_indirect( $tabend_mask, 0, 0, $y, 0, $y, 1, $y, 1, rop::SrcOver | rop::ConstantColor | rop::Premultiply);
+	$tab_mask-> put_image_indirect( $tabend_mask, $tab_mask-> width - $y, 0, 0, 0, $y, 1, $y, 1, rop::SrcOver | rop::ConstantColor | rop::Premultiply);
+
+	$self->{cache}->{tab}  = mask2icon( $tab_mask, cl::White );
+	$self->{cache}->{tabx} = $tab_mask-> width;
+}
+
+sub recalc_images
+{
+	my ( $self, $x, $y ) = @_;
+
+	$x ||= 1;
+	$y ||= 1;
+	my $cache = $self->{cache};
+	return if $cache->{size}->[0] == $x && $cache->{size}->[1] == $y;
+
+	my $recalc_x = $cache->{size}->[1] != $y;
+	if ( !$recalc_x && $cache->{size}->[0] != $x ) {
+		my $tabx = $x / 5;
+		my $diff = abs( $cache->{tabx} - $tabx ) / $tabx;
+		$recalc_x = 1 if $diff < 0.8 || $diff > 1.2;
+	}
+
+	$self->create_tab( $x, $y ) if $recalc_x;
+}
+
+sub next_tick
+{
+	my $self = shift;
+
+	my $timer = $self-> Timer;
+	if ( $self->{tabmode} eq 'silent' ) {
+		if ( $timer-> get_active ) {
+			$self->{tabmode} = 'show';
+			$self->{tabpos}  = - $self->{cache}->{tabx};
+			$timer->timeout( $TIMER_ACTIVE_PERIOD );
+		} else {
+			$timer->timeout( $TIMER_SILENT_PERIOD );
+		}
+		$timer->start;
+	} elsif ( $self->{tabpos} < $self-> width ) {
+		$self->{tabpos} += $TAB_STEP;
+		$self->repaint;
+	} else {
+		$self->{tabmode} = 'silent';
+		$timer->timeout( $TIMER_SILENT_PERIOD );
+		$timer->start;
+		$self->repaint;
+	}
+}
+
+sub on_size
+{
+	my ( $self, $ox, $oy, $x, $y ) = @_;
+	$self->recalc_images( $x, $y );
+}
+
+sub on_hide
+{
+	my $self = shift;
+	$self->Timer1->stop;
+	$self->{tabmode} = 'silent';
+}
+
+sub on_show
+{
+	shift->next_tick;
+}
+
+sub on_paint
+{
+	my ($self,$canvas) = @_;
+
+	my ($xa1, $xa2, $xb1, $xb2, $y1, $y2);
+
+	my @sz = $self-> size;
+	my $indent = $INDENT;
+	my $range  = $self->{max} - $self->{min};
+	$y1 = $indent;
+	$y2 = $sz[1] - 1;
+	if ( $self->{value} == $self->{min} || $sz[0] == 0 || $sz[1] == 0 || $range == 0) {
+		$xa1 = $xa2 = -1;
+	} else {
+		$xa1 = $indent;
+		$xa2 = ( $self->{value} == $self->{max} ) ?
+			$sz[0] - $indent :
+			(( $sz[0] - $indent * 2 ) * $self->{value} / $range + $indent);
+	}
+	if ( $self->{value} == $self->{max} || $sz[0] == 0 || $sz[1] == 0 || $range == 0) {
+		$xb1 = $xb2 = -1;
+	} else {
+		$xb1 = ( $xa2 < 0 ) ? $indent : ( $xa2 + 1 );
+		$xb2 = $sz[0] - $indent;
+	}
+
+	$canvas-> new_gradient(
+		palette => [ cl::Black, $self->color, cl::White ],
+		poly    => [ 0, 0.25, 1, 0.75, 0.75, 0.25 + 0.5 * 0.75 ],
+	)-> bar( $xa1, $y1, $xa2, $y2 ) if $xa1 > 0;
+
+	$canvas-> new_gradient(
+		palette => [ cl::Black, cl::Gray, cl::White ],
+		poly    => [ 0, 0.25, 1, 0.75, 0.75, 0.25 + 0.5 * 0.75 ],
+	)-> bar( $xb1, $y1, $xb2, $y2 ) if $xb1 > 0;
+
+	$canvas-> color(cl::Gray);
+	$canvas-> rectangle( 0, 0, $sz[0] - 1, $sz[1] - 1);
+
+	if ( $self->{tabmode} eq 'show' && $xa1 > 0) {
+		$canvas->clipRect(0, 0, $xa2, $sz[1]);
+		$canvas->put_image( $self->{tabpos}, $_, $self->{cache}->{tab}, rop::SrcOver ) for 0 .. $sz[1];
+	}
+}
+
+sub set_bounds
+{
+	my ( $self, $min, $max) = @_;
+	$max = $min if $max < $min;
+	( $self-> { min}, $self-> { max}) = ( $min, $max);
+	$self-> value( $max) if $self-> {value} > $max;
+	$self-> value( $min) if $self-> {value} < $min;
+}
+
+sub value
+{
+	return $_[0]-> {value} unless $#_;
+	my $v = $_[1] < $_[0]-> {min} ? $_[0]-> {min} : ($_[1] > $_[0]-> {max} ? $_[0]-> {max} : $_[1]);
+	return if $v == $_[0]->{value};
+	$_[0]-> {value} = $v;
+	$_[0]-> repaint;
+}
+
+sub min       {($#_)?$_[0]-> set_bounds($_[1], $_[0]-> {'max'})  : return $_[0]-> {min};}
+sub max       {($#_)?$_[0]-> set_bounds($_[0]-> {'min'}, $_[1])  : return $_[0]-> {max};}
+
+sub Timer_Tick { shift-> next_tick }
+
 1;
 
 =pod
@@ -2352,6 +2604,7 @@ This property unites the following set of class hierarchies:
 	Prima::SpinEdit
 
 	Prima::Gauge
+	Prima::PrigressBar
 
 	Prima::AbstractSlider
 		Prima::Slider
@@ -2396,6 +2649,10 @@ Called when the user finished the mouse transaction.
 
 =head1 Prima::SpinButton
 
+=for podview <img src="spinbutton.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/spinbutton.gif">
+
 A rectangular spin button, consists of three parts, divided horizontally.
 The upper and the lower parts are push-buttons associated with singular
 increment and decrement commands. The middle part, when dragged by mouse,
@@ -2404,11 +2661,19 @@ of the mouse pointer.
 
 =head1 Prima::AltSpinButton
 
+=for podview <img src="altspinbutton.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/altspinbutton.gif">
+
 A rectangular spin button, consists of two push-buttons, associated
 with singular increment and decrement command. Comparing to C<Prima::SpinButton>,
 the class is less functional but has more stylish look.
 
 =head1 Prima::SpinEdit
+
+=for podview <img src="altspinedit.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/altspinedit.gif">
 
 The class is a numerical input line, paired with a spin button.
 The input line value can be change three ways - either as a direct
@@ -2527,6 +2792,10 @@ Called when C<value> is changed.
 
 =head1 Prima::Gauge
 
+=for podview <img src="gauge.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/gauge.gif">
+
 An output-only widget class, displays a progress bar and an eventual percentage string.
 Useful as a progress indicator.
 
@@ -2606,6 +2875,49 @@ Simultaneously sets both C<min> and C<max> values.
 
 Converts integer VALUE into a string format and puts into REF scalar reference.
 Default stringifying conversion is identical to C<sprintf("%2d%%")> one.
+
+=back
+
+=head1 Prima::ProgressBar
+
+=for podview <img src="progressbar.png" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/progressbar.png">
+
+Displays a progress bar
+
+=head2 Properties
+
+=over
+
+=item max INTEGER
+
+Sets the upper limit for C<value>.
+
+Default value: 100.
+
+=item min INTEGER
+
+Sets the lower limit for C<value>.
+
+Default value: 0
+
+=item value INTEGER
+
+Selects integer value between C<min> and C<max>, reflected in the progress bar and
+eventual text.
+
+Default value: 0.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item set_bounds MIN, MAX
+
+Simultaneously sets both C<min> and C<max> values.
 
 =back
 
@@ -2733,6 +3045,10 @@ this notification is a substitute to C<Change>.
 
 =head1 Prima::Slider
 
+=for podview <img src="slider.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/slider.gif">
+
 Presents a linear sliding bar, movable along a linear shaft.
 
 =head2 Properties
@@ -2813,6 +3129,10 @@ Offset in pixels along the shaft axis.
 =back
 
 =head1 Prima::CircularSlider
+
+=for podview <img src="circularslider.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/circularslider.gif">
 
 Presents a slider widget with the dial and two increment / decrement buttons.
 The tick marks are drawn around the perimeter of the dial; current value

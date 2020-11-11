@@ -5,7 +5,7 @@ package Alien::XPA;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.09';
 
 use base qw( Alien::Base );
 
@@ -29,7 +29,7 @@ Alien::XPA - Find or Build libxpa
 
 =head1 VERSION
 
-version 0.01
+version 0.09
 
 =head1 DESCRIPTION
 

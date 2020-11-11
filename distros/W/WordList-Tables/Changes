@@ -1,3 +1,15 @@
+0.003   2020-11-10  Released-By: PERLANCAR
+
+        - Allow loading a dynamic table.
+
+
+0.002   2020-06-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Show examples of using with wordlist CLI in Synopsis.
+
+
 0.001   2020-06-01  Released-By: PERLANCAR
 
         - First release.

@@ -1,3 +1,6 @@
+1.4.10    30.10.2020
+            - attempt to fix exceptions in musl environments (e.g. alipine linux)
+            - attempt to fix exceptions for windows build, single executable test
 1.4.9    12.10.2020
             - require Alien::cmake3 to build
 1.4.8    09.10.2020

@@ -18,12 +18,13 @@ name: Template-Plugin-RPM2
 provides:
   Template::Plugin::RPM2:
     file: lib/Template/Plugin/RPM2.pm
-    version: v1.3.0
+    version: v1.3.2
 requires:
   RPM2: '0'
   Template: '2'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.3.0
+  repository: git://github.com/davorg/template-plugin-rpm2.git
+version: v1.3.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

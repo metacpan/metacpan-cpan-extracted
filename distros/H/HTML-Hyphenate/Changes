@@ -1,5 +1,12 @@
 Revision history for Perl extension HTML::Hyphenate.
 
+v1.1.4 Tue Nov 10 18:24:07 UTC 2020
+    - minimum perl is now 5.16 per Mojolicious requirement
+    - fix: handle documents starting with a doctype RT#133708
+    - test: improved test coverage RT#127977
+    - test: add compile test for script RT#127976
+    - chore: add bitbucket pipelines RT#130645
+
 v1.1.3 Tue Apr  2 07:28:44 UTC 2019
 	- chore: ignore Built.bat from manifest
 

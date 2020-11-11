@@ -9,9 +9,9 @@ use Test::NoTabs;
 my @files = (
     'lib/Alien/XPA.pm',
     't/00-compile.t',
+    't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/alien.t',
-    't/alien.t.orig'
+    't/alien.t'
 );
 
 notabs_ok($_) foreach @files;

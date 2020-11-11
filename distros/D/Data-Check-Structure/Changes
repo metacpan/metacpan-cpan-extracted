@@ -1,4 +1,9 @@
-0.04    2017-07-18 (PERLANCAR)
+0.050   2020-11-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Set $errstr for more details.
+
+
+0.04    2017-07-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,19 +11,19 @@
 	  using warnings.
 
 
-0.03    2014-07-14 (SHARYANTO)
+0.03    2014-07-14  Released-By: SHARYANTO
 
         - Add functions: is_hoa, is_hoaos, is_hoh, is_hohos.
 
 
-0.02    2014-07-10 (SHARYANTO)
+0.02    2014-07-10  Released-By: SHARYANTO
 
         - [Bugfix] forgot to pass options to is_hos().
 
         - Small optimization.
 
 
-0.01    2014-07-10 (SHARYANTO) - Still so happy it's not as bad as previously diagnosed!
+0.01    2014-07-10  Released-By: SHARYANTO; Note: Still so happy it's not as bad as previously diagnosed!
 
         - First release, first released when writing formatter for
           Perinci::CmdLine::Lite.

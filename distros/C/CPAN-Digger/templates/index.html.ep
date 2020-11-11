@@ -1,0 +1,43 @@
+% layout 'main', title => 'CPAN::Digger';
+<h1>CPAN Digger</h1>
+
+<p>
+The most recently uploaded and indexed distributions.
+</p>
+
+<style>
+td {
+   padding-left: 20px;
+}
+</style>
+
+<table>
+    <tr>
+      <th>Distribution</th>
+      <th>VCS</th>
+      <th>CI</th>
+      <th>Author</th>
+    </tr>
+<% for my $dist (@$distributions) { %>
+    <tr>
+        <td><a href="/dist/<%= $dist->{distribution} %>"><%= $dist->{distribution} %></a></td>
+        <td><% if (not $dist->{vcs_url}) { %>NO VCS<% } %></td>
+        <td><% if (not $dist->{has_ci}) { %>NO CI<% } %></td>
+        <td><a href="https://metacpan.org/author/<%= $dist->{author} %>"><%= $dist->{author} %></a></td>
+    </tr>
+<% } %>
+</table>
+
+<ul>
+    <li>Help module authors to ensure that each module that has a public Version Control System (VCS) also include a link to it in the meta files.</li>
+    <li>Help module authors to link to the preferred bug tracking system.</li>
+    <li>Help the projects to have a Continuous Integration (CI) system connected to their VCS.</li>
+    <li>Help module authors to add a license field to the meta files.</li>
+    <li>Help with the new (?) <b>contributing</b> file.</li>
+    <li>Suggest to add a Travis-CI badge to the README.md</li>
+    <li>Look at test coverage reports.</li>
+    <li>Maybe: Check if there are xt test?</li>
+    <li>Maybe: Check the Kwaletee metrics</li>
+</ul>
+
+

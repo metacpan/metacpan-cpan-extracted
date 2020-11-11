@@ -15,7 +15,7 @@ name: Data-Table-Text
 provides:
   Data::Table::Text:
     file: lib/Data/Table/Text.pm
-    version: '20200831'
+    version: '20201030'
 requires:
   B: '0'
   Carp: '0'
@@ -37,6 +37,8 @@ requires:
   perl: v5.26.1
   utf8: '0'
 resources:
+  bugtracker: https://github.com/philiprbrenan/DataTableText/issues
   license: http://dev.perl.org/licenses/
-version: '20200831'
+  repository: https://github.com/philiprbrenan/DataTableText
+version: '20201030'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

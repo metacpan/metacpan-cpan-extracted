@@ -1,5 +1,8 @@
 Revision history for Wasm},
 
+0.21      2020-11-06 03:57:12 -0700
+  - Require Alien::wasmtime 0.15 or wasmtime 0.21.0 (gh#96)
+
 0.20      2020-10-01 05:35:43 -0600
   - Added gc method to Wasm::Wasmtime::Store class (gh#91)
   - Added serialize and deserialize methods to Wasm::Wasmtime::Module (gh#91)

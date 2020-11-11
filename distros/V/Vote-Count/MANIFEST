@@ -9,6 +9,7 @@ Makefile.PL
 README
 README.md
 buildpod.pl
+data_format_proposal.txt
 dist.ini
 example/star.pl
 example/start.pl
@@ -19,6 +20,7 @@ lib/Vote/Count/Approval.pm
 lib/Vote/Count/Borda.pm
 lib/Vote/Count/Common.pm
 lib/Vote/Count/Floor.pm
+lib/Vote/Count/Floor.pm.bak
 lib/Vote/Count/IRV.pm
 lib/Vote/Count/Log.pm
 lib/Vote/Count/Matrix.pm
@@ -112,6 +114,7 @@ t/data/twobeatirv.txt
 t/data/twobeatirv_redacted.txt
 t/data/uncompressed.txt
 t/floor.t
+t/floor.t.bak
 t/irv.t
 t/log.t
 t/matrix.t

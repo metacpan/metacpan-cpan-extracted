@@ -9,6 +9,7 @@ use Test2::Tools::Compare;
 use Test2::Tools::Exception;
 use Test2::Tools::Explain;
 
+use List::Util   qw( max );
 use POSIX        qw( ceil );
 use Scalar::Util qw( looks_like_number );
 use Time::HiRes  qw( time sleep );
@@ -25,6 +26,8 @@ my $schema       = CDTest->init_schema;
 my $track_rs     = $schema->resultset('Track')->search({ position => 1 });
 my $track1_count = $track_rs->count;
 
+$Data::Dumper::Maxdepth = 1;
+
 # This tests that $rs calls aren't in boolean context.  CDBICompat has this
 # strange idea that "if ($rs)" means "actively run a $rs->count on the DB".
 {
@@ -38,7 +41,7 @@ my $track1_count = $track_rs->count;
 }
 
 subtest 'DBIC Processing (+ process_past_max)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -49,7 +52,11 @@ subtest 'DBIC Processing (+ process_past_max)' => sub {
             my ($bc, $rs) = @_;
             isa_ok($rs, ['DBIx::Class::ResultSet'], '$rs');
             $calls++;
-            note explain $bc->_loop_state if $BATCHCHUNK_TEST_DEBUG;
+
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
         process_past_max  => 1,
@@ -74,12 +81,14 @@ subtest 'DBIC Processing (+ process_past_max)' => sub {
     # it'll use that chunk immediately to the PPM point.  Thus, the +1 here is
     # before the division.
     my $right_calls = ceil( ($range + 1) / $CHUNK_SIZE);
+
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $right_calls, 'Right number of calls');
+    cmp_ok($calls,   '==', $right_calls,           'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'DBIC Processing + single_rows (+ rsc)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -91,7 +100,11 @@ subtest 'DBIC Processing + single_rows (+ rsc)' => sub {
             my ($bc, $result) = @_;
             isa_ok($result, ['DBIx::Class::Row'], '$result');
             $calls++;
-            note explain $bc->_loop_state if $BATCHCHUNK_TEST_DEBUG;
+
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
         single_rows       => 1,
@@ -108,12 +121,12 @@ subtest 'DBIC Processing + single_rows (+ rsc)' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $track1_count, 'Right number of calls');
+    cmp_ok($calls,   '==', $track1_count,          'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'DIY Processing (+ process_past_max)' => sub {
-    my $calls = 0;
-    my $max_range = 0;
+    my ($calls, $max_end, $max_range) = (0, 0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -124,6 +137,7 @@ subtest 'DIY Processing (+ process_past_max)' => sub {
             my ($bc, $start, $end) = @_;
             ok(looks_like_number $start,  '$start is a number');
             ok(looks_like_number $end,    '$end   is a number');
+            $max_end = max($max_end, $end);
             $calls++;
 
             note explain { start => $start, end => $end } if $BATCHCHUNK_TEST_DEBUG;
@@ -142,14 +156,14 @@ subtest 'DIY Processing (+ process_past_max)' => sub {
 
     # Process
     my $right_calls = ceil( ($range + 1) / $CHUNK_SIZE);  # see PPM note on the first subtest
+
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $right_calls, 'Right number of calls');
+    cmp_ok($calls,   '==', $right_calls,           'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'process_past_max + min_chunk_percent' => sub {
-    my $calls     = 0;
-    my $max_count = 0;
-    my $max_id    = 0;
+    my ($calls, $max_end, $max_count) = (0, 0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -161,9 +175,10 @@ subtest 'process_past_max + min_chunk_percent' => sub {
             isa_ok($rs, ['DBIx::Class::ResultSet'], '$rs');
             $calls++;
 
+            # Purposely using older loop state hashref calls to check for backwards-compatibility
             my $ls     = $bc->_loop_state;
-            $max_count = $ls->{chunk_count} if $ls->{chunk_count} > $max_count;
-            $max_id    = $ls->{end}         if $ls->{end}         > $max_id;
+            $max_end   = max($max_end,   $ls->{end});
+            $max_count = max($max_count, $ls->{chunk_count});
 
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
@@ -197,12 +212,12 @@ subtest 'process_past_max + min_chunk_percent' => sub {
     $batch_chunker->execute;
     cmp_ok($calls,      '<',  $multiplier_range, 'Fewer coderef calls than normal');
     cmp_ok($calls,      '>=', $max_chunk_calls,  'More coderef calls than minimum threshold');
+    cmp_ok($max_end,    '==', $real_max_id,      'Final chunk ends at _real_ max_id');
     cmp_ok($max_count,  '<=', $max_chunk_count,  'Did not exceed max chunk percentage');
-    cmp_ok($max_id,     '>=', $real_max_id,      'Looked at all of the IDs');
 };
 
 subtest 'Automatic execution (DBIC Processing + single_rows + rsc)' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     my $batch_chunker = DBIx::BatchChunker->construct_and_execute(
         chunk_size => $CHUNK_SIZE,
@@ -213,7 +228,11 @@ subtest 'Automatic execution (DBIC Processing + single_rows + rsc)' => sub {
             my ($bc, $result) = @_;
             isa_ok($result, ['DBIx::Class::Row'], '$result');
             $calls++;
-            note explain $bc->_loop_state if $BATCHCHUNK_TEST_DEBUG;
+
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
 
         single_rows       => 1,
@@ -221,16 +240,16 @@ subtest 'Automatic execution (DBIC Processing + single_rows + rsc)' => sub {
     );
 
     isa_ok($batch_chunker, ['DBIx::BatchChunker'], '$bc');
-    cmp_ok($calls, '==', $track1_count, 'Right number of calls');
+    cmp_ok($calls,   '==', $track1_count,          'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 # An in-memory SQLite DB is going to be far too fast for any sort of CRUD access, so
 # we'd can freely control it with sleep.
 
 subtest 'Runtime targeting (too fast)' => sub {
-    my $calls    = 0;
+    my ($calls, $max_end, $max_time) = (0, 0, 0);
     my $max_size = $CHUNK_SIZE;
-    my $max_time = 0;
     my $chunk_size_changes = 0;
 
     my $batch_chunker = DBIx::BatchChunker->construct_and_execute(
@@ -244,12 +263,14 @@ subtest 'Runtime targeting (too fast)' => sub {
             $calls++;
             sleep 0.05;
 
-            my $ls = $bc->_loop_state;
-            if ($ls->{chunk_size} > $max_size) {
-                $max_size = $ls->{chunk_size};
+            my $ls = $bc->loop_state;
+            if ($ls->chunk_size > $max_size) {
+                $max_size = $ls->chunk_size;
                 $chunk_size_changes++;
             }
-            $max_time = $ls->{prev_runtime} if $ls->{prev_runtime} && $ls->{prev_runtime} > $max_time;
+
+            $max_end  = max($max_end, $ls->end);
+            $max_time = $ls->prev_runtime if $ls->prev_runtime && $ls->prev_runtime > $max_time;
 
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
@@ -261,16 +282,16 @@ subtest 'Runtime targeting (too fast)' => sub {
     my $multiplier_range = ceil($range / $CHUNK_SIZE);
     my $right_changes    = ceil($calls / 5) - 1;
 
-    cmp_ok($calls,              '<',  $multiplier_range, 'Fewer coderef calls than normal');
-    cmp_ok($max_time,           '<',  0.5,               'Never exceeded target time');
-    cmp_ok($max_size,           '>',  $CHUNK_SIZE,       'Larger chunk size');
-    cmp_ok($chunk_size_changes, '==', $right_changes,    'Right number of chunk size changes');
+    cmp_ok($calls,              '<',  $multiplier_range,      'Fewer coderef calls than normal');
+    cmp_ok($max_end,            '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+    cmp_ok($max_time,           '<',  0.5,                    'Never exceeded target time');
+    cmp_ok($max_size,           '>',  $CHUNK_SIZE,            'Larger chunk size');
+    cmp_ok($chunk_size_changes, '==', $right_changes,         'Right number of chunk size changes');
 };
 
 subtest 'Runtime targeting (too slow)' => sub {
-    my $calls    = 0;
+    my ($calls, $max_end, $min_time) = (0, 0, 999);
     my $min_size = $CHUNK_SIZE;
-    my $min_time = 999;
     my $chunk_size_changes = 0;
 
     my $batch_chunker = DBIx::BatchChunker->construct_and_execute(
@@ -284,12 +305,14 @@ subtest 'Runtime targeting (too slow)' => sub {
             $calls++;
             sleep 0.25;
 
-            my $ls = $bc->_loop_state;
-            if ($ls->{chunk_size} < $min_size) {
-                $min_size = $ls->{chunk_size};
+            my $ls = $bc->loop_state;
+            if ($ls->chunk_size < $min_size) {
+                $min_size = $ls->chunk_size;
                 $chunk_size_changes++;
             }
-            $min_time = $ls->{prev_runtime} if $ls->{prev_runtime} && $ls->{prev_runtime} < $min_time;
+
+            $max_end  = max($max_end, $ls->end);
+            $min_time = $ls->prev_runtime if $ls->prev_runtime && $ls->prev_runtime < $min_time;
 
             note explain $ls if $BATCHCHUNK_TEST_DEBUG;
         },
@@ -301,14 +324,15 @@ subtest 'Runtime targeting (too slow)' => sub {
     my $multiplier_range = ceil($range / $CHUNK_SIZE);
     my $right_calls      = $range - $CHUNK_SIZE + 1;
 
-    cmp_ok($calls,    '>',  $multiplier_range, 'Greater coderef calls than normal');
-    cmp_ok($calls,    '==', $right_calls,      'Right coderef calls');
-    cmp_ok($min_time, '>',  0.05,              'Always exceeded target time');
-    cmp_ok($min_size, '==', 1,                 'Right chunk size');
+    cmp_ok($calls,    '>',  $multiplier_range,      'Greater coderef calls than normal');
+    cmp_ok($calls,    '==', $right_calls,           'Right coderef calls');
+    cmp_ok($max_end,  '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
+    cmp_ok($min_time, '>',  0.05,                   'Always exceeded target time');
+    cmp_ok($min_size, '==', 1,                      'Right chunk size');
 };
 
 subtest 'Retry testing' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -318,8 +342,12 @@ subtest 'Retry testing' => sub {
         coderef     => sub {
             my ($bc, $rs) = @_;
             isa_ok($rs, ['DBIx::Class::ResultSet'], '$rs');
-            note explain $bc->_loop_state if $BATCHCHUNK_TEST_DEBUG;
             $calls++;
+
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            note explain $ls if $BATCHCHUNK_TEST_DEBUG;
             die "Don't wanna process right now" if $calls % 3;  # fail 2/3rds of the calls
         },
 
@@ -338,11 +366,12 @@ subtest 'Retry testing' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '==', $multiplier_range * 3, 'Right number of calls');
+    cmp_ok($calls,   '==', $multiplier_range * 3,  'Right number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 subtest 'Retry testing + single_rows' => sub {
-    my $calls = 0;
+    my ($calls, $max_end) = (0, 0);
 
     # Constructor
     my $batch_chunker = DBIx::BatchChunker->new(
@@ -352,8 +381,13 @@ subtest 'Retry testing + single_rows' => sub {
         coderef     => sub {
             my ($bc, $result) = @_;
             isa_ok($result, ['DBIx::Class::Row'], '$result');
-            note explain $bc->_loop_state if $BATCHCHUNK_TEST_DEBUG;
             $calls++;
+
+            my $ls = $bc->loop_state;
+            $max_end = max($max_end, $ls->end);
+
+            note explain $ls if $BATCHCHUNK_TEST_DEBUG;
+
             # fail one of the rows, which will restart the whole chunk
             die "Don't wanna process right now" unless $calls % ($CHUNK_SIZE + 1);
         },
@@ -374,7 +408,8 @@ subtest 'Retry testing + single_rows' => sub {
 
     # Process
     $batch_chunker->execute;
-    cmp_ok($calls, '>=', $rightish_calls, 'Rightish number of calls');
+    cmp_ok($calls,   '>=', $rightish_calls,        'Rightish number of calls');
+    cmp_ok($max_end, '==', $batch_chunker->max_id, 'Final chunk ends at max_id');
 };
 
 ############################################################

@@ -44,6 +44,12 @@ _dmarc.dnslookup.com TXT "v=DMARC1; p=reject; sp=reject;"
 selector._bimi.dnslookup.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
 dnslookup.com TXT "v=spf1 ipc:1.2.3.4 -all"
 
+dnslookupcname.com A 1.2.3.4
+_dmarc.dnslookupcname.com TXT "v=DMARC1; p=reject; sp=reject;"
+selector._bimi.dnslookupcname.com CNAME cnametarget.dnslookupcname.com.
+cnametarget.dnslookupcname.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+dnslookupcname.com TXT "v=spf1 ipc:1.2.3.4 -all"
+
 recordfallback.com A 1.2.3.4
 _dmarc.recordfallback.com TXT "v=DMARC1; p=reject; sp=reject;"
 default._bimi.recordfallback.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"

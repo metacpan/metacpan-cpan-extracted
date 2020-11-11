@@ -4,7 +4,7 @@ use warnings;
 
 use base 'RxPerl::Observable';
 
-our $VERSION = "v6.0.2";
+our $VERSION = "v6.0.3";
 
 sub new {
     my ($class) = @_;

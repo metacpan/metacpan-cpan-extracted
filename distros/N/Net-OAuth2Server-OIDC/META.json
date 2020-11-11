@@ -25,11 +25,11 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Class::Method::Modifiers" : "0",
             "Digest::SHA" : "0",
             "JSON::WebToken" : "0",
             "MIME::Base64" : "0",
-            "Net::OAuth2Server" : "0",
-            "parent" : "0",
+            "Role::Tiny" : "0",
             "perl" : "5.008"
          }
       },
@@ -46,7 +46,7 @@
          "web" : "https://github.com/ap/Net-OAuth2Server-OIDC"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2020

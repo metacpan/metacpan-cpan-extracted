@@ -41,7 +41,7 @@
 #endif
 
 #ifndef HAVE_UNOP_AUX
-typedef struct {
+typedef struct UNOP_with_IV {
   UNOP baseop;
   IV   iv;
 } UNOP_with_IV;
@@ -282,14 +282,14 @@ typedef IV SLOTOFFSET;
 
 typedef struct ClassMeta ClassMeta;
 
-typedef struct {
+typedef struct SlotMeta {
   SV *name;
   ClassMeta *class;
   SV *defaultsv;
   SLOTOFFSET slotix;
 } SlotMeta;
 
-typedef struct {
+typedef struct MethodMeta {
   SV *name;
   ClassMeta *class;
   ClassMeta *role;   /* set if inherited from a role */
@@ -301,27 +301,31 @@ enum MetaType {
   METATYPE_ROLE,
 };
 
+enum ReprType {
+  REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
+  REPR_HASH,         /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
+  REPR_MAGIC,        /* instances store slot AV via magic; superconstructor must be foreign */
+
+  REPR_AUTOSELECT,   /* pick one of the above depending on foreign_new and SvTYPE()==SVt_PVHV */
+};
+
 /* Metadata about a class or role */
 struct ClassMeta {
-  enum MetaType type;
+  enum MetaType type : 8;
+  enum ReprType repr : 8;
+  bool sealed;
+
+  SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
+  SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
+
   SV *name;
   HV *stash;
   ClassMeta *supermeta;
   AV *pending_submeta; /* NULL, or AV containing raw ClassMeta pointers to subclasses pending seal */
   AV *roles;           /* each elem is a raw pointer directly to a RoleEmbedding whose type == METATYPE_ROLE */
-  bool sealed;
-  SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
-  SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
   AV *slots;           /* each elem is a raw pointer directly to a SlotMeta */
   AV *methods;         /* each elem is a raw pointer directly to a MethodMeta */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
-  enum {
-    REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
-    REPR_HASH,         /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
-    REPR_MAGIC,        /* instances store slot AV via magic; superconstructor must be foreign */
-
-    REPR_AUTOSELECT,   /* pick one of the above depending on foreign_new and SvTYPE()==SVt_PVHV */
-  } repr;
   CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
   CV *initslots;       /* the INITSLOTS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
@@ -331,7 +335,7 @@ struct ClassMeta {
 };
 
 /* Metadata about the embedding of a role into a class */
-typedef struct {
+typedef struct RoleEmbedding {
   SV *embeddingsv;
   struct ClassMeta *rolemeta;
   struct ClassMeta *classmeta;
@@ -362,7 +366,7 @@ static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
 static MGVTBL vtbl_slotsav = {};
 
 #define get_obj_slotsav(self, repr, create)  S_obj_get_slotsav(aTHX_ self, repr, create)
-static SV *S_obj_get_slotsav(pTHX_ SV *self, U8 repr, bool create)
+static SV *S_obj_get_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
 {
   SV *rv = SvRV(self);
 
@@ -646,7 +650,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   intro_my();
 
-  U8 repr = meta->repr;
+  enum ReprType repr = meta->repr;
 
   ops = op_append_list(OP_LINESEQ, ops,
     newMETHSTARTOP(OPf_MOD |
@@ -1341,7 +1345,9 @@ static void S_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *role
       croak("Method '%" SVf "' clashes with the one provided by role %" SVf,
         SVfARG(mname), SVfARG(rolemeta->name));
 
-    GvCV_set(*gvp, embed_cv(GvCV((GV *)HeVAL(he)), embedding));
+    CV *newcv;
+    GvCV_set(*gvp, newcv = embed_cv(GvCV((GV *)HeVAL(he)), embedding));
+    CvGV_set(newcv, *gvp);
   }
 
   nmethods = av_count(rolemeta->requiremethods);
@@ -2080,6 +2086,8 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
       PADNAME *outside_pn = PadnamelistARRAY(outside_pnl)[PARENT_PAD_INDEX(pn)];
 
       PARENT_PAD_INDEX_set(pn, PARENT_PAD_INDEX(outside_pn));
+      if(!PadnameOUTER(outside_pn))
+        PadnameOUTER_off(pn);
     }
 
     CvOUTSIDE(PL_compcv)     = CvOUTSIDE(outside);

@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2020-09-12 15:18:34 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2020-10-08 18:32:41 UTC.
 
 on runtime => sub {
     requires 'Carp' => '1.38';
@@ -9,6 +9,7 @@ on runtime => sub {
     requires 'List::Util' => '1.45';
     requires 'Module::Loader' => '0';
     requires 'Moo' => '0';
+    requires 'Ref::Util' => '0';
     requires 'Safe::Isa' => '1.000005';
     requires 'Scalar::Util' => '0';
     requires 'String::CamelCase' => '0.02';

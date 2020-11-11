@@ -2,8 +2,8 @@ NAME
     App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 VERSION
-    This document describes version 0.006 of App::HTTPTinyUtils (from Perl
-    distribution App-HTTPTinyUtils), released on 2019-04-15.
+    This document describes version 0.008 of App::HTTPTinyUtils (from Perl
+    distribution App-HTTPTinyUtils), released on 2020-11-11.
 
 SYNOPSIS
 DESCRIPTION
@@ -16,6 +16,8 @@ DESCRIPTION
     *   http-tiny-customretry
 
     *   http-tiny-plugin
+
+    *   http-tiny-plugin-every
 
     *   http-tiny-retry
 
@@ -70,7 +72,7 @@ FUNCTIONS
 
      http_tiny_cache(%args) -> [status, msg, payload, meta]
 
-    Perform request with HTTP::Tiny::Cache.
+    Perform request(s) with HTTP::Tiny::Cache.
 
     Like "http_tiny", but uses HTTP::Tiny::Cache instead of HTTP::Tiny. See
     the documentation of HTTP::Tiny::Cache on how to set cache period.
@@ -118,7 +120,7 @@ FUNCTIONS
 
      http_tiny_customretry(%args) -> [status, msg, payload, meta]
 
-    Perform request with HTTP::Tiny::CustomRetry.
+    Perform request(s) with HTTP::Tiny::CustomRetry.
 
     Like "http_tiny", but uses HTTP::Tiny::CustomRetry instead of
     HTTP::Tiny. See the documentation of HTTP::Tiny::CustomRetry for more
@@ -167,7 +169,7 @@ FUNCTIONS
 
      http_tiny_plugin(%args) -> [status, msg, payload, meta]
 
-    Perform request with HTTP::Tiny::Plugin.
+    Perform request(s) with HTTP::Tiny::Plugin.
 
     Like "http_tiny", but uses HTTP::Tiny::Plugin instead of HTTP::Tiny. See
     the documentation of HTTP::Tiny::Plugin for more details.
@@ -210,12 +212,65 @@ FUNCTIONS
 
     Return value: (any)
 
+  http_tiny_plugin_every
+    Usage:
+
+     http_tiny_plugin_every(%args) -> [status, msg, payload, meta]
+
+    Perform request(s) with HTTP::Tiny::Plugin every N seconds, log result
+    in a directory.
+
+    Like "http_tiny_plugin", but perform the request every N seconds and log
+    the result in a directory.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   attributes => *hash*
+
+        Pass attributes to HTTP::Tiny constructor.
+
+    *   content => *str*
+
+    *   dir* => *dirname*
+
+    *   every* => *duration*
+
+    *   headers => *hash*
+
+    *   ignore_errors => *bool*
+
+        Ignore errors.
+
+        Normally, when given multiple URLs, the utility will exit after the
+        first non-success response. With "ignore_errors" set to true, will
+        just log the error and continue. Will return with the last error
+        response.
+
+    *   method => *str* (default: "GET")
+
+    *   raw => *bool*
+
+    *   urls* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   http_tiny_retry
     Usage:
 
      http_tiny_retry(%args) -> [status, msg, payload, meta]
 
-    Perform request with HTTP::Tiny::Retry.
+    Perform request(s) with HTTP::Tiny::Retry.
 
     Like "http_tiny", but uses HTTP::Tiny::Retry instead of HTTP::Tiny. See
     the documentation of HTTP::Tiny::Retry for more details.
@@ -277,7 +332,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

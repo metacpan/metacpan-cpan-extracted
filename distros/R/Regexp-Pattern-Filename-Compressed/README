@@ -2,9 +2,9 @@ NAME
     Regexp::Pattern::Filename::Compressed - Compressed data filename
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Regexp::Pattern::Filename::Compressed (from Perl distribution
-    Regexp-Pattern-Filename-Compressed), released on 2020-04-01.
+    Regexp-Pattern-Filename-Compressed), released on 2020-05-31.
 
 SYNOPSIS
      use Regexp::Pattern; # exports re()
@@ -22,11 +22,13 @@ PATTERNS
 
         No extension.
 
-         "foo" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+         "foo" =~ re("Filename::Compressed::filename_compressed");  # DOESN'T MATCH
 
         Not an extension.
 
-         "gz" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+         "gz" =~ re("Filename::Compressed::filename_compressed");  # DOESN'T MATCH
+
+        Example #3.
 
          "foo.gz" =~ re("Filename::Compressed::filename_compressed");  # matches
 
@@ -36,9 +38,11 @@ PATTERNS
 
         Regex is anchored.
 
-         "foo.xz is the file" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+         "foo.xz is the file" =~ re("Filename::Compressed::filename_compressed");  # DOESN'T MATCH
 
-         "foo.mp3" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+        Example #6.
+
+         "foo.mp3" =~ re("Filename::Compressed::filename_compressed");  # DOESN'T MATCH
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -57,9 +61,12 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Filename::Compressed
+
     Regexp::Pattern
 
-    Filename::Compressed
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

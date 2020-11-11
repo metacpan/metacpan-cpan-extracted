@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <vector>
 #include <xs/protocol/websocket.h>
 #include <panda/encode/base16.h>

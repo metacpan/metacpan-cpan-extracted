@@ -8,12 +8,14 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/Markdown/Table.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/new.t
 t/nuclino.t
+t/redaktionsplan.t
 t/rows.t
 t/synopsis_01.t
 t/synopsis_02.t

@@ -1,12 +1,40 @@
+1.191 2020-11-01
+================
+
+[Quiq::Html::Pygments]
+* Test verbessert
+
+1.190 2020-10-30
+================
+
+[Quiq::PlotlyJs::XY::Diagram]
+* Attribut yTitleColor hinzugefügt
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* Attribut type hinzugefügt
+* Plot-Layout für verschiedene Fontgrößen überarbeitet
+
+[Quiq::Sql]
+* Operator "NOT LIKE" hinzugefügt
+
 1.188 2020-09-28
 ================
 
-[Quiq::Database::Connection]
-* stmt() - Alias gen() hinzugefügt
-* select() - Option -sql hinzugefügt
+[Quiq::Dbms]
+* Instantiierung aus Datenbank-Connection hinzugefügt
 
-[Quiq::Gd::Component::Graph]
-* drawCross() - reimplementiert
+[Quiq::PlotlyJs::XY::Diagram]
+* Attribut unit in yTitle umbenannt
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* Attribute debug, xTitle hinzugefügt
+* Defaultwert fontSize auf 11 gesetzt
+
+[Quiq::Sql]
+* mehrzeilige Select-Ausdrücke werden nun eingerückt
+
+[Quiq::Sql::Composer]
+* Klasse hinzugefügt
 
 1.187 2020-08-18
 ================

@@ -1,0 +1,111 @@
+graph Perl {
+ ":recipe:1" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:10" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:11" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_ARCHLIB)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_ARCHLIB)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_ARCHLIB)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:12" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_ARCHAUTODIR)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_ARCHAUTODIR)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_ARCHAUTODIR)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:13" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_LIBDIR)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_LIBDIR)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_LIBDIR)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:14" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_AUTODIR)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_AUTODIR)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_AUTODIR)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:15" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_MAN1DIR)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_MAN1DIR)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_MAN1DIR)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:16" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_MAN3DIR)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_MAN3DIR)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_MAN3DIR)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:17" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:18" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:19" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:2" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l|<port2> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:20" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(ABSPERLRUN)\ -MExtUtils::Install\ -e\ \"pm_to_blib(\{\{@ARGV\}\},\ '$(INST_LIB)\\auto',\ q\[$(PM_FILTER)\],\ '$(PERM_DIR)')\"\ --\ lib/Make.pm\ blib\\lib\\Make.pm\ lib/Make/Functions.pm\ blib\\lib\\Make\\Functions.pm\ lib/Make/Rule.pm\ blib\\lib\\Make\\Rule.pm\ lib/Make/Rule/Vars.pm\ blib\\lib\\Make\\Rule\\Vars.pm\ lib/Make/Target.pm\ blib\\lib\\Make\\Target.pm\l|<port2> $(NOECHO)\ $(TOUCH)\ pm_to_blib\l}" shape="record" style="filled" ]
+ ":recipe:21" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:3" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:4" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(RM_F)\ $(INST_SCRIPT)\\pure-perl-make\l|<port2> $(CP)\ scripts/pure-perl-make\ $(INST_SCRIPT)\\pure-perl-make\l|<port3> $(FIXIN)\ $(INST_SCRIPT)\\pure-perl-make\l|<port4> -$(NOECHO)\ $(CHMOD)\ $(PERM_RWX)\ $(INST_SCRIPT)\\pure-perl-make\l}" shape="record" style="filled" ]
+ ":recipe:5" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(ECHO)\ \"Makefile\ out-of-date\ with\ respect\ to\ $?\"\l|<port2> $(NOECHO)\ $(ECHO)\ \"Cleaning\ current\ config\ before\ rebuilding\ Makefile...\"\l|<port3> -$(NOECHO)\ $(RM_F)\ $(MAKEFILE_OLD)\l|<port4> -$(NOECHO)\ $(MV)\ \ \ $(FIRST_MAKEFILE)\ $(MAKEFILE_OLD)\l|<port5> -\ $(MAKE)\ $(USEMAKEFILE)\ $(MAKEFILE_OLD)\ clean\ $(DEV_NULL)\l|<port6> $(PERLRUN)\ Makefile.PL\ \"MAKE=dmake\"\l|<port7> $(NOECHO)\ $(ECHO)\ \"==\>\ Your\ Makefile\ has\ been\ rebuilt.\ \<==\"\l|<port8> $(NOECHO)\ $(ECHO)\ \"==\>\ Please\ rerun\ the\ $(MAKE)\ command.\ \ \<==\"\l|<port9> $(FALSE)\l}" shape="record" style="filled" ]
+ ":recipe:6" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_BIN)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_BIN)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_BIN)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:7" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(MKPATH)\ $(INST_SCRIPT)\l|<port2> $(NOECHO)\ $(CHMOD)\ $(PERM_DIR)\ $(INST_SCRIPT)\l|<port3> $(NOECHO)\ $(TOUCH)\ $(INST_SCRIPT)$(DFSEP).exists\l}" shape="record" style="filled" ]
+ ":recipe:8" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ ":recipe:9" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> $(NOECHO)\ $(NOOP)\l}" shape="record" style="filled" ]
+ "C:\Users\user\Desktop\straw (perl)\straw-actual\perl\libConfig.pm" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="C:\\Users\\user\\Desktop\\straw (perl)\\straw-actual\\perl\\libConfig.pm" shape="box" style="filled" ]
+ "C:\Users\user\Desktop\straw (perl)\straw-actual\perl\lib\COREconfig.h" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="C:\\Users\\user\\Desktop\\straw (perl)\\straw-actual\\perl\\lib\\COREconfig.h" shape="box" style="filled" ]
+ "Makefile" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="Makefile" shape="box" style="filled" ]
+ "Makefile.PL" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="Makefile.PL" shape="box" style="filled" ]
+ "all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="all" shape="box" style="filled" ]
+ "blib\arch.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\arch.exists" shape="box" style="filled" ]
+ "blib\arch\auto\Make.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\arch\\auto\\Make.exists" shape="box" style="filled" ]
+ "blib\bin.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\bin.exists" shape="box" style="filled" ]
+ "blib\lib.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\lib.exists" shape="box" style="filled" ]
+ "blib\lib\auto\Make.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\lib\\auto\\Make.exists" shape="box" style="filled" ]
+ "blib\man1.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\man1.exists" shape="box" style="filled" ]
+ "blib\man3.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\man3.exists" shape="box" style="filled" ]
+ "blib\script.exists" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\script.exists" shape="box" style="filled" ]
+ "blib\script\pure-perl-make" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blib\\script\\pure-perl-make" shape="box" style="filled" ]
+ "blibdirs" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blibdirs" shape="box" style="filled" ]
+ "config" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="config" shape="box" style="filled" ]
+ "dynamic" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="dynamic" shape="box" style="filled" ]
+ "lib/Make.pm" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="lib/Make.pm" shape="box" style="filled" ]
+ "lib/Make/Functions.pm" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="lib/Make/Functions.pm" shape="box" style="filled" ]
+ "lib/Make/Rule.pm" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="lib/Make/Rule.pm" shape="box" style="filled" ]
+ "lib/Make/Rule/Vars.pm" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="lib/Make/Rule/Vars.pm" shape="box" style="filled" ]
+ "lib/Make/Target.pm" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="lib/Make/Target.pm" shape="box" style="filled" ]
+ "linkext" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="linkext" shape="box" style="filled" ]
+ "pm_to_blib" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="pm_to_blib" shape="box" style="filled" ]
+ "pure_all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="pure_all" shape="box" style="filled" ]
+ "scripts/pure-perl-make" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="scripts/pure-perl-make" shape="box" style="filled" ]
+ "subdirs" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="subdirs" shape="box" style="filled" ]
+ ":recipe:1" -- "pure_all"
+ ":recipe:10" -- "blib\man3.exists"
+ ":recipe:10" -- "blib\man1.exists"
+ ":recipe:10" -- "blib\lib\auto\Make.exists"
+ ":recipe:10" -- "blib\bin.exists"
+ ":recipe:10" -- "blib\arch.exists"
+ ":recipe:10" -- "blib\script.exists"
+ ":recipe:10" -- "blib\lib.exists"
+ ":recipe:10" -- "blib\arch\auto\Make.exists"
+ ":recipe:11" -- "Makefile.PL"
+ ":recipe:12" -- "Makefile.PL"
+ ":recipe:13" -- "Makefile.PL"
+ ":recipe:14" -- "Makefile.PL"
+ ":recipe:15" -- "Makefile.PL"
+ ":recipe:16" -- "Makefile.PL"
+ ":recipe:17" -- "dynamic"
+ ":recipe:18" -- "config"
+ ":recipe:18" -- "Makefile"
+ ":recipe:2" -- "pm_to_blib"
+ ":recipe:2" -- "subdirs"
+ ":recipe:2" -- "linkext"
+ ":recipe:2" -- "config"
+ ":recipe:20" -- "lib/Make/Rule/Vars.pm"
+ ":recipe:20" -- "lib/Make/Rule.pm"
+ ":recipe:20" -- "lib/Make.pm"
+ ":recipe:20" -- "Makefile"
+ ":recipe:20" -- "lib/Make/Functions.pm"
+ ":recipe:20" -- "lib/Make/Target.pm"
+ ":recipe:3" -- "blib\script\pure-perl-make"
+ ":recipe:4" -- "blib\bin.exists"
+ ":recipe:4" -- "scripts/pure-perl-make"
+ ":recipe:4" -- "Makefile"
+ ":recipe:4" -- "blib\script.exists"
+ ":recipe:5" -- "C:\Users\user\Desktop\straw (perl)\straw-actual\perl\lib\COREconfig.h"
+ ":recipe:5" -- "Makefile.PL"
+ ":recipe:5" -- "C:\Users\user\Desktop\straw (perl)\straw-actual\perl\libConfig.pm"
+ ":recipe:6" -- "Makefile.PL"
+ ":recipe:7" -- "Makefile.PL"
+ ":recipe:8" -- "blibdirs"
+ ":recipe:8" -- "Makefile"
+ "Makefile" -- ":recipe:5"
+ "all" -- ":recipe:1"
+ "blib\arch.exists" -- ":recipe:11"
+ "blib\arch\auto\Make.exists" -- ":recipe:12"
+ "blib\bin.exists" -- ":recipe:6"
+ "blib\lib.exists" -- ":recipe:13"
+ "blib\lib\auto\Make.exists" -- ":recipe:14"
+ "blib\man1.exists" -- ":recipe:15"
+ "blib\man3.exists" -- ":recipe:16"
+ "blib\script.exists" -- ":recipe:7"
+ "blib\script\pure-perl-make" -- ":recipe:4"
+ "blibdirs" -- ":recipe:10"
+ "config" -- ":recipe:8"
+ "config" -- ":recipe:9"
+ "dynamic" -- ":recipe:19"
+ "dynamic" -- ":recipe:18"
+ "linkext" -- ":recipe:17"
+ "pm_to_blib" -- ":recipe:20"
+ "pure_all" -- ":recipe:3"
+ "pure_all" -- ":recipe:2"
+ "subdirs" -- ":recipe:21"
+}

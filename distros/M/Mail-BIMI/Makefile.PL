@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Sereal" => 0,
     "Sub::Install" => 0,
     "Term::ANSIColor" => 0,
-    "XML::LibXML" => 0,
+    "XML::LibXML" => "2.0202",
     "base" => 0,
     "constant" => 0,
     "feature" => 0,
@@ -77,7 +77,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.20201020.2",
+  "VERSION" => "2.20201102.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -131,7 +131,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0,
-  "XML::LibXML" => 0,
+  "XML::LibXML" => "2.0202",
   "base" => 0,
   "constant" => 0,
   "feature" => 0,

@@ -73,7 +73,7 @@ use Attribute::Handlers autotie => { "__CALLER__::FixedKeys" => __PACKAGE__ };
 
 our @ISA = qw(Tie::StdHash);
 
-our $VERSION = '1.13.0';
+our $VERSION = '1.13.1';
 
 =head1 METHODS
 

@@ -17,9 +17,9 @@ BEGIN { plan tests => 12};
 
 use Math::Matrix;
 
-my $A = new Math::Matrix ([rand,rand,rand],
-                          [rand,rand,rand],
-                          [rand,rand,rand]);
+my $A = Math::Matrix -> new([[rand,rand,rand],
+                             [rand,rand,rand],
+                             [rand,rand,rand]]);
 
 my $B = $A->multiply_scalar(-2);
 
@@ -35,7 +35,7 @@ my $D = $l->concat($R);
 
 ok($D->equal($A));
 
-my $v = new Math::Matrix ([rand,rand,rand]);
+my $v = Math::Matrix -> new([[rand,rand,rand]]);
 my $M = $A->concat($v->transpose);
 my $x = $M->solve;
 
@@ -66,9 +66,9 @@ my $Ai = $A->invert;
 my $P  = $A->multiply($Ai);
 ok($P->equal($E));
 
-my $Z = new Math::Matrix ([0,0,0],
-                          [0,0,0],
-                          [0,0,0]);
+my $Z = Math::Matrix -> new([[0,0,0],
+                             [0,0,0],
+                             [0,0,0]]);
 my $Q=$Z->subtract($P);
 my $J=-$Q;
 ok($J->equal($P));

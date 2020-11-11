@@ -20,7 +20,7 @@ isa_ok($sd,'Algorithm::SixDegrees');
 $sd->data_source( Movie => \&Simple_Movie );
 $sd->data_source( Actor => \&Simple_Actor );
 
-is_deeply([$sd->make_link('Actor','Kevin Bacon','Pete Krawczyk')],[],'No match OK');
+is_deeply([$sd->make_link('Actor','Kevin Bacon','Peter Krawczyk')],[],'No match OK');
 is($Algorithm::SixDegrees::ERROR,undef,'No error during make_link');
 is_deeply([$sd->make_link('Actor','Kevin Bacon','Kevin Bacon')],['Kevin Bacon'],'Single element link OK');
 is($Algorithm::SixDegrees::ERROR,undef,'No error during make_link');

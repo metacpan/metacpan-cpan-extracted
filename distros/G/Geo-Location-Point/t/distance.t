@@ -25,5 +25,6 @@ DISTANCE: {
 	]);
 
 	delta_within($loc1->distance($loc2)->yards(), 300, 100);
-	ok($loc1->distance($loc2)->yards() == $loc2->distance($loc1)->yards());
+	# ok($loc1->distance($loc2)->yards() == $loc2->distance($loc1)->yards());
+	delta_within($loc1->distance($loc2)->yards(), $loc2->distance($loc1)->yards(), 1e-9);
 }

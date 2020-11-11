@@ -1,5 +1,8 @@
 Revision history for Net-SNMP-Mixin-CiscoDot1qVlanStatic
 
+0.02	Tue, 10 Nov 2020 08:35:36 +0100
+        Accept that the VM_MEMBERSHIP_TABLE maybe empty
+
 0.01	Sun, 31 May 2020 17:49:33 +0200
         first production release
 

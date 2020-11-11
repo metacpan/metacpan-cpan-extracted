@@ -164,7 +164,7 @@ shrink (SV *sv)
 }
 
 /* adds two STRLENs together, slow, and with paranoia */
-STRLEN
+static STRLEN
 strlen_sum (STRLEN l1, STRLEN l2)
 {
   size_t sum = l1 + l2;
@@ -1040,8 +1040,8 @@ decode_ws (dec_t *dec)
         }
       else if (ch != 0x20 && ch != 0x0a && ch != 0x0d && ch != 0x09)
         break; // parse error, but let higher level handle it, gives better error messages
-
-      ++dec->cur;
+      else
+        ++dec->cur;
     }
 }
 

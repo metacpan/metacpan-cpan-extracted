@@ -1,18 +1,25 @@
 use strict;
 use warnings;
 use Test::More; #tests => 1;
+use File::Temp qw[tempdir];
+use POE;
+use POE::Component::SmokeBox::Dists;
+use Cwd;
 
-if ( -e 'no.network' ) {
+my $tepdir = tempdir( DIR => 't', CLEANUP => 1 );
+my $file = POE::Component::SmokeBox::Dists::_fetch( $tepdir );
+
+if ( ! -e $file ) {
   plan skip_all => 'No Internet access no point in proceeding with tests';
 }
 
 plan tests => 4;
 
-diag("Running a random search, this can take a while ...");
+my $tmpdir = tempdir( DIR => 't', CLEANUP => 1 );
+my $cwd = getcwd; END { chdir $cwd }
+chdir $tmpdir;
 
-use POE;
-use POE::Component::SmokeBox::Dists;
-use Cwd;
+diag("Running a random search, this can take a while ...");
 
 $ENV{PERL5_SMOKEBOX_DIR} = cwd();
 

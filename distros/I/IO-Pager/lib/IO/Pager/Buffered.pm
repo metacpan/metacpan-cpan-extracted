@@ -1,5 +1,5 @@
 package IO::Pager::Buffered;
-our $VERSION = 1.03; #Untouched since 1.03
+our $VERSION = 1.04; #Untouched since 1.03
 
 use strict;
 use base qw( IO::Pager );

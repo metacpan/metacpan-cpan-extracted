@@ -1,54 +1,248 @@
 package CPAN::Digger;
-use 5.008008;
-use Moose;
-use MooseX::StrictConstructor;
+use strict;
+use warnings FATAL => 'all';
 
-our $VERSION = '0.08';
+our $VERSION = '1.03';
 
-use autodie;
-use Carp     ();
-use Template ();
+use Capture::Tiny qw(capture);
+use Cwd qw(getcwd);
+use Data::Dumper qw(Dumper);
+use Exporter qw(import);
+use File::Spec ();
+use File::Temp qw(tempdir);
+use Log::Log4perl ();
+use LWP::UserAgent ();
+use MetaCPAN::Client ();
 
-#use CPAN::Digger::DB;
 
-has 'root'   => ( is => 'ro', isa => 'Str' );
-has 'dbfile' => ( is => 'ro', isa => 'Str' );
+use CPAN::Digger::DB qw(get_fields);
 
-#has 'db'     => (is => 'rw', isa => 'MongoDB::Database');
+my $tempdir = tempdir( CLEANUP => ($ENV{KEEP_TEMPDIR} ? 0 : 1) );
 
-has 'tt' => ( is => 'rw', isa => 'Template' );
+my %known_licenses = map {$_ => 1} qw(apache_2_0 artistic_2 bsd gpl_3 lgpl_2_1 lgpl_3_0 perl_5); # open_source, unknown
 
-sub BUILD {
-	my $self = shift;
+sub new {
+    my ($class, %args) = @_;
+    my $self = bless {}, $class;
+    for my $key (keys %args) {
+        $self->{$key} = $args{$key};
+    }
+    $self->{log} = uc $self->{log};
+    $self->{check_github} = delete $self->{github};
 
-	#$self->db(CPAN::Digger::DB->db);
+    $self->{db} = CPAN::Digger::DB->new(db => $self->{db});
+
+    return $self;
+}
+
+sub get_vcs {
+    my ($repository) = @_;
+    if ($repository) {
+        #        $html .= sprintf qq{<a href="%s">%s %s</a><br>\n}, $repository->{$k}, $k, $repository->{$k};
+        # Try to get the web link
+        my $url = $repository->{web};
+        if (not $url) {
+            $url = $repository->{url};
+            $url =~ s{^git://}{https://};
+            $url =~ s{\.git$}{};
+        }
+        my $name = "repository";
+        if ($url =~ m{^https?://github.com/}) {
+            $name = 'GitHub';
+        }
+        if ($url =~ m{^https?://gitlab.com/}) {
+            $name = 'GitLab';
+        }
+        return $url, $name;
+    }
+}
+
+sub get_data {
+    my ($self, $item) = @_;
+
+    my $logger = Log::Log4perl->get_logger();
+    my %data = (
+        distribution => $item->distribution,
+        version      => $item->version,
+        author       => $item->author,
+        date         => $item->date,
+    );
+    #die Dumper $item;
+
+    $logger->debug('dist: ', $item->distribution);
+    $logger->debug('      ', $item->author);
+    my @licenses = @{ $item->license };
+    $data{licenses} = join ' ', @licenses;
+    $logger->debug('      ',  $data{licenses});
+    for my $license (@licenses) {
+        if ($license eq 'unknown') {
+            $logger->error("Unknown license '$license'");
+        } elsif (not exists $known_licenses{$license}) {
+            $logger->warn("Unknown license '$license'. Probably CPAN::Digger needs to be updated");
+        }
+    }
+    # if there are not licenses =>
+    # if there is a license called "unknonws"
+    # check against a known list of licenses (grow it later, or look it up somewhere?)
+    my %resources = %{ $item->resources };
+    #say '  ', join ' ', keys %resources;
+    if ($resources{repository}) {
+        my ($vcs_url, $vcs_name) = get_vcs($resources{repository});
+        if ($vcs_url) {
+            $data{vcs_url} = $vcs_url;
+            $data{vcs_name} = $vcs_name;
+            $logger->debug("      $vcs_name: $vcs_url");
+        }
+    } else {
+        $logger->error('No repository for ', $item->distribution);
+    }
+    return %data;
 }
 
 
-sub get_tt {
-	my $self = shift;
+sub analyze_github {
+    my ($data) = @_;
+    my $logger = Log::Log4perl->get_logger();
 
-	if ( not $self->tt ) {
+    my $vcs_url = $data->{vcs_url};
+    my $repo_name = (split '\/', $vcs_url)[-1];
+    $logger->info("Analyze GitHub repo '$vcs_url' in directory $repo_name");
 
-		my $root = $self->root;
+    my $ua = LWP::UserAgent->new(timeout => 5);
+    my $response = $ua->get($vcs_url);
+    my $status_line = $response->status_line;
+    if ($status_line eq '404 Not Found') {
+        $logger->error("Repository '$vcs_url' Received 404 Not Found. Please update the link in the META file");
+        return;
+    }
+    if ($response->code != 200) {
+        $logger->error("Repository '$vcs_url'  got a response of '$status_line'. Please report this to the maintainer of CPAN::Digger.");
+        return;
+    }
+    if ($response->redirects) {
+        $logger->error("Repository '$vcs_url' is being redirected. Please update the link in the META file");
+    }
 
-		my $config = {
-			INCLUDE_PATH => "$root/views",
-			INTERPOLATE  => 1,
-			POST_CHOMP   => 1,
+    my $git = 'git';
 
-			#	PRE_PROCESS  => 'incl/header.tt',
-			#	POST_PROCESS  => 'incl/footer.tt',
-			EVAL_PERL => 1,
-		};
-		$self->tt( Template->new($config) );
-	}
+    my @cmd = ($git, "clone", "--depth", "1", $data->{vcs_url});
+    my $cwd = getcwd();
+    chdir($tempdir);
+    my ($out, $err, $exit_code) = capture {
+        system(@cmd);
+    };
+    chdir($cwd);
+    my $repo = "$tempdir/$repo_name";
+    $logger->debug("REPO path '$repo'");
 
-	return $self->tt;
+    if ($exit_code != 0) {
+        # TODO capture stderr and include in the log
+        $logger->error("Failed to clone $vcs_url");
+        return;
+    }
+
+    $data->{travis} = -e "$repo/.travis.yml";
+    my @ga = glob("$repo/.github/workflows/*");
+    $data->{github_actions} = (scalar(@ga) ? 1 : 0);
+    $data->{circleci} = -e "$repo/.circleci";
+    $data->{appveyor} = (-e "$repo/.appveyor.yml") || (-e "$repo/appveyor.yml");
+    $data->{azure_pipelines} = -e "$repo/azure-pipelines.yml";
+
+    for my $ci (qw(travis github_actions circleci appveyor)) {
+        $logger->debug("Is CI '$ci'?");
+        if ($data->{$ci}) {
+            $logger->debug("CI '$ci' found!");
+            $data->{has_ci} = 1;
+        }
+    }
+}
+
+sub collect {
+    my ($self) = @_;
+
+    my @all_the_distributions;
+
+    my $log_level = $self->{log}; # TODO: shall we validate?
+    Log::Log4perl->easy_init({
+        level => $log_level,
+        layout   => '%d{yyyy-MM-dd HH:mm:ss} - %p - %m%n',
+    });
+
+    my $logger = Log::Log4perl->get_logger();
+    $logger->info('Starting');
+    $logger->info("Tempdir: $tempdir");
+    $logger->info("Recent: $self->{recent}") if $self->{recent};
+    $logger->info("Author: $self->{author}") if $self->{author};
+
+    my $mcpan = MetaCPAN::Client->new();
+    my $rset;
+    if ($self->{author}) {
+        my $author = $mcpan->author($self->{author});
+        #print $author;
+        $rset = $author->releases;
+    } else {
+        $rset  = $mcpan->recent($self->{recent});
+    }
+    $logger->info("MetaCPAN::Client::ResultSet received with a total of $rset->{total} items");
+    my %distros;
+    my @fields = get_fields();
+    while ( my $item = $rset->next ) {
+    		next if $distros{ $item->distribution }; # We have already deal with this in this session
+            $distros{ $item->distribution } = 1;
+
+            my $row = $self->{db}->db_get_distro($item->distribution);
+            next if $row and $row->{version} eq $item->version; # we already have this in the database (shall we call last?)
+            my %data = $self->get_data($item);
+            #die Dumper \%data;
+            $self->{db}->db_insert_into(@data{@fields});
+            push @all_the_distributions, \%data;
+    }
+
+    if ($self->{author}) {
+        @all_the_distributions = reverse sort {$a->{date} cmp $b->{date}} @all_the_distributions;
+        if ($self->{limit} and @all_the_distributions > $self->{limit}) {
+            @all_the_distributions = @all_the_distributions[0 .. $self->{limit}-1];
+        }
+    }
+
+    # Check on the VCS
+    if ($self->{check_github}) {
+        $logger->info("Starting to check GitHub");
+        for my $data (@all_the_distributions) {
+            my $distribution = $data->{distribution};
+            my $data_ref = $self->{db}->db_get_distro($distribution);
+            next if not $data_ref->{vcs_name};
+
+            if ($self->{check_github} and $data_ref->{vcs_name} eq 'GitHub') {
+                analyze_github($data_ref);
+            }
+            my %data = %$data_ref;
+            $self->{db}->db_update($distribution, @data{@fields});
+            sleep $self->{sleep} if $self->{sleep};
+        }
+    }
+
+
+    if ($self->{report}) {
+        #print "Text report\n";
+        my @distros = @{ $self->{db}->db_get_every_distro() };
+        if ($self->{limit} and @distros > $self->{limit}) {
+            @distros = @distros[0 .. $self->{limit}-1];
+        }
+        for my $distro (@distros) {
+            #die Dumper $distro;
+            printf "%s %-40s %-7s", $distro->{date}, $distro->{distribution}, ($distro->{vcs_url} ? '' : 'NO VCS');
+            if ($self->{check_github}) {
+                printf "%-7s", ($distro->{has_ci} ? '' : 'NO CI');
+            }
+            print "\n";
+        }
+    }
 }
 
 
-1;
+42;
+
 
 =head1 NAME
 
@@ -56,148 +250,20 @@ CPAN::Digger - To dig CPAN
 
 =head1 SYNOPSIS
 
-This module is the the web application running at L<http://...>.
-You can use the interface by browsing there.
+    cpan-digger
 
-For internal usage follow the SETUP section.
+=head1 DESCRIPTION
 
-=head1 SETUP
-
-Download the tar.gz file. Open it and install all its dependencies.
-
-Running perl script\cpan_digger.pl will create a local database
-using the module given in the directory given with the --dir option.
-
-Running CPAN-Digger-WWW.pl will launch a stand-alone web server.
-
-=head1 CPAN::Mini
-
-quick instruction for using CPAN::Mini
-
-- minicpan -l /home/gabor/Downloads/cpan -r http://cpan.pair.com/
-   ftp://cpan.hexten.net/
-- allow the installation of CPAN::Digger and let the indexer copy all the files necessary to run the operation
-
-Proc::Daemon does not show the documentation http://cpandigger.org/dist/Proc-Daemon
-
-http://ontwik.com/perl/perl-programming-best-practices/
-
-Using unzipped releases:
-sudo mkdir /var/www/cpan-digger
-sudo mkdir /var/www/cpan-digger/logs
-sudo chmod a+w /var/www/cpan-digger/logs
-sudo mkdir /var/www/cpan-digger/digger
-sudo chown gabor.gabor /var/www/cpan-digger/digger
-cd /var/www/cpan-digger/
-sudo tar xzf CPAN-Digger-0.02.tar.gz
-sudo mkdir CPAN-Digger-0.02/logs
-sudo chmod a+w CPAN-Digger-0.02/logs
-edit the environments/production.yml file
-and set the path to the database to
-/var/www/cpan-digger/digger/digger.db
+This is a command line program to collect some meta information about CPAN modules.
 
 
-=head1 Indexing
+=head1 COPYRIGHT AND LICENSE
 
-CPAN indexes:
+Copyright (C) 2020 by L<Gabor Szabo|https://szabgab.com/>
 
-  authors/01mailrc.txt.gz by Parse::CPAN::Authors (we don't use this) (CPAN.pm uses)
-  authors/00whois.xml     by Parse::CPAN::Whois  (superset of the above)
-  modules/02packages.details.txt.gz  by Parse::CPAN::Packages   (CPAN.pm uses)
-                            also by CPAN::PackageDetails
-  modules/03modlist.data.gz   (CPAN.pm uses)
-
-
-
-=head2 Word indexing (planned)
-
-For each distribution split up the name and each part of the name becomes a word
-
-For each module name probably the parts of the name might be words though the last part should
-be the most significants
-
-META.yml might have some keywords stored
-
-Names of the functions / methods
-
-Gull text indexing of the POD for each module
-
-Various sections might have different weight.
-
-Later we will allow users of the site to add keywords to the modules/distributions
-
-Store each keyword in lowercase only and map everything to lowercase
-for each word include where it could be found
-
-   word    type_of_source       the source
-   cgi     distro               CGI-Simple
-   cgi     distro               CGI-Application
-   cgi     module               CGI::Simple
-   cgi     module               CGI::Application
-
-
-=head1 Projects
-
-CPAN::Digger is (going to be) capable of processing non-CPAN projects as well.
-We are still trying to design how that should work. Let's start with one example:
-
-Dreamwidth L<http://dreamwidth.org> uses Mercurial to maintain their source code.
-To check out their main repository type:
-
-  hg clone http://hg.dwscoalition.org/dw-free/
-
-projects file:
-  Name:      DW-Free          will be used as the distribution
-  Version:   1.0              some projects might want to index several versions, this field can be used to indicated that
-  Author:    DREAMWIDTH       will be used instead of the PAUSEID (a leading underscore can ensure there is no conflict
-                              with real (even future) PAUSEIDs)
-  Path:      /path/to/source  path to where the source code lives (CPAN::Digger will copy the files from there)
-  Description:    some text    not used by the digger
-
-Currently the Digger won't try to update the source directory using the VCS tools.
-
-
-
-=head1 AUTHOR
-
-Gabor Szabo L<http://szabgab.com/>
-
-=head1 COPYRIGHT
-
-Copyright 2010 Gabor Szabo L<gabor@szabgab.com>
-
-
-=head1 LICENSE
-
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl 5 itself.
-
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
 
-# Copyright 2010 Gabor Szabo http://szabgab.com/
-# LICENSE
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl 5 itself.

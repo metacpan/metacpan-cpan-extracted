@@ -1,0 +1,9 @@
+TAP Version 13
+1..6
+ok 1 level 1 ok
+ok 2 level 2 ok_todo # TODO ok_todo_explanation
+ok 3 level 3 ok_skip # SKIP ok_skip_explanation
+not ok 4 level 4 notok_todo # TODO notok_todo_explanation
+not ok 5 level 5 notok
+not ok 6 level 6 notok_skip # SKIP notok_skip_explanation
+pragma +strict

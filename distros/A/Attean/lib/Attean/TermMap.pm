@@ -7,7 +7,7 @@ Attean::TermMap - Mapping terms to new terms
 
 =head1 VERSION
 
-This document describes Attean::TermMap version 0.026
+This document describes Attean::TermMap version 0.027
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ term objects.
 
 =cut
 
-package Attean::TermMap 0.026 {
+package Attean::TermMap 0.027 {
 	use Moo;
 	use Types::Standard qw(CodeRef);
 	use Attean::API::Binding;
@@ -75,8 +75,9 @@ L<Attean::API::Literal> values.
 			my $term	= shift;
 			return $term unless ($term->does('Attean::API::Literal'));
 			
-			if ($term->does('Attean::API::NumericLiteral')) {
-				return $term->canonicalized_term;
+			if ($term->does('Attean::API::CanonicalizingLiteral')) {
+				my $c	= eval { $term->canonicalized_term };
+				return ($@) ? undef : $c;
 			}
 			
 			return $term;
@@ -203,7 +204,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams.
+Copyright (c) 2014--2020 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

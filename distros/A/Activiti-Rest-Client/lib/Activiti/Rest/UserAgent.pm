@@ -19,6 +19,12 @@ has default_headers => (
     isa => sub { array_ref($_[0]); },
     default => sub { [["Accept","application/json; charset=UTF-8"]]; }
 );
+has keep_alive => (
+    is => 'ro',
+    isa => sub { is_integer($_[0]) && $_[0] >= 0 || die("keep_alive should be natural number"); },
+    lazy => 1,
+    default => sub { 1; }
+);
 
 #usage: request($params,$method)
 requires qw(request);

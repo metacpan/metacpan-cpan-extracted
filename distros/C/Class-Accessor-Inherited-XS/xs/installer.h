@@ -46,7 +46,6 @@ template <AccessorType type, AccessorOpts opts>
 struct CImpl {
 static shared_keys* CAIXS_install_accessor(pTHX_ AccessorOpts val, SV* full_name) {
     if (TYPE_INHERITED && (opts & IsReadonly)) goto next;
-    if ((opts & (IsReadonly | IsWeak)) == (IsReadonly | IsWeak)) goto next;
     if (type == Constructor) goto next;
 
     if ((val & opts) == opts) {

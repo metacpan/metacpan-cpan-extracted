@@ -13,6 +13,7 @@ requires 'Class::Method::Modifiers', 0;
 requires 'Math::Random::Secure', 0;
 requires 'OpenTracing::Any', '>= 1.003';
 requires 'Metrics::Any', 0;
+requires 'Syntax::Keyword::Dynamically', '>= 0.06';
 
 # Client-side caching
 requires 'Cache::LRU', '>= 0.04';

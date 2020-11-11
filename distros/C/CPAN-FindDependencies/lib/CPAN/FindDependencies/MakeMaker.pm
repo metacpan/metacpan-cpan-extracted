@@ -1,9 +1,7 @@
-#!perl -w
-# TODO    Figure out how to recover from fatal errors inside the 'eval $MakefilePL' call.
-
 package CPAN::FindDependencies::MakeMaker;
 
 use strict;
+use warnings;
 use vars qw($VERSION @ISA @EXPORT_OK);
 
 use File::Temp qw(tempdir);

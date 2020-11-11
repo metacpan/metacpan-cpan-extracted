@@ -46,6 +46,7 @@ lib/Mail/BIMI/VMC/Cert.pm
 lib/Mail/BIMI/VMC/Chain.pm
 t/00-load.t
 t/01-bimi.t
+t/01-dns-lookup-cname.t
 t/01-dns-lookup-fail.t
 t/01-dns-lookup-fallback-fail.t
 t/01-dns-lookup-fallback-multi.t

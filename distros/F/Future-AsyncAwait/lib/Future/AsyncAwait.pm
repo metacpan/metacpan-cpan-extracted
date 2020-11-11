@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.45;
+package Future::AsyncAwait 0.46;
 
 use v5.14;
 use warnings;
@@ -13,7 +13,7 @@ use Carp;
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
-require Future;
+require Future; Future->VERSION( '0.43' );
 
 =head1 NAME
 
@@ -456,22 +456,6 @@ sub import_into
 
       croak "Unrecognised import symbol $sym";
    }
-}
-
-if( !defined &Future::AWAIT_CLONE ) {
-   # TODO: These ought to be implemented by Future.pm itself, and it can do
-   # these in a faster, more performant way
-   *Future::AWAIT_CLONE    = sub { shift->new };
-   *Future::AWAIT_NEW_DONE = *Future::AWAIT_DONE = sub { shift->done( @_ ) };
-   *Future::AWAIT_NEW_FAIL = *Future::AWAIT_FAIL = sub { shift->fail( @_ ) };
-
-   *Future::AWAIT_IS_READY     = sub { shift->is_ready };
-   *Future::AWAIT_IS_CANCELLED = sub { shift->is_cancelled };
-
-   *Future::AWAIT_ON_READY  = sub { shift->on_ready( @_ ) };
-   *Future::AWAIT_ON_CANCEL = sub { shift->on_cancel( @_ ) };
-
-   *Future::AWAIT_GET = sub { shift->get };
 }
 
 =head1 SEE ALSO

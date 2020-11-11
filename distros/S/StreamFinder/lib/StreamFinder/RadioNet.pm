@@ -18,11 +18,15 @@ file.
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/perl
+
 	use strict;
 
 	use StreamFinder::RadioNet;
 
-	my $station = new StreamFinder::RadioNet(<url>);
+	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+
+	my $station = new StreamFinder::RadioNet($ARGV[0]);
 
 	die "Invalid URL or no streams found!\n"  unless ($station);
 

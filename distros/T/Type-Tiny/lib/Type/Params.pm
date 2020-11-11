@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.010006';
+	$Type::Params::VERSION   = '1.012000';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -21,14 +21,14 @@ use Scalar::Util qw(refaddr);
 use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
-use Types::Standard -types;
-use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike StringLike to_TypeTiny);
+use Types::Standard ();
+use Types::TypeTiny ();
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 our @EXPORT    = qw( compile compile_named );
-our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods );
+our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods ArgsObject );
 
 sub english_list {
 	require Type::Utils;
@@ -51,6 +51,41 @@ my $QUOTE = \&B::perlstring;
 				],
 			);
 		};
+	}
+	
+	my $ArgsObject;
+	sub ArgsObject (;@) {
+		$ArgsObject ||= do {
+			require Types::Standard;
+			'Type::Tiny'->new(
+				name       => 'ArgsObject',
+				parent     => Types::Standard::Object(),
+				constraint => q{ ref($_) =~ qr/^Type::Params::OO::/ },
+				constraint_generator => sub {
+					my $param = Types::Standard::assert_Str(shift);
+					sub { defined($_->{'~~caller'}) and $_->{'~~caller'} eq $param };
+				},
+				inline_generator => sub {
+					my $param  = shift;
+					my $quoted = $QUOTE->($param);
+					sub {
+						my $var = pop;
+						return (
+							Types::Standard::Object()->inline_check($var),
+							sprintf(q{ ref(%s) =~ qr/^Type::Params::OO::/ }, $var),
+							sprintf(q{ do { use Scalar::Util (); Scalar::Util::reftype(%s) eq 'HASH' } }, $var),
+							sprintf(q{ defined((%s)->{'~~caller'}) && ((%s)->{'~~caller'} eq %s) }, $var, $var, $quoted),
+						);
+					};
+				},
+			);
+		};
+		
+		@_ ? $ArgsObject->parameterize(@{$_[0]}) : $ArgsObject;
+	}
+	
+	if ( $] ge '5.014' ) {
+		&Scalar::Util::set_prototype($_, ';$') for \&ArgsObject;
 	}
 }
 
@@ -84,19 +119,19 @@ sub _mkdefault
 	
 	if (exists $param_options->{default}) {
 		$default = $param_options->{default};
-		if (ArrayRef->check($default) and not @$default) {
+		if (Types::Standard::is_ArrayRef($default) and not @$default) {
 			$default = '[]';
 		}
-		elsif (HashRef->check($default) and not %$default) {
+		elsif (Types::Standard::is_HashRef($default) and not %$default) {
 			$default = '{}';
 		}
-		elsif (Str->check($default)) {
+		elsif (Types::Standard::is_Str($default)) {
 			$default = $QUOTE->($default);
 		}
-		elsif (Undef->check($default)) {
+		elsif (Types::Standard::is_Undef($default)) {
 			$default = 'undef';
 		}
-		elsif (not CodeLike->check($default)) {
+		elsif (not Types::TypeTiny::is_CodeLike($default)) {
 			Error::TypeTiny::croak("Default expected to be string, coderef, undef, or reference to an empty hash or array");
 		}
 	}
@@ -131,10 +166,10 @@ sub _deal_with_head_and_tail {
 			my $constraint = $options->{$position}[$i];
 			$constraint = $options->{$position}[$i] = Types::Standard::Any
 				if !ref $constraint && $constraint eq 1;
-			Types::TypeTiny::TypeTiny->assert_valid($constraint);
+			Types::TypeTiny::assert_TypeTiny($constraint);
 			
 			my $is_optional = 0;
-			$is_optional += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $constraint->parents;
 			Error::TypeTiny::croak("The $position may not contain optional parameters") if $is_optional;
 			
 			my $varname     = sprintf('$%s[%d]', $position, $i);
@@ -226,12 +261,12 @@ sub compile
 	my $return_list = '@_';
 	$code[0] = 'my (%tmp, $tmp);';
 	PARAM: for my $param (@_) {
-		if (HashRef->check($param)) {
+		if (Types::Standard::is_HashRef($param)) {
 			$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 			$return_list = '@R';
 			last PARAM;
 		}
-		elsif (not Bool->check($param)) {
+		elsif (not Types::Standard::is_Bool($param)) {
 			if ($param->has_coercion) {
 				$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 				$return_list = '@R';
@@ -247,6 +282,8 @@ sub compile
 		$return_list = '(@head, @R, @tail)';
 	}
 	
+	my $for = $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__';
+	
 	my @default_indices;
 	my @default_values;
 		
@@ -260,30 +297,30 @@ sub compile
 		my $varname;
 		
 		my $param_options = {};
-		$param_options = shift if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		$param_options = shift if Types::Standard::is_HashRef($_[0]) && !exists $_[0]{slurpy};
 		my $default = _mkdefault($param_options);
 		
 		if ($param_options->{optional} or defined $default) {
 			$is_optional = 1;
 		}
 		
-		if (Bool->check($constraint))
+		if (Types::Standard::is_Bool($constraint))
 		{
-			$constraint = $constraint ? Any : Optional[Any];
+			$constraint = $constraint ? Types::Standard::Any : Types::Standard::Optional[Types::Standard::Any];
 		}
 
-		if (HashRef->check($constraint) and exists $constraint->{slurpy})
+		if (Types::Standard::is_HashRef($constraint) and exists $constraint->{slurpy})
 		{
-			$constraint = to_TypeTiny(
+			$constraint = Types::TypeTiny::to_TypeTiny(
 				$constraint->{slurpy}
 					or Error::TypeTiny::croak("Slurpy parameter malformed")
 			);
 			push @code,
-				$constraint->is_a_type_of(Dict)     ? _mkslurpy('$_', '%', $constraint => $arg) :
-				$constraint->is_a_type_of(Map)      ? _mkslurpy('$_', '%', $constraint => $arg) :
-				$constraint->is_a_type_of(Tuple)    ? _mkslurpy('$_', '@', $constraint => $arg) :
-				$constraint->is_a_type_of(HashRef)  ? _mkslurpy('$_', '%', $constraint => $arg) :
-				$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', $constraint => $arg) :
+				$constraint->is_a_type_of(Types::Standard::Dict)     ? _mkslurpy('$_', '%', $constraint => $arg) :
+				$constraint->is_a_type_of(Types::Standard::Map)      ? _mkslurpy('$_', '%', $constraint => $arg) :
+				$constraint->is_a_type_of(Types::Standard::Tuple)    ? _mkslurpy('$_', '@', $constraint => $arg) :
+				$constraint->is_a_type_of(Types::Standard::HashRef)  ? _mkslurpy('$_', '%', $constraint => $arg) :
+				$constraint->is_a_type_of(Types::Standard::ArrayRef) ? _mkslurpy('$_', '@', $constraint => $arg) :
 				Error::TypeTiny::croak("Slurpy parameter not of type HashRef or ArrayRef");
 			$varname = '$_';
 			$is_slurpy++;
@@ -293,8 +330,8 @@ sub compile
 		{
 			Error::TypeTiny::croak("Parameter following slurpy parameter") if $saw_slurpy;
 			
-			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			$is_optional     += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $constraint->parents;
+			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Types::Standard::Optional->{uniq} && $constraint->type_parameter;
 			
 			if (ref $default) {
 				$env{'@default'}[$arg] = $default;
@@ -359,7 +396,7 @@ sub compile
 			);
 			$varname = '$tmp'.($is_optional ? '{x}' : '');
 		}
-
+		
 		# unweaken the constraint in the cache
 		undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
 		$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
@@ -438,7 +475,7 @@ sub compile
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $for),
 		environment => \%env,
 	);
 	
@@ -472,7 +509,9 @@ sub compile_named
 		push @code, @extra_lines;
 		%env = (%$extra_env, %env);
 	}
-
+	
+	my $for = $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__';
+	
 	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
 	my @names;
 	
@@ -487,32 +526,32 @@ sub compile_named
 		my $varname;
 		my $default;
 		
-		Str->check($name)
+		Types::Standard::is_Str($name)
 			or Error::TypeTiny::croak("Expected parameter name as string, got $name");
 		
 		my $param_options = {};
-		$param_options = shift @_ if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		$param_options = shift @_ if Types::Standard::is_HashRef($_[0]) && !exists $_[0]{slurpy};
 		$default = _mkdefault($param_options);
 		
 		if ($param_options->{optional} or defined $default) {
 			$is_optional = 1;
 		}
 	
-		if (Bool->check($constraint))
+		if (Types::Standard::is_Bool($constraint))
 		{
-			$constraint = $constraint ? Any : Optional[Any];
+			$constraint = $constraint ? Types::Standard::Any : Types::Standard::Optional[Types::Standard::Any];
 		}
 	
-		if (HashRef->check($constraint) and exists $constraint->{slurpy})
+		if (Types::Standard::is_HashRef($constraint) and exists $constraint->{slurpy})
 		{
-			$constraint = to_TypeTiny($constraint->{slurpy});
+			$constraint = Types::TypeTiny::to_TypeTiny($constraint->{slurpy});
 			++$is_slurpy;
 			++$had_slurpy;
 		}
 		else
 		{
-			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			$is_optional     += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $constraint->parents;
+			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Types::Standard::Optional->{uniq} && $constraint->type_parameter;
 			
 			$constraint = $constraint->type_parameter if $really_optional;
 		}
@@ -615,9 +654,12 @@ sub compile_named
 		push @code, sprintf('@R{%s}', join ",", map $QUOTE->($_), @order);
 	}
 	elsif ($options{bless}) {
+		if ($options{oo_trace}) {
+			push @code, sprintf('$R{%s} = %s;', $QUOTE->('~~caller'), $QUOTE->($for));
+		}
 		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
 	}
-	elsif (ArrayRef->check($options{class})) {
+	elsif (Types::Standard::is_ArrayRef($options{class})) {
 		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}[0]), $options{class}[1]||'new');
 	}
 	elsif ($options{class}) {
@@ -639,7 +681,7 @@ sub compile_named
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $for),
 		environment => \%env,
 	);
 	
@@ -721,15 +763,15 @@ sub compile_named_oo
 	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
 		%options = (%options, %{+shift});
 	}
-	my @rest       = @_;
+	my @rest = @_;
 	
 	my %attribs;
 	while (@_) {
 		my ($name, $type) = splice(@_, 0, 2);
-		my $opts = (HashRef->check($_[0]) && !exists $_[0]{slurpy}) ? shift(@_) : {};
+		my $opts = (Types::Standard::is_HashRef($_[0]) && !exists $_[0]{slurpy}) ? shift(@_) : {};
 			
 		my $is_optional = 0+!! $opts->{optional};
-		$is_optional += grep $_->{uniq} == Optional->{uniq}, $type->parents;
+		$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $type->parents;
 		
 		my $getter = exists($opts->{getter})
 			? $opts->{getter}
@@ -755,7 +797,8 @@ sub compile_named_oo
 	
 	$klasses{$kls} ||= _mkklass(\%attribs);
 	
-	compile_named({ %options, bless => $klasses{$kls} }, @rest);
+	@_ = ({ oo_trace => 1, %options, bless => $klasses{$kls} }, @rest);
+	goto \&compile_named;
 }
 
 # Would be faster to inline this into validate and validate_named, but
@@ -763,10 +806,10 @@ sub compile_named_oo
 sub _mk_key {
 	local $_;
 	join ':', map {
-		HashRef->check($_)   ? do { my %h = %$_; sprintf('{%s}', _mk_key(map {; $_ => $h{$_} } sort keys %h)) } :
-		TypeTiny->check($_)  ? sprintf('TYPE=%s', $_->{uniq}) :
-		Ref->check($_)       ? sprintf('REF=%s', refaddr($_)) :
-		Undef->check($_)     ? sprintf('UNDEF') :
+		Types::Standard::is_HashRef($_)  ? do { my %h = %$_; sprintf('{%s}', _mk_key(map {; $_ => $h{$_} } sort keys %h)) } :
+		Types::TypeTiny::is_TypeTiny($_) ? sprintf('TYPE=%s', $_->{uniq}) :
+		Types::Standard::is_Ref($_)      ? sprintf('REF=%s', refaddr($_)) :
+		Types::Standard::is_Undef($_)    ? sprintf('UNDEF') :
 		$QUOTE->($_)
 	} @_;
 }
@@ -802,13 +845,13 @@ sub multisig
 	$options{description} ||= sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__');
 	for my $key ( qw[ message description ] )
 	{
-		StringLike->check($options{$key})
+		Types::TypeTiny::is_StringLike($options{$key})
 			or Error::TypeTiny::croak("Option '$key' expected to be string or stringifiable object");
 	}
 	
 	my @multi = map {
-		CodeLike->check($_)  ? { closure => $_ } :
-		ArrayLike->check($_) ? compile({ want_details => 1 }, @$_) :
+		Types::TypeTiny::is_CodeLike($_)  ? { closure => $_ } :
+		Types::TypeTiny::is_ArrayLike($_) ? compile({ want_details => 1 }, @$_) :
 		$_;
 	} @_;
 	
@@ -1667,6 +1710,41 @@ constraint which accepts classnames I<and> blessed objects.
    
    return $arr->[ $ix ];
  }
+
+=head3 B<ArgsObject>
+
+Type::Params exports a parameterizable type constraint B<ArgsObject>.
+It accepts the kinds of objects returned by C<compile_named_oo> checks.
+
+  package Foo {
+    use Moo;
+    use Type::Params 'ArgsObject';
+    
+    has args => (
+      is  => 'ro',
+      isa => ArgsObject['Bar::bar'],
+    );
+  }
+  
+  package Bar {
+    use Types::Standard -types;
+    use Type::Params 'compile_named_oo';
+    
+    sub bar {
+      state $check = compile_named_oo(
+        xxx => Int,
+        yyy => ArrayRef,
+      );
+      my $args = &$check;
+      
+      return 'Foo'->new( args => $args );
+    }
+  }
+  
+  Bar::bar( xxx => 42, yyy => [] );
+
+The parameter "Bar::bar" refers to the caller when the check is compiled,
+rather than when the parameters are checked.
 
 =head1 ENVIRONMENT
 

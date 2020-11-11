@@ -20,19 +20,18 @@ requires 'Class::Utils' => 0.03;
 requires 'Error::Pure' => 0.08;
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
-requires 'Text::ANSI::Util' => 0;
+requires 'Text::ANSI::Util' => 0.19;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Indent';
-resources 'homepage' => 'https://github.com/tupinek/Indent';
-resources 'repository' => 'git://github.com/tupinek/Indent';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Indent/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Indent';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Indent';
 test_requires 'English' => 0;
 test_requires 'Term::ANSIColor' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Text::ANSI::Util' => 0;
 tests_recursive;
-version '0.05';
+version '0.07';
 
 # Run.
 WriteAll();

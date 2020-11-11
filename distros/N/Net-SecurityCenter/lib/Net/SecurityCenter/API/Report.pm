@@ -4,13 +4,12 @@ use warnings;
 use strict;
 
 use Carp;
-use English qw( -no_match_vars );
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 my $common_template = {
 
@@ -51,9 +50,13 @@ sub list {
     my $raw     = delete( $params->{'raw'} );
     my $reports = $self->client->get( '/report', $params );
 
-    return          if ( !$reports );
-    return $reports if ($raw);
-    return sc_merge($reports);
+    return if ( !$reports );
+
+    if ($raw) {
+        return wantarray ? @{$reports} : $reports;
+    }
+
+    return wantarray ? @{ sc_merge($reports) } : sc_merge($reports);
 
 }
 
@@ -103,12 +106,12 @@ sub download {
     return $report_data if ( !$filename );
 
     open my $fh, '>', $filename
-        or croak("Could not open file '$filename': $OS_ERROR");
+        or croak("Could not open file '$filename': $!");
 
     print $fh $report_data;
 
     close $fh
-        or carp("Failed to close file '$filename': $OS_ERROR");
+        or carp("Failed to close file '$filename': $!");
 
     return 1;
 

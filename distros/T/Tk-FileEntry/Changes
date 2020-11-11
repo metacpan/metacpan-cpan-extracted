@@ -1,13 +1,17 @@
 Revision history for Perl extension Tk::FileEntry.
 
-2.3  Sun Mar 08 19:03:42 2015
+2.4  2020-10-28
+    - do not test POD during install (check for RELEASE_TESTING environment variable)
+    - cosmetic changes: fix spelling issues, author reference, indentation
+
+2.3  2015-03-08
     - added LICENSE file
     - reworked readme
 
-2.2  Thu Aug 12 21:21:00 2014
+2.2  2014-08-12
     - lowered Perl requirement to 5.8.8, related to RT #97845 by Slaven
 
-2.1  Wed Jul 30 21:25:00 2014
+2.1  2014-07-30
     - fixed timestamp of changes entry for v2.0
     - skipped test using MainWindow for computers not having a display
     - removed self-made test suite and replaced by Test::More
@@ -17,8 +21,8 @@ Revision history for Perl extension Tk::FileEntry.
     - removed duplicate BUGS section
     - added example to POD
 
-2.0  Tue Jul 29 21:41:00 2014
-    - pimped original version by moving it to the skelleton created by h2xs 1.23 with options -b 5.14.3 -XA -n Tk::FileEntry
+2.0  2014-07-29
+    - pimped original version by moving it to the skeleton created by h2xs 1.23 with options -b 5.14.3 -XA -n Tk::FileEntry
     - added Changes file
     - removed revision control version number stuff
     - removed print command for arguments
@@ -30,5 +34,5 @@ Revision history for Perl extension Tk::FileEntry.
     - removed known bug POD related to FileSelect issue - it's not used anymore
     - extended fileentry.t
 
-1.4  Tue Nov 26 21:41:00 2013
+1.4  2013-11-26
     - version found on CPAN in Tk::ACH dist v0.04 and on gitpan

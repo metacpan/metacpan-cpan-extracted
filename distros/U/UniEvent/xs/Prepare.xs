@@ -24,6 +24,7 @@ BOOT {
     stash.inherit("UniEvent::Handle");
     stash.add_const_sub("TYPE", Simple(Prepare::TYPE.name));
     xs::at_perl_destroy([]() { cbn.on_prepare = nullptr; });
+    unievent::register_perl_class(Prepare::TYPE, stash);
 }
 
 Prepare* Prepare::new (LoopSP loop = {}) {

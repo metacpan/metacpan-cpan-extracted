@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.188';
+our $VERSION = '1.191';
 
 use Quiq::Math;
 use Quiq::Json;
@@ -280,13 +280,21 @@ Name der Diagramm-Gruppe. Der Name wird als CSS-Id für den
 äußeren div-Container der Diagramm-Gruppe und als Namespace
 für die Funktionen genutzt.
 
-=item shape => $shape (Default: 'Spline')
+=item shape => $shape (Default: scatter: 'Spline', scattergl: 'Linear')
 
-Anfangsauswahl des Shape-Menüs auf allen Diagrammen.
+Anfangsauswahl des Shape-Menüs auf allen Diagrammen. Der Default
+hängt von Attribut type ab.
 
 =item strict => $bool (Default: 1)
 
 Melde Fehler mittels alert(), nicht nur via console.log().
+
+=item type => 'scatter'|'scattergl' (Default: 'scatter')
+
+Art des Diagramms. Bei 'scattergl' ist der Umgang mit größeren Datenmengen
+performanter, insbesondere bei der Anzeige von Markert. Allerdings wird
+die Kurvenform 'spline' nicht unterstützt und im Rangeslider
+wird keine verkleinerte Form des Graphs angezeigt.
 
 =item xAxisType => 'date'|'linear' (Default: 'date')
 
@@ -321,9 +329,9 @@ sub new {
         fontSize => 11,
         height => 300,
         name => 'dgr',
-        petersen => 0, # undokumentierter Parameter
-        shape => 'Spline',
+        shape => undef,
         strict => 1,
+        type => 'scatter',
         width => undef,
         xAxisType => 'date',
         xTitle => undef,
@@ -373,12 +381,18 @@ sub html {
     my ($self,$h) = @_;
 
     # Objektattribute
-    # Undokumentierter Parameter: petersen
 
-    my ($debug,$diagramA,$fontSize,$height,$name,$shape,$strict,$width,
-        $xAxisType,$xTitle,$petersen) =
-        $self->get(qw/debug diagrams fontSize height name shape strict width
-        xAxisType xTitle petersen/);
+    my ($debug,$diagramA,$fontSize,$height,$name,$shape,$strict,$type,
+        $width,$xAxisType,$xTitle) =
+        $self->get(qw/debug diagrams fontSize height name shape strict type
+        width xAxisType xTitle/);
+
+    # Default des Attributs shape hängt von type ab
+
+    if (!defined $shape) {
+        $shape = $type eq 'scatter'? 'Spline': 'Linear';
+        $self->shape($shape);
+    }
 
     # Kein Code, wenn keine Diagram
 
@@ -393,50 +407,41 @@ sub html {
     my $axisBox = 1; # Zeichne eine Box um den Plotbereich. Die Box hat
         # die Farbe der Achsen (siehe axisColor).
 
-    my ($topMargin,$leftMargin,$titleFontSize,$xTitleFontSize,$bottomMargin,
-        $rangeSliderThickness,$rangeSliderThicknessAsFraction);
+    my ($titleFontSize,$xyTitleFontSize,$titleYOffset,$topMargin,
+        $bottomMargin,$leftRightMargin) = @{{
+            # pt   ti xy ty t  b   lr
+            10 => [14,12,16,43,104,undef,],
+            11 => [16,13,18,48,106,undef,],
+            12 => [18,14,18,50,110,undef,],
+            14 => [20,16,20,55,118,undef,],
+            16 => [22,18,20,57,124,  100,],
+            18 => [24,20,22,61,134,  110,],
+            20 => [26,20,22,63,138,  120,],
+            22 => [28,22,22,65,142,  130,],
+            24 => [30,24,24,70,150,  140,],
+            28 => [35,28,24,75,168,  150,],
+            32 => [40,32,24,80,182,  165,],
+            36 => [45,36,24,85,196,  180,],
+        }->{$fontSize}};
 
-    if (!$petersen) {
-        # orig
-        # date: 250->100,300->110,350->120,400->130,450->140,...
-        # linear: ?
-        $topMargin = 45;
-        $leftMargin = undef;
-        $titleFontSize = int($fontSize*1.5);
-        $xTitleFontSize = $fontSize? int($fontSize*1.3): undef;
-        # FIXME: $xAxisLabelHeight in Berechnung einbeziehen
-        $bottomMargin = ($height-300)/50*10+($xAxisType eq 'date'?
-            ($xTitle? 120: 100): ($xTitle? 110: 90));
-        # $rangeSliderThickness 
-        $rangeSliderThicknessAsFraction = 0.2;
+    if ($xAxisType eq 'date') {
+        $bottomMargin += $fontSize;
     }
-    else {
-        # Petersen 1
-        # $titleFontSize = Quiq::Math->roundToInt(1.25*$fontSize-0.2);
-        # $xTitleFontSize = $fontSize+2;
-        # $topMargin = 0.6*$titleFontSize+36;
-        # $leftMargin = 5*($xTitleFontSize+2)-25;
-        # $bottomMargin = 0.2*$height+50+2.5*$fontSize-30;
-        # if ($xAxisType eq 'date') {
-        #     $bottomMargin += 20; # FIXME: hängt von Fontgröße ab
-        # }
-        # $rangeSliderThickness = 0.2;
-        # Petersen 2
-        $titleFontSize = Quiq::Math->roundToInt(1.25*$fontSize-0.2);
-        $xTitleFontSize = $fontSize+2;
-        $topMargin = Quiq::Math->roundToInt(1.2*$titleFontSize+25);
-        $leftMargin = 5*($xTitleFontSize+2)-15;
-        $rangeSliderThickness = Quiq::Math->roundToInt(
-            $height*(1.461E-11*$height**3 - 7.126E-08*$height**2 +
-            5.377E-05*$height + 1.406E-01));
-        $rangeSliderThicknessAsFraction = Quiq::Math->roundTo(
-            $rangeSliderThickness/$height,2);
-        $bottomMargin = $rangeSliderThickness+1.5*$fontSize+
-            1.5*$xTitleFontSize+22;
-        if ($xAxisType eq 'date') {
-            $bottomMargin += 20; # FIXME: hängt von Fontgröße ab
-        }
+    if (!$xTitle) {
+        $bottomMargin -= int $xyTitleFontSize*1.5;
     }
+
+    my $rangeSliderThickness = 25;
+    my $height2 = $height-($rangeSliderThickness+15);
+    my $bottomMargin2 = $bottomMargin-($rangeSliderThickness+18);
+
+    my $titleY = Quiq::Math->roundTo(
+        1-($titleYOffset/$height),4); # Faktor für Titel-Position
+    my $titleY2 = Quiq::Math->roundTo(
+        1-($height*(1-$titleY)/$height2),4);
+
+    my $rangeSliderThicknessAsFraction = Quiq::Math->roundTo(
+        $rangeSliderThickness/($height-$topMargin-$bottomMargin),4);
 
     # Maße für die Ränder
 
@@ -444,10 +449,11 @@ sub html {
     my $fillColor = '#e0e0e0'; # Farbe zwischen Kurve und X-Achse
     my $gridColor = '#e8e8e8'; # Farbe des Gitters
     my $lineColor = $color;
-    my $lineShape = 'spline'; # Linienform: 'spline'|'linear'|'hv'|
+    my $lineShape = $shape eq 'Linear'? 'linear': 'spline';
+        # Linienform: 'spline'|'linear'|'hv'|
         # 'vh'|'hvh'|'vhv'
     my $lineWidth = 1;
-    my $margin = [$topMargin,undef,$bottomMargin,$leftMargin];
+    my $margin = [$topMargin,$leftRightMargin,$bottomMargin,$leftRightMargin];
     my $markerColor = $color;
     my $markerSize = 3;
     my $markerSymbol = 'circle';
@@ -458,7 +464,7 @@ sub html {
     my $plotBackground = '#ffffff'; # Hintergrund Plotbereich
     my $rangeSliderBorderColor = '#e0e0e0';
 
-    my ($xAxisHoverFormat,$xAxisTickFormat,$xAxisLabelHeight);
+    my ($xAxisHoverFormat,$xAxisTickFormat);
     if ($xAxisType eq 'date') {
         $xAxisHoverFormat = '%Y-%m-%d %H:%M:%S'; # Format der
             # Spike-Beschriftung für die X-Koordinate. Siehe:
@@ -466,10 +472,6 @@ sub html {
             # Time-Formatting.md#format
         $xAxisTickFormat = '%Y-%m-%d %H:%M'; # Format der
             # Zeitachsen-Beschriftung
-        $xAxisLabelHeight = 55;
-    }
-    else { # 'linear'
-        $xAxisLabelHeight = 40;
     }
 
     my $xTickLen = 5;
@@ -477,29 +479,6 @@ sub html {
     my $yTickLen = 4;
     my $zeroLineColor = '#d0d0d0';
 
-    my ($height2,$bottomMargin2,$titleY,$titleY2);
-
-    if (!$petersen) {
-        # orig
-        $height2 = $height-($bottomMargin-$xAxisLabelHeight); # orig
-        $bottomMargin2 = $bottomMargin-($bottomMargin-$xAxisLabelHeight);
-        $titleY = 1-(15/$height); # Faktor für Titel-Position
-        $titleY2 = 1-($height*(1-$titleY)/$height2);
-    }
-    else {
-        # Petersen1
-        # $height2 = 0.8*$height-10;
-        # $bottomMargin2 = 40+2.5*$fontSize-30;
-        # Petersen2
-        $height2 = $height-$rangeSliderThickness;
-        $bottomMargin2 = $bottomMargin-$rangeSliderThickness;
-        $titleY = Quiq::Math->roundTo(
-            1-($topMargin-$titleFontSize)/2/$height,4);
-        $titleY2 = Quiq::Math->roundTo(
-            1-($topMargin-$titleFontSize)/2/$height2,4);
-    }
-
-    my $title = undef;
     my $yTitle = undef;
     my $xMin = undef;
     my $xMax = undef;
@@ -710,8 +689,9 @@ sub html {
                 });
             };
 
-            let generatePlot = function (name,i,title,yTitle,color,~
-                    xMin,xMax,yMin,yMax,showRangeSlider,shape,url,x,y,z) {
+            let generatePlot = function (name,i,title,yTitle,yTitleColor,~
+                    color,xMin,xMax,yMin,yMax,showRangeSlider,shape,url,~
+                    x,y,z) {
 
                 let t = $.extend(true,{},trace);
                 t.line.color = color;
@@ -722,7 +702,7 @@ sub html {
                 l.title.font.color = color;
                 l.xaxis.range = [xMin,xMax];
                 l.yaxis.title.text = yTitle;
-                l.yaxis.title.font.color = color;
+                l.yaxis.title.font.color = yTitleColor;
                 l.yaxis.range = [yMin,yMax];
 
                 let dId = name+'-d'+i;
@@ -769,7 +749,7 @@ sub html {
         })();°,
         __NAME__ => $name,
         __TRACE__ => scalar $j->o(
-            type => 'scatter',
+            type => $type,
             mode => $mode, # lines, markers, lines+markers, none,
             fill => 'tozeroy',
             fillcolor => $fillColor,
@@ -792,7 +772,7 @@ sub html {
             paper_bgcolor => $paperBackground,
             # autosize => \'true',
             title => $j->o(
-                text => $title,
+                text => undef,
                 font => $j->o(
                     color => $color,
                     size => $titleFontSize,
@@ -846,7 +826,7 @@ sub html {
                 title => $j->o(
                     text => $xTitle,
                     font => $j->o(
-                        size => $xTitleFontSize,
+                        size => $xyTitleFontSize,
                     ),
                 ),
                 zeroline => \'true',
@@ -878,7 +858,7 @@ sub html {
                     text => $yTitle,
                     font => $j->o(
                         color => $color,
-                        size => $xTitleFontSize, # gleich groß wie x-Achse
+                        size => $xyTitleFontSize,
                     ),
                 ),
                 zeroline => \'true',
@@ -910,16 +890,17 @@ sub html {
             rows => [
                 [[-tag=>'th','height'],[-tag=>'th','fontSize'],
                     [-tag=>'th','rangeSliderThickness'],[-tag=>'th','height2'],
-                    [-tag=>'th','xTitleFontSize'],[-tag=>'th','titleFontSize'],
+                    [-tag=>'th','xyTitleFontSize'],
+                    [-tag=>'th','titleFontSize'],
                     [-tag=>'th','topMargin'],[-tag=>'th','bottomMargin'],
                     [-tag=>'th','bottomMargin2'],[-tag=>'th','titleY'],
-                    [-tag=>'th','titleY2'],[-tag=>'th','leftMargin']],
+                    [-tag=>'th','titleY2'],[-tag=>'th','leftRightMargin']],
                 [[$height],[$fontSize],
                     [$rangeSliderThickness.
                         " ($rangeSliderThicknessAsFraction)"],
-                    [$height2],[$xTitleFontSize],[$titleFontSize],
+                    [$height2],[$xyTitleFontSize],[$titleFontSize],
                     [$topMargin],[$bottomMargin],[$bottomMargin2],[$titleY],
-                    [$titleY2],[$leftMargin]],
+                    [$titleY2],[$leftRightMargin]],
             ],
         );
     }
@@ -936,7 +917,7 @@ sub html {
                 my $i = 0;
                 for my $par (@$diagramA) {
                     $tmp .= $self->htmlDiagram($h,++$i,$par,
-                        $paperBackground);
+                        $paperBackground,$debug);
                 }
                 $tmp;
             }
@@ -965,7 +946,7 @@ sub html {
 
 =head4 Synopsis
 
-  $html = $dgr->htmlDiagram($h,$i);
+  $html = $dgr->htmlDiagram($h,$i,$par,$paperBackground,$debug);
 
 =head4 Arguments
 
@@ -994,11 +975,12 @@ Genererie den HTML-Code für ein Diagramm und liefere diesen zurück.
 # -----------------------------------------------------------------------------
 
 sub htmlDiagram {
-    my ($self,$h,$i,$par,$paperBackground) = @_;
+    my ($self,$h,$i,$par,$paperBackground,$debug) = @_;
 
     # Objektattribute
 
-    my ($height,$name,$shape,$width) = $self->get(qw/height name shape width/);
+    my ($height,$name,$shape,$type,$width) = $self->get(qw/height name
+        shape type width/);
 
     # HTML erzeugen
 
@@ -1008,6 +990,7 @@ sub htmlDiagram {
 
     return
         Quiq::Html::Table::Simple->html($h,
+        border => $debug? 1: undef,
         width => $width? "${width}px": '100%',
         style => [
             border => '1px dotted #b0b0b0',
@@ -1038,7 +1021,7 @@ sub htmlDiagram {
                     id => "$name-s$i",
                     value => $shape,
                     options => [
-                        'Spline',
+                        $type eq 'scatter'? ('Spline'): (),
                         'Linear',
                         'Marker',
                         $zName? ($zName): (),
@@ -1165,17 +1148,17 @@ sub jsDiagram {
 
     my $url = $par->url;
     if ($url) {
-        return sprintf("$name.generatePlot('%s',%s,'%s','%s','%s','%s'".
+        return sprintf("$name.generatePlot('%s',%s,'%s','%s',%s,'%s','%s'".
                 ",'%s',%s,%s,%s,'%s','%s');\n",
-            $name,$i,$par->title,$par->yTitle,$par->color,
-            $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,$url);
+            $name,$i,$par->title,$par->yTitle,$j->encode($par->yTitleColor),
+            $par->color,$xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,$url);
     }
     else {
         # mit x,y,z
-        return sprintf("$name.generatePlot('%s',%s,'%s','%s','%s','%s'".
+        return sprintf("$name.generatePlot('%s',%s,'%s','%s',%s,'%s','%s'".
                 ",'%s',%s,%s,%s,'%s','',%s,%s,%s);\n",
-            $name,$i,$par->title,$par->yTitle,$par->color,
-            $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,
+            $name,$i,$par->title,$par->yTitle,$j->encode($par->yTitleColor),
+            $par->color,$xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,
             scalar($j->encode($par->x)),scalar($j->encode($par->y)),
             scalar($j->encode($par->z)));
     }
@@ -1185,7 +1168,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.188
+1.191
 
 =head1 AUTHOR
 

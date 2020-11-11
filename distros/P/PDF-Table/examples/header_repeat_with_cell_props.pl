@@ -2,37 +2,49 @@
 use warnings;
 use strict;
 use diagnostics;
-
-#Please use TABSTOP=4 for best view
 use PDF::Table;
+
+# Please use TABSTOP=4 for best view
 # -------------
+# -A or -B on command line to select preferred library (if available)
+# then look for PDFpref file and read A or B forms
 my ($PDFpref, $rcA, $rcB); # which is available?
 my $prefFile = "./PDFpref";
 my $prefDefault = "B"; # PDF::Builder default if no prefFile, or both installed
-if (-f $prefFile && -r $prefFile) {
-    open my $FH, '<', $prefFile or die "error opening $prefFile: $!\n";
-    $PDFpref = <$FH>;
-    if      ($PDFpref =~ m/^A/i) {
-	# something starting with A, assume want PDF::API2
-	$PDFpref = 'A';
-    } elsif ($PDFpref =~ m/^B/i) {
-	# something starting with B, assume want PDF::Builder
-	$PDFpref = 'B';
-    } elsif ($PDFpref =~ m/^PDF:{1,2}A/i) {
-	# something starting with PDF:A or PDF::A, assume want PDF::API2
-	$PDFpref = 'A';
-    } elsif ($PDFpref =~ m/^PDF:{1,2}B/i) {
-	# something starting with PDF:B or PDF::B, assume want PDF::Builder
-	$PDFpref = 'B';
+if (@ARGV) {
+    # A or -A argument: set PDFpref to A else B
+    if ($ARGV[0] =~ m/^-?([AB])/i) {
+	$PDFpref = uc($1);
     } else {
-	print STDERR "Don't see A... or B..., default to $prefDefault\n";
-	$PDFpref = $prefDefault;
+	print STDERR "Unknown command line flag $ARGV[0] ignored.\n";
     }
-    close $FH;
-} else {
-    # no preference expressed, default to PDF::Builder
-    print STDERR "No preference file found, so default to $prefDefault\n";
-    $PDFpref = $prefDefault;
+}
+if (!defined $PDFpref) {
+    if (-f $prefFile && -r $prefFile) {
+        open my $FH, '<', $prefFile or die "error opening $prefFile: $!\n";
+        $PDFpref = <$FH>;
+        if      ($PDFpref =~ m/^A/i) {
+	    # something starting with A, assume want PDF::API2
+	    $PDFpref = 'A';
+        } elsif ($PDFpref =~ m/^B/i) {
+	    # something starting with B, assume want PDF::Builder
+	    $PDFpref = 'B';
+        } elsif ($PDFpref =~ m/^PDF:{1,2}A/i) {
+	    # something starting with PDF:A or PDF::A, assume want PDF::API2
+	    $PDFpref = 'A';
+        } elsif ($PDFpref =~ m/^PDF:{1,2}B/i) {
+	    # something starting with PDF:B or PDF::B, assume want PDF::Builder
+	    $PDFpref = 'B';
+        } else {
+	    print STDERR "Don't see A... or B..., default to $prefDefault\n";
+	    $PDFpref = $prefDefault;
+        }
+        close $FH;
+    } else {
+        # no preference expressed, default to PDF::Builder
+        print STDERR "No preference file found, so default to $prefDefault\n";
+        $PDFpref = $prefDefault;
+    }
 }
 foreach (1 .. 2) {
     if ($PDFpref eq 'A') { # A(PI2) preferred
@@ -59,8 +71,8 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '0.12'; # VERSION
-my $LAST_UPDATE = '0.12'; # manually update whenever code is changed
+our $VERSION = '1.001'; # VERSION
+my $LAST_UPDATE = '1.000'; # manually update whenever code is changed
 
 my $outfile = $0;
 if ($outfile =~ m#[\\/]([^\\/]+)$#) { $outfile = $1; }
@@ -100,8 +112,8 @@ my $some_data = [
 # build the table layout
 my $cell_props = [];
 $cell_props->[2][1] = {
-	background_color => '#000000',
-	font_color       => 'blue',
+	background_color => '#000000',  # or bg_color
+	font_color       => 'blue',     # or fg_color
 	justify          => 'left'
 };
 $cell_props->[4][1] = {
@@ -115,6 +127,7 @@ $cell_props->[6][1] = {
 	justify          => 'right'
 };
 
+# note that cell properties taken out-of-line
 $pdftable->table(
 
 	# required params
@@ -123,24 +136,25 @@ $pdftable->table(
 	$some_data,
 	x       => 10,
 	w       => 350,
-	start_y => 780,
+	start_y => 780,  # or y
 	next_y  => 780,
-	start_h => 200,
-	next_h  => 200,
-	padding => 10,
+	start_h => 210,  # or h
+	next_h  => 210,
 
 	# some optional params
 	font_size          => 10,
-	padding_right      => 10,
+	padding            => 10,
+       #padding_right      => 10,
 	horizontal_borders => 1,
 	header_props       => {
 		bg_color   => "silver",
 		font       => $pdf->corefont( "Helvetica", -encoding => "utf8" ),
 		font_size  => 20,
-		font_color => "#006600",
+		font_color => "#006600",  # or fg_color
 		#justify => 'left',
-		repeat  => 1,
+		repeat  => 1,  # default
 	},
 	cell_props => $cell_props
 );
-$pdf->saveas();
+
+$pdf->save();

@@ -1,5 +1,9 @@
 Revision history for Test-Dependencies
 
+0.30    2020-11-08
+        * Recognize 'use v5.10;', 'use 5.008001;' and 'use 5.10.1;' as
+          a minimum version pragma, not a module
+
 0.29    2020-10-10
         * Eliminate masked variable warning
 

@@ -1,3 +1,8 @@
+0.892   2020-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix regex so 'opt:1' is recognized.
+
+
 0.891   2020-04-27  Released-By: PERLANCAR; Urgency: medium
 
 	- More sophisticated humanize_getopt_long_opt_spec(): add options

@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
 # ABSTRACT: Class to model a BIMI record
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -123,8 +123,11 @@ sub _build_is_valid($self) {
       # We could not get an indicator from the location to check against, return an error.
       $self->add_error('SVG_MISMATCH');
     }
-    elsif ( $self->location_is_relevant && $self->authority->vmc->indicator->data_uncompressed ne $self->location->indicator->data_uncompressed ) {
+    elsif ( $self->location_is_relevant && $self->authority->vmc->indicator->data_uncompressed_normalized ne $self->location->indicator->data_uncompressed_normalized ) {
       $self->add_error('SVG_MISMATCH');
+    }
+    elsif ( $self->location_is_relevant && $self->authority->vmc->indicator->data_uncompressed ne $self->location->indicator->data_uncompressed ) {
+      $self->add_warning('Line encoding for SVG in bimi-location did not match SVG in VMC');
     }
   }
 
@@ -204,6 +207,7 @@ sub _build_record_hashref($self) {
 
 sub _get_from_dns($self,$selector,$domain) {
   my @matches;
+  my $cname;
   if ($self->bimi_object->options->force_record) {
     $self->log_verbose('Using fake record');
     push @matches, $self->bimi_object->options->force_record;
@@ -214,9 +218,22 @@ sub _get_from_dns($self,$selector,$domain) {
     return @matches;
   };
   for my $rr ( $query->answer ) {
+    $cname = $rr->cname if $rr->type eq 'CNAME';
     next if $rr->type ne 'TXT';
     push @matches, scalar $rr->txtdata;
   }
+
+  if (!@matches && $cname) {
+    # follow a single CNAME
+    $query   = $res->query( $cname, 'TXT' ) or do {
+      return @matches;
+    };
+    for my $rr ( $query->answer ) {
+      next if $rr->type ne 'TXT';
+      push @matches, scalar $rr->txtdata;
+    }
+  }
+
   return @matches;
 }
 
@@ -259,6 +276,13 @@ sub app_validate($self) {
     say YELLOW.'  Is Valid  '.WHITE.': '.($self->is_valid?GREEN.'Yes':BRIGHT_RED.'No').RESET;
   }
 
+  if ( $self->warnings->@* ) {
+    say "Warnings:";
+    foreach my $warning ( $self->warnings->@* ) {
+      say CYAN.'  '.$warning.RESET;
+    }
+  }
+
   if ( ! $self->is_valid ) {
     say "Errors:";
     foreach my $error ( $self->errors->@* ) {
@@ -285,7 +309,7 @@ Mail::BIMI::Record - Class to model a BIMI record
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -366,6 +390,10 @@ Selector the record was retrieved from
 is=rw
 
 BIMI Version tag
+
+=head2 warnings
+
+is=rw
 
 =head1 CONSUMES
 

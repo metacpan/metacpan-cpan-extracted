@@ -1,0 +1,33 @@
+---
+abstract: 'A PKCE extension for Net::OAuth2Server'
+author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires:
+  Data::Dumper: '0'
+  Net::OAuth2Server::Request::Authorization: '0.003'
+  Net::OAuth2Server::Request::Token::AuthorizationCode: '0.003'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OAuth2Server-PKCE
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Method::Modifiers: '0'
+  Digest::SHA: '0'
+  Role::Tiny: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/ap/Net-OAuth2Server-PKCE/issues
+  repository: git://github.com/ap/Net-OAuth2Server-PKCE.git
+version: '0.002'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2020
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

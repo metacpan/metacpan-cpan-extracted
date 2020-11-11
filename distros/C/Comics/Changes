@@ -1,5 +1,18 @@
 Revision history for Comics
 
+1.18	2020-11-10
+
+	Add GitHub Actions (thanks to Gabor Szabo).
+	Disable LolNein.
+	Remove obsolete entries from MANIFEST.
+
+1.17	2020-11-06
+
+	Fix patterns for Glasbergen, SlackWyrm, PBFComics.
+	Fix patterns for Glasbergen, DoYouKnowFlo, CSectionComicsBonus.
+	Fix patterns for PoorlyDrawnLines, Glasbergen, LittleGamers.
+	Disable MyJetpack, ThatsLife.
+
 1.16	2020-05-19
 
 	Add GrrlPower, DayByDay, GunnerKrigg, TimeTrabble.

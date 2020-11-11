@@ -1,0 +1,18 @@
+CHANGELOG
+Makefile.PL
+lib/Algorithm/Diff/JSON.pm
+t/algorithm-diff-json-additions
+t/algorithm-diff-json-all_changes-big
+t/algorithm-diff-json-base
+t/algorithm-diff-json-base-big
+t/algorithm-diff-json-changes
+t/algorithm-diff-json-removals
+t/algorithm-diff-json.t
+MANIFEST.SKIP
+MANIFEST
+t/pod-coverage.t
+t/pod.t
+ARTISTIC.txt
+GPL2.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

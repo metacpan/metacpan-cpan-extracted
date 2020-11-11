@@ -84,6 +84,7 @@ lib/Mojolicious/Command.pm
 lib/Mojolicious/Command/Author/cpanify.pm
 lib/Mojolicious/Command/Author/generate.pm
 lib/Mojolicious/Command/Author/generate/app.pm
+lib/Mojolicious/Command/Author/generate/dockerfile.pm
 lib/Mojolicious/Command/Author/generate/lite_app.pm
 lib/Mojolicious/Command/Author/generate/makefile.pm
 lib/Mojolicious/Command/Author/generate/plugin.pm
@@ -122,6 +123,9 @@ lib/Mojolicious/Plugins.pm
 lib/Mojolicious/Renderer.pm
 lib/Mojolicious/resources/public/favicon.ico
 lib/Mojolicious/resources/public/mojo/failraptor.png
+lib/Mojolicious/resources/public/mojo/highlight.js/highlight-mojo-dark.css
+lib/Mojolicious/resources/public/mojo/highlight.js/highlight.min.js
+lib/Mojolicious/resources/public/mojo/highlight.js/mojolicious.min.js
 lib/Mojolicious/resources/public/mojo/jquery/jquery.js
 lib/Mojolicious/resources/public/mojo/logo-black-2x.png
 lib/Mojolicious/resources/public/mojo/logo-black.png
@@ -132,8 +136,6 @@ lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
 lib/Mojolicious/resources/public/mojo/pinstripe-dark.png
 lib/Mojolicious/resources/public/mojo/pinstripe-light.png
-lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-dark.css
-lib/Mojolicious/resources/public/mojo/prettify/run_prettify.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
 lib/Mojolicious/resources/templates/mojo/not_found.html.ep

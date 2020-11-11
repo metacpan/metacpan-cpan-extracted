@@ -1,0 +1,7 @@
+Revision history for Net-OAuth2Server-PKCE
+
+0.002 Tue 10 Nov 2020
+	- Better error reporting
+
+0.001 Sun 01 Nov 2020
+	- Initial release

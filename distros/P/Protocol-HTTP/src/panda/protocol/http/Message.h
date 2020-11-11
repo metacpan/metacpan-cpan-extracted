@@ -32,17 +32,7 @@ struct Message : virtual Refcnt {
         Compression::Level level = Compression::Level::min;
     } compression;
 
-    struct SerializationContext {
-        int                         http_version;
-        const Body*                 body;
-        GenericHeaders<2>           handled_headers;
-        Compression::Type           compression;
-        compression::CompressorPtr  compressor;
-        const Request*              request;
-        const URI*                  uri;
-    };
-
-    compression::CompressorPtr compressor;
+    mutable compression::CompressorPtr compressor;
 
     Message () {}
 
@@ -58,26 +48,40 @@ struct Message : virtual Refcnt {
     }
 
     wrapped_chunk make_chunk (const string& s) const { return make_chunk(s, compressor); }
-    wrapped_chunk final_chunk () const { return final_chunk(compressor); }
+    wrapped_chunk final_chunk (const string& s = "") const { return final_chunk(s, compressor); }
 
 protected:
+    struct SerializationContext {
+        int                         http_version;
+        const Body*                 body;
+        GenericHeaders<2>           handled_headers;
+        Compression::Type           compression;
+        compression::CompressorPtr  compressor;
+        const Request*              request;
+        bool                        chunked;
+    };
+
     static string to_string (const std::vector<string>& pieces);
 
-    inline string _content_encoding(const SerializationContext& ctx) const noexcept {
-        string out_compression;
-        if (!headers.has("Content-Encoding") && ctx.compressor) {
-            switch (ctx.compression) {
-            case Compression::GZIP:    out_compression = "gzip";    break;
-            case Compression::DEFLATE: out_compression = "deflate"; break;
-            case Compression::BROTLI:  out_compression = "br";      break;
-            case Compression::IDENTITY: break;
-            }
+    static inline string _compression_string(Compression::Type type) noexcept {
+        switch (type) {
+        case Compression::GZIP:     return "gzip";
+        case Compression::DEFLATE:  return "deflate";
+        case Compression::BROTLI:   return "br";
+        case Compression::IDENTITY: return string{};
         }
-        return out_compression;
+        std::terminate();
+    }
+
+    inline string _content_encoding(const SerializationContext& ctx) const noexcept {
+        if (!headers.has("Content-Encoding") && ctx.compressor) {
+            return _compression_string(ctx.compression);
+        }
+        return string{};
     }
 
     inline void _compile_prepare (SerializationContext& ctx) const {
-        if (chunked) {
+        if (ctx.chunked) {
             ctx.http_version = 11;
             // special header, to prevent multiple TEnc headers
             ctx.handled_headers.set("Transfer-Encoding", "chunked");
@@ -94,7 +98,7 @@ protected:
         _prepare_compressor(ctx, compression.level);
 
         Body mutable_body;
-        if (ctx.compressor && !chunked) {
+        if (ctx.compressor && !ctx.chunked) {
             compress_body(*ctx.compressor, *ctx.body, mutable_body);
             ctx.body = &mutable_body;
         }
@@ -105,7 +109,7 @@ protected:
         auto sz = ctx.body->parts.size();
 
         std::vector<string> result;
-        if (chunked) {
+        if (ctx.chunked) {
             result.reserve(1 + sz * 3 + 1);
             result.emplace_back(compiled_headers);
             auto append_piecewise = [&](auto& piece) { result.emplace_back(piece); };
@@ -119,10 +123,15 @@ protected:
         return result;
     }
 
-private:
-    inline wrapped_chunk wrap_into_chunk (const string& s) const {
-        if (!s) return {"", "", ""};
-        return {string::from_number(s.length(), 16) + "\r\n", s, "\r\n"};
+    static inline compression::CompressorPtr _get_compressor (Compression::Type type, Compression::Level level) {
+        if (type != Compression::IDENTITY) {
+            auto c = compression::instantiate(type);
+            if (c) {
+                c->prepare_compress(level);
+                return c;
+            }
+        }
+        return compression::CompressorPtr{};
     }
 
     inline wrapped_chunk make_chunk (const string& s, const compression::CompressorPtr& compr) const {
@@ -134,13 +143,29 @@ private:
         }
     }
 
-    inline wrapped_chunk final_chunk (const compression::CompressorPtr& compr) const {
+private:
+    inline wrapped_chunk wrap_into_chunk (const string& s) const {
+        if (!s) return {"", "", ""};
+        return {string::from_number(s.length(), 16) + "\r\n", s, "\r\n"};
+    }
+
+    inline wrapped_chunk final_chunk (const string& s, const compression::CompressorPtr& compr) const {
         if (compr) {
-            auto chunk = wrap_into_chunk(compr->flush());
+            string content;
+            if (s) { content += compr->compress(s); }
+            content += compr->flush();
+            auto chunk = wrap_into_chunk(content);
             chunk[2] += "0\r\n\r\n";
             return chunk;
         } else {
-            return {"", "","0\r\n\r\n"};
+            if (s) {
+                return {
+                    string::from_number(s.length(), 16) + "\r\n",
+                    s,
+                    "\r\n0\r\n\r\n"
+                };
+            }
+            else return {"", "","0\r\n\r\n"};
         }
     }
 
@@ -156,20 +181,13 @@ private:
         for (auto& part : ctx.body->parts) {
             _append_chunk(make_chunk(part, ctx.compressor), fn);
         }
-        _append_chunk(final_chunk(ctx.compressor), fn);
+        _append_chunk(final_chunk("", ctx.compressor), fn);
     }
 
     inline void _prepare_compressor (SerializationContext& ctx, Compression::Level level) const {
-        if (ctx.compression != Compression::IDENTITY) {
-            auto compressor = compression::instantiate(ctx.compression);
-            if (compressor) {
-                compressor->prepare_compress(level);
-                ctx.compressor = std::move(compressor);
-                return;
-            }
-            // reset to identity
-            ctx.compression = Compression::IDENTITY;
-        }
+        auto value = _get_compressor(ctx.compression, level);
+        if (value) { compressor = ctx.compressor = value; }
+        else { ctx.compression = Compression::IDENTITY; } // reset back
     }
 
     //friend struct Parser; friend struct RequestParser; friend struct ResponseParser;

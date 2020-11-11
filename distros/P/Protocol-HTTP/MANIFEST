@@ -19,12 +19,10 @@ lib/Protocol/HTTP/Response.pod
 lib/Protocol/HTTP/ResponseParser.pm
 lib/Protocol/HTTP/ResponseParser.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/bench.pl
 misc/mytest.plx
 misc/trun.plx
-Protocol-HTTP.pro
 src/panda/protocol/http.h
 src/panda/protocol/http/Body.cc
 src/panda/protocol/http/Body.h

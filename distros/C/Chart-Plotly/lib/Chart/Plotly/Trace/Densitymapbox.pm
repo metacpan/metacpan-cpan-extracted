@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Densitymapbox::Hoverlabel;
 use Chart::Plotly::Trace::Densitymapbox::Stream;
 use Chart::Plotly::Trace::Densitymapbox::Transform;
 
-our $VERSION = '0.040';    # VERSION
+our $VERSION = '0.041';    # VERSION
 
 # ABSTRACT: Draws a bivariate kernel density estimation with a Gaussian kernel from `lon` and `lat` coordinates and optional `z` values using a colorscale.
 
@@ -317,7 +317,7 @@ Chart::Plotly::Trace::Densitymapbox - Draws a bivariate kernel density estimatio
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 

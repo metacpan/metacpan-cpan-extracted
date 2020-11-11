@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.082';
+our $VERSION   = '0.083';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -1255,12 +1255,12 @@ means that the keyword may appear only within an app definition block.
    Optional[CodeRef]        $definition,
  );
  
- # Scope: CLASS
+ # Scope: CLASS or APP
  extends(
    List[Str|ArrayRef]       @parents,
  );
  
- # Scope: CLASS or ROLE
+ # Scope: ANY
  with(
    List[Str|ArrayRef]       @parents,
  );

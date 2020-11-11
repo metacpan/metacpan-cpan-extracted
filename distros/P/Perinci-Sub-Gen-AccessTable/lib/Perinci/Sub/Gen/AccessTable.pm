@@ -1,7 +1,7 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2020-10-07'; # DATE
-our $VERSION = '0.585'; # VERSION
+our $DATE = '2020-10-28'; # DATE
+our $VERSION = '0.586'; # VERSION
 
 use 5.010001;
 use strict;
@@ -536,19 +536,21 @@ sub __parse_query {
         $frschemas{$f} = Data::Sah::Resolve::resolve_schema($fspecs->{$f}{schema});
     }
 
+    my $cic = $opts->{case_insensitive_comparison};
+
     for my $f (grep {$frschemas{$_}[0] eq 'bool'} @fields) {
         my $fspec = $fspecs->{$f};
         my $ftype = $frschemas{$f}[0];
         my $exists;
         if (defined $args->{"$f.is"}) {
             $exists++;
-            push @filters, [$f, $ftype, "truth", $args->{"$f.is"}];
+            push @filters, [$f, $ftype, "truth", $args->{"$f.is"}, $cic];
         } elsif (defined $args->{"$f.isnt"}) {
             $exists++;
-            push @filters, [$f, $ftype, "truth", !$args->{"$f.isnt"}, $ftype];
+            push @filters, [$f, $ftype, "truth", !$args->{"$f.isnt"}, $ftype, $cic];
         } elsif (defined($args->{$f}) && __is_filter_arg($f, $func_meta)) {
             $exists++;
-            push @filters, [$f, $ftype, "truth", $args->{$f}, $ftype];
+            push @filters, [$f, $ftype, "truth", $args->{$f}, $ftype, $cic];
         }
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
@@ -559,11 +561,11 @@ sub __parse_query {
         my $exists;
         if (defined $args->{"$f.has"}) {
             $exists++;
-            push @filters, [$f, $ftype, "~~", $args->{"$f.has"}, $ftype];
+            push @filters, [$f, $ftype, "~~", $args->{"$f.has"}, $ftype, $cic];
         }
         if (defined $args->{"$f.lacks"}) {
             $exists++;
-            push @filters, [$f, $ftype, "!~~", $args->{"$f.lacks"}, $ftype];
+            push @filters, [$f, $ftype, "!~~", $args->{"$f.lacks"}, $ftype, $cic];
         }
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
@@ -574,11 +576,11 @@ sub __parse_query {
         my $exists;
         if (defined $args->{"$f.in"}) {
             $exists++;
-            push @filters, [$f, $ftype, "in", $args->{"$f.in"}];
+            push @filters, [$f, $ftype, "in", $args->{"$f.in"}, $cic];
         }
         if (defined $args->{"$f.not_in"}) {
             $exists++;
-            push @filters, [$f, $ftype, "not_in", $args->{"$f.not_in"}];
+            push @filters, [$f, $ftype, "not_in", $args->{"$f.not_in"}, $cic];
         }
     }
 
@@ -590,34 +592,34 @@ sub __parse_query {
         if (defined $args->{"$f.is"}) {
             $exists++;
             push @filters,
-                [$f, $ftype, "==", $args->{"$f.is"}];
+                [$f, $ftype, "==", $args->{"$f.is"}, $cic];
         } elsif (defined($args->{$f}) && __is_filter_arg($f,  $func_meta)) {
             $exists++;
-            push @filters, [$f, $ftype, "==", $args->{$f}];
+            push @filters, [$f, $ftype, "==", $args->{$f}, $cic];
         }
         if (defined $args->{"$f.isnt"}) {
             $exists++;
             push @filters,
-                [$f, $ftype, "!=", $args->{"$f.isnt"}];
+                [$f, $ftype, "!=", $args->{"$f.isnt"}, $cic];
         } elsif (defined($args->{$f}) && __is_filter_arg($f,  $func_meta)) {
             $exists++;
-            push @filters, [$f, $ftype, "==", $args->{$f}];
+            push @filters, [$f, $ftype, "==", $args->{$f}, $cic];
         }
         if (defined $args->{"$f.min"}) {
             $exists++;
-            push @filters, [$f, $ftype, '>=', $args->{"$f.min"}];
+            push @filters, [$f, $ftype, '>=', $args->{"$f.min"}, $cic];
         }
         if (defined $args->{"$f.max"}) {
             $exists++;
-            push @filters, [$f, $ftype, '<=', $args->{"$f.max"}];
+            push @filters, [$f, $ftype, '<=', $args->{"$f.max"}, $cic];
         }
         if (defined $args->{"$f.xmin"}) {
             $exists++;
-            push @filters, [$f, $ftype, '>', $args->{"$f.xmin"}];
+            push @filters, [$f, $ftype, '>', $args->{"$f.xmin"}, $cic];
         }
         if (defined $args->{"$f.xmax"}) {
             $exists++;
-            push @filters, [$f, $ftype, '<', $args->{"$f.xmax"}];
+            push @filters, [$f, $ftype, '<', $args->{"$f.xmax"}, $cic];
         }
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
@@ -628,19 +630,19 @@ sub __parse_query {
         my $exists;
         if (defined $args->{"$f.contains"}) {
             $exists++;
-            push @filters, [$f, $ftype, 'pos', $args->{"$f.contains"}];
+            push @filters, [$f, $ftype, 'pos', $args->{"$f.contains"}, $cic];
         }
         if (defined $args->{"$f.not_contains"}) {
             $exists++;
-            push @filters, [$f, $ftype, '!pos', $args->{"$f.not_contains"}];
+            push @filters, [$f, $ftype, '!pos', $args->{"$f.not_contains"}, $cic];
         }
         if (defined $args->{"$f.matches"}) {
             $exists++;
-            push @filters, [$f, $ftype, '=~', $args->{"$f.matches"}];
+            push @filters, [$f, $ftype, '=~', $args->{"$f.matches"}, $cic];
         }
         if (defined $args->{"$f.not_matches"}) {
             $exists++;
-            push @filters, [$f, $ftype, '!~', $args->{"$f.not_matches"}];
+            push @filters, [$f, $ftype, '!~', $args->{"$f.not_matches"}, $cic];
         }
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
@@ -650,7 +652,7 @@ sub __parse_query {
     my $cff = $opts->{custom_filters} // {};
     while (my ($cfn, $cf) = each %$cff) {
         next unless defined $args->{$cfn};
-        push @filters, [$cf->{fields}, undef, 'call', [$cf->{code}, $args->{$cfn}]];
+        push @filters, [$cf->{fields}, undef, 'call', [$cf->{code}, $args->{$cfn}], $cic];
         for (@{$cf->{fields} // []}) {
             push @filter_fields, $_ if !($_ ~~ @filter_fields);
         }
@@ -659,15 +661,15 @@ sub __parse_query {
     my @searchable_fields = grep {
         !defined($fspecs->{$_}{searchable}) || $fspecs->{$_}{searchable}
         } @fields;
-    my $ci = $opts->{case_insensitive_search};
-    my $search_opts = {ci => $ci};
+    my $cis = $opts->{case_insensitive_search};
+    my $search_opts = {ci => $cis};
     my $search_re;
     my $q = $args->{query};
     if (defined $q) {
         if ($opts->{word_search}) {
-            $search_re = $ci ? qr/\b$q\b/i : qr/\b$q\b/;
+            $search_re = $cis ? qr/\b$q\b/i : qr/\b$q\b/;
         } else {
-            $search_re = $ci ? qr/$q/i : qr/$q/;
+            $search_re = $cis ? qr/$q/i : qr/$q/;
         }
     }
     $query->{query} = $args->{query};
@@ -835,23 +837,49 @@ sub _gen_func {
             goto SKIP_FILTER if $metadata->{filtered};
 
             for my $filter (@{$query->{filters}}) {
-                my ($f, $ftype, $op, $opn) = @$filter;
-                my $stringy = $ftype eq 'str';
+                my ($f, $ftype, $op, $opn, $cic) = @$filter;
+                my $stringy = $ftype eq 'str' || $ftype eq 'cistr';
+                $cic = 1 if $ftype eq 'cistr';
                 if ($op eq 'truth') {
                     next REC if $r_h->{$f} xor $opn;
                 } elsif ($op eq '~~') {
-                    for (@$opn) {
-                        next REC unless $_ ~~ @{$r_h->{$f}};
+                    if ($stringy && $cic) {
+                        my @vals = map {lc} @{$r_h->{$f}};
+                        for (@$opn) {
+                            next REC unless lc($_) ~~ @vals;
+                        }
+                    } else {
+                        for (@$opn) {
+                            next REC unless $_ ~~ @{$r_h->{$f}};
+                        }
                     }
                 } elsif ($op eq '!~~') {
-                    for (@$opn) {
-                        next REC if $_ ~~ @{$r_h->{$f}};
+                    if ($stringy && $cic) {
+                        my @vals = map {lc} @{$r_h->{$f}};
+                        for (@$opn) {
+                            next REC if lc($_) ~~ @vals;
+                        }
+                    } else {
+                        for (@$opn) {
+                            next REC if $_ ~~ @{$r_h->{$f}};
+                        }
                     }
                 } elsif ($op eq 'in') {
-                    next REC unless $r_h->{$f} ~~ @$opn;
+                    if ($stringy && $cic) {
+                        my @vals = map {lc} @$opn;
+                        next REC unless lc($r_h->{$f}) ~~ @vals;
+                    } else {
+                        next REC unless $r_h->{$f} ~~ @$opn;
+                    }
                 } elsif ($op eq 'not_in') {
-                    next REC if $r_h->{$f} ~~ @$opn;
-
+                    if ($stringy && $cic) {
+                        my @vals = map {lc} @$opn;
+                        next REC if $r_h->{$f} ~~ @vals;
+                    } else {
+                        next REC if $r_h->{$f} ~~ @$opn;
+                    }
+                } elsif ($op eq '==' && $stringy && $cic) {
+                    next REC unless lc $r_h->{$f} eq lc $opn;
                 } elsif ($op eq '==' && $stringy) {
                     next REC unless $r_h->{$f} eq $opn;
                 } elsif ($op eq '==' && $ftype eq 'date') {
@@ -862,6 +890,8 @@ sub _gen_func {
                 } elsif ($op eq '==') {
                     next REC unless $r_h->{$f} == $opn;
 
+                } elsif ($op eq '!=' && $stringy && $cic) {
+                    next REC unless lc $r_h->{$f} ne lc $opn;
                 } elsif ($op eq '!=' && $stringy) {
                     next REC unless $r_h->{$f} ne $opn;
                 } elsif ($op eq '!=' && $ftype eq 'date') {
@@ -872,6 +902,8 @@ sub _gen_func {
                 } elsif ($op eq '!=') {
                     next REC unless $r_h->{$f} != $opn;
 
+                } elsif ($op eq '>=' && $stringy && $cic) {
+                    next REC unless lc $r_h->{$f} ge lc $opn;
                 } elsif ($op eq '>=' && $stringy) {
                     next REC unless $r_h->{$f} ge $opn;
                 } elsif ($op eq '>=' && $ftype eq 'date') {
@@ -882,6 +914,8 @@ sub _gen_func {
                 } elsif ($op eq '>=') {
                     next REC unless $r_h->{$f} >= $opn;
 
+                } elsif ($op eq '>'  && $stringy && $cic) {
+                    next REC unless lc $r_h->{$f} gt lc $opn;
                 } elsif ($op eq '>'  && $stringy) {
                     next REC unless $r_h->{$f} gt $opn;
                 } elsif ($op eq '>'  && $ftype eq 'date') {
@@ -892,6 +926,8 @@ sub _gen_func {
                 } elsif ($op eq '>' ) {
                     next REC unless $r_h->{$f} >  $opn;
 
+                } elsif ($op eq '<=' && $stringy && $cic) {
+                    next REC unless lc $r_h->{$f} le lc $opn;
                 } elsif ($op eq '<=' && $stringy) {
                     next REC unless $r_h->{$f} le $opn;
                 } elsif ($op eq '<=' && $ftype eq 'date') {
@@ -903,6 +939,8 @@ sub _gen_func {
                     next REC unless $r_h->{$f} <= $opn;
 
                 } elsif ($op eq '<'  && $stringy) {
+                    next REC unless lc $r_h->{$f} lt lc $opn;
+                } elsif ($op eq '<'  && $stringy) {
                     next REC unless $r_h->{$f} lt $opn;
                 } elsif ($op eq '<'  && $ftype eq 'date') {
                     my $dopn = coerce_date($opn);
@@ -912,16 +950,27 @@ sub _gen_func {
                 } elsif ($op eq '<' ) {
                     next REC unless $r_h->{$f} <  $opn;
 
+                # XXX case-insensitive regex matching
                 } elsif ($op eq '=~') {
                     next REC unless $r_h->{$f} =~ $opn;
+
+                # XXX case-insensitive regex negative matching
                 } elsif ($op eq '!~') {
                     next REC unless $r_h->{$f} !~ $opn;
+
+                } elsif ($op eq 'pos' && $cic) {
+                    next REC unless index(lc $r_h->{$f}, lc $opn) >= 0;
                 } elsif ($op eq 'pos') {
                     next REC unless index($r_h->{$f}, $opn) >= 0;
+
+                } elsif ($op eq '!pos' && $cic) {
+                    next REC if index(lc $r_h->{$f}, lc $opn) >= 0;
                 } elsif ($op eq '!pos') {
                     next REC if index($r_h->{$f}, $opn) >= 0;
+
                 } elsif ($op eq 'call') {
                     next REC unless $opn->[0]->($r_h, $opn->[1]);
+
                 } else {
                     die "BUG: Unknown op $op";
                 }
@@ -1284,6 +1333,13 @@ _
             summary => 'Decide whether generated function will perform '.
                 'case-insensitive search',
         },
+        case_insensitive_comparison => {
+            schema => ['bool' => {
+                default => 1,
+            }],
+            summary => 'Decide whether generated function will perform '.
+                'case-insensitive comparison (e.g. for FIELD.is)',
+        },
         custom_search => {
             schema => 'code',
             summary => 'Supply custom searching for generated function',
@@ -1493,6 +1549,7 @@ sub gen_read_table_func {
         custom_search              => $args{custom_search},
         word_search                => $args{word_search},
         case_insensitive_search    => $args{case_insensitive_search} // 1,
+        case_insensitive_comparison=> $args{case_insensitive_comparison},
         enable_ordering            => $args{enable_ordering} // 1,
         enable_random_ordering     => ($args{enable_random_ordering} //
                                            $args{enable_ordering} // 1),
@@ -1540,7 +1597,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.585 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-10-07.
+This document describes version 0.586 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-10-28.
 
 =head1 SYNOPSIS
 
@@ -1751,6 +1808,10 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<case_insensitive_comparison> => I<bool> (default: 1)
+
+Decide whether generated function will perform case-insensitive comparison (e.g. for FIELD.is).
 
 =item * B<case_insensitive_search> => I<bool> (default: 1)
 

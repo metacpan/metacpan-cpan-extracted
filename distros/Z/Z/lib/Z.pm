@@ -5,9 +5,10 @@ use warnings;
 package Z;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use Import::Into ();
+use IO::Handle   ();
 use Module::Runtime qw( use_module );
 use Zydeco::Lite qw( true false );
 
@@ -24,7 +25,7 @@ $ENV{$_} && ++$STRICT && last for qw(
 );
 
 sub import {
-	my ($target, $class ) = ( scalar caller, shift );
+	my ( $target, $class ) = ( scalar caller, shift );
 	
 	my $mode = '-modern';
 	( $_[0] || '' ) =~ /^-/ and $mode = shift;
@@ -43,9 +44,10 @@ sub import {
 		}
 		elsif ( $mode eq '-detect' ) {
 			require Carp;
-			Carp::carp( "$target may require Perl v5.14 or above; attempting compatibility mode" );
+			Carp::carp(
+				"$target may require Perl v5.14 or above; attempting compatibility mode" );
 		}
-	}
+	} #/ else [ if ( PERL_IS_MODERN ) ]
 	
 	for my $modules ( $class->$collection ) {
 		my ( $name, $version, @args ) = @$modules;
@@ -56,81 +58,82 @@ sub import {
 		require indirect;
 		'indirect'->unimport::out_of( $target );
 		1;
-	} or !$STRICT or do {
+	}
+		or !$STRICT
+		or do {
 		require Carp;
 		Carp::carp( "Could not load indirect.pm" );
-	};
-	
+		};
+		
 	$class->also( $target, @_ );
 	
 	use_module( 'namespace::autoclean' )->import::into( $target );
 	
 	return $class;
-}
+} #/ sub import
 
 sub modules {
 	my $class = shift;
 	
 	return (
-		[ 'Syntax::Keyword::Try',     '0.018',     qw( try                ) ],
-		[ 'Zydeco::Lite',             '0.070',     qw( -all               ) ],
-		[ 'Types::Standard',          '1.010000',  qw( -types -is -assert ) ],
-		[ 'Types::Common::Numeric',   '1.010000',  qw( -types -is -assert ) ],
-		[ 'Types::Common::String',    '1.010000',  qw( -types -is -assert ) ],
-		[ 'Types::Path::Tiny',        '0',         qw( -types -is -assert ) ],
-		[ 'Object::Adhoc',            '0.003',     qw( object             ) ],
-		[ 'Path::Tiny',               '0.101',     qw( path               ) ],
-		[ 'match::simple',            '0.010',     qw( match              ) ],
-		[ 'strict',                   '0',         qw( refs subs vars     ) ],
-		[ 'warnings',                 '0',         qw( all                ) ],
-		[ 'feature',                  '0',         qw( say state          ) ],
+		[ 'Syntax::Keyword::Try',   '0.018',    qw( try                ) ],
+		[ 'Zydeco::Lite',           '0.070',    qw( -all               ) ],
+		[ 'Types::Standard',        '1.010000', qw( -types -is -assert ) ],
+		[ 'Types::Common::Numeric', '1.010000', qw( -types -is -assert ) ],
+		[ 'Types::Common::String',  '1.010000', qw( -types -is -assert ) ],
+		[ 'Types::Path::Tiny',      '0',        qw( -types -is -assert ) ],
+		[ 'Object::Adhoc',          '0.003',    qw( object             ) ],
+		[ 'Path::Tiny',             '0.101',    qw( path               ) ],
+		[ 'match::simple',          '0.010',    qw( match              ) ],
+		[ 'strict',                 '0',        qw( refs subs vars     ) ],
+		[ 'warnings',               '0',        qw( all                ) ],
+		[ 'feature',                '0',        qw( say state          ) ],
 	);
-}
+} #/ sub modules
 
 sub compat_modules {
 	my $class = shift;
 	
 	my @modules =
-		grep { my $name = $_->[0]; $name !~ /feature|Try/ }
-		$class->modules;
-
+		grep { my $name = $_->[0]; $name !~ /feature|Try/ } $class->modules;
+		
 	push @modules, [ 'Try::Tiny', '0.30' ];
-
+	
 	if ( $] ge '5.010' ) {
 		push @modules, [ 'feature', '0', qw( say ) ];
 	}
 	else {
-		push @modules, [ 'Perl6::Say',      '0.06'  ];
+		push @modules, [ 'Perl6::Say',      '0.06' ];
 		push @modules, [ 'UNIVERSAL::DOES', '0.001' ];
 	}
 	
 	return @modules;
-}
+} #/ sub compat_modules
 
 my %also = (
 	Dumper => sub {
 		require Data::Dumper;
 		return sub {
 			local $Data::Dumper::Deparse;
-			Data::Dumper::Dumper(@_);
-		},
+			Data::Dumper::Dumper( @_ );
+		};
 	},
 	croak => sub {
 		return sub {
 			require Carp;
-			Carp::croak( @_ > 1 ? sprintf(shift, @_) : @_ );
+			Carp::croak( @_ > 1 ? sprintf( shift, @_ ) : @_ );
 		};
 	},
 	carp => sub {
 		return sub {
 			require Carp;
-			Carp::carp( @_ > 1 ? sprintf(shift, @_) : @_ );
+			Carp::carp( @_ > 1 ? sprintf( shift, @_ ) : @_ );
 		};
 	},
 	cluck => sub {
 		return sub {
 			require Carp;
-			Carp::cluck( @_ > 1 ? sprintf(shift, @_) : @_ );
+			Carp::cluck( @_ > 1 ? sprintf( shift, @_ ) : @_ );
 		};
 	},
 	maybe => sub {
@@ -140,7 +143,7 @@ my %also = (
 		return sub ($$@) {
 			( defined $_[0] and defined $_[1] )
 				? @_
-				: ( ( @_ > 1 ) ? @_[2 .. $#_] : qw() )
+				: ( ( @_ > 1 ) ? @_[ 2 .. $#_ ] : qw() );
 		};
 	},
 	provided => sub {
@@ -150,7 +153,7 @@ my %also = (
 		return sub ($$$@) {
 			( shift )
 				? @_
-				: ( ( @_ > 1 ) ? @_[2 .. $#_] : qw() )
+				: ( ( @_ > 1 ) ? @_[ 2 .. $#_ ] : qw() );
 		};
 	},
 	encode_json => sub {
@@ -173,62 +176,62 @@ my %also = (
 	LAX => sub {
 		$STRICT ? sub () { !!0 } : sub () { !!1 };
 	},
-	all            => q(List::Util),
-	any            => q(List::Util),
-	first          => q(List::Util),
-	head           => q(List::Util),
-	max            => q(List::Util),
-	maxstr         => q(List::Util),
-	min            => q(List::Util),
-	minstr         => q(List::Util),
-	none           => q(List::Util),
-	notall         => q(List::Util),
-	pairfirst      => q(List::Util),
-	pairgrep       => q(List::Util),
-	pairkeys       => q(List::Util),
-	pairmap        => q(List::Util),
-	pairs          => q(List::Util),
-	pairvalues     => q(List::Util),
-	product        => q(List::Util),
-	reduce         => q(List::Util),
-	reductions     => q(List::Util),
-	sample         => q(List::Util),
-	shuffle        => q(List::Util),
-	sum            => q(List::Util),
-	sum0           => q(List::Util),
-	tail           => q(List::Util),
-	uniq           => q(List::Util),
-	uniqnum        => q(List::Util),
-	uniqstr        => q(List::Util),
-	unpairs        => q(List::Util),
-	blessed        => q(Scalar::Util),
-	dualvar        => q(Scalar::Util),
-	isdual         => q(Scalar::Util),
-	isvstring      => q(Scalar::Util),
-	isweak         => q(Scalar::Util),
-	looks_like_number => q(Scalar::Util),
-	openhandle     => q(Scalar::Util),
-	readonly       => q(Scalar::Util),
-	refaddr        => q(Scalar::Util),
-	reftype        => q(Scalar::Util),
-	set_prototype  => q(Scalar::Util),
-	tainted        => q(Scalar::Util),
-	unweaken       => q(Scalar::Util),
-	weaken         => q(Scalar::Util),
-	prototype      => q(Sub::Util),
-	set_prototype  => q(Sub::Util),
-	set_subname    => q(Sub::Util),
-	subname        => q(Sub::Util),
-	check_module_name => q(Module::Runtime),
-	check_module_spec => q(Module::Runtime),
-	compose_module_name => q(Module::Runtime),
-	is_module_name => q(Module::Runtime),
-	is_module_spec => q(Module::Runtime),
-	is_valid_module_name => q(Module::Runtime),
-	is_valid_module_spec => q(Module::Runtime),
-	module_notional_filename => q(Module::Runtime),
-	require_module => q(Module::Runtime),
-	use_module     => q(Module::Runtime),
+	all                        => q(List::Util),
+	any                        => q(List::Util),
+	first                      => q(List::Util),
+	head                       => q(List::Util),
+	max                        => q(List::Util),
+	maxstr                     => q(List::Util),
+	min                        => q(List::Util),
+	minstr                     => q(List::Util),
+	none                       => q(List::Util),
+	notall                     => q(List::Util),
+	pairfirst                  => q(List::Util),
+	pairgrep                   => q(List::Util),
+	pairkeys                   => q(List::Util),
+	pairmap                    => q(List::Util),
+	pairs                      => q(List::Util),
+	pairvalues                 => q(List::Util),
+	product                    => q(List::Util),
+	reduce                     => q(List::Util),
+	reductions                 => q(List::Util),
+	sample                     => q(List::Util),
+	shuffle                    => q(List::Util),
+	sum                        => q(List::Util),
+	sum0                       => q(List::Util),
+	tail                       => q(List::Util),
+	uniq                       => q(List::Util),
+	uniqnum                    => q(List::Util),
+	uniqstr                    => q(List::Util),
+	unpairs                    => q(List::Util),
+	blessed                    => q(Scalar::Util),
+	dualvar                    => q(Scalar::Util),
+	isdual                     => q(Scalar::Util),
+	isvstring                  => q(Scalar::Util),
+	isweak                     => q(Scalar::Util),
+	looks_like_number          => q(Scalar::Util),
+	openhandle                 => q(Scalar::Util),
+	readonly                   => q(Scalar::Util),
+	refaddr                    => q(Scalar::Util),
+	reftype                    => q(Scalar::Util),
+	set_prototype              => q(Scalar::Util),
+	tainted                    => q(Scalar::Util),
+	unweaken                   => q(Scalar::Util),
+	weaken                     => q(Scalar::Util),
+	prototype                  => q(Sub::Util),
+	set_prototype              => q(Sub::Util),
+	set_subname                => q(Sub::Util),
+	subname                    => q(Sub::Util),
+	check_module_name          => q(Module::Runtime),
+	check_module_spec          => q(Module::Runtime),
+	compose_module_name        => q(Module::Runtime),
+	is_module_name             => q(Module::Runtime),
+	is_module_spec             => q(Module::Runtime),
+	is_valid_module_name       => q(Module::Runtime),
+	is_valid_module_spec       => q(Module::Runtime),
+	module_notional_filename   => q(Module::Runtime),
+	require_module             => q(Module::Runtime),
+	use_module                 => q(Module::Runtime),
 	use_package_optimistically => q(Module::Runtime),
 );
 
@@ -246,13 +249,13 @@ sub also {
 			next;
 		};
 		
-		push @{ $imports{ ref($source) or $source } ||= [] },
-			ref($source) ? [ $dest, $source ] : [ $dest, $func ];
-	}
+		push @{ $imports{ ref( $source ) or $source } ||= [] },
+			ref( $source ) ? [ $dest, $source ] : [ $dest, $func ];
+	} #/ for my $arg ( @_ )
 	
 	for my $source ( sort keys %imports ) {
 		if ( $source eq 'CODE' ) {
-			for my $func ( @{$imports{$source}} ) {
+			for my $func ( @{ $imports{$source} } ) {
 				my ( $name, $gen ) = @$func;
 				no strict 'refs';
 				*{"$target\::$name"} = $gen->();
@@ -260,14 +263,14 @@ sub also {
 		}
 		else {
 			use_module( $source );
-			for my $func ( @{$imports{$source}} ) {
+			for my $func ( @{ $imports{$source} } ) {
 				my ( $name, $orig ) = @$func;
 				no strict 'refs';
 				*{"$target\::$name"} = \&{"$source\::$orig"};
 			}
 		}
-	}
-}
+	} #/ for my $source ( sort keys...)
+} #/ sub also
 
 1;
 
@@ -399,4 +402,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

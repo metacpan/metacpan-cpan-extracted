@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Schema;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0105';
+our $VERSION = '0.0107';
 
 use parent 'DBIx::Class::Schema';
 use Carp qw/croak/;
@@ -61,7 +61,7 @@ DBIx::Class::Smooth::Schema - Short intro
 
 =head1 VERSION
 
-Version 0.0105, released 2020-09-20.
+Version 0.0107, released 2020-10-28.
 
 =head1 SYNOPSIS
 

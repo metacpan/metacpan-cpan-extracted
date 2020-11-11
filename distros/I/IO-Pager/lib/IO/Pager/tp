@@ -6,7 +6,7 @@ use Term::ReadKey;
 use Getopt::Long;
 
 use vars '$VERSION';
-$VERSION = '1.03'; #Untouched since 1.03
+$VERSION = '2.10'; #Untouched since 2.10
 
 my %Opts = (fold=>1);
 (my $LESS = $ENV{LESS} || '') =~ s/P.+(?:\$|$)//;
@@ -18,12 +18,12 @@ $Opts{squeeze} = 1   if $LESS =~ /s/;
 $Opts{fold} = 0      if $LESS =~ /S/;
 $Opts{pause} = "\cL" if defined($ENV{MORE}) && $ENV{MORE} =~ /l/;
 
+@ARGV = (map('-'.$_, split(//, $ENV{TPOPT})), @ARGV) if defined($ENV{TPOPT});
 
 my %Long;
 #Custom argument processing
 {
   no warnings 'uninitialized';
-  $Long{shift}  = -(grep { /^-\d+$/ }  @ARGV)[-1];
   ($Long{jump}   =  (grep { /^\+\d+$/ } @ARGV)[-1]) =~ s/^\+//;
   ($Long{search} =  (grep { /^\+\// }   @ARGV)[-1]) =~ s%\+/=%%;
 }
@@ -33,7 +33,7 @@ GetOptions(\%Long,
 	   (map { "$_!"  } split//, 'JSenrs'),  # bare
 	   (map { "$_=s" } qw'j p cols'),       # args ##rows
 	   'f:s',
-	   'tail'
+	   qw/tail|$ scrollbar|[/
 	  );
 $Long{f} = "\cL" if defined($Long{f}) && $Long{f} eq '';
 $Long{tail} = $Long{tail} && scalar(@ARGV) == 1 ? 1 : 0;
@@ -44,7 +44,6 @@ $Opts{pause}     = $Long{f} if defined($Long{f});
 $Opts{lineNo}    = $Long{n} if defined($Long{n});
 $Opts{raw}       = $Long{r} if defined($Long{r});
 $Opts{squeeze}   = $Long{s} if defined($Long{s});
-$Opts{shift}     = $Long{shift} if defined($Long{shift});
 #$Opts{rows}      = $Long{rows} if defined($Long{rows});
 $Opts{cols}      = $Long{cols} if defined($Long{cols});
 $Opts{fold}      = not $Long{S} if defined($Long{S});
@@ -52,6 +51,8 @@ $Opts{jump}      = ($Long{j}||$Long{jump})
   if defined($Long{j})||defined($Long{jump});
 $Opts{search}    = $Long{p}||$Long{search}
   if defined($Long{p})||defined($Long{search});
+
+$Opts{scrollBar} = $Long{scrollbar} if defined($Long{scrollbar});
 
 #use Data::Dumper; print Dumper \%Opts; exit 0;
 
@@ -81,6 +82,7 @@ if( -t STDIN ){
 		       $i++, $#ARGV+1, $file, $err), <FILE>;
       $F[-1] .= $/ unless $F[-1] =~ /\n$/;
       close(FILE);
+      $t->set_fileN($i);
     }
   }
   $t->add_text(@F);
@@ -93,6 +95,7 @@ else{
 }
 
 eval{
+  $t->jump($Opts{jump}) if $Opts{jump};
   while( $t->more(RT=>.05) ){
     my $X;
 
@@ -104,6 +107,7 @@ eval{
       if( $cursize > $prevsize ){
 	$t->add_text($X) if sysread($FILE, $X, $cursize-$prevsize);
 	$prevsize = $cursize;
+	$t->scrollbar() if $t->{scrollBar};
       }
     }
   }
@@ -142,7 +146,7 @@ to trigger this e.g;
 
 You might also supply a regular expression as STR e.g;
 
-    tp -f '[ie]t' bar #pauses on lines in bar with "i" or "e" in them
+    tp -f '[ie]t' bar #pauses on lines in bar with "it" or "et" in them
 
 =item B<-J>
 
@@ -166,7 +170,11 @@ Squeeze multiple blank lines into one.
 
 Do not fold long lines.
 
-=item B<--tail>
+=item B<-[> or B<--scrollbar>
+
+Display an interactive scrollbar in the right-most column.
+
+=item B<-$> or B<--tail>
 
 Keep checking the displayed file for new content.
 Only available when paging a single file.
@@ -182,7 +190,7 @@ loaded or C<stty> or C<tput>, and if these fail it defaults to 25.
 
 =pod
 
-=item B<-cols>
+=item B<--cols>
 
 Set the number of columns for the pager.
 
@@ -208,6 +216,8 @@ C<C-> is Control, C<M-> is Meta/Alt, C<S-> is Shift, and C<\d+> is a sequence of
 =item flush buffer - C<R>
 
 =item save buffer - C<:w>
+
+=item open file - C<:e>
 
 =back
 
@@ -297,7 +307,13 @@ C<C-> is Control, C<M-> is Meta/Alt, C<S-> is Shift, and C<\d+> is a sequence of
 
 =head1 ENVIRONMENT
 
-tp checks the I<LESS>, I<MORE>, I<TERM> and I<TERMCAP> variables.
+tp checks the I<LESS>, I<MORE>, I<TPOPT>, I<TERM> and I<TERMCAP> variables.
+
+The I<TPOPT> variable is used to set options explicitly for tp, by
+concatenating undecorated options together e.g; Sr for squished raw output.
+
+I<LESS> and I<MORE> are checked for options that tp supports, and if detected
+they are enabled.
 
 =head1 SEE ALSO
 

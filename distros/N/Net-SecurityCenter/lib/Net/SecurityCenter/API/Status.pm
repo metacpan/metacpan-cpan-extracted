@@ -3,11 +3,11 @@ package Net::SecurityCenter::API::Status;
 use warnings;
 use strict;
 
-use parent 'Net::SecurityCenter::API';
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
 #-------------------------------------------------------------------------------
 # METHODS
@@ -48,13 +48,13 @@ __END__
 
 =head1 NAME
 
-Net::SecurityCenter::API::System - Perl interface to Tenable.sc (SecurityCenter) Status REST API
+Net::SecurityCenter::API::Status - Perl interface to Tenable.sc (SecurityCenter) Status REST API
 
 
 =head1 SYNOPSIS
 
     use Net::SecurityCenter::REST;
-    use Net::SecurityCenter::API::System;
+    use Net::SecurityCenter::API::Status;
 
     my $sc = Net::SecurityCenter::REST->new('sc.example.org');
 
@@ -67,7 +67,7 @@ Net::SecurityCenter::API::System - Perl interface to Tenable.sc (SecurityCenter)
 
 =head1 DESCRIPTION
 
-This module provides Perl scripts easy way to interface the System REST API of Tenable.sc
+This module provides Perl scripts easy way to interface the Status REST API of Tenable.sc
 (SecurityCenter).
 
 For more information about the Tenable.sc (SecurityCenter) REST API follow the online documentation:

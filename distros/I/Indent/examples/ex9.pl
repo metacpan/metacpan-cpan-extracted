@@ -3,22 +3,10 @@
 use strict;
 use warnings;
 
-use Indent::Data;
+use Indent::Utils qw(string_len);
 
-# Indent::Data object.
-my $i = Indent::Data->new(
-       'line_size' => '10',
-       'next_indent' => '  ',
-       'output_separator' => "|\n",
-);
-
-# Print indented text.
-print $i->indent('text text text text text text', '<->')."|\n";
+# Print string length.
+print string_len("\tab\t")."\n";
 
 # Output:
-# <->text te|
-# <->  xt te|
-# <->  xt te|
-# <->  xt te|
-# <->  xt te|
-# <->  xt|
+# 18

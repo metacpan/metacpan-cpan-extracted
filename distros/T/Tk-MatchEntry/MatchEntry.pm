@@ -1,11 +1,4 @@
 #
-# MatchEntry.pm
-#
-# Revision       : $Revision: 1.12 $
-# Last changed on: $Date: 2005/06/30 05:29:28 $
-#
-
-#
 # MatchEntry is an entry widget with auto-completion capabilities. It attempts
 # to fill the gap in functionality between Tk::BrowseEntry and Tk::HistEntry
 # with focus on user-friendliness concerning the auto-completion.
@@ -15,8 +8,7 @@
 package Tk::MatchEntry;
 
 # Set version information
-use vars qw($VERSION);
-$VERSION = '0.4';
+our $VERSION = '0.5';
 
 # Define dependencies
 use strict;
@@ -1172,10 +1164,12 @@ Tk::MatchEntry - Entry widget with advanced auto-completion capability
 
 =head1 SYNOPSIS
 
- use Tk::MatchEntry;
-
- $match_entry = $top->MatchEntry(-textvariable => \$var1, 
-                                 -choices => @choices);
+    use Tk::MatchEntry;
+    
+    my $match_entry = $top->MatchEntry(
+        -textvariable => \$var1, 
+        -choices => \@choices,
+    );
 
 =head1 DESCRIPTION
 
@@ -1536,19 +1530,18 @@ C<slistbox> is the C<scrolled> listbox.
 This is a primitive example for Tk::MatchEntry which you can use to get to
 know the look and feel.
 
- use Tk;
+    use Tk;
+    use Tk::MatchEntry;
+    
+    my $mw = MainWindow->new(-title => "MatchEntry Test");
+    
+    my @choices = ( qw/one one.green one.blue one.yellow two.blue two.green
+                    two.cyan three.red three.white three.yellow/ );
+    
+    $mw->Button->pack(-side => 'left');
 
- use Tk::MatchEntry;
-
- my $mw = MainWindow->new(-title => "MatchEntry Test");
-
- my @choices = [ qw/one one.green one.blue one.yellow two.blue two.green
-                    two.cyan three.red three.white three.yellow/ ];
-
- $mw->Button->pack(-side => 'left');
-
- my $me = $mw->MatchEntry(
-        -choices        => @choices,
+    my $me = $mw->MatchEntry(
+        -choices        => \@choices,
         -fixedwidth     => 1, 
         -ignorecase     => 1,
         -maxheight      => 5,
@@ -1557,10 +1550,11 @@ know the look and feel.
         -tabcmd         => sub { print "callback: -tabcmd  \n"; }, 
         -zerocmd        => sub { print "callback: -zerocmd \n"; },
     )->pack(-side => 'left', -padx => 50);
-
- $mw->Button(-text => 'popup', 
-             -command => sub{$me->popup}
-            )->pack(-side => 'left');
+    
+    $mw->Button(
+        -text => 'popup', 
+        -command => sub{$me->popup}
+    )->pack(-side => 'left');
  
  MainLoop;
 
@@ -1574,13 +1568,11 @@ The following widgets are similar to I<Tk::MatchEntry> to a certain extent:
 
 =over 4
 
-=item I<Tk::BrowseEntry>
+=item L<Tk::BrowseEntry>
 
-=item I<Tk::HistEntry> 
+=item L<Tk::HistEntry> 
 
-=item I<Tk::JBrowseEntry>
-
-=item I<Tk::SelectionEntry>
+=item L<Tk::JBrowseEntry>
 
 =back
 
@@ -1602,51 +1594,9 @@ mode.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003 - 2005 Wolfgang Hommel. All rights reserved.
+Copyright (c) 2003 - 2020 Wolfgang Hommel. All rights reserved.
 
 This package is free software; you can redistribute it and/or modifiy
 it under the same terms as Perl itself.
 
 =cut
-
-#
-# CVS Changelog:
-# $Log: MatchEntry.pm,v $
-# Revision 1.12  2005/06/30 05:29:28  admin
-# Applied a patch by Ingo Herschmann
-#
-# Revision 1.11  2005/03/14 21:20:17  admin
-# Minor metadata updates
-#
-# Revision 1.10  2005/03/14 21:17:36  admin
-# fixed to work with more recent perl/tk
-#
-# Revision 1.9  2003/04/08 07:57:13  admin
-# added -wraparound and -bottomcmd/-topcmd callbacks
-#
-# Revision 1.8  2003/04/08 07:35:46  admin
-# Added -matchprefix option and behavior
-#
-# Revision 1.7  2003/04/06 20:08:16  admin
-# Added -sorttrigger, updated POD
-#
-# Revision 1.6  2003/04/06 12:20:11  admin
-# Added multimatch mode, -sortcmd callback
-#
-# Revision 1.5  2003/01/30 15:08:01  admin
-# Added POD, added <FocusOut> bind
-#
-# Revision 1.4  2003/01/29 16:56:20  admin
-# Improved support for case-insensitive matching, added 0/1-length callbacks
-#
-# Revision 1.3  2003/01/28 01:17:49  admin
-# added auto-completion and auto-popup functionality,
-# added callbacks for enter and tab,
-# basic keyboard event bindings done
-#
-# Revision 1.2  2003/01/25 20:00:21  admin
-# basic entry + listbox functionality added, based on Tk::BrowseEntry source
-#
-# Revision 1.1  2003/01/25 10:42:19  admin
-# initial commit
- 

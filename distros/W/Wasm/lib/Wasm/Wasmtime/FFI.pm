@@ -12,7 +12,7 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
@@ -22,7 +22,7 @@ sub _lib
   my @symbols = (
     # 0.19.0
     'wasmtime_func_as_funcref',
-    # 0.20.0
+    # 0.20.0 / 0.21.0
     'wasmtime_module_serialize',
     'wasmtime_module_deserialize',
     'wasmtime_store_gc',
@@ -271,7 +271,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

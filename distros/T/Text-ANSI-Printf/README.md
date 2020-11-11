@@ -5,7 +5,7 @@ Text::ANSI::Printf - printf function for string with ANSI sequence
 
 # VERSION
 
-Version 1.01
+Version 1.03
 
 # SYNOPSIS
 
@@ -19,9 +19,12 @@ Version 1.01
 
 # DESCRIPTION
 
-Text::ANSI::Printf is a almost-printf-compatible library with a
-capability of handling string with ANSI color sequences, as well as
-multi-byte wide characters.
+**Text::ANSI::Printf** is a almost-printf-compatible library with a
+capability of handling:
+
+    - ANSI terminal sequences
+    - Multi-byte wide characters
+    - Backspaces
 
 # FUNCTIONS
 

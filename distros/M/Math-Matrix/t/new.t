@@ -9,6 +9,7 @@ use Test::More tests => 41;
 my ($x, $y);
 
 ###############################################################################
+# new() as a class method.
 
 note("\n\$x = Math::Matrix -> new([1, 2, 3], [4, 5, 6]);\n\n");
 $x = Math::Matrix -> new([1, 2, 3], [4, 5, 6]);
@@ -33,17 +34,17 @@ is_deeply([ @$x ], [[1, 2, 3]], '$x has the right values');
 note("\n\$x = Math::Matrix -> new(3);\n\n");
 $x = Math::Matrix -> new(3);
 is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
-is_deeply([ @$x ], [[ 3 ]], '$x has the right values');
+is_deeply([ @$x ], [[3]], '$x has the right values');
 
 note("\n\$x = Math::Matrix -> new([3]);\n\n");
 $x = Math::Matrix -> new([3]);
 is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
-is_deeply([ @$x ], [[ 3 ]], '$x has the right values');
+is_deeply([ @$x ], [[3]], '$x has the right values');
 
 note("\n\$x = Math::Matrix -> new([[3]]);\n\n");
 $x = Math::Matrix -> new([[3]]);
 is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
-is_deeply([ @$x ], [[ 3 ]], '$x has the right values');
+is_deeply([ @$x ], [[3]], '$x has the right values');
 
 note("\n\$x = Math::Matrix -> new();\n\n");
 $x = Math::Matrix -> new();
@@ -61,6 +62,7 @@ is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
 is_deeply([ @$x ], [], '$x has the right values');
 
 ###############################################################################
+# new() as an instance method with input argument(s)
 
 note("\n\$x -> new([1, 2, 3], [4, 5, 6]); \$y = \$x -> new([9, 8, 7], [6, 5, 4])\n\n");
 $x = Math::Matrix -> new([1, 2, 3], [4, 5, 6]);
@@ -84,6 +86,7 @@ is(ref($y), 'Math::Matrix', '$y is a Math::Matrix');
 is_deeply([ @$y ], [[9]], '$y has the right values');
 
 ###############################################################################
+# new() as instance method with no input argument(s)
 
 note("\n\$x = Math::Matrix -> new([1, 2, 3], [4, 5, 6]); \$y = \$x -> new();\n\n");
 $x = Math::Matrix -> new([1, 2, 3], [4, 5, 6]);

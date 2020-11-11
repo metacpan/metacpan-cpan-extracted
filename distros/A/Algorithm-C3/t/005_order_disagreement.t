@@ -1,13 +1,9 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 1;
 
-BEGIN {
-    use_ok('Algorithm::C3');
-}
+use Algorithm::C3;
 
 =pod
 
@@ -28,12 +24,12 @@ except TypeError:
 
 {
     package X;
-    
+
     package Y;
-    
+
     package XY;
     our @ISA = ('X', 'Y');
-    
+
     package YX;
     our @ISA = ('Y', 'X');
 
@@ -41,10 +37,10 @@ except TypeError:
     our @ISA = ('XY', 'YX');
 }
 
-eval { 
+eval {
     Algorithm::C3::merge('Z' => sub {
         no strict 'refs';
         @{$_[0] . '::ISA'};
-    }) 
+    })
 };
 like($@, qr/^Inconsistent hierarchy/, '... got the right error with an inconsistent hierarchy');

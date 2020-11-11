@@ -2,6 +2,9 @@
 
 namespace xs {
 
-PERL_THREAD_LOCAL HV* Typemap<std::error_code>::stash = gv_stashpvs("XS::STL::ErrorCode", GV_ADD);
+HV* xs::Typemap<std::error_code>::stash() {
+    static PERL_THREAD_LOCAL HV* hv = gv_stashpvs("XS::STL::ErrorCode", GV_ADD);
+    return hv;
+}
 
 }

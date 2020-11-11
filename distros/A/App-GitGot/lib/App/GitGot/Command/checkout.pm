@@ -1,6 +1,6 @@
 package App::GitGot::Command::checkout;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::checkout::VERSION = '1.337';
+$App::GitGot::Command::checkout::VERSION = '1.339';
 # ABSTRACT: checkout specific branch for managed repositories
 use 5.014;
 
@@ -68,9 +68,9 @@ sub _git_checkout {
   my @err = try { @{ $entry->_wrapper->ERR } } catch { $_ };
 
   # Typically STDOUT will contain something similar to
-  # Your branch is up-to-date with 'origin/master'.
+  # Your branch is up-to-date with 'origin/main'.
   # or
-  # Your branch is ahead of 'origin/master' by 2 commits.
+  # Your branch is ahead of 'origin/main' by 2 commits.
 
   # Typically STDERR will contain something similar to
   # Switched to branch 'beta'
@@ -124,7 +124,7 @@ App::GitGot::Command::checkout - checkout specific branch for managed repositori
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 AUTHOR
 

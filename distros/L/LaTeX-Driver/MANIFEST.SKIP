@@ -14,3 +14,4 @@ MANIFEST.bak
 Makefile.old
 AssertOS
 CheckOS
+.travis.yml

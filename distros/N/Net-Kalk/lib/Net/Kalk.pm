@@ -1,4 +1,4 @@
-# version  : 2.01 - September 2020
+# version  : 2.06 - November 2020
 # author   : Thierry LE GALL 
 # contact  : facila@gmx.fr
 
@@ -21,7 +21,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '2.06';
 
 my @mask = qw ( 0.0.0.0
 128.0.0.0       192.0.0.0       224.0.0.0       240.0.0.0       248.0.0.0       252.0.0.0       254.0.0.0       255.0.0.0
@@ -209,19 +209,38 @@ sub range {
        $x12_start = &x12 ('ip',$start) } }
 
 sub sort {
-    return if $#_ != 0;
-    my ($list) = @_;
-    my $result;
-    my %list; 
+    return if ! ($#_ == 0 || $#_ == 1);
+    my ($list,$options) = @_;
+    my ($column,$reverse,$unique) = (1,0,0);
 
-    foreach ( split/;/,$list ) {
-       return if &error('ip',$_);
-       $list{sprintf "%03d%03d%03d%03d", split/\./} = $_ }
-    foreach ( sort { $a <=> $b } keys %list ) { $result .= "$list{$_} - $_ -\n" }
+    $options = 1  if ! $options;
+    $column  = $1 if $options =~ /(\d+)/;
+    $reverse = 1  if $options =~ /r/;
+    $unique  = 1  if $options =~ /u/;
+    $column--;
+
+    my $result;
+    my @list;
+    my %unique;
+    my %x12;
+    my $ip;
+    my $i=0;
+
+    foreach(split /;|\n/,$list) {
+       next if $unique && $unique{$_};
+       push @list,$_;
+       $unique{$_} = 1;
+       $ip = (split /\s+/)[$column];
+       return if &error('ip',$ip);
+       $x12{$i} = sprintf "%03d%03d%03d%03d", split /\./ , $ip;
+       $i++ }
+
+    foreach ( sort { if ($reverse) { $x12{$b}<=>$x12{$a} } else { $x12{$a}<=>$x12{$b} } } keys %x12 ) {
+       $result .= "$list[$_]\n" }
     return $result }
-  
+
 sub summary {
-    return if $#_ != 0 && $#_ != 1;
+    return if ! ($#_ == 0 || $#_ == 1);
     my $list   = $_[0];
     my $detail = $_[1] if $_[1];
 
@@ -239,7 +258,7 @@ sub summary {
     return $result }
 
 sub included {
-    return if $#_ != 0 && $#_ != 1;
+    return if ! ($#_ == 0 || $#_ == 1);
     my $list   = $_[0];
     my $detail = $_[1] if $_[1];
 
@@ -260,7 +279,7 @@ sub local_list_1 {
     my($ref_in,$ref_out,$ref_text) = @_;
     my($i,$ip,$mask);
     $i = 0;
-    foreach ( split/;/,$$ref_in ) {
+    foreach ( split/;|\n/,$$ref_in ) {
        $ip = $mask = '';
        if    ( /(.+)\/(.+)/ ) { $ip = $1 ; $mask = "/$2"; return 99 if &error('cidr',$2) }
        elsif ( /(.+) (.+)/  ) { $ip = $1 ; $mask = $2 }
@@ -526,21 +545,39 @@ __END__
  examples :
   - range ('0.0.0.1','255.255.255.254')
 
-=head2 7 : Address sort
+=head2 7 : List sort on address ip column
 
- sort ($list);
+ sort ($list,$options);
 
- list = list of adresses to sort , separated by semicolons
+ list    = list of addresses or line to sort , separated by semicolons or by Line Feed
+ options = Cru with 
+  C = number of column to sort on , default = 1
+  r = for descending order i      , default = ascending order
+  u = for uniques lines only      , default = for all lines 
 
  examples :
-  - sort ('10.145.23.89;20.33.45.187;192.168.25.137;2.0.59.74;172.10.35.0;15.6.7.8;1.2.3.4;111.23.45.67')
+ $list  = "ip route 5.0.0.0 255.0.0.0 192.168.5.254\n";
+ $list .= "ip route 3.0.0.0 255.0.0.0 192.168.99.254\n";
+ $list .= "ip route 11.0.0.0 255.0.0.0 192.168.45.254\n";
+ $list .= "ip route 2.0.0.0 255.0.0.0 172.32.21.254\n";
+ $list .= "ip route 1.0.0.0 255.0.0.0 10.69.14.254\n";
+ $list .= "ip route 23.0.0.0 255.0.0.0 192.168.0.254\n";
+ $list .= "ip route 2.0.0.0 255.0.0.0 172.32.21.254\n";
+ $list .= "ip route 8.0.0.0 255.0.0.0 10.31.21.254\n";
+ $list .= "ip route 210.0.0.0 255.0.0.0 172.16.78.254\n";
+ 
+  - sort ($list)
+  - sort ($list,'3')
+  - sort ($list,'3r')
+  - sort ($list,'3u')
+  - sort ($list,'3ru')
 
 =head2 8 : Address and network summary
 
  summary ($list);
  summary ($list,'d');
 
- list    = list of addresses and networks to summarize , separated by semicolons
+ list    = list of addresses and networks to summarize , separated by semicolons or by Line Feed
  network = address + mask in short or long format , or address + wildcard mask
  examples : A.B.C.D/24 ou A.B.C.D 255.255.255.0 ou A.B.C.D 0.0.0.255
 
@@ -555,7 +592,7 @@ __END__
  included ($list);
  included ($list,'d');
 
- list    = list of addresses and networks to include , separated by semicolons
+ list    = list of addresses and networks to include , separated by semicolons or by Line Feed
  network = address + mask in short or long format , or address + wildcard mask
  examples : A.B.C.D/24 ou A.B.C.D 255.255.255.0 ou A.B.C.D 0.0.0.255
 
@@ -591,7 +628,7 @@ __END__
 
 =head1 VERSION AND AUTHOR
 
- Version  : v2.01 - September 2020
+ Version  : v2.06 - November 2020
  Author   : Thierry LE GALL
  Contact  : facila@gmx.fr
 

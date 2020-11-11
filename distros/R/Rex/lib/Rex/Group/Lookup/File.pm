@@ -24,10 +24,11 @@ With this module you can define hostgroups out of a file.
 
 package Rex::Group::Lookup::File;
 
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

@@ -1,5 +1,11 @@
 Revision history for Perl extension Algorithm-C3.
 
+0.11 - 2020-11-10
+    - set metadata for static dependency list and install
+    - move repository to github
+    - minor test cleanups
+    - fix Makefile.PL to work for authors in perl 5.26+
+
 0.10 - 2014-08-15
     - declare minimum version of perl as 5.6 in metadata
 

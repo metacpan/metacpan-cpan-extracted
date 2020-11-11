@@ -1,5 +1,7 @@
 Changes for DBIx::AnyDBD
 
+2.02	Mon Nov  9 18:58:51 EST 2020
+	No changes to the code, new maintainer - thanks to MSEARGENT
+
 2.01
-    - Only change @ISA if we have to (pdcawley)
-    
+	Only change @ISA if we have to (pdcawley)

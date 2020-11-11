@@ -1,6 +1,12 @@
+2.44    2020-11-06
+
+- The DateTime::TimeZone->offset_as_string now accepts an optional separator
+  string.
+
+
 2.43    2020-10-21
 
-- This release is based on version 2020c of the Olson database. This release
+- This release is based on version 2020d of the Olson database. This release
   includes contemporary changes for Palestine.
 
 

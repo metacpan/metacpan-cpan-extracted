@@ -1,7 +1,7 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl test.pl'
+use strict;
+use warnings;
 
-use Test::Simple tests => 11;
+use Test::More;
 
 use Tie::Hash::FixedKeys;
 ok(1);
@@ -28,3 +28,5 @@ ok(not exists $hash{four});
 %hash = ();
 ok(not defined $hash{one});
 ok(exists $hash{one});
+
+done_testing();

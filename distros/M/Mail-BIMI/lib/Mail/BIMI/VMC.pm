@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '2.20201020.2'; # VERSION
+our $VERSION = '2.20201102.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -51,11 +51,6 @@ sub _build_data($self) {
   }
   if ($self->bimi_object->options->vmc_from_file) {
     return scalar read_file $self->bimi_object->options->vmc_from_file;
-  }
-
-  if ( !( $self->uri =~ /\.pem\?/ || $self->uri =~ /\.pem$/ )) {
-    $self->add_error('INVALID_EXTENSION_A','VMC MUST have .pem extension');
-    return '';
   }
 
   $self->log_verbose('HTTP Fetch: '.$self->uri);
@@ -291,7 +286,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 2.20201020.2
+version 2.20201102.2
 
 =head1 DESCRIPTION
 
@@ -378,6 +373,10 @@ Is this VMC valid
 is=rw
 
 Mail::BIMI::VMC::Cert object for this VMC Set
+
+=head2 warnings
+
+is=rw
 
 =head1 CONSUMES
 

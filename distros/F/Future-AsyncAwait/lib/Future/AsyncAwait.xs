@@ -2393,3 +2393,28 @@ BOOT:
 #endif
 
   boot_xs_parse_sublike(0.10);
+
+  {
+    AV *run_on_loaded = NULL;
+    SV **svp;
+    if(svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/on_loaded", FALSE)) {
+      run_on_loaded = (AV *)SvREFCNT_inc(*svp);
+      hv_deletes(PL_modglobal, "Future::AsyncAwait/on_loaded", 0);
+    }
+
+    hv_stores(PL_modglobal, "Future::AsyncAwait/loaded", &PL_sv_yes);
+
+    if(run_on_loaded) {
+      svp = AvARRAY(run_on_loaded);
+
+      int i;
+      for(i = 0; i < AvFILL(run_on_loaded); i += 2) {
+        void (*func)(pTHX_ void *data) = INT2PTR(void *, SvUV(svp[i  ]));
+        void *data                     = INT2PTR(void *, SvUV(svp[i+1]));
+
+        (*func)(aTHX_ data);
+      }
+
+      SvREFCNT_dec(run_on_loaded);
+    }
+  }

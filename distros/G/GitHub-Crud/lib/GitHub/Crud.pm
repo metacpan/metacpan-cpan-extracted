@@ -8,7 +8,7 @@
 # add download repo zip file as is done in Dita::Conversion then reply to Ivan and request inclusion of this module on their list
 package GitHub::Crud;
 use v5.16;
-our $VERSION = 20200619;
+our $VERSION = 20201031;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -123,13 +123,14 @@ genHash(q(GitHub::Crud::Response),                                              
   X_RateLimit_Limit                       => undef,
   X_RateLimit_Remaining                   => undef,
   X_RateLimit_Reset                       => undef,
+  X_RateLimit_Used                        => undef,
   X_Runtime_rack                          => undef,
   X_Served_By                             => undef,
   X_Timer                                 => undef,
   X_XSS_Protection                        => undef,
  );
 
-genHash(q(GitHub::Crud::Response::Data),                                        # Response L<JSON> from GitHubExecute a request against L<GitHub> and decode the response
+genHash(q(GitHub::Crud::Response::Data),                                        # Response from a request made to L<GitHub>.
   command                                 => undef,
   content                                 => undef,
   documentation_url                       => undef,
@@ -150,7 +151,7 @@ genHash(q(GitHub::Crud::Response::Data),                                        
   url                                     => undef,
  );
 
-sub getSha($)                                                                   #P Compute L<sha> for data after encoding any unicode characters as utf8
+sub getSha($)                                                                   #P Compute L<sha> for data after encoding any unicode characters as utf8.
  {my ($data) = @_;                                                              # String possibly containing non ascii code points
 
   my $length = length($data);
@@ -240,7 +241,7 @@ sub gitHub(%)                                                                   
 
 #D1 Constructor                                                                 # Create a L<github> object with the specified attributes describing the interface with L<github>.
 
-sub new(@)                                                                      # Create a new L<GitHub> object with attributes as describe at: L<GitHub::Crud Definition>.
+sub new(@)                                                                      # Create a new L<GitHub> object with attributes as described at: L<GitHub::Crud Definition>.
  {my (%attributes) = @_;                                                        # Attribute values
 
   my $curl = qx(curl -V);                                                       # Check Curl
@@ -566,7 +567,7 @@ sub listCommits($)                                                              
  }
 
 sub listCommitShas($)                                                           # Create {commit name => sha} from the results of L<listCommits>.
- {my ($commits) = @_;                                                           # Commits from listCommits
+ {my ($commits) = @_;                                                           # Commits from L<listCommits>
 
   return undef unless my $data = $commits->data;                                # Commits array
   {map {$$_{name} => $$_{commit}{sha}} @$data}                                  # Commits hash
@@ -779,7 +780,7 @@ sub createRepositoryFromSavedToken($$;$$)                                       
   $g->private                   = $private;
   $g->personalAccessTokenFolder = $accessFolderOrToken;
   $g->loadPersonalAccessToken;
-  $g->confessOnFailure          = 1;
+  $g->confessOnFailure          = 0;
   $g->createRepository;
  }
 
@@ -905,7 +906,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 # containingFolder
 
 @ISA          = qw(Exporter);
-@EXPORT_OK    = qw(writeFileUsingSavedToken writeFileFromFileUsingSavedToken);
+@EXPORT_OK    = qw(createRepositoryFromSavedToken writeFileUsingSavedToken writeFileFromFileUsingSavedToken);
 %EXPORT_TAGS  = (all=>[@EXPORT_OK]);
 
 #podDocumentation
@@ -963,7 +964,7 @@ Commit a folder to GitHub then read and check some of the uploaded content:
 Create, Read, Update, Delete files, commits, issues, and web hooks on GitHub.
 
 
-Version 20200428.
+Version 20201030.
 
 
 The following sections describe the methods in each functional area of this
@@ -977,7 +978,7 @@ Create a L<GitHub|https://github.com> object with the specified attributes descr
 
 =head2 new(%attributes)
 
-Create a new L<GitHub|https://github.com> object with attributes as describe at: L<GitHub::Crud Definition>.
+Create a new L<GitHub|https://github.com> object with attributes as described at: L<GitHub::Crud Definition>.
 
      Parameter    Description
   1  %attributes  Attribute values
@@ -992,7 +993,9 @@ B<Example:>
     writeFile(fpe($f, q(data), $_, qw(txt)), $c) for 1..3;                        # Place content in files in a sub folder
     copyBinaryFile $if, my $If = fpe $f, qw(face jpg);                            # Add an image
 
-    my $g = GitHub::Crud::𝗻𝗲𝘄                                                     # Create GitHub
+
+    my $g = GitHub::Crud::new                                                     # Create GitHub  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
       (userid           => q(philiprbrenan),
        repository       => q(aaa),
        branch           => q(test),
@@ -1038,8 +1041,12 @@ Returns the list of file names found or empty list if no files were found.
 B<Example:>
 
 
-    success "𝗹𝗶𝘀𝘁:", gitHub->𝗹𝗶𝘀𝘁;
-  # 𝗹𝗶𝘀𝘁: alpha.data .github/workflows/test.yaml images/aaa.txt images/aaa/bbb.txt
+
+    success "list:", gitHub->list;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+  # list: alpha.data .github/workflows/test.yaml images/aaa.txt images/aaa/bbb.txt  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
 
 =head2 specialFileData($d)
@@ -1074,7 +1081,9 @@ B<Example:>
     $g->gitFile = my $f = q(z'2  'z"z.data);
     my $d = q(𝝰𝝱𝝲);
     $g->write($d);
-    confess "𝗿𝗲𝗮𝗱 FAILED" unless $g->𝗿𝗲𝗮𝗱 eq $d;
+
+    confess "read FAILED" unless $g->read eq $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Read passed";
 
 
@@ -1099,18 +1108,28 @@ B<Example:>
 
     if (1)
      {my $t = time();
-      $g->𝘄𝗿𝗶𝘁𝗲($d);
-      lll "First 𝘄𝗿𝗶𝘁𝗲 time: ", time() -  $t;
+
+      $g->write($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      lll "First write time: ", time() -  $t;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      }
 
     my $r = $g->read;
     lll "Write bbb: $r";
     if (1)
      {my $t = time();
-      $g->𝘄𝗿𝗶𝘁𝗲($d);
-      lll "Second 𝘄𝗿𝗶𝘁𝗲 time: ", time() -  $t;
+
+      $g->write($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      lll "Second write time: ", time() -  $t;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      }
-    confess "𝘄𝗿𝗶𝘁𝗲 FAILED" unless $g->exists;
+
+    confess "write FAILED" unless $g->exists;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Write passed";
 
 
@@ -1134,7 +1153,9 @@ B<Example:>
     my $S = q(4a2df549febb701ba651aae46e041923e9550cb8);
     confess q(Write blob FAILED) unless $s eq $S;
 
-    my $D = $g->𝗿𝗲𝗮𝗱𝗕𝗹𝗼𝗯($s);
+
+    my $D = $g->readBlob($s);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     confess q(Write/Read blob FAILED) unless $d eq $D;
     success q(Write/Read blob passed);
 
@@ -1155,7 +1176,9 @@ B<Example:>
     my $g = gitHub;
     $g->gitFile = "face.jpg";
     my $d = readBinaryFile(q(/home/phil/.face));
-    my $s = $g->𝘄𝗿𝗶𝘁𝗲𝗕𝗹𝗼𝗯($d);
+
+    my $s = $g->writeBlob($d);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my $S = q(4a2df549febb701ba651aae46e041923e9550cb8);
     confess q(Write blob FAILED) unless $s eq $S;
 
@@ -1189,12 +1212,16 @@ B<Example:>
     $g->gitFile   = $f1;
     my $d = dateTimeStamp;
     my $w = $g->write($d);
-    my $r = $g->𝗰𝗼𝗽𝘆($f2);
+
+    my $r = $g->copy($f2);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     lll "Copy created: $r";
     $g->gitFile   = $f2;
     my $D = $g->read;
     lll "Read     ccc: $D";
-    confess "𝗰𝗼𝗽𝘆 FAILED" unless $d eq $D;
+
+    confess "copy FAILED" unless $d eq $D;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Copy passed"
 
 
@@ -1216,9 +1243,13 @@ B<Example:>
     $g->gitFile    = "test4.html";
     my $d = dateTimeStamp;
     $g->write($d);
-    confess "𝗲𝘅𝗶𝘀𝘁𝘀 FAILED" unless $g->read eq $d;
+
+    confess "exists FAILED" unless $g->read eq $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     $g->delete;
-    confess "𝗲𝘅𝗶𝘀𝘁𝘀 FAILED" if $g->read eq $d;
+
+    confess "exists FAILED" if $g->read eq $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Exists passed";
 
 
@@ -1246,13 +1277,21 @@ B<Example:>
     my $d = dateTimeStamp;
     $g->gitFile  = $f1;
     $g->write($d);
-    confess "𝗿𝗲𝗻𝗮𝗺𝗲 FAILED" unless $g->read eq $d;
 
-    $g->𝗿𝗲𝗻𝗮𝗺𝗲($f2);
-    confess "𝗿𝗲𝗻𝗮𝗺𝗲 FAILED" if $g->exists;
+    confess "rename FAILED" unless $g->read eq $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+
+    $g->rename($f2);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+    confess "rename FAILED" if $g->exists;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
     $g->gitFile  = $f2;
-    confess "𝗿𝗲𝗻𝗮𝗺𝗲 FAILED" if $g->read eq $d;
+
+    confess "rename FAILED" if $g->read eq $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Rename passed";
 
 
@@ -1279,22 +1318,36 @@ B<Example:>
     $g->gitFile = "zzz.data";
     $g->write($d);
 
-    confess "𝗱𝗲𝗹𝗲𝘁𝗲 FAILED" unless $g->read eq $d;
+
+    confess "delete FAILED" unless $g->read eq $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
     if (1)
      {my $t = time();
-      my $d = $g->𝗱𝗲𝗹𝗲𝘁𝗲;
+
+      my $d = $g->delete;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
       lll "Delete   1: ", $d;
-      lll "First 𝗱𝗲𝗹𝗲𝘁𝗲: ", time() -  $t;
-      confess "𝗱𝗲𝗹𝗲𝘁𝗲 FAILED" if $g->exists;
+
+      lll "First delete: ", time() -  $t;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      confess "delete FAILED" if $g->exists;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      }
 
     if (1)
      {my $t = time();
-      my $d = $g->𝗱𝗲𝗹𝗲𝘁𝗲;
+
+      my $d = $g->delete;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
       lll "Delete   1: ", $d;
-      lll "Second 𝗱𝗲𝗹𝗲𝘁𝗲: ", time() -  $t;
-      confess "𝗱𝗲𝗹𝗲𝘁𝗲 FAILED" if $g->exists;
+
+      lll "Second delete: ", time() -  $t;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+
+      confess "delete FAILED" if $g->exists;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
      }
     success "Delete passed";
 
@@ -1315,7 +1368,9 @@ Required attributes: L<userid|/userid>, L<repository|/repository>.
 B<Example:>
 
 
-    my $c = gitHub->𝗹𝗶𝘀𝘁𝗖𝗼𝗺𝗺𝗶𝘁𝘀;
+
+    my $c = gitHub->listCommits;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my %s = listCommitShas $c;
     lll "Commits
 ",     dump $c;
@@ -1335,7 +1390,9 @@ B<Example:>
 
 
     my $c = gitHub->listCommits;
-    my %s = 𝗹𝗶𝘀𝘁𝗖𝗼𝗺𝗺𝗶𝘁𝗦𝗵𝗮𝘀 $c;
+
+    my %s = listCommitShas $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     lll "Commits
 ",     dump $c;
     lll "Commit shas
@@ -1371,7 +1428,9 @@ B<Example:>
        confessOnFailure => 1);
 
     $g->loadPersonalAccessToken;                                                  # Load a personal access token
-    $g->𝘄𝗿𝗶𝘁𝗲𝗖𝗼𝗺𝗺𝗶𝘁($f);                                                          # Upload commit - confess to any errors
+
+    $g->writeCommit($f);                                                          # Upload commit - confess to any errors  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
     my $C = $g->read(q(data/1.txt));                                              # Read data written in commit
     my $I = $g->read(q(face.jpg));
@@ -1398,7 +1457,9 @@ Returns true if the list  operation was successful else false.
 B<Example:>
 
 
-    success join ' ', q(Webhooks:), dump(gitHub->𝗹𝗶𝘀𝘁𝗪𝗲𝗯𝗛𝗼𝗼𝗸𝘀);
+
+    success join ' ', q(Webhooks:), dump(gitHub->listWebHooks);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
 
 =head2 createPushWebHook($gitHub)
@@ -1420,7 +1481,9 @@ B<Example:>
 
 
     my $g = gitHub;
-    my $d = $g->𝗰𝗿𝗲𝗮𝘁𝗲𝗣𝘂𝘀𝗵𝗪𝗲𝗯𝗛𝗼𝗼𝗸;
+
+    my $d = $g->createPushWebHook;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success join ' ', "Create web hook:", dump($d);
 
 
@@ -1438,7 +1501,9 @@ Returns details of the repositories.
 B<Example:>
 
 
-    success "List repositories: ", dump(gitHub()->𝗹𝗶𝘀𝘁𝗥𝗲𝗽𝗼𝘀𝗶𝘁𝗼𝗿𝗶𝗲𝘀);
+
+    success "List repositories: ", dump(gitHub()->listRepositories);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
 
 =head2 createRepository($gitHub)
@@ -1455,7 +1520,9 @@ Returns true if the issue was created successfully else false.
 B<Example:>
 
 
-    gitHub(repository => q(ccc))->𝗰𝗿𝗲𝗮𝘁𝗲𝗥𝗲𝗽𝗼𝘀𝗶𝘁𝗼𝗿𝘆;
+
+    gitHub(repository => q(ccc))->createRepository;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Create repository succeeded";
 
 
@@ -1474,7 +1541,9 @@ Returns true if the issue was created successfully else false.
 B<Example:>
 
 
-    𝗰𝗿𝗲𝗮𝘁𝗲𝗥𝗲𝗽𝗼𝘀𝗶𝘁𝗼𝗿𝘆𝗙𝗿𝗼𝗺𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(q(philiprbrenan), q(ddd));
+
+    createRepositoryFromSavedToken(q(philiprbrenan), q(ddd));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Create repository succeeded";
 
 
@@ -1494,7 +1563,9 @@ Returns true if the issue was created successfully else false.
 B<Example:>
 
 
-    gitHub(title=>q(Hello), body=>q(World))->𝗰𝗿𝗲𝗮𝘁𝗲𝗜𝘀𝘀𝘂𝗲;
+
+    gitHub(title=>q(Hello), body=>q(World))->createIssue;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Create issue succeeded";
 
 
@@ -1514,7 +1585,9 @@ Returns true if the issue was created successfully else false.
 B<Example:>
 
 
-    &𝗰𝗿𝗲𝗮𝘁𝗲𝗜𝘀𝘀𝘂𝗲𝗙𝗿𝗼𝗺𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(qw(philiprbrenan ddd hello World));
+
+    &createIssueFromSavedToken(qw(philiprbrenan ddd hello World));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     success "Create issue succeeded";
 
 
@@ -1533,7 +1606,9 @@ B<Example:>
 
 
     my $s = q(HelloWorld);
-    &𝘄𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲𝗨𝘀𝗶𝗻𝗴𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(qw(philiprbrenan ddd hello.txt), $s);
+
+    &writeFileUsingSavedToken(qw(philiprbrenan ddd hello.txt), $s);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my $S = gitHub(repository=>q(ddd), gitFile=>q(hello.txt))->read;
 
     confess "Write file using saved token FAILED" unless $s eq $S;
@@ -1556,7 +1631,9 @@ B<Example:>
 
     my $f = writeFile(undef, my $s = "World
 ");
-    &𝘄𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲𝗙𝗿𝗼𝗺𝗙𝗶𝗹𝗲𝗨𝘀𝗶𝗻𝗴𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻(qw(philiprbrenan ddd hello.txt), $f);
+
+    &writeFileFromFileUsingSavedToken(qw(philiprbrenan ddd hello.txt), $f);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my $S = gitHub(repository=>q(ddd), gitFile=>q(hello.txt))->read;
     confess "Write file from file using saved token FAILED" unless $s eq $S;
     success "Write file from file using saved token succeeded"
@@ -1577,7 +1654,9 @@ B<Example:>
 
     my $s = q(Hello to the World);
             &writeFileUsingSavedToken(qw(philiprbrenan ddd hello.txt), $s);
-    my $S = &𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝗨𝘀𝗶𝗻𝗴𝗦𝗮𝘃𝗲𝗱𝗧𝗼𝗸𝗲𝗻 (qw(philiprbrenan ddd hello.txt));
+
+    my $S = &readFileUsingSavedToken (qw(philiprbrenan ddd hello.txt));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
     confess "Read file using saved token FAILED" unless $s eq $S;
     success "Read file using saved token succeeded"
@@ -1617,7 +1696,9 @@ B<Example:>
       personalAccessTokenFolder => $d,
      );
 
-            $g->𝘀𝗮𝘃𝗲𝗣𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗔𝗰𝗰𝗲𝘀𝘀𝗧𝗼𝗸𝗲𝗻;
+
+            $g->savePersonalAccessToken;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
     my $T = $g->loadPersonalAccessToken;
 
     confess "Load/Save token FAILED" unless $t eq $T;
@@ -1644,7 +1725,9 @@ B<Example:>
      );
 
             $g->savePersonalAccessToken;
-    my $T = $g->𝗹𝗼𝗮𝗱𝗣𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗔𝗰𝗰𝗲𝘀𝘀𝗧𝗼𝗸𝗲𝗻;
+
+    my $T = $g->loadPersonalAccessToken;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
 
     confess "Load/Save token FAILED" unless $t eq $T;
     success "Load/Save token succeeded"
@@ -1662,48 +1745,86 @@ Attributes describing the interface with L<GitHub|https://github.com>.
 =head3 Input fields
 
 
-B<body> - The body of an issue.
+=head4 body
 
-B<branch> - Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'.
+The body of an issue.
 
-B<confessOnFailure> - Confess to any failures
+=head4 branch
 
-B<gitFile> - File name on L<GitHub|https://github.com> - this name can contain '/'. This is the file to be read from, written to, copied from, checked for existence or deleted.
+Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'.
 
-B<gitFolder> - Folder name on L<GitHub|https://github.com> - this name can contain '/'.
+=head4 confessOnFailure
 
-B<message> - Optional commit message
+Confess to any failures
 
-B<nonRecursive> - Fetch only one level of files with L<list>.
+=head4 gitFile
 
-B<personalAccessToken> - A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens.
+File name on L<GitHub|https://github.com> - this name can contain '/'. This is the file to be read from, written to, copied from, checked for existence or deleted.
 
-B<personalAccessTokenFolder> - The folder into which to save personal access tokens. Set to q(/etc/GitHubCrudPersonalAccessToken) by default.
+=head4 gitFolder
 
-B<private> - Whether the repository being created should be private or not.
+Folder name on L<GitHub|https://github.com> - this name can contain '/'.
 
-B<repository> - The name of the repository to be worked on minus the userid - you should create this repository first manually.
+=head4 message
 
-B<secret> - The secret for a web hook - this is created by the creator of the web hook and remembered by L<GitHub|https://github.com>,
+Optional commit message
 
-B<title> - The title of an issue.
+=head4 nonRecursive
 
-B<userid> - Userid on L<GitHub|https://github.com> of the repository to be worked on.
+Fetch only one level of files with L<list>.
 
-B<webHookUrl> - The url for a web hook.
+=head4 personalAccessToken
+
+A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens.
+
+=head4 personalAccessTokenFolder
+
+The folder into which to save personal access tokens. Set to q(/etc/GitHubCrudPersonalAccessToken) by default.
+
+=head4 private
+
+Whether the repository being created should be private or not.
+
+=head4 repository
+
+The name of the repository to be worked on minus the userid - you should create this repository first manually.
+
+=head4 secret
+
+The secret for a web hook - this is created by the creator of the web hook and remembered by L<GitHub|https://github.com>,
+
+=head4 title
+
+The title of an issue.
+
+=head4 userid
+
+Userid on L<GitHub|https://github.com> of the repository to be worked on.
+
+=head4 webHookUrl
+
+The url for a web hook.
 
 
 
 =head3 Output fields
 
 
-B<failed> - Defined if the last request to L<GitHub|https://github.com> failed else B<undef>.
+=head4 failed
 
-B<fileList> - Reference to an array of files produced by L<list|/list>.
+Defined if the last request to L<GitHub|https://github.com> failed else B<undef>.
 
-B<readData> - Data produced by L<read|/read>.
+=head4 fileList
 
-B<response> - A reference to L<GitHub|https://github.com>'s response to the latest request.
+Reference to an array of files produced by L<list|/list>.
+
+=head4 readData
+
+Data produced by L<read|/read>.
+
+=head4 response
+
+A reference to L<GitHub|https://github.com>'s response to the latest request.
 
 
 
@@ -1718,11 +1839,17 @@ Attributes describing a response from L<GitHub|https://github.com>.
 =head3 Output fields
 
 
-B<content> - The actual content of the file from L<GitHub|https://github.com>.
+=head4 content
 
-B<data> - The data received from L<GitHub|https://github.com>, normally in L<Json|https://en.wikipedia.org/wiki/JSON> format.
+The actual content of the file from L<GitHub|https://github.com>.
 
-B<status> - Our version of Status.
+=head4 data
+
+The data received from L<GitHub|https://github.com>, normally in L<Json|https://en.wikipedia.org/wiki/JSON> format.
+
+=head4 status
+
+Our version of Status.
 
 
 
@@ -1757,7 +1884,7 @@ B<status> - Our version of Status.
 
 14 L<loadPersonalAccessToken|/loadPersonalAccessToken> - Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
 
-15 L<new|/new> - Create a new L<GitHub|https://github.com> object with attributes as describe at: L<GitHub::Crud Definition>.
+15 L<new|/new> - Create a new L<GitHub|https://github.com> object with attributes as described at: L<GitHub::Crud Definition>.
 
 16 L<read|/read> - Read data from a file on L<GitHub|https://github.com>.
 

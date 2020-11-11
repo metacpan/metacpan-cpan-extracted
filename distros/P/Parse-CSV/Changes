@@ -1,11 +1,16 @@
 Revision history for Perl extension Parse-CSV
 
+2.06      2020-10-31 23:18:00-05:00 America/Chicago
+
+2.06      Sat Oct 31 21:59:18 CDT 2020
+    - Handle Byte Order Marks in files [Suggested by Peter Sergeant]
+
 2.05      2018-06-28 21:53:24-05:00 America/Chicago
 	- Fix error handling to be able to distinguish eof from a real
 	  error <Alexey Lebedeff>
-        - Add failing test case for non-ASCII data <Ken Williams>
-        - Various docs fixups <Ken Williams>
-        - Rename _getline() to getline() and expose it in the docs <Ken Williams>
+    - Add failing test case for non-ASCII data <Ken Williams>
+    - Various docs fixups <Ken Williams>
+    - Rename _getline() to getline() and expose it in the docs <Ken Williams>
 
 2.04      2015-07-15 20:48:16 America/Chicago
 	- Fixed a regression that resulted in some failures in the
@@ -15,7 +20,7 @@ Revision history for Perl extension Parse-CSV
 	- Simplify processing & reduce copying in fetch() [b47286b]
 
 2.03      2015-07-06 00:03:56 America/Chicago
-     	- Now accepts embedded newlines in fields.  Previously parsing
+    - Now accepts embedded newlines in fields.  Previously parsing
           would fail when embedded newlines were encountered. [Ken
           Williams]
 

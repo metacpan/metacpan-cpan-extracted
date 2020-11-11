@@ -27,6 +27,7 @@ BOOT {
     XS_BOOT(UniEvent__Poll);
     XS_BOOT(UniEvent__Udp);
     XS_BOOT(UniEvent__Stream);
+    XS_BOOT(UniEvent__Streamer);
     XS_BOOT(UniEvent__Pipe);
     XS_BOOT(UniEvent__Test);
     XS_BOOT(UniEvent__Tcp);

@@ -51,7 +51,7 @@ subtest "opt:report_unique=0, report_duplicate=3 (-D)" => sub {
 };
 
 subtest "opt:count=1 (-c)" => sub {
-    $res = uniq_files(files => \@f, report_duplicate=>1, count=>1);
+    $res = uniq_files(files => \@f, report_duplicate=>1, show_count=>1);
     is_deeply($res->[2], [{file=>"f1",count=>3}, {file=>"f2",count=>3}, {file=>"f3",count=>1}, {file=>"f4",count=>1}, {file=>"f5",count=>3}]) or diag explain $res;
 };
 

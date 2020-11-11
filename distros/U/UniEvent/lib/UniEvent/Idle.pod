@@ -1,0 +1,90 @@
+=head1 NAME
+
+UniEvent::Idle - runs the given callback once per loop iteration
+
+=head1 SYNOPSIS
+
+    my $loop = UniEvent::Loop->default_loop;
+    my $h = UniEvent::Idle->new;
+    $h->event->add(sub { say 'hello' });
+    $h->start;
+    $loop->run_nowait;  # prints 'hello'
+    $loop->run;         # prints 'hello' multiple times... don't do that
+
+    $h->stop;
+    $h->reset;
+
+=head1 DESCRIPTION
+
+The handlce causes invocation on added callback(s) to be invoked once
+per loop iteration, before preraing them for I/O.
+
+Adding the handle to the event loop causes it the loop to  perform a zero
+timeout poll instead of blocking for I/O. Generally it is rather
+CPU consuming, so you should have a reason to do that.
+
+The handle is inherited from L<UniEvent::Handle>.
+
+=head1 METHOD
+
+=head2 new([$loop = UniEvent::Loop->default_loop])
+
+Constructs new Idle handle and binds it to the specified event loop
+
+=head2 start([$callback = undef])
+
+Starts the Idle handle, i.e. makes it active for the next even loop
+iteration. Optionally it adds the C<$callback> to the event listeners.
+
+=head2 stop()
+
+Stops the Idle handle, i.e. makes it inactive for the next event loop
+iteration.
+
+=head2 callback($code)
+
+Sets the callback, which will be invoked after loop run. All previously
+set event listeners or callbacks will be discarded.
+
+=head2 event()
+
+Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
+can be assigned with. The callbacks will be invoked once per loop iteration
+before preparing other hanlders for I/O. The C++ interface is:
+
+    void(const IdleSP&);
+
+i.e. the callback returns nothing and as an argument takes Idle handle
+itself.
+
+Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
+interface.
+
+=head2 event_listener($delegate [, $weak = false])
+
+Delegates callback invocation to the C<$delegate> object of arbitrary
+class having C<on_idle> method. The object can optionally be weakened.
+
+The method will be invoked as
+
+  $obj->on_idle($handle);
+
+=head2 call_now()
+
+Immediately ivokes assigned callbacks and listeners in the caller context
+(i.e. not waiting loop run).
+
+=head1 CONSTANTS
+
+=head2 TYPE
+
+Idle type constant
+
+=head1 REFERENCES
+
+L<UniEvent::Check>
+
+L<UniEvent::Handle>
+
+L<XS::Framework::CallbackDispatcher>
+=cut

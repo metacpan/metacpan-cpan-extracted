@@ -1,0 +1,20 @@
+
+<%init>
+my $style = $session{'CurrentUser'}
+          ? $session{'CurrentUser'}->Stylesheet
+          : RT->Config->Get('WebDefaultStylesheet');
+
+if ( RT->Config->Get('DevelMode') ) {
+    if ( $style eq 'elevator-light' ) {
+        push @{$CSSFiles}, "/static/css/elevator-dark/main.css";
+    }
+}
+elsif ( $style eq 'elevator-light' ) {
+    my $key = RT::Interface::Web::SquishedCSS( 'elevator-dark' )->Key;
+    push @{$CSSFiles}, "/NoAuth/css/elevator-dark/squished-$key.css";
+}
+</%init>
+
+<%args>
+$CSSFiles
+</%args>

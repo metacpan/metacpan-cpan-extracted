@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::new 6.015;
+package Dist::Zilla::App::Command::new 6.017;
 # ABSTRACT: mint a new dist
 
 use Dist::Zilla::App -command;
@@ -109,7 +109,7 @@ Dist::Zilla::App::Command::new - mint a new dist
 
 =head1 VERSION
 
-version 6.015
+version 6.017
 
 =head1 SYNOPSIS
 

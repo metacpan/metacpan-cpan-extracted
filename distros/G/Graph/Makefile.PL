@@ -49,9 +49,15 @@ WriteMakefile(
                 },
             },
             prereqs => {
+                develop => {
+                    requires => {
+                        'Test::Pod::Coverage' => '1.00',
+                        'Test::Pod' => '1.00',
+                    },
+                },
                 test => {
                     requires => {
-                        'Test::More'	=> 0,
+                        'Test::More'	=> '0.82', # explain
                         'Math::Complex'	=> 0,
                     },
                 },

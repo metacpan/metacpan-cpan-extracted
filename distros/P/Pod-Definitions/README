@@ -3,7 +3,7 @@ NAME
     Pod
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
         my $pod_file = Pod::Definitions->new();

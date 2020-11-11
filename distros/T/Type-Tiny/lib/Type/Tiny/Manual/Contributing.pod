@@ -47,16 +47,22 @@ L<https://codecov.io/gh/tobyink/p5-type-tiny>
 I'm not really a C programmer, nor am I that familiar with Perl's internals,
 so help with L<Type::Tiny::XS> is always appreciated. There are some type
 constraints in L<Types::Standard>, L<Types::Common::String>, and
-L<Types::Common::Numeric> which don't have XS implementations, and
-I<none> of L<Types::TypeTiny> has an XS implementation. (Given that
-the last module is used internally by Type::Tiny a I<lot>, an XS
-implementation of that could provide a good speed boost!)
+L<Types::Common::Numeric> which don't have XS implementations.
 
 =head2 Writing Type Libraries
 
 Though I'm unlikely to bundle many more type libraries in this distribution,
 uploading your own type libraries to CPAN will strengthen the Type::Tiny
 ecosystem.
+
+=head2 Donate
+
+If you or your organization uses Type::Tiny and you wish to contribute
+financially, you should be able to find links to donate on the Type::Tiny
+website at L<https://typetiny.toby.ink/>.
+
+Please note that I am not suggesting that you must do this in order for me
+to continue working on Type::Tiny and related modules.
 
 =head1 NEXT STEPS
 

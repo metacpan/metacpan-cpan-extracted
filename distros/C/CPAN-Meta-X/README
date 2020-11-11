@@ -1,0 +1,137 @@
+NAME
+    CPAN::Meta::X - List of custom (x_*) keys in CPAN distribution metadata
+    being used in the wild
+
+VERSION
+    This document describes version 0.002 of CPAN::Meta::X (from Perl
+    distribution CPAN-Meta-X), released on 2020-10-29.
+
+DESCRIPTION
+    The CPAN distribution metadata specification allows custom keys (those
+    that begin with "x_" or "X_" to be added to the metadata. Over time,
+    some keys are being used for their specific purposes. This document
+    tries to list them.
+
+    This document also lists custom phases and relationships in the prereqs
+    hash that are being used, custom keys in resources hash.
+
+LIST OF CUSTOM DISTRIBUTION METADATA KEYS
+  x_Dist_Zilla key
+    A big structure recording information related to Dist::Zilla which
+    presumably is used to build the current distribution. Some of the things
+    being put in here include: perl version used to build the distribution,
+    Dist::Zilla plugins used to build the distribution, and so on.
+
+  x_authority key
+  x_contributors key
+    List of contributors in a release.
+
+    Examples:
+
+    References:
+
+    *   DAGOLDEN,
+        <https://perlmaven.com/how-to-add-list-of-contributors-to-the-cpan-m
+        eta-files>
+
+    *   SZABGAB, <https://github.com/book/CPANio/issues/7>
+
+  x_deprecated key
+  x_examples key
+    List prerequisites for example scripts.
+
+    References:
+
+    *   KENTNL, <https://perlancar.wordpress.com/2016/12/28/x_-prereqs/>
+
+  x_generated_by_perl key
+  x_help_wanted key
+  x_provides_scripts key
+    List what scripts are being provided in the distribution. The structure
+    is modeled after the standard provides hash.
+
+    Examples:
+
+    So say your distribution provides a "csv2json" script, your META.json
+    would contain:
+
+     "x_provides_scripts": {
+       "csv2json": {
+         "version": "0.1",
+         "file": "bin/csv2json"
+       }
+     }
+
+    References:
+
+    *   TOBYINK, <https://perlmonks.org/?node_id=11123240>
+
+  x_spdx_expression key
+  x_serialization_backend key
+  x_static_install key
+LIST OF CUSTOM PREREQS PHASES
+  x_benchmarks phase
+    Express that the current distribution is benchmarking the specified
+    module.
+
+    References:
+
+    *   PERLANCAR, <https://perlancar.wordpress.com/2016/12/28/x_-prereqs/>
+
+  x_mentions phase
+    Express that the current distribution is mentioning the specified
+    module.
+
+    References:
+
+    *   PERLANCAR, <https://perlancar.wordpress.com/2016/12/28/x_-prereqs/>
+
+  x_spec phase
+    Express that the current distribution is following a specification
+    defined in the specified module.
+
+    References:
+
+    *   PERLANCAR, <https://perlancar.wordpress.com/2016/12/28/x_-prereqs/>
+
+LIST OF CUSTOM PREREQS RELATIONSHIPS
+  x_benchmarks relationship
+    See "x_benchmarks phase".
+
+  x_mentions relationship
+    See "x_mentions phase".
+
+  x_spec relationship
+    See "x_spec phase".
+
+LIST OF CUSTOM RESOURCES
+  x_IRC resource
+  x_identifier resource
+  x_mailinglist resource
+  x_wiki resource
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CPAN-Meta-X>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-CPAN-Meta-X>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-X>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    CPAN::Meta::Spec - Specification for CPAN distribution metadata
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

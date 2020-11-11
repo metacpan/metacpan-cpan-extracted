@@ -2,8 +2,6 @@ use 5.012;
 use warnings;
 use lib 't/lib'; use MyTest;
 
-catch_run('[idle]');
-
 my $l = UniEvent::Loop->default_loop;
 
 subtest 'start/stop/reset' => sub {

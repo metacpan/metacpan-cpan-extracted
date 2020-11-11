@@ -64,9 +64,9 @@ C<cpan install App::SimpleBackuper>
 
 =item * C<cd simple-backuper>
 
-=item * C<make>
-
 =item * C<perl Makefile.pl>
+
+=item * C<make>
 
 =item * C<sudo make install>
 

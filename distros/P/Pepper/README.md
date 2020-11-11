@@ -9,7 +9,7 @@ about Perl and for seasoned users to quickly stand up simple web services.
 
 This is not a framework.  This is a quick-start kit meant to simplify learning and 
 small projects.  The goal is for you to fall in love with Perl and continue your 
-journey on to Mojo, Dancer2, AnyEvent, Rex, RPerl, and all other the many terrific 
+journey on to Mojo, Dancer2, AnyEvent, Rex, PDL, POE, and all other the many terrific 
 Perl libraries (more than I can list here).  This is a great community of builders, 
 and there is so much to discover at [https://metacpan.org](https://metacpan.org) 
 and [https://perldoc.perl.org/](https://perldoc.perl.org/)

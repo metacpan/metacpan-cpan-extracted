@@ -1,0 +1,130 @@
+=head1 NAME
+
+XS::Framework::CallbackDispatcher - callback dispatcher for C++ events
+
+=head1 SYNOPSIS
+
+    my $callback = ...;
+    # add simple callbacks
+    $callback->add(sub { ... });
+    my $cb = sub { ...; return "this return is ignored"; };
+    $callback->add_back($cb);
+
+    my $cb2 = sub { ...; return "this-is-result"; };
+    $callback->add_event_listener($cb2);
+    $callback->add_event_listener_back($cb2);
+
+    # remove callbacks
+    $callback->remove($cb);
+    $callback->remove_all();
+
+    say "I have no listeners" if !$callback->has_listeners();
+    $callback->call('Hi, there!');
+
+=head1 DESCRIPTION
+
+The idea is pretty simple, there is a event source, and possible multiple event
+listeners. When an event occur it is delivered to the listeners (aka callbacks).
+Schematically it is something like:
+
+    my $event_source = ...; # construct it somehow
+    $event_source->add(sub { my $event = shift; say "Hey, I have ", $event; });
+    $event_source->add(sub { my $event = shift; say "Me too have ", $event; });
+    ...
+    $event_source->generate_event('boom!'); # somewhere in C++ code
+
+In the addition to delivering event to a callback, the callback might optionally
+return a value, if the event source asked for that. 
+
+In the C++ world objects are strictly typed, hence the type of event as well
+as the type of the optional result must be declared. Something like:
+
+    CallbackDispatcher<void(string)>;
+
+Here the C<void> is the return type (i.e. nothing is expected), and the event
+type is C<string>.
+
+By the reasons, described above, the pure perl event source aka CallbackDispatcher
+cannot be instantiated, it is always typed and instantiated in C++. If you need
+pure perl implementation without C++ backend, you can easily create your own
+or search in CPAN.
+
+When an event occur, callbacks are invoked in the order they were added.
+
+=head2 SIMPLE and NON-SIMPLE HANDLERS
+
+Lets assume there is a C++ interface like: 
+
+    CallbackDispatcher<bool(string)>;
+
+i.e. string is delivered to the callback and a bool value in the return is
+expected. How would it manage that, if there are multiple callbacks? 
+The answer is: all returned results are ignored, if B<simple> callback
+interface is used, like:
+
+    $event_source->add(sub { ... });
+    $event_source->add(sub { ... });
+
+To deal with result, a little bit more complex result the complex callback
+interface should be used. It takes the special event object and all parameters
+taken during event generation, i.e.:
+
+    $event_source->add_event_listener(sub {
+        my ($event, @args) = @_;
+        return 1 if ($some_condition);
+        return $event->(@args);
+    });
+
+If some condition is met, then result is returned and no further callbacks 
+are polled. Otherwise, C<args> are forwarded further to the next complex
+event listener and the result is taken from it, and so on, recursively.
+The arguments can be modified/changed/substituted on demand, of course.
+
+=head1 METHODS
+
+=head2 add($code[, $back = false])
+
+Appends list of callbacks by additing a C<$code> into the front (or back, if 
+C<$back> is true).
+
+The return result of the C<$code> will be ignored, as it is considered simple
+callback interface. The arguments used on event creation are forwarded to 
+the simple callback(s).
+
+=head2 add_back($code)
+
+Alias for C<add($code, 1)>.
+
+=head2 add_event_listener($code, $back);
+
+Appends list of callbacks by additing a C<$code> into the front (or back, if 
+C<$back> is true).
+
+The return result of the C<$code> will be converted into the required 
+C++ type by calling C<xs::in()>. This is considered complex callback interface,
+so, the C<$code> is invoked with the special event object and arguments, i..e
+
+    $code->($event, @args);
+
+The C<$event> is an anonynous subroutine, which allows to poll further callbacks.
+It should be noted, that C<$event> B<SHOULD NOT> outlive callback dispatcher
+instance, as it leads to core dump.
+
+=head2 remove($code)
+
+Removes the C<$code> from the list of callbacks.
+
+=head2 remove_all()
+
+Clears list of callbacks.
+
+=head2 has_listeners()
+
+Returns C<true> if there is any callback listeners. 
+
+=head2 call([$arg1 [, $arg2 ...]]);
+ 
+Generates the C++ event, converting arguments into proper C++ type via 
+C<xs::in> and invoking with it callbacks.
+
+=cut

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -29,9 +29,9 @@ this unit type. See
 L<systemd.unit(5)>
 for the common options of all unit configuration files. The common
 configuration items are configured in the generic
-C<[Unit]> and C<[Install]>
+[Unit] and [Install]
 sections. The service specific configuration options are
-configured in the C<[Service]> section.
+configured in the [Service] section.
 
 Additional options are listed in
 L<systemd.exec(5)>,
@@ -50,8 +50,8 @@ by the same name (with the C<.service> suffix
 removed) and dynamically creates a service unit from that script.
 This is useful for compatibility with SysV. Note that this
 compatibility is quite comprehensive but not 100%. For details
-about the incompatibilities, see the Incompatibilities
-with SysV document.
+about the incompatibilities, see the L<Incompatibilities
+with SysV|https://www.freedesktop.org/wiki/Software/systemd/Incompatibilities> document.
 
 The L<systemd-run(1)>
 command allows creating C<.service> and C<.scope> units dynamically
@@ -226,7 +226,10 @@ be killed before the next service process is run.
 Note that if any of the commands specified in C<ExecStartPre>,
 C<ExecStart>, or C<ExecStartPost> fail (and are not prefixed with
 C<->, see above) or time out before the service is fully up, execution continues with commands
-specified in C<ExecStopPost>, the commands in C<ExecStop> are skipped.',
+specified in C<ExecStopPost>, the commands in C<ExecStop> are skipped.
+
+Note that the execution of C<ExecStartPost> is taken into account for the purpose of
+C<Before>/C<After> ordering constraints.',
         'type' => 'list'
       },
       'ExecStartPost',
@@ -266,7 +269,10 @@ be killed before the next service process is run.
 Note that if any of the commands specified in C<ExecStartPre>,
 C<ExecStart>, or C<ExecStartPost> fail (and are not prefixed with
 C<->, see above) or time out before the service is fully up, execution continues with commands
-specified in C<ExecStopPost>, the commands in C<ExecStop> are skipped.',
+specified in C<ExecStopPost>, the commands in C<ExecStop> are skipped.
+
+Note that the execution of C<ExecStartPost> is taken into account for the purpose of
+C<Before>/C<After> ordering constraints.',
         'type' => 'list'
       },
       'ExecCondition',
@@ -318,7 +324,9 @@ suitable to order reloads of multiple services against each
 other. It is strongly recommended to set
 C<ExecReload> to a command that not only
 triggers a configuration reload of the daemon, but also
-synchronously waits for it to complete.',
+synchronously waits for it to complete. For example,
+L<dbus-broker(1)>
+uses the following:',
         'type' => 'list'
       },
       'ExecStop',
@@ -389,7 +397,10 @@ Note that all commands that are configured with this setting are invoked with th
 service, as well as the main process' exit code and status, set in the C<\$SERVICE_RESULT>,
 C<\$EXIT_CODE> and C<\$EXIT_STATUS> environment variables, see
 L<systemd.exec(5)> for
-details.",
+details.
+
+Note that the execution of C<ExecStopPost> is taken into account for the purpose of
+C<Before>/C<After> ordering constraints.",
         'type' => 'list'
       },
       'RestartSec',
@@ -403,21 +414,17 @@ as "5min 20s". Defaults to 100ms.',
       },
       'TimeoutStartSec',
       {
-        'description' => "Configures the time to wait for start-up. If a
-daemon service does not signal start-up completion within the
-configured time, the service will be considered failed and
-will be shut down again. Takes a unit-less value in seconds,
-or a time span value such as \"5min 20s\". Pass
-C<infinity> to disable the timeout logic. Defaults to
-C<DefaultTimeoutStartSec> from the manager
-configuration file, except when
-C<Type=oneshot> is used, in which case the
-timeout is disabled by default (see
+        'description' => "Configures the time to wait for start-up. If a daemon service does not signal start-up
+completion within the configured time, the service will be considered failed and will be shut down again. The
+precise action depends on the C<TimeoutStartFailureMode> option. Takes a unit-less value in
+seconds, or a time span value such as \"5min 20s\". Pass C<infinity> to disable the timeout logic.
+Defaults to C<DefaultTimeoutStartSec> from the manager configuration file, except when
+C<Type=oneshot> is used, in which case the timeout is disabled by default (see
 L<systemd-system.conf(5)>).
 
 If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
 the start time to be extended beyond C<TimeoutStartSec>. The first receipt of this message
-must occur before C<TimeoutStartSec> is exceeded, and once the start time has exended beyond
+must occur before C<TimeoutStartSec> is exceeded, and once the start time has extended beyond
 C<TimeoutStartSec>, the service manager will allow the service to continue to start, provided
 the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
 startup status is finished by C<READY=1>. (see
@@ -431,7 +438,8 @@ L<sd_notify(3)>).
         'description' => "This option serves two purposes. First, it configures the time to wait for each
 C<ExecStop> command. If any of them times out, subsequent C<ExecStop> commands
 are skipped and the service will be terminated by C<SIGTERM>. If no C<ExecStop>
-commands are specified, the service gets the C<SIGTERM> immediately. Second, it configures the time
+commands are specified, the service gets the C<SIGTERM> immediately. This default behavior
+can be changed by the C<TimeoutStopFailureMode> option. Second, it configures the time
 to wait for the service itself to stop. If it doesn't terminate in the specified time, it will be forcibly terminated
 by C<SIGKILL> (see C<KillMode> in
 L<systemd.kill(5)>).
@@ -444,7 +452,7 @@ L<systemd-system.conf(5)>).
 
 If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
 the stop time to be extended beyond C<TimeoutStopSec>. The first receipt of this message
-must occur before C<TimeoutStopSec> is exceeded, and once the stop time has exended beyond
+must occur before C<TimeoutStopSec> is exceeded, and once the stop time has extended beyond
 C<TimeoutStopSec>, the service manager will allow the service to continue to stop, provided
 the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
 (see L<sd_notify(3)>).
@@ -472,7 +480,7 @@ L<systemd-system.conf(5)>).
 If a service of C<Type=notify> handles C<SIGABRT> itself (instead of relying
 on the kernel to write a core dump) it can send C<EXTEND_TIMEOUT_USEC=\x{2026}> to
 extended the abort time beyond C<TimeoutAbortSec>. The first receipt of this message
-must occur before C<TimeoutAbortSec> is exceeded, and once the abort time has exended beyond
+must occur before C<TimeoutAbortSec> is exceeded, and once the abort time has extended beyond
 C<TimeoutAbortSec>, the service manager will allow the service to continue to abort, provided
 the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
 (see L<sd_notify(3)>).
@@ -489,6 +497,58 @@ C<TimeoutStopSec> to the specified value.
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'TimeoutStartFailureMode',
+      {
+        'choice' => [
+          'terminate',
+          'abort',
+          'kill'
+        ],
+        'description' => 'These options configure the action that is taken in case a daemon service does not signal
+start-up within its configured C<TimeoutStartSec>, respectively if it does not stop within
+C<TimeoutStopSec>. Takes one of C<terminate>, C<abort> and
+C<kill>. Both options default to C<terminate>.
+
+If C<terminate> is set the service will be gracefully terminated by sending the signal
+specified in C<KillSignal> (defaults to C<SIGTERM>, see
+L<systemd.kill(5)>). If the
+service does not terminate the C<FinalKillSignal> is sent after
+C<TimeoutStopSec>. If C<abort> is set, C<WatchdogSignal> is sent
+instead and C<TimeoutAbortSec> applies before sending C<FinalKillSignal>.
+This setting may be used to analyze services that fail to start-up or shut-down intermittently.
+By using C<kill> the service is immediately terminated by sending
+C<FinalKillSignal> without any further timeout. This setting can be used to expedite the
+shutdown of failing services.
+',
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'TimeoutStopFailureMode',
+      {
+        'choice' => [
+          'terminate',
+          'abort',
+          'kill'
+        ],
+        'description' => 'These options configure the action that is taken in case a daemon service does not signal
+start-up within its configured C<TimeoutStartSec>, respectively if it does not stop within
+C<TimeoutStopSec>. Takes one of C<terminate>, C<abort> and
+C<kill>. Both options default to C<terminate>.
+
+If C<terminate> is set the service will be gracefully terminated by sending the signal
+specified in C<KillSignal> (defaults to C<SIGTERM>, see
+L<systemd.kill(5)>). If the
+service does not terminate the C<FinalKillSignal> is sent after
+C<TimeoutStopSec>. If C<abort> is set, C<WatchdogSignal> is sent
+instead and C<TimeoutAbortSec> applies before sending C<FinalKillSignal>.
+This setting may be used to analyze services that fail to start-up or shut-down intermittently.
+By using C<kill> the service is immediately terminated by sending
+C<FinalKillSignal> without any further timeout. This setting can be used to expedite the
+shutdown of failing services.
+',
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
       'RuntimeMaxSec',
       {
         'description' => "Configures a maximum time for the service to run. If this is used and the service has been
@@ -499,7 +559,7 @@ limit.
 
 If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
 the runtime to be extended beyond C<RuntimeMaxSec>. The first receipt of this message
-must occur before C<RuntimeMaxSec> is exceeded, and once the runtime has exended beyond
+must occur before C<RuntimeMaxSec> is exceeded, and once the runtime has extended beyond
 C<RuntimeMaxSec>, the service manager will allow the service to continue to run, provided
 the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
 shutdown is achieved by C<STOPPING=1> (or termination). (see
@@ -633,25 +693,29 @@ C<on-abnormal> is an alternative choice.',
       'SuccessExitStatus',
       {
         'description' => 'Takes a list of exit status definitions that, when returned by the main service
-process, will be considered successful termination, in addition to the normal successful exit code 0
-and the signals C<SIGHUP>, C<SIGINT>,
+process, will be considered successful termination, in addition to the normal successful exit status
+0 and the signals C<SIGHUP>, C<SIGINT>,
 C<SIGTERM>, and C<SIGPIPE>. Exit status definitions can be
-numeric exit codes, termination code names, or termination signal names, separated by spaces. See the
-Process Exit Codes section in
+numeric termination statuses, termination status names, or termination signal names, separated by
+spaces. See the Process Exit Codes section in
 L<systemd.exec(5)> for
-a list of termination codes names (for this setting only the part without the
-C<EXIT_> or C<EX_> prefix should be used). See
-L<signal(7)> for
+a list of termination status names (for this setting only the part without the
+C<EXIT_> or C<EX_> prefix should be used). See L<signal(7)> for
 a list of signal names.
 
-This option may appear more than once, in which case the
-list of successful exit statuses is merged. If the empty
-string is assigned to this option, the list is reset, all
-prior assignments of this option will have no
-effect.
+Note that this setting does not change the mapping between numeric exit statuses and their
+names, i.e. regardless how this setting is used 0 will still be mapped to C<SUCCESS>
+(and thus typically shown as C<0/SUCCESS> in tool outputs) and 1 to
+C<FAILURE> (and thus typically shown as C<1/FAILURE>), and so on. It
+only controls what happens as effect of these exit statuses, and how it propagates to the state of
+the service as a whole.
 
-Note: systemd-analyze exit-codes may be used to list exit
-codes and translate between numerical code values and names.',
+This option may appear more than once, in which case the list of successful exit statuses is
+merged. If the empty string is assigned to this option, the list is reset, all prior assignments of
+this option will have no effect.
+
+Note: systemd-analyze exit-status may be used to list exit statuses and
+translate between numerical status values and names.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -751,7 +815,14 @@ forked off the process, i.e. on all processes that match C<main> or
 C<exec>. Conversely, if an auxiliary process of the unit sends an
 sd_notify() message and immediately exits, the service manager might not be able to
 properly attribute the message to the unit, and thus will ignore it, even if
-C<NotifyAccess>C<all> is set for it.',
+C<NotifyAccess>C<all> is set for it.
+
+Hence, to eliminate all race conditions involving lookup of the client\'s unit and attribution of notifications
+to units correctly, sd_notify_barrier() may be used. This call acts as a synchronization point
+and ensures all notifications sent before this call have been picked up by the service manager when it returns
+successfully. Use of sd_notify_barrier() is needed for clients which are not invoked by the
+service manager, otherwise this synchronization mechanism is unnecessary for attribution of notifications to the
+unit.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -783,20 +854,24 @@ option) is not supported.',
       },
       'FileDescriptorStoreMax',
       {
-        'description' => 'Configure how many file descriptors may be stored in the service manager for the service using
+        'description' => 'Configure how many file descriptors may be stored in the service manager for the
+service using
 L<sd_pid_notify_with_fds(3)>\'s
-C<FDSTORE=1> messages. This is useful for implementing services that can restart after an
-explicit request or a crash without losing state. Any open sockets and other file descriptors which should not
-be closed during the restart may be stored this way. Application state can either be serialized to a file in
-C</run>, or better, stored in a
-L<memfd_create(2)> memory file
-descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service manager. All file descriptors
-passed to the service manager from a specific service are passed back to the service\'s main process on the next
-service restart. Any file descriptors passed to the service manager are automatically closed when
-C<POLLHUP> or C<POLLERR> is seen on them, or when the service is fully
-stopped and no job is queued or being executed for it. If this option is used, C<NotifyAccess>
-(see above) should be set to open access to the notification socket provided by systemd. If
-C<NotifyAccess> is not set, it will be implicitly set to
+C<FDSTORE=1> messages. This is useful for implementing services that can restart
+after an explicit request or a crash without losing state. Any open sockets and other file
+descriptors which should not be closed during the restart may be stored this way. Application state
+can either be serialized to a file in C</run>, or better, stored in a
+L<memfd_create(2)>
+memory file descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service
+manager. All file descriptors passed to the service manager from a specific service are passed back
+to the service\'s main process on the next service restart (see
+L<sd_listen_fds(3)> for
+details about the precise protocol used and the order in which the file descriptors are passed). Any
+file descriptors passed to the service manager are automatically closed when
+C<POLLHUP> or C<POLLERR> is seen on them, or when the service is
+fully stopped and no job is queued or being executed for it. If this option is used,
+C<NotifyAccess> (see above) should be set to open access to the notification socket
+provided by systemd. If C<NotifyAccess> is not set, it will be implicitly set to
 C<main>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -804,8 +879,8 @@ C<main>.',
       'USBFunctionDescriptors',
       {
         'description' => 'Configure the location of a file containing
-USB
-FunctionFS descriptors, for implementation of USB
+L<USB
+FunctionFS|https://www.kernel.org/doc/Documentation/usb/functionfs.txt> descriptors, for implementation of USB
 gadget functions. This is used only in conjunction with a
 socket unit with C<ListenUSBFunction>
 configured. The contents of this file are written to the
@@ -834,8 +909,8 @@ C<stop> the event is logged but the service is terminated cleanly by the service
 manager. If set to C<kill> and one of the service\'s processes is killed by the OOM
 killer the kernel is instructed to kill all remaining processes of the service, too. Defaults to the
 setting C<DefaultOOMPolicy> in
-L<system.conf(5)> is
-set to, except for services where C<Delegate> is turned on, where it defaults to
+L<systemd-system.conf(5)>
+is set to, except for services where C<Delegate> is turned on, where it defaults to
 C<continue>.
 
 Use the C<OOMScoreAdjust> setting to configure whether processes of the unit

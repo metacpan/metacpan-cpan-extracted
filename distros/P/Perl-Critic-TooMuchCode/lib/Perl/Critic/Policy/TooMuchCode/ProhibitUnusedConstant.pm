@@ -42,7 +42,7 @@ sub violates {
 
     ## Look for the signature of misparsed ternary operator.
     ## https://github.com/adamkennedy/PPI/issues/62
-    ## Once PPI is fixe, this workaround can be eliminated.
+    ## Once PPI is fixed, this workaround can be eliminated.
     Perl::Critic::TooMuchCode::__get_terop_usage(\%used, $doc);
 
     my @violations;

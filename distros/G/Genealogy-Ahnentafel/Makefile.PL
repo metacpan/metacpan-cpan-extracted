@@ -8,7 +8,7 @@ WriteMakefile(
         MooX::ClassAttribute => 0,
         Types::Standard      => 0,
         Type::Utils          => 0,
-},
+    },
     BUILD_REQUIRES    => {
         Test::Exception      => 0,
     },
@@ -16,14 +16,14 @@ WriteMakefile(
     AUTHOR            => 'Dave Cross <dave@perlhacks.com>',
     LICENSE           => 'perl',
     MIN_PERL_VERSION  => '5.6.0',
-    META_MERGE        => {
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
         resources => {
             repository => {
                 type => 'git',
                 url => 'git://github.com/davorg/genealogy-ahnentafel.git',
-                web => 'https://github.com/davorg/extutils-ahnentafel',
+                web => 'https://github.com/davorg/genealogy-ahnentafel',
             },
         },
- 
     },
 );

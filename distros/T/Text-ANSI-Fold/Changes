@@ -1,5 +1,21 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.05 2020-11-11T08:24:22Z
+
+    - Fix word boundary handling bug introduced at 2.03.
+
+2.04 2020-11-06T04:20:15Z
+
+    - Add keep_el parameter to control keep Erase Line or not.
+
+2.03 2020-11-06T03:29:06Z
+
+    - Remember color at erase line sequence, and apply to padding string.
+
+2.02 2020-11-04T05:31:35Z
+
+    - Support backspaces.
+
 2.01 2020-10-20T11:36:15Z
 
     - Implement tab expansion.

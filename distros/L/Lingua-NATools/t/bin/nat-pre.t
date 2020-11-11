@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use Test::More;
 
+# TEST 1
 #
 # Check the binary file
 #
@@ -19,28 +20,30 @@ for (@prefiles) {
 
 `_build/apps/nat-pre -q -i t/input/PT-tok t/input/EN-tok t/PT.lex t/EN.lex t/PT.crp t/EN.crp`;
 
+# TEST 2 TO 7
 for (@prefiles) {
   ok -f, "Checking if file $_ was correctly created";
 }
 
+
+# TEST 8
 #
 # Check that nat-lex2perl does anything for PT and EN
 #
 `$^X -Mblib scripts/nat-lex2perl t/PT.lex > t/PT.perl`;
 ok(-f "t/PT.perl", "nat-lex2perl worked");
 
-
+# TEST 9
 `$^X -Mblib scripts/nat-lex2perl t/EN.lex > t/EN.perl`;
 ok(-f "t/EN.perl", "nat-lex2perl worked");
-
 
 #
 # Check contents for PT.perl
 #
 {
   my $GENERATED = {};
-  my $ORIGINAL = do "t/input/PT-tok.wc";
-  eval{$GENERATED = do "t/PT.perl"};
+  my $ORIGINAL = do "./t/input/PT-tok.wc";
+  eval{$GENERATED = do "./t/PT.perl"};
   ok(!$@, "DO done correctly");
 
   for (keys %$ORIGINAL) {
@@ -55,8 +58,8 @@ ok(-f "t/EN.perl", "nat-lex2perl worked");
 #
 {
   my $GENERATED = {};
-  my $ORIGINAL = do "t/input/EN-tok.wc";
-  eval{$GENERATED = do "t/EN.perl"};
+  my $ORIGINAL = do "./t/input/EN-tok.wc";
+  eval{$GENERATED = do "./t/EN.perl"};
   ok(!$@, "DO done correctly");
 
   for (keys %$ORIGINAL) {
@@ -69,4 +72,8 @@ ok(-f "t/EN.perl", "nat-lex2perl worked");
 for (@prefiles, qw!t/PT.perl t/EN.perl!) {
     unlink if -f
 }
+
+
 done_testing();
+
+

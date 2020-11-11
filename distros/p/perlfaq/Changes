@@ -1,10 +1,17 @@
 Revision history for perlfaq
 
+5.20201107  2020-11-07 21:02:39Z
+  * typo fix (PR#90, Samanta Navarro)
+  * fix learn.perl.org link, which now directs to perldoc.perl.org (PR#91, Dan
+    Book)
+  * modern updates to "How do I efficiently match many regular expressions"
+    (PR#92, Dan Book)
+
 5.20200523  2020-05-22 03:28:54Z
-  * switch perlbug references to GitHub issue tracker (PR##87, Dan Book)
+  * switch perlbug references to GitHub issue tracker (PR#87, Dan Book)
 
 5.20200522  2020-05-22 02:24:31Z
-  * updated perlfaq1 entry on Raku (PR##86, Dan Book)
+  * updated perlfaq1 entry on Raku (PR#86, Dan Book)
 
 5.20200125  2020-01-25 19:11:04Z
   * remove references to smartmatch in perlfaq4; replace use of

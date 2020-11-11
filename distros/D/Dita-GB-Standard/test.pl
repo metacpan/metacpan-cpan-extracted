@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I//home/phil/perl/cpan/DitaGBStandard/lib/
 #-------------------------------------------------------------------------------
 # Test Dita::GB::Standard
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2019

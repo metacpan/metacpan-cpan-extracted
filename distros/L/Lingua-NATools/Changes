@@ -1,3 +1,11 @@
+0.7.12    Mon Nov 09 21:37:00 WET 2020
+
+   - Add metadata about VCS
+
+0.7.11    Mon Nov 02 20:35:07 WET 2020
+
+   - Some locale fixes.
+
 0.7.10    Sat Oct 31 16:51:42 WET 2015
 
    - fix requirement

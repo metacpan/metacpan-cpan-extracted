@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-28'; # DATE
+our $DATE = '2020-06-01'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.131'; # VERSION
+our $VERSION = '0.132'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,22 @@ uniq-files - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.131 of uniq-files (from Perl distribution App-UniqFiles), released on 2020-05-28.
+This document describes version 0.132 of uniq-files (from Perl distribution App-UniqFiles), released on 2020-06-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % uniq-files [-A=s] [-D] [-R] [-a] [--algorithm=s] [-c] [--count] [-d] [--debug] [--digest-args-json=s] [--digest-args=s] [--format=name] [--group-by-digest] [--json] [--log-level=level] [--(no)naked-res] [--no-count] [--no-group-by-digest] [--no-recurse] [--no-report-unique] [--no-show-digest] [--no-show-size] [--nocount] [--nogroup-by-digest] [--norecurse] [--noreport-unique] [--noshow-digest] [--noshow-size] [--page-result[=program]] [--quiet] [--recurse] [--report-duplicate=s] [--report-unique] [--show-digest] [--show-size] [--trace] [-u] [--verbose] [--view-result[=program]] <files> ...
+ % uniq-files [-A=s] [-D] [-R] [-a] [--algorithm=s] [-c] [--count] [-d]
+     [--debug] [--digest-args-json=s] [--digest-args=s] [--format=name]
+     [--group-by-digest] [--json] [--log-level=level] [--(no)naked-res]
+     [--no-group-by-digest] [--no-recurse] [--no-report-unique]
+     [--no-show-count] [--no-show-digest] [--no-show-size]
+     [--nogroup-by-digest] [--norecurse] [--noreport-unique]
+     [--noshow-count] [--noshow-digest] [--noshow-size]
+     [--page-result[=program]] [--quiet] [--recurse] [--report-duplicate=s]
+     [--report-unique] [--show-count] [--show-digest] [--show-size]
+     [--trace] [-u] [--verbose] [--view-result[=program]] <files> ...
 
 Examples:
 
@@ -99,14 +108,6 @@ If set to '', 'none', or 'size', then digest will be set to file size. This
 means uniqueness will be determined solely from file size. This can be quicker
 but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
-
-
-=item B<--count>, B<-c>
-
-Whether to return each file content's number of occurence.
-
-1 means the file content is only encountered once (unique), 2 means there is one
-duplicate, and so on.
 
 
 =item B<--digest-args-json>=I<s>, B<-A>
@@ -165,6 +166,14 @@ copy of the duplicate content. You can use the output of this routine to `mv` or
 `rm`.
 
 If set to 0, duplicate items will not be returned.
+
+
+=item B<--show-count>, B<--count>, B<-c>
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
 
 
 =item B<--show-digest>

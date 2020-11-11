@@ -1,6 +1,19 @@
 Revision history for DBIx-Class-Smooth
 
-0.0105 2020-09-20 15:02:50 UTC
+0.0107 2020-10-28 19:13:27 UTC
+ [Stats & Dependency Changes]
+ - 37 files changed, 37 insertions(+), 37 deletions(-)
+
+0.0106 2020-10-28T18:59:43Z UTC
+ [New Features]
+ - Added annotate() to ResultSetBase.
+ - Started ::Functions
+
+ [Stats & Dependency Changes]
+ - 46 files changed, 323 insertions(+), 49 deletions(-)
+ - (run req) + Ref::Util (any)
+
+0.0105 2020-09-20T15:02:50Z UTC
  [Breaking Changes]
  - Renamed ::Helper::Row::Creation to ::Helper::Row::Definition
 

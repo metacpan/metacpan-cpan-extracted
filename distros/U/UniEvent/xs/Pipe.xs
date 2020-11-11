@@ -35,6 +35,7 @@ BOOT {
     Stash s(__PACKAGE__);
     s.inherit("UniEvent::Stream");
     s.add_const_sub("TYPE", Simple(Pipe::TYPE.name));
+    unievent::register_perl_class(Pipe::TYPE, s);
 }
    
 PipeSP Pipe::new (LoopSP loop = {}, bool ipc = false) {

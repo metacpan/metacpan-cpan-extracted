@@ -7,7 +7,7 @@ AtteanX::Parser::NQuads - N-Quads Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::NQuads version 0.026
+This document describes AtteanX::Parser::NQuads version 0.027
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ This document describes AtteanX::Parser::NQuads version 0.026
 
 =cut
 
-package AtteanX::Parser::NQuads 0.026 {
+package AtteanX::Parser::NQuads 0.027 {
 	use utf8;
 	
 	use Attean;
@@ -93,7 +93,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams. This
+Copyright (c) 2014--2020 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

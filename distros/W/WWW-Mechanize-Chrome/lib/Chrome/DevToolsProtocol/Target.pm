@@ -16,7 +16,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 our @CARP_NOT;
 
 =head1 NAME
@@ -308,7 +308,7 @@ sub connect( $self, %args ) {
         });
 
     } elsif( ref $args{ tab } ) {
-        # Let's assume that the tab is a tab object:
+        # Let's assume that the tab is a Target hash:
         my $tab = $args{ tab };
         $self->tab($tab);
         $done = $done->then(sub {

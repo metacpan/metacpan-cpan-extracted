@@ -7,7 +7,7 @@ Attean::BindingEqualityTest - Test for equality of binding sets with bnode isomo
 
 =head1 VERSION
 
-This document describes Attean::BindingEqualityTest version 0.026
+This document describes Attean::BindingEqualityTest version 0.027
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ package Attean::BindingEqualityTest::_Iter {
 	}
 }
 
-package Attean::BindingEqualityTest 0.026 {
+package Attean::BindingEqualityTest 0.027 {
 	use v5.14;
 	use warnings;
 	use Moo;
@@ -67,6 +67,7 @@ package Attean::BindingEqualityTest 0.026 {
 	use Data::Dumper;
 	use Algorithm::Combinatorics qw(permutations);
 	use Scalar::Util qw(blessed);
+	use List::Util qw(shuffle);
 	use Attean::RDF;
 	use Digest::MD5 qw(md5_hex);
 	use namespace::clean;
@@ -279,7 +280,7 @@ solutions, the solution returned is arbitrary.
 # 		} else {
 			@ka		= keys %blank_ids_a;
 			@kb		= keys %blank_ids_b;
-			$kbp	= permutations( \@kb );
+			$kbp	= permutations( [shuffle @kb] );
 # 		}
 		
 		my %bb_master	= map { $_->as_string => 1 } @$bb;
@@ -358,7 +359,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2019 Gregory Todd Williams.
+Copyright (c) 2014--2020 Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

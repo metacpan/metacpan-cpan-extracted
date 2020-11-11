@@ -1,0 +1,234 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Capture::Tiny qw(capture);
+use Config;
+use CPAN::FindDependencies;
+use File::Find::Rule;
+use LWP::Simple;
+use Text::Diff;
+
+# generate help before chdir()ing. can't assume `perldoc` is in the path. Yuck.
+(my $help, undef) = capture { system(
+    $Config{perlpath}, qw{-MPod::Perldoc -e Pod::Perldoc->run() -- -T}, $0
+) };
+
+my($command, @command_params, %finddeps_args);
+if(@ARGV) {
+    while(my $arg = shift(@ARGV)) {
+        my $this_command;
+        if($arg eq 'add') {
+            die("You must provide an argument to '$arg'.\n\n"._help())
+                unless(@ARGV);
+            ($this_command, @command_params) = (\&_add, shift(@ARGV));
+        } elsif($arg =~ /^(rm|remove|delete)$/) {
+            die("You must provide an argument to '$arg'.\n\n"._help())
+                unless(@ARGV);
+            ($this_command, @command_params) = (\&_remove, shift(@ARGV));
+        } elsif($arg eq 'report') {
+            die("You must provide an argument to '$arg'.\n\n"._help())
+                unless(@ARGV);
+            ($this_command, @command_params) = (\&_report, shift(@ARGV));
+        } elsif($arg =~ /^(--)?mirror$/) {
+            die("You must provide an argument to '$arg'.\n\n"._help())
+                unless(@ARGV);
+            $finddeps_args{mirrors} ||= [];
+            push @{$finddeps_args{mirrors}}, shift(@ARGV);
+        } elsif($arg =~ /^(--)?perl$/) {
+            die("You must provide an argument to '$arg'.\n\n"._help())
+                unless(@ARGV);
+            die("You can't provide two or more versions of perl.\n\n"._help())
+                if(exists($finddeps_args{perl}));
+            $finddeps_args{perl} = shift(@ARGV);
+        } elsif($arg eq 'list') {
+            ($this_command, @command_params) = (\&_print_list);
+        } elsif($arg =~ /^(-h|(--)?help)$/) {
+            ($this_command, @command_params) = (\&_print_help);
+        } else {
+            die("'$arg' isn't a valid argument.\n\n"._help());
+        }
+
+        if($command && $this_command) {
+            die("You can't provide two or more commands.\n\n"._help());
+        } elsif($this_command) {
+            $command = $this_command;
+        }
+    }
+}
+$finddeps_args{mirrors} ||= ['DEFAULT'];
+$finddeps_args{perl}    ||= '5.005';
+
+# create the cache if needed
+chdir($ENV{CPANDEPS_DIFF_DIR} || $ENV{HOME});
+mkdir('.cpandeps-diff');
+mkdir(".cpandeps-diff/$finddeps_args{perl}");
+mkdir(".cpandeps-diff/$finddeps_args{perl}/cache");
+# clear out Ye Olde cache files. Max age is 23h so multiple runs within a
+# day won't hammer servers, but a daily cron job will always be fresh
+unlink(
+    File::Find::Rule->file()->mtime("<=".(time() - 23*60*60))
+        ->in(".cpandeps-diff/$finddeps_args{perl}/cache")
+);
+
+($command, @command_params) = (\&_report, _list())
+    unless($command);
+$command->(@command_params);
+
+sub _get_deps {
+    my $module = shift;
+    return join("\n", sort { $a cmp $b } map { $_->distribution() } grep { $module ne $_->name() } CPAN::FindDependencies::finddeps(
+        $module,
+        nowarnings => 1,
+        perl       => $finddeps_args{perl},
+        cachedir   => ".cpandeps-diff/$finddeps_args{perl}/cache",
+        map { (mirror => $_) } @{$finddeps_args{mirrors}}
+    ));
+}
+
+sub _list {
+    opendir(my $dir_fh, ".cpandeps-diff/$finddeps_args{perl}") ||
+        die("Couldn't read $ENV{HOME}/.cpandeps-diff/$finddeps_args{perl}: $!\n");
+    my @list = grep { -f ".cpandeps-diff/$finddeps_args{perl}/$_" } readdir($dir_fh);
+    closedir($dir_fh);
+    return sort { $a cmp $b } @list;
+}
+
+sub _report {
+    foreach my $module (@_) {
+        my $current_deps  = _get_deps($module);
+        my $previous_deps = do {
+            open(my $fh, '<', ".cpandeps-diff/$finddeps_args{perl}/$module") ||
+                die("Couldn't read $ENV{HOME}/.cpandeps-diff/$finddeps_args{perl}/$module: $!\n");
+            my $prev = join('', <$fh>);
+            close($fh);
+            $prev;
+        };
+        if($current_deps ne $previous_deps) {
+            print "Differences found in dependencies for $module:\n";
+            print diff(\$previous_deps, \$current_deps, { STYLE => 'Table' });
+            open(my $fh, '>', ".cpandeps-diff/$finddeps_args{perl}/$module") ||
+                die("Couldn't write $ENV{HOME}/.cpandeps-diff/$finddeps_args{perl}/$module: $!\n");
+            print $fh $current_deps;
+            close($fh);
+        }
+    }
+}
+
+sub _add {
+    my $module = shift;
+    return if(grep { $_ eq $module } _list());
+
+    open(my $fh, '>', ".cpandeps-diff/$finddeps_args{perl}/$module") ||
+        die("Couldn't write $ENV{HOME}/.cpandeps-diff/$finddeps_args{perl}/$module: $!\n");
+    print $fh _get_deps($module);
+    close($fh);
+}
+
+sub _remove {
+    my $module = shift;
+    die("'$module' isn't in the database.\n\n"._help()) unless(grep { $_ eq $module } _list());
+
+    unlink(".cpandeps-diff/$finddeps_args{perl}/$module");
+}
+
+sub _print_list { print "$_\n" foreach (_list()); }
+sub _print_help { print _help(); }
+sub _help { return $help; }
+
+=head1 NAME
+
+cpandeps-diff - generate reports when modules' dependencies get new releases
+
+=head1 SYNOPSIS
+
+    cpandeps-diff add Some::Module --perl 5.30.3 --mirror file:///home/me/cpanmirror
+
+    cpandeps-diff list
+
+    cpandeps-diff report Some::Module
+
+=head1 COMMANDS
+
+cpandeps-diff takes at most one of several different commands, some of which in
+turn take more arguments:
+
+=head2 add $module [@args]
+
+Add the named module to the list of modules we care about
+
+=head2 remove $module [@args]
+
+Stop reporting on this module
+
+(aliases: delete; rm)
+
+=head2 list
+
+Show which modules we're going to report on
+
+=head2 report $module [@args]
+
+Generate a report for just this one module
+
+=head2 [@args]
+
+If you don't provide a command then it will generate a report about all known
+modules.
+
+=head2 help
+
+Can you guess what this does?
+
+=head1 ARGUMENTS
+
+=head2 perl $version
+
+Use this version of perl for figuring out what's in core. Any dependencies
+that are in core will not be reported on unless a newer version is required.
+
+If not specified it defaults to 5.005.
+
+Note that adding, removing and reporting on modules always depends on the
+version of perl, so as well as being used to figure out what's in core
+you can also have different lists of modules for different versions of perl.
+
+=head2 mirror $mirror
+
+Use this CPAN mirror to fetch dependency information from (see
+L<CPAN::FindDependencies> documentation for details). You may provide this
+argument as many times as you want.
+
+=head1 FILES
+
+Data is stored in a directory called .cpandeps-diff, which by default
+is under your home directory. If you want to put it somewhere else
+(you probably don't) then set CPANDEPS_DIFF_DIR in your environment. That
+data includes a cache of data fetched from the CPAN which will be automatically
+cleared out after 23 hours. This cache helps to generate reports for multiple
+modules more quickly, and also to prevent you from being rate-limited or
+even kicked off CPAN mirrors.
+
+=head1 WARNINGS, BUGS and FEEDBACK
+
+This script has not been thoroughly tested.
+
+I welcome feedback about my code, including constructive criticism.
+Bug reports should be made on Github or by email.
+
+=head1 AUTHOR, LICENCE and COPYRIGHT
+
+Copyright 2007 - 2020 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence. It's
+up to you which one you use. The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This software is also free-as-in-mason.
+
+=cut

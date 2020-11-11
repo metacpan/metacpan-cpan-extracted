@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widgets;
+package Tickit::Widgets 0.31;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.30';
 
 =head1 NAME
 

@@ -5,13 +5,13 @@ package Chart::GGPlot::Backend::Plotly;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0009'; # VERSION
+our $VERSION = '0.0011'; # VERSION
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.039 qw(show_plot);
+use Chart::Plotly qw(show_plot);
 use Chart::Plotly::Plot;
-use Chart::Plotly::Image::Orca;
+use Chart::Plotly::Image;
 
 use Data::Munge qw(elem);
 use JSON;
@@ -561,15 +561,16 @@ method show ($ggplot, HashRef $opts={}) {
 
 method save ($ggplot, $filename, HashRef $opts={}) {
     my $plotly = $self->ggplotly($ggplot);
-    my $good = Chart::Plotly::Image::Orca::orca(
+    my %opts = %$opts;
+    
+    my $good = Chart::Plotly::Image::save_image(
         #<<< no perltidy
                 plot => $plotly,
                 file => $filename,
-        maybe   width => $opts->{width},
-        maybe   height => $opts->{height},
+                %opts,
         #>>>
     );
-    die "Failed to save image via plotly-orca" unless $good;
+    die "Failed to save image" unless $good;
 }
 
 method iplot ($ggplot, HashRef $opts={}) {
@@ -596,7 +597,7 @@ Chart::GGPlot::Backend::Plotly - Plotly backend for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0009
+version 0.0011
 
 =head1 DESCRIPTION
 
@@ -647,7 +648,8 @@ changes.
     save($ggplot, $filename, HashRef $opts={})
 
 Export the plot to a static image file. This internally uses
-L<Chart::Plotly::Image::Orca>.
+L<Chart::Plotly::Image>. And to get L<Chart::Plotly::Image>
+to work, I recommend you install L<Chart::Kaleido::Plotly>.
 
 Below options are supported for C<$opts>:
 
@@ -675,7 +677,7 @@ L<https://plot.ly/|Plotly>
 
 L<Chart::GGPlot::Backend>
 
-L<Chart::Plotly>, L<Chart::Plotly::Image::Orca>
+L<Chart::Plotly>, L<Chart::Plotly::Image>, L<Chart::Kaleido::Plotly>
 
 =head1 AUTHOR
 
@@ -683,7 +685,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

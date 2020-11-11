@@ -6,17 +6,26 @@ use utf8;
 use Carp;
 use Data::Dumper;
 {
-    no warnings 'redefine';
+    no warnings 'redefine', 'once';
     *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
     $Data::Dumper::Useperl = 1;
     $Data::Dumper::Sortkey = 1;
 }
 
+my %char_range = (
+    STRAIGHT => [ [0x01=>0x07], [0x10=>0x1f], [0x21=>0x7e], [0x81=>0xfe] ],
+    MODERATE => [ [0x21=>0x7e], [0x01=>0x07], [0x10=>0x1f], [0x81=>0xfe] ],
+    VISIBLE  => [ [0x21=>0x7e] ],
+    );
+
 my %default = (
-    test   => undef,
-    length => sub { length $_[0] },
-    match  => qr/.+/s,
-    except => '',
+    test    => undef,
+    length  => sub { length $_[0] },
+    match   => qr/.+/s,
+    except  => '',
+    max     => 0,
+    visible => 0,
+    ordered => 1,
 );
 
 sub new {
@@ -28,11 +37,21 @@ sub new {
 
 sub configure {
     my $obj = shift;
-    while (my($key, $value) = splice @_, 0, 2) {
-	if (not exists $default{$key}) {
-	    croak "$key: invalid parameter";
+    while (my($k, $v) = splice @_, 0, 2) {
+	if (not exists $default{$k}) {
+	    croak "$k: invalid parameter";
 	}
-	$obj->{$key} = $value;
+	if ($k eq 'test') {
+	    $obj->{$k} = do {
+		if    (not $v)             { sub { 1 } }
+		elsif (ref $v eq 'Regexp') { sub { $_[0] =~ $v } }
+		elsif (ref $v eq 'CODE')   { $v }
+		else                       { sub { 1 } }
+	    };
+	} else {
+	    $k eq 'length' and ( ref $v eq 'CODE' or die );
+	    $obj->{$k} = $v;
+	}
     }
     $obj;
 }
@@ -40,15 +59,13 @@ sub configure {
 sub encode {
     my $obj = shift;
     $obj->{replace} = [];
-    my $guard = $obj->guard_maker(0+@_, $obj->{except} // '', @_)
+    my $guard = $obj->guard_maker($obj->{except} // '', @_)
 	or return @_;
+    my $match = $obj->{match} or die;
+    my $test = $obj->{test};
     for my $arg (grep { defined } @_) {
-	if (my $test = $obj->{test}) {
-	    next unless ( ( ref $test eq 'Regexp' and $arg =~ $test ) or
-			  ( ref $test eq 'CODE'   and $test->($arg) ) );
-	}
-	my $match = $obj->{match} or die;
-	$arg =~ s{$obj->{match}}{
+	not $test or $test->($arg) or next;
+	$arg =~ s{$match}{
 	    if (my($replace, $regex, $len) = $guard->(${^MATCH})) {
 		push @{$obj->{replace}}, [ $regex, ${^MATCH}, $len ];
 		$replace;
@@ -62,15 +79,17 @@ sub encode {
 
 sub decode {
     my $obj = shift;
-    my @replace = @{$obj->{replace}};
+    my @replace = @{$obj->{replace}} or return @_;
   ARGS:
     for (@_) {
 	for my $i (0 .. $#replace) {
-	    my $ent = $replace[$i];
-	    my($regex, $orig, $len) = @$ent;
-	    # capture group is defined in $regex
-	    if (s/$regex/_replace($1, $orig, $len)/e) {
-		splice @replace, 0, $i + 1;
+	    my($regex, $orig, $len) = @{$replace[$i]};
+	    if (s/$regex/_replace(${^MATCH}, $orig, $len)/pe) {
+		if ($obj->{ordered}) {
+		    splice @replace, 0, $i + 1;
+		} else {
+		    splice @replace, $i, 1;
+		}
 		redo ARGS;
 	    }
 	}
@@ -104,24 +123,37 @@ sub _trim {
 
 sub guard_maker {
     my $obj = shift;
-    my $max = shift;
+    my $max = $obj->{max};
     local $_ = join '', @_;
     my @a;
-    for my $i (1 .. 255) {
+    my @range = do {
+	map { $_->[0] .. $_->[1] }
+	@{ $obj->{range} //= $obj->char_range };
+    };
+    for my $i (@range) {
 	my $c = pack "C", $i;
-	next if $c =~ /\s/ || /\Q$c/;
-	push @a, $c;
-	last if @a > $max;
+	push @a, $c unless /\Q$c/;
+	last if $max && @a > $max;
     }
     return if @a < 2;
     my $lead = do { local $" = ''; qr/[^\Q@a\E]*+/ };
-    my $b = pop @a;
+    my $b = shift @a;
     return sub {
-	my $len = $obj->{length}->(+shift);
+	my $len = $obj->{length}->(+shift =~ s/\X\cH+//gr);
 	return if $len < 1;
 	my $a = $a[ (state $n)++ % @a ];
-	( $a . ($b x ($len - 1)), qr/\G${lead}\K(\Q${a}${b}\E*)/, $len );
+	my $bl = $len - 1;
+	( $a . ($b x $bl), qr/\G${lead}\K\Q$a$b\E{0,$bl}(?!\Q$b\E)/, $len );
     };
+}
+
+sub char_range {
+    my $obj = shift;
+    my $v = $obj->{visible} // 0;
+    if    ($v == 0) { $char_range{STRAIGHT} }
+    elsif ($v == 1) { $char_range{MODERATE} }
+    elsif ($v == 2) { $char_range{VISIBLE}  }
+    else            { die }
 }
 
 1;
@@ -137,7 +169,10 @@ Text::VisualPrintf::Transform - transform and recover interface for text process
 =head1 SYNOPSIS
 
     use Text::VisualPrintf::Transform;
-    my $xform = Text::VisualPrintf::Transform->new();
+    my $xform = Text::VisualPrintf::Transform->new(
+        length => \&sub,
+        match  => qr/regex/,
+        );
     $xform->encode(@args);
     $_ = foo(@args);
     $xform->decode($_);
@@ -153,8 +188,8 @@ to calculate string width.  So next program does not work as we wish.
     use Text::Tabs;
     print expand <>;
 
-In this case, make transform object with B<length> function which
-understand wide character width, and the pattern of string to be
+In this case, make transform object with B<length> function which can
+correctly handle wide character width, and the pattern of string to be
 replaced.
 
     use Text::VisualPrintf::Transform;
@@ -189,9 +224,9 @@ Next program implements ANSI terminal sequence aware expand command.
         print $xform->decode(expand($xform->encode($_)));
     }
 
-Giving many arguments to B<decode> is not a good idea, because
-replacement cycle is performed against all items.  So mix up the
-result into single string if possible.
+Calling B<decode> method with many arguments is not a good idea, since
+replacement cycle is performed against all entries.  So collect them
+into single chunk if possible.
 
     print $xform->decode(join '', @expanded);
 
@@ -225,6 +260,38 @@ Transformation is done by replacing text with different string which
 can not be found in all arguments.  This parameter gives additional
 string which also to be taken care of.
 
+=item B<visible> => I<number>
+
+=over 4
+
+=item L<0>
+
+With default value 0, this module uses characters in the range:
+
+    [0x01=>0x07], [0x10=>0x1f], [0x21=>0x7e], [0x81=>0xfe]
+
+=item L<1>
+
+Use printable characters first, then use non-printable characters.
+
+    [0x21=>0x7e], [0x01=>0x07], [0x10=>0x1f], [0x81=>0xfe]
+
+=item L<2>
+
+Use only printable characters.
+
+    [0x21=>0x7e]
+
+=back
+
+=begin comment
+
+=item B<ordered>
+
+...
+
+=end comment
+
 =back
 
 =item B<encode>
@@ -239,21 +306,20 @@ altered.
 =head1 LIMITATION
 
 All arguments given to B<encode> method have to appear in the same
-order in to-be-decoded string.  Each argument can be shorter than
-the original, or it can even disappear.
+order in the pre-decode string.  Each argument can be shorter than the
+original, or it can even disappear.
 
-If an argument is trimmed down into single byte in a result, and it
-have to be recovered to wide character, it is replaced by single
-space.
+If an argument is trimmed down to single byte in a result, and it have
+to be recovered to wide character, it is replaced by single space.
 
 Replacement string is made of characters those can not be found in all
-arguments.  So if they contains all characters from C<"\001"> to
-C<"\377">, B<encode> method does nothing.  It requires at least two.
+arguments.  So if they contains all characters in the given range,
+B<encode> stop to work.  It requires at least two.
 
-Minimum two characters is good enough to produce correct result if all
-arguments will appear in the same order.  However, if even single
-argument is missing, it wor'n work correctly.  Less characters, more
-confusion.
+Minimum two characters are enough to produce correct result if all
+arguments will appear in the same order.  However, if even single item
+is missing, it won't work correctly.  Using three characters, one
+continuous missing is allowed.  Less characters, more confusion.
 
 =head1 SEE ALSO
 

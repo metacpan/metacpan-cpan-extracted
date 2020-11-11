@@ -22,7 +22,7 @@ my $hitcount = 0;
 $sd->data_source( Movie => \&Simple_Movie, $movie_actor_hash, \$hitcount );
 $sd->data_source( Actor => \&Simple_Actor, $movie_actor_hash, \$hitcount );
 
-is_deeply([$sd->make_link('Actor','Kevin Bacon','Pete Krawczyk')],[],'No match OK');
+is_deeply([$sd->make_link('Actor','Kevin Bacon','Peter Krawczyk')],[],'No match OK');
 is($Algorithm::SixDegrees::ERROR,undef,'No error during make_link');
 is_deeply([$sd->make_link('Actor','Kevin Bacon','Kevin Bacon')],['Kevin Bacon'],'Single element link OK');
 is($Algorithm::SixDegrees::ERROR,undef,'No error during make_link');

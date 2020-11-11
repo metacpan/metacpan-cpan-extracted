@@ -1,2 +1,8 @@
 .travis.yml
 ^\.git
+.appveyor.yml
+.cirrus.yml
+tpr-article
+t/cache/multi/Brewery-1.0.yml
+t/cache/multi/Fruit-1.0.yml
+t/cache/multi/Fruit-Role-Fermentable-1.0.yml

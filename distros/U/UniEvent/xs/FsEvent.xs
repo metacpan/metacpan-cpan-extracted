@@ -34,6 +34,7 @@ BOOT {
     xs::exp::autoexport(s);
     
     xs::at_perl_destroy([]() { cbn.on_fs_event = nullptr; });
+    unievent::register_perl_class(FsEvent::TYPE, s);
 }
 
 FsEvent* FsEvent::new (LoopSP loop = Loop::default_loop()) {

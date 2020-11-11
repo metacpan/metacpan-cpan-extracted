@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,43 +12,37 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: SHA256
 
-SHA1 ad76098fc0dd40c11f1ed868d5eb555e20c25145 Changes
-SHA1 2b5a66111f6fe9f7b4e37fc30ac914c36bc8c396 MANIFEST
-SHA1 aec29637d79041877b2fc498cbaf0639b9fb5b68 META.yml
-SHA1 7eaea8e9e49ee259e2f2de30f86bbd468142f046 Makefile.PL
-SHA1 123569cbc738e2f01b6b7384f006729a2af3ae5f README
-SHA1 10c32c5b8ecaeaf069450baa054efeedb08f7d5e html/Callbacks/CustomFieldsOnUpdate/Ticket/Update.html/AfterWorked
-SHA1 c297753bb40aa4e31599358aed52840be00a9947 html/Callbacks/CustomFieldsOnUpdate/Ticket/Update.html/BeforeUpdate
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 e49d46e168fd16e2aa604d2bb501c2ceb478a818 lib/RT/Extension/CustomFieldsOnUpdate.pm
+SHA256 34fe382928ff681f3a9bc3eaa164bcf2eda1bfe6db82243d74ab0c482a02e7a6 Changes
+SHA256 93ec47e6a99a7475285eb140440cb25d0e0ce39b4abdcfbe4429d7602d0e4fab MANIFEST
+SHA256 9c441b26b20f138591370d45f5ce62056b186177ceba79ba4e10735b3e723029 META.yml
+SHA256 4a7e6db8b5665ad5c1e3afa8c6525ead15c7649cd47dc833b7b34cc2bab6e64e Makefile.PL
+SHA256 c35a78f8f72ca96874fd45b132db357cbfc89c43b940f5cfce69b1588149bfec README
+SHA256 220243941fbbd24ab28eddd43487162af054c26902e2c3f533423bfb416ef3c4 html/Callbacks/CustomFieldsOnUpdate/Ticket/Update.html/AfterWorked
+SHA256 7f8914b4606b18cf4c7971095f8abcd2ddb0716ee836b0f48f7b5b7ad6572f52 html/Callbacks/CustomFieldsOnUpdate/Ticket/Update.html/BeforeUpdate
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 f3e8758524aa0c788400c00f86088e483c1c8b6a2493c3b7f6dbf71b535b4c01 lib/RT/Extension/CustomFieldsOnUpdate.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIcBAEBCgAGBQJXrYlwAAoJEJHs6NvKxcMFsI4QAIKxftCQROW+DjLYurkJq80p
-wm3vYHDbIimWWPZZRLOX1NkJcJVij/4YCZZCRJy7qZ7lGbUiyXRQ8vc4BWmX92gy
-cDn8eenS46Bnk7PDyeVDgLPgo5aiQzIpXXHkJEpUmQnYexxPDX6H1OCy9AQ3OVgv
-mH60hO1nTV8R9uDmKXfYIqx5l9s12oPNA5nuQ5lTQaSN7PVhMhfTH4FdqVkVoPkX
-LHUovNZv37rAnHJK3uhvfYgItIaEthgfMSGo2sA6Ps8MPJo43nsdI4JQeG/f6Bko
-dIuQnjVL1cMfvxGBYbOPxWyfOt09XGoePaxh6PDEpJK6axFp71Ybn/Nnrtoc+Qk5
-NPzXu5yEzrorZYtACSFAQMQpb+p/wnlmSAQ9+q3hnMRmNLZTSUrfyYE8Ly/Emeei
-rcfXxZDKIoeyGQ1Mtcvt3NMZHEmkuVei+jGd8Xy4rncNEe7tGgNbFKRIjSD1+fkl
-6dd1RJ9RTWmWOYhoj1a9416PpTXSgEItPGk7sCTXKprLtSlaaAzM9xnNwLJaI3MR
-u9/L6a7ev8ypESlJKOXW+7Sh/9GgpEqZtvzSbgWMHLFRg3xINgb97c5MmpmSjxj2
-JoBtXcPMDRyQg3pzRH/vYBhVWT2mVBa7uqXR6tmpXA8NIpHWLImgwcm7xduW4N4R
-o5SxfBFmgKGZVba9ZPYt
-=axnn
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAl+pRgQACgkQDfCig/6s
+gLJaSggAkubdg9ZcW6JCkbljZKM8yi2etyZW9os8/1YVZk3EZOREFUFoBUc/QRIQ
+sCT1aRsoAzXd1AVcO3obCzEy26B+lvPKNDHKcUbW/E+2svAViDWS5FSATucWbxq5
+x9kW9ZZUbWQWXVT57W2DFGWYo+UYMslnueJJMGcHM1rP4EIclTRypimCQRAeJl1h
+ffsSF50CNEPcQnD+7ZtEwpfJ/BUhj0VgohcR4/T0i/BDpHJEl2rNBNEXoKl4j7+L
+uaKfmfOUTXLHHBbEZu9yhBDvCmLjo8E9CjpBxyXWODbROeMD74Uhccy4KUXIAnQo
+DI9eGqRbii7keZCqc0ObtyCRQt/q3g==
+=IK9S
 -----END PGP SIGNATURE-----

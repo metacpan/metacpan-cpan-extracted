@@ -1,6 +1,103 @@
 ==================================================
-Changes from 2015-06-06 00:00:00 +0000 to present.
+Changes from 2015-11-10 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.02 at 2020-11-08 19:28:50 +0000
+-----------------------------------------
+
+  Change: f02eab39c2f0073e6aceff6bb0b73f4d03e39b8f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-11-08 19:28:50 +0000
+
+    This is 2.02 
+
+  Change: fa458343e6ae7f70412c466eb604633db44bf24b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-11-08 19:19:39 +0000
+
+    Finesse the check_patchperl script
+
+    Suppress the git output and only show patchperl output if there is a
+    problem with patching 
+
+  Change: d4fe0e9fa23d0fd78b368a5edb34550120e2c233
+  Author: Ichinose Shogo <shogo82148@gmail.com>
+  Date : 2020-11-08 19:18:21 +0000
+
+    fix env command syntax 
+
+  Change: 20692277283d6eb1616eab987583b33cfb612198
+  Author: Ichinose Shogo <shogo82148@gmail.com>
+  Date : 2020-11-08 19:18:21 +0000
+
+    update deprecated GitHub Actions commands
+
+    add-path and set-env are deprecated for security reason.
+    https://github.blog/changelog/2020-10-01-github-actions-deprecating-s
+    et-env-and-add-path-commands/ update them to use the new environment
+    files.
+    https://docs.github.com/en/free-pro-team@latest/actions/reference/wor
+    kflow-commands-for-github-actions#environment-files 
+
+  Change: 175ccb4bc8c88a0e3e3f4600fe1db09f023a9999
+  Author: Ichinose Shogo <shogo82148@gmail.com>
+  Date : 2020-11-07 09:17:00 +0000
+
+    fix -Duseshrplib builds on darwin
+
+    port of https://github.com/Perl/perl5/issues/15057 
+
+  Change: 7c806f542ffd0b5e75d724404012fd8bc9afc4e4
+  Author: Ichinose Shogo <shogo82148@gmail.com>
+  Date : 2020-11-07 09:12:34 +0000
+
+    Patch Time::HiRes in 5.24.2
+
+    Time::HiRes is broken on threaded darwin in 5.24.2, not only 5.24.1
+    and 5.24.0. https://github.com/bingos/devel-patchperl/pull/26 is need
+    in Perl 5.24.2. 
+
+  Change: eaf8ec2500acde369ad78aea12d1de0011480a0e
+  Author: Ichinose Shogo <shogo82148@gmail.com>
+  Date : 2020-06-23 15:26:13 +0000
+
+    Perl 5.32.0 is released 
+
+  Change: 0b60d5d7d06de737cc4e033f658aad8cff906657
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-06-09 16:26:25 +0000
+
+    Fix make depend problems with v5.9.[0-4] 
+
+  Change: df4f5009c804675bf97160490a95af8a67ded395
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-06-09 16:00:56 +0000
+
+    Fix patching the v5.7.x series 
+
+  Change: 3dce408aaf97a3b245b29303f20b30a7584fb362
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-06-08 21:13:06 +0000
+
+    Added a tool to check patchperl from the repository
+
+    It checkouts the perl5 git repository and runs patchperl for all of
+    the supported perl versions 
+
+  Change: 3e819851d4e28806c629ed783ef56b02f6e5ad12
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-06-08 19:09:04 +0000
+
+    Fixed utils/h2ph.PL patching
+
+    v5.21.9 actually already had the fix 
+
+  Change: 647e88747c8469d9c9b418a78a5b999984f17acb
+  Author: Ichinose Shogo <shogo82148@gmail.com>
+  Date : 2020-06-08 12:28:52 +0000
+
+    introduce GitHub Actions 
 
 -----------------------------------------
 version 2.00 at 2020-06-04 10:20:07 +0000
@@ -582,26 +679,6 @@ version 1.40 at 2015-12-16 23:26:59 +0000
 
     Add BuiltbyPatchPerl entry to %Config::Config 
 
------------------------------------------
-version 1.38 at 2015-07-03 18:12:12 +0000
------------------------------------------
-
-  Change: 049fc9226c524846e51c1bdd4e2b17e97e05667d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-07-03 19:12:12 +0000
-
-    Fix the patches introduced in the last release 
-
------------------------------------------
-version 1.36 at 2015-07-03 11:48:26 +0000
------------------------------------------
-
-  Change: 61c7a95065f599b9dc31c8791efab770ad7fba94
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-07-03 12:48:26 +0000
-
-    Added Errno GCC5 patches as far back as v5.6.0 
-
 =================================================
-Plus 67 releases after 2015-06-06 00:00:00 +0000.
+Plus 69 releases after 2015-11-10 00:00:00 +0000.
 =================================================

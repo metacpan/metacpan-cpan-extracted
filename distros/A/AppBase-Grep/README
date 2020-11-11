@@ -2,8 +2,8 @@ NAME
     AppBase::Grep - A base for grep-like CLI utilities
 
 VERSION
-    This document describes version 0.006 of AppBase::Grep (from Perl
-    distribution AppBase-Grep), released on 2020-01-03.
+    This document describes version 0.007 of AppBase::Grep (from Perl
+    distribution AppBase-Grep), released on 2020-11-07.
 
 FUNCTIONS
   grep
@@ -48,6 +48,17 @@ FUNCTIONS
 
         Supress normal output, return a count of matching lines.
 
+    *   dash_prefix_inverts => *bool*
+
+        When given pattern that starts with dash "-FOO", make it to mean
+        "^(?!.*FOO)".
+
+        This is a convenient way to search for lines that do not match a
+        pattern. Instead of using "-v" to invert the meaning of all
+        patterns, this option allows you to invert individual pattern using
+        the dash prefix, which is also used by Google search and a few other
+        search engines.
+
     *   ignore_case => *bool*
 
     *   invert_match => *bool*
@@ -56,11 +67,11 @@ FUNCTIONS
 
     *   line_number => *true*
 
-    *   pattern => *re*
+    *   pattern => *str*
 
     *   quiet => *true*
 
-    *   regexps => *array[re]*
+    *   regexps => *array[str]*
 
     Returns an enveloped result (an array).
 

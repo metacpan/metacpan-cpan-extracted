@@ -1,7 +1,7 @@
 package Pod::Definitions::Heuristic;
 
 use Pod::Headings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use v5.20;
 
@@ -126,7 +126,7 @@ Pod, presumably in English, for indexing and cross-referencing
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

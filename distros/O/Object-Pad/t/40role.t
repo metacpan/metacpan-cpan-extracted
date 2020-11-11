@@ -9,6 +9,10 @@ use Object::Pad;
 
 role ARole {
    method one { return 1 }
+
+   method own_cvname {
+      return +(caller(0))[3];
+   }
 }
 
 class AClass implements ARole {
@@ -19,6 +23,7 @@ class AClass implements ARole {
    isa_ok( $obj, "AClass", '$obj' );
 
    is( $obj->one, 1, 'AClass has a ->one method' );
+   is( $obj->own_cvname, "AClass::own_cvname", '->own_cvname sees correct subname' );
 }
 
 role BRole {
@@ -33,6 +38,7 @@ class BClass implements ARole, BRole {
 
    is( $obj->one, 1, 'BClass has a ->one method' );
    is( $obj->two, 2, 'BClass has a ->two method' );
+   is( $obj->own_cvname, "BClass::own_cvname", '->own_cvname sees correct subname' );
 }
 
 role CRole {

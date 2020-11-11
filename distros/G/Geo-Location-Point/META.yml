@@ -3,26 +3,30 @@ abstract: 'Location information'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::Carp: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
-license: gpl
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Geo-Location-Point
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Carp: '0'
-  Data::Dumper: '0'
   GIS::Distance: '0'
-  perl: v5.10.0
-  strict: '0'
-  warnings: '0'
-version: '0.03'
-x_generated_by_perl: v5.29.6
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  perl: '5.010000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Location-Point
+  repository: git://github.com/nigelhorne/Geo-Location-Point.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

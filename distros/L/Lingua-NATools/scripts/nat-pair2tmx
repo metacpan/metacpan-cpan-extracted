@@ -33,9 +33,11 @@ print " <body>\n";
 open A, "$sourceF" or die;
 open B, "$targetF" or die;
 $/="\n\$\n";
-while($l0 = <A>) {
+while(!eof(A)) {
+    $l0 = <A> || "";
+    $l1 = <B> || "";
     chomp($l0);
-    chomp($l1 = <B>);
+    chomp($l1);
 
     ($l0,$l1) = (n($l0),n($l1));
 

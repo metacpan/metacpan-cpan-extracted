@@ -6,7 +6,7 @@ use vars qw($VERSION);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.25';
+$VERSION = '1.28';
 
 sub holidays {
     my ($self, %params) = @_;
@@ -29,8 +29,6 @@ sub is_holiday {
 
     if ($sub) {
         $holiday = &{$sub}($params{'year'}, $params{'month'}, $params{'day'});
-    } else {
-        $holiday = '';
     }
 
     return $holiday;

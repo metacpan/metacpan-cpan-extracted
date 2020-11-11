@@ -1,6 +1,7 @@
 package MsOffice::Word::Surgeon::Text;
 use feature 'state';
 use Moose;
+use MooseX::StrictConstructor;
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
 use Carp                           qw(croak);
 
@@ -9,7 +10,7 @@ use namespace::clean -except => 'meta';
 has 'xml_before'   => (is => 'ro', isa => 'Str');
 has 'literal_text' => (is => 'ro', isa => 'Str', required => 1);
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 
 sub as_xml {

@@ -1,1 +1,5 @@
 2020.06.21 (a*|b+) was accepting a b, now it does not,
+2020.10.30 Available on GitHub - see "How To Contribute"
+
+2020-10-30 Now available on GitHub at: https://github.com/philiprbrenan/DataNFA
+           Please create a pull request from a cloned copy.

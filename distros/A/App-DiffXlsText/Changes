@@ -1,3 +1,16 @@
+0.003   2020-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: --transpose-csv.
+
+
+0.002   2020-10-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Use Spreadsheet::Read's xls2csv instead of App::OfficeUtils (see
+	  App::OfficeUtils 0.005 Changes entry for more details).
+
+        - [doc] Mention ssdiff from Spreadsheet::Read.
+
+
 0.001   2020-10-26  Released-By: PERLANCAR
 
         - First release.

@@ -12,4 +12,5 @@ on test => sub {
     'Test::Class', 0;
     'Test::More', 0;
     'FindBin', 0;
+    'Test::MockModule', 0;
 };

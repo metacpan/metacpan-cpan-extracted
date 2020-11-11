@@ -1,5 +1,10 @@
 Revision history for Perl extension Params-Util
 
+1.102	2020-11-02
+	- fix RT#133623 - Can't install in pureperl mode. Thanks to Nigel
+	  Gregoire (@nfg) for reporting and proposal for proper fix.
+	- update ppport.h from Devel::PPPort 3.62
+
 1.101	2020-10-22
 	- fix inconsistent license conditions in meta data and documentation
 	  and add appropriate LICENSE files. Fixes RT#133586.

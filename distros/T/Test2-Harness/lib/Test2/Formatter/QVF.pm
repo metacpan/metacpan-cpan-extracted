@@ -2,7 +2,7 @@ package Test2::Formatter::QVF;
 use strict;
 use warnings;
 
-our $VERSION = '1.000032';
+our $VERSION = '1.000038';
 
 BEGIN { require Test2::Formatter::Test2; our @ISA = qw(Test2::Formatter::Test2) }
 
@@ -18,6 +18,15 @@ sub init {
     $self->{+REAL_VERBOSE} = $self->{+VERBOSE};
 
     $self->{+VERBOSE} ||= 100;
+}
+
+sub update_active_disp {
+    my $self = shift;
+    my ($f) = @_;
+
+    return if $f->{__RENDER__}->{update_active_disp}++;
+
+    $self->SUPER::update_active_disp($f);
 }
 
 sub write {
@@ -65,7 +74,7 @@ sub write {
             $self->{+_BUFFERED} = 0;
         }
 
-        print $io $self->render_ecount($f);
+        print $io $self->render_status($f);
         $self->{+_BUFFERED} = 1;
     }
 

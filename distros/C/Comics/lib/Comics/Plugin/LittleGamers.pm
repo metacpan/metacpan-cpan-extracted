@@ -14,7 +14,7 @@ our $url     = "http://www.little-gamers.com/";
 our $pattern =
 	    qr{ <meta \s+
 		 property="og:image" \s+
-		 content="(?<url>https?://little-gamers.com/comics/
+		 content="(?<url>https?://(?:www\.)?little-gamers.com/comics/
 		           (?<image>.*?\.\w+))" \s* /?>
 	      }six;
 

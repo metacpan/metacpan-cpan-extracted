@@ -222,22 +222,22 @@ use constant {
 };
 
 my %csi_terminator = (
-    CUU	=> 'A',    # Cursor up
-    CUD	=> 'B',    # Cursor Down
-    CUF	=> 'C',    # Cursor Forward
-    CUB	=> 'D',    # Cursor Back
-    CNL	=> 'E',    # Cursor Next Line
-    CPL	=> 'F',    # Cursor Previous line
-    CHA	=> 'G',    # Cursor Horizontal Absolute
-    CUP	=> 'H',    # Cursor Position
-    ED  => 'J',    # Erase in Display (0 after, 1 before, 2 entire, 3 w/buffer)
-    EL  => 'K',    # Erase in Line (0 after, 1 before, 2 entire)
-    SU  => 'S',    # Scroll Up
-    SD  => 'T',    # Scroll Down
-    HVP	=> 'f',    # Horizontal Vertical Position
-    SGR	=> 'm',    # Select Graphic Rendition
-    SCP	=> 's',    # Save Cursor Position
-    RCP	=> 'u',    # Restore Cursor Position
+    CUU => 'A',		# Cursor up
+    CUD => 'B',		# Cursor Down
+    CUF => 'C',		# Cursor Forward
+    CUB => 'D',		# Cursor Back
+    CNL => 'E',		# Cursor Next Line
+    CPL => 'F',		# Cursor Previous line
+    CHA => 'G',		# Cursor Horizontal Absolute
+    CUP => 'H',		# Cursor Position
+    ED  => 'J',		# Erase in Display (0 after, 1 before, 2 entire, 3 w/buffer)
+    EL  => 'K',		# Erase in Line (0 after, 1 before, 2 entire)
+    SU  => 'S',		# Scroll Up
+    SD  => 'T',		# Scroll Down
+    HVP => 'f',		# Horizontal Vertical Position
+    SGR => 'm',		# Select Graphic Rendition
+    SCP => 's',		# Save Cursor Position
+    RCP => 'u',		# Restore Cursor Position
     );
 
 sub csi_code {

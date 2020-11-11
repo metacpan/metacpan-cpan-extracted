@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -25,7 +25,7 @@ socket, a device, a mount point, an automount point, a swap file or partition, a
 target, a watched file system path, a timer controlled and supervised by
 L<systemd(1)>, a
 resource management slice or a group of externally created processes. See
-L<systemd.syntax(5)>
+L<systemd.syntax(7)>
 for a general description of the syntax.
 
 This man page lists the common configuration options of all
@@ -81,11 +81,25 @@ existing name in one of the unit search paths. For example, C<systemd-networkd.s
 has the alias C<dbus-org.freedesktop.network1.service>, created during installation as
 a symlink, so when systemd is asked through D-Bus to load
 C<dbus-org.freedesktop.network1.service>, it'll load
-C<systemd-networkd.service>. Alias names may be used in commands like
-disable, start, stop, status,
-and similar, and in all unit dependency directives, including C<Wants>,
-C<Requires>, C<Before>, C<After>. Aliases cannot be
-used with the preset command.
+C<systemd-networkd.service>. As another example, C<default.target> \x{2014}
+the default system target started at boot \x{2014} is commonly symlinked (aliased) to either
+C<multi-user.target> or C<graphical.target> to select what is started
+by default. Alias names may be used in commands like disable,
+start, stop, status, and similar, and in all
+unit dependency directives, including C<Wants>, C<Requires>,
+C<Before>, C<After>. Aliases cannot be used with the
+preset command.
+
+Aliases obey the following restrictions: a unit of a certain type (C<.service>,
+C<.socket>, \x{2026}) can only be aliased by a name with the same type suffix. A plain unit (not
+a template or an instance), may only be aliased by a plain name. A template instance may only be aliased
+by another template instance, and the instance part must be identical. A template may be aliased by
+another template (in which case the alias applies to all instances of the template). As a special case, a
+template instance (e.g. C<alias\@inst.service>) may be a symlink to different template
+(e.g. C<template\@inst.service>). In that case, just this specific instance is aliased,
+while other instances of the template (e.g. C<alias\@foo.service>,
+C<alias\@bar.service>) are not aliased. Those rule preserve the requirement that the
+instance (if any) is always uniquely defined for a given unit and all its aliases.
 
 Unit files may specify aliases through the C<Alias> directive in the [Install]
 section. When the unit is enabled, symlinks will be created for those names, and removed when the unit is
@@ -128,6 +142,16 @@ systematic naming structure is built around dashes as component separators. Note
 further down the prefix hierarchy override those further up,
 i.e. C<foo-bar-.service.d/10-override.conf> overrides
 C<foo-.service.d/10-override.conf>.
+
+In cases of unit aliases (described above), dropins for the aliased name and all aliases are
+loaded. In the example of C<default.target> aliasing
+C<graphical.target>, C<default.target.d/>,
+C<default.target.wants/>, C<default.target.requires/>,
+C<graphical.target.d/>, C<graphical.target.wants/>,
+C<graphical.target.requires/> would all be read. For templates, dropins for the
+template, any template aliases, the template instance, and all alias instances are read. When just a
+specific template instance is aliased, then the dropins for the target template, the target template
+instance, and the alias template instance are read.
 
 In addition to C</etc/systemd/system>, the drop-in C<.d/>
 directories for system services can be placed in C</usr/lib/systemd/system> or
@@ -175,8 +199,8 @@ effective way to fully disable a unit, making it impossible to
 start it even manually.
 
 The unit file format is covered by the
-Interface
-Stability Promise.
+L<Interface
+Stability Promise|https://www.freedesktop.org/wiki/Software/systemd/InterfaceStabilityPromise>.
 
 The set of load paths for the user manager instance may be augmented or
 changed using various environment variables. And environment variables may in
@@ -193,10 +217,12 @@ would be used based on compilation options and current environment use
 
 
 
-Moreover, additional units might be loaded into systemd (\"linked\") from
-directories not on the unit load path. See the link command
-for
-L<systemctl(1)>.
+Moreover, additional units might be loaded into systemd from
+directories not on the unit load path by creating a symlink pointing to a
+unit file in the directories. You can use systemctl link
+for this operation. See
+L<systemctl(1)>
+for its usage and precaution.
 
 
 Unit files may also include a number of C<Condition\x{2026}=> and
@@ -299,7 +325,7 @@ the unit file. For details, see above.
 Units listed in this option will be started if the configuring unit is. However, if the listed
 units fail to start or cannot be added to the transaction, this has no impact on the validity of the
 transaction as a whole, and this unit will still be started. This is the recommended way to hook
-start-up of one unit to the start-up of another unit.
+the start-up of one unit to the start-up of another unit.
 
 Note that requirement dependencies do not influence the order in which services are started or
 stopped. This has to be configured independently with the C<After> or
@@ -445,7 +471,7 @@ unit that is conflicted is stopped.',
         'description' => 'These two settings expect a space-separated list of unit names. They may be specified
 more than once, in which case dependencies for all listed names are created.
 
-Those two setttings configure ordering dependencies between units. If unit
+Those two settings configure ordering dependencies between units. If unit
 C<foo.service> contains the setting C<Before=bar.service> and both
 units are being started, C<bar.service>\'s start-up is delayed until
 C<foo.service> has finished starting up. C<After> is the inverse
@@ -454,7 +480,7 @@ is started before the listed unit begins starting up, C<After> ensures the oppos
 that the listed unit is fully started up before the configured unit is started.
 
 When two units with an ordering dependency between them are shut down, the inverse of the
-start-up order is applied. i.e. if a unit is configured with C<After> on another
+start-up order is applied. I.e. if a unit is configured with C<After> on another
 unit, the former is stopped before the latter if both are shut down. Given two units with any
 ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
 is ordered before the start-up. It doesn\'t matter if the ordering dependency is
@@ -465,13 +491,18 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success.
+success. Note that this does includes C<ExecStartPost> (or
+C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
 configured by C<Requires>, C<Wants>, C<Requisite>,
 or C<BindsTo>. It is a common pattern to include a unit name in both the
 C<After> and C<Wants> options, in which case the unit listed will
-be started before the unit that is configured with these options.',
+be started before the unit that is configured with these options.
+
+Note that C<Before> dependencies on device units have no effect and are not
+supported.  Devices generally become available as a result of an external hotplug event, and systemd
+creates the corresponding device unit without delay.',
         'type' => 'list'
       },
       'After',
@@ -483,7 +514,7 @@ be started before the unit that is configured with these options.',
         'description' => 'These two settings expect a space-separated list of unit names. They may be specified
 more than once, in which case dependencies for all listed names are created.
 
-Those two setttings configure ordering dependencies between units. If unit
+Those two settings configure ordering dependencies between units. If unit
 C<foo.service> contains the setting C<Before=bar.service> and both
 units are being started, C<bar.service>\'s start-up is delayed until
 C<foo.service> has finished starting up. C<After> is the inverse
@@ -492,7 +523,7 @@ is started before the listed unit begins starting up, C<After> ensures the oppos
 that the listed unit is fully started up before the configured unit is started.
 
 When two units with an ordering dependency between them are shut down, the inverse of the
-start-up order is applied. i.e. if a unit is configured with C<After> on another
+start-up order is applied. I.e. if a unit is configured with C<After> on another
 unit, the former is stopped before the latter if both are shut down. Given two units with any
 ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
 is ordered before the start-up. It doesn\'t matter if the ordering dependency is
@@ -503,13 +534,18 @@ they are shut down or started up simultaneously, and no ordering takes place. It
 type when precisely a unit has finished starting up. Most importantly, for service units start-up is
 considered completed for the purpose of C<Before>/C<After> when all
 its configured start-up commands have been invoked and they either failed or reported start-up
-success.
+success. Note that this does includes C<ExecStartPost> (or
+C<ExecStopPost> for the shutdown case).
 
 Note that those settings are independent of and orthogonal to the requirement dependencies as
 configured by C<Requires>, C<Wants>, C<Requisite>,
 or C<BindsTo>. It is a common pattern to include a unit name in both the
 C<After> and C<Wants> options, in which case the unit listed will
-be started before the unit that is configured with these options.',
+be started before the unit that is configured with these options.
+
+Note that C<Before> dependencies on device units have no effect and are not
+supported.  Devices generally become available as a result of an external hotplug event, and systemd
+creates the corresponding device unit without delay.',
         'type' => 'list'
       },
       'OnFailure',
@@ -593,7 +629,7 @@ L<systemctl(1)>\'s
 C<--job-mode=> option for details on the
 possible values. If this is set to C<isolate>,
 only a single unit may be listed in
-C<OnFailure>..',
+C<OnFailure>.',
         'migrate_from' => {
           'formula' => '$unit',
           'variables' => {
@@ -605,11 +641,10 @@ C<OnFailure>..',
       },
       'IgnoreOnIsolate',
       {
-        'description' => 'Takes a boolean argument. If C<true>, this unit
-will not be stopped when isolating another unit. Defaults to
-C<false> for service, target, socket, busname, timer, and path
-units, and C<true> for slice, scope, device, swap, mount, and
-automount units.',
+        'description' => 'Takes a boolean argument. If C<true>, this unit will not be stopped
+when isolating another unit. Defaults to C<false> for service, target, socket, timer,
+and path units, and C<true> for slice, scope, device, swap, mount, and automount
+units.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -824,9 +859,9 @@ L<reboot(2)> system call.
           'exit-force'
         ],
         'description' => 'Configure an additional action to take if the rate limit configured with
-C<StartLimitIntervalSec> and C<StartLimitBurst> is hit.  Takes the same
-values as the setting C<FailureAction>/C<SuccessAction> settings and executes
-the same actions. If C<none> is set, hitting the rate limit will trigger no action besides that
+C<StartLimitIntervalSec> and C<StartLimitBurst> is hit. Takes the same
+values as the C<FailureAction>/C<SuccessAction> settings. If
+C<none> is set, hitting the rate limit will trigger no action except that
 the start will not be permitted. Defaults to C<none>.',
         'type' => 'leaf',
         'value_type' => 'enum'
@@ -952,6 +987,7 @@ C<docker>,
 C<podman>,
 C<rkt>,
 C<wsl>,
+C<proot>,
 C<acrn> to test
 against a specific implementation, or
 C<private-users> to check whether we are running in a user namespace. See
@@ -1011,6 +1047,25 @@ is inherently unportable and should not be used for units which may be used on d
 distributions.',
         'type' => 'list'
       },
+      'ConditionEnvironment',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => "C<ConditionEnvironment> may be used to check whether a specific
+environment variable is set (or if prefixed with the exclamation mark \x{2014} unset) in the service
+manager's environment block.
+The argument may be a single word, to check if the variable with this name is defined in the
+environment block, or an assignment
+(C<name=value>), to check if
+the variable with this exact value is defined. Note that the environment block of the service
+manager itself is checked, i.e. not any variables defined with C<Environment> or
+C<EnvironmentFile>, as described above. This is particularly useful when the
+service manager runs inside a containerized environment or as per-user service manager, in order to
+check for variables passed in by the enclosing container manager or PAM.",
+        'type' => 'list'
+      },
       'ConditionSecurity',
       {
         'cargo' => {
@@ -1066,7 +1121,7 @@ disconnected from a power source.',
           'value_type' => 'enum'
         },
         'description' => 'Takes one of C</var> or C</etc> as argument,
-possibly prefixed with a C<!> (to inverting the condition). This condition may be
+possibly prefixed with a C<!> (to invert the condition). This condition may be
 used to conditionalize units on whether the specified directory requires an update because
 C</usr>\'s modification time is newer than the stamp file
 C<.updated> in the specified directory. This is useful to implement offline
@@ -1075,7 +1130,14 @@ of C</etc> or C</var> on the next following boot. Units making
 use of this condition should order themselves before
 L<systemd-update-done.service(8)>,
 to make sure they run before the stamp file\'s modification time gets reset indicating a completed
-update.',
+update.
+
+If the C<systemd.condition-needs-update=> option is specified on the kernel
+command line (taking a boolean), it will override the result of this condition check, taking
+precedence over any file modification time checks. If it is used
+C<systemd-update-done.service> will not have immediate effect on any following
+C<ConditionNeedsUpdate> checks, until the system is rebooted where the kernel
+command line option is not specified anymore.',
         'type' => 'list'
       },
       'ConditionFirstBoot',
@@ -1092,7 +1154,11 @@ update.',
 whether the system is booting up with an unpopulated C</etc> directory
 (specifically: an C</etc> with no C</etc/machine-id>). This may
 be used to populate C</etc> on the first boot after factory reset, or when a new
-system instance boots up for the first time.',
+system instance boots up for the first time.
+
+If the C<systemd.condition-first-boot=> option is specified on the kernel
+command line (taking a boolean), it will override the result of this condition check, taking
+precedence over C</etc/machine-id> existence checks.',
         'type' => 'list'
       },
       'ConditionPathExists',
@@ -1161,6 +1227,20 @@ point.',
         'description' => 'C<ConditionPathIsReadWrite> is similar to
 C<ConditionPathExists> but verifies that the underlying file system is readable
 and writable (i.e. not mounted read-only).',
+        'type' => 'list'
+      },
+      'ConditionPathIsEncrypted',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'C<ConditionPathIsEncrypted> is similar to
+C<ConditionPathExists> but verifies that the underlying file system\'s backing
+block device is encrypted using dm-crypt/LUKS. Note that this check does not cover ext4
+per-directory encryption, and only detects block level encryption. Moreover, if the specified path
+resides on a file system on top of a loopback block device, only encryption above the loopback device is
+detected. It is not detected whether the file system backing the loopback block device is encrypted.',
         'type' => 'list'
       },
       'ConditionDirectoryNotEmpty',
@@ -1592,7 +1672,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 244 doc',
+    'generated_by' => 'parse-man.pl from systemd 246 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

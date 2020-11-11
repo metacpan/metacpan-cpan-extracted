@@ -1,9 +1,9 @@
 package Regexp::Pattern::Filename::Image;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-05-31'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Image'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ Regexp::Pattern::Filename::Image - Image filename
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Image (from Perl distribution Regexp-Pattern-Filename-Image), released on 2020-04-01.
+This document describes version 0.002 of Regexp::Pattern::Filename::Image (from Perl distribution Regexp-Pattern-Filename-Image), released on 2020-05-31.
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,13 @@ Examples:
 
 No extension.
 
- "foo" =~ re("Filename::Image::filename_image");  # doesn't match
+ "foo" =~ re("Filename::Image::filename_image");  # DOESN'T MATCH
 
 Not an extension.
 
- "jpg" =~ re("Filename::Image::filename_image");  # doesn't match
+ "jpg" =~ re("Filename::Image::filename_image");  # DOESN'T MATCH
+
+Example #3.
 
  "foo.jpg" =~ re("Filename::Image::filename_image");  # matches
 
@@ -80,9 +82,11 @@ Case insensitive.
 
 Regex is anchored.
 
- "foo.GIF is the file" =~ re("Filename::Image::filename_image");  # doesn't match
+ "foo.GIF is the file" =~ re("Filename::Image::filename_image");  # DOESN'T MATCH
 
- "foo.mp3" =~ re("Filename::Image::filename_image");  # doesn't match
+Example #6.
+
+ "foo.mp3" =~ re("Filename::Image::filename_image");  # DOESN'T MATCH
 
 =back
 
@@ -104,9 +108,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Filename::Image>
+
 L<Regexp::Pattern>
 
-L<Filename::Image>
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
 
 =head1 AUTHOR
 

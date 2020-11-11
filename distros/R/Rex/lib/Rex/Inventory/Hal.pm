@@ -6,6 +6,7 @@
 
 package Rex::Inventory::Hal;
 
+use 5.010001;
 use strict;
 use warnings;
 
@@ -15,7 +16,7 @@ use Rex::Helper::Run;
 use Rex::Commands::Gather;
 use Rex::Logger;
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 use Data::Dumper;
 

@@ -52,6 +52,11 @@ static Sv _get_global_loop_sv () {
     return global_loop.ref();
 }
 
+struct SvWrapper : panda::Refcnt {
+    SvWrapper(Sv sv) : sv(sv) {}
+    Sv sv;
+};
+
 MODULE = UniEvent::Loop                PACKAGE = UniEvent::Loop
 PROTOTYPES: DISABLE
 
@@ -155,6 +160,26 @@ void Loop::cancel_delay (Ref ref) {
 
 XSCallbackDispatcher* Loop::fork_event () {
     RETVAL = XSCallbackDispatcher::create(THIS->fork_event);
+}
+
+void Loop::start_debug_tracer (Sub s) {
+    THIS->new_handle_event.add([s](const LoopSP&, Handle* h){
+        Sv stack = s.call();
+        h->user_data = new SvWrapper(stack);
+    });
+}
+
+void Loop::watch_active_trace (Sub s) {
+    for (auto h : THIS->handles()) {
+        auto sv = panda::dynamic_pointer_cast<SvWrapper>(h->user_data);
+        if (!h->user_data || !h->active() || h->weak()) {
+            continue;
+        }
+        if (!sv) {
+            throw std::logic_error("Trace is broken or somebody else used Handle::user_data");
+        }
+        s.call(xs::out(h), sv->sv);
+    }
 }
 
 SV* CLONE_SKIP (...) {

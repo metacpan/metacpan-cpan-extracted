@@ -42,3 +42,52 @@ use Foo qw( FOO BAR BAZ );
 my $fb = hoi () ? FOO :
          hai () ? BAR :
          hui () ? BAZ ;
+
+## name Importer syntax. 1
+## failures 1
+## cut
+
+use Importer 'Foo' => qw( BAR );
+print 42;
+
+## name Importer syntax. 2
+## failures 2
+## cut
+
+use Importer 'Foo' => qw( BAR QUX );
+print 42;
+
+## todo Importer syntax. List of str
+## failures 2
+## cut
+
+use Importer 'Foo' => ( 'BAR', 'QUX' );
+print 42;
+
+## todo General syntax. List of str
+## failures 2
+## cut
+
+use Foo ('BAR', 'QUX');
+print 42;
+
+## name Exporter
+## failures 0
+## cut
+
+use Exporter qw/import/;
+print 42;
+
+## name Test::Requires
+## failures 0
+## cut
+
+use Test::Requires qw/DBI/;
+print 42;
+
+## name subroutine ref
+## failures 0
+## cut
+
+use Encode qw( decode );
+my $ref = \&decode;

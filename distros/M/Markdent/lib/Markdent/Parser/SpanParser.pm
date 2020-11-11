@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -26,7 +26,7 @@ use Markdent::Event::StartHTMLTag;
 use Markdent::Event::StartLink;
 use Markdent::Event::StartStrong;
 use Markdent::Event::Text;
-use Markdent::Regexes qw( $HTMLComment );
+use Markdent::Regexes qw( $HorizontalWS $HTMLComment );
 use Markdent::Types;
 
 use Moose;
@@ -142,7 +142,7 @@ sub _parse_uri_and_title {
 
     $text =~ s/^\s+|\s+$//g;
 
-    my ( $uri, $title ) = split /(?:\p{SpaceSeparator}|\t)+/, $text, 2;
+    my ( $uri, $title ) = split /$HorizontalWS+/, $text, 2;
 
     $uri = q{}
         unless defined $uri;
@@ -285,7 +285,7 @@ sub _look_for_strong_and_emphasis {
 sub _open_start_events_for_span {
     my $self         = shift;
     my %wanted_start = map { 'start_' . $_ => $_ } @_;
-    my %wanted_end   = map { 'end_' . $_ => $_ } @_;
+    my %wanted_end   = map { 'end_' . $_   => $_ } @_;
 
     my %open;
     for my $event ( $self->_pending_events() ) {
@@ -997,7 +997,7 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -157,6 +157,7 @@ sub parse_xml ($list, $map) {
             'option' => $turn_to_pod_c,
             'filename' => $turn_to_pod_c,
             'constant' => $turn_to_pod_c,
+            ulink => sub {my $url = $_->{att}{url}; my $t = $_->text();$_->set_text("L<$t|$url>"); },
             # this also remove the indentation of programlisting
             # element,
             'para' => sub { $_->subs_text(qr/\n\s+/,"\n"); 1;},
@@ -260,7 +261,7 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
         my @choices;
 
         # handle "Takes the same settings as ..." (seen only for enum)
-        if ($desc =~ /takes the same values as the setting C<(\w+)>/i) {
+        if ($desc =~ /takes the same values as the (?:setting )?C<(\w+)>/i) {
             my $other = $1;
             my $other_obj = $obj->grab("- element:$other");
             @choices = $other_obj->fetch_element('choice')->fetch;

@@ -1,26 +1,195 @@
-package SPVM::Hash {
+package SPVM::Hash : precompile {
   use SPVM::Hash::Entry;
   use SPVM::Util (INT32_MAX, copy_str);
 
   has bucket_count : int;
   has count : int;
   has entries : SPVM::Hash::Entry [];
-  has max_load_factor : public rw double;
+  
+  private enum {
+    _DEFALUT_HASH_TABLE_LENGTH = 16,
+  }
+  private sub _MAX_LOAD_FACTOR : double () { return 0.75; }
 
-  precompile sub _bucket_count : int ($self : self) {
+  sub new : SPVM::Hash () {
+    my $self = new SPVM::Hash;
+    my $default_capacity = 32;
+    $self->{bucket_count} = _DEFALUT_HASH_TABLE_LENGTH();
+    $self->{entries} = new SPVM::Hash::Entry[_DEFALUT_HASH_TABLE_LENGTH()];
+    $self->{count} = 0;
+    return $self;
+  }
+  
+  sub count : int ($self : self) {
+    return $self->{count};
+  }
+
+  sub set : void ($self : self, $key : string, $val : object) {
+    unless ($key) {
+      die "key must not be undef";
+    }
+    # Rehash
+    if (((double)$self->{count} / $self->{bucket_count}) > _MAX_LOAD_FACTOR()) {
+      $self->_rehash;
+    }
+    my $count = $self->{count};
+    _set_to_container($self->{entries}, $self->{bucket_count}, \$count, $key, $val);
+    $self->{count} = $count;
+  }
+
+  sub get : object ($self : self, $key : string) {
+    my $index = _index_by_key($key, $self->{bucket_count});
+    my $ref = $self->{entries}->[$index];
+    unless ($ref) {
+      return undef;
+    }
+    while (1) {
+      if ($ref->{key} eq $key) {
+        return $ref->{val};
+      }
+      unless ($ref->{next_entry}) {
+        return undef;
+      }
+      $ref = $ref->{next_entry};
+    }
+  }
+
+  sub exists : int ($self : self, $key : string) {
+    my $index = _index_by_key($key, $self->{bucket_count});
+    my $ref = $self->{entries}->[$index];
+    
+    unless ($ref) {
+      return 0;
+    }
+    while (1) {
+      if ($ref->{key} eq $key) {
+        return 1;
+      }
+      unless ($ref->{next_entry}) {
+        return 0;
+      }
+      $ref = $ref->{next_entry};
+    }
+  }
+
+  sub delete : object ($self : self, $key : string) {
+    my $index = _index_by_key($key, $self->{bucket_count});
+    my $ref = $self->{entries}->[$index];
+    my $prev : SPVM::Hash::Entry = undef;
+    unless ($ref) {
+      return undef;
+    }
+    while (1) {
+      if ($ref->{key} eq $key) {
+        my $ret = $ref->{val};
+        if ($prev) {
+          $prev->{next_entry} = $ref->{next_entry};
+        }
+        else {
+          $self->{entries}->[$index] = $ref->{next_entry};
+        }
+        $self->{count}--;
+        return $ret;
+      }
+      unless ($ref->{next_entry}) {
+        return undef;
+      }
+      $prev = $ref;
+      $ref = $ref->{next_entry};
+    }
+  }
+
+  sub keys : string[] ($self : self) {
+    my $retval = new string[$self->{count}];
+    # iterate entries
+    my $count = 0;
+    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
+      my $ref = $self->{entries}->[$i];
+      while ($ref) {
+        $retval->[$count++] = $ref->{key};
+        $ref = $ref->{next_entry};
+      }
+    }
+    return $retval;
+  }
+
+  sub values : object[] ($self : self) {
+    my $retval = new object[$self->{count}];
+    # iterate entries
+    my $count = 0;
+    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
+      my $ref = $self->{entries}->[$i];
+      while ($ref) {
+        $retval->[$count++] = $ref->{val};
+        $ref = $ref->{next_entry};
+      }
+    }
+    return $retval;
+  }
+
+  sub copy : SPVM::Hash ($self : self) {
+    my $ret = SPVM::Hash->new;
+    my $keys = $self->keys;
+    for (my $i = 0; $i < @$keys; ++$i) {
+      $ret->set($keys->[$i], $self->get($keys->[$i]));
+    }
+    return $ret;
+  }
+
+  native sub _murmur_hash : long ($string : string, $seed : int);
+  
+  sub set_byte : void ($self : self, $name : string, $value : byte) {
+    $self->set($name => SPVM::Byte->new($value));
+  }
+  sub set_short : void ($self : self, $name : string, $value : short) {
+    $self->set($name => SPVM::Short->new($value));
+  }
+  sub set_int : void ($self : self, $name : string, $value : int) {
+    $self->set($name => SPVM::Int->new($value));
+  }
+  sub set_long : void ($self : self, $name : string, $value : long) {
+    $self->set($name => SPVM::Long->new($value));
+  }
+  sub set_float : void ($self : self, $name : string, $value : float) {
+    $self->set($name => SPVM::Float->new($value));
+  }
+  sub set_double : void ($self : self, $name : string, $value : double) {
+    $self->set($name => SPVM::Double->new($value));
+  }
+  
+  sub get_byte : byte ($self : self, $name : string) {
+    return (byte)$self->get($name);
+  }
+  sub get_short : short ($self : self, $name : string) {
+    return (short)$self->get($name);
+  }
+  sub get_int : int ($self : self, $name : string) {
+    return (int)$self->get($name);
+  }
+  sub get_long : long ($self : self, $name : string) {
+    return (long)$self->get($name);
+  }
+  sub get_float : float ($self : self, $name : string) {
+    return (float)$self->get($name);
+  }
+  sub get_double : double ($self : self, $name : string) {
+    return (double)$self->get($name);
+  }
+
+  sub _bucket_count : int ($self : self) {
     return $self->{bucket_count};
   }
 
-  precompile sub _entries : SPVM::Hash::Entry [] ($self : self) {
+  sub _entries : SPVM::Hash::Entry [] ($self : self) {
     return $self->{entries};
   }
 
-  precompile sub _index_by_key : int ($key : string, $bucket_count : int) {
+  sub _index_by_key : int ($key : string, $bucket_count : int) {
     my $default_seed = 123456789;
-    return (int)(murmur_hash($key, $default_seed) % $bucket_count);
+    return (int)(_murmur_hash($key, $default_seed) % $bucket_count);
   }
 
-  precompile sub _set_to_container : void ($entries : SPVM::Hash::Entry[], $bucket_count : int, $count_ref : int&,
+  sub _set_to_container : void ($entries : SPVM::Hash::Entry[], $bucket_count : int, $count_ref : int&,
     $key : string, $val : object) {
     my $index = _index_by_key($key, $bucket_count);
     my $ref = $entries->[$index];
@@ -49,17 +218,9 @@ package SPVM::Hash {
     }
   }
 
-  precompile sub _rehash : void ($self : self) {
+  sub _rehash : void ($self : self) {
     my $new_bucket_count : int;
-    if ($self->{bucket_count} > INT32_MAX() / 2) {
-      if ($self->{bucket_count} == INT32_MAX()) {
-        return;
-      }
-      $new_bucket_count = INT32_MAX();
-    }
-    else {
-      $new_bucket_count = $self->{bucket_count} * 2;
-    }
+    $new_bucket_count = $self->{bucket_count} * 2;
     my $new_entries = new SPVM::Hash::Entry [$new_bucket_count];
     my $new_count = 0;
     # iterate entries
@@ -73,204 +234,4 @@ package SPVM::Hash {
     $self->{bucket_count} = $new_bucket_count;
     $self->{entries} = $new_entries;
   }
-
-  precompile sub new_empty : SPVM::Hash () {
-    my $self = new SPVM::Hash;
-    my $default_capacity = 32;
-    $self->{bucket_count} = $default_capacity;
-    $self->{entries} = new SPVM::Hash::Entry[$default_capacity];
-    $self->{count} = 0;
-    $self->{max_load_factor} = 1.0;
-    return $self;
-  }
-
-  precompile sub new : SPVM::Hash ($objects : object[]) {
-    unless (@$objects % 2 == 0) {
-      die "Odd number of elements provided";
-    }
-    my $self = new SPVM::Hash;
-    my $capacity = 2;
-    if (@$objects >= INT32_MAX() / 2) {
-      $capacity = INT32_MAX();
-    }
-    else {
-      while ($capacity < @$objects / 2) {
-        $capacity *= 2;
-      }
-    }
-    $self->{bucket_count} = $capacity;
-    $self->{entries} = new SPVM::Hash::Entry[$capacity];
-    my $count = 0;
-    for (my $i = 0; $i < @$objects / 2; ++$i) {
-      _set_to_container($self->{entries}, $self->{bucket_count}, \$count,
-          (string)($objects->[2 * $i]), $objects->[2 * $i + 1]);
-    }
-    $self->{count} = $count;
-    $self->{max_load_factor} = 1.0;
-    return $self;
-  }
-
-  precompile sub new_opt : SPVM::Hash ($options : object[]) {
-    my $self = new SPVM::Hash;
-    
-    if (@$options % 2 != 0) {
-      die "Element count of options must be even number";
-    }
-    
-    my $default_capacity = 0;
-    for (my $i = 0; $i < @$options; $i += 2) {
-      my $name = (string)$options->[$i];
-      my $value = $options->[$i + 1];
-      
-      if ($name eq "capacity") {
-        $default_capacity = (int)$value;
-      }
-    }
-    
-    $self->{bucket_count} = $default_capacity;
-    if ($default_capacity <= 0) {
-      die "Need capacity";
-    }
-    $self->{entries} = new SPVM::Hash::Entry[$default_capacity];
-    $self->{count} = 0;
-    $self->{max_load_factor} = 1.0;
-    
-    return $self;
-  }
-
-  precompile sub count : int ($self : self) {
-    return $self->{count};
-  }
-
-  precompile sub set : void ($self : self, $key : string, $val : object) {
-    unless ($key) {
-      die "key must not be undef";
-    }
-    unless ($self->load_factor < $self->{max_load_factor} || $self->{bucket_count} == INT32_MAX()) {
-      $self->_rehash;
-    }
-    my $count = $self->{count};
-    _set_to_container($self->{entries}, $self->{bucket_count}, \$count, $key, $val);
-    $self->{count} = $count;
-  }
-
-  precompile sub get : object ($self : self, $key : string) {
-    my $index = _index_by_key($key, $self->{bucket_count});
-    my $ref = $self->{entries}->[$index];
-    unless ($ref) {
-      return undef;
-    }
-    while (1) {
-      if ($ref->{key} eq $key) {
-        return $ref->{val};
-      }
-      unless ($ref->{next_entry}) {
-        return undef;
-      }
-      $ref = $ref->{next_entry};
-    }
-  }
-
-  precompile sub exists : int ($self : self, $key : string) {
-    my $index = _index_by_key($key, $self->{bucket_count});
-    my $ref = $self->{entries}->[$index];
-    
-    unless ($ref) {
-      return 0;
-    }
-    while (1) {
-      if ($ref->{key} eq $key) {
-        return 1;
-      }
-      unless ($ref->{next_entry}) {
-        return 0;
-      }
-      $ref = $ref->{next_entry};
-    }
-  }
-
-  precompile sub delete : object ($self : self, $key : string) {
-    my $index = _index_by_key($key, $self->{bucket_count});
-    my $ref = $self->{entries}->[$index];
-    my $prev : SPVM::Hash::Entry = undef;
-    unless ($ref) {
-      return undef;
-    }
-    while (1) {
-      if ($ref->{key} eq $key) {
-        my $ret = $ref->{val};
-        if ($prev) {
-          $prev->{next_entry} = $ref->{next_entry};
-        }
-        else {
-          $self->{entries}->[$index] = $ref->{next_entry};
-        }
-        $self->{count}--;
-        return $ret;
-      }
-      unless ($ref->{next_entry}) {
-        return undef;
-      }
-      $prev = $ref;
-      $ref = $ref->{next_entry};
-    }
-  }
-
-  precompile sub load_factor : double ($self : self) {
-    return (double) $self->{count} / $self->{bucket_count};
-  }
-
-  precompile sub keys : string[] ($self : self) {
-    my $retval = new string[$self->{count}];
-    # iterate entries
-    my $count = 0;
-    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
-      my $ref = $self->{entries}->[$i];
-      while ($ref) {
-        $retval->[$count++] = copy_str($ref->{key});
-        $ref = $ref->{next_entry};
-
-      }
-    }
-    return $retval;
-  }
-
-  precompile sub values : object[] ($self : self) {
-    my $retval = new object[$self->{count}];
-    # iterate entries
-    my $count = 0;
-    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
-      my $ref = $self->{entries}->[$i];
-      while ($ref) {
-        $retval->[$count++] = $ref->{val};
-        $ref = $ref->{next_entry};
-      }
-    }
-    return $retval;
-  }
-
-  precompile sub each : object[][] ($self : self) {
-    my $retval = new object[][$self->{count}];
-    # iterate entries
-    my $count = 0;
-    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
-      my $ref = $self->{entries}->[$i];
-      while ($ref) {
-        $retval->[$count++] = [(object) copy_str($ref->{key}), $ref->{val}];
-        $ref = $ref->{next_entry};
-      }
-    }
-    return $retval;
-  }
-
-  precompile sub copy : SPVM::Hash ($self : self) {
-    my $ret = SPVM::Hash->new_empty;
-    my $keys = $self->keys;
-    for (my $i = 0; $i < @$keys; ++$i) {
-      $ret->set($keys->[$i], $self->get($keys->[$i]));
-    }
-    return $ret;
-  }
-
-  native sub murmur_hash : long ($string : string, $seed : int);
 }

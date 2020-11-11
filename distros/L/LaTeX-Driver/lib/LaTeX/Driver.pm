@@ -20,14 +20,17 @@ use File::Compare;                      # standard Perl class
 use File::Path;                         # standard Perl class
 use File::Slurp;
 use File::Spec;                         # from PathTools
+use File::Temp;
 use IO::File;                           # from IO
 use Readonly;
 use File::pushd;                        # temporary cwd changes
 use Capture::Tiny qw(capture);
 
+use Log::Any qw($log);
+
 Readonly our $DEFAULT_MAXRUNS => 10;
 
-our $VERSION = "1.1.1";
+our $VERSION = "1.2.0";
 
 __PACKAGE__->mk_accessors( qw( basename basedir basepath options
                                source output tmpdir format timeout stderr
@@ -36,7 +39,7 @@ __PACKAGE__->mk_accessors( qw( basename basedir basepath options
                                undefined_citations undefined_references
                                labels_changed rerun_required ) );
 
-our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
+our $DEBUG;
 our $DEBUGPREFIX;
 
 
@@ -61,19 +64,19 @@ our $DEFAULT_DOCNAME = 'latexdoc';
 our $DEFAULT_FORMAT = 'pdf';
 
 our %FORMATTERS  = (
-    dvi        => [ 'latex' ],
-    ps         => [ 'latex', 'dvips' ],
-    postscript => [ 'latex', 'dvips' ],
-    pdf        => [ 'xelatex' ],
+    dvi             => [ 'latex' ],
+    ps              => [ 'latex', 'dvips' ],
+    postscript      => [ 'latex', 'dvips' ],
+    pdf             => [ 'xelatex' ],
     'pdf(pdflatex)' => [ 'pdflatex' ],
     'pdf(xelatex)'  => [ 'xelatex' ],
-    'pdf(lualatex)'  => [ 'lualatex' ],
+    'pdf(lualatex)' => [ 'lualatex' ],
     'pdf(dvi)'      => [ 'latex', 'dvipdfm' ],
     'pdf(ps)'       => [ 'latex', 'dvips', 'ps2pdf' ],
     'ps(pdf)'       => [ 'pdflatex', 'pdf2ps' ],
-    'ps(pdflatex)'       => [ 'pdflatex', 'pdf2ps' ],
-    'ps(xelatex)'       => [ 'xelatex', 'pdf2ps' ],
-    'ps(lualatex)'       => [ 'lualatex', 'pdf2ps' ],
+    'ps(pdflatex)'  => [ 'pdflatex', 'pdf2ps' ],
+    'ps(xelatex)'   => [ 'xelatex', 'pdf2ps' ],
+    'ps(lualatex)'  => [ 'lualatex', 'pdf2ps' ],
 );
 
 
@@ -90,9 +93,6 @@ sub new {
     my $options = ref $_[0] ? shift : { @_ };
     my ($volume, $basedir, $basename, $basepath, $orig_ext, $cleanup);
     my ($formatter, @postprocessors);
-
-    $DEBUG       = $options->{DEBUG} || 0;
-    $DEBUGPREFIX = $options->{DEBUGPREFIX} if exists $options->{DEBUGPREFIX};
 
     # Sanity check first - check we're running on a supported OS
 
@@ -161,7 +161,7 @@ sub new {
     my $tmpdir = $options->{tmpdir};
     if ($tmpdir or ref $source) {
         $basedir = $class->_setup_tmpdir($tmpdir);
-        $cleanup = 'rmdir' if ((!defined($tmpdir)) or ($tmpdir eq "1"));
+
         if (ref $source) {
             $basename = $DEFAULT_DOCNAME;
             $basepath = File::Spec->catfile($basedir, $basename);
@@ -217,23 +217,28 @@ sub new {
 
     # construct and return the object
 
-    return $class->SUPER::new( { basename       => $basename,
-                                 basedir        => $basedir,
-                                 basepath       => $basepath,
-                                 format         => $format,
-                                 output         => $output,
-                                 cleanup        => $cleanup || '',
-                                 options        => $options,
-                                 maxruns        => $options->{maxruns}   || $DEFAULT_MAXRUNS,
-                                 extraruns      => $options->{extraruns} ||  0,
-                                 timeout        => $options->{timeout},
-                                 capture_stderr => $options->{capture_stderr} || 0,
-                                 formatter      => $formatter,
-                                 _program_path  => $path,
-                                 texinputs_path => join($texinputs_sep, ('.', @{$texinputs_path}, '')),
-                                 preprocessors  => [],
-                                 postprocessors => \@postprocessors,
-                                 stats          => { runs => {} } } );
+    return $class->SUPER::new(
+        {
+            basename       => $basename,
+            basedir        => "$basedir",
+            _file_tmp_base => $basedir, # retain ref during object life
+            basepath       => $basepath,
+            format         => $format,
+            output         => $output,
+            cleanup        => $cleanup || '',
+            options        => $options,
+            maxruns        => $options->{maxruns}   || $DEFAULT_MAXRUNS,
+            extraruns      => $options->{extraruns} ||  0,
+            timeout        => $options->{timeout},
+            capture_stderr => $options->{capture_stderr} || 0,
+            formatter      => $formatter,
+            _program_path  => $path,
+            texinputs_path => join($texinputs_sep,
+                                   ('.', @{$texinputs_path}, '')),
+            preprocessors  => [],
+            postprocessors => \@postprocessors,
+            stats          => { runs => {} }
+        });
 
 }
 
@@ -246,8 +251,6 @@ sub new {
 
 sub run {
     my $self = shift;
-
-    $DEBUG = $self->options->{DEBUG} || 0;
 
     # Check that the file exists
 
@@ -300,28 +303,12 @@ sub run {
 
 
     # Return any output
-
     $self->copy_to_output
         if $self->output;
 
     return 1;
 }
 
-
-
-#------------------------------------------------------------------------
-# destructor
-#
-#------------------------------------------------------------------------
-
-sub DESTROY {
-    my $self = shift;
-
-    debug('DESTROY called') if $DEBUG;
-
-    $self->cleanup();
-    return;
-}
 
 
 #------------------------------------------------------------------------
@@ -349,7 +336,7 @@ sub run_latex {
         $self->reset_latex_required;
         my $matched = 0;
         while ( my $line = <$fh> ) {
-            debug($line) if $DEBUG >= 9;
+            $log->trace($line);
             # TeX errors start with a "!" at the start of the
             # line, and followed several lines later by a line
             # designator of the form "l.nnn" where nnn is the line
@@ -372,24 +359,24 @@ sub run_latex {
                 $self->undefined_references(1);
             }
             elsif ( $line =~ /^LaTeX Warning: Citation .* on page \d+ undefined/ ) {
-                debug('undefined citations detected') if $DEBUG;
+                $self->debug('undefined citations detected');
                 $self->undefined_citations(1);
             }
             elsif ( $line =~ /LaTeX Warning: There were undefined references./i ) {
-                debug('undefined reference detected') if $DEBUG;
+                $self->debug('undefined reference detected');
                 $self->undefined_references(1)
                     unless $self->undefined_citations;
             }
             elsif ( $line =~ /No file $basename\.(toc|lof|lot)/i ) {
-                debug("missing $1 file") if $DEBUG;
+                $self->debug("missing $1 file");
                 $self->undefined_references(1);
             }
             elsif ( $line =~ /^LaTeX Warning: Label\(s\) may have changed./i ) {
-                debug('labels have changed') if $DEBUG;
+                $self->debug('labels have changed');
                 $self->labels_changed(1);
             }
             elsif ( $line =~ /^Package longtable Warning: Table widths have changed[.] Rerun LaTeX[.]/i) {
-                debug('table widths changed') if $DEBUG;
+                $self->debug('table widths changed');
                 $self->rerun_required(1);
             }
 
@@ -397,7 +384,7 @@ sub run_latex {
             # pdfmark, etc); this regexp catches most of those.
 
             elsif ( $line =~ /Rerun to get (.*) right/i) {
-                debug("$1 changed") if $DEBUG;
+                $self->debug("$1 changed");
                 $self->rerun_required(1);
             }
         }
@@ -665,7 +652,7 @@ sub run_command {
     $envvars = [ $envvars ] unless ref $envvars;
     local(@ENV{@{$envvars}}) = map { $self->texinputs_path } @{$envvars};
     $self->stats->{runs}{$progname}++;
-    debug("running '$program $args'") if $DEBUG;
+    $self->debug("running '$program $args'");
     my $cwd = pushd($dir);
 
     # Format the command appropriately for our O/S
@@ -719,10 +706,10 @@ sub copy_to_output {
         # it's quite common for /tmp to be a separate filesystem
 
         if (rename($file, $output)) {
-            debug("renamed $file to $output") if $DEBUG;
+            $self->debug("renamed $file to $output");
         }
         elsif (copy($file, $output)) {
-            debug("copied $file to $output") if $DEBUG;
+            $self->debug("copied $file to $output");
         }
         else {
             $self->throw("failed to copy $file to $output");
@@ -742,45 +729,36 @@ sub copy_to_output {
 sub _setup_tmpdir {
     my ($class, $dirname) = @_;
 
-    my $tmp  = File::Spec->tmpdir();
+    my $tmp;
+    $tmp = File::Spec->catdir(File::Spec->tmpdir(), $dirname . 'XXXXXXX')
+        if ($dirname and ($dirname ne 1));
 
-    if ($dirname and ($dirname ne 1)) {
-        $dirname = File::Spec->catdir($tmp, $dirname);
-        eval { mkpath($dirname, 0, oct(700)) } unless -d $dirname;
-    }
-    else {
-        my $n = 0;
-        do {
-            $dirname = File::Spec->catdir($tmp, "$DEFAULT_TMPDIR$$" . '_' . $n++);
-        } while (-e $dirname);
-        eval { mkpath($dirname, 0, oct(700)) };
-    }
-    $class->throw("cannot create temporary directory: $@")
-        if $@;
-
-    debug(sprintf("setting up temporary directory '%s'\n", $dirname)) if $DEBUG;
-
-    return $dirname;
+    __PACKAGE__->debug("setting up temporary directory '%s'\n", $dirname || '');
+    return File::Temp->newdir(TEMPLATE => $tmp);
 }
 
 
 #------------------------------------------------------------------------
-# $self->cleanup
+# Destructor (clean up log/temp files)
 #
-# cleans up the temporary files
-# TODO: work out exactly what this should do
 #------------------------------------------------------------------------
 
-sub cleanup {
-    my ($self, $what) = @_;
-    my $cleanup = $self->{cleanup};
-    debug('cleanup called') if $DEBUG;
-    if ($cleanup eq 'rmdir') {
-        if ((!defined $what) or ($what ne 'none')) {
-            debug('cleanup removing directory tree ' . $self->basedir) if $DEBUG;
-            rmtree($self->basedir);
-        }
-    }
+sub DESTROY {
+    local($., $@, $!, $^E, $?);
+    my $self = shift;
+
+    # Don't log in DESTROY: it has weird interactions with
+    #  global destruction; also: don't use other objects here.
+    my $what = $self->{cleanup};
+
+    return if (not $what or $what eq 'none' or not -d $self->basedir);
+
+    unlink $self->basepath . ".$_"
+        for (@LOGFILE_EXTS);
+    return if ($what eq 'logfiles');
+
+    unlink $self->basepath . ".$_"
+        for (@TMPFILE_EXTS);
     return;
 }
 
@@ -814,9 +792,17 @@ sub throw {
 }
 
 sub debug {
-    my (@args) = @_;
-    print STDERR $DEBUGPREFIX || "[latex] ", @args;
-    print STDERR "\n" unless @args and ($args[-1] =~ / \n $ /mx);
+    my ($self, $string, @args) = @_;
+
+    my $prefix = ref $self ? $self->{DEBUGPREFIX} : $DEBUGPREFIX;
+    $prefix ||= '[latex] ';
+    $log->debugf($prefix . $string, @args)
+        or do {
+            if (ref $self ? $self->{DEBUG} : $DEBUG) {
+                print STDERR $prefix, @args;
+                print STDERR "\n" unless @args and ($args[-1] =~ / \n $ /mx);
+            }
+    };
     return;
 }
 
@@ -831,7 +817,7 @@ LaTeX::Driver - Latex driver
 
 =head1 VERSION
 
-1.1.1
+1.2.0
 
 =head1 SYNOPSIS
 
@@ -843,7 +829,6 @@ LaTeX::Driver - Latex driver
                                %other_params );
     $ok    = $drv->run;
     $stats = $drv->stats;
-    $drv->cleanup($what);
 
 =head1 DESCRIPTION
 
@@ -857,7 +842,8 @@ This module runs the required commands in the directory specified,
 either explicitly with the C<dirname> option or implicitly by the
 directory part of C<basename>, or in the current directory.  As a
 result of the processing up to a dozen or more intermediate files are
-created.  These can be removed with the C<cleanup> method.
+created.  These will be removed upon object destruction, given the
+C<cleanup> argument to C<new>.
 
 
 =head1 SOURCE
@@ -1056,14 +1042,6 @@ Note: the return value will probably become an object in a future
 version of the module.
 
 
-=item C<cleanup($what)>
-
-Removes temporary intermediate files from the document directory and
-resets the stats.
-
-Not yet implemented
-
-
 =item C<program_path($program_name, $opt_value)>
 
 Get or set the path to the named program.  Can be used as a class
@@ -1253,6 +1231,12 @@ location.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
+When the using application configures L<Log::Any>, this module will use
+it to log C<debug> and C<trace> level messages to the C<LaTeX::Driver>
+category. Please note that the C<$DEBUG> variable does not need to be
+set to enable this type of logging. When this type of logging is enabled,
+the value of C<$DEBUG> is ignored.
+
 
 =head1 DEPENDENCIES
 
@@ -1266,9 +1250,9 @@ None known.
 
 =head1 BUGS AND LIMITATIONS
 
-This is beta software - there are bound to be bugs and misfeatures.
 If you have any comments about this software I would be very grateful
-to hear them; email me at E<lt>a.ford@ford-mason.co.ukE<gt>.
+to hear them; please file your comments as issues at
+L<https://github.com/Template-Toolkit-Latex/LaTeX-Driver/issues>.
 
 Among the things I am aware of are:
 
@@ -1404,7 +1388,7 @@ the web2c TeX distribution, TeX live, tetex, TeX on Windows, etc.
 
 =head1 AUTHOR
 
-   Chris Travers <chris.travers@gmail.com>  (current maintainer)
+   Erik Huelsmann  <erik@efficito.com>  (current maintainer)
 
 =head1 LICENSE AND COPYRIGHT
 

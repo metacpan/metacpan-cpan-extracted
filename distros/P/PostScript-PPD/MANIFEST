@@ -20,5 +20,6 @@ t/ppd/postscript.ppd.gz
 t/ppd/zebraep2.ppd.gz
 t/00_info.t
 t/ppd/lj4515.ppd
+t/ppd/stlin.ppd
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

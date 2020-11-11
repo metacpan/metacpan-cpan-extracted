@@ -5,10 +5,11 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
-  Type::Tiny: '1.010001'
+  Type::Tiny: '1.012000'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+  Module::Metadata: '0'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -19,9 +20,15 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Compiled::Params::OO:
+    file: lib/Compiled/Params/OO.pm
+    version: '0.05'
 requires:
   Import::Export: '1.00'
   Type::Tiny: '1.010001'
   perl: '5.006'
-version: '0.04'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Compiled-Params-OO.git
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

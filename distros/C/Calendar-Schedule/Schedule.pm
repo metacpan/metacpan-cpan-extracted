@@ -18,11 +18,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(new);
 
 #<?echo "our \$VERSION = '$Meta->{version}';"!>#+
-our $VERSION = '1.13';#-
-
-use vars qw($Version $Revision);
-$Version = $VERSION;
-($Revision = substr(q$Revision: 239 $, 10)) =~ s/\s+$//;
+our $VERSION = '1.19';#-
 
 # non-exported package globals
 use vars qw( $REweekday3 $REmonth3 $RE1st );
@@ -1209,8 +1205,10 @@ sub generate_table {
 		  @ind1 = (\%eprep, $di, $self->{'RowLabels'}[$j], $oi) if $oi > 0;
 		  
 		  if ($oi == 0) {
-		      while ($j <= $num_of_timelabels-1 &&
-			     $self->_table_get(\%eprep, $di, $self->{'RowLabels'}[$j]) eq 'continue')
+		    while ($j <= $num_of_timelabels-1 &&
+			   $self->_table_get(\%eprep, $di,
+					     $self->{'RowLabels'}[$j]) eq
+			   'continue')
 		      { ++ $counter; ++$j }
 		  } else {
 		      while ($j <= $num_of_timelabels-1 &&
@@ -1386,8 +1384,9 @@ sub _table_get {
     my $epr = shift;
     my $col = shift;
     my $row = shift;
-    my $overlap = shift;
-    return $overlap > 0 ? $epr->{$col, $row, $overlap} : $epr->{$col, $row};
+    my $overlap = shift // 0;
+    my $ret = $overlap > 0 ? $epr->{$col, $row, $overlap} : $epr->{$col, $row};
+    return defined($ret) ? $ret : '';
 }
 
 =pod
@@ -1406,23 +1405,25 @@ sub _getfile($) {
 1;
 __END__
 
-=head1 THANKS
+=head1 CONTRIBUTORS
 
-I would like to thank Stefan Goebel for his report and detailed
-analysis of a bug and suggestions, Mike Vasiljevs for his
-suggestions and patches for ISO8601 format, and Mohammad S Anwar for
-correction regarding missing license field.
+I would like to thank Stefan Goebel for his report and detailed analysis of
+a bug and suggestions, Mike Vasiljevs for his suggestions and patches for
+ISO8601 format, Mohammad S Anwar for correction regarding missing license
+field, Slaven Rezic from the CPAN testers for useful bug reports, Gabor Szabo
+for the initial GitHub CI code.
 
 =head1 AUTHOR
 
-Copyright 2002-2020 Vlado Keselj, vlado@dnlp.ca, http://web.cs.dal.ca/~vlado
+Copyright 2002-2020 Vlado Keselj (vlado@dnlp.ca http://vlado.ca)
+and the contributors (section CONTRIBUTORS).
 
 This script is provided "as is" without expressed or implied warranty.
 This is free software; you can redistribute it, modify it, or both under
 the same terms as Perl itself.
 
 The latest version can be found at
-L<http://web.cs.dal.ca/~vlado/srcperl/Calendar-Schedule/>.
+L<http://vlado.ca/srcperl/Calendar-Schedule/>.
 
 =head1 SEE ALSO
 

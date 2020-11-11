@@ -12,7 +12,7 @@ sudo cpanm Pepper
 
 echo "Setting up Pepper - Please answer carefully"
 
-sudo pepper setup
+pepper setup
 
 echo "Starting Pepper"
 pepper start

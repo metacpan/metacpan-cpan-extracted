@@ -39,6 +39,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.25",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/asb-capfan/Tk-TableMatrix.git",
+         "web" : "https://github.com/asb-capfan/Tk-TableMatrix"
+      }
+   },
+   "version" : "1.26",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

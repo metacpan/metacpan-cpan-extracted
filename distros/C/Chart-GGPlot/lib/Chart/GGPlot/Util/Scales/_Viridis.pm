@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0009'; # VERSION
+our $VERSION = '0.0011'; # VERSION
 
 use Convert::Color::RGB;
 
@@ -1361,7 +1361,7 @@ Chart::GGPlot::Util::Scales::_Viridis
 
 =head1 VERSION
 
-version 0.0009
+version 0.0011
 
 =head1 AUTHOR
 
@@ -1369,7 +1369,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

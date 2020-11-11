@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Path::Tiny;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 sub set_value {
     my $self = shift;
@@ -44,15 +44,14 @@ Getopt::Kingpin::Type::ExistingDir - command line option object
 
 =head1 DESCRIPTION
 
-Getopt::Kingpin::Type::ExistingDir は、Getopt::Kingpin内で使用する型定義です。
+Getopt::Kingpin::Type::ExistingDir is the type definition for ExistingDir within Getopt::Kingpin.
 
 =head1 METHOD
 
 =head2 set_value($value)
 
-$self->valueに値を設定します。
-値は、Path::Tinyによって処理されます。
-必ず存在するdirectoryである必要があります。
+Set the value of $self->value. Converts strings to Path::Tiny objects and
+checks C<is_dir> is true.
 
 =head1 LICENSE
 

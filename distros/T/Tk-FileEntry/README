@@ -26,13 +26,13 @@ modules from CPAN. If you don't have one, have a look at:
 DEPENDENCIES
 
 This module requires some other modules and libraries.
-See Makefile.PL for a detailled list. If you are going to install
+See Makefile.PL for a detailed list. If you are going to install
 via cpan shell or PPM, you don't have to care about.
 
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
-Copyright (C) 2014 by Alex Becker
+Copyright (C) 2013-2020 by Alexander Becker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.16.3 or,

@@ -1,17 +1,14 @@
 package Map::Tube::Warsaw;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Get XML.
 has xml => (
@@ -117,11 +114,9 @@ For more information about Warsaw Map, click L<here|https://en.wikipedia.org/wik
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Warsaw;
 
@@ -139,11 +134,9 @@ For more information about Warsaw Map, click L<here|https://en.wikipedia.org/wik
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Warsaw;
 
  # Object.
@@ -160,11 +153,9 @@ For more information about Warsaw Map, click L<here|https://en.wikipedia.org/wik
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Warsaw;
@@ -185,23 +176,21 @@ For more information about Warsaw Map, click L<here|https://en.wikipedia.org/wik
  system "ls -l Warsaw.png";
 
  # Output like:
- # -rw-r--r-- 1 skim skim 86466 Mar 15 23:26 Warsaw.png
+ # -rw-r--r-- 1 skim skim 90061 lis  3 23:18 Warsaw.png
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Warsaw/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Warsaw/master/images/ex3.png" alt="Metro w Warszawie" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Warsaw/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Warsaw/master/images/ex3.png" alt="Metro w Warszawie" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Warsaw;
 
@@ -217,6 +206,59 @@ For more information about Warsaw Map, click L<here|https://en.wikipedia.org/wik
  # Output:
  # Linia M1
  # Linia M2
+
+=head1 EXAMPLE5
+
+ use strict;
+ use warnings;
+
+ use Encode qw(encode_utf8);
+ use Map::Tube::Warsaw;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = $ARGV[0];
+
+ # Object.
+ my $obj = Map::Tube::Warsaw->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Linia M1' argument.
+ # Kabaty
+ # Natolin
+ # Imielin
+ # Stokłosy
+ # Ursynów
+ # Służew
+ # Wilanowska
+ # Wierzbno
+ # Racławicka
+ # Pole Mokotowskie
+ # Politechnika
+ # Centrum
+ # Świętokrzyska
+ # Ratusz Arsenał
+ # Dworzec Gdański
+ # Plac Wilsona
+ # Marymont
+ # Słodowiec
+ # Stare Bielany
+ # Wawrzyszew
+ # Młociny
 
 =head1 DEPENDENCIES
 
@@ -245,22 +287,24 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Warsaw>
+L<https://github.com/michal-josef-spacek/Map-Tube-Warsaw>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

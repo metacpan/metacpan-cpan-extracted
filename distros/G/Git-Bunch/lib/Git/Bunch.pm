@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2020-01-31'; # DATE
-our $VERSION = '0.626'; # VERSION
+our $DATE = '2020-10-30'; # DATE
+our $VERSION = '0.627'; # VERSION
 
 use 5.010001;
 use strict;
@@ -508,7 +508,10 @@ sub check_bunch {
     [200,
      $has_unclean ? "Some repos unclean" : "All repos clean",
      \%res,
-     {'cmdline.result'=>'', 'func.res'=>\%res}];
+     {
+         'cmdline.result' => '', 'func.res'=>\%res,
+         'cmdline.exit_code' => $has_unclean ? 1:0,
+     }];
 }
 
 $SPEC{list_bunch_contents} = {
@@ -1164,7 +1167,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.626 of Git::Bunch (from Perl distribution Git-Bunch), released on 2020-01-31.
+This document describes version 0.627 of Git::Bunch (from Perl distribution Git-Bunch), released on 2020-10-30.
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Moose::Role;
 
@@ -34,7 +34,7 @@ Markdent::Dialect::Theory::SpanParser - Span parser for Theory's proposed Markdo
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,10 @@
 Build.PL
-CONTRIBUTING.md
-englishWords/listOfEnglishWords.pl
-englishWords/listOfEnglishWordsNormalized.txt
+CHANGES
+CONTRIBUTING
 lib/Dita/GB/Standard.pm
-MANIFEST			This list of files
+MANIFEST
+README
+README.md
 test.pl
 META.yml
 META.json

@@ -1,3 +1,9 @@
+2020-11-04  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.13
+
+  * Added repo details 
+
 2018-02-23  Dave Cross <dave@dave.org.uk>
 
   * Build.PL: Missed a version number.

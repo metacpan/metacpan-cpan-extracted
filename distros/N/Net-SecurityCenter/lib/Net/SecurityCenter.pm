@@ -3,15 +3,32 @@ package Net::SecurityCenter;
 use warnings;
 use strict;
 
-use Net::SecurityCenter::Utils qw(decamelize);
+use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::REST;
-use Net::SecurityCenter::Error;
 
-our $VERSION = '0.206';
+our $VERSION = '0.300';
 
-my @apis = qw/Analysis Credential DeviceInfo Feed File Plugin PluginFamily Policy Report
-    Repository Scan ScanResult Scanner Status System User Zone/;
+my @api = qw(
+    analysis
+    credential
+    device_info
+    feed
+    file
+    notification
+    plugin
+    plugin_family
+    policy
+    report
+    repository
+    scan
+    scan_result
+    scanner
+    status
+    system
+    user
+    zone
+);
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -27,14 +44,15 @@ sub new {
         host    => $host,
         options => $options,
         client  => $client,
+        api     => {}
     };
 
     bless $self, $class;
 
-    foreach (@apis) {
-        my $api_module = "Net::SecurityCenter::API::$_";
-        eval "require $api_module";    ## no critic
-        $self->{ decamelize $_ } = $api_module->new($client);
+    foreach my $method (@api) {
+        my $api_class = 'Net::SecurityCenter::API::' . join '', map {ucfirst} split /_/, $method;
+        eval "require $api_class";    ## no critic
+        $self->{api}->{$method} = $api_class->new($client);
     }
 
     return $self;
@@ -45,37 +63,11 @@ sub new {
 # COMMON METHODS
 #-------------------------------------------------------------------------------
 
-sub client {
-
-    my ($self) = @_;
-    return $self->{'client'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub error {
-
-    my ( $self, $message, $code ) = @_;
-
-    if ( defined $message ) {
-        $self->{'client'}->{'_error'} = Net::SecurityCenter::Error->new( $message, $code );
-        return;
-    } else {
-        return $self->{'client'}->{'_error'};
-    }
-
-}
-
-#-------------------------------------------------------------------------------
-
 sub login {
 
-    my ( $self, $username, $password ) = @_;
+    my ( $self, %args ) = @_;
 
-    ( @_ == 3 ) or croak(q/Usage: $sc->login(USERNAME, PASSWORD)/);
-
-    $self->client->login( $username, $password ) or return;
+    $self->client->login(%args) or return;
     return 1;
 
 }
@@ -85,7 +77,7 @@ sub login {
 sub logout {
 
     my ($self) = @_;
-    $self->client->logout() or return;
+    $self->client->logout or return;
     return 1;
 
 }
@@ -94,17 +86,14 @@ sub logout {
 # HELPER METHODS
 #-------------------------------------------------------------------------------
 
-foreach (@apis) {
-
-    my $helper = decamelize $_;
-
-    my $sub = sub {
-        my ($self) = @_;
-        return $self->{$helper};
-    };
+foreach my $method (@api) {
 
     no strict 'refs';    ## no critic
-    *{$helper} = $sub;
+
+    *{$method} = sub {
+        my ($self) = @_;
+        return $self->{api}->{$method};
+    };
 
 }
 
@@ -129,7 +118,9 @@ Net::SecurityCenter - Perl interface to Tenable.sc (SecurityCenter) REST API
 
     my $sc = Net::SecurityCenter('sc.example.org');
 
-    $sc->login('secman', 'password');
+    if (! $sc->login(username => 'secman', password => 's3cr3t')) {
+        die $sc->error;
+    }
 
     my $running_scans = $sc->scan_result->list_running;
 
@@ -156,15 +147,15 @@ Params:
 
 =over 4
 
-=item * C<timeout> : Request timeout in seconds (default is C<180> seconds).
-If a socket open, read or write takes longer than the timeout, an exception is thrown.
+=item * C<timeout> : Request timeout in seconds (default is 180) If a socket open,
+read or write takes longer than the timeout, an exception is thrown.
 
 =item * C<ssl_options> : A hashref of C<SSL_*> options to pass through to L<IO::Socket::SSL>.
 
-=item * C<logger> : A logger instance (eg. L<Log::Log4perl> or L<Log::Any> for log
-the REST request and response messages.
+=item * C<logger> : A logger instance (eg. L<Log::Log4perl>, L<Log::Any> or L<Mojo::Log>)
+for log the REST request and response messages.
 
-=item * C<no_check> : Disable the check of SecurityCenter instance.
+=item * C<scheme> : URI scheme (default: HTTPS).
 
 =back
 
@@ -175,13 +166,16 @@ the REST request and response messages.
 
 Return the instance of L<Net::SecurityCenter::REST> class
 
-=head2 $sc->login ( $username, $password )
+=head2 $sc->login ( ... )
 
 Login into SecurityCenter.
+
+See "Username and password authetication" and "API Key authentication" in L<Net::SecurityCenter::REST>.
 
 =head2 $sc->logout
 
 Logout from SecurityCenter.
+
 
 =head1 HELPER METHODS
 
@@ -200,6 +194,10 @@ Return L<Net::SecurityCenter::API::Feed> instance.
 =head2 file
 
 Return L<Net::SecurityCenter::API::File> instance.
+
+=head2 notification
+
+Return L<Net::SecurityCenter::API::Notification> instance.
 
 =head2 plugin
 

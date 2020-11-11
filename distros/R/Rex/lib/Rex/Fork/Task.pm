@@ -6,11 +6,12 @@
 
 package Rex::Fork::Task;
 
+use 5.010001;
 use strict;
 use warnings;
 use POSIX ":sys_wait_h";
 
-our $VERSION = '1.13.0'; # VERSION
+our $VERSION = '1.13.1'; # VERSION
 
 sub new {
   my $that  = shift;

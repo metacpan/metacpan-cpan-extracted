@@ -218,6 +218,15 @@ sub run_tests {
 	is( $error,'invalid_grant','has error' );
 
 	( $res,$error ) = $Grant->verify_token_and_scope(
+		auth_header      => "Bearer ",
+		scopes           => [ qw/ drink / ],
+		is_refresh_token => 0,
+	);
+
+	ok( ! $res,'->verify_access_token, empty Bearer token' );
+	is( $error,'invalid_request','has error' );
+
+	( $res,$error ) = $Grant->verify_token_and_scope(
 		auth_header      => "Bearer $access_token",
 		scopes           => $scopes_ref,
 		is_refresh_token => 0,

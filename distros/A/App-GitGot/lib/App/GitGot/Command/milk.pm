@@ -1,6 +1,6 @@
 package App::GitGot::Command::milk;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::milk::VERSION = '1.337';
+$App::GitGot::Command::milk::VERSION = '1.339';
 use 5.014;
 
 # ABSTRACT: well, do you?
@@ -41,7 +41,7 @@ App::GitGot::Command::milk - well, do you?
 
 =head1 VERSION
 
-version 1.337
+version 1.339
 
 =head1 AUTHOR
 

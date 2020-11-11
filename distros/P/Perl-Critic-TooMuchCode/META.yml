@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.028, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,7 +37,7 @@ provides:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
   Perl::Critic::TooMuchCode:
     file: lib/Perl/Critic/TooMuchCode.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   List::Util: '1.50'
   PPIx::Utils: '0.002'
@@ -46,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/gugod/Perl-Critic-TooMuchCode/issues
   repository: https://github.com/gugod/Perl-Critic-TooMuchCode.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

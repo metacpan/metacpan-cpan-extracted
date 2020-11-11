@@ -41,9 +41,10 @@
       "x_mentions" : {
          "x_mentions" : {
             "App::DiffDocText" : "0",
+            "App::DiffXlsText" : "0",
+            "App::GrepUtils" : "0",
             "App::diffwc" : "0",
             "App::gitwrap" : "0",
-            "App::lcpan" : "0",
             "App::manwrap::pm" : "0",
             "App::rsync::new2old" : "0",
             "App::rsynccolor" : "0",
@@ -64,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-CLI-Wrapper-UnixCommand"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -74,6 +75,11 @@
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules",
             "name" : "Acme::CPANModules",
             "version" : "0.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -164,7 +170,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -184,7 +190,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.041"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -233,9 +239,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -394,7 +400,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Acme::CPANModules",
                         "name" : "-Acme::CPANModules",
-                        "version" : "0.003"
+                        "version" : "0.004"
                      }
                   ]
                }
