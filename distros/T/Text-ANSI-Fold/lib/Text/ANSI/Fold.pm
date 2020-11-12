@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.05";
+our $VERSION = "2.06";
 
 use Data::Dumper;
 use Carp;
@@ -32,7 +32,14 @@ my $alphanum_re = qr{ [_\d\p{Latin}] }x;
 my $reset_re    = qr{ \e \[ [0;]* m }x;
 my $color_re    = qr{ \e \[ [\d;]* m }x;
 my $erase_re    = qr{ \e \[ [\d;]* K }x;
-my $control_re  = qr{
+my $csi_re      = qr{
+    # see ECMA-48 5.4 Control sequences
+    \e \[		# csi
+    [\x30-\x3f]*	# parameter bytes
+    [\x20-\x2f]*	# intermediate bytes
+    [\x40-\x7e]		# final byte
+}x;
+my $osc_re      = qr{
     # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
     \e \]			# osc
     [\x08-\x13\x20-\x7d]*+	# command
@@ -93,7 +100,7 @@ sub new {
 	runout    => $DEFAULT_RUNOUT_WIDTH,
 	expand    => 0,
 	tabstop   => 8,
-	keep_el   => 1,
+	discard   => {},
     }, $class;
 
     $obj->configure(@_) if @_;
@@ -139,6 +146,9 @@ sub configure {
 	my($a, $b) = splice @_, 0, 2;
 	croak "$a: invalid parameter\n" if not exists $obj->{$a};
 	$obj->{$a} = $b;
+    }
+    if (ref $obj->{discard} eq 'ARRAY') {
+	$obj->{discard} = { map { uc $_ => 1 } @{$obj->{discard}} };
     }
     $obj;
 }
@@ -200,13 +210,13 @@ sub fold {
 	    next;
 	}
 	# ECMA-48 OPERATING SYSTEM COMMAND
-	if (s/\A($control_re)//) {
-	    $folded .= $1;
+	if (s/\A($osc_re)//) {
+	    $folded .= $1 unless $obj->{discard}->{OSC};
 	    next;
 	}
 	# erase line (assume 0)
 	if (s/\A($erase_re)//) {
-	    $folded .= $1 if $obj->{keep_el};
+	    $folded .= $1 unless $obj->{discard}->{EL};
 	    @bg_stack = @color_stack;
 	    next;
 	}
@@ -282,7 +292,7 @@ sub fold {
 	and my($tail) = /^(${alphanum_re}+)/o
 	and $folded =~ m{
 		^
-		( (?: [^\e]* (?:${color_re}|${erase_re}) ) *+ )
+		( (?: [^\e]* ${csi_re}++ ) *+ )
 		( .*? )
 		( ${alphanum_re}+ )
 		\z
@@ -439,7 +449,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.05
+Version 2.06
 
 =head1 SYNOPSIS
 
@@ -627,11 +637,11 @@ Tells how to treat Unicode East Asian ambiguous characters.  Default
 is "narrow" which means single column.  Set "wide" to tell the module
 to treat them as wide character.
 
-=item B<keep_el> => I<bool>
+=item B<discard> => [ "EL", "OSC" ]
 
-Keep sole ANSI Erase Line sequence or not.  Default is 1.  If not
-true, individual Erase Line sequence is not kept in the result string.
-Erase Line right after RESET sequence is always kept.
+Specify the list reference of control sequence name to be discarded.
+B<EL> means Erase Line; B<OSC> means Operating System Command, defined
+in ECMA-48.  Erase Line right after RESET sequence is always kept.
 
 =item B<linebreak> => I<mode>
 

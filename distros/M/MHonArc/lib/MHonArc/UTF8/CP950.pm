@@ -1,4 +1,7 @@
 package MHonArc::UTF8::CP950;
+
+our $VERSION = '2.6.23';
+
 +{
 '¡±','Â§',
 '¡Â','Â¯',

@@ -15,7 +15,7 @@ my $builder = Module::Build->new(
     dist_name => "Mozilla-PublicSuffix",
     license => "MIT",
     dist_abstract => q(Get a domain name's public suffix via Mozilla's Public Suffix List),
-    dist_author => q"Richard Simões <rsimoes AT cpan DOT org>",
+    dist_author => q"Tom Hukins <tom@eborcom.com>",
     dist_version_from => "lib/Mozilla/PublicSuffix.pm",
     # Prerequisites inserted by DistZilla:
       'build_requires' => {
@@ -24,7 +24,6 @@ my $builder = Module::Build->new(
     'IPC::Open3' => '0',
     'Module::Build' => '0.28',
     'Test::More' => '0',
-    'blib' => '1.01',
     'perl' => '5.008'
   },
   'configure_requires' => {
@@ -49,7 +48,7 @@ my $get_new_list = $builder->y_n(
 if ($get_new_list) {
     my $http = HTTP::Tiny->new( timeout => 6 );
     my $list_uri = URI->new(
-        "http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/$dat_file"
+        "https://publicsuffix.org/list/$dat_file"
     );
     $list_uri->query_form({ raw => 1 });
     my %options = (

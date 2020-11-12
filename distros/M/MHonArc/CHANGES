@@ -12,6 +12,44 @@
     all visible changes.
 
 YYYY/MM/DD
+
+============================================================================
+2020/11/12	(2.6.23)
+
+* Bug Fixes:
+
+  * Modify version due to PAUSE conflict
+
+============================================================================
+2020/09/21	(2.6.22)
+
+* Bug Fixes:
+
+  * Modify version due to PAUSE conflict
+
+============================================================================
+2020/09/14	(2.6.21)
+
+* Bug Fixes:
+
+  * Modify version declaration to allow PAUSE indexing
+
+============================================================================
+2020/09/14	(2.6.20)
+
+* MHonarc is now under the responsabilité of the Sympa community
+  Repository is https://github.com/sympa-community/MHonArc
+  Issues are tracked on https://github.com/sympa-community/MHonArc/issues
+* Some continuous integration (CI) has been added to the project to add a
+  minimum of tests
+
+* Bug Fixes:
+
+    Bug ID  Summary
+    ------  ------------------------------------------------------------
+    76857   Deprecation warnings in Perl 5.12/5.14
+    ------  ------------------------------------------------------------
+
 ============================================================================
 2014/04/21	(2.6.19)
 

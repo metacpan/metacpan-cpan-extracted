@@ -1,3 +1,8 @@
+0.34.18 2020-11-12 11:45:30 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - only accept POST requests as the qx plugin is very
+   lax with handling GET requests regarding header security
+
 0.34.17 2020-10-08 16:03:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix UserList range

@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.06 2020-11-12T04:18:29Z
+
+    - More robust definition of CSI sequence.
+    - Change keep_el -> discard.
+
 2.05 2020-11-11T08:24:22Z
 
     - Fix word boundary handling bug introduced at 2.03.

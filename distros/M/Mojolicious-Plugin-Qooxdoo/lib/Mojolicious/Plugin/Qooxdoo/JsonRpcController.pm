@@ -13,7 +13,7 @@ use Encode;
 
 has toUTF8 => sub { find_encoding('utf8') };
 
-our $VERSION = '1.0.7';
+our $VERSION = '1.0.9';
 
 has 'service';
 
@@ -43,27 +43,35 @@ sub dispatch {
     for ( $self->req->method ){
         /^POST$/ && do {
             # Data comes as JSON object, so fetch a reference to it
+            my $type = $self->req->headers->content_type//'*missing header*';
+            if ($type !~ m{^application/json\b}i) {
+                $log->error("unexpected Content-Type header: $type (should be application/json)");
+                $self->render(text => "invalid payload format announcement", status=>500);
+                return;
+            }
             $data = eval { decode_json($self->req->body) };
-	    	if ($@) {
-				my $error = "Invalid json string: " . $@;
-				$log->error($error);
-				$self->render(text => $error, status=>500);
-				return;
-	    	};
+            if ($@) {
+                my $error = "Invalid json string: " . $@;
+                $log->error($error);
+                $self->render(text => "invalid payload format", status=>500);
+                return;
+            };
             $self->requestId($data->{id});
             $self->crossDomain(0);
             last;
         };
         /^GET$/ && do {
-
+            # not checking the content header here since we are trying to
+            # to a cross domain request ... all sorts of things may have
+            # happened to the data since this
             $data= eval { decode_json($self->param('_ScriptTransport_data')) };
 
             if ($@) {
-				my $error = "Invalid json string: " . $@;
-				$log->error($error);
-				$self->render(text => $error, status=>500);
-				return;
-	    	};
+                my $error = "Invalid json string: " . $@;
+                $log->error($error);
+                $self->render(text => $error, status=>500);
+                return;
+            };
 
             $self->requestId($self->param('_ScriptTransport_id')) ;
             $self->crossDomain(1);
@@ -182,8 +190,8 @@ sub logRpcCall {
 }
 
 sub renderJsonRpcResult {
-	my $self = shift;
-	my $data = shift;
+    my $self = shift;
+    my $data = shift;
     my $reply = { id => $self->requestId, result => $data };
     $self->logRpcReturn(dclone($reply));
     $self->finalizeJsonRpcReply(encode_json($reply));
@@ -203,10 +211,10 @@ sub logRpcReturn {
 }
 
 sub renderJsonRpcError {
-	my $self = shift;
-	my $exception = shift;
-	my $error;
-	for (ref $exception){
+    my $self = shift;
+    my $exception = shift;
+    my $error;
+    for (ref $exception){
         /HASH/ && $exception->{message} && do {
             $error = {
                 origin => $exception->{origin} || 2, 
@@ -234,8 +242,8 @@ sub renderJsonRpcError {
 }
 
 sub finalizeJsonRpcReply {
-	my $self  = shift;
-	my $reply = shift;
+    my $self  = shift;
+    my $reply = shift;
     if ($self->crossDomain){
         # for GET requests, qooxdoo expects us to send a javascript method
         # and to wrap our json a litte bit more

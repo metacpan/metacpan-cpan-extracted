@@ -2,7 +2,7 @@ package CPAN::Digger;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(getcwd);
@@ -13,13 +13,17 @@ use File::Temp qw(tempdir);
 use Log::Log4perl ();
 use LWP::UserAgent ();
 use MetaCPAN::Client ();
+use DateTime         ();
+use Template ();
+
+my @ci_names = qw(travis github_actions circleci appveyor azure_pipeline gitlab_pipeline);
 
 
 use CPAN::Digger::DB qw(get_fields);
 
 my $tempdir = tempdir( CLEANUP => ($ENV{KEEP_TEMPDIR} ? 0 : 1) );
 
-my %known_licenses = map {$_ => 1} qw(apache_2_0 artistic_2 bsd gpl_3 lgpl_2_1 lgpl_3_0 perl_5); # open_source, unknown
+my %known_licenses = map {$_ => 1} qw(apache_2_0 artistic_2 bsd gpl_2 gpl_3 lgpl_2_1 lgpl_3_0 perl_5); # open_source, unknown
 
 sub new {
     my ($class, %args) = @_;
@@ -28,11 +32,28 @@ sub new {
         $self->{$key} = $args{$key};
     }
     $self->{log} = uc $self->{log};
-    $self->{check_github} = delete $self->{github};
+    $self->{check_vcs} = delete $self->{vcs};
+    $self->{total} = 0;
+
+    my $dt = DateTime->now;
+    $self->{end_date}       = $dt->ymd;
+    if ($self->{days}) {
+        $self->{start_date}     = $dt->add( days => -$self->{days} )->ymd;
+    }
 
     $self->{db} = CPAN::Digger::DB->new(db => $self->{db});
 
     return $self;
+}
+
+sub read_dashboards {
+    my ($self) = @_;
+    my @pathes = ('dashboard', '/home/gabor/cpan/dashboard');
+    for my $path (@pathes) {
+        if (-e $path) {
+            $self->{dashboards} = { map { m{.*/([^/]+)\.json$}; $1 => 1 } glob "$path/authors/*.json" };
+        }
+    }
 }
 
 sub get_vcs {
@@ -100,7 +121,7 @@ sub get_data {
 }
 
 
-sub analyze_github {
+sub analyze_vcs {
     my ($data) = @_;
     my $logger = Log::Log4perl->get_logger();
 
@@ -141,19 +162,128 @@ sub analyze_github {
         return;
     }
 
-    $data->{travis} = -e "$repo/.travis.yml";
-    my @ga = glob("$repo/.github/workflows/*");
-    $data->{github_actions} = (scalar(@ga) ? 1 : 0);
-    $data->{circleci} = -e "$repo/.circleci";
-    $data->{appveyor} = (-e "$repo/.appveyor.yml") || (-e "$repo/appveyor.yml");
-    $data->{azure_pipelines} = -e "$repo/azure-pipelines.yml";
+    if ($data->{vcs_name} eq 'GitHub') {
+        analyze_github($data, $repo);
+    }
+    if ($data->{vcs_name} eq 'GitLab') {
+        analyze_gitlab($data, $repo);
+    }
 
-    for my $ci (qw(travis github_actions circleci appveyor)) {
+    for my $ci (@ci_names) {
         $logger->debug("Is CI '$ci'?");
         if ($data->{$ci}) {
             $logger->debug("CI '$ci' found!");
             $data->{has_ci} = 1;
         }
+    }
+}
+
+sub analyze_gitlab {
+    my ($data, $repo) = @_;
+
+    $data->{gitlab_pipeline} = -e "$repo/.gitlab-ci.yml";
+}
+
+sub analyze_github {
+    my ($data, $repo) = @_;
+
+    $data->{travis} = -e "$repo/.travis.yml";
+    my @ga = glob("$repo/.github/workflows/*");
+    $data->{github_actions} = (scalar(@ga) ? 1 : 0);
+    $data->{circleci} = -e "$repo/.circleci";
+    $data->{appveyor} = (-e "$repo/.appveyor.yml") || (-e "$repo/appveyor.yml");
+    $data->{azure_pipeline} = -e "$repo/azure-pipelines.yml";
+}
+
+sub html {
+    my ($self) = @_;
+
+    return if not $self->{html};
+    if (not -d $self->{html}) {
+        mkdir $self->{html};
+    }
+
+    $self->read_dashboards;
+
+    my @distros = @{ $self->{db}->db_get_every_distro() };
+    my %stats = (
+        total => scalar @distros,
+        has_vcs => 0,
+        vcs => {},
+        has_ci => 0,
+        ci => {},
+    );
+    for my $ci (@ci_names) {
+        $stats{ci}{$ci} = 0;
+    }
+    for my $dist (@distros) {
+        $dist->{dashboard} = $self->{dashboards}{ $dist->{author} };
+        if ($dist->{vcs_name}) {
+            $stats{has_vcs}++;
+            $stats{vcs}{ $dist->{vcs_name} }++;
+        }
+        if ($dist->{has_ci}) {
+            $stats{has_ci}++;
+            for my $ci (@ci_names) {
+                $stats{ci}{$ci}++ if $dist->{$ci};
+            }
+        }
+    }
+    if ($stats{total}) {
+        $stats{has_vcs_percentage} = int(100 * $stats{has_vcs} / $stats{total});
+        $stats{has_ci_percentage} = int(100 * $stats{has_ci} / $stats{total});
+    }
+
+
+    my $tt = Template->new({
+        INCLUDE_PATH => './templates',
+        INTERPOLATE  => 1,
+        WRAPPER      => 'wrapper.tt',
+    }) or die "$Template::ERROR\n";
+
+    my $report;
+    $tt->process('main.tt', {
+        distros => \@distros,
+        version => $VERSION,
+        timestamp => DateTime->now,
+        stats => \%stats,
+    }, \$report) or die $tt->error(), "\n";
+    my $html_file = File::Spec->catfile($self->{html}, 'index.html');
+    open(my $fh, '>', $html_file) or die "Could not open '$html_file'";
+    print $fh $report;
+    close $fh;
+}
+
+
+sub report {
+    my ($self) = @_;
+
+    return if not $self->{report};
+
+    print "Report\n";
+    print "------------\n";
+    my @distros = @{ $self->{db}->db_get_every_distro() };
+    if ($self->{limit} and @distros > $self->{limit}) {
+        @distros = @distros[0 .. $self->{limit}-1];
+    }
+    for my $distro (@distros) {
+        #die Dumper $distro;
+        printf "%s %-40s %-7s", $distro->{date}, $distro->{distribution}, ($distro->{vcs_url} ? '' : 'NO VCS');
+        if ($self->{check_vcs}) {
+            printf "%-7s", ($distro->{has_ci} ? '' : 'NO CI');
+        }
+        print "\n";
+    }
+
+    if ($self->{days}) {
+        my $distros = $self->{db}->get_distro_count($self->{start_date}, $self->{end_date});
+        my $authors = $self->{db}->get_author_count($self->{start_date}, $self->{end_date});
+        my $vcs_count = $self->{db}->get_vcs_count($self->{start_date}, $self->{end_date});
+        my $ci_count = $self->{db}->get_ci_count($self->{start_date}, $self->{end_date});
+        printf
+            "Last week there were a total of %s uploads to CPAN of %s distinct distributions by %s different authors. Number of distributions with link to VCS: %s. Number of distros with CI: %s.\n",
+            $self->{total}, $distros, $authors, $vcs_count,
+            $ci_count;
     }
 }
 
@@ -187,6 +317,13 @@ sub collect {
     my %distros;
     my @fields = get_fields();
     while ( my $item = $rset->next ) {
+            if ($self->{days}) {
+	            next if $item->date lt $self->{start_date};
+	            next if $self->{end_date} le $item->date;
+            }
+
+            $self->{total}++;
+
     		next if $distros{ $item->distribution }; # We have already deal with this in this session
             $distros{ $item->distribution } = 1;
 
@@ -206,16 +343,15 @@ sub collect {
     }
 
     # Check on the VCS
-    if ($self->{check_github}) {
+    if ($self->{check_vcs}) {
         $logger->info("Starting to check GitHub");
         for my $data (@all_the_distributions) {
             my $distribution = $data->{distribution};
             my $data_ref = $self->{db}->db_get_distro($distribution);
             next if not $data_ref->{vcs_name};
 
-            if ($self->{check_github} and $data_ref->{vcs_name} eq 'GitHub') {
-                analyze_github($data_ref);
-            }
+            analyze_vcs($data_ref);
+
             my %data = %$data_ref;
             $self->{db}->db_update($distribution, @data{@fields});
             sleep $self->{sleep} if $self->{sleep};
@@ -223,21 +359,8 @@ sub collect {
     }
 
 
-    if ($self->{report}) {
-        #print "Text report\n";
-        my @distros = @{ $self->{db}->db_get_every_distro() };
-        if ($self->{limit} and @distros > $self->{limit}) {
-            @distros = @distros[0 .. $self->{limit}-1];
-        }
-        for my $distro (@distros) {
-            #die Dumper $distro;
-            printf "%s %-40s %-7s", $distro->{date}, $distro->{distribution}, ($distro->{vcs_url} ? '' : 'NO VCS');
-            if ($self->{check_github}) {
-                printf "%-7s", ($distro->{has_ci} ? '' : 'NO CI');
-            }
-            print "\n";
-        }
-    }
+    $self->report;
+    $self->html;
 }
 
 

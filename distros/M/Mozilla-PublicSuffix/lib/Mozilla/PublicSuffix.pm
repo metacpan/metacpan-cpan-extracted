@@ -8,7 +8,7 @@ use URI::_idna;
 
 our @EXPORT_OK = qw(public_suffix);
 
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 # ABSTRACT: Get a domain name's public suffix via the Mozilla Public Suffix List
 
 my $dn_re = do {
@@ -155,9 +155,22 @@ public suffix.
 
 =back
 
-=head1 AUTHOR
+=head1 BUG REPORTS
+
+Please submit bug reports to L<<
+https://rt.cpan.org/Public/Dist/Display.html?Name=Mozilla::PublicSuffix
+>>.
+
+If you would like to send patches, please send a git pull request to L<<
+mailto:bug-Mozilla::PublicSuffix@rt.cpan.org >>.
+
+=head1 ORIGINAL AUTHOR
 
 Richard Simões C<< <rsimoes AT cpan DOT org> >>
+
+=head1 CURRENT MAINTAINER
+
+Tom Hukins
 
 =head1 COPYRIGHT & LICENSE
 

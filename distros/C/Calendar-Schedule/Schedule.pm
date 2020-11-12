@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(new);
 
 #<?echo "our \$VERSION = '$Meta->{version}';"!>#+
-our $VERSION = '1.19';#-
+our $VERSION = '1.20';#-
 
 # non-exported package globals
 use vars qw( $REweekday3 $REmonth3 $RE1st );

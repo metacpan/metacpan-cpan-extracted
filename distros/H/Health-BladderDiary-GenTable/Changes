@@ -1,3 +1,13 @@
+0.002   2020-11-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Some more convenience: allow entries as single lines if no blank lines
+	  are found, shortcut for events drink (d) & urination (u or urin),
+	  scrape u0..u10 for urgency=... and c0..c6 for color=clear/light
+	  yellow/etc (using the 7-color-of-test-tubes urine color chart).
+
+	- [test] Add some tests.
+
+
 0.001   2020-11-11  Released-By: PERLANCAR
 
         - First release.

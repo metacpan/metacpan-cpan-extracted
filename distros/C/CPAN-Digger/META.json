@@ -37,8 +37,9 @@
             "DBI" : "0",
             "LWP::UserAgent" : "0",
             "Log::Log4perl" : "0",
-            "MetaCPAN::Client" : "0",
-            "Path::Tiny" : "0"
+            "MetaCPAN::Client" : "2.026",
+            "Path::Tiny" : "0",
+            "Template" : "0"
          }
       },
       "test" : {
@@ -61,6 +62,6 @@
          "web" : "https://github.com/szabgab/CPAN-Digger"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

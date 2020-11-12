@@ -2,9 +2,9 @@ NAME
     Perinci::Result::Format::Lite - Format enveloped result
 
 VERSION
-    This document describes version 0.277 of Perinci::Result::Format::Lite
+    This document describes version 0.278 of Perinci::Result::Format::Lite
     (from Perl distribution Perinci-Result-Format-Lite), released on
-    2020-07-30.
+    2020-11-12.
 
 SYNOPSIS
 DESCRIPTION
@@ -19,6 +19,10 @@ ENVIRONMENT
     sure Text::Table::Org backend is already installed):
 
      % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid
+
+    For convenience, a default is chosen for you under certain condition.
+    When inside Emacs (environment "INSIDE_EMACS" is set),
+    "Text::Table::Org" is used as default.
 
   FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
     Set the default of "table_column_orders" in "format_options" in result

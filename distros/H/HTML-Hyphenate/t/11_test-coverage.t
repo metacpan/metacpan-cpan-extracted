@@ -6,11 +6,6 @@ use Test::More;
 # We need this otherwise testcover doesn't pick things up:
 use HTML::Hyphenate;
 
-if ( not $ENV{AUTHOR_TESTING} ) {
-    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
-    plan( skip_all => $msg );
-}
-
 sub cover {
     my $obj = HTML::Hyphenate->new();
     $obj->html(q{<p>hyphenated hyphenation</p>});

@@ -1,4 +1,7 @@
 package MHonArc::CharEnt::AppleCyrillic;
+
+our $VERSION = '2.6.23';
+
 +{
 'Ê','&#xA0;',
 '£','&#xA3;',

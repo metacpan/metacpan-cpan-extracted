@@ -4,7 +4,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.05
+Version 2.06
 
 # SYNOPSIS
 
@@ -190,11 +190,11 @@ function as well as **new** and **configure** method.
     is "narrow" which means single column.  Set "wide" to tell the module
     to treat them as wide character.
 
-- **keep\_el** => _bool_
+- **discard** => \[ "EL", "OSC" \]
 
-    Keep sole ANSI Erase Line sequence or not.  Default is 1.  If not
-    true, individual Erase Line sequence is not kept in the result string.
-    Erase Line right after RESET sequence is always kept.
+    Specify the list reference of control sequence name to be discarded.
+    **EL** means Erase Line; **OSC** means Operating System Command, defined
+    in ECMA-48.  Erase Line right after RESET sequence is always kept.
 
 - **linebreak** => _mode_
 - **runin** => _width_

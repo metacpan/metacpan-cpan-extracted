@@ -1,5 +1,9 @@
 Revision history for Perl extension Calendar::Schedule.
 
+1.20 Thu Nov 12 06:57:13 AST 2020
+ - fixing a testing issue on Windows in t/t02.t (thanks to CPAN testers)
+   (single quote in argv is printed in Windows, removed)
+
 1.19 Tue Nov 10 06:54:28 AST 2020
  - addressing some issues reported by testers, thanks to Alexandr Ciornii
    1. use of uninitialize value in comparisons, lines 1386 and 1208

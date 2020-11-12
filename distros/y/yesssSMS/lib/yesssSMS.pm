@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '2.15';
+our $VERSION = '2.20';
 
 sub new
 {
@@ -177,7 +177,6 @@ sub selectPhonenumber
 	$phoneParser->{'amountSubscriptions'}=0;
 	$phoneParser->{'amountItems'}=0;
 	$phoneParser->parse($self->{CONTENT}->decoded_content);
-
 	
 }
 
@@ -185,6 +184,7 @@ sub sendmessage
 {
 	my $self = shift;
 	my ($telnr,$message)=@_;
+	my $tokenParser;
 
 	# only send message when login was successful
 	if ($self->{LOGINSTATE} == 0)
@@ -212,13 +212,29 @@ sub sendmessage
 		return 4;
 	}
 
+	# get token for websms.php
+	$tokenParser=HTML::Parser->new(api_version=>3,
+		start_h => [\&websmsGetTokenStartTagParse, "self,tagname,attr"],
+		end_h => [\&websmsGetTokenEndTagParse, "self, tagname"]
+	);
+	$self->{'websmsToken'}='';
+	$tokenParser->{'inWebsmsSendForm'}=0;
+	$tokenParser->{'yesssSMSself'}=$self;
+	$tokenParser->parse($self->{CONTENT}->decoded_content);
+
 	# try to send message
-	$self->{CONTENT}=$self->{UA}->post($self->{URL}."websms_send.php",{'to_netz' => 'a','to_nummer' => $telnr,'nachricht' => $message});
+	$self->{CONTENT}=$self->{UA}->post($self->{URL}."websms_send.php",
+		{ 'to_netz' => 'a',
+			'to_nummer' => $telnr,
+			'nachricht' => $message,
+			'token' => $self->{'websmsToken'}
+		});
 
 	# stop on error
 	if (!($self->{CONTENT}->is_success))
 	{
-		$self->{LASTERROR}='Error while sending message';
+		$self->{LASTERROR}='Error while sending message ('.
+			$self->{CONTENT}->status_line.')';
 		$self->{RETURNCODE}=5;
 		return 5;
 	}
@@ -305,6 +321,7 @@ sub DESTROY
 
 ####### methods for parser
 # login/switch phone number
+
 sub loginStartTagParse
 {
 	my ($self, $tagname, $attr) = @_;
@@ -449,6 +466,48 @@ sub loginEndTagParse
 	}
 }
 
+## methods for parsing websms_send.php for the token
+sub websmsGetTokenStartTagParse
+{
+	my ($self, $tagname, $attr) = @_;
+
+	if ($self->{'inWebsmsSendForm'} != 1)
+	{
+		if ($tagname eq 'form')
+		{
+			if ($attr->{'action'} eq 'websms_send.php')
+			{
+				$self->{'inWebsmsSendForm'} = 1,
+			}
+		}
+	}
+	else
+	{
+		if ($tagname eq 'input')
+		{
+			if (($attr->{'type'} eq 'hidden') &&
+				($attr->{'name'} eq 'token'))
+			{
+				$self->{'yesssSMSself'}->{'websmsToken'}=$attr->{'value'};
+			}
+		}
+	}
+}
+
+sub websmsGetTokenEndTagParse
+{
+	my ($self, $tagname) = @_;
+
+	if ($self->{'inWebsmsSendForm'} == 1)
+	{
+		if ($tagname eq 'form')
+		{
+			$self->{'inWebsmsSendForm'} = 0;
+		}
+	}
+}
+
+
 sub trim
 {
 	my $string=$_[0];
@@ -520,11 +579,13 @@ yesssSMS - Send text messages to mobile phones through the website of yesss!
 =head1 DESCRIPTION
 
 Objects of the yesssSMS class are only able to send text messages to
-mobile phones through the website of yesss!. To be able to use this
-service, you need to have an account at yesss! (a mobile phone). The
-target phone number must be provided with the international code starting
-with 00 (e.g. 0043 for Austria). The text messages are limited to 160 
-characters.
+mobile phones through the website of yesss! (Kontomanager). Kontomanager
+might also be in use by other providers (probably Georg, Krone und Kurier, but
+this is not tested). Adopting yesssSMS for the use with other providers might
+be simple, feel free to contact me if you are willing to try.
+To be able to use this service, you need to have an account at yesss!
+(a mobile phone). The target phone number must be provided with the
+international code starting with 00 (e.g. 0043 for Austria).
 
 This module requires following modules:
 
@@ -688,6 +749,12 @@ Removed 'type' from subscriptions as they were removed from the site.
 =item 2.15
 
 Removed accidental remaining debug output
+
+=item 2.20
+
+Implemented token introduced on website on November 11th, 2020
+
+Added status_line in case of errors when sending message
 
 =back
 

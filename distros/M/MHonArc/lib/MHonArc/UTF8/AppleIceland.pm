@@ -1,4 +1,7 @@
 package MHonArc::UTF8::AppleIceland;
+
+our $VERSION = '2.6.23';
+
 +{
 'ส','ย ',
 'ม','ยก',

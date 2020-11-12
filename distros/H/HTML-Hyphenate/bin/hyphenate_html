@@ -1,37 +1,230 @@
-#!/usr/bin/env perl -w    # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2009-2018, Roland van Ipenburg
+#!/usr/bin/env perl
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2009-2020, Roland van Ipenburg
 use strict;
 use warnings;
 
 use utf8;
 use 5.016000;
+use open qw(:std :utf8);
 use English qw( -no_match_vars );
-BEGIN { our $VERSION = v1.1.1; }
+BEGIN { our $VERSION = v1.1.5; }
 
 use HTML::Hyphenate;
+use Getopt::Long;
+use Pod::Usage;
+
+my @INCL = ();
+my @EXCL = ();
 
 use Readonly;
 ## no critic qw(ProhibitCallsToUnexportedSubs)
-Readonly::Scalar my $MIN_LENGTH => 5;
+Readonly::Array my @GETOPT_CONFIG =>
+  qw(no_ignore_case bundling auto_version auto_help);
+Readonly::Array my @GETOPTIONS => (
+    q{length|l=i}, q{start|s=i}, q{end|e=i}, q{lang=s},
+    q{excluded!},  q{incl=s@},   q{excl=s@}, q{input|i=s},
+    q{output|o=s},
+);
 ## use critic
 
-my $hyphenator = HTML::Hyphenate->new();
-$hyphenator->min_length($MIN_LENGTH);
+my %OPTS_DEFAULT = (
+    'length'   => 10,
+    'start'    => 2,
+    'end'      => 2,
+    'lang'     => q{en_US},
+    'excluded' => 0,
+    'incl'     => \@INCL,
+    'excl'     => \@EXCL,
+);
+Getopt::Long::Configure(@GETOPT_CONFIG);
+my %opts = %OPTS_DEFAULT;
+Getopt::Long::GetOptions( \%opts, @GETOPTIONS ) or Pod::Usage::pod2usage(2);
 
-while ( my $filename = shift @ARGV ) {
-    open( my $fh, q{<:encoding(UTF-8)}, $filename )
-      ## no critic qw(RequireCarping RequireUseOfExceptions)
-      || die qq{Can't open UTF-8 encoded $filename: $ERRNO};
-    ## use critic
-    my $html = q{};
-    while ( my $line = <$fh> ) {
-        $html .= $line;
-    }
-    ## no critic qw(RequireCarping RequireUseOfExceptions)
-    close $fh || die qq{Can't close UTF-8 encoded $fh: $ERRNO};
-    ## use critic
-    binmode STDOUT, ':encoding(UTF-8)';
-    ## no critic qw(RequireCheckedSyscalls)
-    print $hyphenator->hyphenated($html);
-    ## use critic
+my $hyphenator = HTML::Hyphenate->new();
+$hyphenator->min_length( $opts{'length'} );
+$hyphenator->min_pre( $opts{'start'} );
+$hyphenator->min_post( $opts{'end'} );
+$hyphenator->default_lang( $opts{'lang'} );
+$hyphenator->default_included( !$opts{'excluded'} ? 1 : 0 );
+$hyphenator->classes_included( \@INCL );
+$hyphenator->classes_excluded( \@EXCL );
+
+if ( $opts{'input'} ) {
+    unshift @ARGV, $opts{'input'};
 }
+
+my $html = q{};
+while ( my $line = <> ) {
+    $html .= $line;
+}
+binmode STDOUT, ':encoding(UTF-8)';
+my $fh;
+if ( $opts{'output'} ) {
+## no critic qw(RequireUseOfExceptions)
+    open $fh, '>', $opts{'output'} or die "can't open file, $ERRNO\n";
+## use critic
+}
+else {
+    $fh = \*STDOUT;
+}
+## no critic qw(RequireUseOfExceptions)
+print {$fh} $hyphenator->hyphenated($html)
+  or die "can't print to file, $ERRNO\n";
+close $fh or die "can't close file, $ERRNO\n";
+## use critic
+
+__END__
+
+=encoding utf8
+
+=for stopwords Ipenburg Readonly merchantability Mojolicious lang index.html
+
+=head1 NAME
+
+hyphenate_html
+
+=head1 USAGE
+
+B<hyphenate_html>
+[B<--length> I<10>]
+[B<--start> I<2>]
+[B<--end> I<2>]
+[B<--lang> I<en_US>]
+I<index.html>
+
+B<hyphenate_html>
+[B<--excluded>]
+[B<--incl> I<class1>]
+[B<--incl> I<class2>]
+I<index.html>
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<length>: minimal length of a word that will be hyphenated. Defaults
+to 10.
+
+=item * C<start>: minimum number of characters at the start of a word that
+won't be hyphenated. Defaults to 2.
+
+=item * C<end>: minimum number of characters at the end of a word that won't
+be hyphenated. Defaults to 2.
+
+=item * C<lang>: default language used for hyphenation when a language isn't
+defined in the document itself. Defaults to C<en_US>.
+
+=item * C<excluded>: determine if nodes are to be hyphenated by default or
+need to have it's class specified by the C<incl> option. Defaults to false so
+without further classes given to include or exclude in the next options the
+content of all nodes is hyphenated. This is only to limit the number of soft
+hyphens added to the document: whether they are used to break words can and
+should be set using the CSS applied to the HTML.
+
+=item * C<incl>: classes of nodes that should have it's contents hyphenated.
+
+=item * C<excl>: classes of nodes that should not have it's contents
+hyphenated when C<excluded> is not set.
+
+=item * C<input>: input file. Defaults to standard input.
+
+=item * C<output>: output file. Defaults to standard output.
+
+=back
+
+=head1 DESCRIPTION
+
+Inserts soft hyphens in the words in an HTML document to get more control over
+at what position words are allowed to break and wrap over multiple lines when
+rendered in a browser.
+
+=head1 REQUIRED ARGUMENTS
+
+There are no required arguments.
+
+=head1 DIAGNOSTICS
+
+It dies with an error message when the input or output doesn't behave as
+expected.
+
+=head1 EXIT STATUS
+
+Nothing special.
+
+=head1 CONFIGURATION
+
+There is no configuration.
+
+=head1 DEPENDENCIES
+
+It depends on L<HTML::Hyphenate>, L<Getopt::Long> and L<Pod::Usage>.
+
+=head1 INCOMPATIBILITIES
+
+There are no known incompatibilities.
+
+=head1 BUGS AND LIMITATIONS
+
+=over 4
+
+=item * Perfect hyphenation can be more complicated than just inserting a
+hyphen somewhere in a word, and sometimes requires semantics to get it right.
+For example C<cafeetje> should be hyphenated as C<cafe-tje> and not
+C<cafee-tje> and C<buurtje> can be hyphenated as C<buur-tje> or C<buurt-je>,
+depending on it's meaning. While HTML could provide a bit more context (mainly
+the language being used) than plain text to handle these issues, the initial
+purpose of this module is to make it possible for HTML rendering engines that
+support soft hyphens to be able to break long words over multiple lines to
+avoid unwanted overflow.
+
+=item * The hyphenation doesn't get better than TeX::Hyphenate and it's
+hyphenation patterns provide.
+
+=item * The round trip from HTML source via Mojo::DOM to HTML source might
+introduce changes to the source, for example accented characters might be
+transformed to HTML encoded entity equivalents or Boolean attributes are
+converted to a different notation.
+
+=back
+
+Please report any bugs or feature requests at
+L<RT for rt.cpan.org|
+https://rt.cpan.org/Dist/Display.html?Queue=HTML-Hyphenate>.
+
+=head1 AUTHOR
+
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2009-2020, Roland van Ipenburg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

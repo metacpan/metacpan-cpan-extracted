@@ -66,7 +66,11 @@ has pluginMap => sub {
 sub allow_rpc_access {
     my $self = shift;
     my $method = shift;
-    
+    if (not $self->req->method eq 'POST') {
+        # sorry we do not allow GET requests
+        $self->log->error("refused ".$self->req->method." request");
+        return 0;
+    }
     if (not exists $allow{$method}){
         return 0;
     }

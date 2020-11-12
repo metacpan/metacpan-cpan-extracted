@@ -2,7 +2,7 @@ package CPAN::Digger::CLI;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Getopt::Long qw(GetOptions);
 
@@ -12,7 +12,7 @@ sub run {
     my %args = (
         report => undef,
         author => undef,
-        github => undef,
+        vcs    => undef,
         recent => undef,
         log    => 'INFO',
         help   => undef,
@@ -20,6 +20,8 @@ sub run {
         db     => undef,
         version => undef,
         limit   => undef,
+        days    => undef,
+        html    => undef,
     );
 
     GetOptions(
@@ -29,11 +31,13 @@ sub run {
         'recent=i',
         'limit=i',
         'sleep=i',
-        'github',
+        'vcs',
         'log=s',
         'report',
         'help',
         'version',
+	    'days:i',
+        'html=s',
     ) or usage();
     usage() if $args{help};
     if ($args{version}) {
@@ -53,25 +57,29 @@ sub usage {
 
 Usage: $0
     Required exactly one of them:
-       --recent N         (Number of the most recent packages to check)
-       --author PAUSEID
+        --recent N         (Number of the most recent packages to check)
+        --days N
 
-       --report           (Show text report at the end of processing.)
-       --log LEVEL        [ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF] (default is INFO)
+        --author PAUSEID
+        --limit N
 
-       --github           Fetch information from github
-       --sleep SECONDS    (Wait time between git clone operations, defaults to 0)
+        --report           (Show text report at the end of processing.)
+        --html DIR         Create HTML pages in the given directory.
+        --log LEVEL        [ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF] (default is INFO)
 
-       --db PATH          (path to SQLite database file, if not supplied using in-memory database)
+        --vcs              Fetch information from github, gitlab
+        --sleep SECONDS    (Wait time between git clone operations, defaults to 0)
 
-       --version
-       --help
+        --db PATH          (path to SQLite database file, if not supplied using in-memory database)
+
+        --version
+        --help
 
     Sample usage for authors:
-        $0 --author SZABGAB --report --github --sleep 3
+        $0 --author SZABGAB --report --vcs --sleep 3
 
     Sample usage in general:
-        $0 --recent 30 --report --github --sleep 3
+        $0 --recent 30 --report --vcs --sleep 3
 
 };
 }

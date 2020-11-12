@@ -1,4 +1,14 @@
 
+1.04 2020.11.12
+    - Add GitLab processing, recorgnize GitLab Pipeline.
+    - Include Azure Pipelines.
+    - Add links to https://cpandashboard.com/ and https://cpan.rocks/
+    - Generate static html report and publish it on https://cpan-digger.perlmaven.com/
+    - Add --days flag and report needed for the Perl Weekly report.
+    - Set minimum version of MetaCPAN::Client to 2.026 that I know works.
+    - Add more statistics.
+    - Show licenses, warn about unknown license.
+
 1.03 2020.11.07
     - Change default log level to INFO
     - Start checking license fields with several valid license keys

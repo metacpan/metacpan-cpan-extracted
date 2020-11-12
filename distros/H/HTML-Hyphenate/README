@@ -1,6 +1,6 @@
 HTML::Hyphenate is Copyright (C) 2009-2020, Roland van Ipenburg
 
-HTML::Hyphenate version v1.1.4
+HTML::Hyphenate version v1.1.5
 ==============================
 
 This module can be used to insert soft hyphens into HTML.

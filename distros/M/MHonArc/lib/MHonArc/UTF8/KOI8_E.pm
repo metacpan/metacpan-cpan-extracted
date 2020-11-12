@@ -1,4 +1,7 @@
 package MHonArc::UTF8::KOI8_E;
+
+our $VERSION = '2.6.23';
+
 +{
 ' ','Â ',
 '¡','Ñ’',

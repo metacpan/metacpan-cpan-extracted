@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Perinci::Result::Format::Lite",
   "PREREQ_PM" => {
-    "Data::Check::Structure" => 0,
+    "Data::Check::Structure" => "0.050",
     "Data::Dumper" => 0,
     "Exporter" => "5.57",
     "JSON::PP" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.277",
+  "VERSION" => "0.278",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Check::Structure" => 0,
+  "Data::Check::Structure" => "0.050",
   "Data::Dumper" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,

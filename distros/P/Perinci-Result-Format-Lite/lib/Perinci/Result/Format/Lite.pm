@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2020-07-30'; # DATE
-our $VERSION = '0.277'; # VERSION
+our $DATE = '2020-11-12'; # DATE
+our $VERSION = '0.278'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -343,7 +343,9 @@ sub __gen_table {
         } # END align columns
 
         my $fres;
-        if (my $backend = $ENV{FORMAT_PRETTY_TABLE_BACKEND}) {
+        my $backend = $ENV{FORMAT_PRETTY_TABLE_BACKEND};
+        $backend //= "Text::Table::Org" if $ENV{INSIDE_EMACS};
+        if ($backend) {
             require Text::Table::Any;
             $fres = Text::Table::Any::table(rows=>$data, header_row=>$header_row, backend=>$backend);
         } else {
@@ -533,7 +535,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.277 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-07-30.
+This document describes version 0.278 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-11-12.
 
 =head1 SYNOPSIS
 
@@ -556,6 +558,10 @@ different format, for example to generate Org tables (make sure
 L<Text::Table::Org> backend is already installed):
 
  % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid
+
+For convenience, a default is chosen for you under certain condition. When
+inside Emacs (environment C<INSIDE_EMACS> is set), C<Text::Table::Org> is used
+as default.
 
 =head2 FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
 

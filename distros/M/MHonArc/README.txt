@@ -1,3 +1,27 @@
+##############################################################################
+#                                                                            #
+#   This is the Conservatory archive of the MHonArc mail-to-HTML converter.  #
+#   MHonArc is written and still actively maintained by Earl Hood.  Because  #
+#   his CVS repository is currently not publicly accessible, we've created   #
+#   this Conservatory Git repository.  However, if you have bug reports or   #
+#   other questions, please bring them to https://www.mhonarc.org/.          #
+#                                                                            #
+#   The Conservatory (https://conservatory.github.io/) is a place where      #
+#   free software that has no other public version-controlled home on the    #
+#   Internet is made available in a git repository.  For MHonArc, we used    #
+#   https://www.mhonarc.org/MHonArc/CHANGES as a list of all the historical  #
+#   releases available, and found whatever release packages we could on the  #
+#   Internet.  We have committed each upstream release package as one git    #
+#   revision, starting from an early 1.0.0 zipfile from 1994.  We were not   #
+#   able to find every release, however.  We would happily rebuild the git   #
+#   repository to include more releases as people find them.                 # 
+#                                                                            #
+#   This README is the only file we've changed from upstream, and the only   #
+#   change we made was to add this note.  Below is the original content of   #
+#   the README file.                                                         #
+#                                                                            #
+##############################################################################
+
 ---------------------------------------------------------------------------
 			  README for MHonArc
 				 v2.6

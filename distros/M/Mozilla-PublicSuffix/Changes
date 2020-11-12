@@ -1,3 +1,8 @@
+v1.0.1    2020-10-11
+    - Updated the public suffix list to a current version for the first
+      time since 2016.
+    - New maintainer
+
 v1.0.0    2016-08-04 11:01:52-05:00 America/Chicago
     - Updated test suite to reflect new non-wildcarded .cy
     - Added .il to test suite

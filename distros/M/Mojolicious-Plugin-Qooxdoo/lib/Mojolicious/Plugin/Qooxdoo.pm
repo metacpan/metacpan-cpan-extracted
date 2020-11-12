@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions qw(splitdir updir catdir file_name_is_absolute);
 use Cwd qw(abs_path);
 
-our $VERSION = '1.0.8';
+our $VERSION = '1.0.9';
 
 sub register {
     my ($self, $app, $conf) = @_;

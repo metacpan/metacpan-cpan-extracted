@@ -1,3 +1,14 @@
+2020-11-11   Armin Fuerst <armin@fuerst.priv.at>
+
+  Release 2.20
+  Implemented token introduced on website on November 11th, 2020
+  Added status_line in case of errors when sending message
+
+2019-08-25   Armin Fuerst <armin@fuerst.priv.at>
+
+  Release 2.15
+  Removed accidental remaining debug output
+
 2019-08-25   Armin Fuerst <armin@fuerst.priv.at>
 
   Release 2.14

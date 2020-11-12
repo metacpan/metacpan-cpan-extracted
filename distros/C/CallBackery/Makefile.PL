@@ -13,7 +13,7 @@ WriteMakefile(
   LICENSE      => 'gpl_3',
   PREREQ_PM    => {
     'Mojolicious' => '8.26',
-    'Mojolicious::Plugin::Qooxdoo' => '1.0.8',
+    'Mojolicious::Plugin::Qooxdoo' => '1.0.9',
     'Config::Grammar' => '1.13',
     'Locale::PO' => '0.27',
     'JSON::Validator' => 0,

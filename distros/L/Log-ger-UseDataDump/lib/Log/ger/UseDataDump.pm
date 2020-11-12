@@ -1,7 +1,7 @@
 package Log::ger::UseDataDump;
 
-our $DATE = '2020-06-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-06-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use Data::Dump ();
 use Log::ger ();
@@ -24,7 +24,7 @@ Log::ger::UseDataDump - Use Data::Dump to dump data structures
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::UseDataDump (from Perl distribution Log-ger-UseDataDump), released on 2020-06-04.
+This document describes version 0.004 of Log::ger::UseDataDump (from Perl distribution Log-ger-UseDataDump), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -54,9 +54,25 @@ L<Log::ger>
 
 L<Data::Dump>
 
-Other modules to set data dumper for Log::ger: L<Log::ger::UseDataPrinter>,
-L<Log::ger::UseDataDumpColor>, L<Log::ger::UseDataDumpObjectAsString>,
-L<Log::ger::UseDataDumpOptions>, L<Log::ger::UseDataDumper>.
+Other modules to set data dumper for Log::ger:
+
+=over
+
+=item * L<Log::ger::UseDataBahe>
+
+=item * L<Log::ger::UseDataDumpColor>
+
+=item * L<Log::ger::UseDataDumpObjectAsString>
+
+=item * L<Log::ger::UseDataDumpOptions>
+
+=item * L<Log::ger::UseDataDumper>
+
+=item * L<Log::ger::UseDataDumperCompact>
+
+=item * L<Log::ger::UseDataPrinter>
+
+=back
 
 =head1 AUTHOR
 

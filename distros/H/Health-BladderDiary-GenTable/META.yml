@@ -6,7 +6,8 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::Deep: '0'
+  Test::More: '0.98'
   perl: '5.010001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Health-BladderDiary-GenTable
   homepage: https://metacpan.org/release/Health-BladderDiary-GenTable
   repository: git://github.com/perlancar/perl-Health-BladderDiary-GenTable.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

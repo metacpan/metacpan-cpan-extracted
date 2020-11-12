@@ -1,12 +1,14 @@
-yesssSMS version 1.00
+yesssSMS version 2.20
 =====================
 
 Objects of the yesssSMS class are only able to send text messages to
-mobile phones through the website of yesss!. To be able to use this
-service, you need to have an account at yesss! (a mobile phone). The
-target phone number must be provided with the international code starting
-with 00 (e.g. 0043 for Austria). The text messages are limited to 160 
-characters.
+mobile phones through the website of yesss! (Kontomanager). Kontomanager
+might also be in use by other providers (probably Georg, Krone und Kurier, but
+this is not tested). Adopting yesssSMS for the use with other providers might
+be simple, feel free to contact me if you are willing to try.
+To be able to use this service, you need to have an account at yesss!
+(a mobile phone). The target phone number must be provided with the
+international code starting with 00 (e.g. 0043 for Austria).
 
 INSTALLATION
 
@@ -29,7 +31,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014 by Armin Fuerst
+Copyright (C) 2014-2020 by Armin Fuerst
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

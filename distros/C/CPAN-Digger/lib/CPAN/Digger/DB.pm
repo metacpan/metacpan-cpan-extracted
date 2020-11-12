@@ -2,7 +2,7 @@ package CPAN::Digger::DB;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use DBI;
 use Exporter qw(import);
@@ -12,7 +12,7 @@ use Path::Tiny qw(path);
 
 our @EXPORT_OK = qw(get_fields);
 
-my @fields = qw(distribution version author date vcs_url vcs_name travis github_actions appveyor circleci has_ci license issues azure_pipelines);
+my @fields = qw(distribution version author date vcs_url vcs_name travis github_actions appveyor circleci has_ci licenses issues azure_pipeline gitlab_pipeline);
 sub get_fields {
     return @fields;
 }
@@ -94,6 +94,43 @@ sub db_get_every_distro {
     return \@distros;
 }
 
+sub get_distro_count {
+    my ($self, $start_date, $end_date) = @_;
+
+    my $sth = $self->{dbh}->prepare('SELECT COUNT(*) FROM dists WHERE date >= ? AND date < ?');
+    $sth->execute($start_date, $end_date);
+    my ($total) = $sth->fetchrow_array;
+    return $total;
+}
+
+sub get_author_count {
+    my ($self, $start_date, $end_date) = @_;
+
+    my $sth = $self->{dbh}->prepare('SELECT COUNT(DISTINCT(author)) FROM dists WHERE date >= ? AND date < ?');
+    $sth->execute($start_date, $end_date);
+    my ($total) = $sth->fetchrow_array;
+    return $total;
+}
+
+sub get_vcs_count {
+    my ($self, $start_date, $end_date) = @_;
+
+    my $sth = $self->{dbh}->prepare('SELECT COUNT(*) FROM dists WHERE vcs_name IS NOT NULL AND date >= ? AND date < ?');
+    $sth->execute($start_date, $end_date);
+    my ($total) = $sth->fetchrow_array;
+    return $total;
+}
+
+sub get_ci_count {
+    my ($self, $start_date, $end_date) = @_;
+
+    my $sth = $self->{dbh}->prepare('SELECT COUNT(*) FROM dists WHERE has_ci IS NOT NULL AND date >= ? AND date < ?');
+    $sth->execute($start_date, $end_date);
+    my ($total) = $sth->fetchrow_array;
+    return $total;
+}
+
+
 42;
 
 __DATA__
@@ -102,7 +139,7 @@ CREATE TABLE dists (
     date         VARCHAR(255),
     version      VARCHAR(255),
     author       VARCHAR(255),
-    license      VARCHAR(255),
+    licenses     VARCHAR(255),
     issues       VARCHAR(255),
     vcs_url      VARCHAR(255),
     vcs_name     VARCHAR(255),
@@ -110,6 +147,7 @@ CREATE TABLE dists (
     circleci         BOOLEAN,
     travis           BOOLEAN,
     github_actions   BOOLEAN,
-    azure_pipelines  BOOLEAN,
+    azure_pipeline   BOOLEAN,
+    gitlab_pipeline  BOOLEAN,
     has_ci           BOOLEAN
 );

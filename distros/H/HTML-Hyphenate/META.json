@@ -53,7 +53,7 @@
    "provides" : {
       "HTML::Hyphenate" : {
          "file" : "lib/HTML/Hyphenate.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/html-hyphenate"
       }
    },
-   "version" : "v1.1.4",
+   "version" : "v1.1.5",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

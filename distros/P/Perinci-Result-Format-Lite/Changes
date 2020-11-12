@@ -1,3 +1,9 @@
+0.278   2020-11-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Use Text::Table::Org as default table backend when inside
+	  Emacs.
+
+
 0.277   2020-07-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Try harder to detect aos, etc; instead of just looking at at

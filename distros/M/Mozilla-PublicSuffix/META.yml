@@ -1,6 +1,7 @@
 ---
 abstract: "Get a domain name's public suffix via the Mozilla Public Suffix List"
 author:
+  - 'Tom Hukins <tom@eborcom.com>'
   - 'Richard Simões <rsimoes AT cpan DOT org>'
 build_requires:
   File::Spec: '0'
@@ -8,7 +9,6 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.008'
 configure_requires:
   HTTP::Tiny: '0'
@@ -18,7 +18,7 @@ configure_requires:
   URI: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,8 +29,9 @@ requires:
   URI: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/rsimoes/mozilla-publicsuffix/issues
-  homepage: https://metacpan.org/release/Mozilla-PublicSuffix
-  repository: git://github.com/rsimoes/mozilla-publicsuffix.git
-version: v1.0.0
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Mozilla-PublicSuffix
+  repository: git://git.scrubhole.org/Mozilla-PublicSuffix
+version: v1.0.1
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

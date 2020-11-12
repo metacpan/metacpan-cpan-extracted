@@ -1,4 +1,7 @@
 package MHonArc::CharEnt::AppleCroatian;
+
+our $VERSION = '2.6.23';
+
 +{
 'Ê','&#xA0;',
 'Á','&#xA1;',

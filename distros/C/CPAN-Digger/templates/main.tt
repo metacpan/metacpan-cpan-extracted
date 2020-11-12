@@ -1,0 +1,112 @@
+<h1>CPAN Digger</h1>
+
+    <table class="table table-striped table-hover" id="sort_table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Author</th>
+          <th>Date</th>
+          <th>Licenses</th>
+          <th>VCS</th>
+          <th>Issues</th>
+          <th>CI</th>
+          <th>Dashboard</th>
+        </tr>
+      </thead>
+      <tbody>
+
+    [% FOREACH item IN distros %]
+        <tr>
+          <td><a href="https://metacpan.org/release/[% item.distribution %]">[% item.distribution %]</a></td>
+          <td><a href="https://metacpan.org/author/[% item.author %]">[% item.author %]</a></td>
+          <td>[% item.date %]</td>
+          <td>
+              [% IF item.licenses == 'unknown' %]
+                  <a class="badge badge-danger" href="https://perlmaven.com/how-to-add-the-license-field-to-meta-files-on-cpan">[% item.licenses %]</a>
+              [% ELSE %]
+                  [% item.licenses %]
+              [% END %]
+          </td>
+          <td>
+              [% IF item.vcs_url %]
+                  <a href="[% item.vcs_url %]">[% item.vcs_name %]</a>
+              [% ELSE %]
+                  <a class="badge badge-danger" href="https://perlmaven.com/how-to-add-link-to-version-control-system-of-a-cpan-distributions">Missing</a>
+              [% END %]
+          </td>
+          <td>[% item.issues %]</td>
+          <td>
+              [% IF item.has_ci %]
+                    [% IF item.travis %]
+                        Travis<br>
+                    [% END %]
+                    [% IF item.github_actions %]
+                        GitHub Actions<br>
+                    [% END %]
+                    [% IF item.appveyor %]
+                        Appveyor<br>
+                    [% END %]
+                    [% IF item.circleci %]
+                        CircleCI<br>
+                    [% END %]
+                    [% IF item.azure_pipeline %]
+                        Acure Pipelines
+                    [% END %]
+                    [% IF item.gitlab_pipeline %]
+                        Gitlab Pipelines
+                    [% END %]
+              [% ELSE %]
+                  <span class="badge badge-danger">No CI</span>
+              [% END %]
+          </td>
+          <td>
+              [% IF item.dashboard %]
+                  <a class="badge badge-success" href="https://cpandashboard.com/[% item.author %]/">Visit</a>
+              [% ELSE %]
+                  <a class="badge badge-warning" href="https://cpandashboard.com/">Add</a>
+              [% END %]
+          </td>
+        </tr>
+   [% END %]
+      </tbody>
+    </table>
+
+
+<h2>Statistics</h2>
+<ul>
+   <li>Total: [% stats.total %]</li>
+   <li>Has VCS: [% stats.has_vcs %] ( [% stats.has_vcs_percentage %]% )</li>
+   <li>- GitHub: [% stats.vcs.GitHub %]</li>
+   <li>- GitLab: [% stats.vcs.GitLab %]</li>
+   <li>Has CI: [% stats.has_ci %] ( [% stats.has_ci_percentage %]% )</li>
+   <li>- GitHub Actions: [% stats.ci.github_actions %]</li>
+   <li>- Azure Pipeline: [% stats.ci.azure_pipeline %]</li>
+   <li>- Travis-CI: [% stats.ci.travis %]</li>
+   <li>- CircleCI: [% stats.ci.circleci %]</li>
+   <li>- Appveyor: [% stats.ci.appveyor %]</li>
+   <li>- GitLab Pipeline: [% stats.ci.gitlab_pipeline %]</li>
+</ul>
+
+<!--
+<ul>
+    <li>Help module authors to ensure that each module that has a public Version Control System (VCS) also include a link to it in the meta files.</li>
+    <li>Help module authors to link to the preferred bug tracking system.</li>
+    <li>Help the projects to have a Continuous Integration (CI) system connected to their VCS.</li>
+    <li>Help module authors to add a license field to the meta files.</li>
+    <li>Help with the new (?) <b>contributing</b> file.</li>
+    <li>Suggest to add a Travis-CI badge to the README.md</li>
+    <li>Look at test coverage reports.</li>
+    <li>Maybe: Check if there are xt test?</li>
+    <li>Maybe: Check the Kwaletee metrics</li>
+</ul>
+
+<hr>
+If you are a CPAN author, see also the <a href="https://cpandashboard.com/">CPAN Dashboard</a> for your own personal dashboard.
+<p>
+Check our <a href="https://cpan.rocks/">CPAN.Rocks</a> to get some statistics of all the modules on CPAN.
+<p>
+Generated using CPAN::Digger Version [% version %]<br>
+Last updated: [% timestamp %] <a href="https://github.com/szabgab/cpan-digger-new">Source</a>
+Supported via <a href="https://www.patreon.com/szabgab">Patreon</a>
+-->
+

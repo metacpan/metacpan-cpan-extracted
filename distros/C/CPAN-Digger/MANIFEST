@@ -13,6 +13,7 @@ templates/distribution.html.ep
 templates/index.html.ep
 templates/layouts/main.html.ep
 templates/main.tt
+templates/wrapper.tt
 webapp.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

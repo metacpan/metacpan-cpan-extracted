@@ -1,4 +1,7 @@
 package MHonArc::UTF8::AppleCenteuro;
+
+our $VERSION = '2.6.23';
+
 +{
 'Ê','Â ',
 '£','Â£',

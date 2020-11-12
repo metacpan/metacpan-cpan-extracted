@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Perl/Critic/Policy/ProhibitOrReturn.pm
+minil.toml
+t/00_compile.t
+t/10_violation.t
+t/11_pass.t
+t/data/multi.pl
+t/data/only_return.pl
+t/data/pass.pl
+t/data/single.pl
+META.yml
+MANIFEST
