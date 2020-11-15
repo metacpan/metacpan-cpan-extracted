@@ -182,6 +182,7 @@ sub div {
 sub roundup ($$;$) {
     use integer;
     my($a, $b, $c) = @_;
+    return $a if $b == 0;
     div($a + ($c // 0), $b) * $b;
 }
 

@@ -1,5 +1,26 @@
 Revision history for Perl extension Package::Role::ini.
 
+0.07 2020-11-13
+  - Added t/002_live.t - Adding Test coverage
+  - Updated lib/Package/Role/ini.pm - Fixed issue with ini_path method
+
+0.06 2020-11-13
+  - Updated Makefile.PL to support meta::cpan better
+    - Added meta-spec version
+    - Added contributing files
+
+0.05 2020-11-12
+  - Updated Makefile.PL
+    - Added bugtracker
+    - Fixed homepage
+
+0.04 2020-11-12
+  - Updated Makefile.PL
+    - Added license and git for CPAN index
+
+0.03 2020-11-12
+  - Updated Makefile.PL - For CPAN testers
+
 0.02 2020-11-09
   - Updated lib/Package/Role/ini.pm
     - Renamed internal method to external methods

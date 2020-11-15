@@ -64,3 +64,14 @@ Revision history for Control-CLI-Extreme
 	  cables connected but with stacking-mode disabled on the switch.
 	* cmd_initiated_prompt() default prompt match pattern was not matching Y/N confirm prompts from
 	  ExtremeXOS family switches and is now changed to: '[?:=]\h*(?:\(.+?\)\h*)?$'
+
+1.05	2020-11-14
+	* Update to PassportERS VOSS error patterns
+	* Update to BaystackERS error patterns
+	* Was not locking correctly onto BaystackERS CLI prompts with the TACACS suffix "<level-XX>"
+	* Was not setting 'is_voss' attribute on new 5520 switches in VOSS persona
+	* Attributes 'oob_ip' and 'is_oob_connected' were not getting set with the new VSP segmented management
+	  stack introduced in VOSS8.2
+	* Detection of attributes 'is_slx_r' was giving uninitialized value errors on SLX versions 20 and above
+	  as the "r" is now omitted from the version going forward. Attribute 'is_slx_r' will still be set as
+	  SLX versions beyond 20 are implied to be SLX-R code stream

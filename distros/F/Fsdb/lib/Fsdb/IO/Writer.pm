@@ -2,9 +2,8 @@
 
 #
 # Fsdb::IO::Writer.pm
-# $Id: fd415a455a6624afba5caf36461747a81c2d0186 $
 #
-# Copyright (C) 2005-2013 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2005-2019 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -52,6 +51,10 @@ use Fsdb::IO;
     $fsdb = new Fsdb::IO::Writer(-file => '-',
 				    -fscode => 'S',
 				    -cols => [qw(firstcol second)]);
+    # or to add a column to a prior file
+    $in = new Fsdb::IO::Reader(-file => '-');
+    $out = new Fsdb::IO::Writer(-clone => $in, -outputheader => 'delay');
+    $out->col_create('new_column');
 
 Creates a new writer object.
 Always succeeds, but 

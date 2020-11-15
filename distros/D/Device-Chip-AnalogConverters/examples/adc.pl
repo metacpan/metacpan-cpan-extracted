@@ -37,10 +37,6 @@ END { $chip->protocol->power(0)->get if $chip }
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
-END {
-   $chip and $chip->protocol->power(0)->get;
-}
-
 my $HAVE_TRIGGER          = $chip->can( 'trigger' );
 my $HAVE_READ_ADC_VOLTAGE = $chip->can( 'read_adc_voltage' );
 my $HAVE_READ_ADC_RATIO   = $chip->can( 'read_adc_ratio' );
@@ -48,6 +44,8 @@ my $HAVE_READ_ADC_RATIO   = $chip->can( 'read_adc_ratio' );
 if( @ARGV ) {
    my %changes = map { ( $_ =~ m/^(.*?)=(.*)/ ) } @ARGV;
    $chip->change_config( %changes )->get;
+
+   sleep 0.1; # Allow chip to settle from any config changes
 }
 
 if( $chip->can( "init" ) ) {

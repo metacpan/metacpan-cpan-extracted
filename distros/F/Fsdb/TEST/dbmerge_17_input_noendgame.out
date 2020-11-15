@@ -998,6 +998,6 @@
 996	17
 997	17
 998	17
-#   | dbmerge --noendgame -n -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in n
 999	17
+#   | dbmerge --noendgame -n -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in n
 #   | dbrowuniq -c

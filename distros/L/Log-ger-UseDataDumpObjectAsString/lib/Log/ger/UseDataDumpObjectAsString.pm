@@ -1,9 +1,9 @@
 package Log::ger::UseDataDumpObjectAsString;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Log-ger-UseDataDumpObjectAsString'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Data::Dump::ObjectAsString ();
 use Log::ger ();
@@ -26,7 +26,7 @@ Log::ger::UseDataDumpObjectAsString - Use Data::Dump::ObjectAsString to dump dat
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::UseDataDumpObjectAsString (from Perl distribution Log-ger-UseDataDumpObjectAsString), released on 2020-06-04.
+This document describes version 0.002 of Log::ger::UseDataDumpObjectAsString (from Perl distribution Log-ger-UseDataDumpObjectAsString), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -56,9 +56,25 @@ L<Log::ger>
 
 L<Data::Dump::ObjectAsString>
 
-Other modules to set data dumper for Log::ger: L<Log::ger::UseDataDump>,
-L<Log::ger::UseDataDumpColor>, L<Log::ger::UseDataDumpOptions>,
-L<Log::ger::UseDataDumper>, L<Log::ger::UseDataPrinter>.
+Other modules to set data dumper for Log::ger:
+
+=over
+
+=item * L<Log::ger::UseDataBahe>
+
+=item * L<Log::ger::UseDataDump>
+
+=item * L<Log::ger::UseDataDumpColor>
+
+=item * L<Log::ger::UseDataDumpOptions>
+
+=item * L<Log::ger::UseDataDumper>
+
+=item * L<Log::ger::UseDataDumperCompact>
+
+=item * L<Log::ger::UseDataPrinter>
+
+=back
 
 =head1 AUTHOR
 

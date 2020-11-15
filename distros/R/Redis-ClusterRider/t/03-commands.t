@@ -2,7 +2,7 @@ use 5.008000;
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Fatal;
 BEGIN {
   require 't/test_helper.pl';
@@ -24,6 +24,12 @@ t_error_reply($cluster);
 t_multiword_command($cluster);
 t_keys($cluster);
 
+# try different combinations of options
+my $other_cluster = new_cluster(
+  refresh_interval => 0,
+  lazy => 1,
+);
+t_get($other_cluster);
 
 sub t_nodes {
   my $cluster = shift;

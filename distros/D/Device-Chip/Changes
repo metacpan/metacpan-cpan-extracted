@@ -1,5 +1,12 @@
 Revision history for Device-Chip
 
+0.14    2020-11-13
+        [CHANGES]
+         * Migrated Tickit UI files into their own distribution
+         * Permit Test::Device::Chip::Adapter to use the ->read method on SPI
+           protocol
+         * Use new `catch ($var)` syntax from Syntax::Keyword::Try 0.16
+
 0.13    2020-06-10
         [CHANGES]
          * Beginnings of a UART protocol type, sufficient for transmit-only or

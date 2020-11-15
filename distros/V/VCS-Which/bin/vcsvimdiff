@@ -20,7 +20,7 @@ use IO::Prompt qw/prompt/;
 use Path::Tiny;
 use File::Copy qw/copy/;
 
-our $VERSION = version->new('0.6.7');
+our $VERSION = version->new('0.6.8');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -179,9 +179,9 @@ sub replay {
             next if @files == 2 && $other->{'Lines added'} == 0 && $other->{'Lines removed'} == 0;
         }
 
-        print "y = yes continue (Default), n = not stop processing, s = skip this revision\n" if !$warned++;
+        print "y = yes continue (Default), n = not stop processing, s = skip this revision, d = show simple diff\n" if !$warned++;
         my $ans = prompt(
-            "Next revision $rev_old: Continue? [yns] ",
+            "Next revision $rev_old: Continue? [ynsd] ",
             '-tty',
             '-1',
             -d => 'y',
@@ -191,8 +191,14 @@ sub replay {
         last if $ans eq 'n' || $ans eq 'q';
         next if $ans eq 's';
 
-        # run the diff if not testing
-        diff(@files) if !$option{test};
+        if ($ans eq 'd') {
+            system 'diff', '-uN', @files;
+            redo;
+        }
+        else {
+            # run the diff if not testing
+            diff(@files) if !$option{test};
+        }
     }
     unlink "$tmp.$rev_old" if -e "$tmp.$rev_old";
     unlink $last           if $last && -e $last;
@@ -361,7 +367,7 @@ vcsvimdiff - Uses vimdiff to compare a file with it unmodified version or histor
 
 =head1 VERSION
 
-This documentation refers to vcsvimdiff version 0.6.7.
+This documentation refers to vcsvimdiff version 0.6.8.
 
 =head1 SYNOPSIS
 

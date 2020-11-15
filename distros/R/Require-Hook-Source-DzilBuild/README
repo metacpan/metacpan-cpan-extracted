@@ -1,0 +1,69 @@
+NAME
+    Require::Hook::Source::DzilBuild - Load module source code from
+    Dist::Zilla build files
+
+VERSION
+    This document describes version 0.003 of
+    Require::Hook::Source::DzilBuild (from Perl distribution
+    Require-Hook-Source-DzilBuild), released on 2020-11-13.
+
+SYNOPSIS
+    In your Dist::Zilla plugin, e.g. in "munge_files()":
+
+     sub munge_files {
+         my $self = shift;
+
+         local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $self->zilla), @INC);
+         require Foo::Bar; # will be searched from build files, if exist
+
+         ...
+     }
+
+DESCRIPTION
+    This is the Require::Hook version of the same functionality found in
+    Dist::Zilla::Role::RequireFromBuild.
+
+    It looks for files from "lib/" and "." of Dist::Zilla build files.
+
+METHODS
+  new(%args) => obj
+    Constructor. Known arguments:
+
+    *   die => bool (default: 0)
+
+        If set to 1, will die if filename to be "require()"-d does not exist
+        in build files. Otherwise if set to false (the default) will simply
+        decline if file is not found in build files.
+
+    *   debug => bool
+
+        If set to 1, will print more debug stuffs to STDERR.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Require-Hook-Source-DzilBuild>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Require-Hook-Source-DzilBuild>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Require-Hook-Source-D
+    zilBuild>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Dist::Zilla::Role::RequireFromBuild
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

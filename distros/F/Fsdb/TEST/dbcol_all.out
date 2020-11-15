@@ -1,0 +1,6 @@
+#fsdb fullname account passwd uid gid homedir shell
+John_Heidemann	johnh	*	2274	134	/home/johnh	/bin/bash
+Greg_Johnson	greg	*	2275	134	/home/greg	/bin/bash
+Root	root	*	0	0	/root	/bin/bash
+# this is a simple database
+#   | dbcol -a fullname

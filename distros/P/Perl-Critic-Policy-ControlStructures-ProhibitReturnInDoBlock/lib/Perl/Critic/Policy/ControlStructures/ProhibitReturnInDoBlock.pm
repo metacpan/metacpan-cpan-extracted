@@ -8,7 +8,7 @@ use Perl::Critic::Utils qw(:severities);
 use constant DESC => '"return" statement in "do" block.';
 use constant EXPL => 'A "return" in "do" block causes confusing behavior.';
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub supported_parameters { return (); }
 sub default_severity     { return $SEVERITY_HIGHEST; }
@@ -19,6 +19,7 @@ sub violates {
     my ($self, $elem, undef) = @_;
 
     return if !_is_do_block($elem);
+    return if _is_do_loop($elem);
 
     my @stmts = $elem->schildren;
     return if !@stmts;
@@ -37,6 +38,12 @@ sub _is_do_block {
 
     return 0 if !$elem->sprevious_sibling;
     return $elem->sprevious_sibling->content eq 'do';
+}
+
+sub _is_do_loop {
+    my ($elem) = @_;
+    return 0 if !$elem->snext_sibling;
+    return $elem->snext_sibling->content eq 'while' || $elem->snext_sibling->content eq 'until';
 }
 
 sub _is_return {

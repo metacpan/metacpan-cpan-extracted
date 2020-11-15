@@ -30,7 +30,15 @@ sub run {
 			}elsif($rand < 0.64 and $#{$chromosomes->[$idx]} < $#$_translations){
 				unshift @{$chromosomes->[$idx]}, rand > 0.5 ? 0 : 1;
 			}elsif($rand < 0.8){
-				tied(@{$chromosomes->[$idx]})->reverse;
+				##tied(@{$chromosomes->[$idx]})->reverse;
+				
+				#if( my $obj = tied( @{ $chromosomes->[ $idx ] } ) ){
+				#	$obj->reverse;
+				#}else{
+				#	@{ $chromosomes->[ $idx ] } = reverse @{ $chromosomes->[ $idx ] };
+				#}
+				#@{ $chromosomes->[ $idx ] } = reverse @{ $chromosomes->[ $idx ] };
+				
 			}else{
 				my $id = int rand @{$chromosomes->[$idx]};
 				$chromosomes->[$idx]->[$id] = $chromosomes->[$idx]->[$id] ? 0 : 1;

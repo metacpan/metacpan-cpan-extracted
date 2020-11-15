@@ -1,11 +1,8 @@
 package Image::Synchronize::GpsPositionCollection;
 
-use warnings;
-use strict;
+use Modern::Perl;
 
-use v5.10.0;
-
-use parent 'Exporter';
+#use parent 'Exporter';
 
 use Carp;
 use Image::Synchronize::Timerange;
@@ -265,6 +262,8 @@ $altitude]>.  The positions are sorted by decreasing scope length.
 
 sub position_for_time {
   my ( $self, $time, %options ) = @_;
+  $time = $time->time_utc
+    if Image::Synchronize::Timestamp->istypeof($time);
   my @results;
   foreach my $scope (
     sort { length($b) <=> length($a) or $a cmp $b }
@@ -430,7 +429,7 @@ Louis Strous E<lt>LS@quae.nlE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018 Louis Strous.
+Copyright (c) 2018 - 2020 Louis Strous.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

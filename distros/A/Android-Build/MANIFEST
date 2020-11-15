@@ -1,9 +1,10 @@
 Build.PL
+CHANGES
+CONTRIBUTING
 lib/Android/Build.pm
-MANIFEST			This list of files
-SampleApp/perl/generateAKey.pl
-SampleApp/perl/makeWithPerl.pl
-SampleApp/src/Activity.java
+MANIFEST
+README
+README.md
 test.pl
 META.yml
 META.json

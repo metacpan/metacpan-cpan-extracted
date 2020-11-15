@@ -1,6 +1,6 @@
 package Cassandra::Client::Error::WriteTimeoutException;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Error::WriteTimeoutException::VERSION = '0.17';
+$Cassandra::Client::Error::WriteTimeoutException::VERSION = '0.18';
 use parent 'Cassandra::Client::Error::Base';
 use 5.010;
 use strict;
@@ -24,7 +24,7 @@ Cassandra::Client::Error::WriteTimeoutException
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

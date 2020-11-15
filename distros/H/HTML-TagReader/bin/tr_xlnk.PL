@@ -324,7 +324,7 @@ E.g href="../" would become href="../index.html" if index.html exists.
 =head1 AUTHOR
 
 tr_xlnk is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 =cut
 

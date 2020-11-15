@@ -1,5 +1,25 @@
 Revision history for Perl extension AI::Genetic::Pro.
 
+1.004 Sun, 15 Nov 2020 14:18:24 +0100
+	- Added specification of required MCE version.
+
+1.003 Sun, 15 Nov 2020 09:14:05 +0100
+	- Fixed bug causing "internal error" in a case of cloning raw chromosomes.
+
+1.002 Sat, 14 Nov 2020 21:33:38 +0100
+	- Fixed bug in a documentation.
+
+1.001 Sat, 14 Nov 2020 19:20:53 +0100
+	- Fixed bug in a documentation.
+
+1.000 Sat, 14 Nov 2020 18:03:39 +0100
+	- Added support (long awaited ;) for multi-core processing, through MCE.
+	- Added direct support for native arrays instead of packed scalars (for chromosomes).
+	- Some bug fixes.
+
+0.401 Fri, 19 Nov 2011 19:22:45 +0100
+	- Some bug fixes.
+
 0.341 Mon, 23 Mar 2009 17:21:52 +0100
 	- Fixed bug in a documentation. Thanks to Randal L. Schwartz :-)
 

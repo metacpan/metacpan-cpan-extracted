@@ -1,6 +1,6 @@
 package Cassandra::Client::Policy::LoadBalancing::Default;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Policy::LoadBalancing::Default::VERSION = '0.17';
+$Cassandra::Client::Policy::LoadBalancing::Default::VERSION = '0.18';
 use 5.010;
 use strict;
 use warnings;
@@ -122,7 +122,7 @@ Cassandra::Client::Policy::LoadBalancing::Default
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
 package Test::Device::Chip::Adapter;
 
@@ -9,11 +9,11 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp;
 
-use Future;
+use Test::Future::Deferred;
 use List::Util 1.33 qw( first any );
 use Test::Builder;
 
@@ -46,6 +46,10 @@ instance. It operates in an "expect-and-check" style of mocking, requiring the
 test script to declare upfront what methods are expected to be called, and
 what values they return.
 
+Futures returned by this module will not yield results immediately; they must
+be awaited by invoking the C<< ->get >> method. This ensures that unit tests
+correctly perform the required asynchronisation.
+
 =cut
 
 sub new
@@ -61,33 +65,33 @@ sub make_protocol_GPIO
 {
    my $self = shift;
    $self->{protocol} = "GPIO";
-   return Future->done( $self );
+   return Test::Future::Deferred->done_later( $self );
 }
 
 sub make_protocol_I2C
 {
    my $self = shift;
    $self->{protocol} = "I2C";
-   return Future->done( $self );
+   return Test::Future::Deferred->done_later( $self );
 }
 
 sub make_protocol_SPI
 {
    my $self = shift;
    $self->{protocol} = "SPI";
-   return Future->done( $self );
+   return Test::Future::Deferred->done_later( $self );
 }
 
 sub make_protocol_UART
 {
    my $self = shift;
    $self->{protocol} = "UART";
-   return Future->done( $self );
+   return Test::Future::Deferred->done_later( $self );
 }
 
 sub configure
 {
-   Future->done;
+   Test::Future::Deferred->done_later;
 }
 
 sub _stringify
@@ -150,7 +154,7 @@ my %METHODS = (
    write           => [ undef,
                         [qw( SPI I2C UART )] ],
    read            => [ undef,
-                        [qw( I2C UART )] ],
+                        [qw( SPI I2C UART )] ],
    write_then_read => [ undef,
                         [qw( SPI I2C )] ],
    readwrite       => [ undef,
@@ -295,8 +299,8 @@ sub fails
 sub future
 {
    my $self = shift;
-   $self->[FAILURE] ? Future->fail( @{ $self->[FAILURE] } )
-                    : Future->done( @{ $self->[RETURN] } )
+   $self->[FAILURE] ? Test::Future::Deferred->fail_later( @{ $self->[FAILURE] } )
+                    : Test::Future::Deferred->done_later( @{ $self->[RETURN] } )
 }
 
 =head1 TODO

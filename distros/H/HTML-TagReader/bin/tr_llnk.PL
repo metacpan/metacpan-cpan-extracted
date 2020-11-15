@@ -409,7 +409,7 @@ tr_llnk -Al something.html
 =head1 AUTHOR
 
 tr_llnk is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 =cut
 

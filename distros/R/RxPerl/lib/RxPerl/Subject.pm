@@ -4,7 +4,12 @@ use warnings;
 
 use base 'RxPerl::Observable';
 
-our $VERSION = "v6.0.3";
+our $VERSION = "v6.1.1";
+
+# over-rideable
+sub _on_subscribe {
+    my ($self, $subscriber) = @_;
+}
 
 sub new {
     my ($class) = @_;
@@ -15,11 +20,13 @@ sub new {
         my ($subscriber) = @_;
 
         if ($self->{_closed}) {
-            $subscriber->{complete}->() if defined $subscriber->{complete};
+            my ($type, @args) = @{ $self->{_closed} };
+            $subscriber->{$type}->(@args) if defined $subscriber->{$type};
             return;
         }
 
         $subscribers{$subscriber} = $subscriber;
+        $self->_on_subscribe($subscriber);
 
         return sub {
             delete $subscribers{$subscriber};
@@ -29,7 +36,8 @@ sub new {
     $self->{_closed} = 0;
     foreach my $type (qw/ error complete /) {
         $self->{$type} = sub {
-            $self->{_closed} = 1;
+            return if $self->{_closed};
+            $self->{_closed} = [$type, @_];
             foreach my $subscriber (values %subscribers) {
                 $subscriber->{$type}->(@_) if defined $subscriber->{$type};
             }
@@ -45,6 +53,24 @@ sub new {
     };
 
     return $self;
+}
+
+sub next {
+    my $self = shift;
+
+    $self->{next}->(splice @_, 0, 1) if defined $self->{next};
+}
+
+sub error {
+    my $self = shift;
+
+    $self->{error}->(splice @_, 0, 1) if defined $self->{error};
+}
+
+sub complete {
+    my $self = shift;
+
+    $self->{complete}->() if defined $self->{complete};
 }
 
 1;

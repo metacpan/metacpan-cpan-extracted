@@ -137,7 +137,11 @@ As of 2013-09-21, we don't verify key order with options C<-M -S>.
 
 =item B<-k> or B<--key> KeyField
 
-specify which column is the key for grouping (default: the first column)
+Specify which column is the key for grouping (default: the first column).
+
+Note that dbmapreduce can only operate on one column as the key.
+To group on the combination of multiple columns,
+one must merge them, perhaps with L<dbcolmerge>.
 
 =item B<-S> or B<--pre-sorted>
 

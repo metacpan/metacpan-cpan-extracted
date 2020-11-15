@@ -3,9 +3,9 @@ NAME
     dump data structures
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Log::ger::UseDataDumpObjectAsString (from Perl distribution
-    Log-ger-UseDataDumpObjectAsString), released on 2020-06-04.
+    Log-ger-UseDataDumpObjectAsString), released on 2020-06-06.
 
 SYNOPSIS
      use Log::ger::UseDataDumpObjectAsString;
@@ -32,9 +32,21 @@ SEE ALSO
 
     Data::Dump::ObjectAsString
 
-    Other modules to set data dumper for Log::ger: Log::ger::UseDataDump,
-    Log::ger::UseDataDumpColor, Log::ger::UseDataDumpOptions,
-    Log::ger::UseDataDumper, Log::ger::UseDataPrinter.
+    Other modules to set data dumper for Log::ger:
+
+    *   Log::ger::UseDataBahe
+
+    *   Log::ger::UseDataDump
+
+    *   Log::ger::UseDataDumpColor
+
+    *   Log::ger::UseDataDumpOptions
+
+    *   Log::ger::UseDataDumper
+
+    *   Log::ger::UseDataDumperCompact
+
+    *   Log::ger::UseDataPrinter
 
 AUTHOR
     perlancar <perlancar@cpan.org>

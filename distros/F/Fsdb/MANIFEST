@@ -131,6 +131,8 @@ TEST/db_to_csv_no_comments.out
 TEST/db_to_html_table.cmd
 TEST/db_to_html_table.in
 TEST/db_to_html_table.out
+TEST/dbcol_all.cmd
+TEST/dbcol_all.out
 TEST/dbcol_create.cmd
 TEST/dbcol_create.out
 TEST/dbcol_ex.cmd
@@ -667,6 +669,9 @@ TEST/dbmerge2_ex_R.cmd
 TEST/dbmerge2_ex_R.out
 TEST/dbmerge2_two_input.cmd
 TEST/dbmerge2_two_input.out
+TEST/dbmerge_0_xargs.cmd
+TEST/dbmerge_0_xargs.in
+TEST/dbmerge_0_xargs.out
 TEST/dbmerge_16k.in
 TEST/dbmerge_17_input_endgame.cmd
 TEST/dbmerge_17_input_endgame.out
@@ -675,6 +680,9 @@ TEST/dbmerge_17_input_noendgame.out
 TEST/dbmerge_17_xargs.cmd
 TEST/dbmerge_17_xargs.in
 TEST/dbmerge_17_xargs.out
+TEST/dbmerge_1_xargs.cmd
+TEST/dbmerge_1_xargs.in
+TEST/dbmerge_1_xargs.out
 TEST/dbmerge_1k.in
 TEST/dbmerge_20_delayed.cmd
 TEST/dbmerge_20_delayed.out
@@ -855,6 +863,9 @@ TEST/dbroweval_unicode.out
 TEST/dbroweval_unicode_n.cmd
 TEST/dbroweval_unicode_n.code
 TEST/dbroweval_unicode_n.out
+TEST/dbrowuniq_delay_comments.cmd
+TEST/dbrowuniq_delay_comments.in
+TEST/dbrowuniq_delay_comments.out
 TEST/dbrowuniq_empty.cmd
 TEST/dbrowuniq_empty.in
 TEST/dbrowuniq_empty.out

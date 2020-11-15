@@ -1,278 +1,339 @@
-#!/usr/bin/perl -w
-use strict;
-use warnings;
+#!/usr/bin/perl
+use Modern::Perl;
 
-use Image::Synchronize::Timestamp;
-use Scalar::Util qw(refaddr);
+use Scalar::Util qw(refaddr looks_like_number);
 use Test::More;
-use Time::Local qw(timegm);
+use Time::Local qw(timegm_modern timelocal_modern);
+use Image::Synchronize::Timestamp;
 
 sub parse_components_ {
   Image::Synchronize::Timestamp::parse_components_(@_);
 }
 
-my $et = Image::Synchronize::Timestamp->new;
-isa_ok( $et, 'Image::Synchronize::Timestamp' );
-is( $et->time_local,      undef, 'time_local undef' );
-is( $et->time_utc,        undef, 'time_utc undef' );
-is( $et->offset_from_utc, undef, 'offset_from_utc undef' );
-is( $et->stringify,       undef, 'stringify undef' );
+# test unrecognized timestamp
+
+foreach my $test
+  (
+   undef,                       # undefined
+   '',                          # empty
+   '2001-02-03',                # date only
+   'some text',
+   ' 2001-02-03T04:05:06',      # whitespace prefix
+ )
 {
-  no warnings;    # don't complain about $et being undefined
-  is( "$et", '', 'stringify undef' );
+  my $et = Image::Synchronize::Timestamp->new($test);
+  ok(not(defined $et), 'unrecognized timestamp: ' . ($test // 'undef'));
 }
 
-foreach my $test (
-  {
-    in         => '2001-02-03T04:05:06+07:08:09',
-    components => [ 2001, 2, 3, 4, 5, 6, 7 * 3600 + 8 * 60 + 9 ]
-  },
-  {
-    in         => '2001-02-03T04:05:06+07:08',
-    components => [ 2001, 2, 3, 4, 5, 6, 7 * 3600 + 8 * 60 ]
-  },
-  {
-    in         => '2001-02-03T04:05:06-07:08',
-    components => [ 2001, 2, 3, 4, 5, 6, -7 * 3600 - 8 * 60 ]
-  },
-  {
-    in         => '2001-02-03T04:05:06Z',
-    components => [ 2001, 2, 3, 4, 5, 6, 0 ]
-  },
-  {
-    in         => '2001:02:03T04:05:06',
-    components => [ 2001, 2, 3, 4, 5, 6, undef ]
-  },
-  {
-    in         => '2001-02-03 04:05:06',
-    components => [ 2001, 2, 3, 4, 5, 6, undef ]
-  },
-  {
-    in         => '2001-02-03T04:05',
-    components => [ 2001, 2, 3, 4, 5, undef, undef ]
-  },
-  {
-    in         => '2001-02-03T04',
-    components => [ 2001, 2, 3, 4, undef, undef, undef ]
-  },
-  {
-    in         => '04:05:06',
-    components => [ undef, undef, undef, 4, 5, 6, undef ]
-  },
-  {
-    in         => '04:05:06-07:08',
-    components => [ undef, undef, undef, 4, 5, 6, -7 * 3600 - 8 * 60 ]
-  },
-  {
-    in         => '04:05:06+07',
-    components => [ undef, undef, undef, 4, 5, 6, 7 * 3600 ]
-  },
-  {
-    in         => '04:05',
-    components => [ undef, undef, undef, 4, 5, undef, undef ]
-  },
-  {
-    in         => '04',
-    components => [ undef, undef, undef, 4, undef, undef, undef ]
-  },
-  )
+my $chosen_time = 981180000;
+my $chosen_time_iso = '2001-02-03T06:00:00Z';
+is_deeply([gmtime($chosen_time)],
+          # sec,min,hr,mday,mon,year,wday,yday,isdst
+          [   0,  0, 6,   3,  1, 101,   6,  33,    0],
+          'check chosen time');
+
+# test various ways of specifying the same instant of time with
+# timezone, equivalent to 2001-02-03T06:00:00Z
+
+foreach my $test
+  (
+   '2001:02:03 14:00:00+08:00', # exif format with timezone
+   '2001-02-03 14:00:00+08:00', # - as date separator
+   '2001-02-03T14:00:00+08:00', # ISO 8601
+   '2001-02-03T14:00:00+08:00:00', # timezone seconds, too
+   '2001-02-03T14:00:00+08',    # timezone hours only
+   '2001-02-03T14:00+08:00',    # no clock seconds
+   '2001-02-03T14+08',          # no minutes or seconds
+   '2001-02-03T13+07',          # different timezone, same instant
+   '2001-02-03T06+00',          # UTC
+   '2001-02-03T06Z',            # UTC
+   '2001-02-03T05-01',          # negative timezone offset
+   '2001-02-03T05-1',           # single timezone hour digit
+   '2001-2-3T7+1',              # omit initial 0s
+ )
 {
-  is_deeply( [ parse_components_( $test->{in} ) ],
-    $test->{components}, "parse_components_ $test->{in}" );
+  my $et = Image::Synchronize::Timestamp->new($test);
+  is($et->time_utc, $chosen_time, "same instant with tz: $test");
 }
 
-foreach my $test (
-  {
-    in  => '2001-02-03T04:05:06+07:08:09',
-    out => '2001-02-03T04:05:06+07:08:09'
-  },
-  {
-    in  => '2001:02:03 04:05:06+07:08',
-    out => '2001-02-03T04:05:06+07:08'
-  },
-  {
-    in  => '2001-02-03T04:05:06-07:08',
-    out => '2001-02-03T04:05:06-07:08'
-  },
-  {
-    in  => '2001-02-03T04:05:06Z',
-    out => '2001-02-03T04:05:06+00:00'
-  },
-  {
-    in  => '2001-02-03T04:05:06+00:00',
-    out => '2001-02-03T04:05:06+00:00'
-  },
-  {
-    in  => '2001:02:03T04:05:06',
-    out => '2001-02-03T04:05:06'
-  },
-  {
-    in  => '2001-02-03 04:05:06',
-    out => '2001-02-03T04:05:06'
-  },
-  {
-    in  => '2001-02-03T04:05',
-    out => '2001-02-03T04:05:00'
-  },
-  {
-    in  => '2001-02-03T04',
-    out => '2001-02-03T04:00:00'
-  },
-  {
-    in  => '2001-02-03T04+01',
-    out => '2001-02-03T04:00:00+01:00'
-  },
-  )
+# test epoch
 {
-  is( Image::Synchronize::Timestamp->new( $test->{in} )->display_iso,
-    $test->{out}, 'timestamp ' . $test->{out} );
+  my $et = Image::Synchronize::Timestamp->new('1970-01-01T00+00');
+  is($et->time_utc, 0, 'epoch');
 }
 
-foreach my $test (
-  {
-    in  => [ '04:05:06', '2001-02-03T04:05:06+07:08:09' ],
-    out => '2001-02-03T04:05:06+07:08:09'
+# test minutes and seconds
+foreach my $test
+  (
+   {
+    in => '2001-02-03T14:15:16+08:00:00',
+    expect => $chosen_time + 15*60 + 16,
   },
-  {
-    in  => [ '12:15:33', '2001:02:03 04:05:06+07:08' ],
-    out => '2001-02-03T12:15:33+07:08'
+   {
+    in => '2001-02-03T14:00:00+08:09:10',
+    expect => $chosen_time - 9*60 - 10,
   },
-  {
-    in  => [ '01:00:00', '2001:02:03 04:05:06+07:08' ],
-    out => '2001-02-03T01:00:00+07:08'
-  },
-  {
-    in  => [ '16:05:07', '2001:02:03 04:05:06+07:08' ],
-    out => '2001-02-02T16:05:07+07:08'
-  },
-  {
-    in  => [ '16:05:06', '2001-02-03T04:05:06-07:08' ],
-    out => '2001-02-03T16:05:06-07:08'
-  },
-  {
-    in  => [ '16:05:05', '2001-02-03T04:05:06-07:08' ],
-    out => '2001-02-03T16:05:05-07:08'
-  },
-  )
+ )
 {
-  is( Image::Synchronize::Timestamp->new( @{ $test->{in} } )->display_iso,
-    $test->{out}, "2 timestamps @{$test->{in}}" );
+  my $et = Image::Synchronize::Timestamp->new($test->{in});
+  is($et->time_utc, $test->{expect}, 'same instant with tz: ' . $test->{in});
 }
 
-my $text = '2001:02:03 04:05:06';
-is_deeply(
-  [ parse_components_($text) ],
-  [ 2001, 2, 3, 4, 5, 6, undef ],
-  "parse_components_ $text"
-);
-is( $et->set_from_text($text)->stringify, $text, "set_from_text $text" );
-my $time = timegm( 6, 5, 4, 3, 2 - 1, 2001 - 1900 );
-is( $et->time_local,      $time, "time_local $text" );
-is( $et->time_utc,        undef, "time_utc $text" );
-is( $et->offset_from_utc, undef, "offset_from_utc $text" );
-is( $et->stringify,       $text, "stringify $text" );
-is( "$et",                $text, "stringify $text" );
+# test various ways of specifying the same time without a date, which
+# is 06:00:00Z
 
-$text = '2005-11-23 17:44:28+02:10';
-my $et2 = Image::Synchronize::Timestamp->new($text);
-my $time2 = timegm( 28, 44, 17, 23, 11 - 1, 2005 - 1900 );
-is( $et2->time_local, $time2, "time_local $text" );
-is( $et2->time_utc, $time2 - 2 * 3600 - 10 * 60, "time_utc $text" );
-is( $et2->offset_from_utc, 2 * 3600 + 10 * 60, "offset_from_utc $text" );
-my $text2 = $text;
-$text2 =~ s/-/:/g;
-is( $et2->stringify, $text2, "stringify $text" );
-is( "$et2",          $text2, "stringify $text" );
-
-my $et3 = $et->clone;
-isnt( refaddr($et3), refaddr($et), 'clone has different address' );
-ok( $et3 == $et,  'clone has same value' );
-ok( $et3 != $et2, 'different value' );
-
-my $et4 = Image::Synchronize::Timestamp->new('2005:11:23 17:44:28');
-ok( not( $et4->identical($et2) ), 'different, missing offset' );
-is( $et4->time_local, $et2->time_local, 'equal local time' );
-isnt( $et4->time_utc,        $et2->time_utc,        'unequal utc time' );
-isnt( $et4->offset_from_utc, $et2->offset_from_utc, 'unequal offset' );
-$et4 = $et4->combine($et2);
-isnt( refaddr($et4), refaddr($et2), 'not the same object' );
-is( "$et4", "$et2", 'the same stringification' );
-
-$et  = Image::Synchronize::Timestamp->new('2012-03-04T17:12:14');
-$et2 = Image::Synchronize::Timestamp->new('2012-03-04T20:12:14');
-is( $et2 - $et, 3 * 3600, 'difference no timezone' );
-
-$et = Image::Synchronize::Timestamp->new('2012-03-04T17:12:14+03:00');
-is( $et2 - $et, 3 * 3600, 'difference one timezone' );
-
-$et2 = Image::Synchronize::Timestamp->new('2012-03-04T20:12:14+02:00');
-is( $et2 - $et, 4 * 3600, 'difference two timezones' );
-
-$et3 = $et2 + 20;
-is( "$et3", '2012:03:04 20:12:34+02:00', 'add scalar' );
-$et3 = $et2 - 20;
-is( "$et3", '2012:03:04 20:11:54+02:00', 'subtract scalar' );
-
-foreach my $test (
-  [ '2012-03-04T05:06:07',       '2012-03-04T05:06:07' ],
-  [ '2012-03-04T05:06:07',       '2012-03-04T05:06:08' ],
-  [ '2012-03-04T05:06:07+08:00', '2012-03-04T05:06:08' ],
-  [ '2012-03-04T05:06:08+08:00', '2012-03-04T05:06:08' ],
-  [ '2012-03-04T05:06:07-08:00', '2012-03-04T05:06:08' ],
-  [ '2012-03-04T05:06:08-08:00', '2012-03-04T05:06:08' ],
-  [ '2012-03-04T05:06:07+08:00', '2012-03-04T05:06:08+08:00' ],
-  [ '2012-03-04T05:06:08+08:00', '2012-03-04T05:06:08+08:00' ],
-  [ '2012-03-04T06:06:08+08:00', '2012-03-04T05:06:08+07:00' ],
-  )
+foreach my $test
+  (
+   '+14:00:00+08:00',
+   '+14+8',
+   '+6Z',
+   '+06:00+00:00',
+   '14:00+8',
+   '14+8',
+   '6Z',
+   '6+0',
+   '6-0',
+ )
 {
-  ok(
-    Image::Synchronize::Timestamp->new( $test->[0] ) <=
-      Image::Synchronize::Timestamp->new( $test->[1] ),
-    "$test->[0] <= $test->[1]"
-  );
-  ok(
-    Image::Synchronize::Timestamp->new( $test->[1] ) >=
-      Image::Synchronize::Timestamp->new( $test->[0] ),
-    "$test->[1] >= $test->[0]"
-  );
+  my $et = Image::Synchronize::Timestamp->new($test);
+  is($et->time_utc, 21600, "same time with tz without a date: $test");
 }
 
-my $noet = Image::Synchronize::Timestamp->new;
-ok( $noet <= $noet, 'undef <= undef' );
-ok( $noet >= $noet, 'undef >= undef' );
-ok( $noet <= $et2,  'undef <= def' );
-ok( $et2 >= $noet,  'def >= undef' );
+# test various ways of specifying the same instant of time without
+# timezone, equivalent to 2001-02-03T06:00:00
 
-$et = Image::Synchronize::Timestamp->new('2012-03-04T17:12:14+03:00');
-is( $et->display_utc, '2012-03-04T14:12:14Z', 'utc' );
-$et2 = Image::Synchronize::Timestamp->new('2012-03-04T20:12:14');
+foreach my $test
+  (
+   '2001:02:03 06:00:00',          # exif format
+   '2001-02-03 06:00:00',          # - as date separator
+   '2001-02-03T06:00:00',          # ISO 8601
+   '2001-02-03T06:00',             # no clock seconds
+   '2001-02-03T06',                # no minutes or seconds
+ )
+{
+  my $et = Image::Synchronize::Timestamp->new($test);
+  is($et->time_local, $chosen_time, "same instant no tz: $test");
+}
 
-$et->set_timezone_offset(3600);
-is( $et->display_iso, '2012-03-04T15:12:14+01:00',
-    'set_timezone_offset w/tz' );
+# test minutes and seconds, without timezone
+foreach my $test
+  (
+   {
+    in => '2001-02-03T06:15:16',
+    expect => $chosen_time + 15*60 + 16,
+  },
+ )
+{
+  my $et = Image::Synchronize::Timestamp->new($test->{in});
+  is($et->time_local, $test->{expect}, 'same instant no tz: ' . $test->{in});
+}
 
-$et2->set_timezone_offset(3600);
-is( $et2->display_iso, '2012-03-04T20:12:14+01:00',
-  'set_timezone_offset wo/tz' );
+# test various ways of specifying the same time without a date and
+# timezone, equivalent to 06:00:00
 
-my $l   = $et->local_offset_from_utc;
-my $etu = $et->time_utc;
-$et = $et->clone_to_local_timezone;
-is( $et->time_utc,        $etu, 'clone_to_local_timezone' );
-is( $et->offset_from_utc, $l,   'local timezone offset' );
+foreach my $test
+  (
+   '+06:00:00',
+   '+6:0',
+ )
+{
+  my $et = Image::Synchronize::Timestamp->new($test);
+  is($et->time_local, 21600, "same time without a date or tz: $test");
+}
 
-$et->set_timezone_offset(3603);
-is( $et->display_iso, '2012-03-04T15:12:17+01:00:03',
-    'timezone with seconds' );
+# clone
 
-$et->set_timezone_offset(-3603);
-is(
-  $et->display_iso,
-  '2012-03-04T13:12:11-01:00:03',
-  'negative timezone with seconds'
-);
+{
+  my $et = Image::Synchronize::Timestamp->new('2000-01-01T11:03');
+  my $et2 = $et;
+  is("$et2", "$et", 'assignment yields same value');
+  is(refaddr($et2), refaddr($et), 'assignment yields ref to same object');
 
-is( $et->date, '2012:03:04', 'date' );
-is( $et->time, '13:12:11',   'time' );
+  $et = $et->clone;
+  is("$et2", "$et", 'clone yields same value');
+  isnt(refaddr($et2), refaddr($et), 'clone yields ref to other object');
+}
+
+# stringify
+
+{
+  my $et = Image::Synchronize::Timestamp->new('2000-01-01T11:03');
+  is("$et", '2000:01:01 11:03:00', 'implicit stringify');
+  is($et->stringify, '2000:01:01 11:03:00', 'explicit stringify');
+  is($et->display_iso, '2000-01-01T11:03:00', 'ISO 8601 stringify');
+  is($et->display_utc, undef, 'UTC stringify'); # no timezone, so undef
+  is($et->display_time, '+262979:03', 'time stringify');
+
+  $et = Image::Synchronize::Timestamp->new('2000-01-01T11:03:05');
+  is("$et", '2000:01:01 11:03:05', 'implicit stringify, with seconds');
+  is($et->stringify, '2000:01:01 11:03:05', 'explicit stringify, with seconds');
+  is($et->display_iso, '2000-01-01T11:03:05', 'ISO 8601 stringify, with seconds');
+  is($et->display_utc, undef, 'UTC stringify, with seconds'); # no timezone, so undef
+  is($et->display_time, '+262979:03:05', 'time stringify, with seconds');
+
+  $et = Image::Synchronize::Timestamp->new('2000-01-01T11:03+01');
+  is("$et", '2000:01:01 11:03:00+01:00', 'implicit stringify, with tz');
+  is($et->stringify, '2000:01:01 11:03:00+01:00', 'explicit stringify, with tz');
+  is($et->display_iso, '2000-01-01T11:03:00+01:00', 'ISO 8601 stringify, with tz');
+  is($et->display_utc, '2000-01-01T10:03:00Z', 'UTC stringify, with tz');
+  is($et->display_time, '+262979:03+01:00', 'time stringify, with tz');
+
+  $et = Image::Synchronize::Timestamp->new('16:44');
+  is("$et", '+16:44', 'implicit stringify (no date)');
+  is($et->stringify, '+16:44', 'explicit stringify (no date)');
+  is($et->display_iso, '+16:44', 'ISO 8601 stringify (no date)');
+  is($et->display_utc, undef, 'UTC stringify (no date)');
+  is($et->display_time, '+16:44', 'time stringify (no date)');
+}
+
+# query
+
+{
+  my $et = Image::Synchronize::Timestamp->new($chosen_time_iso);
+  is($et->time_utc, $chosen_time, 'time_utc');
+  is($et->time_local, $chosen_time, 'time_local'); # here same as UTC
+  is($et->timezone_offset, 0, 'timezone_offset');
+
+  $et->set_timezone_offset(3600); # UTC+1
+  is($et->time_utc, $chosen_time - 3600, 'time_utc (shifted tz)');
+  is($et->time_local, $chosen_time, 'time_local (shifted tz)');
+  is($et->timezone_offset, 3600, 'timezone_offset (shifted tz)');
+
+  my @t = localtime($chosen_time);
+  my $tz_offset = timegm_modern(@t) - timelocal_modern(@t);
+  is($et->local_timezone_offset, $tz_offset, 'local_timezone_offset');
+
+  ok($et->has_timezone_offset, 'has_timezone_offset');
+  $et->remove_timezone;
+  ok(not($et->has_timezone_offset), 'has_timezone_offset (no tz)');
+
+  ok(not($et->is_empty), 'is_empty (not empty)');
+
+  $et = Image::Synchronize::Timestamp->new;
+  ok($et->is_empty, 'is empty');
+
+  ok(Image::Synchronize::Timestamp->istypeof($et), 'istypeof (class)');
+  ok($et->istypeof($et), 'istypeof (object)');
+  ok(not($et->istypeof(3)), '3 is not a timestamp');
+}
+
+# combine
+
+{
+  my $et = Image::Synchronize::Timestamp->new($chosen_time_iso);
+  my $et2 = $et + 30;
+  is($et2->time_utc - $et->time_utc, 30, 'timestamp + 30');
+
+  $et2 = 30 + $et;
+  is($et2->time_utc - $et->time_utc, 30, '30 + timestamp');
+
+  $et2 += 20;
+  is($et2->time_utc - $et->time_utc, 50, 'timestamp += 20');
+
+  eval {
+    my $et3 = $et + $et2;
+  };
+  like($@, qr/^Sorry, cannot add Image::Synchronize::Timestamp and Image::Synchronize::Timestamp/, 'cannot add timestamps');
+
+  my $d = $et2 - $et;
+  is($d, 50, 'subtract timestamps');
+  $et2 = $et - 20;
+  is($et->time_utc - $et2->time_utc, 20, 'timestamp - 20');
+
+  $et->set_timezone_offset(3600);
+  $et2 = -$et;
+  is($et2->time_local, -$et->time_local, 'negative (time)');
+  is($et2->timezone_offset, $et->timezone_offset, 'negative (tz)');
+
+  $et2 = $et->clone;
+  $et -= 30;
+  is($et2->time_utc - $et->time_utc, 30, 'timestamp -= 30');
+
+  # now without timezone
+  
+  $et = Image::Synchronize::Timestamp->new($chosen_time_iso)
+    ->remove_timezone;
+  $et2 = $et + 30;
+  is($et2->time_local - $et->time_local, 30, 'timestamp + 30 (no tz)');
+
+  $et2 = 30 + $et;
+  is($et2->time_local - $et->time_local, 30, '30 + timestamp (no tz)');
+
+  $et2 += 20;
+  is($et2->time_local - $et->time_local, 50, 'timestamp += 20 (no tz)');
+
+  eval {
+    my $et3 = $et + $et2;
+  };
+  like($@, qr/^Sorry, cannot add Image::Synchronize::Timestamp and Image::Synchronize::Timestamp/, 'cannot add timestamps (no tz)');
+
+  $d = $et2 - $et;
+  is($d, 50, 'subtract timestamps (no tz)');
+  $et2 = $et - 20;
+  is($et->time_local - $et2->time_local, 20, 'timestamp - 20 (no tz)');
+
+  $et2 = -$et;
+  is($et2->time_local, -$et->time_local, 'negative (time) (no tz)');
+  ok(not($et2->has_timezone_offset), 'still no timezone after negative');
+
+  $et2 = $et->clone;
+  $et -= 30;
+  is($et2->time_local - $et->time_local, 30, 'timestamp -= 30 (no tz)');
+}
+
+# compare
+
+{
+  my $t1 = Image::Synchronize::Timestamp->new('+17:44:12+03:00');
+  my $t2 = Image::Synchronize::Timestamp->new('+15:44:12+01:00');
+  my $t3 = Image::Synchronize::Timestamp->new('+17:00:00+03:00');
+
+  ok($t1 == $t2, '==');    # same instant (though different timezones)
+  ok($t3 < $t1, '<');
+  ok($t3 <= $t1, '<=');
+  ok($t2 >= $t3, '>=');        # because compares UTC, not clock times
+  ok($t2 > $t3, '>');
+  ok($t3 != $t2, '!=');
+  ok($t1->identical($t1), 'identical'); # same clock time and timezone
+
+  ok(not($t1->identical($t2)), 'not identical'); # same instant but
+                                                 # not identical time
+                                                 # and timezone
+
+  # three-way compare
+  is($t1 <=> $t2, 0, '<=> 0');  # same instant
+  is($t1 <=> $t3, +1, '<=> +1'); # first one is later
+  is($t3 <=> $t1, -1, '<=> -1'); # first one is earlier
+}
+
+# modify
+
+{
+  my $et = Image::Synchronize::Timestamp->new($chosen_time_iso);
+  $et->set_from_text('+17:0'); # old contents are lost
+  is($et->display_time, '+17:00', 'set_from_text');
+  $et->set_from_text(17); # old contents are lost
+  is($et->display_time, '+00:00:17', 'set_from_text');
+}
+
+{
+  my $et = Image::Synchronize::Timestamp->new($chosen_time_iso); # 06+00
+  my $et2 = $et->clone->adjust_timezone_offset(-3600);           # 05-01
+  is($et2->time_utc, $et->time_utc, 'adjust_timezone_offset (utc)');
+  is($et2->time_local, $et->time_local - 3600,
+     'adjust_timezone_offset (local)');
+
+  $et = $et2->clone->adjust_to_utc; # 05-01 -> 06+00
+  is($et->time_utc, $et2->time_utc, 'adjust_to_utc (utc)');
+  is($et->time_local, $et2->time_local + 3600,
+     'adjust_to_utc (local)');
+
+  $et2 = $et->clone->set_timezone_offset(3600); # 05-01 -> 05+01
+  is($et->time_local, $et2->time_local, 'set_timezone_offset');
+  is($et2->timezone_offset, 3600, 'offset_from_utc');
+
+  $et2->remove_timezone;
+  ok(not(defined $et2->timezone_offset), 'remove_timezone');
+}
 
 done_testing();

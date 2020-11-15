@@ -1,0 +1,59 @@
+{
+   "abstract" : "an app that serves a wiki as a Gemini and web site",
+   "author" : [
+      "Alex Schroeder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-phoebe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Diff" : "0",
+            "File::ReadBackwards" : "0",
+            "File::Slurper" : "0",
+            "IO::Socket::INET6" : "0",
+            "IO::Socket::SSL" : "0",
+            "Modern::Perl" : "0",
+            "Net::Server" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.026000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://alexschroeder.ch/cgit/phoebe",
+         "web" : "https://alexschroeder.ch/cgit/phoebe/about/"
+      }
+   },
+   "version" : 1.21,
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -4,7 +4,6 @@ use warnings;
 use FindBin qw($Bin);
 use lib $Bin;
 use Test::More qw(no_plan);
-use Clone qw(clone);
 use Struct::Compare;
 use AI::Genetic::Pro;
 
@@ -55,7 +54,7 @@ $ga->init(BITS);
 
 my $population = [ ];
 for my $chromosome(@{$ga->chromosomes}){
-	push @$population, clone($chromosome);
+	push @$population, $chromosome->clone;
 }
 
 my @data;

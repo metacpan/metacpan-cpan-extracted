@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-dblistize - DEPRICATED, now use dbfilealter
+dblistize - DEPRECATED, now use dbfilealter
 
 =cut
 

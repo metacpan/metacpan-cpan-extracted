@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-MultiMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-multimethod>;
@@ -202,6 +202,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.901.tar.gz>;
 	doap:revision        "0.901"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.902"^^xsd:string;
+	dc:issued            "2020-11-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Should require Sub::Util 1.40, not Sub::Name 1.40.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.902.tar.gz>;
+	doap:revision        "0.902"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

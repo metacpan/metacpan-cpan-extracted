@@ -3,7 +3,7 @@
 #
 # Fsdb.pm
 #
-# Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.69';
+our $VERSION = '2.70';
 
 =head1 SYNOPSIS
 
@@ -235,30 +235,46 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.69, 2019-11-22
-a small bugfix in dbcolstats
+=head2 2.70, 2020-11-12
+Some small quality-of-life enhancements and corner-case bugfixes.
 
 =over 4
 
-=item BUG FIX
+=item ENHANCEMENT
 
-Filled in the the test case for autodecompress,
-which was missing for the 2.68 release.
+L<dbcol> can now take an option C<-a> to include all columns,
+allowing reordering of certain columns while passing the rest through.
 
 =item ENHANCEMENT
 
-The groff program is required for build,
-and the C<Makefile.PL> fails if groff is missing at build time.
-Thanks to Chris Williams for suggesting this check,
-and the CPAN auto-building system for trying many platforms.
+L<dbrowuniq> and L<dbmerge> now buffer comments in a way
+that the last row of data output is no longer in the last block of comments.
+(The data is identical, but for humans looking at output,
+this change makes it less likely to lose the last row.)
 
 =item BUG FIX
 
-The L<dbcolstats> program had numerical instability 
-that sometimes results in failing with a square-root of a negative
-number when many values varied right at the edge of floating-point 
-precision.  We now detect and report that case as 0 stddev.
-Thanks to Hang Guo for providing a test case.
+L<dbmultistats> and L<dbpipeline> documentation now indicates
+that they support C<--header> (something they did since version 2.62 in 2016-11-29,
+but now documented.
+
+=item ENHANCEMENT
+
+L<dbcolcreate> now supports C<--header>.
+
+=item BUG FIX
+
+Fixed several spelling errors in deprecated programs
+and removed information about the no-longer existing FreeBSD and MacOS ports.
+Thanks to Calvin Ardi for the patch.
+
+=item BUG FIX
+
+L<dbmerge> now handles --xargs when only one file is provided
+(and passes the file through unchanged).
+It also throws a clean error with --xargs if zero files are provided.
+(To support L<dbmerge>, L<dbcol> now has an internal C<--saveoutput> option.)
+Thanks to Yuri Pradkin for reporting the unhandled corner-case.
 
 =back
 
@@ -324,12 +340,9 @@ A test-suite is available, run it with
 
     make test
 
-A FreeBSD port to Fsdb is available, see
-L<http://www.freshports.org/databases/fsdb/>.
-
-A Fink (MacOS X) port is available, see
-L<http://pdb.finkproject.org/pdb/package.php/fsdb>.
-(Thanks to Lars Eggert for maintaining this port.)
+In the past, the ports existed for FreeBSD and MacOS.
+If someone running one of those OSes wants to contribute
+a new port, please let me know.
 
 
 =head1 BASIC DATA FORMAT
@@ -3600,6 +3613,34 @@ that extends with a standard extension (.gz, .bz2, and .xz).
 
 =back
 
+=head2 2.69, 2019-11-22
+a small bugfix in dbcolstats
+
+=over 4
+
+=item BUG FIX
+
+Filled in the the test case for autodecompress,
+which was missing for the 2.68 release.
+
+=item ENHANCEMENT
+
+The groff program is required for build,
+and the C<Makefile.PL> fails if groff is missing at build time.
+Thanks to Chris Williams for suggesting this check,
+and the CPAN auto-building system for trying many platforms.
+
+=item BUG FIX
+
+The L<dbcolstats> program had numerical instability 
+that sometimes results in failing with a square-root of a negative
+number when many values varied right at the edge of floating-point 
+precision.  We now detect and report that case as 0 stddev.
+Thanks to Hang Guo for providing a test case.
+
+=back
+
+
 =head1 AUTHOR
 
 John Heidemann, C<johnh@isi.edu>
@@ -3610,7 +3651,7 @@ bug reports and fixes.
 
 =head1 COPYRIGHT
 
-Fsdb is Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>.
+Fsdb is Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as

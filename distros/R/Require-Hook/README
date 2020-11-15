@@ -1,8 +1,77 @@
-DESCRIPTION
+NAME
+    Require::Hook - Namespace for require() hooks
 
-    Currently empty, name grab only.
+VERSION
+    This document describes version 0.002 of Require::Hook (from Perl
+    distribution Require-Hook), released on 2020-11-13.
+
+DESCRIPTION
+    As one already understands, Perl lets you put coderefs or objects in
+    @INC as "hooks". This lets you do all sorts of things when it comes to
+    loading modules, for example:
+
+    *   faking that a module does not exist when it does
+
+        This can be used for testing.
+
+    *   loading module from various sources
+
+        You can load module source from the DATA section or variables, as is
+        done in a fatpacked script. Or you can retrieve module source from
+        CPAN so a script can magically run without installing extra CPAN
+        modules.
+
+    *   munging source code
+
+        Like adding some Perl code before ("use strict;") or after, for
+        testing purpose or otherwise.
+
+    *   decrypt from an ecrypted source
+
+    In the case of objects, perl will call your "INC" method. So this is how
+    you would write a module for a require hook:
+
+     package My::INCHandler;
+     sub new { ... }
+     sub My::INCHandler::INC {
+         my ($self, $filename) = @_;
+         ...
+     }
+     1;
+
+    "Require::Hook" is just a namespace to put and share all your require
+    hooks.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Require-Hook>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Require-Hook>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Require-Hook>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    "Require::Hook::*" modules.
 
-    Require::Hook::* modules.
+    Require::HookChain is another namespace for require hooks and also a way
+    to use "Require::Hook::*" modules.
+
+    RHC is a short alias for Require::HookChain for convenience in
+    one-liners.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

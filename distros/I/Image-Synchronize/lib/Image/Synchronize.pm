@@ -1,6 +1,6 @@
 package Image::Synchronize;
 
-use v5.13.2;
+use Modern::Perl;
 
 =head1 NAME
 
@@ -29,7 +29,7 @@ Louis Strous, E<lt>imsync@quae.nl<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2019 by Louis Strous
+Copyright (C) 2018-2020 by Louis Strous
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.2 or,
@@ -37,12 +37,12 @@ at your option, any later version of Perl 5 you may have available.
 
 =cut
 
-use strict;
-use warnings;
+use Modern::Perl;
 
 use feature 'state';
 
 use Carp;
+use Clone qw(clone);
 use File::Copy qw(
   copy
   move
@@ -70,6 +70,7 @@ use POSIX qw(
   floor
 );
 use Scalar::Util qw(
+  blessed
   looks_like_number
 );
 use XML::Twig;
@@ -82,7 +83,7 @@ use YAML::Any qw(
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.000';
+our $VERSION = '2.001';
 
 my $CASE_TOLERANT;
 
@@ -269,16 +270,78 @@ sub add_maybe {
   return ();
 }
 
+#  ($quotient, $remainder) = split_number($value, $divisor);
+#  $quotient = split_number($value, $divisor);
+#
+# Divides two numbers and returns their quotient and (in list mode)
+# non-negative remainder.
+sub split_number {
+  my ($value, $period) = @_;
+  $period = abs($period);
+  my $q = sprintf('%d', $value/$period)*$period;
+  my $r = $value - $q;
+  if ($r < 0) {
+    $r += $period;
+    $q -= $period;;
+  } elsif ($r >= $period) {
+    $r -= $period;
+    $q += $period;
+  }
+  return wantarray? ($q, $r): $q;
+}
+
 #  $corrected_time = apply_camera_offset($time, $offset);
 #
-# Applies camera offset C<$offset> (in seconds) to a clones of
+# Applies camera offset C<$offset> (in seconds) to a clone of
 # C<$time>, which must be a Synchronize::Timestamp.  Returns the
 # clone.
 sub apply_camera_offset {
   my ( $t, $offset ) = @_;
-  $t = $t->clone;
-  $t->remove_timezone if $t->has_timezone_offset;
-  $t->set_timezone_offset($offset)->clone_to_local_timezone;
+  $t = $t->clone;        # don't modify object that argument refers to
+
+  # In v2.0.0, we processed as follows:
+  # - remove the timezone (if any) from $t
+  # - set the timezone offset of $t to $offset, which was a plain number
+  # - move $t to the local timezone
+
+  if (Image::Synchronize::Timestamp->istypeof($offset)) {
+    # the timezone offset has a time part and perhaps a timezone part
+    $offset = $offset->clone; # don't modify object that argument
+                              # refers to
+  } else {
+    # deprecated: offset is a number; support for backward
+    # compatibility
+    $t->set_timezone_offset($offset)
+      ->adjust_to_local_timezone;
+  }
+
+  # If $offset has no timezone offset, then split its time part into
+  # two parts: (1) the whole number of hours nearest its value, which
+  # becomes the timezone part of $offset; (2) the remainder, which
+  # becomes the new time part of $offset.
+  #
+  # For example, if $offset is +02:11:03 then it gets changed to
+  # +0:11:03+02:00.
+  if (not $offset->has_timezone_offset) {
+    my ($q, $r) = split_number($offset->time_local, 3600);
+    if ($r >= 1800) { # the offset is nearer the next higher hour than
+                      # the current hour
+      $r -= 3600;
+      $q += 3600;
+    }
+    $offset = Image::Synchronize::Timestamp
+      ->new($r)
+      ->adjust_timezone_offset($q)
+      ->adjust_nodate;
+  }
+
+  # Add the time part of $offset to $t and then adjust the timezone
+  # of $t to the timezone of $offset.  For example, if $t is
+  # 12:40:00+02:00 and $offset is +00:05+03:00, then the result is
+  # 13:45:00+03:00.
+  $t += $offset->time_local;
+  $t->adjust_timezone_offset($offset->timezone_offset);
+
   return $t;
 }
 
@@ -323,14 +386,14 @@ sub basename_pattern {
   return $name;
 }
 
-#   $camera_id = camera_id($path, $info);
+#   $camera_id = camera_id($info);
 #
 # returns the ID of the camera, based on information extracted from an
 # image file through Image::ExifTool::ImageInfo.  For some but not all
 # types of camera, the camera ID includes a serial number that is
 # unique to the camera.
 sub camera_id {
-  my ( $path, $info ) = @_;
+  my ( $info ) = @_;
   my $id =
     join( '|', map { $info->get($_) // '' } qw(Make Model SerialNumber) );
   $id = undef if $id =~ /^\|+$/;
@@ -354,10 +417,10 @@ sub camera_id_from_fallback {
   }
 }
 
-#   $camera_offsets_path = $ims->camera_offsets_path;
+#   $camera_offsets_path = $ims->camera_offsets_path
 #
 # Returns the camera offsets path, which is taken from the
-# C<offsetspath> option if defined.  If that option is not defined,
+# C<offsetspath> option if defined.  If C<offsetspath> is not defined,
 # then uses C<'.imsync-cameraoffsets.yaml'> if that file exists in the
 # current working directory or if the C<HOME> environment variable
 # isn't set, and otherwise uses that file name in the directory
@@ -365,7 +428,7 @@ sub camera_id_from_fallback {
 sub camera_offsets_path {
   my ( $self ) = @_;
   my $path = $self->option('offsetspath');
-  if ( not $path ) {
+  if ( not defined $path ) {
     $path = '.imsync-cameraoffsets.yaml';
     if ( not(-e $path) and exists $ENV{HOME}) {
       $path = file( $ENV{HOME}, $path );
@@ -444,26 +507,62 @@ sub convert_to_xmp {
 
 #  $offset = deduce_camera_offset($camera_time, $target_time);
 #
-# deduce the camera timezone offset from the C<$camera_time> and the
-# C<$target_time>.  The $target_time must be an absolute time (with
-# timezone offset).
+# deduce the camera offset from the C<$camera_time> and the
+# C<$target_time>.  The $target_time must have a timezone offset.  The
+# $camera_time may or may not have a timezone offset.
+#
+# The deduced camera offset has a time part and a timezone part.  The
+# time part says how much to add to the instant expressed by the
+# camera time to get the instant expressed by the target time (if both
+# are converted to the same timezone).  The timezone part says how
+# much to add to UTC to get the nominal timezone offset of the camera.
+# The nominal timezone is the timezone that the camera's clock was
+# intended to follow.  The time part of the offset says how much the
+# "true" camera timezone differed from the nominal one, perhaps due to
+# misconfiguration or clock drift.
+#
+# If the camera time is 2020-07-30T08:22:30+02:00 and the target time
+# is 2020-07-30T09:23:05+03:00 then the deduced camera offset is
+# +00:00:35+02:00.
+#
+# TODO: what timezone should we assume for the target time if it has
+# none, to get backward compatibility with versions of imsync
+# predating the introduction of the timezone part of the camera
+# offset?
+#
+# In the past the camera offset did not have a timezone part yet.
+# Then the camera offset was added to the camera time (which was
+# assumed to have no timezone offset) and the resulting timestamp was
+# assumed to be given relative to the system's timezone for that
+# instant.
+#
+# If the camera time was 2020-07-30T08:22:30 and the target time was
+# 2020-07-30T09:23:05+03:00 (with the system's timezone offset
+# UTC+03:00) then the deduced camera offset was +01:00:35.
 sub deduce_camera_offset {
   my ( $camera_time, $target_time ) = @_;
 
   croak "Target time must have a timezone offset\n"
     unless $target_time->has_timezone_offset;
 
-  if ( $camera_time->has_timezone_offset ) {
+  my $d = Image::Synchronize::Timestamp->new($target_time - $camera_time)
+    ->adjust_nodate;
 
-    # both the camera time and the target time are absolute times
-    # (with timezones).
-    $camera_time = $camera_time->clone->remove_timezone;
+  if ($camera_time->has_timezone_offset) {
+    # The camera time includes a timezone offset, so $d is the number
+    # of seconds between the two instants of time when converted to
+    # the same timezone.  We assign the timezone of the camera time.
+
+    $d->adjust_timezone_offset($camera_time->timezone_offset);
+  } else {
+    # The camera time does not include a timezone offset, so $d is the
+    # number of seconds between the two instants of time when the
+    # camera time is assumed to be in the same timezone as the target
+    # time.  We assign the timezone of the target time.
+
+    $d->adjust_timezone_offset($target_time->timezone_offset);
   }
-
-  # the camera time has no timezone offset.  If we add the camera
-  # timezone offset to the camera clock time, then we get the
-  # absolute target time.
-  return $camera_time->time_local - $target_time->time_utc;
+  return $d;
 }
 
 #   $ims->delete_backups(@file_patterns);
@@ -523,6 +622,7 @@ sub determine_new_values_for_all_files {
   my %count_needs_force;
   foreach my $file (@files) {
     my $info = $self->{original_info}->{$file};
+
 
     if ( $self->has_useful_timestamp($file, $info) ) {
 
@@ -681,6 +781,11 @@ sub determine_new_values_for_file {
     )
   {
     my $v = $info->get($tag);
+    if (blessed $v) {
+      # create a clone; we don't want to accidentally adjust the $info
+      # member by adjusting the $new_info member
+      $v = clone($v);
+    }
     $new_info->set( $tag, $v ) if defined $v;
   }
 
@@ -731,29 +836,34 @@ sub determine_new_values_for_file {
   }
 
   # determine the target time
-  my $target_timestamp;     # timestamp to assign to image
+  my $target_file_time;     # file modification timestamp to assign to image
+  my $target_dto_time;      # DateTimeOriginal to assign to image
   my $timesource;           # value for TimeSource tag
   my $timesource_letter;    # letter to identify time source in report
+  my $camera_timezone_offset;   # target timezone and offset of camera
 
   if ( defined $target_file ) {
 
     # copying target time from another file
     my $target_file_info = $self->{new_info}->{$target_file};
-    $target_timestamp  = $target_file_info->get('FileModifyDate');
+    $target_file_time  = $target_file_info->get('FileModifyDate');
+    $target_dto_time   = $target_file_info->get('DateTimeOriginal');
     $timesource_letter = 'n';
     $timesource        = 'Other';
     push @messages, " Target time copied from '$target_file'.";
   }
   else {
-    $target_timestamp = $self->repository('user_times')->{$file};
-    if ( defined $target_timestamp ) {
+    $target_dto_time = $self->repository('user_times')->{$file};
+    if ( defined $target_dto_time ) {
       push @messages, " Target time is set by user.";
       $extra_info->set( 'explicit_change', 1 );
       $timesource_letter = 't';      # source is user's --time
       $timesource        = 'User';
+      $target_file_time = $self->file_from_dto($target_dto_time);
     }
     elsif ( $info->get('createdate_was_embedded')
-      and defined $info->get('GPSDatetime') )
+            and defined $info->get('GPSDatetime')
+         )
     {
       $timesource = $self->get_effective_timesource( $info, $file );
       if ( $timesource ne 'Other' ) {
@@ -765,21 +875,21 @@ sub determine_new_values_for_file {
 
         push @messages, " Target time is $timesource time.\n";
         $timesource_letter = $time_sources->{$timesource} // '?';
-        my ( $camera_timezone_offset, $adjustment ) =
+        ( $camera_timezone_offset, my $adjustment ) =
           $self->get_camera_offset($file);
         if ($adjustment) {
           push @messages, " Assuming GPS fix lag.";
         }
-        $target_timestamp = apply_camera_offset( $new_info->get('CreateDate'),
-          $camera_timezone_offset );
+        $target_dto_time = apply_camera_offset( $new_info->get('CreateDate'),
+                                                $camera_timezone_offset );
+        $target_file_time = $self->file_from_dto($target_dto_time);
       }
     }
-    unless ($target_timestamp) {
+    unless ($target_file_time) {
       if ( $info->get('createdate_was_embedded') ) {
 
         # Locate the "best" offset (GPS minus creation) for the image,
         # based on GPS timestamps in nearby images by the same camera.
-        my $camera_timezone_offset;
         if ( defined $new_info->get('CreateDate') ) {
           $camera_timezone_offset =
             $self->gps_offsets->get( $new_info->get('CameraID'),
@@ -790,23 +900,30 @@ sub determine_new_values_for_file {
           push @messages, " Target time is based on camera timezone offsets.";
           $timesource_letter = 's';     # source is CreateDate plus other images
           $timesource        = 'Other';
-          $target_timestamp = apply_camera_offset( $new_info->get('CreateDate'),
-            $camera_timezone_offset );
+          $target_dto_time = apply_camera_offset( $new_info->get('CreateDate'),
+                                                  $camera_timezone_offset );
+          $target_file_time = $self->file_from_dto($target_dto_time);
         }
       }
     }
-    unless ($target_timestamp) {
+    unless ($target_file_time) {
       if ( defined $info->get('DateTimeOriginal') ) {
 
         # No offset available based on GPS, but do have
-        # DateTimeOriginal; ensure that the file modification
-        # timestamp is equal to DateTimeOriginal
+        # DateTimeOriginal; set the file modification timestamp equal
+        # to the DateTimeOriginal
         push @messages,
           " Target time is embedded original time (DateTimeOriginal).";
         $timesource_letter = 'o';       # source is DateTimeOriginal
         $timesource        = 'Other';
-        $target_timestamp =
-          $new_info->get('DateTimeOriginal')->clone_to_local_timezone;
+        $target_dto_time = $new_info->get('DateTimeOriginal');
+        if (not $target_dto_time->has_timezone_offset) {
+          # we need the target time to have a timezone offset.  Assume
+          # that it is given relative to the timezone that would have
+          # been in effect on the local system at that time.
+          $target_dto_time->adjust_to_local_timezone;
+        }
+        $target_file_time = $self->file_from_dto($target_dto_time);
       }
       elsif ( $info->get('createdate_was_embedded') ) {
 
@@ -815,36 +932,33 @@ sub determine_new_values_for_file {
         push @messages, " Target time is embedded creation time (CreateDate).";
         $timesource_letter = 'c';       # source is CreateDate
         $timesource        = 'Other';
-        $target_timestamp =
-          $new_info->get('CreateDate')->clone_to_local_timezone;
+        $target_dto_time = $new_info->get('CreateDate');
+        $target_file_time = $self->file_from_dto($target_dto_time);
       }
     }
   }
 
-  if ( defined($target_timestamp) ) {
+  if ( defined($target_file_time) ) {
     if ( defined( my $j = $self->repository('jump')->{$file} ) ) {
-      $target_timestamp += $j * 3600;
+      $target_dto_time += $j * 3600;
+      $target_file_time = $self->file_from_dto($target_dto_time);
       push @messages, " Clock time of camera jumps by $j hours.";
     }
     $extra_info->set( 'timesource_letter', $timesource_letter );
     $new_info->set( 'TimeSource', $timesource )
       if is_image_or_movie($info);
 
-    $target_timestamp->set_to_local_timezone;
-
-    $new_info->set( 'FileModifyDate', $target_timestamp );
-
-    push @messages, " Target time is $target_timestamp.";
-
     if ( $info->get('createdate_was_embedded') ) {
-      $new_info->set( 'DateTimeOriginal', $target_timestamp );
+      $new_info->set( 'DateTimeOriginal', $target_dto_time );
 
       if ( $timesource_letter ne 'n' ) {
-        my $camera_timezone_offset =
+        my $o = $camera_timezone_offset;
+        $camera_timezone_offset =
           deduce_camera_offset( $new_info->get('CreateDate'),
-          $target_timestamp );
+                                $target_dto_time );
+
         push @messages, ' Timezone offset for camera is '
-          . display_offset($camera_timezone_offset) . '.';
+          . $camera_timezone_offset->display_time . '.';
 
         # record the offset so it can be used for later files
         $self->gps_offsets->set(
@@ -854,6 +968,9 @@ sub determine_new_values_for_file {
         );
       }
     }
+    $new_info->set( 'FileModifyDate', $target_file_time );
+
+    push @messages, " Target time is $target_file_time.";
 
     if ( is_image_or_movie($info) ) {
 
@@ -889,7 +1006,7 @@ sub determine_new_values_for_file {
         # assumed to have been added by an earlier run of an
         # application like this one, and then it is OK to update it.
         my @gps_positions =
-          $self->gps_positions->position_for_time( $target_timestamp,
+          $self->gps_positions->position_for_time( $target_file_time,
           scope => scope_for_file($file) );
         if (@gps_positions) {
           my $l = length( $gps_positions[0]->{scope} );
@@ -915,8 +1032,8 @@ sub determine_new_values_for_file {
               if defined($position->[$ix]) and (not(defined $v) or $position->[$ix] != $v);
           }
           my $v = $info->get('GPSDateTime');
-          $new_info->set( 'GPSDateTime', $target_timestamp )
-            if not(defined $v) or $target_timestamp != $v;
+          $new_info->set( 'GPSDateTime', $target_file_time )
+            if not(defined $v) or $target_file_time != $v;
           croak "Expected new TimeSource to have been set already\n"
             unless defined $new_info->get('TimeSource');
         } else {                # remove position
@@ -957,7 +1074,8 @@ sub determine_new_values_for_file {
   }
 
   if ( is_image_or_movie($info) ) {
-    $new_info->set( 'DateTimeOriginal', $new_info->get('FileModifyDate') );
+    $new_info->set( 'DateTimeOriginal', $new_info->get('FileModifyDate') )
+      unless defined $new_info->get('DateTimeOriginal');
     $new_info->set( 'ImsyncVersion',    $VERSION );
 
     # our XMP tags must go in the XMP namespace
@@ -971,11 +1089,18 @@ sub determine_new_values_for_file {
 
     # We want to store DateTimeOriginal with a timezone, which means
     # we must put it in the XMP group, because DateTimeOriginal in the
-    # default Exif group has no room for a timezone.
+    # default Exif group likely has no room for a timezone.
     {
       my $dto = $new_info->get('DateTimeOriginal');
-      $new_info->set( 'XMP', 'DateTimeOriginal', $dto )
-        if defined $dto;
+      if (defined $dto) {
+        $new_info->set( 'XMP', 'DateTimeOriginal', $dto );
+        my $o = $info->get('DateTimeOriginal');
+        if (defined($o) && not($o->has_timezone_offset)) {
+          # original DateTimeOriginal has no timezone offset, so the
+          # new one (for the Exif group) can't have one
+          $new_info->set('DateTimeOriginal', $dto->clone->remove_timezone);
+        }
+      }
     }
   }
 
@@ -1295,10 +1420,14 @@ sub ensure_backup {
 # Export the camera offsets.  Returns C<$ims>.
 sub export_camera_offsets {
   my ($self) = @_;
-  my $path   = $self->camera_offsets_path(1);
-  my $data   = $self->gps_offsets->export_data;
-  log_message("Exporting camera offsets to '$path'.\n");
-  DumpFile( $path, $data );
+  my $path   = $self->camera_offsets_path;
+  if ($path) {
+    my $data   = $self->gps_offsets->export_data;
+    log_message("Exporting camera offsets to '$path'.\n");
+    DumpFile( $path, $data );
+  } else {
+    log_message("Not exporting camera offsets because --offsetspath value was empty.\n");
+  }
   $self;
 }
 
@@ -1394,12 +1523,12 @@ sub exportgpx {
   return $self;
 }
 
-#   $fallback_camera_id = fallback_camera_id($path, $info);
+#   $fallback_camera_id = fallback_camera_id($path);
 #
 # Returns the fall-back camera ID, to be used in case the usual
 # information from which to deduce a camera ID is not available.
 sub fallback_camera_id {
-  my ( $path, $info ) = @_;
+  my ( $path ) = @_;
   return '?' . basename_pattern($path);
 }
 
@@ -1639,7 +1768,7 @@ sub get_image_info {
       # store the creation timestamp in the local timezone, so we
       # assume that QuickTime:CreateDate is in UTC.
 
-      $info->get( 'QuickTime', 'CreateDate' )->set_to_utc;
+      $info->get( 'QuickTime', 'CreateDate' )->adjust_to_utc;
     }
 
     if ( defined $info->get('GPSLongitude')
@@ -1648,12 +1777,12 @@ sub get_image_info {
       # Some QuickTime files with a GPS position embedded in the
       # QuickTime section have no explicit GPSDateTime defined,
       # because some other timestamp serves the same purpose.
-      # (E.g., for Apple iPod touch.)  The remainder of this program
+      # (E.g., for Apple iPod Touch.)  The remainder of this program
       # assumes that if GPS information is present then it includes
       # at least longitude, latitude, and time, so copy a suitable
       # timestamp to GPSDateTime
       $info->set( 'GPSDateTime', $info->get( 'QuickTime', 'CreateDate' ) );
-      $info->get('GPSDateTime')->set_to_utc;    # just in case
+      $info->get('GPSDateTime')->adjust_to_utc;    # just in case
     }
   }
 
@@ -1731,20 +1860,23 @@ sub identify_files {
 sub import_camera_offsets {
   my ($self) = @_;
   my $path = $self->camera_offsets_path;
-  if ( -e $path ) {
-    log_message("Importing camera offsets from '$path'.\n");
-    my $data = LoadFile($path);
-    $self->gps_offsets->parse($data)
-      or croak "Imported camera offsets are invalid: $@\n";
-    log_message(
-      16,
-      sub {
-        "Camera Offsets:\n", Dump( $self->gps_offsets->export_data ), "\n";
-      }
-    );
-  }
-  else {
-    log_message("No camera offsets file found to import from.\n");
+  if ($path) {
+    if ( -e $path ) {
+      log_message("Importing camera offsets from '$path'.\n");
+      my $data = LoadFile($path);
+      $self->gps_offsets->parse($data)
+        or croak "Imported camera offsets are invalid: $@\n";
+      log_message(
+                  16,
+                  sub {
+                    "Camera Offsets:\n", Dump( $self->gps_offsets->export_data ), "\n";
+                  }
+                );
+    } else {
+      log_message("No camera offsets file found to import from.\n");
+    }
+  } else {
+    log_message("Not importing camera offsets because --offsetspath has an empty value.\n");
   }
   $self;
 }
@@ -1895,10 +2027,10 @@ sub inspect_files {
       if (  $count_essential_gps_tags
         and $count_essential_gps_tags < 3 )
       {
-        log_warn(<<EOD);
-File '$file' has some but not all of GPSDateTime, GPSLongitude, GPSLatitude.
-Ignoring its GPS information.
-EOD
+        log_warn(<<~EOD);
+        File '$file' has some but not all of GPSDateTime,
+        GPSLongitude, GPSLatitude.  Ignoring its GPS information.
+        EOD
         $info->delete($_)
           foreach qw(GPSLatitude GPSLongitude GPSAltitude GPSDateTime);
       }
@@ -1918,13 +2050,13 @@ EOD
         else {
           # no embedded camera ID; attempt to construct one from the
           # embedded information
-          $camera_id = camera_id( $file, $info );
+          $camera_id = camera_id( $info );
         }
 
         # there may not be sufficient information to deduce a camera
         # ID in the preferred way; also deduce a fallback camera ID
         # that is always available
-        my $fallback_camera_id = fallback_camera_id( $file, $info );
+        my $fallback_camera_id = fallback_camera_id( $file );
 
         if ( defined $camera_id ) {
           $info->set( 'camera_id', $camera_id );
@@ -2038,7 +2170,7 @@ my %convert_for_writing = (
   },
   GPSDateTime => sub {
     my ( $tag, $in, $out ) = @_;
-    my $t = Image::Synchronize::Timestamp->new($in)->to_utc;
+    my $t = Image::Synchronize::Timestamp->new($in)->adjust_to_utc;
 
     # GPSDateStamp and GPSTimeStamp are needed for EXIF.
     $out->{GPSDateStamp} = $t->date;
@@ -2148,39 +2280,19 @@ sub modify_file {
         else {
           log_warn(
             defined( $values{$t} )
-            ? " Error setting $t of '$file' to '" . $values{$t} . "': $error\n"
-            : " Error removing $t from '$file': $error\n"
+            ? " ExifTool error setting $t of '$file' to '" . $values{$t} . "': $error\n"
+            : " ExifTool error removing $t from '$file': $error\n"
           );
         }
       }
     }
 
-    if ( $changed or $found_filemodifydate_tag ) {
-
-      # Also update the FileModifyDate (the file system modification
-      # timestamp), because updating any embedded information changes
-      # that timestamp to the current time.
-      my $value = $new_info->get('FileModifyDate');
-      $value = "$value";    # stringify
-      my ( $success, $error ) =
-        $b->SetNewValue( 'FileModifyDate', $value, Protected => 1 );
-      if ($success) {
-        log_message(
-          4,
-          {
-            name => $file
-          },
-          sub { " Set FileModifyDate of '$file' to '$value'\n" }
-        );
-        $changed += $success;
-      }
-      else {
-        log_warn(
-          " Error setting FileModifyDate of '$file' to '$value': $error\n");
-      }
+    if ( $changed ) {
 
       $status = $b->WriteInfo($file);    # write to file
-      log_warn(" '$file' written but no changes made.\n") if $status == 2;
+      if ( $status == 2 ) {
+        log_warn(" '$file' written but no changes made.\n");
+      }
       if ( $status == 1 ) {
         my $warning = $b->GetValue('Warning');
         if ($warning) {
@@ -2197,7 +2309,7 @@ sub modify_file {
                               /x } @warnings;
           if (@warnings) {
             $warning = join( "\n", @warnings );
-            log_warn(" Writing '$file' succeeded with warning: $warning\n");
+            log_warn(" Writing '$file' succeeded with ExifTool warning: $warning\n");
           }
         }
       }
@@ -2206,13 +2318,47 @@ sub modify_file {
         log_warn(
           join( ', ',
             " Writing '$file' failed",
-            ( $error ? "Error: $error" : () ) )
+            ( $error ? "ExifTool reports:\n $error" : () ) )
             . "\n"
         );
         $status = 4;
+
+        # Probably the file is unchanged, but we don't know for sure.
+        foreach my $tag (@{$changes}) {
+          next if $tag eq 'FileModifyDate';
+          $new_info->delete($tag);
+        }
       }
     }
-    $b->RestoreNewValues();    # return to clean slate
+
+    if ( $changed or $found_filemodifydate_tag ) {
+      # Updating the FileModifyDate (the file system modification
+      # timestamp) via WriteInfo doesn't always work; for example,
+      # ExifTool 10.63 does not support modifying AVI files.
+      #
+      # Unfortunately, on Microsoft Windows setting the file
+      # modification time via utime() is problematic, because the zero
+      # point depends on the timzone settings (at least it depends on
+      # whether Daylight Savings Time is in effect when this code is
+      # executed).
+      #
+      # Fortunately, the author of Image::ExifTool has faced the same
+      # problem, so we can use Image::ExifTool functionality to work
+      # around it.  We directly call the Image::ExifTool functionality
+      # that sets the file modification time.
+
+      my $fmt = $new_info->get('FileModifyDate');
+      my $success = $b->SetFileTime($file, undef, $fmt->time_utc);
+
+      if ($success) {
+        log_message( 4, { name => $file },
+                    sub { " Set FileModifyDate of '$file' to '$fmt'\n" } );
+        $changed += $success;
+      } else {
+        log_warn( " Error setting FileModifyDate of '$file' to '$fmt'\n");
+      }
+    }
+    $b->RestoreNewValues();     # return to clean slate
   }
   else {
     log_error(" Could not create backup file for '$file': not modified.\n");
@@ -2401,7 +2547,7 @@ sub process_gpx_track {
             or $time > $maxtime;
           my $ele = $point->first_child_text('ele');
           ++$gps_point_count;
-          $gpc->add( $time->to_utc, $lat, $lon, $ele, $id,
+          $gpc->add( $time->time_utc, $lat, $lon, $ele, $id,
             scope_for_file($file) )
             if $time;
         }
@@ -2429,6 +2575,8 @@ sub process_gpx_track {
     return 1;
   }
   else {
+    # some error
+    log_message("Problem parsing GPX tracks from $file: $@\n");
     return 0;
   }
 }
@@ -3149,7 +3297,7 @@ sub report_letter {
   if ( defined $new ) {
     if ( defined $old ) {
       if ( $new ne $old ) {
-        return '*';    # modified
+        return '*';             # modified
       }
       else {
         return '=';    # unchanged
@@ -3504,4 +3652,75 @@ sub user_camera_id {
   return $self->repository('user_camera_ids')->{$path};
 }
 
+# Calculates a file modification timestamp from a DateTimeOriginal.
+#
+# The file modification timestamp is expressed in the local timezone.
+# If 'relativefiletime' is set, then the file modification timestamp
+# has the same clock time as the DateTimeOriginal.  Otherwise, the
+# file modification timestamp represents the same instant of universal
+# time as the DateTimeOriginal.
+sub file_from_dto {
+  my ($self, $dto_timestamp) = @_;
+  if ($self->option('relativefiletime')) {
+    my $ltzo = $dto_timestamp->local_timezone_offset;
+    return $dto_timestamp->clone->set_timezone_offset($ltzo);
+  } else {
+    return $dto_timestamp;
+  }
+}
+
 1;
+
+__END__
+
+
+        # "Supposedly UTC" images may have a timezone that is
+        # different from that of regular images taken by the same
+        # camera, i.e., different from the nominal timezone of the
+        # camera.  If --relativefiletime is used then the file
+        # modification timestamp is the target time with its clock
+        # time unchanged but its timezone part replaced by the
+        # timezone appropriate for the current system at that moment.
+        # The two kinds of images may then end up far apart in file
+        # modification time even if they were recorded in close
+        # succession.
+
+        if ($info->get('supposedly_utc')) {
+          # Let's try to find out what was the nominal timezone offset
+          # of the camera at the time that this image was taken.
+
+          my $nominal_camera_id = $new_info->get('CameraID') =~ s/\|U$//r;
+          my $nominal_camera_timezone_offset =
+            $self->gps_offsets->get( $nominal_camera_id,
+                                     $new_info->get('CreateDate') );
+
+          # The CreateDate was relative to the supposedly-UTC
+          # timezone, but the offset retrieved just now was obtained
+          # based on the assumption that the CreateDate was relative
+          # to the nominal timezone, which may be some hours different
+          # from the supposedly-UTC timezone, so the offset may have
+          # been queried for a timestamp that was a few hours off.  If
+          # the nominal timezone happened to change during those few
+          # hours, then the retrieved nominal timezone may be wrong.
+          # TODO: handle
+
+          if (not($nominal_camera_timezone_offset
+              ->has_timezone_offset)) {
+            my ($q, $r) = split_number($nominal_camera_timezone_offset
+                                       ->time_local, 3600);
+            if ($r >= 1800) { # the offset is nearer the next higher
+                              # hour than the current hour
+              $r -= 3600;
+              $q += 3600;
+            }
+            $nominal_camera_timezone_offset = Image::Synchronize::Timestamp
+              ->new($r)
+              ->adjust_timezone_offset($q)
+              ->adjust_nodate;
+          }
+
+          $target_file_time
+            ->adjust_timezone_offset($nominal_camera_timezone_offset
+                                     ->timezone_offset);
+        }
+

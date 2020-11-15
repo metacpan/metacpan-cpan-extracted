@@ -5,7 +5,7 @@
 
 use Object::Pad 0.19;
 
-package Device::Chip::MCP4725 0.09;
+package Device::Chip::MCP4725 0.10;
 class Device::Chip::MCP4725
    extends Device::Chip;
 
@@ -22,14 +22,14 @@ C<Device::Chip::MCP4725> - chip driver for F<MCP4725>
 
 =head1 SYNOPSIS
 
- use Device::Chip::MCP4725;
+   use Device::Chip::MCP4725;
 
- my $chip = Device::Chip::MCP4725->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::MCP4725->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- # Presuming Vcc = 5V
- $chip->write_dac_ratio( 1.23 / 5 )->get;
- print "Output is now set to 1.23V\n";
+   # Presuming Vcc = 5V
+   $chip->write_dac_ratio( 1.23 / 5 )->get;
+   print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION
 

@@ -2,6 +2,8 @@ Changes
 Makefile.PL
 MANIFEST
 README
+CONTRIBUTING.pod
+CONTRIBUTING.md
 t/001_load.t
 t/changes.t
 t/pod.t

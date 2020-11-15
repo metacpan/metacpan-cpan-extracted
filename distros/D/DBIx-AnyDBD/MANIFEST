@@ -1,12 +1,19 @@
-AnyDBD.pm
-MANIFEST
-Makefile.PL
-README
 Changes
 example/DB.pm
 example/DB/Default.pm
-example/DB/Pg.pm
 example/DB/Oracle.pm
-t/base.t
+example/DB/Pg.pm
+lib/DBIx/AnyDBD.pm
+Makefile.PL
+MANIFEST
+README
+README.md
+t/00-load.t
+t/links.t
+t/no404s.t
+t/pod-cm.t
+t/pod.t
+t/unused.t
+t/used.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

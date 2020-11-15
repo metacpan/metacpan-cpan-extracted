@@ -1,0 +1,3415 @@
+#!/usr/bin/perl
+# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 Phoebe
+
+Phoebe serves a wiki as a Gemini site.
+
+It does two and a half things:
+
+=over
+
+=item It's a program that you run on a computer and other people connect to it
+      using their L<Gemini client|https://gemini.circumlunar.space/clients.html>
+      in order to read the pages on it.
+
+=item It's a wiki, which means that people can edit the pages without needing an
+      account. All they need is a client that speaks both
+      L<Gemini|https://gemini.circumlunar.space/> and
+      L<Titan|https://communitywiki.org/wiki/Titan>, and the password. The
+      default password is "hello". 😃
+
+=item People can also access it using a regular web browser. They'll get a very
+      simple, read-only version of the site.
+
+=back
+
+To take a look for yourself, check out the test wiki via the
+L<web|https://transjovian.org:1965/test> or via
+L<Gemini|gemini://transjovian.org/test>.
+
+=head2 What are pages written in?
+
+Pages are written in gemtext, a lightweight hypertext format. You can use your
+favourite text editor to write them.
+
+A text line is a paragraph of text.
+
+    This is a paragraph.
+    This is another paragraph.
+
+A link line starts with "=>", a space, a URL, optionally followed by whitespace
+and some text; the URL can be absolute or relative.
+
+    => http://transjovian.org/ The Transjovian Council on the web
+    => Welcome                 Welcome to The Transjovian Council
+
+A line starting with "```" toggles preformatting on and off.
+
+    Example:
+    ```
+    ./phoebe
+    ```
+
+A line starting with "#", "##", or "###", followed by a space and some text is a
+heading.
+
+    ## License
+    The GNU Affero General Public License.
+
+A line starting with "*", followed by a space and some text is a list item.
+
+    * one item
+    * another item
+
+A line starting with ">", followed by a space and some text is a quote.
+
+    The monologue at the end is fantastic, with the city lights and the rain.
+    > I've seen things you people wouldn't believe.
+
+=head2 How do you edit a Phoebe wiki?
+
+You need to use a Titan-enabled client.
+
+Known clients:
+
+=over
+
+=item This repository comes with a Perl script called
+      L<titan|https://alexschroeder.ch/cgit/phoebe/plain/titan> to upload
+      files
+
+=item L<Gemini Write|https://alexschroeder.ch/cgit/gemini-write/> is an
+      extension for the Emacs Gopher and Gemini client
+      L<Elpher|https://thelambdalab.xyz/elpher/>
+
+=item L<Gemini & Titan for Bash|https://alexschroeder.ch/cgit/gemini-titan/about/>
+      are two shell functions that allow you to download and upload files
+
+=back
+
+=head2 What is Titan?
+
+Titan is a companion protocol to Gemini: it allows clients to upload files to
+Gemini sites, if servers allow this. On Phoebe, you can edit "raw"
+pages. That is, at the bottom of a page you'll see a link to the "raw" page. If
+you follow it, you'll see the page content as plain text. You can submit a
+changed version of this text to the same URL using Titan. There is more
+information for developers available
+L<on Community Wiki|https://communitywiki.org/wiki/Titan>.
+
+=head2 License
+
+GNU Affero General Public License
+
+=head2 Installation
+
+Using C<cpan>:
+
+    $ cpan App::phoebe
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+=head2 Dependencies
+
+Perl libraries you need to install if you want to run Phoebe:
+
+=over
+
+=item L<Algorithm::Diff>
+
+=item L<File::ReadBackwards>
+
+=item L<File::Slurper>
+
+=item L<IO::Socket::INET6>
+
+=item L<IO::Socket::SSL>
+
+=item L<Modern::Perl>
+
+=item L<Net::Server>
+
+=item L<URI::Escape>
+
+=back
+
+I'm going to be using F<curl> and F<openssl> in the L</Quickstart> instructions,
+so you'll need those tools as well. And finally, when people download their
+data, the code calls C<tar>.
+
+On Debian:
+
+    sudo apt install \
+      libalgorithm-diff-xs-perl \
+      libfile-readbackwards-perl \
+      libfile-slurper-perl \
+      libmodern-perl-perl \
+      libnet-server-perl \
+      liburi-escape-xs-perl \
+      curl openssl tar
+
+The F<update-readme.pl> script I use to generate F<README.md> also requires
+L<Pod::Markdown> and L<Text::Slugify>.
+
+=head2 Quickstart
+
+Right now there aren't any releases. You just get the latest version from the
+repository and that's it. I'm going to assume that you're going to create a new
+user just to be safe.
+
+    sudo adduser --disabled-login --disabled-password phoebe
+    sudo su phoebe
+    cd
+
+Now you're in your home directory, F</home/phoebe>. We're going to install
+things right here. First, get the source code:
+
+    curl --output phoebe https://alexschroeder.ch/cgit/phoebe/plain/phoebe
+
+Since Phoebe traffic is encrypted, we need to generate a certificate and a key.
+These are both stored in PEM files. To create your own copies of these files
+(and you should!), use "make cert" if you have a copy of the Makefile. If you
+don't, use this:
+
+    openssl req -new -x509 -newkey ec \
+    -pkeyopt ec_paramgen_curve:prime256v1 \
+    -days 1825 -nodes -out cert.pem -keyout key.pem
+
+This creates a certificate and a private key, both of them unencrypted, using
+eliptic curves of a particular kind, valid for five years.
+
+You should have three files, now: F<phoebe>, F<cert.pem>, and
+F<key.pem>. That's enough to get started! Start the server:
+
+    perl phoebe
+
+This starts the server in the foreground. If it aborts, see the
+L</Troubleshooting> section below. If it runs, open a second terminal and test
+it:
+
+    echo gemini://localhost \
+      | openssl s_client --quiet --connect localhost:1965 2>/dev/null
+
+You should see a Gemini page starting with the following:
+
+    20 text/gemini; charset=UTF-8
+    Welcome to Phoebe!
+
+Success!! 😀 🚀🚀
+
+Let's create a new page using the Titan protocol, from the command line:
+
+    echo "Welcome to the wiki!" > test.txt
+    echo "Please be kind." >> test.txt
+    echo "titan://localhost/raw/Welcome;mime=text/plain;size="`wc --bytes < test.txt`";token=hello" \
+      | cat - test.txt | openssl s_client --quiet --connect localhost:1965 2>/dev/null
+
+You should get a nice redirect message, with an appropriate date.
+
+    30 gemini://localhost:1965/page/Welcome
+
+You can check the page, now (replacing the appropriate date):
+
+    echo gemini://localhost:1965/page/Welcome \
+      | openssl s_client --quiet --connect localhost:1965 2>/dev/null
+
+You should get back a page that starts as follows:
+
+    20 text/gemini; charset=UTF-8
+    Welcome to the wiki!
+    Please be kind.
+
+Yay! 😁🎉 🚀🚀
+
+Let me return to the topic of Titan-enabled clients for a moment. With those,
+you can do simple things like this:
+
+    echo "Hello! This is a test!" | titan --url=localhost/test --token=hello
+
+Or this:
+
+    titan --url=localhost/test --token=hello test.txt
+
+That makes it a lot easier to upload new content! 😅
+
+If you have a bunch of Gemtext files in a directory, you can upload them all in
+one go:
+
+    titan --url=titan://localhost/ --token=hello *.gmi
+
+=head2 Image uploads
+
+OK, how do image uploads work? First, we need to specify which MIME types Phoebe
+accepts. The files are going to be served back with that MIME type, so even if
+somebody uploads an executable and claim it's an image, other people's clients
+will treat it as an image instead of executing it (one hopes!) – so let's start
+with a list of common MIME types.
+
+=over
+
+=item C<image/jpeg> is for photos (usually with the C<jpg> extension)
+
+=item C<image/png> is for graphics (usually with the C<png> extension)
+
+=item C<audio/mpeg> is for sound (usually with the C<mp3> extension)
+
+=back
+
+Let's continue using the setup we used for the L</Quickstart> section. Restart
+the server and allow photos:
+
+    perl phoebe --wiki_mime_type=image/jpeg
+
+Upload the image using the C<titan> script:
+
+    titan --url=titan://localhost:1965/jupiter.jpg \
+      --token=hello Pictures/Planets/Juno.jpg
+
+You should get back a redirect to the uploaded image:
+
+    30 gemini://localhost:1965/file/jupiter.jpg
+
+How did the C<titan> script know the MIME-type to use for the upload? If you
+don't specify a MIME-type using C<--mime>, the C<file> utility is called to
+guess the MIME type of the file.
+
+Test it:
+
+    file --mime-type --brief Pictures/Planets/Juno.jpg
+
+The result is the MIME-type we enabled for our wiki:
+
+    image/jpeg
+
+Here's what happens when you're trying to upload an unsupported MIME-type:
+
+    titan --url=titan://localhost:1965/earth.png \
+      --token=hello Pictures/Planets/Earth.png
+
+What you get back explains the problem:
+
+    59 This wiki does not allow image/png
+
+In order to allow such graphics as well, you need to restart Phoebe:
+
+    perl phoebe --wiki_mime_type=image/jpeg --wiki_mime_type=image/png
+
+Except that in my case, the image is too big:
+
+    59 This wiki does not allow more than 100000 bytes per page
+
+I could scale it down before I upload the image, using C<convert> (which is part
+of ImageMagick):
+
+    convert -scale 20% Pictures/Planets/Earth.png earth-small.png
+
+Try again:
+
+    titan --url=titan://localhost:1965/earth.png \
+      --token=hello earth-small.png
+
+Alternatively, you can increase the size limit using the
+C<--wiki_page_size_limit> option, but you need to restart Phoebe:
+
+    perl phoebe --wiki_page_size_limit=10000000 \
+      --wiki_mime_type=image/jpeg --wiki_mime_type=image/png
+
+Now you can upload about 10MB…
+
+=head2 Troubleshooting
+
+🔥 B<Cannot connect to SSL port 1965 on 127.0.0.1 [No such file or directory]>
+🔥 Perhaps your L<Net::Server::Proto::SSL> module is too old? Phoebe comes with
+a separate F<lib> directory which contains a patched version of the module. Move
+this directory into your working directory where you want to run Phoebe and try
+again.
+
+🔥 B<SSL_cert_file cert.pem can't be used: No such file or directory> 🔥 Perhaps
+you're missing the certificate (F<cert.pem>) or key file (F<key.pem>). The git
+repo has the necessary files which you can use to do a quick test. Copy them
+into the installation directory where you want to run Phoebe and try again. Once
+it works, you should I<generate your own> using the Makefile: C<make cert>
+should do it.
+
+=head2 Wiki Directory
+
+Your home directory should now also contain a wiki directory called F<wiki>. In
+it, you'll find a few more files:
+
+=over
+
+=item F<page> is the directory with all the page files in it; each file has the
+      C<gmi> extension and should be written in Gemtext format
+
+=item F<index> is a file containing all the files in your F<page> directory for
+      quick access; if you create new files in the F<page> directory, you should
+      delete the F<index> file – it will get regenerated when needed; the format
+      is one page name (without the C<.gmi> extension) per line, with lines
+      separated from each other by a single C<\n>
+
+=item F<keep> is the directory with all the old revisions of pages in it – if
+      you've only made one change, then it won't exist; if you don't care about
+      the older revisions, you can delete them; assuming you have a page called
+      C<Welcome> and edit it once, you have the current revision as
+      F<page/Welcome.gmi>, and the old revision in F<keep/Welcome/1.gmi> (the
+      page name turns into a subdirectory and each revision gets an apropriate
+      number)
+
+=item F<file> is the directory with all the uploaded files in it – if you
+      haven't uploaded any files, then it won't exist; you must explicitly allow
+      MIME types for upload using the C<--wiki_mime_type> option (see I<Options>
+      below)
+
+=item F<meta> is the directory with all the meta data for uploaded files in it –
+      there should be a file here for every file in the F<file> directory; if
+      you create new files in the F<file> directory, you should create a
+      matching file here; if you have a file F<file/alex.jpg> you want to create
+      a file F<meta/alex.jpg> containing the line C<content-type: image/jpeg>
+
+=item F<changes.log> is a file listing all the pages made to the wiki; if you
+      make changes to the files in the F<page> or F<file> directory, they aren't
+      going to be listed in this file and thus people will be confused by the
+      changes you made – your call (but in all fairness, if you're collaborating
+      with others you probably shouldn't do this); the format is one change per
+      line, with lines separated from each other by a single C<\n>, and each
+      line consisting of time stamp, pagename or filename, revision number if a
+      page or 0 if a file, and the numeric code of the user making the edit (see
+      L</Privacy> below), all separated from each other with a C<\x1f>
+
+=item F<config> probably doesn't exist, yet; it is an optional file containing
+      Perl code where you can add new features and change how Phoebe works (see
+      L</Configuration> below)
+
+=item F<conf.d> probably doesn't exist, either; it is an optional directory
+      containing even more Perl files where you can add new features and change
+      how Phoebe works (see L</Configuration> below); the idea is that people
+      can share stand-alone configurations that you can copy into this directory
+      without having to edit your own F<config> file.
+
+=back
+
+=head2 Options
+
+Phoebe has a bunch of options, and it uses L<Net::Server> in the background,
+which has even more options. Let's try to focus on the options you might want to
+use right away.
+
+Here's an example:
+
+    perl phoebe \
+      --wiki_token=Elrond \
+      --wiki_token=Thranduil \
+      --wiki_page=Welcome \
+      --wiki_page=About
+
+Here's the documentation for the most useful options:
+
+=over
+
+=item C<--wiki_token> is for the token that users editing pages have to provide;
+      the default is "hello"; you can use this option multiple times and give
+      different users different passwords, if you want
+
+=item C<--wiki_page> is an extra page to show in the main menu; you can use this
+      option multiple times; this is ideal for general items like I<About> or
+      I<Contact>
+
+=item C<--wiki_main_page> is the page containing your header for the main page;
+      that's were you would put your ASCII art header, your welcome message, and
+      so on, see L</Main Page and Title> below
+
+=item C<--wiki_mime_type> is a MIME type to allow for uploads; text/plain is
+      always allowed and doesn't need to be listed; you can also just list the
+      type without a subtype, eg. C<image> will allow all sorts of images (make
+      sure random people can't use your server to exchange images – set a
+      password using C<--wiki_token>)
+
+=item C<--wiki_page_size_limit> is the number of bytes to allow for uploads,
+      both for pages and for files; the default is 10000 (10kB)
+
+=item C<--host> is the hostname to serve; the default is C<localhost> – you
+      probably want to pick the name of your machine, if it is reachable from
+      the Internet; if you use it multiple times, each host gets its own wiki
+      space (see C<--wiki_space> below)
+
+=item C<--port> is the port to use; the default is 1965
+
+=item C<--wiki_dir> is the wiki data directory to use; the default is either the
+      value of the C<PHOEBE_DATA_DIR> environment variable, or the "./wiki"
+      subdirectory
+
+=item C<--wiki_space> adds an extra space that acts as its own wiki; a
+      subdirectory with the same name gets created in your wiki data directory
+      and thus you shouldn't name spaces like any of the files and directories
+      already there (see L</Wiki Directory>); not that settings such as
+      C<--wiki_page> and C<--wiki_main_page> apply to all spaces, but the page
+      content will be different for every wiki space
+
+=item C<--cert_file> is the certificate PEM file to use; the default is
+      F<cert.pem>
+
+=item C<--key_file> is the private key PEM file to use; the default is
+      F<key.pem>
+
+=item C<--log_level> is the log level to use, 0 is quiet, 1 is errors, 2 is
+      warnings, 3 is info, and 4 is debug; the default is 2
+
+=back
+
+=head2 Running Phoebe as a Daemon
+
+If you want to start Phoebe as a daemon, the following options come in
+handy:
+
+=over
+
+=item C<--setsid> makes sure Phoebe runs as a daemon in the background
+
+=item C<--pid_file> is the file where the process id (pid) gets written once the
+      server starts up; this is useful if you run the server in the background
+      and you need to kill it
+
+=item C<--log_file> is the file to write logs into; the default is to write log
+      output to the standard error (stderr)
+
+=item C<--user> and C<--group> might come in handy if you start Phoebe
+      using a different user
+
+=back
+
+=head2 Using systemd
+
+In this case, we don't want to daemonize the process. Systemd is going to handle
+that for us. There's more documentation L<available
+online|https://www.freedesktop.org/software/systemd/man/systemd.service.html>.
+
+Basically, this is the template for our service:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/phoebe
+    ExecStart=/home/phoebe/phoebe
+    Restart=always
+    User=phoebe
+    Group=phoebe
+    [Install]
+    WantedBy=multi-user.target
+
+Save this as F<phoebe.service>, and then link it:
+
+    sudo ln -s /home/phoebe/phoebe.service /etc/systemd/system/
+
+Reload systemd:
+
+    sudo systemctl daemon-reload
+
+Start Phoebe:
+
+    sudo systemctl start phoebe
+
+Check the log output:
+
+    sudo journalctl --unit phoebe
+
+=head2 Security
+
+The server uses "access tokens" to check whether people are allowed to edit
+files. You could also call them "passwords", if you want. They aren't associated
+with a username. You set them using the C<--wiki_token> option. By default, the
+only password is "hello". That's why the Titan command above contained
+"token=hello". 😊
+
+If you're going to check up on your wiki often (daily!), you could just tell
+people about the token on a page of your wiki. Spammers would at least have to
+read the instructions and in my experience the hardly ever do.
+
+You could also create a separate password for every contributor and when they
+leave the project, you just remove the token from the options and restart
+Phoebe. They will no longer be able to edit the site.
+
+=head2 Privacy
+
+The server only actively logs changes to pages. It calculates a "code" for every
+contribution: it is a four digit octal code. The idea is that you could colour
+every digit using one of the eight standard terminal colours and thus get little
+four-coloured flags.
+
+This allows you to make a pretty good guess about edits made by the same person,
+without telling you their IP numbers.
+
+The code is computed as follows: the IP numbers is turned into a 32bit number
+using a hash function, converted to octal, and the first four digits are the
+code. Thus all possible IP numbers are mapped into 8⁴=4096 codes.
+
+If you increase the log level, the server will produce more output, including
+information about the connections happening, like C<2020/06/29-15:35:59 CONNECT
+SSL Peer: "[::1]:52730" Local: "[::1]:1965"> and the like (in this case C<::1>
+is my local address so that isn't too useful but it could also be your visitor's
+IP numbers, in which case you will need to tell them about it using in order to
+comply with the
+L<GDPR|https://en.wikipedia.org/wiki/General_Data_Protection_Regulation>.
+
+=head2 Files
+
+If you allow uploads of binary files, these are stored separately from the
+regular pages; the wiki doesn't keep old revisions of files around. If somebody
+overwrites a file, the old revision is gone.
+
+You definitely don't want random people uploading all sorts of images, videos
+and binaries to your server. Make sure you set up those L<tokens|/Security>
+using C<--wiki_token>!
+
+=head2 Main Page and Title
+
+The main page will include ("transclude") a page of your choosing if you use the
+C<--wiki_main_page> option. This also sets the title of your wiki in various
+places like the RSS and Atom feeds.
+
+In order to be more flexible, the name of the main page does not get printed. If
+you want it, you need to add it yourself using a header. This allows you to keep
+the main page in a page called "Welcome" containing some ASCII art such that the
+word "Welcome" does not show on the main page. This assumes you're using
+C<--wiki_main_page=Welcome>, of course.
+
+If you have pages with names that start with an ISO date like 2020-06-30, then
+I'm assuming you want some sort of blog. In this case, up to ten of them will be
+shown on your front page.
+
+=head2 GUS and robots.txt
+
+There are search machines out there that will index your site. Ideally, these
+wouldn't index the history pages and all that: they would only get the list of
+all pages, and all the pages. I'm not even sure that we need them to look at all
+the files. The L<robots exclusion
+standard|https://en.wikipedia.org/wiki/Robots_exclusion_standard> lets you
+control what the bots ought to index and what they ought to skip. It doesn't
+always work.
+
+Here's my suggestion:
+
+    User-agent: *
+    Disallow: raw/*
+    Disallow: html/*
+    Disallow: diff/*
+    Disallow: history/*
+    Disallow: do/changes*
+    Disallow: do/all/changes*
+    Disallow: do/all/latest/changes*
+    Disallow: do/rss
+    Disallow: do/atom
+    Disallow: do/all/atom
+    Disallow: do/new
+    Disallow: do/more/*
+    Disallow: do/match
+    Disallow: do/search
+    # allowing do/index!
+    Crawl-delay: 10
+
+In fact, as long as you don't create a page called C<robots> then this is what
+gets served. I think it's a good enough way to start. If you're using spaces,
+the C<robots> pages of all the spaces are concatenated.
+
+If you want to be more paranoid, create a page called C<robots> and put this on
+it:
+
+    User-agent: *
+    Disallow: /
+
+Note that if you've created your own C<robots> page, and you haven't decided to
+disallow them all, then you also have to do the right thing for all your spaces,
+if you use them at all.
+
+=head2 Limited, read-only HTTP support
+
+You can actually look at your wiki pages using a browser! But beware: these days
+browser will refuse to connect to sites that have self-signed certificates.
+You'll have to click buttons and make exceptions and all of that, or get your
+certificate from Let's Encrypt or the like. Anyway, it works in theory. If you
+went through the L</Quickstart>, visiting C<https://localhost:1965/> should
+work!
+
+Notice that Phoebe doesn't have to live behind another web server like
+Apache or nginx. It's a (simple) web server, too!
+
+Here's how you could serve the wiki both on Gemini, and the standard HTTPS port,
+443:
+
+    sudo ./phoebe --port=443 --port=1965 \
+      --user=$(id --user --name) --group=$(id --group  --name)
+
+We need to use F<sudo> because all the ports below 1024 are priviledge ports and
+that includes the standard HTTPS port. Since we don't want the server itself to
+run with all those priviledges, however, I'm using the C<--user> and C<--group>
+options to change effective and user and group ID. The F<id> command is used to
+get your user and your group IDs instead. If you've followed the L</Quickstart>
+and created a separate C<phoebe> user, you could simply use C<--user=phoebe> and
+C<--group=phoebe> instead. 👍
+
+=head2 Configuration
+
+This section describes some hooks you can use to customize your wiki using the
+F<config> file, or using a Perl file (ending in F<*.pl> or F<*.pm>) in the
+F<conf.d> directory. Once you're happy with the changes you've made, reload the
+server to make it read the config file. You can do that by sending it the HUP
+signal, if you know the pid, or if you have a pid file:
+
+    kill -s SIGHUP `cat phoebe.pid`
+
+Here are the ways you can hook into Phoebe code:
+
+=over
+
+=item C<@init> is a list of code references allowing you to change the
+      configuration of the server; it gets executed as the server starts, after
+      regular configuration
+
+=item C<@extensions> is a list of code references allowing you to handle
+      additional URLs; return 1 if you handle a URL; each code reference gets
+      called with $self, the first line of the request (a Gemini URL, a Gopher
+      selector, a finger user, a HTTP request line), and a hash reference for
+      the headers (in the case of HTTP requests)
+
+=item C<@main_menu> adds more lines to the main menu, possibly links that aren't
+      simply links to existing pages
+
+=item C<@footer> is a list of code references allowing you to add things like
+      licenses or contact information to every page; each code reference gets
+      called with $self, $host, $space, $id, $revision, and $format ('gemini' or
+      'html') used to serve the page; return a gemtext string to append at the
+      end; the alternative is to overwrite the C<footer> or C<html_footer> subs
+      – the default implementation for Gemini adds History, Raw text and HTML
+      link, and C<@footer> to the bottom of every page; the default
+      implementatino for HTTP just adds C<@footer> to the bottom of every page
+
+=back
+
+A very simple example to add a contact mail at the bottom of every page; this
+works for both Gemini and the web:
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our (@footer);
+    push(@footer, sub { '=> mailto:alex@alexschroeder.ch Mail' });
+
+This prints a very simply footer instead of the usual footer for Gemini, as the
+C<footer> sub is redefined. At the same time, the C<@footer> array is still used
+for the web:
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our (@footer); # HTML only
+    push(@footer, sub { '=> https://alexschroeder.ch/wiki/Contact Contact' });
+    # footer sub is Gemini only
+    no warnings qw(redefine);
+    sub footer {
+      return '—' x 10 . "\n" . '=> mailto:alex@alexschroeder.ch Mail';
+    }
+
+This example also shows how to redefine existing code in your config file
+without the warning "Subroutine … redefined".
+
+Here's a more elaborate example to add a new action the main menu and a handler
+for it:
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our (@extensions, @main_menu);
+    push(@main_menu, "=> gemini://localhost/do/test Test");
+    push(@extensions, \&serve_test);
+    sub serve_test {
+      my $self = shift;
+      my $url = shift;
+      my $headers = shift;
+      my $host = $self->host_regex();
+      my $port = $self->port();
+      if ($url =~ m!^gemini://($host)(?::$port)?/do/test$!) {
+	say "20 text/plain\r";
+	say "Test";
+	return 1;
+      }
+      return;
+    }
+    1;
+
+=head2 Wiki Spaces
+
+Wiki spaces are separate wikis managed by the same Phoebe server, on the
+same machine, but with data stored in a different directory. If you used
+C<--wiki_space=alex> and C<--wiki_space=berta>, for example, then you'd have
+three wikis in total:
+
+=over
+
+=item C<gemini://localhost/> is the main space that continues to be available
+
+=item C<gemini://localhost/alex/> is the wiki space for Alex
+
+=item C<gemini://localhost/berta/> is the wiki space for Berta
+
+=back
+
+Note that all three spaces are still editable by anybody who knows any of the
+L<tokens|/Security>.
+
+=head2 Tokens per Wiki Space
+
+Per default, there is simply one set of tokens which allows the editing of the
+wiki, and all the wiki spaces you defined. If you want to give users a token
+just for their space, you can do that, too. Doing this is starting to strain the
+command line interface, however, and therefore the following illustrates how to
+do more advanced configuration using C<@init> in the config file:
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our (@init);
+    push(@init, \&init_tokens);
+    sub init_tokens {
+      my $self = shift;
+      $self->{server}->{wiki_space_token}->{alex} = ["*secret*"];
+    };
+
+The code above sets up the C<wiki_space_token> property. It's a hash reference
+where keys are existing wiki spaces and values are array references listing the
+valid tokens for that space (in addition to the global tokens that you can set
+up using C<--wiki_token> which defaults to the token "hello"). Thus, the above
+code sets up the token C<*secret*> for the C<alex> wiki space.
+
+You can use the config file to change the values of other properties as well,
+even if these properties are set via the command line.
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our (@init);
+    push(@init, \&init_tokens);
+    sub init_tokens {
+      my $self = shift;
+      $self->{server}->{wiki_token} = [];
+    };
+
+This code simply deactivates the token list. No more tokens!
+
+=head2 Client Certificates
+
+Phoebe serves a public wiki by default. In theory, limiting editing to
+known users (that is, known client certificates) is possible. I say "in theory"
+because this requires a small change to L<Net::Server::Proto::SSL>. For your
+convenience, this repository comes with a patched version (based on
+L<Net::Server> 2.009). All this does is add C<SSL_verify_callback> to the list of
+options for L<IO::Socket::SSL>. Phoebe includes the local F<lib> directory
+in its library search path, so if you have the F<lib/Net/Server/Proto/SSL.pm>
+file in the current directory where you start F<phoebe>, it should simply
+work.
+
+Here's a config file using client certificates to limit writing to a single,
+known fingerprint:
+
+    package App::Phoebe;
+    use Modern::Perl;
+    our (@init, @extensions);
+    my @fingerprints = ('sha256$e4b871adf0d74d9ab61fbf0b6773d75a152594090916834278d416a769712570');
+    push(@extensions, \&protected_wiki);
+    sub protected_wiki {
+      my $self = shift;
+      my $url = shift;
+      my $host_regex = $self->host_regex();
+      my $port = $self->port();
+      my $spaces = $self->space_regex();
+      my $fingerprint = $self->{server}->{client}->get_fingerprint();
+      if (my ($host, $path) = $url =~ m!^titan://($host_regex)(?::$port)?([^?#]*)!) {
+	my ($space, $resource) = $path =~ m!^(?:/($spaces))?(?:/raw)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!;
+	if (not $resource) {
+	  $self->log(4, "The Titan URL is malformed: $path $spaces");
+	  say "59 The Titan URL is malformed\r";
+	} elsif ($fingerprint and grep { $_ eq $fingerprint} @fingerprints) {
+	  $self->log(3, "Successfully identified client certificate");
+	  my ($id, @params) = split(/[;=&]/, $resource);
+	  $self->write_page($host, $self->space($host, $space), decode_utf8(uri_unescape($id)),
+			    {map {decode_utf8(uri_unescape($_))} @params});
+	} elsif ($fingerprint) {
+	  $self->log(3, "Unknown client certificate $fingerprint");
+	  say "61 Your client certificate is not authorized for editing\r";
+	} else {
+	  $self->log(3, "Requested client certificate");
+	  say "60 You need a client certificate to edit this wiki\r";
+	}
+	return 1;
+      }
+      return;
+    }
+    1;
+
+C<@fingerprints> is a list, so you could add more fingerprints:
+
+    my @fingerprints = qw(
+      sha256$e4b871adf0d74d9ab61fbf0b6773d75a152594090916834278d416a769712570
+      sha256$4a948f5a11f4a81d0a2e8b60b1e4b3c9d1e25f4d95694965d98b333a443a3b25);
+
+Or you could read them from a file:
+
+    use File::Slurper qw(read_lines);
+    my @fingerprints = read_lines("fingerprints");
+
+The important part is that this code matches the same Titan requests as the
+default code, and it comes first. Thus, the old code can no longer be reached
+and this code checks for a known client certificate fingerprint.
+
+To be sure, it doesn't check anything else! It doesn't check whether the client
+certificate has expired, for example.
+
+You could, for example, install Phoebe, use the code above for your config
+file, and replace the fingerprint with the fingerprint of your own client
+certificate. The F<Makefile> allows you to easily create such a certificate:
+
+    make client-cert
+
+Answer at least one of the questions OpenSSL asks of you and you should now have
+a F<client-cert.pem> and a F<client-key.pem> file. To get the fingerprint of
+your client certificate:
+
+    make client-fingerprint
+
+The output is the fingerprint you need to put into your config file.
+
+=head2 Virtual Hosting
+
+Sometimes you want have a machine reachable under different domain names and you
+want each domain name to have their own wiki space, automatically. You can do
+this by using multiple C<--host> options.
+
+Here's a simple, stand-alone setup that will work on your local machine. These
+are usually reachable using the IPv4 C<127.0.0.1> or the name C<localhost>. The
+following command tells Phoebe to serve both C<127.0.0.1> and C<localhost>
+(the default is to just serve C<localhost>).
+
+    perl phoebe --host=127.0.0.1 --host=localhost
+
+Visit both at L<gemini://localhost/> and L<gemini://127.0.0.1/>, and create a
+new page in each one, then examine the data directory F<wiki>. You'll see both
+F<wiki/localhost> and F<wiki/127.0.0.1>.
+
+If you're using more wiki spaces, you need to prefix them with the respective
+hostname if you use more than one:
+
+    perl phoebe --host=127.0.0.1 --host=localhost \
+        --wiki_space=127.0.0.1/alex --wiki_space=localhost/berta
+
+In this situation, you can visit L<gemini://127.0.0.1/>,
+L<gemini://127.0.0.1/alex/>, L<gemini://localhost/>, and
+L<gemini://localhost/berta/>, and they will all be different.
+
+If this is confusing, remember that not using virtual hosting and not using
+spaces is fine, too. 😀
+
+=head2 Multiple Certificates
+
+If you're using virtual hosting as discussed above, you have two options: you
+can use one certificate for all your hostnames, or you can use different
+certificates for the hosts. If you want to use just one certificate for all your
+hosts, you don't need to do anything else. If you want to use different
+certificates for different hosts, you have to specify them all on the command
+line. Generally speaking, use C<--host> to specifiy one or more hosts, followed
+by both C<--cert_file> and C<--key_file> to specifiy the certificate and key to
+use for the hosts.
+
+For example:
+
+    perl phoebe --host=transjovian.org \
+        --cert_file=/var/lib/dehydrated/certs/transjovian.org/cert.pem \
+        --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+        --host=alexschroeder.ch \
+        --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/cert.pem \
+        --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem
+
+=head2 CSS for the Web
+
+The wiki can also answer web requests. By default, it only does that on port
+1965. The web pages refer to a CSS file at C</default.css>, and the response to
+a request for this CSS is served by a function that you can override in your
+config file. The following would be the beginning of a CSS that supports a dark
+theme, for example. The
+L<Cache-Control|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control>
+header makes sure browsers don't keep trying to revalidate the CSS more than
+once a day.
+
+    sub serve_css_via_http {
+      my $self = shift;
+      $self->log(3, "Serving CSS via HTTP");
+      say "HTTP/1.1 200 OK\r";
+      say "Content-Type: text/css\r";
+      say "Cache-Control: public, max-age=86400, immutable\r"; # 24h
+      say "\r";
+      say <<'EOT';
+    html { max-width: 70ch; padding: 2ch; margin: auto; }
+    body { color: #111111; background-color: #fffff8; }
+    a:link { color: #0000ee }
+    a:visited { color: #551a8b }
+    a:hover { color: #7a67ee }
+    @media (prefers-color-scheme: dark) {
+       body { color: #eeeee8; background-color: #333333; }
+       a:link { color: #1e90ff }
+       a:hover { color: #63b8ff }
+       a:visited { color: #7a67ee }
+    }
+    EOT
+    }
+
+=head2 Favicon for the Web
+
+Here's an example where we a little Jupiter SVG is being served for the favicon,
+for all hosts. You could, of course, accept the C<$headers> as an additional
+argument to C<favicon>, match hostnames, pass the C<$host> to
+C<serve_favicon_via_http>, and return different images depending on the host.
+Let me know if you need this and you are stuck.
+
+    push(@extensions, \&favicon);
+
+    sub favicon {
+      my $self = shift;
+      my $url = shift;
+      if ($url =~ m!^GET /favicon.ico HTTP/1\.[01]$!) {
+	$self->serve_favicon_via_http();
+	return 1;
+      }
+      return 0;
+    }
+
+    sub serve_favicon_via_http {
+      my $self = shift;
+      $self->log(3, "Serving favicon via HTTP");
+      say "HTTP/1.1 200 OK\r";
+      say "Content-Type: image/svg+xml\r";
+      say "Cache-Control: public, max-age=86400, immutable\r"; # 24h
+      say "\r";
+      say <<'EOT';
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+    <circle cx="50" cy="50" r="45" fill="white" stroke="black" stroke-width="5"/>
+    <line x1="12" y1="25" x2="88" y2="25" stroke="black" stroke-width="4"/>
+    <line x1="5" y1="45" x2="95" y2="45" stroke="black" stroke-width="7"/>
+    <line x1="5" y1="60" x2="95" y2="60" stroke="black" stroke-width="4"/>
+    <path d="M20,73 C30,65 40,63 60,70 C70,72 80,73 90,72
+	     L90,74 C80,75 70,74 60,76 C40,83 30,81 20,73" fill="black"/>
+    <ellipse cx="40" cy="73" rx="11.5" ry="4.5" fill="red"/>
+    <line x1="22" y1="85" x2="78" y2="85" stroke="black" stroke-width="3"/>
+    </svg>
+    EOT
+    }
+
+=head2 More
+
+As you might have guessed, the system is easy to tinker with, if you know some
+Perl. L<The Transjovian Council|https://transjovian.org:1965/> has L<a wiki
+space dedicated to Phoebe|https://transjovian.org:1965/phoebe/>, and it includes
+a section with more configuration examples, including simple comments
+(append-only via Gemini), complex comments (editing via Titan or the web),
+wholesale page editing via the web, user-agent blocking, and so on.
+
+=cut
+
+package App::Phoebe;
+use base qw(Net::Server::Fork); # any personality will do
+use File::Slurper qw(read_text read_binary read_lines read_dir write_text write_binary);
+use Encode qw(encode_utf8 decode_utf8);
+use List::Util qw(first min);
+use Modern::Perl '2018';
+use File::ReadBackwards;
+use Algorithm::Diff;
+use IO::Socket::SSL;
+use URI::Escape;
+use Pod::Text;
+use utf8;
+use B;
+
+# The following is needed because there's a patched version of
+# Net::Server::Proto::SSL 2.009 in the repository which you need if you want to
+# use client certificates. If you don't need client certificates, then the
+# patched version of Net::Server::Proto::SSL is not required.
+use lib 'lib';
+
+# Phoebe variables you can set in the config file
+our (@init, @extensions, @main_menu, @footer);
+
+App::Phoebe->run(wiki_command_line());
+
+sub wiki_command_line {
+  # defaults
+  my %args = (
+    proto => 'ssl',
+    # default file names
+    SSL_cert_file => 'cert.pem',
+    SSL_key_file => 'key.pem',
+    # the following is needed for client certificates
+    SSL_verify_mode => SSL_VERIFY_PEER,
+    SSL_verify_callback => \&verify_fingerprint, );
+  my (@host, $cert, $key);
+  for (@ARGV) {
+    if ($_ eq '--help') {
+      my $parser = Pod::Text->new();
+      $parser->parse_file($0);
+      exit;
+    }
+    push(@host, $1) if /--host=([^\/*]+)/;
+    $cert = $1 if /--cert_file=(.*)/;
+    $key = $1 if /--key_file=(.*)/;
+    if ($cert and $key) {
+      if (@host) {
+	$args{SSL_cert_file} = {} unless ref $args{SSL_cert_file} eq 'HASH';
+	$args{SSL_key_file} = {} unless ref $args{SSL_key_file} eq 'HASH';
+	for (@host) {
+	  $args{SSL_cert_file}->{$_} = $cert;
+	  $args{SSL_key_file}->{$_} = $key;
+	}
+      } else {
+	$args{SSL_cert_file} = $cert;
+	$args{SSL_key_file} = $key;
+      }
+      $cert = $key = undef;
+      @host = ();
+    }
+  }
+  if ($cert or $key) {
+    die "I must have both --key_file and --cert_file\n";
+  }
+  if ($args{SSL_cert_file} eq 'cert.pem'
+      and $args{SSL_key_file} eq 'key.pem'
+      and (not -f $args{SSL_cert_file}
+	   or not -f $args{SSL_key_file})) {
+    generate_certificates();
+  }
+  return \%args;
+}
+
+sub generate_certificates {
+  local $SIG{'ALRM'} = sub {
+    die "Timed out!\n";
+  };
+  alarm(30); # timeout
+  say "The default certificate (and key) files are missing.";
+  say "Do you want to create them right now?";
+  say "The certificate uses eliptic curves and is valid for five years.";
+  say "If so, please provide your hostname (e.g. localhost).";
+  say "If not, just press Enter.";
+  my $hostname = <STDIN>;
+  chomp $hostname;
+  die "The hostname may not contain any whitespace\n" if $hostname =~ /\s/;
+  my $cmd = qq(openssl req -new -x509 -newkey ec -subj "/CN=$hostname" )
+      . qq(-pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem);
+  if ($hostname) {
+    say "$cmd ";
+    system($cmd) == 0
+      or die "openssl failed: $?";
+  }
+}
+
+sub verify_fingerprint {
+  my ($ok, $ctx_store, $certname, $error, $cert, $depth) = @_;
+  return 1;
+}
+
+sub default_values {
+  my $protocols = 'https?|ftp|afs|news|nntp|mid|cid|mailto|wais|prospero|telnet|gophers?|irc|feed|gemini|xmpp';
+  my $chars = '[-a-zA-Z0-9/@=+$_~*.,;:?!\'"()&#%]'; # see RFC 2396
+  return {
+    full_url_regex => "((?:$protocols):$chars+)",
+    host => 'localhost',
+    ipv => '*',
+    port => 1965,
+    wiki_token => ['hello'],
+    wiki_space => [],
+    wiki_mime_type => [],
+    wiki_dir => './wiki',
+    wiki_main_page => '',
+    wiki_page_size_limit => 100000,
+  };
+}
+
+sub options {
+  my $self = shift;
+  my $prop = $self->{'server'};
+  my $template = shift;
+  $self->SUPER::options($template);
+  $prop->{full_url_regex} ||= undef;
+  $template->{full_url_regex} = \$prop->{full_url_regex};
+  $prop->{wiki_dir} ||= undef;
+  $template->{wiki_dir} = \$prop->{wiki_dir};
+  $prop->{wiki_main_page} ||= undef;
+  $template->{wiki_main_page} = \$prop->{wiki_main_page};
+  $prop->{wiki_token} ||= [];
+  $template->{wiki_token} = $prop->{wiki_token};
+  $prop->{wiki_page} ||= [];
+  $template->{wiki_page} = $prop->{wiki_page};
+  $prop->{wiki_space} ||= [];
+  $template->{wiki_space} = $prop->{wiki_space};
+  $prop->{wiki_space_token} ||= {};
+  # no way to set it from the command line
+  $prop->{wiki_mime_type} ||= [];
+  $template->{wiki_mime_type} = $prop->{wiki_mime_type};
+  $prop->{wiki_page_size_limit} ||= undef;
+  $template->{wiki_page_size_limit} = \$prop->{wiki_page_size_limit};
+}
+
+sub post_configure_hook {
+  my $self = shift;
+  $self->{server}->{wiki_dir} = $ENV{PHOEBE_DATA_DIR} if $ENV{PHOEBE_DATA_DIR};
+  # config file with extra code; restart server if you change it
+  my $dir = $self->{server}->{wiki_dir};
+  my @config;
+  push(@config, "$dir/config") if -f "$dir/config";
+  push(@config, map { "$dir/conf.d/$_" } grep(/\.p[lm]$/, read_dir("$dir/conf.d"))) if -d "$dir/conf.d";
+  for my $config (@config) {
+    $self->log(3, "Running $config");
+    do $config if -r $config;
+    $self->log(1, "$@") if $@;
+  }
+  # summarize config results
+  $self->log(3, "PID $$");
+  $self->log(3, "Port @{$self->{server}->{port}}");
+  $self->log(3, "Host " . ("@{$self->{server}->{host}}" || "*"));
+    $self->log(3, "Space @{$self->{server}->{wiki_space}}");
+  if (@{$self->{server}->{host}} > 1) {
+    my $host_regex = $self->host_regex();
+    for (grep(!/^$host_regex\//, @{$self->{server}->{wiki_space}})) {
+      $self->log(2, "Space $_ is not prefixed with a known host");
+    }
+  } else {
+    for (grep(/\//, @{$self->{server}->{wiki_space}})) {
+      $self->log(2, "Space $_ is prefixed with a host but we serve just one");
+    }
+  }
+  $self->log(3, "Token @{$self->{server}->{wiki_token}}");
+  $self->log(3, "Main page $self->{server}->{wiki_main_page}");
+  $self->log(3, "Pages @{$self->{server}->{wiki_page}}");
+  $self->log(3, "MIME types @{$self->{server}->{wiki_mime_type}}");
+  $self->log(3, "Wiki data directory is $self->{server}->{wiki_dir}");
+}
+
+sub success {
+  my $self = shift;
+  my $type = shift || 'text/gemini; charset=UTF-8';
+  my $lang = shift;
+  if ($lang) {
+    say "20 $type; lang=$lang\r";
+  } else {
+    say "20 $type\r";
+  }
+}
+
+# We can't use C<flock> because this defaults to C<fcntl> which means they are
+# I<per process> and we don't know whether this code is going to be threaded or
+# not.
+sub with_lock {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $code = shift;
+  my $retry = shift;
+  my $dir = $self->wiki_dir($host, $space);
+  my $lock = "$dir/locked";
+  # remove stale locks
+  rmdir $lock if -e $lock and time() - $self->modified($lock) > 5;
+  for (1 .. 25) { # try up to 25×0.2s=5s
+    if (mkdir($lock)) {
+      eval { $code->() }; # protect against exceptions
+      $self->log(1, "Unable to run code with locked $lock: $@") if $@;
+      rmdir($lock);
+      return;
+    } else {
+      $self->log(4, "Waiting for $lock");
+      select(undef, undef, undef, 0.19 + rand(0.02)); # sleep ca. 0.2s
+    }
+  }
+  if ($retry) { # retry only once
+    $self->log(1, "Unable to unlock $lock");
+  } else {
+    $self->log(2, "Forced unlocking of $lock");
+    $self->unlock($lock);
+    $self->with_lock($lock, $code, 1);
+  }
+}
+
+# The hostnames we know we want to serve because they were specified via --host
+# options.
+sub host_regex {
+  my $self = shift;
+  return join("|", map { quotemeta } @{$self->{server}->{host}});
+}
+
+sub port {
+  my $self = shift;
+  return $self->{server}->{sockport}; # the actual port
+}
+
+# if you call this yourself, $id must look like "page/foo"
+sub link {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $scheme = shift || "gemini";
+  my $port = $self->port();
+  if ($space) {
+    $space = "" if $space eq $host;
+    $space =~ s/.*\///;
+    $space = uri_escape_utf8($space);
+  }
+  # don't encode the slash
+  return "$scheme://$host:$port/"
+      . ($space ? "$space/" : "")
+      . join("/", map { uri_escape_utf8($_) } split (/\//, $id));
+}
+
+sub link_html {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $title = shift;
+  my $id = shift;
+  if (not $id) {
+    $id = "page/$title";
+  }
+  my $port = $self->port();
+  # don't encode the slash
+  return "<a href=\"https://$host:$port/"
+      . ($space && $space ne $host ? uri_escape_utf8($space) . "/" : "")
+      . join("/", map { uri_escape_utf8($_) } split (/\//, $id))
+      . "\">"
+      . $self->quote_html($title)
+      . "</a>";
+}
+
+sub gemini_link {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $title = shift;
+  my $id = shift;
+  if (not $id) {
+    $id = "page/$title";
+  }
+  return "=> $id $title" if $id =~ /^$self->{server}->{full_url_regex}$/;
+  my $url = $self->link($host, $space, $id);
+  return "=> $url $title";
+}
+
+sub print_link {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $title = shift;
+  my $id = shift;
+  say $self->gemini_link($host, $space, $title, $id);
+}
+
+sub pages {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $re = shift;
+  my $dir = $self->wiki_dir($host, $space);
+  my $index = "$dir/index";
+  if (not -f $index) {
+    return if not -d "$dir/page";
+    my @pages = map { s/\.gmi$//; $_ } read_dir("$dir/page");
+    write_text($index, join("\n", @pages, ""));
+    return @pages;
+  }
+  return grep /$re/i, read_lines $index if $re;
+  return read_lines $index;
+}
+
+sub blog_pages {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  return sort { $b cmp $a } $self->pages($host, $space, '^\d\d\d\d-\d\d-\d\d');
+}
+
+sub blog {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $n = shift || 10;
+  my @blog = $self->blog_pages($host, $space);
+  return unless @blog;
+  say "Blog:";
+  # we should check for pages marked for deletion!
+  for my $id (@blog[0 .. min($#blog, $n - 1)]) {
+    $self->print_link($host, $space, $id);
+  }
+  $self->print_link($host, $space, "More...", "do/more/" . ($n * 10)) if @blog > $n;
+  say "";
+}
+
+sub blog_html {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $n = shift || 10;
+  my @blog = $self->blog_pages($host, $space);
+  return unless @blog;
+  say "<p>Blog:";
+  say "<ul>";
+  # we should check for pages marked for deletion!
+  for my $id (@blog[0 .. min($#blog, $n - 1)]) {
+    say "<li>" . $self->link_html($host, $space, $id);
+  }
+  say "</ul>";
+}
+
+sub serve_main_menu {
+  my $self = shift;
+  my $host = shift||"";
+  my $space = shift||"";
+  $self->log(3, "Serving main menu");
+  $self->success();
+  my $page = $self->{server}->{wiki_main_page};
+  if ($page) {
+    say $self->text($host, $space, $page);
+  } else {
+    say "# Welcome to Phoebe!";
+    say "";
+  }
+  $self->blog($host, $space, 10);
+  for my $id (@{$self->{server}->{wiki_page}}) {
+    $self->print_link($host, $space, $id);
+  }
+  for my $line (@main_menu) {
+    say $line;
+  }
+  $self->print_link($host, $space, "Changes", "do/changes");
+  $self->print_link($host, $space, "Search matching page names", "do/match");
+  $self->print_link($host, $space, "Search matching page content", "do/search");
+  $self->print_link($host, $space, "New page", "do/new");
+  say "";
+  $self->print_link($host, $space, "Index of all pages", "do/index");
+  $self->print_link($host, $space, "Index of all files", "do/files");
+  $self->print_link($host, undef, "Index of all spaces", "do/spaces")
+      if @{$self->{server}->{wiki_space}} or @{$self->{server}->{host}} > 1;
+  $self->print_link($host, $space, "Download data", "do/data");
+  # a requirement of the GNU Affero General Public License
+  $self->print_link($host, undef, "Source code", "do/source");
+  say "";
+}
+
+sub serve_main_menu_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving main menu via HTTP");
+  my $page = $self->{server}->{wiki_main_page};
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  if ($page) {
+    say "<title>" . $self->quote_html($page) . "</title>";
+  } else {
+    say "<title>Phoebe</title>";
+  }
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  if ($page) {
+    say $self->to_html($self->text($host, $space, $page));
+  } else {
+    say "<h1>Welcome to Phoebe!</h1>";
+  }
+  $self->blog_html($host, $space);
+  say "<p>Important links:";
+  say "<ul>";
+  my @pages = @{$self->{server}->{wiki_page}};
+  for my $id (@pages) {
+    say "<li>" . $self->link_html($host, $space, $id);
+  }
+  say "<li>" . $self->link_html($host, $space, "Changes", "do/changes");
+  say "<li>" . $self->link_html($host, $space, "Index of all pages", "do/index");
+  say "<li>" . $self->link_html($host, $space, "Index of all files", "do/files")
+      if @{$self->{server}->{wiki_mime_type}};
+  say "<li>" . $self->link_html($host, undef, "Index of all spaces", "do/spaces")
+      if @{$self->{server}->{wiki_space}} or @{$self->{server}->{host}} > 1;
+  # a requirement of the GNU Affero General Public License
+  say "<li>" . $self->link_html($host, undef, "Source", "do/source");
+  say "</ul>";
+  say "</body>";
+  say "</html>";
+}
+
+sub serve_css_via_http {
+  my $self = shift;
+  $self->log(3, "Serving CSS via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/css\r";
+  say "Cache-Control: public, max-age=86400, immutable\r"; # 24h
+  say "\r";
+  say "html { max-width: 70ch; padding: 2ch; margin: auto; color: #111; background: #ffe; }";
+}
+
+sub quote_html {
+  my $self = shift;
+  my $html = shift;
+  $html =~ s/&/&amp;/g;
+  $html =~ s/</&lt;/g;
+  $html =~ s/>/&gt;/g;
+  $html =~ s/[\x00-\x08\x0b\x0c\x0e-\x1f]/ /g; # legal xml: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+  return $html;
+}
+
+sub serve_blog {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $n = shift;
+  $self->success();
+  $self->log(3, "Serving blog");
+  say "# Blog";
+  my @blog = $self->blog_pages($host, $space);
+  if (not @blog) {
+    say "The are no blog pages.";
+    return;
+  }
+  say "Serving up to $n entries.";
+  for my $id (@blog[0 .. min($#blog, $n - 1)]) {
+    $self->print_link($host, $space, $id);
+  }
+  $self->print_link($host, $space, "More...", "do/more/" . ($n * 10)) if @blog > $n;
+}
+
+sub serve_index {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->success();
+  $self->log(3, "Serving index of all pages");
+  say "# All Pages";
+  my @pages = $self->pages($host, $space);
+  say "The are no pages." unless @pages;
+  for my $id (sort { $self->newest_first($a, $b) } @pages) {
+    $self->print_link($host, $space, $id);
+  }
+}
+
+sub serve_index_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving index of all pages via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>All Pages</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>All Pages</h1>";
+  my @pages = $self->pages($host, $space);
+  if (@pages) {
+    say "<ul>";
+    for my $id (sort { $self->newest_first($a, $b) } @pages) {
+      say "<li>" . $self->link_html($host, $space, $id);
+    }
+    say "</ul>";
+  } else {
+    say "<p>The are no pages."
+  }
+}
+
+sub files {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $re = shift;
+  my $dir = $self->wiki_dir($host, $space);
+  $dir = "$dir/file";
+  return if not -d $dir;
+  my @files = map { decode_utf8($_) } read_dir($dir);
+  return grep /$re/i, @files if $re;
+  return @files;
+}
+
+sub serve_files {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->success();
+  $self->log(3, "Serving index of all files");
+  say "# All Files";
+  my @files = $self->files($host, $space);
+  say "The are no files." unless @files;
+  for my $id (sort @files) {
+    $self->print_link($host, $space, $id, "file/$id");
+  }
+}
+
+sub serve_files_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving all files via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>All Files</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>All Files</h1>";
+  my @files = $self->files($host, $space);
+  if (@files) {
+    say "<ul>";
+    for my $id (sort @files) {
+      say "<li>" . $self->link_html($host, $space, $id, "file/$id");
+    }
+    say "</ul>";
+  } else {
+    say "<p>The are no files."
+  }
+}
+
+sub serve_spaces {
+  my $self = shift;
+  my $host = shift;
+  my $port = shift;
+  $self->success();
+  $self->log(3, "Serving all spaces");
+  say "# Spaces";
+  my $spaces = $self->space_links("gemini", $host, $port);
+  for my $url (sort keys %$spaces) {
+    say "=> $url $spaces->{$url}";
+  }
+}
+
+sub serve_spaces_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $port = shift;
+  $self->log(3, "Serving all spaces via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>All Spaces</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>All Spaces</h1>";
+  say "<ul>";
+  my $spaces = $self->space_links("https", $host, $port);
+  for my $url (sort keys %$spaces) {
+    say "<li><a href=\"$url\">$spaces->{$url}</a>";
+  }
+  say "</ul>";
+}
+
+sub serve_data {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  # use /bin/tar instead of Archive::Tar to save memory
+  my $dir = $self->wiki_dir($host, $space);
+  my $file = "$dir/data.tar.gz";
+  if (-e $file and time() - $self->modified($file) <= 300) { # data is valid for 5 minutes
+    $self->log(3, "Serving cached data archive");
+    $self->success("application/tar");
+    print read_binary($file);
+  } else {
+    write_binary($file, ""); # truncate in order to avoid "file changed as we read it" warning
+    my @command = ('/bin/tar', '--create', '--gzip',
+		   '--file', $file,
+		   '--exclude', $file,
+		   '--directory', "$dir/..",
+		   ((split(/\//,$dir))[-1]));
+    $self->log(4, "@command");
+    if (system(@command) == 0) {
+      $self->log(3, "Serving new data archive");
+      $self->success("application/tar");
+      print read_binary($file);
+    } else {
+      $self->log(1, "Creation of data archive failed");
+      say("59 Archive creation failed\r");
+    }
+  }
+}
+
+sub serve_match {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $match = shift;
+  if (not $match) {
+    say("59 Search term is missing\r");
+    return;
+  }
+  $self->success();
+  $self->log(3, "Serving pages matching $match");
+  say "# Search page titles for $match";
+  say "Use a Perl regular expression to match page titles.";
+  my @pages = $self->pages($host, $space, $match);
+  say "No matching page names found." unless @pages;
+  for my $id (sort { $self->newest_first($a, $b) } @pages) {
+    $self->print_link($host, $space, $id);
+  }
+}
+
+sub serve_search {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $str = shift;
+  if (not $str) {
+    say("59 Search term is missing\r");
+    return;
+  }
+  $self->success();
+  $self->log(3, "Serving search result for $str");
+  say "# Search page content for $str";
+  say "Use a Perl regular expression to match page titles and page content.";
+  if (not $self->search($host, $space, $str, sub { $self->highlight(@_) })) {
+    say "Search term not found."
+  }
+}
+
+sub search {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $str = shift;
+  my $func = shift;
+  my @pages = sort { $self->newest_first($a, $b) } $self->pages($host, $space);
+  return unless @pages;
+  my $found = 0;
+  for my $id (@pages) {
+    my $text = $self->text($host, $space, $id);
+    if ($id =~ /$str/ or $text =~ /$str/) {
+      $func->($host, $space, $id, $text, $str);
+      $found++;
+    }
+  }
+  return $found;
+}
+
+sub highlight {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $text = shift;
+  my $str = shift;
+  my ($snippetlen, $maxsnippets) = (100, 4); #  these seem nice.
+  # show a snippet from the beginning of the document
+  my $j = index($text, ' ', $snippetlen); # end on word boundary
+  my $t = substr($text, 0, $j);
+  my $result = "## $id\n$t … ";
+  $text = substr($text, $j);  # to avoid rematching
+  my $jsnippet = 0 ;
+  while ($jsnippet < $maxsnippets and $text =~ m/($str)/i) {
+    $jsnippet++;
+    if (($j = index($text, $1)) > -1 ) {
+      # get substr containing (start of) match, ending on word boundaries
+      my $start = index($text, ' ', $j - $snippetlen / 2);
+      $start = 0 if $start == -1;
+      my $end = index($text, ' ', $j + $snippetlen / 2);
+      $end = length($text) if $end == -1;
+      $t = substr($text, $start, $end - $start);
+      $result .= $t . ' … ';
+      # truncate text to avoid rematching the same string.
+      $text = substr($text, $end);
+    }
+  }
+  say $result;
+  $self->print_link($host, $space, $id);
+}
+
+sub serve_changes {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $n = shift;
+  my $style = shift;
+  $self->log(3, "Serving $n changes");
+  $self->success();
+  say "# Changes";
+  if (not $style) { $self->print_link($host, undef, "Colour changes", "do/changes/$n/colour") }
+  elsif ($style eq "colour") { $self->print_link($host, undef, "Fancy changes", "do/changes/$n/fancy") }
+  elsif ($style eq "fancy") { $self->print_link($host, undef, "Normal changes", "do/changes/$n") }
+  $self->print_link($host, undef, "Changes for all spaces", "do/all/changes")
+      if @{$self->{server}->{wiki_space}};
+  $self->print_link($host, $space, "Atom Feed", "do/atom");
+  $self->print_link($host, $space, "RSS Feed", "do/rss");
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  if (not -e $log) {
+    say "No changes.";
+    return;
+  }
+  say "Showing up to $n changes.";
+  my $fh = File::ReadBackwards->new($log);
+  return unless $self->changes(
+    $n,
+    sub { say "## " . shift },
+    sub { say shift . " by " . $self->colourize(shift, $style) },
+    sub { $self->print_link(@_) },
+    sub { say @_ },
+    sub {
+      return unless $_ = decode_utf8($fh->readline);
+      chomp;
+      split(/\x1f/), $host, $space, 0 });
+  say "";
+  $self->print_link($host, $space, "More...", "do/changes/" . 10 * $n . ($style ? "/$style" : ""));
+}
+
+sub serve_changes_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $n = shift;
+  $self->log(3, "Serving $n changes via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>Changes</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>Changes</h1>";
+  say "<ul>";
+  say "<li>" . $self->link_html($host, undef, "Changes for all spaces", "do/all/changes")
+      if @{$self->{server}->{wiki_space}};
+  say "<li>" . $self->link_html($host, $space, "Atom feed", "do/atom");
+  say "<li>" . $self->link_html($host, $space, "RSS feed", "do/rss");
+  say "</ul>";
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  if (not -e $log) {
+    say "<p>No changes.";
+    return;
+  }
+  say "<p>Showing up to $n changes.";
+  my $fh = File::ReadBackwards->new($log);
+  my $more = $self->changes(
+    $n,
+    sub { say "<h2>" . shift . "</h2>" },
+    sub { say "<p>" . shift . " by " . $self->colourize_html(shift) },
+    sub {
+      my ($host, $space, $title, $id) = @_;
+      say "<br> → " . $self->link_html($host, $space, $title, $id);
+    },
+    sub { say "<br> → $_[0]" },
+    sub {
+      return unless $_ = decode_utf8($fh->readline);
+      chomp;
+      split(/\x1f/), $host, $space, 0 });
+  return unless $more;
+  say "<p>" . $self->link_html($host, $space, "More...", "do/changes/" . 10 * $n);
+}
+
+sub serve_all_changes {
+  my $self = shift;
+  my $host = shift;
+  my $n = shift;
+  my $style = shift;
+  my $filter = shift;
+  $self->log(3, $filter ? "Serving $n all $filter changes" :  "Serving $n all changes");
+  $self->success();
+  say "# Changes for all spaces";
+  # merge all logs
+  my $log = $self->all_logs($host, $n);
+  if (not @$log) {
+    say "No changes.";
+    return;
+  }
+  my $filter_segment = $filter ? "/$filter" : "";
+  my $style_segment = $style ? "/$style" : "";
+  if (not $style) { $self->print_link($host, undef, "Colour changes", "do/all$filter_segment/changes/$n/colour") }
+  elsif ($style eq "colour") { $self->print_link($host, undef, "Fancy changes", "do/all$filter_segment/changes/$n/fancy") }
+  elsif ($style eq "fancy") { $self->print_link($host, undef, "Normal changes", "do/all$filter_segment/changes/$n") }
+  if ($filter) { $self->print_link($host, undef, "All changes", "do/all/changes/$n$style_segment") }
+  else { $self->print_link($host, undef, "Latest changes", "do/all/latest/changes/$n$style_segment") }
+  # taking the head of the @$log to get new log entries
+  $self->print_link($host, undef, "Atom Feed", "do/all/atom");
+  my $filter_description = $filter ? " $filter" : "";
+  say "Showing up to $n$filter_description changes.";
+  return unless $self->changes(
+    $n,
+    sub { say "## " . shift },
+    sub { say shift . " by " . $self->colourize(shift, $style) },
+    sub { $self->print_link(@_) },
+    sub { say @_ },
+    sub { @{shift(@$log) }, 1 if @$log },
+    undef,
+    $filter);
+  say "";
+  $self->print_link($host, undef, "More...", "do/all/changes/" . 10 * $n . ($style ? "/$style" : ""));
+}
+
+sub serve_all_changes_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $n = shift;
+  my $filter = shift;
+  $self->log(3, $filter ? "Serving $n all $filter changes via HTTP" : "Serving $n all changes via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>Changes for all spaces</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>Changes for all spaces</h1>";
+  say "<ul>";
+  say "<li>" . $self->link_html($host, undef, "Atom feed", "do/all/atom");
+  if ($filter) { say "<li>" . $self->link_html($host, undef, "All changes", "do/all/changes/$n") }
+  else { say "<li>" . $self->link_html($host, undef, "Latest changes", "do/all/latest/changes/$n") }
+  say "</ul>";
+  my $log = $self->all_logs($host, $n);
+  if (not @$log) {
+    say "<p>No changes.";
+    return;
+  }
+  # taking the head of the @$log to get new log entries
+  say "<p>Showing up to $n $filter changes.";
+  my $more = $self->changes(
+    $n,
+    sub { say "<h2>" . shift . "</h2>" },
+    sub { say "<p>" . shift . " by " . $self->colourize_html(shift) },
+    sub { say "<br> → " . $self->link_html(@_) },
+    sub { say "<br> → $_[0]" },
+    sub { @{shift(@$log) }, 1 if @$log },
+    undef,
+    $filter);
+  return unless $more;
+  say "<p>" . $self->link_html($host, undef, "More...", "do/all/changes/" . 10 * $n);
+}
+
+sub all_logs {
+  my $self = shift;
+  my $host = shift;
+  my $n = shift;
+  # merge all logs
+  my @log;
+  my $dir = $self->{server}->{wiki_dir};
+  my @spaces = $self->space_dirs();
+  for my $space (@spaces) {
+    my $log = $dir;
+    $log .= "/$space" if $space;
+    $log .= "/changes.log";
+    next unless -f $log;
+    $self->log(4, "Reading $log");
+    next unless my $fh = File::ReadBackwards->new($log);
+    if (@{$self->{server}->{host}} > 1) {
+      push(@log, @{$self->read_log($fh, $n, split(/\//, $space, 2))});
+    } else {
+      push(@log, @{$self->read_log($fh, $n, $host, $space)});
+    }
+  }
+  @log = sort { $b->[0] <=> $a->[0] } @log;
+  return \@log;
+ }
+
+sub read_log {
+  my $self = shift;
+  my $fh = shift; # File::ReadBackwards
+  my $n = shift;
+  my $host = shift;
+  my $space = shift;
+  my @log;
+  for (1 .. $n) {
+    $_ = decode_utf8($fh->readline);
+    # $_ can be undefined or a newline (which won't split)
+    last unless $_ and $_ ne "\n";
+    chomp;
+    push(@log, [split(/\x1f/), $host, $space]);
+  }
+  $self->log(4, "Read log: " . @log);
+  return \@log;
+}
+
+# $n is the number of changes to show. $header is a code reference that prints a
+# header for the date (one argument). $change is a code reference that prints
+# the time and code of the person making the change (two arguments). $link is a
+# code reference that prints a link (four arguments). $nolink is a code reference
+# that prints a name that isn't linked (one argument). $next is a code reference
+# that returns the list of attributes for the next change, these attributes
+# being: the timestamp (as returned by time); the page or file name; the page
+# revision or zero if a file; the code to represent the person that made the
+# change, represented as a string of octal digits that will be fed to the
+# colourize sub; the host, and the spaces, if any; and a boolean if space and
+# page or file name should both be shown (up to seven arguments). Finally, the
+# optional argument $kept is a code reference to say whether an old revision
+# actually exists. If not, there's no point in showing a diff link. The default
+# implementation checks for the existence of the keep file. $filter describes
+# how changes are to be filtered: 'latest' means that only the latest change
+# will be shown, i.e. a link to current revision. The default is to show all
+# changes.
+sub changes {
+  my $self = shift;
+  my $n = shift;
+  my $header = shift;
+  my $change = shift;
+  my $link = shift;
+  my $nolink = shift;
+  my $next = shift;
+  my $kept = shift || sub {
+    my ($host, $space, $id, $revision) = @_;
+    -e $self->wiki_dir($host, $space) . "/keep/$id/$revision.gmi";
+  };
+  my $filter = shift||'';
+  my $last_day = '';
+  my %seen;
+  for (1 .. $n) {
+    my ($ts, $id, $revision, $code, $host, $space, $show_space) = $next->();
+    return unless $ts and $id;
+    my $name = $self->name($id, $host, $space, $show_space);
+    next if $filter eq "latest" and $seen{$name};
+    my $day = $self->day($ts);
+    if ($day ne $last_day) {
+      $header->($day);
+      $last_day = $day;
+    }
+    $change->($self->time_of_day($ts), $code);
+    if ($revision eq "🖹") {
+      # a deleted page
+      $link->($host, $space, "$name (deleted)", "page/$id");
+      $link->($host, $space, "History", "history/$id");
+      $seen{$name} = 1;
+    } elsif ($revision eq "🖻") {
+      # a deleted file
+      $nolink->("$name (deleted file)");
+      $seen{$name . "\x1c"} = 1;
+    } elsif ($revision > 0) {
+      # a page
+      if ($seen{$name}) {
+	$link->($host, $space, "$name ($revision)", "page/$id/$revision");;
+	$link->($host, $space, "Differences", "diff/$id/$revision") if $kept->($host, $space, $id, $revision);
+      } elsif ($filter eq "latest") {
+	$link->($host, $space, "$name", "page/$id");
+	$link->($host, $space, "History", "history/$id");
+	$seen{$name} = 1;
+      } else {
+	$link->($host, $space, "$name (current)", "page/$id");
+	$link->($host, $space, "History", "history/$id");
+	$seen{$name} = 1;
+      }
+    } else {
+      # a file
+      if ($seen{$name . "\x1c"}) {
+	$nolink->("$name (file)");
+      } else {
+	$link->($host, $space, "$name (file)", "file/$id");
+	$seen{$name . "\x1c"} = 1;
+      }
+    }
+  }
+  return () = $next->(); # return something, if there's more
+}
+
+sub name {
+  my $self = shift;
+  my $id = shift;
+  my $host = shift;
+  my $space = shift;
+  my $show_space = shift;
+  if ($show_space) {
+    if (@{$self->{server}->{host}} > 1) {
+      if ($space) {
+	return "[$host/$space] $id";
+      } else {
+	return "[$host] $id";
+      }
+    } elsif ($space) {
+      return "[$space] $id";
+    }
+  }
+  return $id;
+}
+
+sub colourize {
+  my $self = shift;
+  my $code = shift;
+  my $style = shift;
+  my %rgb;
+  return $code unless $style;
+  if ($style eq "colour") {
+    # 3/4 bit
+    return join("", map { "\033[1;3${_};4${_}m${_}" } split //, $code) . "\033[0m ";
+  } elsif ($style eq "fancy") {
+    # 24 bit!
+    %rgb = (
+    0 => "0;0;0",
+    1 => "222;56;43",
+    2 => "57;181;74",
+    3 => "255;199;6",
+    4 => "0;111;184",
+    5 => "118;38;113",
+    6 => "44;181;233",
+    7 => "204;204;204", );
+    return join("", map { "\033[38;2;$rgb{$_};48;2;$rgb{$_}m$_" } split //, $code) . "\033[0m ";
+  }
+  return $code;
+}
+
+# https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
+sub colourize_html {
+  my $self = shift;
+  my $code = shift;
+  my %rgb = (
+    0 => "0,0,0",
+    1 => "222,56,43",
+    2 => "57,181,74",
+    3 => "255,199,6",
+    4 => "0,111,184",
+    5 => "118,38,113",
+    6 => "44,181,233",
+    7 => "204,204,204", );
+  $code = join("", map {
+    "<span style=\"color: rgb($rgb{$_}); background-color: rgb($rgb{$_})\">$_</span>";
+	       } split //, $code);
+  return $code;
+}
+
+sub serve_rss {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving Gemini RSS");
+  $self->success("application/rss+xml");
+  $self->rss($host, $space, 'gemini');
+}
+
+sub serve_rss_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving RSS via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: application/xml\r";
+  say "\r";
+  $self->rss($host, $space, 'https');
+}
+
+sub rss {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $scheme = shift;
+  my $name = $self->{server}->{wiki_main_page} || "Phoebe";
+  my $port = $self->port();
+  say "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">";
+  say "<channel>";
+  say "<title>" . $self->quote_html($name) . "</title>";
+  say "<description>Changes on this wiki.</description>";
+  say "<link>$scheme://$host:$port/</link>";
+  say "<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"$scheme://$host:$port/do/rss\" />";
+  say "<generator>Phoebe</generator>";
+  say "<docs>http://blogs.law.harvard.edu/tech/rss</docs>";
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  if (-e $log and my $fh = File::ReadBackwards->new($log)) {
+    my %seen;
+    for (1 .. 100) {
+      last unless $_ = decode_utf8($fh->readline);
+      chomp;
+      my ($ts, $id, $revision, $code) = split(/\x1f/);
+      next if $seen{$id};
+      $seen{$id} = 1;
+      say "<item>";
+      say "<title>" . $self->quote_html($id) . "</title>";
+      my $link = $self->link($host, $space, "page/$id", $scheme);
+      say "<link>$link</link>";
+      say "<guid>$link</guid>";
+      say "<description>" . $self->quote_html($self->text($host, $space, $id)) . "</description>";
+      my ($sec, $min, $hour, $mday, $mon, $year, $wday) = gmtime($ts); # Sat, 07 Sep 2002 00:00:01 GMT
+      say "<pubDate>"
+	  . sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", qw(Sun Mon Tue Wed Thu Fri Sat)[$wday], $mday,
+		    qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)[$mon], $year + 1900, $hour, $min, $sec)
+	  . "</pubDate>";
+      say "</item>";
+    }
+  }
+  say "</channel>";
+  say "</rss>";
+}
+
+sub serve_atom {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving Gemini Atom");
+  $self->success("application/atom+xml");
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  my $fh = File::ReadBackwards->new($log);
+  $self->atom(sub {
+    return unless $_ = decode_utf8($fh->readline);
+    chomp;
+    split(/\x1f/), $host, $space, 0
+  }, $host, $space, 'gemini');
+}
+
+sub serve_all_atom {
+  my $self = shift;
+  my $host = shift;
+  $self->log(3, "Serving Gemini Atom");
+  $self->success("application/atom+xml");
+  my $log = $self->all_logs($host, 30);
+  $self->atom(sub { @{shift(@$log) }, 1 if @$log }, $host, undef, 'gemini');
+}
+
+sub serve_atom_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $self->log(3, "Serving Atom via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: application/xml\r";
+  say "\r";
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  my $fh = File::ReadBackwards->new($log);
+  $self->atom(sub {
+    return unless $_ = decode_utf8($fh->readline);
+    chomp;
+    split(/\x1f/), $host, $space, 0
+  }, $host, $space, 'https');
+}
+
+sub serve_all_atom_via_http {
+  my $self = shift;
+  my $host = shift;
+  $self->log(3, "Serving Atom via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: application/xml\r";
+  say "\r";
+  my $log = $self->all_logs($host, 30);
+  $self->atom(sub { @{shift(@$log) }, 1 if @$log }, $host, undef, 'https');
+}
+
+# $next is a code reference that returns the list of attributes for the next
+# change, these attributes being: the timestamp (as returned by time); the page
+# or file name; the page revision or zero if a file; the code to represent the
+# person that made the change, represented as a string of octal digits that will
+# be fed to the colourize sub; the host, and the spaces, if any; and a boolean
+# if space and page or file name should both be shown (up to seven arguments).
+# $scheme is either 'gemini' or 'https'.
+sub atom {
+  my $self = shift;
+  my $next = shift;
+  my $host = shift;
+  my $space = shift;
+  my $scheme = shift;
+  my $first_host = shift;
+  my $name = $self->{server}->{wiki_main_page} || "Phoebe";
+  my $port = $self->port();
+  say "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+  say "<feed xmlns=\"http://www.w3.org/2005/Atom\">";
+  say "<title>" . $self->quote_html($name) . "</title>";
+  my $link = $self->link($host, $space, "", $scheme);
+  say "<link href=\"$link\"/>";
+  $link = $self->link($host, $space, "do/atom", $scheme);
+  say "<link rel=\"self\" type=\"application/atom+xml\" href=\"$link\"/>";
+  say "<id>$link</id>";
+  my $feed_ts = "0001-01-01T00:00:00Z";
+  say "<generator uri=\"https://alexschroeder.ch/cgit/phoebe/about/\" version=\"1.0\">Phoebe</generator>";
+  my %seen;
+  for (1 .. 100) {
+    my ($ts, $id, $revision, $code, $host, $space, $show_space) = $next->();
+    last unless $ts and $id;
+    $feed_ts = $ts if $ts gt $feed_ts;
+    my $name = $self->name($id, $host, $space, $show_space);
+    if ($revision eq "🖹") {
+      next if $seen{$name};
+      # a deleted page
+      say "<entry>";
+      say "<title>" . $self->quote_html($name) . " (deleted)</title>";
+      $seen{$name} = 1;
+    } elsif ($revision eq "🖻") {
+      # a deleted file
+      next if $seen{$name . "\x1c"};
+      say "<entry>";
+      say "<title>" . $self->quote_html($name) . " (deleted file)</title>";
+      $seen{$name . "\x1c"} = 1;
+    } elsif ($revision > 0) {
+      # a page
+      next if $seen{$name};
+      say "<entry>";
+      say "<title>" . $self->quote_html($name) . "</title>";
+      my $link = $self->link($host, $space, "page/$id", $scheme);
+      say "<link href=\"$link\"/>";
+      say "<id>$link</id>";
+      say "<content type=\"text\">" . $self->quote_html($self->text($host, $space, $id)) . "</content>";
+      $seen{$name} = 1;
+    } else {
+      # a file
+      next if $seen{$name . "\x1c"};
+      say "<entry>";
+      say "<title>" . $self->quote_html($name) . " (file)</title>";
+      my $link = $self->link($host, $space, "file/$id", $scheme);
+      say "<link href=\"$link\"/>";
+      say "<id>$link</id>";
+      $seen{$name . "\x1c"} = 1;
+    }
+    my ($sec, $min, $hour, $mday, $mon, $year) = gmtime($ts); # 2003-12-13T18:30:02Z
+    say "<updated>"
+	. sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ", $year + 1900, $mon + 1, $mday, $hour, $min, $sec)
+	. "</updated>";
+    say "<author><name>$code</name></author>";
+    say "</entry>";
+  }
+  say "<updated>$feed_ts</updated>";
+  say "</feed>";
+}
+
+sub serve_raw {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serving raw $id");
+  $self->success('text/plain; charset=UTF-8');
+  print $self->text($host, $space, $id, $revision);
+}
+
+sub serve_raw_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serving raw $id via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/plain; charset=UTF-8\r";
+  say "\r";
+  print $self->text($host, $space, $id, $revision);
+}
+
+sub serve_diff {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  my $style = shift;
+  $self->log(3, "Serving the diff of $id");
+  $self->success();
+  say "# Differences for $id";
+  if (not $style) { $self->print_link($host, $space, "Colour diff", "diff/$id/$revision/colour") }
+  else { $self->print_link($host, $space, "Normal diff", "diff/$id/$revision") }
+  say "Showing the differences between revision $revision and the current revision.";
+  my $new = $self->text($host, $space, $id);
+  my $old = $self->text($host, $space, $id, $revision);
+  if (not $style) {
+    say $self->diff($old, $new,
+		    sub { say $_ for @_ },
+		    sub { say "> $_" for map { $_||"⏎" } @_ },
+		    sub { say "> $_" for map { $_||"⏎" } @_ },
+		    sub { "｢$_[0]｣" });
+  } else {
+    say $self->diff($old, $new,
+		    sub { say $_ for @_ },
+		    sub { say "> \033[31m$_\033[0m" for map { $_||"⏎" } @_ },
+		    sub { say "> \033[32m$_\033[0m" for map { $_||"⏎" } @_ },
+		    sub { "\033[1m$_[0]\033[22m" });
+  }
+}
+
+sub serve_diff_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serving the diff of $id via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>Differences for " . $self->quote_html($id) . "</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>Differences for " . $self->quote_html($id) . "</h1>";
+  say "<p>Showing the differences between revision $revision and the current revision.";
+  my $new = $self->text($host, $space, $id);
+  my $old = $self->text($host, $space, $id, $revision);
+  say $self->diff($old, $new,
+		  sub { say "<p>$_" for @_ },
+		  sub { say "<p style=\"color: rgb(222,56,43)\">" . join("<br>", map { $_||"⏎" } @_) },
+		  sub { say "<p style=\"color: rgb(57,181,74)\">" . join("<br>", map { $_||"⏎" } @_) },
+		  sub { "<strong>$_</strong>" });
+}
+
+# old text, new text, code reference to print a paragraph, print deleted text,
+# print added text
+sub diff {
+  my $self = shift;
+  my @old = split(/\n/, shift);
+  my @new = split(/\n/, shift);
+  my $paragraph = shift;
+  my $deleted = shift;
+  my $added = shift;
+  my $highlight = shift;
+  $self->log(4, "Preparing a diff");
+  my $diff = Algorithm::Diff->new(\@old, \@new);
+  $diff->Base(1); # line numbers, not indices
+  my $result = '';
+  while($diff->Next()) {
+    next if $diff->Same();
+    my $sep = '';
+    my ($min1, $max1, $min2, $max2) = $diff->Get(qw(min1 max1 min2 max2));
+    if ($diff->Diff == 3) {
+      my ($from, $to) = $self->refine([$diff->Items(1)], [$diff->Items(2)], $highlight);
+      $paragraph->($min1 == $max1 ? "Changed line $min1 from:" : "Changed lines $min1–$max1 from:");
+      $deleted->(@$from);
+      $paragraph->($min2 == $max2 ? "to:" : "to lines $min2–$max2:");
+      $added->(@$to);
+    } elsif ($diff->Diff == 2) {
+      $paragraph->($min2 == $max2 ? "Added line $min2:" : "Added lines $min2–$max2:");
+      $added->($diff->Items(2));
+    } elsif ($diff->Diff == 1) {
+      $paragraph->($min1 == $max1 ? "Deleted line $min1:" : "Deleted lines $min1–$max1:");
+      $deleted->($diff->Items(1));
+    }
+  }
+  return $result;
+}
+
+# $from_lines and $to_lines are references to lists of lines. The lines are
+# concatenated and split by words.
+sub refine {
+  my $self = shift;
+  my $from_lines = shift;
+  my $to_lines = shift;
+  my $highlight = shift;
+  # split by words+whitespace, i.e. "split ", "by ", "words+whitespace, " ...
+  my $diff = Algorithm::Diff->new([split(/\b(?=\w)/, join("\n", @$from_lines))],
+				  [split(/\b(?=\w)/, join("\n", @$to_lines))]);
+  my ($from, $to);
+  while($diff->Next()) {
+    if (my @list = $diff->Same()) {
+      $from .= join('', @list);
+      $to .= join('', @list);
+    } else {
+      # reassemble the chunks, and highlight them per line, don't strip trailing newlines!
+      $from .= join("\n", map { $_ ? $highlight->($_) : $_ } (split(/\n/, join('', $diff->Items(1)), -1)));
+      $to   .= join("\n", map { $_ ? $highlight->($_) : $_ } (split(/\n/, join('', $diff->Items(2)), -1)));
+    }
+  }
+  # return lines
+  return [split(/\n/, $from)], [split(/\n/, $to)];
+}
+
+sub serve_html {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->success('text/html');
+  $self->log(3, "Serving $id as HTML");
+  $self->html_page($host, $space, $id, $revision);
+}
+
+sub serve_page_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serving $id as HTML via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  $self->html_page($host, $space, $id, $revision);
+}
+
+sub html_page {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>" . $self->quote_html($id) . "</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>" . $self->quote_html($id) . "</h1>";
+  say $self->to_html($self->text($host, $space, $id, $revision));
+  say $self->to_html($self->html_footer($host, $space, $id, $revision));
+  say "</body>";
+  say "</html>";
+}
+
+# returns lines!
+sub to_html {
+  my $self = shift;
+  my $text = shift;
+  my @lines;
+  my $list;
+  my $code;
+  for (split /\n/, $self->quote_html($text)) {
+    if (/^```(?:type=([a-z]+))?/) {
+      my $type = $1||"default";
+      if ($code) {
+	push @lines, "</pre>";
+	$code = 0;
+      } else {
+	push @lines, "</ul>" if $list;
+	$list = 0;
+	push @lines, "<pre class=\"$type\">";
+	$code = 1;
+      }
+    } elsif ($code) {
+      push @lines, $_;
+    } elsif (/^\* +(.*)/) {
+      push @lines, "<ul>" unless $list;
+      push @lines, "<li>$1";
+      $list = 1;
+    } elsif (my ($url, $text) = /^=&gt;\s*(\S+)\s*(.*)/) { # quoted HTML!
+      push @lines, "<ul>" unless $list;
+      $text ||= $url;
+      push @lines, "<li><a href=\"$url\">$text</a>";
+      $list = 1;
+    } elsif (/^(#{1,6})\s*(.*)/) {
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      my $level = length($1);
+      push @lines, "<h$level>$2</h$level>";
+    } elsif (/^&gt;\s*(.*)/) { # quoted HTML!
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      push @lines, "<blockquote>$1</blockquote>";
+    } else {
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      push @lines, "<p>$_";
+    }
+  }
+  push @lines, "</pre>" if $code;
+  push @lines, "</ul>" if $list;
+  return join("\n", @lines);
+}
+
+sub html_footer {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift||"";
+  my @links;
+  push(@links, $_->($self, $host, $space, $id, $revision, "html")) for @footer;
+  my $html = join("\n", @links);
+  return "\n\nMore:\n$html" if $html =~ /\S/;
+  return "";
+}
+
+sub day {
+  my $self = shift;
+  my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(shift);
+  return sprintf('%4d-%02d-%02d', $year + 1900, $mon + 1, $mday);
+}
+
+sub time_of_day {
+  my $self = shift;
+  my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(shift);
+  return sprintf('%02d:%02d UTC', $hour, $min);
+}
+
+sub modified {
+  my $self = shift;
+  my $ts = (stat(shift))[9];
+  return $ts;
+}
+
+sub serve_history {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $n = shift;
+  my $style = shift;
+  $self->success();
+  $self->log(3, "Serve history for $id");
+  say "# Page history for $id";
+  if (not $style) { $self->print_link($host, $space, "Colour history", "history/$id/$n/colour") }
+  elsif ($style eq "colour") { $self->print_link($host, $space, "Fancy history", "history/$id/$n/fancy") }
+  elsif ($style eq "fancy") { $self->print_link($host, $space, "Normal history", "history/$id/$n") }
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  if (not -e $log) {
+    say "No changes.";
+    return;
+  }
+  say "Showing up to $n changes.";
+  my $fh = File::ReadBackwards->new($log);
+  return unless $self->changes(
+    $n,
+    sub { say "## " . shift },
+    sub { say shift . " by " . $self->colourize(shift, $style) },
+    sub { $self->print_link(@_) },
+    sub { say @_ },
+    sub {
+    READ:
+      return unless $_ = decode_utf8($fh->readline);
+      chomp;
+      my ($ts, $id_log, $revision, $code) = split(/\x1f/);
+      goto READ if $id_log ne $id;
+      $ts, $id_log, $revision, $code, $host, $space, 0 });
+  say "";
+  $self->print_link($host, $space, "More...", "history/" . uri_escape_utf8($id) . "/" . 10 * $n . ($style ? "/$style" : ""));
+}
+
+sub serve_history_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $n = shift;
+  $self->log(3, "Serve history for $id via HTTP");
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: text/html\r";
+  say "\r";
+  say "<!DOCTYPE html>";
+  say "<html>";
+  say "<head>";
+  say "<meta charset=\"utf-8\">";
+  say "<title>Page history for " . $self->quote_html($id) . "</title>";
+  say "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+  say "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  say "</head>";
+  say "<body>";
+  say "<h1>Page history for " . $self->quote_html($id) . "</h1>";
+  my $dir = $self->wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  if (not -e $log) {
+    say "<p>No changes.";
+    return;
+  }
+  say "<p>Showing up to $n changes.";
+  my $fh = File::ReadBackwards->new($log);
+  my $first = 1;
+  my $more = $self->changes(
+    $n,
+    sub { say "<h2>" . shift . "</h2>" },
+    sub { say "<p>" . shift . " by " . $self->colourize_html(shift) },
+    sub {
+      my ($host, $space, $title, $id) = @_;
+      say "<br> → " . $self->link_html($host, $space, $title, $id);
+    },
+    sub { "<br> → $_[0]" },
+    sub {
+    READ:
+      return unless $_ = decode_utf8($fh->readline);
+      chomp;
+      my ($ts, $id_log, $revision, $code) = split(/\x1f/);
+      goto READ if $id_log ne $id;
+      $ts, $id_log, $revision, $code, $host, $space, 0 });
+  return unless $more;
+  say "<p>" . $self->link_html($host, $space, "More...", "history/" . uri_escape_utf8($id) . "/" . 10 * $n);
+}
+
+sub footer {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift||"";
+  my @links;
+  push(@links, $self->gemini_link($host, $space, "History", "history/$id"));
+  push(@links, $self->gemini_link($host, $space, "Raw text", "raw/$id/$revision"));
+  push(@links, $self->gemini_link($host, $space, "HTML", "html/$id/$revision"));
+  push(@links, $_->($self, $host, $space, $id, $revision, "gemini")) for @footer;
+  return join("\n", "\n\nMore:", @links, ""); # includes a trailing newline
+}
+
+sub serve_page {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serve Gemini page $id");
+  $self->success();
+  say "# $id";
+  print $self->text($host, $space, $id, $revision);
+  print $self->footer($host, $space, $id, $revision);
+}
+
+sub text {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  my $dir = $self->wiki_dir($host, $space);
+  return read_text "$dir/keep/$id/$revision.gmi" if $revision and -f "$dir/keep/$id/$revision.gmi";
+  return read_text "$dir/page/$id.gmi" if -f "$dir/page/$id.gmi";
+  return $self->robots() if $id eq "robots" and not $space;
+  return "This this revision is no longer available." if $revision;
+  return "This page does not yet exist.";
+}
+
+sub robots () {
+  my $self = shift;
+  my $ban = << 'EOT';
+User-agent: *
+Disallow: raw/*
+Disallow: html/*
+Disallow: diff/*
+Disallow: history/*
+Disallow: do/changes*
+Disallow: do/all/changes*
+Disallow: do/all/latest/changes*
+Disallow: do/rss
+Disallow: do/atom
+Disallow: do/all/atom
+Disallow: do/new
+Disallow: do/more
+Disallow: do/match
+Disallow: do/search
+# allowing do/index!
+Crawl-delay: 10
+EOT
+  my @disallows = $ban =~ /Disallow: (.*)/g;
+  return $ban
+      . join("\n",
+	     map {
+	       my $space = $_;
+	       join("\n", "# $space", map { "Disallow: $space/$_" } @disallows)
+	     } @{$self->{server}->{wiki_space}}) . "\n";
+}
+
+sub serve_file {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serve file $id");
+  my $dir = $self->wiki_dir($host, $space);
+  my $file = "$dir/file/$id";
+  my $meta = "$dir/meta/$id";
+  if (not -f $file) {
+    say "40 File not found\r";
+    return;
+  } elsif (not -f $meta) {
+    say "40 Metadata not found\r";
+    return;
+  }
+  my %meta = (map { split(/: /, $_, 2) } read_lines($meta));
+  if (not $meta{'content-type'}) {
+    say "59 Metadata corrupt\r";
+    return;
+  }
+  $self->success($meta{'content-type'});
+  print read_binary($file);
+}
+
+sub serve_file_via_http {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $revision = shift;
+  $self->log(3, "Serve file $id");
+  my $dir = $self->wiki_dir($host, $space);
+  my $file = "$dir/file/$id";
+  my $meta = "$dir/meta/$id";
+  if (not -f $file) {
+    say "HTTP/1.1 404 Error\r";
+    say "Content-Type: text/plain\r";
+    say "\r";
+    say "File not found\r";
+    return;
+  } elsif (not -f $meta) {
+    say "HTTP/1.1 500 Error\r";
+    say "Content-Type: text/plain\r";
+    say "\r";
+    say "Metadata not found\r";
+    return;
+  }
+  my %meta = (map { split(/: /, $_, 2) } read_lines($meta));
+  if (not $meta{'content-type'}) {
+    say "HTTP/1.1 500 Error\r";
+    say "Content-Type: text/plain\r";
+    say "\r";
+    say "Metadata corrupt\r";
+    return;
+  }
+  say "HTTP/1.1 200 OK\r";
+  say "Content-Type: " . $meta{'content-type'} ."\r";
+  say "\r";
+  print read_binary($file);
+}
+
+sub newest_first {
+  my $self = shift;
+  my ($date_a, $article_a) = $a =~ /^(\d\d\d\d-\d\d(?:-\d\d)? ?)?(.*)/;
+  my ($date_b, $article_b) = $b =~ /^(\d\d\d\d-\d\d(?:-\d\d)? ?)?(.*)/;
+  return (($date_b and $date_a and $date_b cmp $date_a)
+	  || ($article_a cmp $article_b)
+	  # this last one should be unnecessary
+	  || ($a cmp $b));
+}
+
+sub bogus_hash {
+  my $self = shift;
+  my $str = shift;
+  my $num = unpack("L",B::hash($str)); # 32-bit integer
+  my $code = sprintf("%o", $num); # octal is 0-7
+  return substr($code, 0, 4); # four numbers
+}
+
+sub write_file {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $data = shift;
+  my $type = shift;
+  $self->log(3, "Writing file $id");
+  my $dir = $self->wiki_dir($host, $space);
+  my $file = "$dir/file/$id";
+  my $meta = "$dir/meta/$id";
+  if (-e $file) {
+    my $old = read_binary($file);
+    if ($old eq $data) {
+      $self->log(3, "$id is unchanged");
+      say "30 " . $self->link($host, $space, "page/$id") . "\r";
+      return;
+    }
+  }
+  my $log = "$dir/changes.log";
+  if (not open(my $fh, ">>:encoding(UTF-8)", $log)) {
+    $self->log(1, "Cannot write log $log: $!");
+    say "59 Unable to write log\r";
+    return;
+  } else {
+    my $peeraddr = $self->{server}->{'peeraddr'};
+    say $fh join("\x1f", scalar(time), $id, 0, $self->bogus_hash($peeraddr));
+    close($fh);
+  }
+  mkdir "$dir/file" unless -d "$dir/file";
+  eval { write_binary($file, $data) };
+  if ($@) {
+    say "59 Unable to save $id: $@\r";
+    return;
+  }
+  mkdir "$dir/meta" unless -d "$dir/meta";
+  eval { write_text($meta, "content-type: $type\n") };
+  if ($@) {
+    say "59 Unable to save metadata for $id: $@\r";
+    return;
+  }
+  $self->log(3, "Wrote $id");
+  say "30 " . $self->link($host, $space, "file/$id") . "\r";
+}
+
+sub delete_file {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  $self->log(3, "Deleting file $id");
+  my $dir = $self->wiki_dir($host, $space);
+  unlink("$dir/file/$id", "$dir/meta/$id");
+  my $log = "$dir/changes.log";
+  if (not open(my $fh, ">>:encoding(UTF-8)", $log)) {
+    $self->log(1, "Cannot write log $log: $!");
+    say "59 Unable to write log\r";
+    return;
+  } else {
+    my $peeraddr = $self->{server}->{'peeraddr'};
+    say $fh join("\x1f", scalar(time), $id, "🖻", $self->bogus_hash($peeraddr));
+    close($fh);
+  }
+  $self->success();
+  say "# $id";
+  say "The file was deleted.";
+}
+
+sub write {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $text = shift;
+  $self->log(3, "Writing page $id");
+  my $dir = $self->wiki_dir($host, $space);
+  my $file = "$dir/page/$id.gmi";
+  my $revision = 0;
+  if (-e $file) {
+    my $old = read_text($file);
+    if ($old eq $text) {
+      $self->log(3, "$id is unchanged");
+      say "30 " . $self->link($host, $space, "page/$id") . "\r";
+      return;
+    }
+    mkdir "$dir/keep" unless -d "$dir/keep";
+    if (-d "$dir/keep/$id") {
+      foreach (read_dir("$dir/keep/$id")) {
+	$revision = $1 if m/^(\d+)\.gmi$/ and $1 > $revision;
+      }
+      $revision++;
+    } else {
+      mkdir "$dir/keep/$id";
+      $revision = 1;
+    }
+    rename $file, "$dir/keep/$id/$revision.gmi";
+  } else {
+    my $index = "$dir/index";
+    if (not open(my $fh, ">>:encoding(UTF-8)", $index)) {
+      $self->log(1, "Cannot write index $index: $!");
+      say "59 Unable to write index\r";
+      return;
+    } else {
+      say $fh $id;
+      close($fh);
+    }
+  }
+  my $log = "$dir/changes.log";
+  if (not open(my $fh, ">>:encoding(UTF-8)", $log)) {
+    $self->log(1, "Cannot write log $log: $!");
+    say "59 Unable to write log\r";
+    return;
+  } else {
+    my $peeraddr = $self->{server}->{'peeraddr'};
+    say $fh join("\x1f", scalar(time), $id, $revision + 1, $self->bogus_hash($peeraddr));
+    close($fh);
+  }
+  mkdir "$dir/page" unless -d "$dir/page";
+  eval { write_text($file, $text) };
+  if ($@) {
+    $self->log(1, "Unable to save $id: $@");
+    say "59 Unable to save $id: $@\r";
+  } else {
+    $self->log(3, "Wrote $id");
+    say "30 " . $self->link($host, $space, "page/$id") . "\r";
+  }
+}
+
+sub delete {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  $self->log(3, "Deleting page $id");
+  my $dir = $self->wiki_dir($host, $space);
+  my $file = "$dir/page/$id.gmi";
+  if (-e $file) {
+    my $revision = 0;
+    mkdir "$dir/keep" unless -d "$dir/keep";
+    if (-d "$dir/keep/$id") {
+      foreach (read_dir("$dir/keep/$id")) {
+	$revision = $1 if m/^(\d+)\.gmi$/ and $1 > $revision;
+      }
+      $revision++;
+    } else {
+      mkdir "$dir/keep/$id";
+      $revision = 1;
+    }
+    # effectively deleting the file
+    rename $file, "$dir/keep/$id/$revision.gmi";
+  }
+  my $index = "$dir/index";
+  if (-f $index) {
+    # remove $id from the index
+    my @pages = grep { $_ ne $id } read_lines $index;
+    write_text($index, join("\n", @pages, ""));
+  }
+  my $log = "$dir/changes.log";
+  if (not open(my $fh, ">>:encoding(UTF-8)", $log)) {
+    $self->log(1, "Cannot write log $log: $!");
+    say "59 Unable to write log\r";
+    return;
+  } else {
+    my $peeraddr = $self->{server}->{'peeraddr'};
+    say $fh join("\x1f", scalar(time), $id, "🖹", $self->bogus_hash($peeraddr));
+    close($fh);
+  }
+  $self->log(3, "Deleted $id");
+  say "30 " . $self->link($host, $space, "page/$id") . "\r";
+}
+
+sub write_page {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $id = shift;
+  my $params = shift;
+  if (not $id) {
+    $self->log(4, "The URL lacks a page name");
+    say "59 The URL lacks a page name\r";
+    return;
+  }
+  if (my $error = $self->valid($id)) {
+    $self->log(4, "$id is not a valid page name: $error");
+    say "59 $id is not a valid page name: $error\r";
+    return;
+  }
+  my $token = quotemeta($params->{token}||"");
+  my @tokens = @{$self->{server}->{wiki_token}};
+  push(@tokens, @{$self->{server}->{wiki_space_token}->{$space}})
+      if $space and $self->{server}->{wiki_space_token}->{$space};
+  $self->log(4, "Valid tokens: @tokens");
+  $self->log(4, "Spaces: " . join(", ", keys %{$self->{server}->{wiki_space_token}}));
+  if (not $token and @tokens) {
+    $self->log(4, "Uploads require a token");
+    say "59 Uploads require a token\r";
+    return;
+  } elsif (not grep(/^$token$/, @tokens)) {
+    $self->log(4, "Your token is the wrong token");
+    say "59 Your token is the wrong token\r";
+    return;
+  }
+  my $type = $params->{mime};
+  my ($main_type) = split(/\//, $type, 1);
+  my @types = @{$self->{server}->{wiki_mime_type}};
+  if (not $type) {
+    $self->log(4, "Uploads require a MIME type");
+    say "59 Uploads require a MIME type\r";
+    return;
+  } elsif ($type ne "text/plain" and not grep(/^$type$/, @types) and not grep(/^$main_type$/, @types)) {
+    $self->log(4, "This wiki does not allow $type");
+    say "59 This wiki does not allow $type\r";
+    return;
+  }
+  my $length = $params->{size};
+  if ($length > $self->{server}->{wiki_page_size_limit}) {
+    $self->log(4, "This wiki does not allow more than $self->{server}->{wiki_page_size_limit} bytes per page");
+    say "59 This wiki does not allow more than $self->{server}->{wiki_page_size_limit} bytes per page\r";
+    return;
+  } elsif ($length !~ /^\d+$/) {
+    $self->log(4, "You need to send along the number of bytes, not $length");
+    say "59 You need to send along the number of bytes, not $length\r";
+    return;
+  }
+  my ($data, $actual) = $self->read_stdin($length);
+  if ($actual != $length) {
+    $self->log(4, "Got $actual bytes instead of $length");
+    say "59 Got $actual bytes instead of $length\r";
+    return;
+  }
+  if ($type ne "text/plain") {
+    if ($length == 0) {
+      $self->with_lock($host, $space, sub { $self->delete_file($host, $space, $id) } );
+      return;
+    } else {
+      $self->with_lock($host, $space, sub { $self->write_file($host, $space, $id, $data, $type) } );
+      return;
+    }
+  } elsif ($length == 0) {
+    $self->with_lock($host, $space, sub { $self->delete($host, $space, $id) } );
+    return;
+  } elsif (utf8::decode($data)) { # decodes in-place and returns success
+    $self->with_lock($host, $space, sub { $self->write($host, $space, $id, $data) } );
+    return;
+  } else {
+    $self->log(4, "The text is invalid UTF-8");
+    say "59 The text is invalid UTF-8\r";
+    return;
+  }
+}
+
+sub read_stdin {
+  my $self = shift;
+  my $length = shift;
+  return ('', 0) unless $length > 0;
+  local $/ = undef;
+  my $data;
+  my $actual = read(STDIN, $data, $length);
+  $self->log(2, "Reading data from STDIN: $!") unless defined $actual;
+  return ($data, $actual);
+}
+
+sub allow_deny_hook {
+  my $self = shift;
+  my $client = shift;
+  # consider adding rate limiting?
+  return 1;
+}
+
+sub run_extensions {
+  my $self = shift;
+  my $url = shift;
+  my $headers = shift;
+  foreach my $sub (@extensions) {
+    return 1 if $sub->($self, $url, $headers);
+  }
+  return;
+}
+
+sub run_init {
+  my $self = shift;
+  for my $sub (@init) {
+    $sub->($self);
+  }
+}
+
+sub valid {
+  my $self = shift;
+  my $id = shift;
+  return 'Page names must not control characters' if $id =~ /[[:cntrl:]]/;
+  return 0;
+}
+
+sub headers {
+  my $self = shift;
+  my %result;
+  my ($key, $value);
+  while (<STDIN>) {
+    if (/^(\S+?): (.+?)\r?$/) {
+      ($key, $value) = (lc($1), $2);
+      $result{$key} = $value;
+    } elsif (/^\s+(.+?)\r?$/) {
+      $result{$key} .= " $1";
+    } else {
+      last;
+    }
+  }
+  $result{host} .= ":" . $self->port() if $result{host} and $result{host} !~ /:\d+$/;
+  $self->log(4, "HTTP headers: " . join(", ", map { "$_ => '$result{$_}'" } keys %result));
+  return \%result;
+}
+
+sub wiki_dir {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  my $dir = $self->{server}->{wiki_dir};
+  if (@{$self->{server}->{host}} > 1) {
+    $dir .= "/$host" ;
+    mkdir($dir) unless -d $dir;
+  }
+  $dir .= "/$space" if $space;
+  mkdir($dir) unless -d $dir;
+  return $dir;
+}
+
+# If we are serving multiple hostnames, we need to check whether the space
+# supplied in the URL matches a known hostname/space combo.
+sub space {
+  my $self = shift;
+  my $host = shift;
+  my $space = shift;
+  $space = decode_utf8(uri_unescape($space)) if $space;
+  if (@{$self->{server}->{host}} > 1) {
+    return undef unless $space;
+    return $space if grep { $_ eq "$host/$space" } @{$self->{server}->{wiki_space}};
+    # else it's an error and we jump out to the eval {} in process_request
+    say "40 $host doesn't know about $space\r";
+    die "unknown space: $host/$space\n";
+  }
+  # Without wildcards, just return the space. We already know that the space
+  # matched the regular expression of spaces.
+  return $space;
+}
+
+sub space_dirs {
+  my $self = shift;
+  my @spaces;
+  if (@{$self->{server}->{host}} > 1) {
+    push @spaces, @{$self->{server}->{host}};
+  } else {
+    push @spaces, undef;
+  }
+  push @spaces, @{$self->{server}->{wiki_space}};
+  return @spaces;
+}
+
+# A list of links to all the spaces we have. The tricky part here is that we
+# want to create appropriate links if we're virtual hosting. Keys are URLs,
+# values are names.
+sub space_links {
+  my $self = shift;
+  my $scheme = shift;
+  my $host = shift;
+  my $port = shift;
+  my %spaces;
+  if (@{$self->{server}->{host}} > 1) {
+    for (@{$self->{server}->{host}}) {
+      $spaces{"$scheme://$_:$port/"} = $_;
+    }
+    for my $space (@{$self->{server}->{wiki_space}}) {
+      my ($ahost, $aspace) = split(/\//m, $space, 2);
+      $spaces{"$scheme://$ahost:$port/$aspace/"} = $space;
+    }
+  } elsif (@{$self->{server}->{wiki_space}}) {
+    $spaces{"$scheme://$host:$port/"} = "Main space";
+    for (sort @{$self->{server}->{wiki_space}}) {
+      $spaces{"$scheme://$host:$port/$_/"} = $_;
+    }
+  }
+  return \%spaces;
+}
+
+# A regular expression matching wiki spaces in URLs. The tricky part is that we
+# must strip the hostnames, as these aren't repeated: for a URL like
+# gemini://localhost:1965/alex/ the regular expression must just match 'alex'
+# and it's $self->('localhost', 'alex') that will check whether 'alex' is a
+# legal space for localhost.
+sub space_regex {
+  my $self = shift;
+  my @spaces;
+  if (@{$self->{server}->{host}} > 1) {
+    for (@{$self->{server}->{wiki_space}}) {
+      my ($space) = /\/(.*)/;
+      push(@spaces, $space);
+    }
+  } elsif (@{$self->{server}->{wiki_space}}) {
+    @spaces = @{$self->{server}->{wiki_space}};
+  }
+  return join("|", map { quotemeta } @spaces);
+}
+
+# A regular expression matching parts of reserved paths in URLs. When looking at
+# gemini://localhost:1965/page/test or gemini://localhost:1965/do/index and
+# using a client that has an "up" command, you'd end up at
+# gemini://localhost:1965/page – but what should happen in this case? We should
+# redirect these requests to gemini://localhost:1965/, I think.
+sub reserved_regex {
+  return join("|", qw(do page raw file html history diff));
+}
+
+sub process_request {
+  my $self = shift;
+  eval {
+    my $url; # declare here so we can print it on a timeout
+    local $SIG{'ALRM'} = sub {
+      if ($url) {
+	$self->log(1, "Timeout processing $url");
+      } else {
+	$self->log(1, "Timeout");
+      }
+      die "Timed Out!\n";
+    };
+    alarm(10); # timeout
+    $self->run_init();
+    my $host_regex = $self->host_regex();
+    my $port = $self->port();
+    my $spaces = $self->space_regex();
+    my $reserved = $self->reserved_regex();
+    $self->log(4, "Serving ($host_regex)(?::$port)?");
+    $self->log(4, "Spaces $spaces");
+    $url = <STDIN>; # no loop
+    return unless $url and $url =~ /\r\n$/; # CR LF is mandatory
+    $url =~ s/\s+$//g; # no trailing whitespace
+    # $url =~ s!^([^/:]+://[^/:]+)(/.*|)$!$1:$port$2!; # add port
+    # $url .= '/' if $url =~ m!^[^/]+://[^/]+$!; # add missing trailing slash
+    my($scheme, $authority, $path, $query, $fragment) =
+	$url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+    my $headers;
+    $headers = $self->headers() if $url =~ m!^[a-z]+ .* HTTP/1\.[01]$!i;
+    $self->log(3, "Looking at $url");
+    my ($host, $space, $id, $n, $style, $filter);
+    if ($self->run_extensions($url, $headers)) {
+      # config file goes first
+    } elsif (not $url) {
+	$self->log(4, "The URL is empty");
+	say "59 URL expected\r";
+    } elsif (length($url) > 1024) {
+	$self->log(4, "The URL is too long");
+	say "59 The URL is too long\r";
+    } elsif (($host) = $url =~ m!^titan://($host_regex)(?::$port)?!) {
+      if (($space) = $path =~ m!^(?:/($spaces))?(?:/raw)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!) {
+	my ($id, @params) = split(/[;=&]/, $2);
+	$self->write_page($host, $self->space($host, $space), decode_utf8(uri_unescape($id)),
+			  {map {decode_utf8(uri_unescape($_))} @params});
+      } else {
+	$self->log(4, "The path $path is malformed");
+	say "59 The path $path is malformed\r";
+      }
+    } elsif (($host, $n, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(:$port)?(?:(?:/($spaces))?/(?:$reserved))?$!) {
+      # redirect gemini://localhost:2020 or gemini://localhost:2020/do  to gemini://localhost:2020/
+      # redirect gemini://localhost:2020/space/do to gemini://localhost:2020/space
+      $space = $self->space($host, $space) || "";
+      say "31 gemini://$host" . ($n ? ":$port" : "") . "/$space\r" ; # enforce trailing slash, and support "up"
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/?$!) {
+      $self->serve_main_menu($host, $self->space($host, $space));
+    } elsif (($host, $space, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/more(?:/(\d+))?$!) {
+      $self->serve_blog($host, $self->space($host, $space), $n);
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/index$!) {
+      $self->serve_index($host, $self->space($host, $space));
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/files$!) {
+      $self->serve_files($host, $self->space($host, $space));
+    } elsif (($host) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/spaces$!) {
+      $self->serve_spaces($host, $port);
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/data$!) {
+      $self->serve_data($host, $self->space($host, $space));
+    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?/do/source$!) {
+      $self->success('text/plain; charset=UTF-8');
+      seek DATA, 0, 0;
+      local $/ = undef; # slurp
+      print <DATA>;
+    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/match$!) {
+      say "10 Find page by name (Perl regex)\r";
+    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/match\?!) {
+      $self->serve_match($host, map {decode_utf8(uri_unescape($_))} $space, $query);
+    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/search$!) {
+      say "10 Find page by content (Perl regex)\r";
+    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/search\?!) {
+      $self->serve_search($host, $self->space($host, $space), decode_utf8(uri_unescape($query))); # search terms include spaces
+    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/new$!) {
+      say "10 New page\r";
+    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/new\?!) {
+      # no URI escaping required
+      if ($space) {
+	say "30 gemini://$host:$port/$space/raw/$query\r";
+      } else {
+	say "30 gemini://$host:$port/raw/$query\r";
+      }
+    } elsif (($host, $space, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/changes(?:/(\d+))?(?:/(colour|fancy))?$!) {
+      $self->serve_changes($host, $self->space($host, $space), $n||100, $style);
+    } elsif (($host, $filter, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?/do/all(?:/(latest))?/changes(?:/(\d+))?(?:/(colour|fancy))?$!) {
+      $self->serve_all_changes($host, $n||100, $style||"", $filter||"");
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/rss$!) {
+      $self->serve_rss($host, $self->space($host, $space));
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/atom$!) {
+      $self->serve_atom($host, $self->space($host, $space));
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/all/atom$!) {
+      $self->serve_all_atom($host);
+    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?/robots.txt$!) {
+      $self->serve_raw($host, undef, "robots");
+    } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/history/([^/]*)(?:/(\d+))?(?:/(colour|fancy))?$!) {
+      $self->serve_history($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n||10, $style);
+    } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/diff/([^/]*)(?:/(\d+))?(?:/(colour))?$!) {
+      $self->serve_diff($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n, $style);
+    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/raw/([^/]*)(?:/(\d+))?$!) {
+      $self->serve_raw($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n);
+    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/html/([^/]*)(?:/(\d+))?$!) {
+      $self->serve_html($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n);
+    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/page/([^/]+)(?:/(\d+))?$!) {
+      $self->serve_page($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n);
+    } elsif (($host, $space, $id) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/file/([^/]+)?$!) {
+      $self->serve_file($host, $self->space($host, $space), decode_utf8(uri_unescape($id)));
+    } elsif ($url =~ m!^GET /default.css HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_css_via_http($host);
+    } elsif (($space) = $url =~ m!^GET (?:(?:/($spaces)/?)?|/) HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_main_menu_via_http($host, $self->space($host, $space));
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/page/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_page_via_http($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n);
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/file/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_file_via_http($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n);
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/history/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_history_via_http($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n||10);
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/diff/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_diff_via_http($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n||10);
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/raw/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_raw_via_http($host, $self->space($host, $space), decode_utf8(uri_unescape($id)), $n);
+    } elsif ($url =~ m!^GET /robots.txt HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_raw_via_http($host, undef, 'robots');
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/do/changes(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_changes_via_http($host, $self->space($host, $space), $n||100);
+    } elsif (($filter, $n) = $url =~ m!^GET /do/all(?:/(latest))?/changes(?:/(\d+))? HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_all_changes_via_http($host, $n||100, $filter||"");
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/do/index HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_index_via_http($host, $self->space($host, $space));
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/do/files HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_files_via_http($host, $self->space($host, $space));
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/do/spaces HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_spaces_via_http($host, $port);
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/do/rss HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_rss_via_http($host, $self->space($host, $space));
+    } elsif (($space, $id, $n) = $url =~ m!^GET (?:/($spaces))?/do/atom HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_atom_via_http($host, $self->space($host, $space));
+    } elsif (($space, $n) = $url =~ m!^GET /do/all/atom HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      $self->serve_all_atom_via_http($host);
+    } elsif ($url =~ m!^GET (?:/($spaces))?/do/source HTTP/1\.[01]$!
+	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+      say "HTTP/1.1 200 OK\r";
+      say "Content-Type: text/plain; charset=UTF-8\r";
+      say "\r";
+      seek DATA, 0, 0;
+      local $/ = undef; # slurp
+      print <DATA>;
+    } elsif (($host) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(/|$)!) {
+      $self->log(3, "Unknown path for $url\r");
+      say "51 Path not found for $url\r";
+    } elsif ($authority) {
+      $self->log(3, "Unsupported proxy request for $url");
+      say "53 Unsupported proxy request for $url\r";
+    } else {
+      $self->log(3, "No handler for $url");
+      say "59 Don't know how to handle $url\r";
+    }
+    $self->log(4, "Done");
+  };
+  $self->log(1, "Error: $@") if $@;
+}
+
+__DATA__

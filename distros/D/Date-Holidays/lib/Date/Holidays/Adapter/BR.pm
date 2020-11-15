@@ -7,7 +7,7 @@ use base 'Date::Holidays::Adapter';
 
 use vars qw($VERSION);
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 sub holidays {
     my ( $self, %params ) = @_;

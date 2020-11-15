@@ -1,5 +1,5 @@
 Name:           perl-Package-Role-ini
-Version:        0.02
+Version:        0.07
 Release:        1%{?dist}
 Summary:        Perl role for "ini" object the returns a Config::IniFiles object
 License:        perl
@@ -10,6 +10,8 @@ BuildArch:      noarch
 BuildRequires:  perl(Config::IniFiles)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Path::Class)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Package::New)
 Requires:       perl(Config::IniFiles)
 Requires:       perl(Path::Class)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))

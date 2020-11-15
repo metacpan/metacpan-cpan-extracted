@@ -208,6 +208,6 @@ tr_mvlnk 's|tldp.org/linuxfocus|linuxfocus.org|' index.html
 =head1 AUTHOR
 
 xlnk is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 =cut

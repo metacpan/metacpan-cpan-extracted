@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.4706, CPAN::Meta::Converter version 2.150010'
 keywords:
   - json
   - serializer
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-MaybeXS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/p5sagit/JSON-MaybeXS.git
-version: '1.004002'
+version: '1.004003'
 x_contributors:
   - 'Clinton Gormley <develop@traveljury.com>'
   - 'Graham Knop <haarg@haarg.org>'

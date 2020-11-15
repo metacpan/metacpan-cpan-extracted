@@ -7,7 +7,7 @@ use base qw(Date::Holidays::Adapter::GB);
 
 use vars qw($VERSION);
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 1;
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Lingua::FR::Nums2Words.
 
+1.01	Fri Nov 13 17:29:20 EST 2020
+	RT#104988
+	No other changes to the code, new maintainer - thanks to FABPOT and NEILB
+
 1.00  Wed May  5 18:30:00 2004
 	- original version
-

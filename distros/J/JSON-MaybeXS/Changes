@@ -1,5 +1,8 @@
 Revision history for JSON-MaybeXS
 
+1.004003 - 2020-11-13
+ - fix another test that fails when JSON::XS is installed, but below version 3.0
+
 1.004002 - 2020-05-17
  - fix test that fails when JSON::XS is installed, but below version 3.0
    (RT#132578)

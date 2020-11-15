@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::AD5691R 0.09;
+package Device::Chip::AD5691R 0.10;
 class Device::Chip::AD5691R
    extends Device::Chip;
 
@@ -25,14 +25,14 @@ C<Device::Chip::AD5691R> - chip driver for F<AD5691R>
 
 =head1 SYNOPSIS
 
- use Device::Chip::AD5691R;
+   use Device::Chip::AD5691R;
 
- my $chip = Device::Chip::AD5691R->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::AD5691R->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- my $voltage = 1.23;
- $chip->write_dac( 4096 * $voltage / 2.5 )->get;
- print "Output is now set to 1.23V\n";
+   my $voltage = 1.23;
+   $chip->write_dac( 4096 * $voltage / 2.5 )->get;
+   print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION
 

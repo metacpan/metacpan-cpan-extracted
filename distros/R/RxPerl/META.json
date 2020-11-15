@@ -55,15 +55,19 @@
    "provides" : {
       "RxPerl" : {
          "file" : "lib/RxPerl.pm",
-         "version" : "v6.0.3"
+         "version" : "v6.1.1"
+      },
+      "RxPerl::BehaviorSubject" : {
+         "file" : "lib/RxPerl/BehaviorSubject.pm",
+         "version" : "v6.1.1"
       },
       "RxPerl::ConnectableObservable" : {
          "file" : "lib/RxPerl/ConnectableObservable.pm",
-         "version" : "v6.0.3"
+         "version" : "v6.1.1"
       },
       "RxPerl::Observable" : {
          "file" : "lib/RxPerl/Observable.pm",
-         "version" : "v6.0.3"
+         "version" : "v6.1.1"
       },
       "RxPerl::Operators::Creation" : {
          "file" : "lib/RxPerl/Operators/Creation.pm"
@@ -73,14 +77,14 @@
       },
       "RxPerl::Subject" : {
          "file" : "lib/RxPerl/Subject.pm",
-         "version" : "v6.0.3"
+         "version" : "v6.1.1"
       },
       "RxPerl::Subscriber" : {
          "file" : "lib/RxPerl/Subscriber.pm"
       },
       "RxPerl::Subscription" : {
          "file" : "lib/RxPerl/Subscription.pm",
-         "version" : "v6.0.3"
+         "version" : "v6.1.1"
       },
       "RxPerl::SyncTimers" : {
          "file" : "lib/RxPerl/SyncTimers.pm"
@@ -90,7 +94,7 @@
       },
       "RxPerl::Utils" : {
          "file" : "lib/RxPerl/Utils.pm",
-         "version" : "v6.0.3"
+         "version" : "v6.1.1"
       }
    },
    "release_status" : "stable",
@@ -104,7 +108,7 @@
          "web" : "https://gitlab.com/karjala/rxperl"
       }
    },
-   "version" : "v6.0.3",
+   "version" : "v6.1.1",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

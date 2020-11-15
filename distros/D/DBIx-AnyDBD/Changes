@@ -1,5 +1,10 @@
 Changes for DBIx::AnyDBD
 
+2.03	Fri Nov 13 20:54:16 EST 2020
+	Added new_with_dbh, RT#5661
+	Added extra mappings, RT#4785
+	Added DBI as a dependency
+
 2.02	Mon Nov  9 18:58:51 EST 2020
 	No changes to the code, new maintainer - thanks to MSEARGENT
 

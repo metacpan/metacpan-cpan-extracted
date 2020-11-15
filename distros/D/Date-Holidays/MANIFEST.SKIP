@@ -98,7 +98,6 @@ _config\.yml
 ^assets
 README\.mkdn
 README\.md
-CONTRIBUTING\.md
 CODE_OF_CONDUCT\.md
 ^\.github/
 ^_site

@@ -1,0 +1,10 @@
+~$
+\.ptkdb$
+\.old$
+dist.ini
+_build
+\.orig$
+^MYMETA.yml$
+blib
+wr_root
+\.rej$

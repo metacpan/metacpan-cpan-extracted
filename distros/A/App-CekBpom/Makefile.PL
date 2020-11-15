@@ -7,20 +7,21 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Check BPOM products via the command-line (CLI interface for cekbpom.pom.go.id)",
+  "ABSTRACT" => "Check BPOM products/manufacturers (\"sarana\") via the command-line (CLI interface for cekbpom.pom.go.id)",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-CekBpom",
   "EXE_FILES" => [
-    "script/cek-bpom"
+    "script/cek-bpom-products"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CekBpom",
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,

@@ -11,12 +11,10 @@ The module provides the following methods:
 
 =cut
 
-use warnings;
-use strict;
-
-use v5.10.0;
+use Modern::Perl;
 
 use Carp;
+use Clone;
 use Image::Synchronize::Timestamp;
 use Scalar::Util qw(
   looks_like_number
@@ -29,16 +27,21 @@ use YAML::Any qw(
   Dump
 );
 
+use overload
+  '""' => \&stringify
+;
+
 =head2 new
 
   $co = Image::Synchronize::CameraOffsets->new;
+  $co2 = $co->new;
 
 Creates and returns a new instance of this class.
 
 =cut
 
 sub new {
-  my ( $class, %options ) = @_;
+  my ( $invocant, %options ) = @_;
 
   # all three hash references have structure
   # $camera_id => { $time => $offset }
@@ -50,7 +53,7 @@ sub new {
     exists( $options{log_callback} )
     ? ( log_callback => $options{log_callback} )
     : (),
-  }, $class;
+  }, (ref($invocant) || $invocant);
 }
 
 =head2 set
@@ -67,8 +70,16 @@ C<$time> is the time (either in seconds since the epoch, as for
 L<gmtime>, or else as an L<Image::Synchronize::Timestamp>) of the
 image for which the offset is specified.
 
-C<$offset> is the time offset in seconds that is valid at the
-specified C<$time>.
+C<$offset> is the time offset that is valid at the specified C<$time>.
+It must be either a number, or else an
+L<Image::Synchronize::Timestamp>.
+
+If it is a number, then that is the time offset in seconds.
+
+If it is an L<Image::Synchronize::Timestamp>, then the timezone part
+provides the nominal timezone that the camera clock was set to, and
+the clock time part provides the time offset relative to the nominal
+timezone.
 
 C<$file> is the optional file name.  If it is defined, then it is used
 in any generated messages.
@@ -84,12 +95,26 @@ also if there was already an offset but it wasn't changed.
 sub set {
   my ( $self, $camera_id, $time, $offset, $file ) = @_;
   if ( Image::Synchronize::Timestamp->istypeof($time) ) {
+    # we prefer UTC but if the camera doesn't provide UTC then we
+    # accept local time.
     $time = $time->time_utc // $time->time_local;
+  } elsif (not looks_like_number($time)) {
+    croak "Time must be a number or an Image::Synchronize::Timestamp"
+      . ($file? " for $file": '') . "\n";
   }
-  croak 'Offset must be a scalar but was a '
-    . ref($offset)
-    . ( $file ? " for $file" : '' ) . "\n"
-    if ref $offset;
+  if (ref($offset)) {
+    if (not(Image::Synchronize::Timestamp->istypeof($offset))) {
+      croak 'Offset must be a scalar or an Image::Synchronize::Timestamp '
+        . 'with no date but was a ' . identify($offset)
+        . ( $file ? " for $file" : '' ) . "\n";
+    } elsif ($offset->has_date) {
+      croak 'Offset cannot be an Image::Synchronize::Timestamp '
+        . 'with a date '. ( $file ? "for $file" : '' ) . "\n";
+    }
+  } else {
+    $offset = Image::Synchronize::Timestamp->new($offset)
+      ->adjust_nodate;
+  }
   my $changed = 0;
   if ( not defined $self->{added}->{$camera_id}->{$time} ) {
     $changed = 1;
@@ -101,7 +126,7 @@ sub set {
           "Replacing offset $self->{added}->{$camera_id}->{$time}->{offset} "
         . "of camera $camera_id "
         . ( $file ? "for $file " : '' ) . "at "
-        . $t->clone_to_local_timezone
+        . $t->clone->adjust_to_local_timezone
         . " with $offset\n";
       if ( $self->{log_callback} ) {
         $self->{log_callback}->($message);
@@ -127,6 +152,17 @@ sub set {
     || $time > $self->{max_added_time};
   $self->{accessed_cameras}->{$camera_id} = 1;
   return wantarray ? ( $self, ( $changed == 2 ) ) : $self;
+}
+
+# identify the type of the value in a non-empty string, either the
+# name of the package (if an object), or the reference type (if a
+# reference), or '-undef-' (if undef), or '-scalar-'.
+sub identify {
+  my ($value) = @_;
+  if ( ref $value ) {
+    return ( blessed($value) or ref($value) );
+  }
+  return defined($value)? '-scalar-': '-undef-';
 }
 
 =head2 cameras
@@ -176,6 +212,16 @@ sub added_time_range {
   return ( $self->{min_added_time}, $self->{max_added_time} );
 }
 
+sub identical_offsets {
+  my ($o1, $o2) = @_;
+  return if ref($o1) ne ref($o2);
+  if (ref $o1) {
+    # assume Image::Synchronize::Timestamp
+    return $o1->identical($o2);
+  }
+  return $o1 == $o2;
+}
+
 # merge 'added' into 'base' to produce 'effective'
 sub make_effective {
   my ($self) = @_;
@@ -194,13 +240,13 @@ sub make_effective {
         # Add the new entries for the period of interest
         foreach ( keys %{$r} ) {
           if ( defined( $effective{$_} )
-            && $effective{$_} != $r->{$_}->{offset} )
+            && !identical_offsets($effective{$_}, $r->{$_}->{offset}) )
           {
             my $message =
                 "Replacing offset $effective{$_} "
               . "of camera $camera_id at "
               . Image::Synchronize::Timestamp->new($_)
-              ->clone_to_local_timezone->display_iso
+              ->adjust_to_local_timezone->display_iso
               . " with $r->{$_}->{offset}\n";
             if ( exists $self->{log_callback} ) {
               $self->{log_callback}->($message);
@@ -219,7 +265,8 @@ sub make_effective {
         my $offset;
         my @times = sort { $a <=> $b } keys %effective;
         foreach my $i ( 0 .. $#times ) {
-          if ( defined($offset) and $effective{ $times[$i] } == $offset ) {
+          if ( defined($offset)
+               and identical_offsets($effective{ $times[$i] }, $offset) ) {
             delete $effective{ $times[$i] } unless $i == $#times && $i > 0;
           }
           else {
@@ -272,12 +319,6 @@ sub get {
     $time = $time->time_local;
   }
   $self->make_effective;
-  $self->{min_added_time} = $time
-    if not( defined $self->{min_added_time} )
-    || $time < $self->{min_added_time};
-  $self->{max_added_time} = $time
-    if not( defined $self->{max_added_time} )
-    || $time > $self->{max_added_time};
   $self->{accessed_cameras}->{$camera_id} = 1;
   my $c = $self->{effective}->{$camera_id};
   my @times = sort { $a <=> $b } keys %{$c};
@@ -330,6 +371,19 @@ sub get_exact {
   }
 }
 
+sub export_internal {
+  my ($e) = @_;
+  my %export;
+  while ( my ( $camera_id, $c ) = each %{$e} ) {
+    my %items;
+    foreach my $time ( sort { $a <=> $b } keys %{$c} ) {
+      $items{ display_time($time) } = display_offset( $c->{$time} );
+    }
+    $export{$camera_id} = \%items;
+  }
+  return \%export;
+}
+
 =head2 export_data
 
   $data = $co->export_data;
@@ -355,16 +409,7 @@ for exporting.  The return value is similar to
 sub export_data {
   my ($self) = @_;
   $self->make_effective;
-  my %export;
-  my $e = $self->{effective};
-  while ( my ( $camera_id, $c ) = each %{$e} ) {
-    my %items;
-    foreach my $time ( sort { $a <=> $b } keys %{$c} ) {
-      $items{ display_time($time) } = display_offset( $c->{$time} );
-    }
-    $export{$camera_id} = \%items;
-  }
-  return \%export;
+  return export_internal($self->{effective});
 }
 
 =head2 parse
@@ -399,14 +444,14 @@ sub parse {
 
       my $offset = $c->{$key};
       croak "Undefined offset\n" unless defined $offset;
-      if ( $offset =~ /^([-+])?(\d+):(\d+)(?::(\d+))?$/ ) {
-        $offset = $2 * 3600 + $3 * 60 + ( $4 // 0 );
-        $offset = -$offset if $1 eq '-';
+      my $o;
+      if (looks_like_number($offset)) {
+        $o = $offset;
+      } else {
+        $o = Image::Synchronize::Timestamp->new($offset);
       }
-      elsif ( $offset !~ /^[-+]?\d+$/ ) {
-        croak "Invalid offset: $offset\n";
-      }
-      $e->{ $time->time_local } = $offset;
+      croak "Invalid offset: $offset\n" unless defined $o;
+      $e->{ $time->time_local } = $o;
     }
   }
   $self->{base} = \%import;
@@ -419,7 +464,7 @@ sub parse {
   # store the "base" contents also as the "effective" contents.  It
   # must be a deep copy, not a shallow one, otherwise processing of
   # "effective" may modify "base", too.
-  $self->{effective}    = Load( Dump( $self->{base} ) );
+  $self->{effective}    = Clone::clone($self->{base});
   $self->{synchronized} = 1;
   return $self;
 }
@@ -428,28 +473,20 @@ sub parse {
 # L<Image::Synchronize::Timestamp>) that is ready for display.  For
 # use by the L</stringify> method.
 sub display_time {
-  my ($time) = @_;
+  my ($time) = (@_ == 1? $_[0]: $_[1]);;
   my $t = Image::Synchronize::Timestamp->new($time);
   $t->remove_timezone;
   return $t->display_iso;
 }
 
-# returns a version of timezone offset C<$offset> (in seconds) that is
-# ready for display.  For use by the L</stringify> method.
+# returns a version of timezone offset C<$offset> (a scalar in
+# seconds, or an L<Image::Synchronize::Timestamp>) that is ready for
+# display.  For use by the L</stringify> method.
 sub display_offset {
-  my ($offset) = @_;
-  use integer;
-  my $tzmin  = $offset / 60;
-  my $tzsec  = $offset % 60;
-  my $tzhour = $tzmin / 60;
-  $tzmin = abs( $tzmin % 60 );
-  $tzsec = abs($tzsec);
-  if ($tzsec) {
-    return sprintf( '%+d:%02d:%02d', $tzhour, $tzmin, $tzsec );
-  }
-  else {
-    return sprintf( '%+d:%02d', $tzhour, $tzmin );
-  }
+  my ($offset) = (@_ == 1? $_[0]: $_[1]);
+  $offset = Image::Synchronize::Timestamp->new($offset)
+    unless Image::Synchronize::Timestamp->istypeof($offset);
+  return $offset->display_time;
 }
 
 =head2 relevant_part
@@ -577,7 +614,7 @@ Louis Strous E<lt>LS@quae.nlE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018 Louis Strous.
+Copyright (c) 2018 - 2020 Louis Strous.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

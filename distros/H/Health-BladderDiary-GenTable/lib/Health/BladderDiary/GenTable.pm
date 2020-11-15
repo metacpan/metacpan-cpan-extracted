@@ -1,9 +1,9 @@
 package Health::BladderDiary::GenTable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-12'; # DATE
+our $DATE = '2020-11-13'; # DATE
 our $DIST = 'Health-BladderDiary-GenTable'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -93,6 +93,7 @@ sub gen_bladder_diary_table_from_entries {
             }
 
             $uentry =~ /\b(\d+)ml\b/     and $parsed_entry->{vol}     //= $1;
+            $uentry =~ /\bv(\d+)\b/      and $parsed_entry->{vol}     //= $1;
             $uentry =~ /\bu([0-9]|10)\b/ and $parsed_entry->{urgency} //= $1;
             $uentry =~ /\bc([0-6])\b/    and $parsed_entry->{color}   //= do {
                 if    ($1 == 0) { 'clear' } # very good
@@ -147,7 +148,7 @@ sub gen_bladder_diary_table_from_entries {
             last unless @intakes || @urinations;
 
             my @hour_rows;
-            push @hour_rows, {time => sprintf("%02d-%02d.00", $h, $h+1 <= 23 ? $h+1 : 0)};
+            push @hour_rows, {time => sprintf("%02d.00-%02d.00", $h, $h+1 <= 23 ? $h+1 : 0)};
 
             my $j = 0;
             while (@intakes && $intakes[0]{_h} == $h) {
@@ -260,7 +261,7 @@ Health::BladderDiary::GenTable - Create bladder diary table from entries
 
 =head1 VERSION
 
-This document describes version 0.002 of Health::BladderDiary::GenTable (from Perl distribution Health-BladderDiary-GenTable), released on 2020-11-12.
+This document describes version 0.004 of Health::BladderDiary::GenTable (from Perl distribution Health-BladderDiary-GenTable), released on 2020-11-13.
 
 =head1 SYNOPSIS
 
@@ -327,6 +328,7 @@ C<urgency>, C<color>.
 Some other information are scraped for writing convenience:
 
  /\b(\d+)ml\b/          for volume
+ /\bv(\d+)\b/           for volume
  /\bu([0-9]|10)\b/      for urgency (1-10)
  /\bc([0-6])\b/         for clear to dark orange color (0=clear, 1=light yellow, 2=yellow, 3=dark yellow, 4=amber, 5=brown, 6=red)
 
@@ -346,7 +348,8 @@ Example C<urinate> entry (all are equivalent):
 
 A urination entry is an entry with event C<urination> (can be written as just
 C<u> or C<urin>). At least volume is required, can be written in ml unit e.g.
-C<300ml> or using C<vol> key, e.g. C<vol=300>. Example:
+C<300ml>, or using C<vNUMBER> e.g. C<v300>, or using C<vol> key, e.g.
+C<vol=300>. Example:
 
  1230 u 200ml
 
@@ -369,19 +372,16 @@ Example:
  1230 u 200ml c2
 
 You can also enter urgency information using C<urgency=NUMBER> or C<u0>..C<u10>,
-which is a number from 0 (not urgent at all) to 10 (most urgent).
-
-Example:
+which is a number from 0 (not urgent at all) to 10 (most urgent). Example:
 
  1230 u 200ml c2 u4
 
 =head2 Drink entries
 
 A drink (fluid intake) entry is an entry with event C<drink> (can be written as
-just C<d>). At least volume is required, can be written in ml unit e.g. C<300ml>
-or using C<vol> key, e.g. C<vol=300>.
-
-Example:
+just C<d>). At least volume is required, can be written in ml unit e.g.
+C<300ml>, or using C<vNUMBER> e.g. C<v300>, or using C<vol> key, e.g.
+C<vol=300>. Example:
 
  1300 d 300ml
 

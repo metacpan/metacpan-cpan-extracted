@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/cek-bpom'
+    'script/cek-bpom-products'
 );
 
 # no fake home requested

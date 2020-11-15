@@ -998,6 +998,6 @@
 996	3
 997	3
 998	3
-#   | dbmerge --parallelism=10 -n -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in n
 999	3
+#   | dbmerge --parallelism=10 -n -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in -i TEST/dbmerge_1k.in n
 #   | dbrowuniq -c

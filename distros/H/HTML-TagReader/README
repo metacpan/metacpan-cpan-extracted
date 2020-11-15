@@ -16,6 +16,11 @@ make install
 Note: the application tr_imgaddsize needs Image::Size but
 you can install HTML::TagReader without having this
 module if you don't need tr_imgaddsize.
+You can test if Image::Size is installed on your computer by running
+perl -e 'use Image::Size'
+This command will print nothing if it is installed.
+tr_httpcheck has a dependency on curl but this is also not enforced
+during installation.
 
 You can check what the version of a possibly already installed
 HTML::TagReader is by running the command:
@@ -79,7 +84,7 @@ way of reading/processing html files.
 These application programs will normally be installed to /usr/bin/
 
 ------------------- ------------------- -------------------
-Author: guido(at)linuxfocus.org
+Author: guidosocher(at)fastmail.com
 
 Homepage: http://linuxfocus.org/~guido/
 Homepage on CPAN: http://cpan.org/authors/id/G/GU/GUS/
@@ -236,7 +241,7 @@ DESCRIPTION
     use.
 
 COPYRIGHT
-    Copyright (c) Guido Socher [guido(at)linuxfocus.org]
+    Copyright (c) Guido Socher 
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

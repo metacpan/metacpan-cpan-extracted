@@ -40,9 +40,18 @@ Relaxed error checking: ignore columns that aren't there.
 
 Output all columns except those listed (like grep -v).
 
+=item B<-a> or B<--all>
+
+Output all columns, in addition to those listed.
+(Thus C<-a foo> will move column foo to the first column.)
+
 =item B<-e> EmptyValue or B<--empty>
 
 Specify the value newly created columns get.
+
+=item B<--saveoutput $OUT_REF>
+
+Save output writer (for integration with other fsdb filters).
 
 =back
 
@@ -170,6 +179,7 @@ sub set_defaults ($) {
     $self->SUPER::set_defaults();
     $self->{_null_value} = undef;
     $self->{_invert_match} = undef;
+    $self->{_all} = undef;
     $self->{_relaxed_errors} = undef;
     $self->{_header} = undef;
 }
@@ -192,6 +202,7 @@ sub parse_options ($@) {
 	'man' => sub { pod2usage(-verbose => 2); },
 	'autorun!' => \$self->{_autorun},
 	'close!' => \$self->{_close},
+	'a|all+' => \$self->{_all},
 	'd|debug+' => \$self->{_debug},
  	'e|empty=s' => \$self->{_null_value},
 	'header=s' => \$self->{_header},
@@ -199,6 +210,7 @@ sub parse_options ($@) {
 	'log!' => \$self->{_logprog},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
 	'r|relaxed-errors!' => \$self->{_relaxed_errors},
+	'saveoutput=s' => \$self->{_save_output},
         'v|invert-match!' => \$self->{_invert_match}
 	) or pod2usage(2);
     push (@{$self->{_arg_cols}}, @arg_cols);
@@ -214,6 +226,9 @@ Internal: setup, parse headers.
 
 sub setup ($) {
     my($self) = @_;
+
+    croak($self->{_prog} . ": cannot use both -a (all) and -v (invert) options.\n")
+        if ($self->{_all} && $self->{_invert_match});
 
     my(@in_options) = (-comment_handler => $self->create_pass_comments_sub);
     push(@in_options, -header => $self->{_header}) if (defined($self->{_header}));
@@ -240,11 +255,19 @@ sub setup ($) {
 	};
     } else {
         # convert any numeric colnames to names
+        my %taken_cols;
 	foreach (@{$self->{_arg_cols}}) {
+            $taken_cols{$_} = 1;
 	    push(@new_arg_cols, defined($self->{_in}->col_to_i($_)) ?
 			$self->{_in}->i_to_col($self->{_in}->col_to_i($_)) :
 			$_);
 	};
+        if ($self->{_all}) {
+            # add in the rest of the cols
+            foreach (@{$self->{_in}->cols}) {
+                push(@new_arg_cols, $_) unless (defined($taken_cols{$_}));
+            };
+        };
     };
     @{$self->{_arg_cols}} = @new_arg_cols;
 

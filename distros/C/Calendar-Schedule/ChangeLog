@@ -1,5 +1,9 @@
 Revision history for Perl extension Calendar::Schedule.
 
+1.21 Fri Nov 13 05:54:38 AST 2020
+ - fixing a fail report from CPAN testers: Schedule.pm line 1387.
+   using now "defined" instead of "//"
+
 1.20 Thu Nov 12 06:57:13 AST 2020
  - fixing a testing issue on Windows in t/t02.t (thanks to CPAN testers)
    (single quote in argv is printed in Windows, removed)

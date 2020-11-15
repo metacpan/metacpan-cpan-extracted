@@ -26,7 +26,7 @@ skipall_unless_can_db('MySQL');
 {
     local $@;
     eval { require DBD::MariaDB };
-    no warnings 'redefine';
+    no warnings qw/once redefine/;
     *DBD::MariaDB::dr::connect = sub { die "Should not be using me!" };
 }
 

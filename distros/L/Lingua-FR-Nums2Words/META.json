@@ -1,0 +1,57 @@
+{
+   "abstract" : "Converts numbers to French words",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-FR-Nums2Words",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/Lingua-FR-Nums2Words/issues",
+         "x_url" : "https://github.com/nigelhorne/Lingua-FR-Nums2Words/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Lingua-FR-Nums2Words.git",
+         "web" : "https://github.com/nigelhorne/Lingua-FR-Nums2Words",
+         "x_repository" : "https://github.com/nigelhorne/Lingua-FR-Nums2Words"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

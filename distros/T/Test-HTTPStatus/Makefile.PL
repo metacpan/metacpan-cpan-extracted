@@ -35,23 +35,12 @@ Perl.
 
 =cut
 
-print STDERR <<"HERE";
-====================================================================
-Test::HTTPStatus is an abandoned module. You can still use it but
-there is no support and it might not stay on CPAN. If you want to
-use it, take over the module or fork it.
-
-https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
-====================================================================
-
-HERE
-
 use File::Spec::Functions qw(catfile);
 
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/CPAN-Adoptable-Modules/test-httpstatus';
+my $github    = 'https://github.com/nigelhorne/Test-HTTPStatus';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
@@ -73,7 +62,7 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::Builder::Module'    => '0',
-		'Test::More'               => '1',
+		'Test::Most'               => 0,
 		},
 
 	'PREREQ_PM'     => {
@@ -121,8 +110,7 @@ sub do_it {
 	eval "require $minimum_perl;" or die $@;
 
 	WriteMakefile( %$arguments );
-	}
-
+}
 
 no warnings;
 __PACKAGE__;

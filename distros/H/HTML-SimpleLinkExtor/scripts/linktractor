@@ -62,15 +62,11 @@ standard input, fetch this URL and use it as input.
 
 =back
 
-=head1 SOURCE AVAILABILITY
-
-This module is in Github
-
-	https://github.com/briandfoy/html-simplelinkextor
-
 =head1 AUTHORS
 
 brian d foy, C<< <bdfoy@cpan.org> >>
+
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 COPYRIGHT
 

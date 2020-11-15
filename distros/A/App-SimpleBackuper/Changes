@@ -1,3 +1,8 @@
+0.2.15	2020-01-15
+	- Fix bug: infonity attempts ti read when reads more than 0 bytes and then read fails.
+	- Minor cosmetic fix for verbose mode.
+0.2.14	2020-01-15
+	- Fix bug with output compression ratio of zero file.
 0.2.13	2020-01-08
 	- Remove debug of OOM on openBSD: cause of OOM in Compress::Raw::Lzma & this compression method eats many of RAM.
 0.2.12	2020-01-05

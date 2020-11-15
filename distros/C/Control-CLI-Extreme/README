@@ -7,6 +7,7 @@ Control::CLI::Extreme currently supports:
 
       VSP XA-1x00, 4x00, 7x00, 8x00, 9000
       XOS Summit switches
+      Unified Hardware 5520
       ERS models 2500, 3x00, 4x00, 5x00
       Wireless Wing APs and Controllers
       SLX Data Center switches

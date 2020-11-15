@@ -21,15 +21,12 @@ Test::HTTPStatus - check an HTTP status
 
 =head1 DESCRIPTION
 
-THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
-IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
-
 Check the HTTP status for a resource.
 
 =cut
 
 use v5.10.1;  # Mojolicious is v5.10.1 and later
-our $VERSION = '2.004';
+our $VERSION = '2.05';
 
 use parent 'Test::Builder::Module';
 
@@ -110,26 +107,58 @@ sub _get_status {
 
 =head1 SEE ALSO
 
-Apache::Constants, HTTP::SimpleLinkChecker
+L<Apache::Constants>, L<HTTP::SimpleLinkChecker>
 
-=head1 SOURCE AVAILABILITY
-
-This project is in GitHub:
-
-	https://github.com/CPAN-Adoptable-Modules/test-httpstatus
-
-=head1 AUTHOR
+=head1 AUTHORS
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
-=head1 COPYRIGHT AND LICENSE
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Test::HTTPStatus
+
+You can also look for information at:
+
+=over 4
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Test-HTTPStatus>
+
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-HTTPStatus>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/Test-HTTPStatus>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Test-HTTPStatus>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Test-HTTPStatus>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=Test::HTTPStatus>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+This program is released under the following licence: GPL2
 Copyright © 2002-2019, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.
 
 =cut
-
 
 1;

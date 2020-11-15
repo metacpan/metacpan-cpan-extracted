@@ -57,7 +57,7 @@
          "url" : "https://github.com/iph0/Redis-ClusterRider"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
       "Sergei Zhmylev <zhmylove@cpan.org>"
    ],

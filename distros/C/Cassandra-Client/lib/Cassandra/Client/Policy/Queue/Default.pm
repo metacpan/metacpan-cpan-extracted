@@ -1,6 +1,6 @@
 package Cassandra::Client::Policy::Queue::Default;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Policy::Queue::Default::VERSION = '0.17';
+$Cassandra::Client::Policy::Queue::Default::VERSION = '0.18';
 use 5.010;
 use strict;
 use warnings;
@@ -48,7 +48,7 @@ Cassandra::Client::Policy::Queue::Default
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

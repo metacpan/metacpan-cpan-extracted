@@ -69,6 +69,16 @@ my @testcases = (
         filename    => 't/data/loop-block.pl',
         expected    => [],
     },
+    {
+        description => '`return` in do-while loop block is OK',
+        filename    => 't/data/do-while.pl',
+        expected    => [],
+    },
+    {
+        description => '`return` in do-until loop block is OK',
+        filename    => 't/data/do-until.pl',
+        expected    => [],
+    },
 );
 
 for my $testcase (@testcases) {

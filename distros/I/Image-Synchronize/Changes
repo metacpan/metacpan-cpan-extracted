@@ -1,6 +1,18 @@
 Revision history for Perl extension Image::Synchronize.
 
+2.001 2020-11-14
+
+      - Allow camera offsets with timezones.
+
+      - Introduce --relativefiletime.
+
+2.000 2020-03-15
+
+      - Change version number to resolve version number interpretation
+        problems (bug #132148).
+
 1.4.2 2019-06-08
+
       - FIX some POD errors.
 
 1.4.1 2019-06-08

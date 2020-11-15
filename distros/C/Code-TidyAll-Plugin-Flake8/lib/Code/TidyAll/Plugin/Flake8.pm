@@ -1,5 +1,5 @@
 package Code::TidyAll::Plugin::Flake8;
-$Code::TidyAll::Plugin::Flake8::VERSION = '0.2.1';
+$Code::TidyAll::Plugin::Flake8::VERSION = '0.4.0';
 use Moo;
 use String::ShellQuote qw/ shell_quote /;
 
@@ -34,9 +34,9 @@ extends 'Code::TidyAll::Plugin';
 sub validate_file
 {
     my ( $self, $fn ) = @_;
-    if ( $_check->($fn) )
+    if ( my $error = $_check->($fn) )
     {
-        die 'not valid';
+        die qq#flake8 validation failed for the file "$fn" ; error="$error"#;
     }
     return;
 }
@@ -55,7 +55,7 @@ Code::TidyAll::Plugin::Flake8 - run flake8 using Code::TidyAll
 
 =head1 VERSION
 
-version 0.2.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

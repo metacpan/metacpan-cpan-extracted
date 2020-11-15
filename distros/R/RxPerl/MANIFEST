@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/RxPerl.pm
+lib/RxPerl/BehaviorSubject.pm
 lib/RxPerl/ConnectableObservable.pm
 lib/RxPerl/Observable.pm
 lib/RxPerl/Operators/Creation.pm

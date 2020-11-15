@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   Test::More: '0.45'
-version: '2.08'
+version: '2.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

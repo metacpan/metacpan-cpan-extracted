@@ -1,6 +1,6 @@
 {
     "name": "PGP::Sign",
-    "version": "1.03",
+    "version": "1.04",
     "synopsis": "create and verify detached PGP signatures",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [

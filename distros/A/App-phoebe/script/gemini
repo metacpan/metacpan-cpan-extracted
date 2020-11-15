@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 Gemini
+
+This is a test client. All it does is dump the response.
+
+=over
+
+=item The first line is the server fingerprint on STDERR
+
+=item The second line is the response header on STDERR
+
+=item The rest is the response itself
+
+=back
+
+Usage:
+
+    gemini gemini://alexschroeder.ch/Test
+
+Download an image:
+
+    ./gemini gemini://alexschroeder.ch:1965/do/gallery/2016-aminona/thumbs/Bisse_de_Tsittoret.jpg \
+      > Bisse_de_Tsittoret.jpg
+
+Download all the images on a page:
+
+    for url in $(./gemini gemini://alexschroeder.ch:1965/do/gallery/2016-aminona \
+                 | grep thumbs | cut --delimiter=' ' --fields=2); do
+      echo $url
+      ./gemini "$url" > $(basename "$url")
+    done
+
+In the shell script above, the first call to gemini gets the page with all the
+links, grep then filters for the links to thumbnails, extract the URL using cut
+(assuming a space between "=>" and the URL), and download each URL, and save the
+output in the filename indicated by the URL.
+
+=cut
+
+use Modern::Perl '2018';
+use Pod::Text;
+use IO::Socket::SSL;
+
+# Help
+if ($ARGV[0] and $ARGV[0] eq '--help') {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+# Regular arguments
+my ($url) = @ARGV;
+
+die "⚠ You must provide an URL\n" unless $url;
+
+my($scheme, $authority, $path, $query, $fragment) =
+    $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+
+die "⚠ The URL '$url' must use the gemini scheme\n" unless $scheme and $scheme eq 'gemini';
+die "⚠ The URL '$url' must have an authority\n" unless $authority;
+
+my ($host, $port) = split(/:/, $authority, 2);
+$port //= 1965;
+
+# create client
+my $socket = IO::Socket::SSL->new(
+  PeerHost => $host,
+  PeerService => $port,
+  SSL_verify_mode => SSL_VERIFY_NONE)
+    or die "Cannot construct client socket: $@";
+
+warn $socket->get_fingerprint . "\n";
+
+# send data in one go
+print $socket "$url\r\n";
+
+# read response
+undef $/;
+my ($header, $response) = split(/\r\n/, <$socket>, 2);
+warn "$header\n";
+print $response;

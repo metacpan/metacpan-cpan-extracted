@@ -1,5 +1,3 @@
-.ChangeLog.swp
-.github/workflows/testsuite.yml
 ChangeLog
 lib/Pod/Simple.pm
 lib/Pod/Simple.pod

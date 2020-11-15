@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -18,6 +18,9 @@ use DBIx::QuickDB::Util::HashBase qw{
 
     -dbd_driver
     -mysqld_provider
+    -use_bootstrap
+
+    -character_set_server
 
     -config
 };
@@ -103,6 +106,7 @@ sub _default_config {
             'socket'   => $socket,
             'tmpdir'   => $temp_dir,
 
+            'secure_file_priv'               => $dir,
             'default_storage_engine'         => 'InnoDB',
             'innodb_buffer_pool_size'        => '20M',
             'key_buffer_size'                => '20M',
@@ -128,10 +132,10 @@ sub _default_config {
 
             $provider eq 'percona'
             ? (
-                'character_set_server' => 'UTF8MB4',
+                'character_set_server' => $self->{+CHARACTER_SET_SERVER},
               )
             : (
-                'character_set_server' => 'UTF8MB4',
+                'character_set_server' => $self->{+CHARACTER_SET_SERVER},
                 'query_cache_limit'    => '1M',
                 'query_cache_size'     => '20M',
             ),
@@ -179,10 +183,19 @@ sub init {
     unless ($self->{+MYSQLD_PROVIDER}) {
         if ($self->version_string =~ m/(mariadb|percona)/i) {
             $self->{+MYSQLD_PROVIDER} = lc($1);
+
+            if ($self->{+MYSQLD_PROVIDER} eq 'percona') {
+                my $binary = $self->{+MYSQLD} || $MYSQLD;
+                my $help = `$binary --help --verbose 2>&1`;
+
+                if ($help =~ m/--bootstrap/) {
+                    $self->{+USE_BOOTSTRAP} = 1;
+                }
+            }
         }
         else {
             my $binary = $self->{+MYSQLD} || $MYSQLD;
-            my $help = `$binary --help --verbose`;
+            my $help = `$binary --help --verbose 2>&1`;
 
             if ($help =~ m/(mariadb|percona)/i) {
                 $self->{+MYSQLD_PROVIDER} = lc($1);
@@ -200,6 +213,8 @@ sub init {
         unless $self->{+MYSQLD_PROVIDER};
 
     $self->{+DBD_DRIVER} //= $DBDMARIA || $DBDMYSQL;
+
+    $self->{+CHARACTER_SET_SERVER} //= 'UTF8MB4';
 
     $self->{+DATA_DIR} = $self->{+DIR} . '/data';
     $self->{+TEMP_DIR} = $self->{+DIR} . '/temp';
@@ -304,15 +319,20 @@ sub bootstrap {
 
     if ($provider eq 'percona') {
         $self->write_config();
-        $self->run_command([$self->start_command, '--initialize']);
 
-        $self->start;
-        $self->load_sql("", $init_file);
+        if ($self->{+USE_BOOTSTRAP}) {
+            $self->run_command([$self->start_command, '--bootstrap'], {stdin => $init_file});
+        }
+        else {
+            $self->run_command([$self->start_command, '--initialize']);
+            $self->start;
+            $self->load_sql("", $init_file);
+        }
     }
     else {
         # Bootstrap is much faster without InnoDB, we will turn InnoDB back on later, and things will use it.
         $self->write_config(skip => qr/innodb/i, add => {'default-storage-engine' => 'MyISAM'});
-        $self->run_command([$self->start_command, '--bootstrap', '--innodb=off'], {stdin => $init_file});
+        $self->run_command([$self->start_command, '--bootstrap'], {stdin => $init_file});
 
         # Turn InnoDB back on
         $self->write_config();

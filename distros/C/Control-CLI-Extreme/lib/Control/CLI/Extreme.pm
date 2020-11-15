@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -170,7 +170,7 @@ my %Attribute = (
 my @InitPromptOrder = ("$Prm{pers}_cli", "$Prm{pers}_nncli", $Prm{xos}, 'generic');
 my %InitPrompt = ( # Initial prompt pattern expected at login
 	# Capturing brackets: $1 = switchName, $2 = login_cpu_slot, $3 = configContext;
-	$Prm{bstk}		=>	'\x0d?([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?[>#]$',
+	$Prm{bstk}		=>	'\x0d?([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?(?:<.+>)?[>#]$',
 	"$Prm{pers}_cli"	=>	'\x0d?([^\n\x0d\x0a]+):([1356])((?:\/[\w\d\.-]+)*)[>#] $',
 	"$Prm{pers}_nncli"	=>	'\x0d?([^\n\x0d\x0a]+):([12356])(?:\((.+?)\))?[>#]$',
 	$Prm{xlr}		=>	'\x0d?([^\n\x0d\x0a]+?)()((?:\/[\w\d-]+)*)[>#] $',
@@ -186,7 +186,7 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 );
 
 my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual switch prompt during login
-	$Prm{bstk}		=>	'SWITCHNAME(?:\((.+?)\))?[>#]$',
+	$Prm{bstk}		=>	'SWITCHNAME(?:\((.+?)\))?(?:<.+>)?[>#]$',
 	"$Prm{pers}_cli"	=>	'SWITCHNAME:[1356]((?:\/[\w\d\.-]+)*)[>#] $',
 	"$Prm{pers}_nncli"	=>	'SWITCHNAME:[12356](?:\((.+?)\))?[>#]$',
 	$Prm{xlr}		=>	'SWITCHNAME((?:\/[\w\d-]+)*)[>#] $',
@@ -263,26 +263,26 @@ my %RefreshCommands = ( # Some commands on some devices endlessly refresh the ou
 our %ErrorPatterns = ( # Patterns which indicated the last command sent generated a syntax error on the host device (if regex does not match full error message, it must end with .+)
 	$Prm{bstk}		=>	'^('
 					. '\s+\^\n.+'
-					. '|% Invalid input detected at \'\^\' marker\.'
+					. '|% Invalid '						# "% Invalid input detected at '^' marker." OR "% Invalid QoS UBP [classifier] entry name" 
 					. '|% Cannot modify settings'
-					. '|% Bad (?:port|unit) number\.'
+					. '|% Bad (?:port|unit|format)'				# ife 33/1; ife 1/333; ife 1/1-2/2
 					. '|% MLT \d+ does not exist or it is not enabled'
 					. '|% No such VLAN'
 					. '|% Bad VLAN list format\.'
-					. '|% View name does not exist'					# snmp-server user admin read-view root write-view root notify-view root
-					. '|% Partial configuration of \'.+?\' already exists\.'	# same as above
-					. '|% View already exists, you must first delete it\.'		# snmp-server view root 1
-					. '|% User \w+ does not exist'					# no snmp-server user admindes
-					. '|% User \'.+?\' already exists'				# snmp-server user admin md5 passwdvbn read-view root write-view root notify-view root
-					. '|% Password length must be in range:' 			# username add rwa role-name RW password // rwa // rwa (with password security)
-					. '|% Bad format, use forms:.+'					# vlan members add 71 1/6-1/7 (1/6-7 is correct)
+					. '|% View name does not exist'				# snmp-server user admin read-view root write-view root notify-view root
+					. '|% Partial configuration of \'.+?\' already exists\.'# same as above
+					. '|% View already exists, you must first delete it\.'	# snmp-server view root 1
+					. '|% User \w+ does not exist'				# no snmp-server user admindes
+					. '|% User \'.+?\' already exists'			# snmp-server user admin md5 passwdvbn read-view root write-view root notify-view root
+					. '|% Password length must be in range:' 		# username add rwa role-name RW password // rwa // rwa (with password security)
+					. '|% Bad format, use forms:.+'				# vlan members add 71 1/6-1/7 (1/6-7 is correct)
 				. ')',
 	$Prm{pers}		=>	'^('
 					. '\x07?\s+\^\n.+'
 					. '|% Invalid input detected at \'\^\' marker\.'
 					. '|.+? not found in path .+'
 					. '|(?:parameter|object) .+? is out of range'
-					. '|\x07?Error ?: .+'
+					. '| ?\x07?Error ?: .+'
 					. '|Unable to .+'
 					. '|% Not allowed on secondary cpu\.'
 					. '|% Incomplete command\.'
@@ -302,6 +302,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|Error: Prefix List ".+?" not found'				# no ip prefix-list "<non-existent>"
 					. '|Invalid ipv4 address\.'					# filter acl ace action 11 6 permit redirect-next-hop 2000:100::201 (on a non-ipv6 acl)
 					. '|\x07?error in getting .+'					# mlt 1 member 1/1 (where mlt does not exist)
+					. '|\x07?Error In \w+ ?:'					# ip name-server primary <ip> (where <ip> is already set)
 				. ')',
 	$Prm{xlr}		=>	'^('
 					. '.+? not found'
@@ -2315,6 +2316,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 					my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [undef, 'show ip interface vrf MgmtRouter']);
 					return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 					my ($ip1, $ip2, $ipv);
+					$ip1 = $1 if $$outref =~ /mgmt-oob\s+ ([\d\.]+)/g;
 					$ip1 = $1 if $$outref =~ /Portmgmt\s+ ([\d\.]+)/g;
 					$ip1 = $1 if $$outref =~ /Port1\/1\s+ ([\d\.]+)/g;
 					$ipv = $1 if $$outref =~ /MgmtVirtIp\s+ ([\d\.]+)/g;
@@ -2883,7 +2885,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$$outref =~ /SLX-OS Version                : (\d+([rsx])?.+)/g && do {
 				$self->_setAttrib('sw_version', $1);
 				for my $rsx ('r', 's', 'x') {
-					$self->_setAttrib("is_slx_$rsx", $2 eq $rsx ? 1 : undef);
+					$self->_setAttrib("is_slx_$rsx", !defined $2 || $2 eq $rsx ? 1 : undef) if $rsx eq 'r';
+					$self->_setAttrib("is_slx_$rsx", defined $2 && $2 eq $rsx ? 1 : undef) unless $rsx eq 'r';
 				}
 			};
 			if ($self->{$Package}{ATTRIBFLAG}{'is_dual_mm'}) {
@@ -2908,7 +2911,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$$outref =~ /Firmware name:      (\d+([rsx])?.+)/g && do {
 				$self->_setAttrib('sw_version', $1);
 				for my $rsx ('r', 's', 'x') {
-					$self->_setAttrib("is_slx_$rsx", $2 eq $rsx ? 1 : undef);
+					$self->_setAttrib("is_slx_$rsx", !defined $2 || $2 eq $rsx ? 1 : undef) if $rsx eq 'r';
+					$self->_setAttrib("is_slx_$rsx", defined $2 && $2 eq $rsx ? 1 : undef) unless $rsx eq 'r';
 				}
 			};
 			$$outref =~ /Kernel:             (.+)/g && $self->_setAttrib('fw_version', $1);
@@ -4147,7 +4151,8 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 
 	# VOSS is a PassportERS with a VSP model name
 	if ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{pers}) {
-		if ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^(?:VSP|XA)/) { # Requires is_apls to always be set before is_voss
+		# Requires is_apls to always be set before is_voss
+		if ($self->{$Package}{ATTRIB}{'is_apls'} || $model =~ /^(?:VSP|XA)/ || $model =~ /VOSS$/) {
 			$self->_setAttrib('is_voss', 1);
 		}
 		else {
@@ -4420,6 +4425,10 @@ VSP XA-1x00, 4x00, 7x00, 8x00, 9000
 =item *
 
 XOS Summit switches
+
+=item *
+
+Unified Hardware 5520
 
 =item *
 

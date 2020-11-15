@@ -116,7 +116,7 @@ sub flush {
     return if ($#{$self} == 0);   # nothing queued
     if (!ref($self->[0])) {
         # in memory
-	shift @$self;
+	shift @$self;  # eat the size count
 	foreach (@$self) {
 	    if (defined($fsdb)) {
 		$fsdb->write_raw($_);
@@ -137,7 +137,9 @@ sub flush {
 	    };
 	};
 	$fh->close;
-    };
+    }
+    # reset to in-memory with no data
+    $self->[0] = 0;
 }
 
 1;

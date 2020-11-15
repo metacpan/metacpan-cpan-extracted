@@ -9,11 +9,15 @@ our @EXPORT_OK = qw(
 	get_package_by_element_size
 	get_array_ref_by_element_size
 );
+#-----------------------------------------------------------------------
+our $Native = 0;
 #=======================================================================
 sub get_package_by_element_size {
+	return if $Native;
+	
 	my $size = shift;
 	
-	my $type =	#$size <				   32	? undef										:	#  Pure Perl array
+	my $type =	#$size <			   32	? undef										:	#  Pure Perl array
 				#$size <			   32	? 'AI::Genetic::Pro::Array::Tied'			:	#  Pure Perl array
 			 	$size <     		  128	? 'Tie::Array::Packed::Char'				: 	#  8 bits
 				$size <     		  256	? 'Tie::Array::Packed::UnsignedChar'		:	#  8 bits

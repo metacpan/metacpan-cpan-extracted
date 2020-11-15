@@ -189,8 +189,11 @@ sub _print_progress {
 	state $last_print_time = 0;
 	return if time - $last_print_time < 60 and ! $_[1];
 	
-	printf "Progress: processed %s of %s in last backup, total backups weight %s.\n",
-		fmt_weight($_[0]->{bytes_processed}), fmt_weight($_[0]->{bytes_in_last_backup}), fmt_weight($_[0]->{total_weight});
+	print "Progress: ";
+	if($_[0]->{bytes_in_last_backup}) {
+		printf "processed %s of %s in last backup, ", fmt_weight($_[0]->{bytes_processed}), fmt_weight($_[0]->{bytes_in_last_backup});
+	}
+	printf "total backups weight %s.\n", fmt_weight($_[0]->{total_weight});
 	$last_print_time = time;
 }
 
@@ -369,16 +372,18 @@ sub _file_proc {
 			while(1) {
 				$state->{profile}->{fs} -= time;
 				$state->{profile}->{fs_read} -= time;
+				my $read_failed;
 				my $read = try {
 					$reg_file->read($part_number);
 				} catch {
 					1 while chomp;
 					push @{ $state->{fails}->{$_} }, $task->[0];
 					print ", can't read: $_\n" if $options->{verbose};
+					$read_failed = 1;
 				};
 				$state->{profile}->{fs} += time;
 				$state->{profile}->{fs_read} += time;
-				return if ! defined $read;
+				return if $read_failed;
 				last if ! $read;
 				
 				print "\tpart #$part_number: " if $options->{verbose};

@@ -77,6 +77,11 @@ but Fsdb::Filter objects in Perl do not run until you invoke
 the run() method.
 The C<--(no)autorun> option controls that behavior within Perl.
 
+=item B<--header> H
+
+Use H as the full Fsdb header, rather than reading a header from
+then input.
+
 =item B<--help>
 
 Show help.
@@ -165,6 +170,7 @@ sub set_defaults ($) {
     $self->{_first} = undef;
     $self->{_create_values} = {};
     $self->{_recreate_fatal} = 1;
+    $self->{_header} = undef;
 }
 
 =head2 parse_options
@@ -188,6 +194,7 @@ sub parse_options ($@) {
 	'd|debug+' => \$self->{_debug},
 	'e|empty=s' => \$self->{_empty},
 	'f|first!' => \$self->{_first},
+	'header=s' => \$self->{_header},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
 	'recreate-fatal!' => \$self->{_recreate_fatal},
 	'log!' => \$self->{_logprog},
@@ -219,7 +226,9 @@ sub setup ($) {
     croak($self->{_prog} . ": no new columns to create.\n")
 	if ($#{$self->{_creations}} == -1);
 
-    $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
+    my(@in_options) = (-comment_handler => $self->create_pass_comments_sub);
+    push(@in_options, -header => $self->{_header}) if (defined($self->{_header}));
+    $self->finish_io_option('input', @in_options);
 
     my @new_cols = @{$self->{_in}->cols};
     my %existing_cols;

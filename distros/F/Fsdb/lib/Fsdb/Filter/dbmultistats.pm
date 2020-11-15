@@ -2,8 +2,7 @@
 
 #
 # dbmultistats.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 85a9faaa887a82737100dceee7013e2894b800e1 $
+# Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -145,6 +144,11 @@ By default, programs process automatically,
 but Fsdb::Filter objects in Perl do not run until you invoke
 the run() method.
 The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--header> H
+
+Use H as the full Fsdb header, rather than reading a header from
+then input.
 
 =item B<--help>
 

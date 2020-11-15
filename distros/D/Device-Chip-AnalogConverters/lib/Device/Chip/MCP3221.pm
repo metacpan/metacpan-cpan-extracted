@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::MCP3221 0.09;
+package Device::Chip::MCP3221 0.10;
 class Device::Chip::MCP3221
    extends Device::Chip;
 
@@ -22,12 +22,12 @@ C<Device::Chip::MCP3221> - chip driver for F<MCP3221>
 
 =head1 SYNOPSIS
 
- use Device::Chip::MCP3221;
+   use Device::Chip::MCP3221;
 
- my $chip = Device::Chip::MCP3221->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::MCP3221->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- printf "The reading is %d\n", $chip->read_adc->get;
+   printf "The reading is %d\n", $chip->read_adc->get;
 
 =head1 DESCRIPTION
 

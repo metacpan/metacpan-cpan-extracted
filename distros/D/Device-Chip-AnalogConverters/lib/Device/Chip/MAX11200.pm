@@ -5,7 +5,7 @@
 
 use Object::Pad 0.27;
 
-package Device::Chip::MAX11200 0.09;
+package Device::Chip::MAX11200 0.10;
 class Device::Chip::MAX11200
    extends Device::Chip;
 
@@ -23,14 +23,14 @@ C<Device::Chip::MAX11200> - chip driver for F<MAX11200>
 
 =head1 SYNOPSIS
 
- use Device::Chip::MAX11200;
+   use Device::Chip::MAX11200;
 
- my $chip = Device::Chip::MAX11200->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::MAX11200->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- $chip->trigger->get;
+   $chip->trigger->get;
 
- printf "The reading is %d\n", $chip->read_adc->get;
+   printf "The reading is %d\n", $chip->read_adc->get;
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ async method init ()
 
    await $self->selfcal;
 
-   await Future::IO->sleep( 0.2 ); # selfcal takes 200msec
+   await Future::IO->sleep( 0.25 ); # selfcal takes 200msec (longer at LINEF=50Hz)
 }
 
 use constant {

@@ -32,4 +32,13 @@ $chip->mount(
    $adapter->check_and_clear( '$chip->write_dac with powerdown' );
 }
 
+# ->write_dac_ratio
+{
+   $adapter->expect_write( "\x08\x00" );
+
+   $chip->write_dac_ratio( 0.5 )->get;
+
+   $adapter->check_and_clear( '$chip->write_dac_ratio' );
+}
+
 done_testing;

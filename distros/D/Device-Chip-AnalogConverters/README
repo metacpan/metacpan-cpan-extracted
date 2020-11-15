@@ -9,6 +9,8 @@ DESCRIPTION
 
 ADCs
 
+      * Device::Chip::ADC121Sx
+
       * Device::Chip::ADS1115
 
       * Device::Chip::LTC2400
@@ -16,6 +18,8 @@ ADCs
       * Device::Chip::MCP3221
 
       * Device::Chip::MAX11200
+
+      * Device::Chip::MAX1166x
 
  SUGGESTED ADC METHODS
 
@@ -56,6 +60,8 @@ DACs
 
       * Device::Chip::AD5691R
 
+      * Device::Chip::DAC7513
+
       * Device::Chip::DAC7571
 
       * Device::Chip::MCP4725
@@ -82,7 +88,7 @@ DACs
        $chip->write_dac_ratio( $ratio )->get
 
     If the chip (driver) does not have a reference to scale convert a given
-    voltage to a DAC code valjue, then this method should be provided
+    voltage to a DAC code value, then this method should be provided
     instead that takes a given ratio, as a floating-point number between 0
     and 1 for unipolar (single-ended unsigned) outputs or between -1 and 1
     for bipolar (differential signed) outputs, and scales it by a suitable

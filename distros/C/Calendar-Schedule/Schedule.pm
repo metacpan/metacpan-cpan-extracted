@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(new);
 
 #<?echo "our \$VERSION = '$Meta->{version}';"!>#+
-our $VERSION = '1.20';#-
+our $VERSION = '1.21';#-
 
 # non-exported package globals
 use vars qw( $REweekday3 $REmonth3 $RE1st );
@@ -1384,7 +1384,7 @@ sub _table_get {
     my $epr = shift;
     my $col = shift;
     my $row = shift;
-    my $overlap = shift // 0;
+    my $overlap = shift; $overlap = 0 if !defined($overlap);
     my $ret = $overlap > 0 ? $epr->{$col, $row, $overlap} : $epr->{$col, $row};
     return defined($ret) ? $ret : '';
 }

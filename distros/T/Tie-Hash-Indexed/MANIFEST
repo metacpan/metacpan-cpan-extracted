@@ -3,11 +3,18 @@ Indexed.xs
 lib/Tie/Hash/Indexed.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 ppport.h
 README
+README.md
 t/101_basic.t
 t/102_storable.t
 t/103_bugs.t
+t/104_utfhash.t
+t/105_oo.t
+t/106_magic.t
+t/801_pod.t
 TODO
 typemap
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

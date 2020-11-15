@@ -10,7 +10,7 @@ use lib map {
 use Test::More 0.88;
 use JSON::MaybeXS;
 
-use Test::Needs 'JSON::XS';
+use Test::Needs { 'JSON::XS' => '3.0' };  # load first, before JSON::MaybeXS
 diag 'Using JSON::XS ', JSON::XS->VERSION;
 
 is( JSON, 'JSON::XS', 'Correct JSON class' );

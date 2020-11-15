@@ -154,7 +154,7 @@ index.html:257: E<lt>IMG SRC="../Logo.gif" width=128 height=53E<gt>
 =head1 AUTHOR
 
 tr_tagcontentgrep is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 =cut
 

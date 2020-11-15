@@ -39,30 +39,18 @@ __END__
 #
 no locale;
 use strict;
-use vars qw($opt_E $opt_e $opt_h $opt_s);
+use vars qw($opt_E $opt_e $opt_h);
 use Getopt::Std;
 require 5.003;
 use Socket;
 # 
-sub interrupt();
-sub proxy_check(@);
-sub httphead($$$);
-sub parseurl($);
 sub help();
 #------------------
-my @udat;
-my @proxy;
-my @noproxy;
-my %cache; # check repleated urls only once
-my $proxyvalid=0;
 my $url;
 my $res;
 my $exitstat=0;
-my ($http_proxy,$no_proxy,$l);
 my $err=1;
 my $dotcnt=0;
-my $interruptvar=0;
-my $timeoutint=11; # timeout interval in seconds (value range should be 5-25).
 #------------------
 #
 # The http 1.0 proctocol is described in 
@@ -70,98 +58,84 @@ my $timeoutint=11; # timeout interval in seconds (value range should be 5-25).
 # This script uses also 1.1 elemets
 #
 #------------------
-$SIG{'ALRM'}=\&interrupt;
 #
 $opt_e=0;
 $opt_E=0;
-&getopts("ehEs")||die "ERROR: No such option. -h for help.\n";
+&getopts("ehE")||die "ERROR: No such option. -h for help.\n";
 help() if ($opt_h);
 #
-if ($ENV{'HTTP_PROXY'}){
-    $http_proxy=$ENV{'HTTP_PROXY'};
-}elsif ($ENV{'http_proxy'}){
-    $http_proxy=$ENV{'http_proxy'};
-}
-if ($ENV{'NO_PROXY'}){
-    $no_proxy=$ENV{'NO_PROXY'};
-}elsif ($ENV{'no_proxy'}){
-    $no_proxy=$ENV{'no_proxy'};
-}
-if ($http_proxy){
-    @proxy=parseurl($http_proxy);
-    if ($proxy[0] eq 'http'){
-        $proxyvalid=1;
-        if ($no_proxy){
-            @noproxy=split(/[, ]+/,$no_proxy);
-        }
-    }else{
-        print STDERR "ERROR: http_proxy or HTTP_PROXY variable defined but not set correcly.\n";
-        exit(1);
-    }
-}
 if (scalar @ARGV < 1){
     # read output of tr_blck -a on stdin 
     $|=1; #flush for dot printing
     while(<>){
         chomp;
-        $l=$_;
         next unless (/\w/); #ignore empty lines
+        # lines look like this: index.html:133:55: href="https://en.wikipedia.org/wiki/1889–1890_flu_pandemic"
         next if (/=\"\//); # ignore abs file system links
         if (/: *\w+=\"(.+)\"/){
-            @udat=proxy_check(parseurl($1));
-            if ($udat[0] eq 'http'){
-                $interruptvar=0;
+            $url=$1;
+            # encode space URL encoding:
+            $url=~s/ /%20/g;
+            if ($url=~m%^https?://%i){
+                open(PP,"curl -i -G -k -m 4 -s '$url' |")||die;
                 if ($opt_E){
                     print ".";
                     $dotcnt=($dotcnt+1)%40;
                     print "\n" if ($dotcnt==0);
                 }
-                eval{
-                    alarm $timeoutint; # the request must return in a given time sec.
-                    $res=httphead($udat[1],$udat[2],$udat[3]);
-                    alarm 0;
-                };
-                if ($interruptvar){
-                    $err=1;
-                    $res="ERROR: timeout";
+                $err=1;
+                # read only the status code on the first line
+                while(<PP>){
+                    # first line is something like: HTTP/1.1 404 Not Found
+                    chomp;
+                    $res=$_;
+                    #print "\nurl $url, dbg $_\n";
+                    if (m/HTTP\S+\s[23]/){
+                        $err=0;
+                    }
+                    last;
                 }
+                close PP;
                 if ($opt_e || $opt_E){
                     if ($opt_E && $err){
                         print "\n";
                         $dotcnt=0;
                     }
                     # print nothing if no error
-                    print "$l :: $res\n" if ($err);
+                    print "$url :: $res\n" if ($err);
                 }else{
-                    print "$l :: $res\n";
+                    print "$url :: $res\n";
                 }
+                $exitstat=1 if($err);
             }else{
-                print "$l -- SORRY: not http, can not check it\n" unless($opt_e || $opt_E);
+                print "$url -- SORRY: can not check this url\n" unless($opt_e || $opt_E);
+                $exitstat=2;
             }
-        }else{
-            print "$l -- SORRY: can not check this url\n" unless($opt_e || $opt_E);
         }
     }
     print "\n" if ($opt_E);
+    exit($exitstat);
 }else{
     for $url (@ARGV){
-        @udat=proxy_check(parseurl($url));
-        if ($udat[0] eq 'http'){
-            $interruptvar=0;
+        if ($url=~m%^https?://%i){
+            open(PP,"curl -i -G -k -m 4 -s '$url' |")||die;
             if ($opt_E){
                 print ".";
                 $dotcnt=($dotcnt+1)%40;
                 print "\n" if ($dotcnt==0);
             }
-            eval{
-                alarm $timeoutint; # the request must return in $timeoutint sec.
-                $res=httphead($udat[1],$udat[2],$udat[3]);
-                alarm 0;
-            };
-            if ($interruptvar){
-                $err=1;
-                $res="ERROR: timeout";
+            $err=1;
+            # read only the status code on the first line
+            while(<PP>){
+                # first line is something like: HTTP/1.1 404 Not Found
+                chomp;
+                $res=$_;
+                if (m/HTTP\S+\s[23]/){
+                    $err=0;
+                }
+                last;
             }
+            close PP;
             if ($opt_e || $opt_E){
                 if ($opt_E && $err){
                     print "\n";
@@ -174,7 +148,7 @@ if (scalar @ARGV < 1){
             }
             $exitstat=1 if($err);
         }else{
-            print STDOUT "ERROR: can not parse url or can not get host info\n";
+            print "$url -- SORRY: can not check this url\n" unless($opt_e || $opt_E);
             $exitstat=2;
         }
     }
@@ -182,156 +156,10 @@ if (scalar @ARGV < 1){
     exit($exitstat);
 }
 #------------------
-sub interrupt(){
-    $interruptvar++;
-    die "interrupt\n";
-}
-#------------------
-# Take an array of the form ('http',$server,$port,$file)
-# and check if this request should go via proxy if the proxy is set
-# The result is an array of the form ('http',$server,$port,$file)
-# but possibly modified for a proxy request.
-sub proxy_check(@){
-    my @arr=@_;
-    my ($np,$nfile,$proto,$server,$port,$file);
-    if (scalar @arr == 4){
-        ($proto,$server,$port,$file)=@arr;
-        if ($proxyvalid){
-            foreach $np (@noproxy){
-                if (index($server,$np) != -1){
-                    # matches-> do not use proxy
-                    return(@arr);
-                }
-            }
-            # use the proxy
-            if (${port} == 80){
-                $nfile="$proto://${server}$file";
-            }else{
-                $nfile="$proto://$server:${port}$file";
-            }
-            return(($proto,$proxy[1],$proxy[2],$nfile));
-        }
-    }
-    return(@arr);
-}
-#------------------
-# take a (server,port,file) and get the HTTP head.
-# file must start with /
-# returns "server: reason" or "ERROR connect: reason"
-# This sub sets global var $err
-# Note: This function may block for ever if the server does connect
-#       but not reply. It is best to put an alarm timeout arround it.
-sub httphead($$$){
-    my $server=shift;
-    my $port=shift;
-    my $file=shift;
-    my ($l,$paddr,$proto,$newloc,$wserver,$reason,$result);
-    my $wait_for_loc;
-    my @in_addrs;
-    $err=1;
-    #check the cache to see if we did already verify this url:
-    if($cache{"$server $file"}){
-        $result=$cache{"$server $file"};
-        $err=0 if ($result=~/ (200|301|302)/);
-        return($result);
-    }
-    # generate a packed IP addr from server and port
-    @in_addrs = (gethostbyname($server))[4];
-    if (scalar @in_addrs > 0){
-        $paddr = sockaddr_in($port,$in_addrs[0]);
-    }else{
-        $result="ERROR: $server lookup failure";
-        $cache{"$server $file"}=$result;
-        return($result);
-    }
-    $proto = getprotobyname('tcp');
-    socket(S,PF_INET,SOCK_STREAM,$proto)||die "ERROR socket:$!\n";
-    connect(S,$paddr)||return "ERROR connect: $!";
-    select(S);$|=1;select(STDOUT);
-    print S "HEAD $file HTTP/1.0\r\n";
-    # end of request is an empty line:
-    print S "User-Agent: Httpcheck/1.0 (Perl $])\r\n";
-    print S "Host: $server\r\n\r\n";
-    $l=0;
-    $wait_for_loc=0;
-    # Note: some servers keep the connection alive. Therefore we need
-    #       to close the connection as soon as we have enough info.
-    #       Otherwise we might accidently timeout.
-    while(<S>){
-        $l++;
-        last if ($l > 15);
-        # dbg:
-        # print;
-        chomp();
-        s/\r$//; # remove ^M, not all servers put it!
-        #The answer looks like: HTTP/1.0 200 OK 
-        if (/^HTTP\S+ (.+)/){
-            $reason=$1;
-            $err=0 if ($reason=~ /200/);
-            if ($reason=~ /301|302/){
-                # Moved, wait for "Location:"
-                $err=0;
-                $wait_for_loc=1 
-            }
-            unless($reason=~ /200|301|302/){
-                $reason= "ERROR: $reason";
-            }
-            next;
-        }
-        if (/^Location: (.+)/){
-            $wait_for_loc=0;
-            $newloc=$1;
-        }
-        if (/^Server: (.+)/){
-            $wserver=$1;
-        }
-        last if (/^Content-type:/);
-        #check if we have all information:
-        last if ($wserver && $reason && $wait_for_loc==0);
-    }
-    close S;
-    $wserver="UnknownServerType" unless ($wserver);
-    $reason="no status code" unless ($reason);
-    $wserver=~s/\s+//g;
-    if ($newloc){
-        $result="$wserver: $reason, New location: $newloc ";
-        $result="$reason, New location: $newloc " if($opt_s);
-    }else{
-        $result="$wserver: $reason ";
-        $result="$reason " if($opt_s);
-    }
-    $cache{"$server $file"}=$result;
-    return($result);
-}
-#------------------
-# Take a url of the form http://ser.ver/file
-# and return (protocol,server,port,file) or 
-# (nothttp) if this url can not be parsed.
-sub parseurl($){
-    my $url=shift;
-    my ($port,$server,$file);
-    if ($url=~ m%http://([\w\.\-]+)%i){
-        $server=$1;
-        if($url=~ m%http://[\w\.\-]+:(\d+)%i){
-            $port=$1;
-        }else{
-            $port=80;
-        }
-        if($url=~ m%http://[\w\.\-\:]+/(.+)%i){
-            $file="/$1";
-            $file=~s/\#.+//; #take care of named anchors
-        }else{
-            $file="/";
-        }
-        ('http',$server,$port,$file);
-    }else{
-        ('nothttp');
-    }
-}
 #------------------
 sub help(){
     print "tr_httpcheck -- check if a particular web-pages exists 
-USAGE: tr_httpcheck [-heEs] [url1 url2...]
+USAGE: tr_httpcheck [-heE] [url1 url2...]
 
 OPTIONS: 
 
@@ -341,27 +169,20 @@ OPTIONS:
 
     -E Like -e but print a . for every checked url.
 
-    -s print result in short format without the URL
-
 If no URL is given then tr_httpcheck reads output from 
 \"tr_blck -a\" on stdin and processes it. 
-Note: This program does only http type of protocol checks. It can e.g not
+Note: This program does only http and https type of protocol checks. It can e.g not
 check https or ftp.
 
 EXAMPLES: 
  check a single url:
- tr_httpcheck http://www.oche.de/
+ tr_httpcheck http://www.tuxgraphics.org/
 
  check many URLs extracted with tr_blck
  from web pages:
  tr_blck -a *.html |  tr_httpcheck -E
 
-You may set the environment variable HTTP_PROXY and NO_PROXY or
-http_proxy and no_proxy to use a proxy. If both are set then the
-uppercase version takes precedence.
-The format of the http_proxy variable looks like \"http://www-proxy:8080/\"
-and the no_proxy is a comma or space seperated list of servers or domains
-for which a direct connection should be made.
+Under the hood the program uses curl.
 
 tr_httpcheck is part of the HTML::TagReader package.
 \n";
@@ -420,7 +241,7 @@ for which a direct connection should be made.
 =head1 AUTHOR
 
 tr_httpcheck is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 =head1 NOTES
 
@@ -512,4 +333,3 @@ Connection: close
 Content-Type: text/html
  
 ENDOFFILE
-

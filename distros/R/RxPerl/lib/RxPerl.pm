@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.0.3";
+our $VERSION = "v6.1.1";
 
 1;
 __END__
@@ -83,6 +83,24 @@ The following list is the currently implemented creation operators with links to
 should apply to RxPerl too).
 
 =over
+
+=item rx_behavior_subject
+
+L<https://rxjs.dev/api/index/class/BehaviorSubject>
+
+    # 10, 20, 30, complete
+    my $b_s = rx_behavior_subject->new(10);
+    $b_s->subscribe($observer);
+    $b_s->next(20);
+    $b_s->next(30);
+    $b_s->complete;
+
+    # 20, 30, complete
+    my $b_s = rx_behavior_subject->new(10);
+    $b_s->next(20);
+    $b_s->subscribe($observer);
+    $b_s->next(30);
+    $b_s->complete;
 
 =item rx_combine_latest
 

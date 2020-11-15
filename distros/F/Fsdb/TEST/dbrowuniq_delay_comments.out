@@ -1,0 +1,9 @@
+#fsdb event count
+# comment amid +128
+# comment between entries
+_null_getpage+128	6
+# comment amid +4
+_null_getpage+4	6
+#  | /home/johnh/BIN/DB/dbcol event
+#  | /home/johnh/BIN/DB/dbsort event
+#   | dbrowuniq -c

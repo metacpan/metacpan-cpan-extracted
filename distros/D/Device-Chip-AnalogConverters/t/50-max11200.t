@@ -142,6 +142,19 @@ $chip->mount(
    $adapter->check_and_clear( '$chip->selfcal' );
 }
 
+# concurrent read and GPIO
+{
+   $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
+      ->returns( "\x00\x12\x34\x56" );
+   $adapter->expect_readwrite( "\xC5\x00" )
+      ->returns( "\x00\x39" );
+
+   is_deeply(
+      [ Future->needs_all( $chip->read_adc, $chip->read_gpios )->get ],
+      [ 0x123456, 0x09 ],
+      'concurrent ->read_adc + ->read_gpios' );
+}
+
 # GPIO adapter
 {
    my $gpioproto = $chip->as_gpio_adapter->make_protocol( "GPIO" )->get;

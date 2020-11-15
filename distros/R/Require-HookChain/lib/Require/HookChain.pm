@@ -1,7 +1,9 @@
 package Require::HookChain;
 
-our $DATE = '2017-02-18'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-13'; # DATE
+our $DIST = 'Require-HookChain'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -10,7 +12,7 @@ use Scalar::Util qw(blessed);
 my $our_hook; $our_hook = sub {
     my ($self, $filename) = @_;
 
-    my $r = Require::HookChain::r->new;
+    my $r = Require::HookChain::r->new(filename => $filename);
     # find source code first
     for my $item (@INC) {
         next if ref $item;
@@ -80,8 +82,13 @@ sub import {
 package Require::HookChain::r;
 
 sub new {
-    my $class = shift;
-    bless {}, $class;
+    my ($class, %args) = @_;
+    bless \%args, $class;
+}
+
+sub filename {
+    my $self = shift;
+    $self->{filename};
 }
 
 sub src {
@@ -110,7 +117,7 @@ Require::HookChain - Chainable require hook
 
 =head1 VERSION
 
-This document describes version 0.001 of Require::HookChain (from Perl distribution Require-HookChain), released on 2017-02-18.
+This document describes version 0.002 of Require::HookChain (from Perl distribution Require-HookChain), released on 2020-11-13.
 
 =head1 SYNOPSIS
 
@@ -189,9 +196,18 @@ constructor as well as C<INC> handler.
 
 =head2 Methods
 
+=head3 filename
+
+Usage:
+
+ my $filename = $r->filename;
+
 =head3 src
 
-Usage: $r->src( [ $new_value ] ) => str
+Usage:
+
+ my $src = $r->src;
+ $r->src($new_src);
 
 Get or set source code content. Will return undef if source code has not been
 found or set.
@@ -220,7 +236,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

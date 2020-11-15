@@ -124,4 +124,9 @@ Revision history for Perl extension HTML::TagReader.
 
 1.11 Fri Sep  9 12:00:12 EDT 2016
     - fix bug in tr_blck (stripping a dot off ".." in links to anchors)
+
+1.12 Sun Nov 15 10:19:13 EST 2020
+    - removed compiler warning
+    - allow bigger tags (e.g for <img src= alt= title= > type of tags)
+    - re-designed tr_httpcheck
 # end of changes

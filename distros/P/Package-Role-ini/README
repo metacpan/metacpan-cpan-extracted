@@ -1,86 +1,85 @@
-=head1 NAME
+NAME
+    Package::Role::ini - Perl role for "ini" object the returns a
+    Config::IniFiles object
 
-Package::Role::ini - Perl role for "ini" object the returns a Config::IniFiles object
+SYNOPSIS
+    Configure INI file
 
-=head1 SYNOPSIS
+      /etc/my-package.ini
+      [section]
+      entry=my_value
 
-Configure INI file
+    Package
 
-  /etc/my-package.ini
-  [section]
-  entry=my_value
+      package My::Package;
+      use base qw{Package::New Package::Role::ini};
 
-Package
+      sub my_method {
+        my $self  = shift;
+        my $value = $self->ini->val('section', 'entry', 'default');
+        return $value
+      }
 
-  package My::Package;
-  use base qw{Package::New Package::Role::ini};
+DESCRIPTION
+    Perl role for "ini" object that returns a Config::IniFiles object
+    against a default INI file name and location
 
-  sub my_method {
-    my $self  = shift;
-    my $value = $self->ini->val('section', 'entry', 'default');
-    return $value
-  }
+OBJECT ACCESSORS
+  ini
+    Returns a lazy loaded Config::IniFiles object so that you can read
+    settings from the INI file.
 
-=head1 DESCRIPTION
+      my $ini = $object->ini; #isa Config::IniFiles
 
-Perl role for "ini" object that returns a Config::IniFiles object against a default INI file name and location
+METHODS
+  ini_file
+    Sets or returns the profile INI filename
 
-=head1 OBJECT ACCESSORS
+      my $file = $object->ini_file;
+      my $file = $object->ini_file("./my.ini");
 
-=head2 ini
+    Set on construction
 
-Returns a lazy loaded L<Config::IniFiles> object so that you can read settings from the INI file.
+      my $object = My::Class->new(ini_file=>"./my.ini");
 
-  my $ini = $object->ini; #isa Config::IniFiles
+    Default is the object lower case class name replacing :: with - and
+    adding ".ini" extension. In other words, for the package My::Package the
+    default location on Linux would be /etc/my-package.ini.
 
-=head1 METHODS
+    override in sub class
 
-=head2 ini_file
+      sub ini_file {"/path/my.ini"};
 
-Sets or returns the profile INI filename
+  ini_path
+    Sets and returns the path for the INI file.
 
-  my $file = $object->ini_file;
-  my $file = $object->ini_file("./my.ini");
+      my $path = $object->ini_path;                  #isa Str
+      my $path = $object->ini_path("../other/path"); #isa Str
 
-Set on construction
+    Default: C:\Windows on Windows-like systems that have Win32 installed
+    Default: /etc on systems that have /etc Default: Sys::Path->sysconfdir
+    on systems that Sys::Path installed Default: . otherwise
 
-  my $object = My::Class->new(ini_file=>"./my.ini");
+    override in sub class
 
-Default is the object lower case class name replacing :: with - and adding ".ini" extension. In other words, for the package My::Package the default location on Linux would be /etc/my-package.ini.
+      sub ini_path {"/my/path"};
 
-override in sub class
+  ini_file_default
+    Default: lc(__PACKAGE__)=~s/::/-/g
 
-  sub ini_file {"/path/my.ini"};
+  ini_file_default_extension
+    Default: ini
 
-=head2 ini_path
+SEE ALSO
+    Config::IniFiles, Package::New
 
-Sets and returns the path for the INI file.
+AUTHOR
+    Michael R. Davis, mrdvt92
 
-  my $path = $object->ini_path;                  #isa Str
-  my $path = $object->ini_path("../other/path"); #isa Str
+COPYRIGHT AND LICENSE
+    Copyright (C) 2020 by Michael R. Davis
 
-Default: C:\Windows            on Windows-like systems that have Win32 installed
-Default: /etc                  on systems that have /etc
-Default: Sys::Path->sysconfdir on systems that Sys::Path installed
-Default: .                     otherwise
-
-override in sub class
-
-  sub ini_path {"/my/path"};
-
-=head1 SEE ALSO
-
-L<Config::IniFiles>, L<Package::New>
-
-=head1 AUTHOR
-
-Michael R. Davis, mrdvt92
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2020 by Michael R. Davis
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.3 or,
-at your option, any later version of Perl 5 you may have available.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.16.3 or, at
+    your option, any later version of Perl 5 you may have available.
 

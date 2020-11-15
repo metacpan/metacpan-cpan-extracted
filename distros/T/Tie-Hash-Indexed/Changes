@@ -1,4 +1,49 @@
 -------------------------
+Version 0.06 (2020-11-14)
+-------------------------
+
+* remove accidentally added test
+
+----------------------------
+Version 0.05_04 (2020-11-13)
+----------------------------
+
+* Merge PR #3: fix for changed scalar(%hash) return signature
+
+* updated ppport.h to silence compiler warnings
+
+* added more tests
+
+----------------------------
+Version 0.05_03 (2016-05-15)
+----------------------------
+
+* added iterator support
+
+* added support for preinc / postinc / predec / postdec
+
+* added support for add / subtract / multiply / divide / ...
+
+----------------------------
+Version 0.05_02 (2016-05-12)
+----------------------------
+
+* added OO interface
+
+----------------------------
+Version 0.05_01 (2016-05-11)
+----------------------------
+
+* fixed CPAN #81449: Test failures due to hash randomisation in perl 5.17.6
+  thanks to MARIOROY for a patch
+
+* added some optimisations suggested in CPAN #97641
+
+* added UTF8 tests
+
+* general code cleanups
+
+-------------------------
 Version 0.05 (2007-08-24)
 -------------------------
 

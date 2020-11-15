@@ -3,6 +3,7 @@
 # Command line build of an Android apk without resorting to ant or gradle
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
+# perl Build.PL && perl Build test && sudo perl Build install
 package Android::Build;
 require v5.16.0;
 use warnings FATAL => qw(all);
@@ -13,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20180626';
+our $VERSION = '20201115';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -303,7 +304,7 @@ sub manifest
 </manifest>
 END
   $manifest =~ s/android:debuggable="true"//gs unless $android->debug;
-  writeFile($man, $manifest);
+  overWriteFile($man, $manifest);
  }
 
 #-------------------------------------------------------------------------------
@@ -336,12 +337,12 @@ sub resources()
     $strings
 </resources>
 END
-  writeFile($res."values/strings.xml", $t);
+  overWriteFile($res."values/strings.xml", $t);
 
   if (my $titles = $android->titles)                                            # Create additional titles from a hash of: {ISO::639 2 digit language code=>title in that language}
    {for my $l(sort keys %$titles)
      {my $t = $title->{$l};
-      writeFile($res."values-$l/strings.xml", <<END);
+      overWriteFile($res."values-$l/strings.xml", <<END);
       <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">$t</string>
@@ -439,8 +440,8 @@ sub make
   my @src          = @{$android->src};
   my @libs         = @{$android->libs};
   my $manifest     = $android->getManifestFile;
-  my $binRes       = filePath($bin, $res);
-  my $classes      = filePath($bin, qw(classes));
+  my $binRes       = filePath($bin, q(res));
+  my $classes      = filePath($bin, q(classes));
   my $api          = $bin."$getAppName.ap_";
   my $apj          = $bin."$getAppName-unaligned.apk";
   my $apk          = $bin."$getAppName.apk";
@@ -486,7 +487,7 @@ sub make
     zzz($c);
    }
 
-  if (1)                                                                        # Dx
+  if (1)                                                                        # 'Dx'
    {my $j = join ' ', @libs;                                                    # Jar files to include in dex
     zzz("$dx --incremental --dex --force-jumbo ".
         " --output $classes.dex $classes $j");
@@ -510,9 +511,11 @@ sub make
     zzz("cd $bin && zip -qv $apj classes.dex");                                 # Add dexed classes
    }
 
-  if (my $assetsFiles = $android->assets)                                       # Create asset files if necessary
-   {my $assetsFolder  = $android->getAssFolder;
-    writeFiles($assetsFiles, $assetsFolder);
+  my $assetsFolder = $android->getAssFolder;
+  my $assetsFiles  = $android->assets;                                          # Create asset files if necessary
+
+  if ($assetsFiles or -d $assetsFolder)                                         # Create asset files if necessary
+   {writeFiles($assetsFiles, $assetsFolder) if $assetsFiles;                    # Write assets file system hash if supplied
     zzz(qq(cd $assetsFolder && cd .. && zip -rv $apj assets));                  # Add assets to apk
    }
 
@@ -570,9 +573,11 @@ sub install2($)                                                                 
   my $package    = $android->getPackage;
   my $activity   = $android->activityX;
   my $adb        = $android->getAdb." $device ";
-
+# say STDERR "Install app";
   zzz("$adb install -r $apk");
+# say STDERR "Start app";
   zzz("$adb shell am start $package/.Activity");
+# say STDERR "App installed and started";
  }
 
 sub lint2($)                                                                    #P Lint all the source code java files for the app
@@ -602,7 +607,7 @@ if (1) {                                                                        
   genLValueScalarMethods(qw(activity));                                         # Activity name: default is B<Activity>. The name of the activity to start on your android device: L<device|/device> is L<package|/package>/L<Activity|/Activity>
   genLValueScalarMethods(qw(assets));                                           # A hash containing your assets folder (if any).  Each key is the file name in the assets folder, each corresponding value is the data for that file. The keys of this hash may contain B</> to create sub folders.
   genLValueScalarMethods(qw(buildTools));                                       # Name of the folder containing the build tools to be used to build the app, see L<prerequisites|/prerequisites>
-  genLValueScalarMethods(qw(buildFolder));                                      # Name of a folder in which to build the app, The default is B</tmp/app/>
+  genLValueScalarMethods(qw(buildFolder));                                      # Name of a folder in which to build the app, The default is B</tmp/app/>. If you wish to include assets with your app, specify a named build folder and load it with the desired assets before calling L<compile> or specify the assets via L<assets>.
   genLValueScalarMethods(qw(classes));                                          # A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against.
   genLValueScalarMethods(qw(debug));                                            # The app will be debuggable if this option is true.
   genLValueScalarMethods(qw(device));                                           # Device to run on, default is the only emulator or specify '-d', '-e', or '-s SERIAL' per L<adb|http://developer.android.com/guide/developing/tools/adb.html>
@@ -679,9 +684,14 @@ sub run($)                                                                      
 
 Android::Build - Lint, compile, install, run an Android app using the command line tools minus Ant and Gradle thus freeing development effort from the strictures imposed by Android Studio.
 
-=head1 Prerequisites
+=head1 Synopsis
 
- sudo apt-get install imagemagick zip openjdk-8-jdk
+You can see Android::Build in action in GitHub Actions at the end of:
+L<https://github.com/philiprbrenan/AppaAppsGitHubPhotoApp/blob/main/genApp.pm>
+
+=head2 Prerequisites
+
+ sudo apt-get install imagemagick zip openjdk-8-jdk openjdk-8-jre
  sudo cpan install Data::Table::Text Data::Dump Carp POSIX File::Copy;
 
 You will need a version of the
@@ -693,13 +703,35 @@ Download:
 
   wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 
-then using the sdkmanager to get the version of the SDK that you want to use,
-for example:
+and unzip to get a copy of B<sdkmanager> which can be used to get the version of
+the SDK that you want to use, for example:
 
   sdkmanager --list --verbose
 
-  sdkmanager 'platforms;android-25'  'build-tools;25.0.3' emulator \
-   'system-images;android-25;google_apis;x86_64'
+Download the SDK components to be used:
+
+  (cd  android/sdk/; tools/bin/sdkmanager         \
+  echo 'y' | android/sdk/tools/bin/sdkmanager     \
+   'build-tools;25.0.3' emulator 'platform-tools' \
+   'platforms;android-25' 'system-images;android-25;google_apis;x86_64')
+
+Add to these components to the B<$PATH> variable for easy command line use:
+
+  export PATH=$PATH:~/android/sdk/tools/:~/android/sdk/tools/bin:\
+  ~/android/sdk/platform-tools/:~/android/sdk/build-tools/25.0.3
+
+Create an AVD:
+
+ avdmanager create avd --name aaa \
+   -k 'system-images;android-25;google_apis;x86_64' -g google_apis
+
+Start the B<AVD> with a specified screen size (you might need to go into the
+B<android/sdk/tools> folder):
+
+ emulator -avd aaa -skin "2000x1000"
+
+Running L<compile> will load the newly created L<apk> into the emulator as long
+as it is the only one running.
 
 =head1 Synopsis
 
@@ -722,6 +754,11 @@ for example:
 
 Modify the code above to reflect your local environment, then start an emulator
 and run the modified code to compile your app and load it into the emulator.
+
+If you wish to include assets with your app, either use L<buildFolder> to
+specify a build area and place your assets in the B<assets> sub directory of
+this folder before using L<compile> to compile your app, else use the L<assets>
+keyword to specify a hash of assets to be included with your app.
 
 =head2 Sample App
 
@@ -750,256 +787,18 @@ script:
 
 Lint, compile, install, run an Android app using the command line tools minus Ant and Gradle thus freeing development effort from the strictures imposed by Android Studio.
 
+
+Version '20201114'.
+
+
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 
 
-=head1 Methods and attributes
-
-=head2 new()
-
-Create a new build.
-
-
-This is a static method and so should be invoked as:
-
-  Android::Build::new
-
-
-=head2 activity :lvalue
-
-Activity name: default is B<Activity>. The name of the activity to start on your android device: L<device|/device> is L<package|/package>/L<Activity|/Activity>
-
-
-=head2 assets :lvalue
-
-A hash containing your assets folder (if any).  Each key is the file name in the assets folder, each corresponding value is the data for that file. The keys of this hash may contain B</> to create sub folders.
-
-
-=head2 buildTools :lvalue
-
-Name of the folder containing the build tools to be used to build the app, see L<prerequisites|/prerequisites>
-
-
-=head2 buildFolder :lvalue
-
-Name of a folder in which to build the app, The default is B</tmp/app/>
-
-
-=head2 classes :lvalue
-
-A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against.
-
-
-=head2 debug :lvalue
-
-The app will be debuggable if this option is true.
-
-
-=head2 device :lvalue
-
-Device to run on, default is the only emulator or specify '-d', '-e', or '-s SERIAL' per L<adb|http://developer.android.com/guide/developing/tools/adb.html>
-
-
-=head2 fastIcons :lvalue
-
-Create icons in parallel if true - the default is to create them serially which takes more elapsed time.
-
-
-=head2 icon :lvalue
-
-Jpg file containing a picture that will be converted and scaled by L<ImageMagick|http://imagemagick.org/script/index.php> to make an icon for the app, default is B<icon.jpg> in the current directory.
-
-
-=head2 keyAlias :lvalue
-
-Alias of the key in your key store file which will be used to sign this app. See L<Signing key|/Signing key> for how to generate a key.
-
-
-=head2 keyStoreFile :lvalue
-
-Name of your key store file.  See L<Signing key|/Signing key> for how to generate a key.
-
-
-=head2 keyStorePwd :lvalue
-
-Password of your key store file.  See L<Signing key|/Signing key> for how to generate a key.
-
-
-=head2 libs :lvalue
-
-A reference to an array of jar files to be copied into the app build to be used as libraries.
-
-
-=head2 lintFile :lvalue
-
-A file to be linted with the L<lint|/lint> action using the android L<platform|/platform> and the L<classes|/classes> specified.
-
-
-=head2 log :lvalue
-
-Output: a reference to an array of messages showing all the non fatal errors produced by this running this build. To catch fatal error enclose L<build|/build> with L<eval{}|perlfunc/eval>
-
-
-=head2 package :lvalue
-
-The package name used in the manifest file to identify the app. The java file containing the L<activity|/activity> for this app should use this package name on its B<package> statement.
-
-
-=head2 parameters :lvalue
-
-Optional parameter string to be placed in folder: B<res> as a string accessible via: B<R.string.parameters> from within the app. Alternatively, if this is a reference to a hash, strings are created for each hash key=value
-
-
-=head2 permissions :lvalue
-
-A reference to an array of permissions, a standard useful set is applied by default if none are specified.
-
-
-=head2 platform :lvalue
-
-Folder containing B<android.jar>. For example B<~/Android/sdk/platforms/25.0.2>
-
-
-=head2 platformTools :lvalue
-
-Folder containing L<adb|https://developer.android.com/studio/command-line/adb.html>
-
-
-=head2 sdkLevels :lvalue
-
-[minSdkVersion, targetSdkVersion], default is [15, 25]
-
-
-=head2 src :lvalue
-
-A reference to an array of java source files to be compiled to create this app.
-
-
-=head2 title :lvalue
-
-Title of app, the default is the L<package|/package> name of the app.
-
-
-=head2 titles :lvalue
-
-A hash of translated titles: {ISO::639 2 digit language code=>title in that language}* for this app.
-
-
-=head2 verifyApk :lvalue
-
-Verify the signed apk if this is true.
-
-
-=head2 version :lvalue
-
-The version number of the app. Default is today's date, formatted as B<YYYYMMDD>
-
-
-=head2 compile($)
-
-Compile the app.
-
-     Parameter  Description    
-  1  $android   Android build  
-
-=head2 cloneApk($$)
-
-Clone an apk file: copy the existing apk, replace the L<assets|/assets>, re-sign, zipalign, return the name of the newly created apk file.
-
-     Parameter  Description                            
-  1  $android   Android build                          
-  2  $oldApk    The file name of the apk to be cloned  
-
-=head2 lint($)
-
-Lint all the Java source code files for the app.
-
-     Parameter  Description    
-  1  $android   Android build  
-
-=head2 install($)
-
-Install an already L<compiled|/compile> app on to the selected L<device|/device>
-
-     Parameter  Description    
-  1  $android   Android build  
-
-=head2 run($)
-
-L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
-
-     Parameter  Description    
-  1  $android   Android build  
-
 
 =head1 Index
 
-
-1 L<activity|/activity>
-
-2 L<assets|/assets>
-
-3 L<buildFolder|/buildFolder>
-
-4 L<buildTools|/buildTools>
-
-5 L<classes|/classes>
-
-6 L<cloneApk|/cloneApk>
-
-7 L<compile|/compile>
-
-8 L<debug|/debug>
-
-9 L<device|/device>
-
-10 L<fastIcons|/fastIcons>
-
-11 L<icon|/icon>
-
-12 L<install|/install>
-
-13 L<keyAlias|/keyAlias>
-
-14 L<keyStoreFile|/keyStoreFile>
-
-15 L<keyStorePwd|/keyStorePwd>
-
-16 L<libs|/libs>
-
-17 L<lint|/lint>
-
-18 L<lintFile|/lintFile>
-
-19 L<log|/log>
-
-20 L<new|/new>
-
-21 L<package|/package>
-
-22 L<parameters|/parameters>
-
-23 L<permissions|/permissions>
-
-24 L<platform|/platform>
-
-25 L<platformTools|/platformTools>
-
-26 L<run|/run>
-
-27 L<sdkLevels|/sdkLevels>
-
-28 L<src|/src>
-
-29 L<title|/title>
-
-30 L<titles|/titles>
-
-31 L<verifyApk|/verifyApk>
-
-32 L<version|/version>
 
 =head1 Installation
 
@@ -1016,7 +815,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -1035,6 +834,7 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;

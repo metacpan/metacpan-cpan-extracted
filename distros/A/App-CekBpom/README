@@ -1,19 +1,19 @@
 NAME
-    App::CekBpom - Check BPOM products via the command-line (CLI interface
-    for cekbpom.pom.go.id)
+    App::CekBpom - Check BPOM products/manufacturers ("sarana") via the
+    command-line (CLI interface for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.011 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2020-10-23.
+    This document describes version 0.012 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2020-11-13.
 
 DESCRIPTION
-    See included script cek-bpom.
+    See included script cek-bpom-products and cek-bpom-manufacturers.
 
 FUNCTIONS
-  cek_bpom
+  cek_bpom_products
     Usage:
 
-     cek_bpom(%args) -> [status, msg, payload, meta]
+     cek_bpom_products(%args) -> [status, msg, payload, meta]
 
     Search BPOM products via https://cekbpom.pom.go.id/.
 
@@ -21,7 +21,7 @@ FUNCTIONS
 
     *   By default search against name (nama_produk) and brand (merk):
 
-         cek_bpom( queries => ["hichew", "hi-chew", "hi chew"]);
+         cek_bpom_products( queries => ["hichew", "hi-chew", "hi chew"]);
 
     Uses LWP::UserAgent::Plugin so you can add retry, caching, or additional
     HTTP client behavior by setting "LWP_USERAGENT_PLUGINS" environment
@@ -30,6 +30,17 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   get_product_detail => *bool*
+
+        For each product (search result), fetch the detail. This currently
+        fetches the manufacturer ("produsen"), which is not displayed by the
+        search result page. Note that this requires a separate HTTP request
+        for each product so can potentially take a long time and might get
+        you banned. Suggestions include: (1) searching without this option
+        first to find out the number of results, then search again with this
+        option if you need it; (2) use LWP::UserAgent::Plugin::Delay to
+        throttle your HTTP requests.
 
     *   note => *str*
 
@@ -52,7 +63,7 @@ FUNCTIONS
 
         For example, this invocation:
 
-         % cek-bpom "minuman susu fermentasi" yakult --query-log-file /some/path.txt
+         % cek-bpom-products "minuman susu fermentasi" yakult --query-log-file /some/path.txt
 
         Sample log line:
 
@@ -65,18 +76,18 @@ FUNCTIONS
         If specified, will dump full enveloped result to a file in specified
         directory path, in JSON format. The JSON formatting makes it easy to
         grep each row. The file will be named
-        "cek-bpom-result.<encoded-timestamp>.<search-types-encoded>.<queries
-        -encoded>(.<note-encoded>)?.json". The encoded timestamp is ISO 8601
-        format with colon replaced by underscore. The encoded query will
-        replace all every group of "unsafe" characters in query with a
+        "cek-bpom-products-result.<encoded-timestamp>.<search-types-encoded>
+        .<queries-encoded>(.<note-encoded>)?.json". The encoded timestamp is
+        ISO 8601 format with colon replaced by underscore. The encoded query
+        will replace all every group of "unsafe" characters in query with a
         single dash. The same goes with encoded note, which comes from the
         "note" argument. For example, this invocation:
 
-         % cek-bpom "minuman susu fermentasi" yakult --note "some note"
+         % cek-bpom-products "minuman susu fermentasi" yakult --note "some note"
 
         will result in a result dump file name like:
-        "cek-bpom-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-s
-        usu-fermentasi-yakult.some-note.json".
+        "cek-bpom-products-result.2020-10-22T01_02_03.000Z.merk-nama_produk.
+        minuman-susu-fermentasi-yakult.some-note.json".
 
     *   search_types => *array[str]*
 
@@ -91,6 +102,15 @@ FUNCTIONS
         or:
 
          --nama-produk --nama-pendaftar
+
+        Note: the mobile app version allows you to search for products by
+        original manufacturer ("produsen") as well, which is not available
+        in the website version. The website allows you to search for
+        producers ("sarana") by name/address/city/province/country, though,
+        and lets you view what products are registered for that producer.
+
+        This utility will allow you to fetch the detail of each product,
+        including manufacturer (see "--get-product-detail" option).
 
     Returns an enveloped result (an array).
 

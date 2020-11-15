@@ -8473,11 +8473,12 @@ sub getpasswd
       my $capath=$Net::FullAuto::FA_Core::gbp->('clipasswordsdk');
       my $app_id=$Hosts{$hostlabel}{'ca_appid'}||'';
       my $ca_das=$Hosts{$hostlabel}{'ca_das'}||'';
+      $ca_das=";DualAccountStatus=$ca_das" if $ca_das;
       my $ca_host=$Hosts{$hostlabel}{'ca_host'}||'localhost';
       my $ca_user=$Hosts{$hostlabel}{'loginid'}||$username;
       my $cmd="${capath}clipasswordsdk GetPassword -p "
              ."AppDescs.AppID=$app_id -p Query=\"Address="
-             ."$hostname;Username=$ca_user;DualAccountStatus="
+             ."$hostname;Username=$ca_user"
              ."$ca_das\" -p RequiredProps=* -o Password";
       unless ($ca_das) {
          $cmd="${capath}clipasswordsdk GetPassword -p "

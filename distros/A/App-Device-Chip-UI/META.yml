@@ -1,0 +1,47 @@
+---
+abstract: 'L<Tickit>-based UI for L<Device::Chip> drivers'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Device-Chip-UI
+provides:
+  App::Device::Chip::UI:
+    file: lib/App/Device/Chip/UI.pm
+    version: '0.01'
+  App::Device::Chip::UI::GPIOBox:
+    file: lib/App/Device/Chip/UI/GPIOBox.pm
+    version: '0.01'
+  App::Device::Chip::UI::SPIBox:
+    file: lib/App/Device/Chip/UI/SPIBox.pm
+    version: '0.01'
+  App::Device::Chip::UI::UARTBox:
+    file: lib/App/Device/Chip/UI/UARTBox.pm
+    version: '0.01'
+requires:
+  Device::Chip::Adapter: '0'
+  Object::Pad: '0.32'
+  Syntax::Keyword::Try: '0.18'
+  Tickit: '0'
+  Tickit::Widget::Button: '0'
+  Tickit::Widget::CheckButton: '0'
+  Tickit::Widget::Choice: '0'
+  Tickit::Widget::Entry: '0'
+  Tickit::Widget::GridBox: '0'
+  Tickit::Widget::Static: '0'
+  Tickit::Widget::Tabbed: '0'
+  Tickit::Widget::VBox: '0'
+  Tickit::Widgets: '0'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

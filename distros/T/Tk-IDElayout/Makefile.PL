@@ -9,7 +9,7 @@ BEGIN {
 
     $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-    $VERSION = '0.35';
+    $VERSION = '0.36';
     $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
     require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
     
@@ -42,7 +42,7 @@ BEGIN {
                     },
                 },
             },
-            'PREREQ_PM'  => { Tk => 804.027, Tk::DynaTabFrame => 0.23, Graph => 0.20105}
+            'PREREQ_PM'  => { Tk => 804.027, 'Tk::DynaTabFrame' => 0.23, Graph => 0.20105}
             );
         exit();
     }
@@ -62,10 +62,34 @@ if ($IsWin32) {
         @libs = ('');
     }
 } else {
-    # We need to link in the Tk Library on Unix to get TkpWmSetState and other symbols
+    # We need to link in the Tk Library on Unix (unless it is a Darwin/macOS
+    # Mach-O bundle not meant for linking) to get TkpWmSetState and other symbols
     #    (These are exported in the TkintplatdeclsVptr in windows, but not on unix)
     $TkLibPath = Tk::MMutil::findINC('auto/Tk/Tk.'.$Config{dlext});
-    
+    if ($^O eq 'darwin') {
+        # Check for MH_BUNDLE header fields (based on `struct mach_header` and
+        # `struct mach_header_64` from <mach-o/loader.h>):
+        #    - magic    (uint32_t at bytes 0 to 4)
+        #    - filetype (uint32_t at bytes 12 to 15)
+        my $MH_MAGIC    = 0xfeedface;
+        my $MH_CIGAM    = 0xcefaedfe;
+        my $MH_MAGIC_64 = 0xfeedfacf;
+        my $MH_CIGAM_64 = 0xcffaedfe;
+        my $MH_BUNDLE   = 0x8;
+        open my $TkLibFH, '<:raw', $TkLibPath;
+        my $header_size = read $TkLibFH, my $header, 16;
+        die "Couldn't read header of $TkLibPath" unless $header_size == 16;
+        close $TkLibFH;
+        my ($magic, $filetype) = unpack('L x8 L', $header);
+        #printf("Got magic == 0x\%x, filetype == 0x\%x\n", $magic, $filetype);
+        $TkLibPath = ' ' if (
+            ($magic == $MH_MAGIC or
+             $magic == $MH_CIGAM or
+             $magic == $MH_MAGIC_64 or
+             $magic == $MH_CIGAM_64)
+            and ($filetype == $MH_BUNDLE));
+    }
+
     my $plibs = $Config{'libs'};
     my $libs  = "$xlib -lX11";   # Used to have -lpt in here as well.
     my @try   = qw(-lsocket -lnsl -lm);
@@ -114,7 +138,7 @@ Tk::MMutil::TkExtMakefile(
     'INC'    => "-I$ptkPath",
     'LIBS'    => \@libs,
      'OBJECT'  => '$(O_FILES)'. " $TkLibPath", # Tk Lib path will be the Tk library on Unix, blank for win32
-    'PREREQ_PM'  => { Tk => 804.027, Tk::DynaTabFrame => 0.23, Graph => 0.20105},
+    'PREREQ_PM'  => { Tk => 804.027, 'Tk::DynaTabFrame' => 0.23, Graph => 0.20105},
     @macro
 );
 

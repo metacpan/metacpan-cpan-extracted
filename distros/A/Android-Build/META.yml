@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,16 +15,18 @@ name: Android-Build
 provides:
   Android::Build:
     file: lib/Android/Build.pm
-    version: '20180626'
+    version: '20201115'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20180316'
+  Data::Table::Text: '20201029'
   File::Copy: '0'
   POSIX: '0'
   Test2::API: '0'
   Test::More: '0'
 resources:
+  bugtracker: https://github.com/philiprbrenan/AndroidBuild/issues
   license: http://dev.perl.org/licenses/
-version: '20180626'
+  repository: https://github.com/philiprbrenan/AndroidBuild
+version: '20201115'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

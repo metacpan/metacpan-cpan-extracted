@@ -1,0 +1,28 @@
+---
+abstract: 'Perl Interface for Sercomm ICamera2 network camera'
+author:
+  - 'Michael R. Davis <mrdvt at cpan>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Camera-Sercomm-ICamera2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  Package::New: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Net-Camera-Sercomm-ICamera2/issues
+  homepage: https://github.com/mrdvt92/perl-Net-Camera-Sercomm-ICamera2
+  repository: https://github.com/mrdvt92/perl-Net-Camera-Sercomm-ICamera2.git
+version: '0.01'

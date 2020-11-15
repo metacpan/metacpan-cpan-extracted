@@ -1,5 +1,9 @@
 Changes file for Date-Holidays
 
+1.29 2020-11-13 Maintenance release, update not required
+
+- Added contribution guidelines for meta.cpan.org
+
 1.28 2020-11-11 Maintenance release, update not required
 
 - We need to specify the requirement of Test::MockModule to version 0.13, since redefined not introduced until this version

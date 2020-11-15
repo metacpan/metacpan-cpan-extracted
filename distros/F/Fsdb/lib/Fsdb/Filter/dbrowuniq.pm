@@ -2,7 +2,7 @@
 
 #
 # dbrowuniq.pm
-# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2020 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -331,7 +331,7 @@ Internal: setup, parse headers.
 sub setup ($) {
     my($self) = @_;
 
-    my(@finish_args) = (-comment_handler => $self->create_pass_comments_sub);
+    my(@finish_args) = (-comment_handler => $self->create_delay_comments_sub);
     push (@finish_args, -header => $self->{_header}) if (defined($self->{_header}));
     $self->finish_io_option('input', @finish_args);
 
@@ -421,8 +421,12 @@ sub run ($) {
 	    '&$write_fastpath_sub($output_fref) if ($count > 1);' . "\n";
     };
 
+    my $input_delay_comments = $self->{_delay_comments}[0];
+    my $delay_comments_out = $self->{_out};
+    my $delay_comments_flush_code = $input_delay_comments ? '$input_delay_comments->flush($delay_comments_out);' : "";
     my $loop_code = q'
 	while ($this_fref = &$read_fastpath_sub()) {
+            ' . $delay_comments_flush_code . q'
 	    if ($count > 0) {
 		if (' . $check_code . q') {
 		    # identical, so just update prev
@@ -450,7 +454,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1997-2020 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

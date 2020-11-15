@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl-Critic-Policy-ControlStructures-ProhibitReturnInDoBlock
 
+0.02 2020-11-14T10:15:31Z
+
+    - Do not violate return statement in do-(while|until) loop (github PR: #1)
+
 0.01 2020-11-12T11:54:31Z
 
     - original version

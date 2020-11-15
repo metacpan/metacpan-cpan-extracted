@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansicolumn
 
+1.02 2020-11-13T03:45:54Z
+
+    - Remove mswin from supported os.
+    - Fix test code to use $^X.
+
 1.01 2020-11-12T10:35:53Z
 
     - CPAN release.

@@ -17,7 +17,7 @@ dbcolmovingstats - compute moving statistics over a window of a column of data
 
 =head1 SYNOPSIS
 
-dbcolmovingstats [-am] [-w window-width] [-e EmptyValue] column
+dbcolmovingstats [-am] [-w WINDOW] [-e EmptyValue] [-k KEY] column
 
 =head1 DESCRIPTION
 
@@ -25,6 +25,13 @@ Compute moving statistics over a COLUMN of data.
 Records containing non-numeric data are considered null
 do not contribute to the stats (optionally they are treated as zeros 
 with C<-a>).
+
+Statitics are computed over a WINDOW of samples of data.
+
+[In progress 2020-11-12, but not completed:
+Alternatively, if a key column is given with C<-k KEY>,
+then a we treat the key column as a time value
+and compute the time-weighted mean.]
 
 Currently we compute mean and sample standard deviation.
 (Note we only compute sample standard deviation,
@@ -55,6 +62,16 @@ as zero rather than just ignoring them).
 
 WINDOW of how many items to accumulate (defaults to 10).
 (For compatibility with fsdb-1.x, B<-n> is also supported.)
+
+=item B<-k> or B<--key> KEY
+
+The KEY specifies a field that is used to evaluate the window---a window
+must span at most this range of value so the key field.
+(For example, if KEY is the time and window is 60, then enough samples
+will be added to make at most 60s of observations.
+With a key, sampling can be irregular.)
+If key is specified, we also output a moving_n field  for how many samples
+are in each window.
 
 =item B<-m> or B<--median>
 
@@ -225,6 +242,7 @@ sub set_defaults ($) {
     $self->{_include_non_numeric} = undef;
     $self->{_window} = 10;
     $self->{_median} = undef;
+    $self->{_key_column} = undef;
 }
 
 =head2 parse_options
@@ -250,6 +268,7 @@ sub parse_options ($@) {
 	'e|empty=s' => \$self->{_empty},
 	'f|format=s' => \$self->{_format},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
+	'k|key=s' => \$self->{_key_column},
 	'log!' => \$self->{_logprog},
 	'm|median!' =>  \$self->{_median},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
@@ -275,6 +294,13 @@ sub setup ($) {
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
     croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
+    if ($self->{_key_column}) {
+        $self->{_key_coli} = $self->{_in}->col_to_i($self->{_key_column});
+        croak($self->{_prog} . ": key column " . $self->{_key_column} . " is not in input stream.\n")
+            if (!defined($self->{_key_coli}));
+    } else {
+        $self->{_key_coli} = undef;
+    };
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     my(@new_cols) = qw(moving_mean moving_stddev);
@@ -300,6 +326,7 @@ sub run ($) {
     my $write_fastpath_sub = $self->{_out}->fastpath_sub();
 
     my $coli = $self->{_target_coli};
+    my $key_coli = $self->{_key_coli};
     my $mean_coli = $self->{_out}->col_to_i('moving_mean');
     my $stddev_coli = $self->{_out}->col_to_i('moving_stddev');
     my $doing_median = defined($self->{_median});
@@ -308,6 +335,7 @@ sub run ($) {
     my $req_acc = $self->{_window};
     my $empty_value = $self->{_empty};
 
+    my(@k) = ();
     my(@d) = ();
     my($sx) = 0;
     my($sxx) = 0;
@@ -329,16 +357,25 @@ sub run ($) {
 	    };
 	};
 
+        my $k = undef;
+        if (defined($key_coli)) {
+            $k = $fref->[$key_coli];
+        };
+
 	if ($x_is_valid) {
 	    push(@d, $x);
 	    $sx += $x;
 	    $sxx += $x * $x;
+            push(@k, $k) if (defined($key_coli));
 	};
+
 	#    print SAVE_DATA "$x\n" if ($save_data);
-	if ($#d >= $req_acc) {
+        my($window_filled) = defined($key_coli) ? ($k[$#k] - $k[0] >= $req_acc) : ($#d >= $req_acc);
+	if ($window_filled) {
 	    my $ox = shift @d;
 	    $sx -= $ox;
 	    $sxx -= $ox * $ox;
+            shift @k if (defined($key_coli));
         };
 
 	#    if (!$minmaxinit) {

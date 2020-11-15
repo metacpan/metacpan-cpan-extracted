@@ -9,7 +9,7 @@ examples/usingthreads-ex1.pl
 lib/Control/CLI/Extreme.pm
 Makefile.PL
 MANIFEST
+META.json
+META.yml
 README
 t/extremecli.t
-META.yml
-META.json

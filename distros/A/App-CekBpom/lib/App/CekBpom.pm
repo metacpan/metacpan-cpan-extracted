@@ -1,9 +1,9 @@
 package App::CekBpom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-23'; # DATE
+our $DATE = '2020-11-13'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -13,7 +13,7 @@ use Log::ger;
 use Time::HiRes qw(time);
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(cek_bpom);
+our @EXPORT_OK = qw(cek_bpom_products);
 
 our %SPEC;
 
@@ -37,7 +37,7 @@ sub _encode {
     $str;
 }
 
-$SPEC{cek_bpom} = {
+$SPEC{cek_bpom_products} = {
     v => 1.1,
     summary => 'Search BPOM products via https://cekbpom.pom.go.id/',
     description => <<'_',
@@ -79,6 +79,15 @@ or:
 
     --nama-produk --nama-pendaftar
 
+Note: the mobile app version allows you to search for products by original
+manufacturer ("produsen") as well, which is not available in the website
+version. The website allows you to search for producers ("sarana") by
+name/address/city/province/country, though, and lets you view what products are
+registered for that producer.
+
+This utility will allow you to fetch the detail of each product, including
+manufacturer (see `--get-product-detail` option).
+
 _
         },
         queries => {
@@ -88,6 +97,20 @@ _
             req => 1,
             pos => 0,
             slurpy => 1,
+        },
+        get_product_detail => {
+            schema => 'bool*',
+            description => <<'_',
+
+For each product (search result), fetch the detail. This currently fetches the
+manufacturer ("produsen"), which is not displayed by the search result page.
+Note that this requires a separate HTTP request for each product so can
+potentially take a long time and might get you banned. Suggestions include: (1)
+searching without this option first to find out the number of results, then
+search again with this option if you need it; (2) use
+<pm:LWP::UserAgent::Plugin::Delay> to throttle your HTTP requests.
+
+_
         },
         note => {
             summary => 'Add note',
@@ -111,7 +134,7 @@ into 4 spaces, to avoid clash with the use of Tab as field separator.
 
 For example, this invocation:
 
-    % cek-bpom "minuman susu fermentasi" yakult --query-log-file /some/path.txt
+    % cek-bpom-products "minuman susu fermentasi" yakult --query-log-file /some/path.txt
 
 Sample log line:
 
@@ -128,16 +151,16 @@ _
 If specified, will dump full enveloped result to a file in specified directory
 path, in JSON format. The JSON formatting makes it easy to grep each row. The
 file will be named
-`cek-bpom-result.<encoded-timestamp>.<search-types-encoded>.<queries-encoded>(.<note-encoded>)?.json`.
+`cek-bpom-products-result.<encoded-timestamp>.<search-types-encoded>.<queries-encoded>(.<note-encoded>)?.json`.
 The encoded timestamp is ISO 8601 format with colon replaced by underscore. The
 encoded query will replace all every group of "unsafe" characters in query with
 a single dash. The same goes with encoded note, which comes from the `note`
 argument. For example, this invocation:
 
-    % cek-bpom "minuman susu fermentasi" yakult --note "some note"
+    % cek-bpom-products "minuman susu fermentasi" yakult --note "some note"
 
 will result in a result dump file name like:
-`cek-bpom-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json`.
+`cek-bpom-products-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json`.
 
 _
             tags => ['category:logging'],
@@ -159,7 +182,7 @@ _
         },
     ],
 };
-sub cek_bpom {
+sub cek_bpom_products {
     require HTTP::CookieJar::LWP;
     require LWP::UserAgent::Plugin;
 
@@ -258,8 +281,31 @@ sub cek_bpom {
         log_trace "Got a total of %d result(s)", scalar(@all_rows);
     }
 
+  GET_PRODUCT_DETAIL: {
+        last unless $args{get_product_detail};
+        my $i = 0;
+        for my $row (@all_rows) {
+            $i++;
+            log_trace "[%d/%d] Getting product detail for %s (%s) ...",
+                $i, scalar(@all_rows), $row->{reg_id}, $row->{nama};
+            my $res = $ua->get("$url_prefix/home/detil/$session_id/produk/$row->{reg_id}");
+            unless ($res->is_success) {
+                log_warn "Cannot get product detail for $row->{reg_id} ($row->{nama}), skipped";
+                next;
+            }
+            my $ct = $res->content;
+            $ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>\s*([^<]+?)\s*</a> - ([^<]+?)\s*</td>! or do {
+                log_warn "Cannot get manufacturer detail for $row->{reg_id} ($row->{nama}), skipped";
+            };
+            $row->{sarana_id} = $1;
+            $row->{sarana_nama} = $2;
+            $row->{sarana_negara} = $3;
+            my $session_id = $1;
+        }
+    } # GET_PRODUCT_DETAIL
+
     my %resmeta;
-    $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar/];
+    $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar sarana_id sarana_nama sarana_negara/];
 
     unless (@all_rows) {
         $resmeta{'cmdline.result'} = "No results found for ".join(", ", @$queries).
@@ -271,9 +317,11 @@ sub cek_bpom {
         require Date::Format::ISO8601;
 
         my %fields = (
+            what => 'products',
             time => Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0}, $time_start),
             queries => join(",", @$queries),
             search_types => join(",", @$search_types),
+            opt_get_product_detail => $args{get_product_detail} ? 1:0,
             num_results => scalar @all_rows,
             (note => $args{note}) x !!(exists $args{note}),
             duration => sprintf("%0.3f", $time_after_query-$time_before_query),
@@ -302,7 +350,7 @@ sub cek_bpom {
             last DUMP_RESULT;
         };
         my $filename = sprintf(
-            "cek-bpom-result.%s.%s.%s%s.json",
+            "cek-bpom-products-result.%s.%s.%s%s.json",
             Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0, time_sep=>"_"}, $time_start),
             _encode(join ",", @$search_types),
             _encode(join ",", @$queries),
@@ -323,7 +371,7 @@ sub cek_bpom {
 }
 
 1;
-# ABSTRACT: Check BPOM products via the command-line (CLI interface for cekbpom.pom.go.id)
+# ABSTRACT: Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)
 
 __END__
 
@@ -333,24 +381,24 @@ __END__
 
 =head1 NAME
 
-App::CekBpom - Check BPOM products via the command-line (CLI interface for cekbpom.pom.go.id)
+App::CekBpom - Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)
 
 =head1 VERSION
 
-This document describes version 0.011 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-10-23.
+This document describes version 0.012 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-11-13.
 
 =head1 DESCRIPTION
 
-See included script L<cek-bpom>.
+See included script L<cek-bpom-products> and L<cek-bpom-manufacturers>.
 
 =head1 FUNCTIONS
 
 
-=head2 cek_bpom
+=head2 cek_bpom_products
 
 Usage:
 
- cek_bpom(%args) -> [status, msg, payload, meta]
+ cek_bpom_products(%args) -> [status, msg, payload, meta]
 
 Search BPOM products via https:E<sol>E<sol>cekbpom.pom.go.idE<sol>.
 
@@ -360,7 +408,7 @@ Examples:
 
 =item * By default search against name (nama_produk) and brand (merk):
 
- cek_bpom( queries => ["hichew", "hi-chew", "hi chew"]);
+ cek_bpom_products( queries => ["hichew", "hi-chew", "hi chew"]);
 
 =back
 
@@ -372,6 +420,16 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<get_product_detail> => I<bool>
+
+For each product (search result), fetch the detail. This currently fetches the
+manufacturer ("produsen"), which is not displayed by the search result page.
+Note that this requires a separate HTTP request for each product so can
+potentially take a long time and might get you banned. Suggestions include: (1)
+searching without this option first to find out the number of results, then
+search again with this option if you need it; (2) use
+L<LWP::UserAgent::Plugin::Delay> to throttle your HTTP requests.
 
 =item * B<note> => I<str>
 
@@ -392,7 +450,7 @@ into 4 spaces, to avoid clash with the use of Tab as field separator.
 
 For example, this invocation:
 
- % cek-bpom "minuman susu fermentasi" yakult --query-log-file /some/path.txt
+ % cek-bpom-products "minuman susu fermentasi" yakult --query-log-file /some/path.txt
 
 Sample log line:
 
@@ -405,16 +463,16 @@ Dump result to directory.
 If specified, will dump full enveloped result to a file in specified directory
 path, in JSON format. The JSON formatting makes it easy to grep each row. The
 file will be named
-C<< cek-bpom-result.E<lt>encoded-timestampE<gt>.E<lt>search-types-encodedE<gt>.E<lt>queries-encodedE<gt>(.E<lt>note-encodedE<gt>)?.json >>.
+C<< cek-bpom-products-result.E<lt>encoded-timestampE<gt>.E<lt>search-types-encodedE<gt>.E<lt>queries-encodedE<gt>(.E<lt>note-encodedE<gt>)?.json >>.
 The encoded timestamp is ISO 8601 format with colon replaced by underscore. The
 encoded query will replace all every group of "unsafe" characters in query with
 a single dash. The same goes with encoded note, which comes from the C<note>
 argument. For example, this invocation:
 
- % cek-bpom "minuman susu fermentasi" yakult --note "some note"
+ % cek-bpom-products "minuman susu fermentasi" yakult --note "some note"
 
 will result in a result dump file name like:
-C<cek-bpom-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json>.
+C<cek-bpom-products-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json>.
 
 =item * B<search_types> => I<array[str]>
 
@@ -429,6 +487,15 @@ those types, e.g.:
 or:
 
  --nama-produk --nama-pendaftar
+
+Note: the mobile app version allows you to search for products by original
+manufacturer ("produsen") as well, which is not available in the website
+version. The website allows you to search for producers ("sarana") by
+name/address/city/province/country, though, and lets you view what products are
+registered for that producer.
+
+This utility will allow you to fetch the detail of each product, including
+manufacturer (see C<--get-product-detail> option).
 
 
 =back

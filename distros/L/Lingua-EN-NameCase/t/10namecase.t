@@ -15,7 +15,7 @@ my @proper_names = (
     "van Dyke",         "Van",                  "ap Llwyd Dafydd",
     "al Fahd",          "Al",
     "el Grecco",
-    "Ben Gurion",       "Ben",  
+    "Ben Gurion",       "Ben",
     "da Vinci",
     "di Caprio",        "du Pont",              "de Legate",
     "del Crond",        "der Sind",             "van der Post",

@@ -1,7 +1,7 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Tk Widget for Layout of Frames Similar to an IDE",
    "author" : [
-      "unknown"
+      "jcerney@home.com (John Cerney)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -50,6 +50,6 @@
          "web" : "https://github.com/asb-capfan/Tk-IDElayout"
       }
    },
-   "version" : "0.35",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.36",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

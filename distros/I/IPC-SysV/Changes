@@ -1,3 +1,9 @@
+2.09 - 2020-11-13
+
+    * Fix GitHub #8: Comparison between signed and unsigned integer
+    * Merge PR #9: Fix compile warnings with -Wsign-compare
+    * Merge PR #11: Avoid indirect call syntax
+
 2.08 - 2020-06-23
 
     * RT #129387: IPC::SysV memory operations limited to 31-bit offsets

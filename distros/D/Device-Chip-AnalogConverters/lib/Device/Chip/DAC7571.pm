@@ -1,16 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::DAC7571 0.09;
+package Device::Chip::DAC7571 0.10;
 class Device::Chip::DAC7571
-   extends Device::Chip;
+   extends Device::Chip::DAC75xx;
 
-use Carp;
 use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
@@ -23,14 +22,14 @@ C<Device::Chip::DAC7571> - chip driver for F<DAC7571>
 
 =head1 SYNOPSIS
 
- use Device::Chip::DAC7571;
+   use Device::Chip::DAC7571;
 
- my $chip = Device::Chip::DAC7571->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::DAC7571->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- # Presuming Vcc = 5V
- $chip->write_dac( 4096 * 1.23 / 5 )->get;
- print "Output is now set to 1.23V\n";
+   # Presuming Vcc = 5V
+   $chip->write_dac_ratio( 1.23 / 5 )->get;
+   print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION
 
@@ -40,6 +39,9 @@ F<Texas Instruments> F<DAC7571> attached to a computer via an I²C adapter.
 The reader is presumed to be familiar with the general operation of this chip;
 the documentation here will not attempt to explain or define chip-specific
 concepts or features, only the use of this module to access them.
+
+This class is derived from L<Device::Chip::DAC75xx>, and inherits the methods
+defined there.
 
 =cut
 
@@ -63,51 +65,9 @@ sub I2C_options ( $, %params )
    );
 }
 
-=head1 METHODS
-
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
-
-=cut
-
-my %NAME_TO_POWERDOWN = (
-   normal => 0,
-   "1k"   => 1,
-   "100k" => 2,
-   "hiZ"  => 3,
-);
-
-# Chip has no config registers
-async method read_config () { return {} }
-async method change_config (%) { }
-
-=head2 write_dac
-
-   $chip->write_dac( $dac, $powerdown )->get
-
-Writes a new value for the DAC output and powerdown state.
-
-C<$powerdown> is optional and will default to C<normal> if not provided. Must
-be one of the following four values
-
-   normal 1k 100k hiZ
-
-=cut
-
-async method write_dac ( $dac, $powerdown = undef )
+async method _write ( $code )
 {
-   $dac &= 0x0FFF;
-
-   my $pd = 0;
-   $pd = $NAME_TO_POWERDOWN{$powerdown} // croak "Unrecognised powerdown state '$powerdown'"
-      if defined $powerdown;
-
-   await $self->protocol->write( pack "S>", $pd << 12 | $dac );
-}
-
-async method write_dac_ratio ( $ratio )
-{
-   await $self->write_dac( $ratio * 2**12 );
+   await $self->protocol->write( pack "S>", $code );
 }
 
 =head1 AUTHOR

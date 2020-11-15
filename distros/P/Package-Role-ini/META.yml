@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,5 +19,11 @@ no_index:
     - inc
 requires:
   Config::IniFiles: '0'
+  Package::New: '0'
   Path::Class: '0'
-version: '0.02'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Package-Role-ini/issues
+  homepage: https://github.com/mrdvt92/perl-Package-Role-ini
+  repository: https://github.com/mrdvt92/perl-Package-Role-ini.git
+version: '0.07'

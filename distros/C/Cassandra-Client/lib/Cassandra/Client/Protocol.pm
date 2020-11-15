@@ -1,6 +1,6 @@
 package Cassandra::Client::Protocol;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Protocol::VERSION = '0.17';
+$Cassandra::Client::Protocol::VERSION = '0.18';
 use 5.010;
 use strict;
 use warnings;
@@ -444,7 +444,7 @@ Cassandra::Client::Protocol
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

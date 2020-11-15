@@ -4,7 +4,7 @@ use warnings;
 use Path::Class qw{};
 use Config::IniFiles qw{};
 
-our $VERSION = '0.02';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -108,7 +108,7 @@ sub ini_path {
     $self->{'ini_path'} = shift;
     delete($self->{'ini'}); #delete cached Config::IniFiles
   }
-  unless (ref($self->{'ini_path'}) eq 'ARRAY') {
+  unless (defined $self->{'ini_path'}) { #both "" and "0" are valid paths
     my $etc = $self->_ini_path_etc;
     if ($^O eq 'MSWin32') {
       local $@;

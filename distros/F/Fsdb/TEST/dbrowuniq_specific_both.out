@@ -2,8 +2,8 @@
 singleton	9	1
 _null_getpage+128	10	6
 _null_getpage+128	15	6
-#  | /home/johnh/BIN/DB/dbcol event
-#  | /home/johnh/BIN/DB/dbsort event
 _null_getpage+4	16	6
 _null_getpage+4	21	6
+#  | /home/johnh/BIN/DB/dbcol event
+#  | /home/johnh/BIN/DB/dbsort event
 #   | dbrowuniq -B -c event

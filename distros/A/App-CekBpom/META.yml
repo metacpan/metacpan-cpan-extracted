@@ -1,5 +1,5 @@
 ---
-abstract: 'Check BPOM products via the command-line (CLI interface for cekbpom.pom.go.id)'
+abstract: 'Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -18,6 +18,7 @@ meta-spec:
 name: App-CekBpom
 requires:
   Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
@@ -40,14 +41,14 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom
   homepage: https://metacpan.org/release/App-CekBpom
   repository: git://github.com/perlancar/perl-App-CekBpom.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript cek-bpom'
+      name: 'GenPericmdScript cek-bpom-products'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
@@ -124,7 +125,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.602'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -140,7 +141,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.041'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

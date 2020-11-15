@@ -60,6 +60,24 @@ operator (or by other similar operators).
 The following list is the currently implemented creation operators with links to relevant rxjs documentation (which
 should apply to RxPerl too).
 
+- rx\_behavior\_subject
+
+    [https://rxjs.dev/api/index/class/BehaviorSubject](https://rxjs.dev/api/index/class/BehaviorSubject)
+
+        # 10, 20, 30, complete
+        my $b_s = rx_behavior_subject->new(10);
+        $b_s->subscribe($observer);
+        $b_s->next(20);
+        $b_s->next(30);
+        $b_s->complete;
+
+        # 20, 30, complete
+        my $b_s = rx_behavior_subject->new(10);
+        $b_s->next(20);
+        $b_s->subscribe($observer);
+        $b_s->next(30);
+        $b_s->complete;
+
 - rx\_combine\_latest
 
     [https://rxjs.dev/api/index/function/combineLatest](https://rxjs.dev/api/index/function/combineLatest)

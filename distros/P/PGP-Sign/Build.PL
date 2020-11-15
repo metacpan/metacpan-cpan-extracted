@@ -22,7 +22,7 @@ my $build = Module::Build->new(
     dist_author          => 'Russ Allbery <rra@cpan.org>',
     license              => 'perl',
     recursive_test_files => 1,
-    add_to_cleanup =>
+    add_to_cleanup       =>
       [qw(MANIFEST.bak cover_db t/data/random_seed t/data/trustdb.gpg)],
 
     # Add additional package metadata.

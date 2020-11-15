@@ -1,5 +1,8 @@
 Revision history for Data-MoneyCurrency
 
+0.11    Sat Nov 14 21:18:10 CET 2020
+        new ruby-money conf
+
 0.10    Fri Jun 12 10:27:29 CEST 2020
         new ruby-money conf
         point to OpenCage Github repo in pod and README

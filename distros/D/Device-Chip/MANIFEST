@@ -1,15 +1,11 @@
 Build.PL
 Changes
 examples/read-gpios.pl
-examples/tickit-ui.pl
 examples/write-gpios.pl
 lib/Device/Chip.pm
 lib/Device/Chip/Adapter.pm
 lib/Device/Chip/Authoring.pod
 lib/Device/Chip/Base/RegisteredI2C.pm
-lib/Device/Chip/Ex/GPIOTickitBox.pm
-lib/Device/Chip/Ex/SPITickitBox.pm
-lib/Device/Chip/Ex/TickitUI.pm
 lib/Device/Chip/ProtocolBase/SPI.pm
 lib/Test/Device/Chip/Adapter.pm
 LICENSE

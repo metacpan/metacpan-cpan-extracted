@@ -8,3 +8,8 @@ static_install = "auto"
 
 [FileGatherer]
 exclude_match=['^images/.*']
+
+[unsupported]
+os = [
+    "MSWin32",
+]

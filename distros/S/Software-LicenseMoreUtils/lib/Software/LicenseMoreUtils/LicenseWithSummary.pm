@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils::LicenseWithSummary;
-$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '1.004';
+$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '1.005';
 # ABSTRACT: Software::License with a summary
 
 use strict;
@@ -110,7 +110,7 @@ Software::LicenseMoreUtils::LicenseWithSummary - Software::License with a summar
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 

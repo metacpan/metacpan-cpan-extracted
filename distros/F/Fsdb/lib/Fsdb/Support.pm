@@ -3,7 +3,6 @@
 #
 # Support.pm
 # Copyright (C) 1991-2007 by John Heidemann <johnh@isi.edu>
-# $Id: 88483b6ffcd50120552f971d8e96d3f2e82f71dd $
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING

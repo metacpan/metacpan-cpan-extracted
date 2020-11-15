@@ -1,5 +1,10 @@
 Revision history for Code-TidyAll-Plugin-Flake8
 
+0.4.0       2020-11-13
+    - Display the flake8 errors (in case of failures) by including them in the thrown exception.
+        - https://github.com/shlomif/PySolFC/pull/191
+        - Thanks to @jnumm and @cardset
+
 0.2.1       2020-10-22
     - Avoid stale POD
         - Inspired by Lady_Aleena.

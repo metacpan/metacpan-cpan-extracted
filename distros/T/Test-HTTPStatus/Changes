@@ -1,5 +1,8 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.05	Sat Nov 14 09:53:52 EST 2020
+	No changes to the code, new maintainer - thanks to BDFOY
+
 2.004 2019-07-21T22:50:05Z
 	* Abandon this module. There are much better ways to do this in this
 	century.

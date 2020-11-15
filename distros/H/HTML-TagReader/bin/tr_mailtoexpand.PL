@@ -197,7 +197,7 @@ tr_mailtoexpand index.html
 =head1 AUTHOR
 
 tr_mailtoexpand is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 =cut
 

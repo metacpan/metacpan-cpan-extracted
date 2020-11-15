@@ -10,7 +10,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp;
 
@@ -143,6 +143,7 @@ be one of the following values:
    GPIO
    SPI
    I2C
+   UART
 
 It is unspecified what class these objects should belong to. In particular, it
 is permitted that an adapter could even return itself as the protocol

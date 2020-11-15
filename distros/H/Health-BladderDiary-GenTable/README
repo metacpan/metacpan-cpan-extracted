@@ -2,9 +2,9 @@ NAME
     Health::BladderDiary::GenTable - Create bladder diary table from entries
 
 VERSION
-    This document describes version 0.002 of Health::BladderDiary::GenTable
+    This document describes version 0.004 of Health::BladderDiary::GenTable
     (from Perl distribution Health-BladderDiary-GenTable), released on
-    2020-11-12.
+    2020-11-13.
 
 SYNOPSIS
     Your bladder entries e.g. in `bd-entry1.txt` (I usually write in Org
@@ -70,6 +70,7 @@ DESCRIPTION
     Some other information are scraped for writing convenience:
 
      /\b(\d+)ml\b/          for volume
+     /\bv(\d+)\b/           for volume
      /\bu([0-9]|10)\b/      for urgency (1-10)
      /\bc([0-6])\b/         for clear to dark orange color (0=clear, 1=light yellow, 2=yellow, 3=dark yellow, 4=amber, 5=brown, 6=red)
 
@@ -88,7 +89,8 @@ DESCRIPTION
    Urination entries
     A urination entry is an entry with event "urination" (can be written as
     just "u" or "urin"). At least volume is required, can be written in ml
-    unit e.g. "300ml" or using "vol" key, e.g. "vol=300". Example:
+    unit e.g. "300ml", or using "vNUMBER" e.g. "v300", or using "vol" key,
+    e.g. "vol=300". Example:
 
      1230 u 200ml
 
@@ -113,18 +115,15 @@ DESCRIPTION
 
     You can also enter urgency information using "urgency=NUMBER" or
     "u0".."u10", which is a number from 0 (not urgent at all) to 10 (most
-    urgent).
-
-    Example:
+    urgent). Example:
 
      1230 u 200ml c2 u4
 
   Drink entries
     A drink (fluid intake) entry is an entry with event "drink" (can be
     written as just "d"). At least volume is required, can be written in ml
-    unit e.g. "300ml" or using "vol" key, e.g. "vol=300".
-
-    Example:
+    unit e.g. "300ml", or using "vNUMBER" e.g. "v300", or using "vol" key,
+    e.g. "vol=300". Example:
 
      1300 d 300ml
 

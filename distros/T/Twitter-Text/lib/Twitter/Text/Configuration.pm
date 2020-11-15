@@ -2,7 +2,7 @@ package
     Twitter::Text::Configuration; # hide from PAUSE
 use strict;
 use warnings;
-use JSON::XS ();
+use JSON ();
 use Path::Tiny qw(path);
 use File::Share qw(dist_file);
 
@@ -15,7 +15,7 @@ sub configuration_from_file {
 
     return $config_cache{$config_name} if exists $config_cache{$config_name};
 
-    return $config_cache{$config_name} ||= JSON::XS::decode_json(path(dist_file('Twitter-Text', "config/$config_name.json"))->slurp);
+    return $config_cache{$config_name} ||= JSON::decode_json(path(dist_file('Twitter-Text', "config/$config_name.json"))->slurp);
 }
 
 sub V1 {

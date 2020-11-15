@@ -9,7 +9,7 @@ my $b = Module::Build->new
   requires      =>
    {'Carp'             =>0,
     'Data::Dump'       =>0,
-    'Data::Table::Text'=>20180316,
+    'Data::Table::Text'              => 20201029,
     'File::Copy'       =>0,
     'POSIX'            =>0,
     'Test2::API'       =>0,
@@ -18,6 +18,12 @@ my $b = Module::Build->new
   configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,
   perl          => '5.16.0',
+  meta_merge =>
+   {resources =>
+     {repository => 'https://github.com/philiprbrenan/AndroidBuild',
+      bugtracker => 'https://github.com/philiprbrenan/AndroidBuild/issues'
+     }
+   },
  );
 
 $b->create_build_script();

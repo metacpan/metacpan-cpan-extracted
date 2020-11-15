@@ -1,6 +1,6 @@
 NAME
-    AI::Genetic::Pro - Efficient genetic algorithms for professional
-    purpose.
+    AI::Genetic::Pro - Efficient genetic algorithms for professional purpose
+    with support for multiprocessing.
 
 SYNOPSIS
         use AI::Genetic::Pro;
@@ -30,6 +30,8 @@ SYNOPSIS
             -history         => 1,                # remember best results
             -preserve        => 3,                # remember the bests
             -variable_length => 1,                # turn variable length ON
+            -mce             => 1,                # optional MCE support
+            -workers         => 3,                # number of workers (MCE)
         );
         
         # init population of 32-bit vectors
@@ -52,13 +54,13 @@ SYNOPSIS
 
 DESCRIPTION
     This module provides efficient implementation of a genetic algorithm for
-    professional use. It was designed to operate as fast as possible even on
-    very large populations and big individuals/chromosomes.
-    "AI::Genetic::Pro" was inspired by "AI::Genetic", so it is in most cases
-    compatible (there are some changes). Additionally "AI::Genetic::Pro"
-    isn't a pure Perl solution, so it doesn't have limitations of its
-    ancestor (such as serious slow-down in the case of big populations (
-    >10000 ) or vectors with more than 33 fields).
+    professional use with support for multiprocessing. It was designed to
+    operate as fast as possible even on very large populations and big
+    individuals/chromosomes. "AI::Genetic::Pro" was inspired by
+    "AI::Genetic", so it is in most cases compatible (there are some
+    changes). Additionally "AI::Genetic::Pro" isn't a pure Perl solution, so
+    it doesn't have limitations of its ancestor (such as slow-down in the
+    case of big populations ( >10000 ) or vectors with more than 33 fields).
 
     If You are looking for a pure Perl solution, consider AI::Genetic.
 
@@ -67,10 +69,23 @@ DESCRIPTION
         This distribution was tested on Windows and Linux platforms (and
         should work on any other).
 
+        Multicore support is available through Many-Core Engine ("MCE"). You
+        can gain the most speed up for big populations ora time/CPU
+        consuming fitness functions, however for small populations and/or
+        simple fitness function better choice will be single-process
+        version.
+
+        You can gat even more speed up if you turn on use of native arrays
+        (parameter: "native") instead of packing chromosomes into single
+        scalar. However you have to remember about expensive memory use in
+        that case.
+
     Memory
         This module was designed to use as little memory as possible. A
         population of size 10000 consisting of 92-bit vectors uses only
-        ~24MB ("AI::Genetic" would use about 78MB!).
+        ~24MB ("AI::Genetic" would use about 78MB). However - if you use MCE
+        - there will be bigger memory consumption. This is consequence of
+        necessity of synchronization between many processes.
 
     Advanced options
         To provide more flexibility "AI::Genetic::Pro" supports many
@@ -415,6 +430,21 @@ METHODS
         -history
                 This defines whether history should be collected. Allowed
                 values are 1 or 0 (default: *0*).
+
+        -native This defines whether native arrays should be used instead of
+                packing each chromosome into signle scalar. Turning this
+                option can give you speed up, but much more memory will be
+                used. Allowed values are 1 or 0 (default: *0*).
+
+        -mce    This defines whether Many-Core Engine (MCE) should be used
+                during processing. This can give you significant speed up on
+                many-core/CPU systems, but it'll increase memory
+                consumption. Allowed values are 1 or 0 (default: *0*).
+
+        -workers
+                This option has any meaning only if MCE is turned on. This
+                defines how many process will be used during processing.
+                Default will be used one proces per core (most efficient).
 
         -strict This defines if the check for modifying chromosomes in a
                 user-defined fitness function is active. Directly modifying

@@ -9,6 +9,8 @@ minil.toml
 t/00_compile.t
 t/10_violation.t
 t/data/anonymous-subroutine-call.pl
+t/data/do-until.pl
+t/data/do-while.pl
 t/data/eval.pl
 t/data/loop-block.pl
 t/data/multiple-subroutines.pl

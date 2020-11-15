@@ -4,12 +4,13 @@ author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
   Test::More: '0.94'
+  Test::Most: '0'
   Test::Output: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,14 +21,15 @@ no_index:
     - t
     - inc
 requires:
+  AutoLoader: '0'
+  Carp: '0'
   HTML::LinkExtor: '1.28'
   LWP::UserAgent: '0'
   URI: '1.09'
   URI::file: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor/issues
-  homepage: https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor
-  repository: https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor.git
-version: '1.272'
+  bugtracker: https://github.com/nigelhorne/HTML-SimpleLinkExtor/issues
+  repository: git://github.com/nigelhorne/HTML-SimpleLinkExtor.git
+version: '1.273'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

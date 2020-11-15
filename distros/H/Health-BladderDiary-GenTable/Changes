@@ -1,3 +1,18 @@
+0.004   2020-11-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Forgot to document vNUMBER shortcut.
+
+
+0.003   2020-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Allow specifying volume using v<NUM>, e.g. v100 (in addition
+	  to volume=100 and 100ml).
+
+	- Change formatting of time/hour column: 01-02.00 -> 01.00-02.00.
+
+
 0.002   2020-11-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Some more convenience: allow entries as single lines if no blank lines

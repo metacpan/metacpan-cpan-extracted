@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "DBD independent class",
    "author" : [
-      "unknown"
+      "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -29,9 +29,31 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "2.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/DBIx-AnyDBD/issues",
+         "x_url" : "https://github.com/nigelhorne/DBIx-AnyDBD/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/DBIx-AnyDBD.git",
+         "web" : "https://github.com/nigelhorne/DBIx-AnyDBD",
+         "x_repository" : "https://github.com/nigelhorne/DBIx-AnyDBD"
+      }
+   },
+   "version" : "2.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

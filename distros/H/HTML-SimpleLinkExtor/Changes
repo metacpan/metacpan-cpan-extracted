@@ -1,5 +1,8 @@
 Revision history for Perl module HTML::SimpleLinkExtor
 
+1.273	Fri Nov 13 18:29:10 EST 2020
+	No changes to the code, new maintainer - thanks to BDFOY
+
 1.272 2019-07-21T23:15:47Z
 	* Abandon the module
 

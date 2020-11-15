@@ -1,14 +1,26 @@
---- #YAML:1.0
-name:                Tie-Hash-Indexed
-version:             0.05
-abstract:            Ordered hashes for Perl
-license:             perl
-generated_by:        ExtUtils::MakeMaker version 6.36
-distribution_type:   module
-requires:     
-    Test:                          0
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'Ordered hashes for Perl'
 author:
-    - Marcus Holland-Moritz <mhx@cpan.org>
+  - 'Marcus Holland-Moritz <mhx@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Hash-Indexed
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test: '0'
+resources:
+  bugtracker: https://github.com/mhx/Tie-Hash-Indexed/issues/
+  repository: git://github.com/mhx/Tie-Hash-Indexed.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

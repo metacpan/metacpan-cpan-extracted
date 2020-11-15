@@ -1,5 +1,9 @@
 Revision history for VCS-Which
 
+0.6.8   2020-11-14
+        Updating for release of version 0.6.8
+        Adding an option to just show simple diff of versions (Ivan Wills)
+
 0.6.7   2020-10-04
         Updating for release of version 0.6.7
         Updating date (Ivan Wills)

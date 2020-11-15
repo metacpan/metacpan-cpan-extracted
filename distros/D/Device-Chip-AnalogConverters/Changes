@@ -1,5 +1,13 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.10    2020-11-13
+        [CHANGES]
+         * Add drivers for ADC121Sx, MAX1166x, DAC7513
+
+        [BUGFIXES]
+         * Allow a little longer for MAX11200 to SELFCAL when running at
+           LINEF=50Hz
+
 0.09    2020-06-13
         [CHANGES]
          * Update to Object::Pad 0.27

@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Plugin::NoWarnings;
 use Test2::Plugin::GitHub::Actions::AnnotateFailedTest;
 
 use Twitter::Text::Util;

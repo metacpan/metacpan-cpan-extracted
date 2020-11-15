@@ -1,14 +1,12 @@
-#!/usr/bin/perl -w
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Image::Synchronize::Timerange;
 use Image::Synchronize::Timestamp;
 use Test::More;
 use Time::Local qw(timegm);
 
-is( Image::Synchronize::Timerange->new('20170614T00/11:56'),
-  undef, 'bad format' );
+ok( not(defined Image::Synchronize::Timerange->new('20170614T00/11:56')),
+    'bad format' );
 is(
   Image::Synchronize::Timerange->new('2017-06-14T00/11:56')->stringify,
   '2017-06-14T00:00:00/11:56:00',
@@ -41,11 +39,6 @@ foreach my $test (
     begin => '2001-02-03T04:05:06+07:08',
     end   => '2001-02-03T04:05:06+07:08'
   },
-  {
-    in    => '2001-02-03T04:05:06+07:08/02:00:00',
-    begin => '2001-02-03T02:00:00+07:08',
-    end   => '2001-02-03T04:05:06+07:08'
-  },
 
   # with pieces missing
   {
@@ -62,11 +55,6 @@ foreach my $test (
     in    => '2001-02-03T04/07',
     begin => '2001-02-03T04:00:00',
     end   => '2001-02-03T07:00:00'
-  },
-  {
-    in    => '2001-02-03T23/04',
-    begin => '2001-02-03T23:00:00',
-    end   => '2001-02-03T04:00:00'
   },
   )
 {
@@ -88,11 +76,11 @@ foreach my $test (
     sprintf( "%-16s $text", 'time_utc' )
   );
   is_deeply(
-    [ $r->offset_from_utc ],
-    [ $t1->offset_from_utc, $t2->offset_from_utc ],
-    sprintf( "%-16s $text", 'offset_from_utc' )
+    [ $r->timezone_offset ],
+    [ $t1->timezone_offset, $t2->timezone_offset ],
+    sprintf( "%-16s $text", 'timezone_offset' )
   );
-  is( $r->length, $t2 - $t1, sprintf( "%-16s $text", 'length' ) );
+  is( $r->duration, $t2 - $t1, sprintf( "%-16s $text", 'duration' ) );
 }
 
 my $r = Image::Synchronize::Timerange->new;
@@ -135,15 +123,15 @@ foreach my $test (
 {
   $r->set_from_text( $test->{in} );
   is( "$r", $test->{out} // $test->{in}, "set_from_text       $test->{in}" );
-  my $r2 = $r->clone->set_timezone_offset(3600);
-  is( "$r2", $test->{tzp}, "set_timezone_offset(+3600) $test->{in}" );
-  $r2 = $r->clone->set_timezone_offset(-3600);
-  is( "$r2", $test->{tzm}, "set_timezone_offset(-3600) $test->{in}" );
-  $r2 = $r->clone->set_timezone_offset;
+  my $r2 = $r->clone->adjust_timezone_offset(3600);
+  is( "$r2", $test->{tzp}, "adjust_timezone_offset(+3600) $test->{in}" );
+  $r2 = $r->clone->adjust_timezone_offset(-3600);
+  is( "$r2", $test->{tzm}, "adjust_timezone_offset(-3600) $test->{in}" );
+  $r2 = $r->clone->adjust_timezone_offset;
   is(
     "$r2",
     $test->{tzno} // $test->{in},
-    "set_timezone_offset no     $test->{in}"
+    "adjust_timezone_offset no     $test->{in}"
   );
 }
 
@@ -265,12 +253,12 @@ foreach my $test (
   is( $r2 <=> $r1, -$test->{expect}, "$test->{two} <=> $test->{one}" );
 
   # one timezone offset
-  $r1->set_timezone_offset(2000);
+  $r1->adjust_timezone_offset(2000);
   is( $r1 <=> $r2, $test->{expect},  "$test->{one} TZ <=> $test->{two}" );
   is( $r2 <=> $r1, -$test->{expect}, "$test->{two} <=> $test->{one} TZ" );
 
   # two equal timezone offsets
-  $r2->set_timezone_offset(2000);
+  $r2->adjust_timezone_offset(2000);
   is( $r1 <=> $r2, $test->{expect},  "$test->{one} TZ <=> $test->{two} TZ" );
   is( $r2 <=> $r1, -$test->{expect}, "$test->{two} TZ <=> $test->{one} TZ" );
 }

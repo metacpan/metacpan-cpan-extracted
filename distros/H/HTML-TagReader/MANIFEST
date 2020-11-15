@@ -21,3 +21,4 @@ bin/tr_imgaddsize.PL
 bin/tr_mailtoexpand.PL
 bin/tr_delfont.PL
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

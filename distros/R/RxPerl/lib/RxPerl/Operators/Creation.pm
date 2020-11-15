@@ -6,19 +6,23 @@ use RxPerl::Observable;
 use RxPerl::Subscription;
 use RxPerl::Utils 'get_timer_subs', 'get_interval_subs';
 use RxPerl::Subject;
+use RxPerl::BehaviorSubject;
 
 use Carp 'croak';
 use Scalar::Util qw/ weaken blessed reftype /;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    rx_observable rx_combine_latest rx_concat rx_defer rx_EMPTY rx_from_event
-    rx_from_event_array rx_interval rx_merge rx_NEVER rx_of rx_race
-    rx_subject rx_throw_error rx_timer rx_from rx_fork_join
+    rx_behavior_subject rx_combine_latest rx_concat rx_defer rx_EMPTY
+    rx_fork_join rx_from rx_from_event rx_from_event_array rx_interval
+    rx_merge rx_NEVER rx_observable rx_of rx_race rx_subject
+    rx_throw_error rx_timer
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 sub rx_observable;
+
+sub rx_behavior_subject { "RxPerl::BehaviorSubject" }
 
 sub rx_combine_latest {
     my ($sources) = @_;

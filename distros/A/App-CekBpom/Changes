@@ -1,3 +1,12 @@
+0.012   2020-11-13  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible change] Rename CLI cek-bpom to cek-bpom-products.
+
+	[CLI cek-bpom-products]
+
+        - Add option: --get-product-detail.
+
+
 0.011   2020-10-23  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	[Incompatible changes]

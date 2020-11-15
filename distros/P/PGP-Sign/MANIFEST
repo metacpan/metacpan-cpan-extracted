@@ -19,6 +19,7 @@ README.md
 t/api/basic.t
 t/api/errors.t
 t/api/gpg1.t
+t/api/large-data.t
 t/api/whitespace.t
 t/data/gnupg1/pubring.gpg
 t/data/gnupg1/secring.gpg

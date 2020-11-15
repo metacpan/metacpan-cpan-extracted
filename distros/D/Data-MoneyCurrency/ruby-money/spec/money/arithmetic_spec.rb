@@ -168,6 +168,19 @@ describe Money::Arithmetic do
       expect(Money.usd(1) > 0.0).to eq true
       expect(Money.usd(0) >= 0.0).to eq true
     end
+
+    it 'compares with zero Money in any currency' do
+      expect(Money.new(42, 'USD') > Money.zero('USD')).to eq(true)
+      expect(Money.new(42, 'USD') > Money.zero('CAD')).to eq(true)
+      expect(Money.new(42, 'CAD') > Money.zero('USD')).to eq(true)
+
+      expect(Money.zero('USD') > Money.new(42, 'USD')).to eq(false)
+      expect(Money.zero('CAD') > Money.new(42, 'USD')).to eq(false)
+      expect(Money.zero('USD') > Money.new(42, 'CAD')).to eq(false)
+
+      expect(Money.zero('USD') == Money.zero('USD')).to be(true)
+      expect(Money.zero('USD') == Money.zero('CAD')).to be(true)
+    end
   end
 
   describe "#positive?" do
@@ -374,7 +387,7 @@ describe Money::Arithmetic do
       end
     end
 
-    context "with infinite_precision", :infinite_precision do
+    context "with infinite_precision", :default_infinite_precision_true do
       it "uses BigDecimal division" do
         ts = [
           {a: Money.new( 13, :USD), b: 4, c: Money.new( 3.25, :USD)},
@@ -429,7 +442,7 @@ describe Money::Arithmetic do
       end
     end
 
-    context "with infinite_precision", :infinite_precision do
+    context "with infinite_precision", :default_infinite_precision_true do
       it "uses BigDecimal division" do
         ts = [
           {a: Money.new( 13, :USD), b: 4, c: Money.new( 3.25, :USD)},
@@ -482,7 +495,7 @@ describe Money::Arithmetic do
       end
     end
 
-    context "with infinite_precision", :infinite_precision do
+    context "with infinite_precision", :default_infinite_precision_true do
       it "uses BigDecimal division" do
         ts = [
             {a: Money.new( 13, :USD), b: 4, c: [Money.new( 3, :USD), Money.new( 1, :USD)]},

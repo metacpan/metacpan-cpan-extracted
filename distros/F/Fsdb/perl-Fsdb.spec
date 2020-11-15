@@ -1,7 +1,7 @@
 Summary: A set of commands for manipulating flat-text databases from the shell
 Name: perl-Fsdb
-Version: 2.69
-Epoch: 1
+Version: 2.70
+Epoch: 2
 Release: 1%{?dist}
 License: GPLv2
 URL: http://www.isi.edu/~johnh/SOFTWARE/FSDB/
@@ -18,6 +18,7 @@ BuildRequires: perl(Getopt::Long)
 BuildRequires: perl(IO::File)
 BuildRequires: perl(IO::Handle)
 BuildRequires: perl(IO::Uncompress::AnyUncompress)
+BuildRequires: perl(IPC::Cmd)
 BuildRequires: perl(Pod::Usage)
 BuildRequires: perl(Pod::Html)
 BuildRequires: perl(strict)
@@ -43,6 +44,7 @@ Requires:       perl(Text::CSV_XS)
 Requires:       perl(IO::Compress::Bzip2)
 Requires:       perl(IO::Compress::Gzip)
 Requires:       perl(IO::Compress::Xz)
+Requires:  perl(IPC::Cmd)
 Requires:  perl(XML::Simple)
 Requires:  perl(YAML::XS)
 
@@ -102,5 +104,5 @@ make test
 
 
 %changelog
-* Fri Nov 22 2019 John Heidemann <johnh@isi.edu> 2.69-1
+* Thu Nov 12 2020 John Heidemann <johnh@isi.edu> 2.70-1
 - See http://www.isi.edu/~johnh/SOFTWARE/FSDB/

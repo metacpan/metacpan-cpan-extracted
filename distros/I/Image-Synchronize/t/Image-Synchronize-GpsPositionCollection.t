@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
-use strict;
-use warnings;
-
+use Modern::Perl;
 use Image::Synchronize::GpsPositionCollection;
 use Test::More;
 use YAML::Any qw(Dump);
@@ -149,9 +147,9 @@ is_deeply(
 # implementations of YAML produce a whitespace character after the
 # '---' and some do not.
 is( "$gpc",
-    Dump(['1970-01-12T13:46:40+00:00/13:46:50    5.00000000    6.00000000',
-          '1970-01-12T13:46:47+00:00/13:47:00   17.00000000   18.00000000',
-          '1970-01-12T13:47:20+00:00            25.00000000   26.00000000']),
+    Dump(['1970-01-12T13:46:40/13:46:50          5.00000000    6.00000000',
+          '1970-01-12T13:46:47/13:47:00         17.00000000   18.00000000',
+          '1970-01-12T13:47:20                  25.00000000   26.00000000']),
     'stringified' );
 
 done_testing;

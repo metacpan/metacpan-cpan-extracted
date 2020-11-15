@@ -1,28 +1,34 @@
-SYNOPSIS
+NAME
+    Require::HookChain - Chainable require hook
 
-    Say you want to create a require hook to prepend some code to the
-    module source code that is loaded. In your hook source, in
+VERSION
+    This document describes version 0.002 of Require::HookChain (from Perl
+    distribution Require-HookChain), released on 2020-11-13.
+
+SYNOPSIS
+    Say you want to create a require hook to prepend some code to the module
+    source code that is loaded. In your hook source, in
     Require/HookChain/prepend.pm:
 
      package Require::HookChain::prepend;
-    
+
      sub new {
          my ($class, $preamble) = @_;
          bless { preamble => $preamble }, $class;
      }
-    
+
      sub Require::HookChain::prepend::INC {
          my ($self, $r) = @_;
-    
+
          # safety, in case we are not called by Require::HookChain
          return () unless ref $r;
-    
+
          my $src = $r->src;
          return unless defined $src;
          $src = "$self->{preamble};\n$src";
          $r->src($src);
      }
-    
+
      1;
 
     In a code to use this hook:
@@ -36,10 +42,9 @@ SYNOPSIS
      use Require::HookChain -end => 1, append => 'some code';
 
 DESCRIPTION
-
     This module lets you create chainable require hooks. As one already
     understands, Perl lets you put a coderef or object in @INC. In the case
-    of object, its INC method will be called by Perl:
+    of object, its "INC" method will be called by Perl:
 
      package My::INCHandler;
      sub new { ... }
@@ -49,41 +54,69 @@ DESCRIPTION
      }
 
     The method is passed itself then filename (which is what is passed to
-    require()) and is expected to return nothing or a list of up to four
-    values: a scalar reference containing source code, filehandle,
-    reference to subroutine, optional state for subroutine (more
-    information can be read from the perlfunc manpage). As soon as the
-    first hook in @INC returns non-empty value then the search for source
-    code is stopped.
+    "require()") and is expected to return nothing or a list of up to four
+    values: a scalar reference containing source code, filehandle, reference
+    to subroutine, optional state for subroutine (more information can be
+    read from the perlfunc manpage). As soon as the first hook in @INC
+    returns non-empty value then the search for source code is stopped.
 
-    With Require::HookChain, you can put multiple hooks in @INC that all
-    get executed. When use'd, Require::HookChain will install its own hook
-    at the beginning of @INC which will search for source code in @INC as
-    well as execute INC method of all the other hooks which are instances
-    of Require::HookChain::* class. Instead of filename, the method is
-    passed a Require::HookChain::r object ($r). The method can do things on
-    $r, for example retrieve source code via $r->src or modify source code
-    via $r->src($new_content). After the method returns, the next
-    Require::HookChain::* hook is executed, and so on. The final source
-    code will be retrieved from $r->src and returned for Perl.
+    With "Require::HookChain", you can put multiple hooks in @INC that all
+    get executed. When "use"'d, "Require::HookChain" will install its own
+    hook at the beginning of @INC which will search for source code in @INC
+    as well as execute "INC" method of all the other hooks which are
+    instances of "Require::HookChain::*" class. Instead of filename, the
+    method is passed a "Require::HookChain::r" object ($r). The method can
+    do things on $r, for example retrieve source code via "$r->src" or
+    modify source code via "$r->src($new_content)". After the method
+    returns, the next "Require::HookChain::*" hook is executed, and so on.
+    The final source code will be retrieved from "$r->src" and returned for
+    Perl.
 
     This lets one chainable hook munge the result of the previous chainable
     hook.
 
     To create your own chainable require hook, see example in "SYNOPSIS".
-    First you create a module under the Require::HookChain::* namespace,
-    then create a constructor as well as INC handler.
+    First you create a module under the "Require::HookChain::*" namespace,
+    then create a constructor as well as "INC" handler.
 
 Require::HookChain::r OBJECT
+  Methods
+   filename
+    Usage:
 
- Methods
+     my $filename = $r->filename;
 
-  src
+   src
+    Usage:
 
-    Usage: $r->src( [ $new_value ] ) => str
+     my $src = $r->src;
+     $r->src($new_src);
 
-    Get or set source code content. Will return undef if source code has
-    not been found or set.
+    Get or set source code content. Will return undef if source code has not
+    been found or set.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Require-HookChain>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Require-HookChain>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Require-HookChain>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

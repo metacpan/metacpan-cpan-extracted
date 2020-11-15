@@ -1,10 +1,10 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -23,6 +23,10 @@ and DAC chips.
 
 =item *
 
+L<Device::Chip::ADC121Sx>
+
+=item *
+
 L<Device::Chip::ADS1115>
 
 =item *
@@ -36,6 +40,10 @@ L<Device::Chip::MCP3221>
 =item *
 
 L<Device::Chip::MAX11200>
+
+=item *
+
+L<Device::Chip::MAX1166x>
 
 =back
 
@@ -85,6 +93,10 @@ L<Device::Chip::AD5691R>
 
 =item *
 
+L<Device::Chip::DAC7513>
+
+=item *
+
 L<Device::Chip::DAC7571>
 
 =item *
@@ -115,7 +127,7 @@ voltage into a raw value to invoke L</write_dac> with.
    $chip->write_dac_ratio( $ratio )->get
 
 If the chip (driver) does not have a reference to scale convert a given
-voltage to a DAC code valjue, then this method should be provided instead that
+voltage to a DAC code value, then this method should be provided instead that
 takes a given ratio, as a floating-point number between 0 and 1 for unipolar
 (single-ended unsigned) outputs or between -1 and 1 for bipolar (differential
 signed) outputs, and scales it by a suitable factor.

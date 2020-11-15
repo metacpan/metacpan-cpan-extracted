@@ -1,22 +1,14 @@
 ################################################################################
 #
-# $Project: /Tie-Hash-Indexed $
-# $Author: mhx $
-# $Date: 2007/08/24 15:12:22 +0200 $
-# $Revision: 7 $
-# $Source: /t/101_basic.t $
-#
-################################################################################
-# 
-# Copyright (c) 2002-2003 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2016 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
-# 
+#
 ################################################################################
 
 use Test;
 
-BEGIN { plan tests => 32 };
+BEGIN { plan tests => 35 };
 
 use Tie::Hash::Indexed;
 ok(1);
@@ -39,20 +31,23 @@ ok(join(',', keys %h), 'foo,bar,zoo,baz');
 ok(exists $h{foo});
 ok(exists $h{bar});
 ok(!exists $h{xxx});
+ok(scalar keys %h, 4);
 $s = &scalar_h;
-skip($scalar, $s =~ /^(\d+)\/\d+$/ && $1 == scalar keys %h);
+skip($scalar, $s =~ /^(\d+)\/\d+$/ && $1 > 0 && $1 <= scalar keys %h);
 
 $h{xxx} = 5;
 ok(join(',', keys %h), 'foo,bar,zoo,baz,xxx');
 ok(exists $h{xxx});
+ok(scalar keys %h, 5);
 $s = &scalar_h;
-skip($scalar, $s =~ /^(\d+)\/\d+$/ && $1 == scalar keys %h);
+skip($scalar, $s =~ /^(\d+)\/\d+$/ && $1 > 0 && $1 <= scalar keys %h);
 
 $h{foo} = 6;
 ok(join(',', keys %h), 'foo,bar,zoo,baz,xxx');
 ok(exists $h{foo});
+ok(scalar keys %h, 5);
 $s = &scalar_h;
-skip($scalar, $s =~ /^(\d+)\/\d+$/ && $1 == scalar keys %h);
+skip($scalar, $s =~ /^(\d+)\/\d+$/ && $1 > 0 && $1 <= scalar keys %h);
 
 while (my($k,$v) = each %h) {
   $key .= $k;
@@ -99,4 +94,3 @@ tie my %hash => 'Tie::Hash::Indexed',
     foo => 1, bar => 2, zoo => 3, baz => 4;
 
 ok(join(',', keys %hash), 'foo,bar,zoo,baz');
-

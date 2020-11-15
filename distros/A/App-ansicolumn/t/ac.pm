@@ -11,7 +11,7 @@ use Data::Dumper;
 sub new {
     my $class = shift;
     my $obj = $class->SUPER::new();
-    $obj->command([ qw(perl -Ilib script/ansicolumn), @_ ]);
+    $obj->command([ $^X, qw(-Ilib script/ansicolumn), @_ ]);
     $obj;
 }
 

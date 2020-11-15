@@ -29,7 +29,7 @@
    "provides" : {
       "PGP::Sign" : {
          "file" : "lib/PGP/Sign.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "web" : "https://github.com/rra/pgp-sign"
       }
    },
-   "version" : "1.03",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

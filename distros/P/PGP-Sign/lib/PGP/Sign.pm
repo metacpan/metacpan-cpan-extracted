@@ -19,7 +19,7 @@
 # Modules and declarations
 ##############################################################################
 
-package PGP::Sign 1.03;
+package PGP::Sign 1.04;
 
 use 5.020;
 use autodie;
@@ -30,6 +30,7 @@ use Exporter qw(import);
 use File::Temp ();
 use IO::Handle;
 use IPC::Run qw(finish run start timeout);
+use POSIX qw(EAGAIN);
 use Scalar::Util qw(blessed);
 
 # Export pgp_sign and pgp_verify by default for backwards compatibility.
@@ -131,6 +132,35 @@ sub _print_fh {
     return;
 }
 
+# Write to a non-blocking file descriptor.  Handles the select loop waiting
+# for the file descriptor to be ready to accept data.
+#
+# $fh   - Output file handle
+# $data - Data to write
+#
+# Returns: undef
+#  Throws: Text exception on output failure
+sub _write_nonblocking {
+    my ($fh, $data) = @_;
+    my $win = q{};
+    vec($win, fileno($fh), 1) = 1;
+    my $length = length($data);
+    my $total  = 0;
+    while ($total < $length) {
+        no autodie qw(syswrite);
+        select(undef, my $wout = $win, undef, undef)
+          or croak("cannot select on pipe: $!");
+        my $written = syswrite($fh, $data, $length - $total, $total);
+        if (!defined($written) && $! != EAGAIN) {
+            croak("write to pipe failed: $!");
+        }
+        if (defined($written)) {
+            $total += $written;
+        }
+    }
+    return;
+}
+
 ##############################################################################
 # Object-oriented interface
 ##############################################################################
@@ -199,7 +229,7 @@ sub _write_string {
         }
     }
 
-    _print_fh($fh, $string);
+    _write_nonblocking($fh, $string);
     return;
 }
 
@@ -308,16 +338,24 @@ sub sign {
     # Fork off a pgp process that we're going to be feeding data to, and tell
     # it to just generate a signature using the given key id and pass phrase.
     my $writefh = IO::Handle->new();
+    my $passfh  = IO::Handle->new();
     my ($signature, $errors);
     #<<<
     my $h = start(
         \@command,
-        '3<', \$passphrase,
+        '3<pipe', $passfh,
         '<pipe', $writefh,
         '>', \$signature,
         '2>', \$errors,
     );
     #>>>
+
+    # Push the passphrase to the subprocess so that it doesn't block waiting
+    # for it and not read its input.
+    _write_nonblocking($passfh, $passphrase);
+    close($passfh);
+
+    # Send in the data to be signed.
     $self->_write_data($writefh, @sources);
     close($writefh);
 

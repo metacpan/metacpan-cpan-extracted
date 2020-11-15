@@ -2,30 +2,34 @@ package AI::Genetic::Pro;
 
 use vars qw($VERSION);
 
-$VERSION = 0.401;
+$VERSION = 1.004;
 #---------------
 
 use warnings;
 use strict;
-use lib qw(../lib/perl);
+use base 							qw( Class::Accessor::Fast::XS );
+#-----------------------------------------------------------------------
 use Carp;
-use Clone qw(clone);
+use Clone 							qw( clone );
 use Struct::Compare;
-use Digest::MD5 qw(md5_hex);
-use List::Util qw(sum);
-use List::MoreUtils qw(minmax first_index apply);
-#use Data::Dumper; $Data::Dumper::Sortkeys = 1;
+use Digest::MD5 					qw( md5_hex );
+use List::Util 						qw( sum );
+use List::MoreUtils 				qw( minmax first_index apply );
+#use Data::Dumper; 					$Data::Dumper::Sortkeys = 1;
+use Tie::Array::Packed;
 use UNIVERSAL::require;
-use AI::Genetic::Pro::Array::Type qw(get_package_by_element_size);
+#-----------------------------------------------------------------------
+use AI::Genetic::Pro::Array::Type 	qw( get_package_by_element_size );
 use AI::Genetic::Pro::Chromosome;
-use base qw(Class::Accessor::Fast::XS);
 #-----------------------------------------------------------------------
 __PACKAGE__->mk_accessors(qw(
+	mce
 	type
 	population
 	terminate
 	chromosomes 
 	crossover 
+	native
 	parents 		_parents 
 	history 		_history
 	fitness 		_fitness 		_fitness_real
@@ -39,7 +43,11 @@ __PACKAGE__->mk_accessors(qw(
 	variable_length
 	_fix_range
 	_package
+	_length
 	strict			_strict
+	workers
+	size
+	_init
 ));
 #=======================================================================
 # Additional modules
@@ -50,11 +58,16 @@ my $_Cache = { };
 my $_temp_chromosome;
 #=======================================================================
 sub new {
-	my $class = shift;
+	my ( $class, %args ) = ( shift, @_ );
 	
+	#-------------------------------------------------------------------
 	my %opts = map { if(ref $_){$_}else{ /^-?(.*)$/o; $1 }} @_;
 	my $self = bless \%opts, $class;
 	
+	#-------------------------------------------------------------------
+	$AI::Genetic::Pro::Array::Type::Native = 1 if $self->native;
+	
+	#-------------------------------------------------------------------
 	croak(q/Type of chromosomes cannot be "combination" if "variable length" feature is active!/)
 		if $self->type eq q/combination/ and $self->variable_length;
 	croak(q/You must specify a crossover strategy with -strategy!/)
@@ -64,9 +77,17 @@ sub new {
 	croak(q/Strategy cannot be "/,$self->strategy->[0],q/" if "variable length" feature is active!/ )
 		if ($self->strategy->[0] eq 'PMX' or $self->strategy->[0] eq 'OX') and $self->variable_length;
 	
+	#-------------------------------------------------------------------
 	$self->_set_strict if $self->strict;
+
+	#-------------------------------------------------------------------
+	return $self unless $self->mce;
+
+	#-------------------------------------------------------------------
+	delete $self->{ mce };
+	'AI::Genetic::Pro::MCE'->use or die q[Cannot raise multicore support: ] . $@;
 	
-	return $self;
+	return AI::Genetic::Pro::MCE->new( $self, \%args );
 }
 #=======================================================================
 sub _Cache { $_Cache; }
@@ -90,8 +111,11 @@ sub _set_strict {
 #=======================================================================
 sub _fitness_cached {
 	my ($self, $chromosome) = @_;
-	my $key = md5_hex(${tied(@$chromosome)});
+	
+	#my $key = md5_hex(${tied(@$chromosome)});
+	my $key = md5_hex( $self->_package ? md5_hex( ${ tied( @$chromosome ) } ) : join( q[:], @$chromosome ) );
 	return $_Cache->{$key} if exists $_Cache->{$key};
+	
 	$_Cache->{$key} = $self->_fitness_real->($self, $chromosome);
 	return $_Cache->{$key};
 }
@@ -134,11 +158,12 @@ sub _find_fix_range {
 }
 #=======================================================================
 sub init { 
-	my ($self, $data) = @_;
+	my ( $self, $data ) = @_;
 	
 	croak q/You have to pass some data to "init"!/ unless $data;
 	#-------------------------------------------------------------------
 	$self->generation(0);
+	$self->_init( $data );
 	$self->_fitness( { } );
 	$self->_fix_range( [ ] );
 	$self->_history( [  [ ], [ ], [ ] ] );
@@ -174,8 +199,10 @@ sub init {
 
 	my $length = ref $data ? sub { $#$data; } : sub { $data - 1 };
 	if($self->variable_length){
-		$length = ref $data ? sub { 1 + int(rand($#$data)); } : sub { 1 + int(rand($data - 1)); };
+		$length = ref $data ? sub { 1 + int( rand( $#{ $self->_init } ) ); } : sub { 1 + int( rand( $self->_init - 1) ); };
 	}
+
+	$self->_length( $length );
 
 	$self->chromosomes( [ ] );
 	push @{$self->chromosomes}, 
@@ -187,54 +214,67 @@ sub init {
 #=======================================================================
 # SAVE / LOAD ##########################################################
 #=======================================================================
-sub save { 
-	STORABLE->use(qw(store retrieve)) or croak(q/You need "/.STORABLE.q/" module to save a state of "/.__PACKAGE__.q/"!/);
+sub spew {
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	STORABLE->use( qw( store retrieve freeze thaw ) ) or croak(q/You need "/.STORABLE.q/" module to save a state of "/.__PACKAGE__.q/"!/);
 	$Storable::Deparse = 1;
 	$Storable::Eval = 1;
-	
-	my ($self, $file) = @_;
-	croak(q/You have to specify file!/) unless defined $file;
-
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	my ( $self ) = @_;
+ 	
 	my $clone = { 
-		vector_type	=> ref(tied(@{$self->chromosomes->[0]})),
-		chromosomes => [ map { my @genes = @$_; \@genes; } @{$self->chromosomes} ],
 		_selector	=> undef,
 		_strategist	=> undef,
 		_mutator	=> undef,
 	};
+	
+	$clone->{ chromosomes } = [ map { ${ tied( @$_ ) } } @{ $self->chromosomes } ] 
+		if $self->_package;
 	
 	foreach my $key(keys %$self){
 		next if exists $clone->{$key};
 		$clone->{$key} = $self->{$key};
 	}
 	
-	store($clone, $file);
+	return $clone;
+}
+#=======================================================================
+sub slurp {
+	my ( $self, $dump ) = @_;
+
+	if( my $typ = $self->_package ){ 
+		@{ $dump->{ chromosomes } } = map {
+			my $arr = $typ->make_with_packed( $_ );
+			bless $arr, q[AI::Genetic::Pro::Chromosome];
+		} @{ $dump->{ chromosomes } };
+	}
+    
+    %$self = %$dump;
+    
+	return 1;
+}
+#=======================================================================
+sub save { 
+	my ( $self, $file ) = @_;
+	
+	croak(q/You have to specify file!/) unless defined $file;
+	
+	store( $self->spew, $file );
 }
 #=======================================================================
 sub load { 
-	STORABLE->use(qw(store retrieve)) or croak(q/You need "/.STORABLE.q/" module to load a state of "/.__PACKAGE__.q/"!/);	
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	STORABLE->use( qw( store retrieve freeze thaw ) ) or croak(q/You need "/.STORABLE.q/" module to load a state of "/.__PACKAGE__.q/"!/);	
 	$Storable::Deparse = 1;
 	$Storable::Eval = 1;
-	
+	#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	my ($self, $file) = @_;
 	croak(q/You have to specify file!/) unless defined $file;
 
 	my $clone = retrieve($file);
 	return carp('Incorrect file!') unless $clone;
 	
-	$clone->{chromosomes} = [ 
-		map {
-    		tie my (@genes), $clone->{vector_type};
-    			@genes = @$_;
-    			\@genes;
-    		} @{$clone->{chromosomes}}
-    ];
-    
-    delete $clone->{vector_type};
-    
-    %$self = %$clone;
-    
-    return 1;
+	return $self->slurp( $clone );
 }
 #=======================================================================
 # CHARTS ###############################################################
@@ -326,8 +366,14 @@ sub as_array {
 	my ($self, $chromosome) = @_;
 	
 	if($self->type eq q/bitvector/){
-		return @$chromosome if wantarray;
-		return $chromosome;
+		# This could lead to internal error, bacause of underlaying Tie::Array::Packed
+		#return @$chromosome if wantarray;
+		#return $chromosome;
+		
+		my @chr = @$chromosome;
+		return @chr if wantarray;
+		return \@chr;
+		
 	}elsif($self->type eq q/rangevector/){
 		my $fix_range = $self->_fix_range;
 		my $c = -1;
@@ -364,7 +410,7 @@ sub as_string {
 sub as_value { 
 	my ($self, $chromosome) = @_;
 	croak(q/You MUST call 'as_value' as method of 'AI::Genetic::Pro' object./)
-		unless defined $_[0] and ref $_[0] and ref $_[0] eq 'AI::Genetic::Pro';
+		unless defined $_[0] and ref $_[0] and ( ref $_[0] eq 'AI::Genetic::Pro' or ref $_[0] eq 'AI::Genetic::Pro::MCE');
 	croak(q/You MUST pass 'AI::Genetic::Pro::Chromosome' object to 'as_value' method./) 
 		unless defined $_[1] and ref $_[1] and ref $_[1] eq 'AI::Genetic::Pro::Chromosome';
 	return $self->fitness->($self, $chromosome);  
@@ -401,7 +447,7 @@ sub _select_parents {
 			unless defined $self->selection;
 		my @tmp = @{$self->selection};
 		my $selector = q/AI::Genetic::Pro::Selection::/ . shift @tmp;
-		$selector->require;
+		$selector->require or die $!;
 		$self->_selector($selector->new(@tmp));
 	}
 	
@@ -416,7 +462,7 @@ sub _crossover {
 	unless($self->_strategist){
 		my @tmp = @{$self->strategy};
 		my $strategist = q/AI::Genetic::Pro::Crossover::/ . shift @tmp;
-		$strategist->require;
+		$strategist->require or die $!;
 		$self->_strategist($strategist->new(@tmp));
 	}
 
@@ -462,8 +508,33 @@ sub inject {
 
 	}			
 	$self->_strict( [ ] );
+	$self->population( $self->population + scalar( @$candidates ) );
 
 	return 1;
+}
+#=======================================================================
+sub _state {
+	my ( $self ) = @_;
+	
+	my @res;
+	
+	if( $self->_package ){
+		@res = map { 
+			[
+				${ tied( @{ $self->chromosomes->[ $_ ] } ) },
+				$self->_fitness->{ $_ },
+			]
+		} 0 .. $self->population - 1
+	}else{
+		@res = map { 
+			[
+				$self->chromosomes->[ $_ ],
+				$self->_fitness->{ $_ },
+			]
+		} 0 .. $self->population - 1
+	}
+	
+	return \@res;
 }
 #=======================================================================
 sub evolve {
@@ -527,7 +598,7 @@ sub evolve {
 	
 	if($self->strict){
 		$self->_strict( [ ] );
-		push @{$self->_strict}, clone($_) for @{$self->chromosomes};
+		push @{$self->_strict}, $_->clone for @{$self->chromosomes};
 	}
 }
 #=======================================================================
@@ -555,15 +626,29 @@ sub getFittest_as_arrayref {
 	if($uniq){
 		my %grep;
 		my $chromosomes = $self->chromosomes;
-		@keys = grep { 
-				my $add_to_list = 0;
-				my $key = md5_hex(${tied(@{$chromosomes->[$_]})});
-				unless($grep{$key}) { 
-					$grep{$key} = 1; 
-					$add_to_list = 1;
-				}
-				$add_to_list;
+		if( my $pkg = $self->_package ){
+			my %tmp;
+			@keys = grep { 
+				my $key = ${ tied( @{ $chromosomes->[ $_ ] } ) };
+				#my $key = md5_hex( ${ tied( @{ $chromosomes->[ $_ ] } ) } ); # ?
+				$tmp{ $key } && 0 or $tmp{ $key } = 1;
 			} @keys;
+			#@keys = grep { 
+			#		my $add_to_list = 0;
+			#		my $key = md5_hex(${tied(@{$chromosomes->[$_]})});
+			#		unless($grep{$key}) { 
+			#			$grep{$key} = 1; 
+			#			$add_to_list = 1;
+			#		}
+			#		$add_to_list;
+			#	} @keys;
+		}else{
+			my %tmp;
+			@keys = grep { 
+				my $key = md5_hex( join( q[:], @{ $chromosomes->[ $_ ] } ) );
+				$tmp{ $key } && 0 or $tmp{ $key } = 1;
+			} @keys;
+		}
 	}
 	
 	$n = scalar @keys if $n > scalar @keys;
@@ -587,7 +672,7 @@ __END__
 
 =head1 NAME
 
-AI::Genetic::Pro - Efficient genetic algorithms for professional purpose.
+AI::Genetic::Pro - Efficient genetic algorithms for professional purpose with support for multiprocessing.
 
 =head1 SYNOPSIS
 
@@ -618,6 +703,8 @@ AI::Genetic::Pro - Efficient genetic algorithms for professional purpose.
         -history         => 1,                # remember best results
         -preserve        => 3,                # remember the bests
         -variable_length => 1,                # turn variable length ON
+        -mce             => 1,                # optional MCE support
+        -workers         => 3,                # number of workers (MCE)
     );
 	
     # init population of 32-bit vectors
@@ -641,11 +728,11 @@ AI::Genetic::Pro - Efficient genetic algorithms for professional purpose.
 =head1 DESCRIPTION
 
 This module provides efficient implementation of a genetic algorithm for
-professional use. It was designed to operate as fast as possible
+professional use with support for multiprocessing. It was designed to operate as fast as possible
 even on very large populations and big individuals/chromosomes. C<AI::Genetic::Pro> 
 was inspired by C<AI::Genetic>, so it is in most cases compatible 
 (there are some changes). Additionally C<AI::Genetic::Pro> isn't a pure Perl solution, so it 
-B<doesn't have> limitations of its ancestor (such as serious slow-down in the
+doesn't have limitations of its ancestor (such as slow-down in the
 case of big populations ( >10000 ) or vectors with more than 33 fields).
 
 If You are looking for a pure Perl solution, consider L<AI::Genetic>.
@@ -658,11 +745,22 @@ To increase speed XS code is used, however with portability in
 mind. This distribution was tested on Windows and Linux platforms 
 (and should work on any other).
 
+Multicore support is available through Many-Core Engine (C<MCE>). 
+You can gain the most speed up for big populations ora time/CPU consuming 
+fitness functions, however for small populations and/or simple fitness 
+function better choice will be single-process version.
+
+You can gat even more speed up if you turn on use of native arrays 
+(parameter: C<native>) instead of packing chromosomes into single scalar. 
+However you have to remember about expensive memory use in that case.
+
 =item Memory
 
 This module was designed to use as little memory as possible. A population
 of size 10000 consisting of 92-bit vectors uses only ~24MB (C<AI::Genetic> 
-would use about 78MB!).
+would use about 78MB). However - if you use MCE - there will be bigger 
+memory consumption. This is consequence of necessity of synchronization 
+between many processes.
 
 =item Advanced options
 
@@ -1022,6 +1120,22 @@ This defines whether a cache should be used. Allowed values are 1 or 0
 =item -history 
 
 This defines whether history should be collected. Allowed values are 1 or 0 (default: I<0>).
+
+=item -native 
+
+This defines whether native arrays should be used instead of packing each chromosome into signle scalar. 
+Turning this option can give you speed up, but much more memory will be used. Allowed values are 1 or 0 (default: I<0>).
+
+=item -mce
+
+This defines whether Many-Core Engine (MCE) should be used during processing. 
+This can give you significant speed up on many-core/CPU systems, but it'll 
+increase memory consumption. Allowed values are 1 or 0 (default: I<0>).
+
+=item -workers
+
+This option has any meaning only if MCE is turned on. This defines how 
+many process will be used during processing. Default will be used one proces per core (most efficient).
 
 =item -strict
 

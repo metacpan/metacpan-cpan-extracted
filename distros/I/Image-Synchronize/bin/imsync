@@ -32,8 +32,9 @@ GetOptions(
            'logfile|log-file=s',
            'man',
            'modify!',
-           'offsetspath|offsets-path=s',
+           'offsetspath|offsets-path:s',
            'recurse!',
+           'relativefiletime',
            'removebackups|remove-backups',
            'removeourtags|remove-our-tags',
            'reportlevel|report-level:1',
@@ -143,6 +144,11 @@ file I<imsync.log>).
                    directories.  Can be written as --offsets-path.
   --recurse        Process subdirectories, too.  This is the default.
                    Use --no-recurse to not process subdirectories.
+  --relativefiletime  Set file modification timestamps to the same
+                   local clock times as in the (far-away) time zone
+                   where the images were recorded, instead of setting
+                   file modification timestamps to the same absolute
+                   times.
   --removebackups  Remove backup files.  Can also be written
                    as --remove-backups.
   --removeourtags  Remove embedded tags that were added by this
@@ -385,7 +391,7 @@ timestamp range.
 
 The location may be identified by a partial file name, a location
 specification, or an empty value.  If it is a partial file name then
-it must match only a single file, and then that files's location is
+it must match only a single file, and then that file's location is
 copied to the target.
 
 If it is an empty value then the existing location (if any) is slated
@@ -452,6 +458,14 @@ read from the C<HOME> environment variable.
 
 Process subdirectories, too.  This is the default.  The opposite is
 C<--norecurse>.
+
+=head2 --relativefiletime
+
+Says to transfer the local time of the images (relative to the time
+zone where each image was taken) into the time zone of the current
+system.  This makes images that were recorded near noon local time in
+different time zones show up near noon local time in the current
+system's time zone (when sorted by file modification time).
 
 =head2 --removebackups
 
@@ -787,18 +801,35 @@ example:
     CameraID1:
       2017-06-22T15:57:01: +0:00
     CameraID2:
-      2017-06-19T14:08:22: +1:05:46
+      2017-06-19T14:08:22: +0:05:46+03:00
     CameraID3:
       2017-06-20T00:15:54: +4:00
       2017-06-23T05:21:25: +2:00
-      2017-06-25T13:44:12: +2:00
+      2017-06-25T13:44:12: +0:00+02:00
 
 From the cameras with camera IDs C<CameraID1> and C<CameraID2>, only a
 single image or movie each has been processed so far.  The camera with
 camera ID C<CameraID3> has produced multiple image files, of which the
-ones from the first until just before the second timestamp were in
-timezone UTC+4:00, and the ones from the second through the last
-timestamps were in timezone UTC+2:00.
+ones from the first until just before the second timestamp were taken
+when the camera clock corresponded to UTC+4:00, and the ones from the
+second through the last timestamps were taken when the camera clock
+corresponded to UTC+2:00.
+
+Since version 2.001 of this application, camera timezone offsets get
+stored with two time components, for example C<+0:00:15+02:00>.  The
+second component specifies the time zone that is appropriate for the
+images (the "nomimal timezone" that was in effect in the location
+where the image was recorded), and the first component specifies the
+clock drift relative to that time zone.  In the example, the image was
+taken in a location where the timezone UTC+02:00 was active, and the
+camera clock was 15 seconds ahead of the clock time in that timezone.
+
+Older versions of this application stored camera timezone offsets
+consisting of a single value.  The sum of the two newer values
+corresponds to the older value.
+
+Specifying the offsets as two values is relevant for the
+L</--relativefiletime> option.
 
 For each camera ID, the first and last included timestamps are
 associated with the oldest and youngest image files recorded by that
@@ -827,6 +858,9 @@ their automatically determined L<camera ID|/Camera ID>.  If the camera
 ID for a local-timezone image file is C<Brand|Model|SerialNumber>,
 then the camera ID for a supposedly-UTC image file by that same camera
 is C<Brand|Model|SerialNumber|U>.
+
+At present, only Apple QuickTime movies fall into this category.  Use
+the L</--cameraid> option to assign different camera IDs when needed.
 
 =head2 GPS Fix Lag
 
@@ -953,6 +987,42 @@ Otherwise, the file is considered not to be a regular image file, and
 is marked for later processing after all regular image files have been
 processed.  See L</File Numbers>.
 
+=head2 Relative File Times
+
+By default, target timestamps are I<absolute times>.  If two people
+take pictures of the same event (such as of a lunar eclipse, or of
+themselves calling each other) and then properly use the current
+application, then their images end up with nearly the same timestamp
+when measured relative to UTC, even if those images were recorded in
+locations in very different time zones.  However, absolute timestamps
+are not always the most convenient for organizing and displaying your
+images and movies.
+
+Suppose that you travel to a location in a very different time zone.
+The daytime in that location is shifted by some hours relative to the
+daytime of your home location.  You go to dinner at the local dinner
+time, sleep during the local night, and take sunny pictures during the
+local daytime.  When you get back home and use the current application
+to synchronize your images, then they end up at the correct absolute
+instants of time, but the daily rhythm visible in those pictures is
+shifted some hours relative to the clock time of your home location.
+That picture of your dinner may end up with a file modification
+timestamp after midnight in your home time zone, and those sunny
+pictures may end up after dark in your home time zone.  If your image
+viewing application displays the file modification timestamps, then
+they won't show what clock time it was over there, but rather what
+clock time it was back home at that same instant.
+
+If L</--relativefiletime> is specified, then the target timestamp gets
+adjusted for the difference between the remote and local time zones,
+such that pictures taken near noon at the remote location get file
+modification timestamps near noon on the current system.
+
+Only the file modification timestamp gets adjusted in that way.  The
+timestamp (if any) that gets embedded in the image (tag
+I<DateTimeOriginal>, and I<GPSDateTime> if available) still represents
+absolute time.
+
 =head2 File Numbers
 
 If the name of a file (excluding any directory part and excluding the
@@ -1029,13 +1099,14 @@ L</--modify> is specified.  Without that option, the proposed
 modifications are reported but not applied.
 
 If the file does get modified, then all of the changed tags are
-updated, but the GPS position only if it is flexible or if L<--force
---force> is specified.  If the file gets modified and already had a
-GPS position but no I<XMP:TimeSource> yet, then it gets an
-I<XMP:TimeSource> equal to C<GPS>.  If the GPS position is new and was
-specified through L</--location>, then I<XMP:TimeSource> gets the
-value C<User>.  If the GPS location was obtained from a GPX file, then
-the tag gets the value C<Other>.
+updated (as far as the target file type supports the tags), but the
+GPS position only if it is flexible or if L<--force --force> is
+specified.  If the file gets modified and already had a GPS position
+but no I<XMP:TimeSource> yet, then it gets an I<XMP:TimeSource> equal
+to C<GPS>.  If the GPS position is new and was specified through
+L</--location>, then I<XMP:TimeSource> gets the value C<User>.  If the
+GPS location was obtained from a GPX file, then the tag gets the value
+C<Other>.
 
 =head2 Backups
 
@@ -1225,7 +1296,7 @@ Louis Strous E<lt>LS@quae.nlE<gt>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2018 Louis Strous.
+Copyright (c) 2018-2020 Louis Strous.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

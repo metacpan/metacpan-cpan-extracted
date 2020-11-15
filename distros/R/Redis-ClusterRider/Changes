@@ -1,5 +1,8 @@
 Revision history for Perl extension Redis::ClusterRider.
 
+0.21 Sat Nov 14 17:16:00 MSK 2020
+  - Bugfix: make sure to call _init. Thanks to Masahiro Honma
+
 0.20 Thu Sep 10 18:35:00 MSK 2020
   - Implement run_command() function. Thanks to Sergei Zhmylev.
   - Return context (list or scalar context) now is not lost. Thanks to Sergei

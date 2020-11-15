@@ -17,7 +17,7 @@ use FindBin qw/$Bin/;
 use Path::Tiny;
 use VCS::Which;
 
-our $VERSION = version->new('0.6.7');
+our $VERSION = version->new('0.6.8');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 if ( !@ARGV ) {
@@ -74,7 +74,7 @@ vcsw - One command to rule version control systems
 
 =head1 VERSION
 
-This documentation refers to vcsw version 0.6.7.
+This documentation refers to vcsw version 0.6.8.
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::ADS1115 0.09;
+package Device::Chip::ADS1115 0.10;
 class Device::Chip::ADS1115
    extends Device::Chip::Base::RegisteredI2C;
 
@@ -24,15 +24,15 @@ C<Device::Chip::ADS1115> - chip driver for F<ADS1115>
 
 =head1 SYNOPSIS
 
- use Device::Chip::ADS1115;
+   use Device::Chip::ADS1115;
 
- my $chip = Device::Chip::ADS1115->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::ADS1115->new;
+   $chip->mount( Device::Chip::Adapter::...->new )->get;
 
- $chip->change_config( MUX => "0" )->get;
- $chip->trigger->get;
+   $chip->change_config( MUX => "0" )->get;
+   $chip->trigger->get;
 
- printf "The voltage is %.2fV\n", $chip->read_adc_voltage->get;
+   printf "The voltage is %.2fV\n", $chip->read_adc_voltage->get;
 
 =head1 DESCRIPTION
 

@@ -4,13 +4,13 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-HTTPStatus",
    "no_index" : {
@@ -41,22 +41,22 @@
       "test" : {
          "requires" : {
             "Test::Builder::Module" : "0",
-            "Test::More" : "1"
+            "Test::Most" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/CPAN-Adoptable-Modules/test-httpstatus/issues"
+         "web" : "https://github.com/nigelhorne/Test-HTTPStatus/issues"
       },
-      "homepage" : "https://github.com/CPAN-Adoptable-Modules/test-httpstatus",
+      "homepage" : "https://github.com/nigelhorne/Test-HTTPStatus",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/CPAN-Adoptable-Modules/test-httpstatus.git",
-         "web" : "https://github.com/CPAN-Adoptable-Modules/test-httpstatus"
+         "url" : "https://github.com/nigelhorne/Test-HTTPStatus.git",
+         "web" : "https://github.com/nigelhorne/Test-HTTPStatus"
       }
    },
-   "version" : "2.004",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.05",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

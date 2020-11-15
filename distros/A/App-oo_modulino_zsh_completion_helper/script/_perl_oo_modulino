@@ -1,0 +1,97 @@
+#compdef -P (*/)#*.pm
+
+(($+commands[oo_modulino_zsh_completion_helper.pl])) || {
+  echo 1>&2 "Can't find oo_modulino_zsh_completion_helper.pl!"
+  return 1
+}
+
+: ${_perl_oo_modulino_inspector:=oo_modulino_zsh_completion_helper.pl}
+
+function _perl_oo_modulino_inspect {
+    local method=$1 pmfile
+    shift || return 1
+    pmfile=$words[1]
+    shift words || return 1
+    local words_json;
+    words_json=$($_perl_oo_modulino_inspector cli_array "$words[@]")
+    $_perl_oo_modulino_inspector \
+        -0 joined \
+        $method \
+        CURSOR $CURSOR \
+        CURRENT $[CURRENT - 1] \
+        NUMERIC "$NUMERIC" \
+        pmfile $~pmfile \
+        words $words_json \
+        BUFFER ${(q-)BUFFER} \
+        "$@" || return $?
+}
+
+function _perl_oo_modulino_set_method_pos {
+    local varName=$1; shift
+    local argList; argList=("${(@)argv[2,-1]}")
+    local pos=$argList[(ri)[[:alpha:]][[:IDENT:]]#]
+    typeset -g "$varName=$[pos+1]"
+}
+
+function _perl_oo_modulino_debug_do {
+    if (($+debug)) && ((debug)); then setopt local_options; set -x; fi
+    "$@"
+}
+
+function _perl_oo_modulino {
+    integer ret=1
+    # local curcontext=$curcontext state line
+    # declare -A opt_args
+
+    local debug=0
+    if (($+DEBUG_ZSH_perl_oo_modulino)) && ((DEBUG_ZSH_perl_oo_modulino)); then
+        debug=1
+        if ((DEBUG_ZSH_perl_oo_modulino >= 2)); then
+            set -x
+        fi
+    fi
+
+    if ! [[ -e ${~words[1]} ]]; then
+        # _message "No such module: $words[1]"
+        print "No such module: $words[1]"
+        return 0
+    elif ! [[ -x ${~words[1]} ]]; then
+        print "Module is not an executable: $words[1]"
+        return 0
+    fi
+
+    local methodPos
+    _perl_oo_modulino_debug_do \
+        _perl_oo_modulino_set_method_pos methodPos "$words[@]"
+    if ((debug)); then
+        print CURRENT=$CURRENT methodPos=$methodPos
+    fi
+
+    if ((CURRENT < methodPos)) && [[ $words[CURRENT] == -* ]]; then
+        local modulino_opts
+        if ((debug)); then set -x; fi
+        modulino_opts=(${(0)"$(_perl_oo_modulino_inspect zsh_options)"})
+        if ((debug)); then set +x; fi
+
+        _arguments : $modulino_opts && ret=0
+
+        # _describe -t main_options "Main Options" modulino_opts && ret=0
+        
+    elif ((CURRENT == methodPos)) || ((CURRENT + 1  == methodPos)); then
+        local modulino_methods
+        if ((debug)); then set -x; fi
+        modulino_methods=(${(0)"$(_perl_oo_modulino_inspect zsh_methods)"})
+        if ((debug)); then set +x; fi
+
+        _describe -t method "Methods" modulino_methods && ret=0
+
+    else
+        # XXX: argument name completion/ respects type
+
+        _files && ret=0
+    fi
+
+    return ret
+}
+
+_perl_oo_modulino

@@ -20,6 +20,18 @@
 #######################################################################
 
 
+2020-10-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000541 released
+
+        * Added EmailServer_is.pm to MANIFEST.
+
+2020-10-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000540 released
+
+        * Added EmailServer_is.pm.
+
 2020-10-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000539 released

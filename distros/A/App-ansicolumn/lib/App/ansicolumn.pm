@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use v5.14;
 use warnings;
@@ -196,6 +196,7 @@ sub column_out {
 	    $panes = $obj->{pane} || $width / $span || 1;
 	}
 	$span -= $obj->border_width('center');
+	$span < 1 and die "Not enough space.\n";
 	($span, $panes);
     };
 

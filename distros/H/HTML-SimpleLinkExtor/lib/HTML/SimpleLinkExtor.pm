@@ -13,7 +13,7 @@ use HTML::LinkExtor;
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = '1.272';
+our $VERSION = '1.273';
 
 use parent qw(HTML::LinkExtor);
 
@@ -45,7 +45,7 @@ sub AUTOLOAD {
 	unless( exists $AUTO_METHODS{$method} ) {
 		carp __PACKAGE__ . ": method $method unknown";
 		return;
-		}
+	}
 
 	$self->_extract( $method );
 	}
@@ -195,9 +195,6 @@ HTML::SimpleLinkExtor - Extract links from HTML
 	@links       = $extor->schemes( 'http' );
 
 =head1 DESCRIPTION
-
-THIS IS AN ABANDONED MODULE. THERE IS NO SUPPORT. YOU CAN ADOPT IT
-IF YOU LIKE: https://pause.perl.org/pause/query?ACTION=pause_04about#takeover
 
 This is a simple HTML link extractor designed for the person who does
 not want to deal with the intricacies of C<HTML::Parser> or the
@@ -561,15 +558,11 @@ can edit C<%AUTO_METHODS> in the source.
 Will Crain who identified a problem with IMG links that had
 a USEMAP attribute.
 
-=head1 SOURCE AVAILABILITY
-
-This module is in Github
-
-	https://github.com:CPAN-Adoptable-Modules/html-simplelinkextor.git
-
 =head1 AUTHORS
 
 brian d foy, C<< <bdfoy@cpan.org> >>
+
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 COPYRIGHT AND LICENSE
 

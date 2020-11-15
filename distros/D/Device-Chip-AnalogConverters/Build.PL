@@ -16,7 +16,7 @@ my $build = Module::Build->new(
       'Future::IO' => 0,
    },
    test_requires => {
-      'Test::Device::Chip::Adapter' => 0,
+      'Test::Device::Chip::Adapter' => '0.14',
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

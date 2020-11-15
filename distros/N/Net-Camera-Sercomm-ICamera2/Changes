@@ -1,0 +1,4 @@
+Revision history for Perl extension Net::Camera::Sercomm::ICamera2
+
+0.01 2020-11-11
+  - Original version forked from Net::Camera::Edimax::IC1500

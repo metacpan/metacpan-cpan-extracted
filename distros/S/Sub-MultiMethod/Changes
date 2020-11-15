@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.902	2020-11-15
+
+ [ Packaging ]
+ - Should require Sub::Util 1.40, not Sub::Name 1.40.
+
 0.901	2020-10-09
 
  - Refactor role support, setting up role hooks in the API instead of the

@@ -1,3 +1,13 @@
-0.001   2017-02-18 (PERLANCAR)
+0.002   2020-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Rearrange namespace, add category: Require::HookChain::prepend ->
+	  Require::HookChain::munge::prepend.
+
+	- Add Require::HookChain::source::metacpan.
+
+	- Add short alias for Require::HookChain: RHC.
+
+
+0.001   2017-02-18  Released-By: PERLANCAR
 
         - First release.

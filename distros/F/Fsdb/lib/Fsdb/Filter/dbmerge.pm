@@ -2,7 +2,7 @@
 
 #
 # dbmerge.pm
-# Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -216,13 +216,14 @@ L<Fsdb(3)>
 use 5.010;
 use strict;
 use Pod::Usage;
-use Carp qw(croak);
+use Carp qw(croak carp);
 
 use IO::Pipe;
 use IO::Select;
 
 use Fsdb::Filter;
 use Fsdb::Filter::dbmerge2;
+use Fsdb::Filter::dbcol;
 use Fsdb::IO::Reader;
 use Fsdb::IO::Writer;
 use Fsdb::Support::NamedTmpfile;
@@ -432,7 +433,7 @@ sub _unique_id() {
 =head2 segments_merge2_run
 
     $out = $self->segments_merge2_run($out_fn, $is_final_output, 
-			$in0, $in1);
+			$in0, $in1, $id);
 
 
 Internal: do the actual merge2 work (maybe our parent put us in a
@@ -468,6 +469,38 @@ sub segments_merge2_run($$$$$$) {
         print "# segments_merge2_run: merge closing out " . ref($out_fn) . " $debug_msg\n"
 	    if ($self->{_debug});
     };
+}
+
+=head2 segments_merge1_run
+
+    $out = $self->segments_merge1_run($out_fn, $in0);
+
+Internal: a special case of merge1 when we have only one file.
+
+=cut
+sub segments_merge1_run($$$) {
+    my($self, $out_fn, $in0) = @_;
+
+    my @col_options = qw(--all --autorun --nolog);
+    push(@col_options, '--noclose', '--saveoutput' => \$self->{_out});  # $is_final_output
+    push(@col_options, '--header' => $self->{_header})
+	if ($self->{_header});
+
+    my $debug_msg = '';
+    if ($self->{_debug}) {
+	$debug_msg = _pretty_fn($in0) . " to " . _pretty_fn($out_fn) . " (final) " . join(" ", @col_options);
+    };
+    print "# segments_merge1_run: merge start $debug_msg\n"
+	if ($self->{_debug});
+    new Fsdb::Filter::dbcol(@col_options,
+			'--input' => $in0,
+                            '--output' => $out_fn);
+    print "# segments_merge1_run: merge finish $debug_msg\n"
+	if ($self->{_debug});
+
+    $self->segment_cleanup($in0);
+    print "# segments_merge1_run: merge closing out " . ref($out_fn) . " $debug_msg\n"
+        if ($self->{_debug});
 }
 
 
@@ -641,15 +674,17 @@ sub segments_xargs($) {
 	# hacky...
 	$self->{_input} = $self->{_inputs}[0];
     };
-    $self->finish_io_option('input', -header => '#fsdb filename');
+    $self->finish_io_option('input', -header => '#fsdb filename', -comment_handler => undef);
     my $read_fastpath_sub = $self->{_in}->fastpath_sub();
     while (my $fref = &$read_fastpath_sub()) {
+        next if (!defined($fref) || $#$fref != 0);   # handle zero files
 	# send each file for processing as level zero
 	print "# dbmerge: segments_xargs: got $fref->[0]\n" if ($self->{_debug});
 	$ipc->print($fref->[0] . "\n");
 	$num_inputs++;
     };
-#    if ($num_inputs <= 1) {
+    # We need to catch 0 or 1 input file in the xargs reader.
+#    if ($num_inputs == 0) {
 #	$ipc->print("-1\terror: --xargs, but zero or one input files; dbmerge needs at least two.\n");  # signal eof-f
 #    };
     $ipc->close;
@@ -721,6 +756,7 @@ sub segments_merge_all($) {
     # and reaping finished processes.
     #
     my $overall_progress = 0;
+    my $overall_progress_last_reset = 0;
     my $PROGRESS_START = 0.001;
     my $PROGRESS_MAX = 2;
     my $PROGRESS_MULTIPLIER = 2;
@@ -728,7 +764,22 @@ sub segments_merge_all($) {
     for (;;) {
 	# done?
 	my $deepest = $#{$self->{_work}};
-	last if ($self->{_work_closed}[$deepest] && $#{$self->{_work}[$deepest]} <= 0);
+	if ($self->{_work_closed}[$deepest] && $#{$self->{_work}[$deepest]} <= 0) {
+            if ($deepest == 0 && $#{$self->{_work}[$deepest]} == 0) {
+                # special case singleton file (must be from xargs)
+                print "# segments_merge_all: singleton file from xargs\n" if ($self->{_debug});
+                # handle it here, in-line, so we update $self->{_out}
+                my($out_fn) = $self->segment_next_output('final');
+                my($in0) = $self->{_work}[$deepest][0][1];
+		$self->segments_merge1_run($out_fn, $in0);
+            } elsif ($deepest == 0 && $#{$self->{_work}[$deepest]} == -1) {
+                # special case: xargs and no files.
+                croak($self->{_prog} . ": xargs, but no files for input\n")
+                    if ($self->{_xargs});
+            };
+            # all done for real
+            last;
+        };
 
 	#
 	# First, put more work on the queue, where possible.
@@ -804,14 +855,23 @@ sub segments_merge_all($) {
 		my ($fn) = $fh->getline;
 		if (defined($fn)) {
 		    chomp($fn);
-		    $self->{_files_cleanup}{$fn} = 'unlink'
-			if ($self->{_remove_inputs});
-		    $self->enqueue_work(0, [2, $fn, undef]);
-		    print "# xargs receive $fn\n" if ($self->{_debug});
+                    $self->{_files_cleanup}{$fn} = 'unlink'
+                        if ($self->{_remove_inputs});
+                    $self->enqueue_work(0, [2, $fn, undef]);
+                    $self->{_xargs_ipc_count}++;
+                    print "# xargs receive $fn, file " . $self->{_xargs_ipc_count} . "\n" if ($self->{_debug});
 		} else {
 		    # eof, so no more xargs
 		    $self->{_work_closed}[0] = 1;
-		    $self->{_xargs_ipc_status} = undef;
+                    # We could check for special cases of 0 or 1 file.
+                    # But we don't.  Just pass them through to the parent who will handle it.
+                    # if ($self->{_xargs_ipc_count} == 0) {
+                    #	croak($self->{_prog} . ": xargs, but no files for input\n");
+                    # } elsif ($self->{_xargs_ipc_count} == 1) {
+                    	# carp($self->{_prog} . ": xargs, but one file for input\n");
+                        # Pass through and we will catch this case
+                        # in the main segements_merge_all loop.
+                    # };
 		};
 		$overall_progress++;
             };
@@ -819,7 +879,7 @@ sub segments_merge_all($) {
 	#
 	# Avoid spinlooping.
 	#
-	if (!$overall_progress) {
+	if ($overall_progress <= $overall_progress_last_reset) {
 	    # No progress, so stall.
 	    print "# segments_merge_all: stalling for $progress_backoff\n" if ($self->{_debug});
 	    sleep($progress_backoff);
@@ -827,7 +887,7 @@ sub segments_merge_all($) {
 	    $progress_backoff = $PROGRESS_MAX if ($progress_backoff > $PROGRESS_MAX);
 	} else {
 	    # Woo-hoo, did something.  Rush right back and try again.
-	    $overall_progress = 0;
+	    $overall_progress_last_reset = $overall_progress;
 	    $progress_backoff = $PROGRESS_START;
 	};
     };
@@ -919,6 +979,7 @@ sub setup($) {
 	my $xargs_ipc_writer = new IO::Handle;
 	pipe($xargs_ipc_reader, $xargs_ipc_writer) or croak("cannot open pipe\n");
 	$self->{_xargs_ipc_status} = 'running';
+	$self->{_xargs_ipc_count} = 0;
 	$self->{_xargs_fred} = new Fsdb::Support::Freds('dbmerge:xargs',
 	    sub {
 		$SIG{PIPE} = 'IGNORE';   # in case we finish before main reads anything
@@ -971,7 +1032,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2020 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

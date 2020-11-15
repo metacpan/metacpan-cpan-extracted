@@ -1,9 +1,6 @@
 package Image::Synchronize::GroupedInfo;
 
-use warnings;
-use strict;
-
-use v5.10.0;
+use Modern::Perl;
 
 use overload '""' => \&stringify;
 
@@ -11,7 +8,8 @@ use Carp;
 
 =head1 NAME
 
-Image::Synchronize::GroupedInfo - a data collection in support of Image::Synchronize
+Image::Synchronize::GroupedInfo - a data collection in support of
+Image::Synchronize
 
 =cut
 
@@ -104,7 +102,7 @@ sub get_context {
   }
   else {
     # look for groups in descending order of preference
-    foreach my $group ( '', 'XMP', 'EXIF', 'File' ) {
+    foreach my $group ( '', 'XMP', 'EXIF', 'File' ) { # TODO: switch '' and XMP
       my $v = $self->{$tag}->{$group};
       if ( defined $v ) {
         return wantarray ? ( $group, $v ) : $v;
@@ -220,5 +218,18 @@ sub stringify {
   }
   return join( "\n", @text );
 }
+
+=head1 AUTHOR
+
+Louis Strous E<lt>LS@quae.nlE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2020 Louis Strous.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

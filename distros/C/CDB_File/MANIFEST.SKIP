@@ -11,3 +11,4 @@
 ^CDB_File.c
 ^.*\.o
 cpanfile
+^xt/

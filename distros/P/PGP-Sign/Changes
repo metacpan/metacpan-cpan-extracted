@@ -1,5 +1,13 @@
                       User-Visible PGP::Sign Changes
 
+PGP::Sign 1.04 (2020-11-14)
+
+    PGP::Sign 1.00 and later failed to sign input that's larger than can
+    be held by the operating system pipe buffer because IPC::Run set the
+    input pipe to non-blocking.  Fix this by using a non-blocking write in
+    a select loop, and avoid a deadlock by using a pipe for the passphrase
+    as well instead of a scalar.
+
 PGP::Sign 1.03 (2020-09-12)
 
     Document that GnuPG 2.1.23 or GnuPG 1.4.20 or later is required and

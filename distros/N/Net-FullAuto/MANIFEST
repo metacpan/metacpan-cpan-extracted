@@ -41,6 +41,7 @@ lib/Net/FullAuto/ISets/Local/Ampache_is.pm
 lib/Net/FullAuto/ISets/Local/ClipBucket_is.pm
 lib/Net/FullAuto/ISets/Local/WordPress_is.pm
 lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
+lib/Net/FullAuto/ISets/Local/EmailServer_is.pm
 lib/Net/FullAuto/ISets/Local/PHP_is.pm
 lib/Net/FullAuto/FA_Core.pm
 LICENSE

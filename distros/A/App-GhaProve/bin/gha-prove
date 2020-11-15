@@ -1,0 +1,33 @@
+#!perl
+
+use strict;
+use warnings;
+
+my $testing_mode = $ENV{GHA_TESTING_MODE}  || 0;
+my $coverage     = $ENV{GHA_TESTING_COVER} || 0;
+
+if ( $coverage =~ /^(true|1)$/i ) {
+	$ENV{HARNESS_PERL_SWITCHES} = '-MDevel::Cover';
+}
+
+my @errors;
+
+if ( $testing_mode !~ /^(extended|1)$/i ) {
+	delete $ENV{EXTENDED_TESTING};
+	print "# ~~ Standard testing\n";
+	push @errors, system( 'prove', @ARGV );
+}
+
+if ( $testing_mode =~ /^(extended|both|1|2)$/i ) {
+	$ENV{EXTENDED_TESTING} = 1;
+	print "# ~~ Extended testing\n";
+	push @errors, system( 'prove', @ARGV );
+}
+
+my ( $max ) = sort { $b <=> $a } @errors;
+
+if ( $max > 254 ) {
+	$max = 254;
+}
+
+exit( $max );

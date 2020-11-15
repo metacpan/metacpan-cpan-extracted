@@ -252,7 +252,7 @@ tr_imgaddsize file.html
 =head1 AUTHOR
 
 tr_imgaddsize is part of the HTML::TagReader package and was written by
-Guido Socher [guido(at)linuxfocus.org]
+Guido Socher 
 
 This program needs Image::Size from
 http://www.cpan.org/authors/id/R/RJ/RJRAY/

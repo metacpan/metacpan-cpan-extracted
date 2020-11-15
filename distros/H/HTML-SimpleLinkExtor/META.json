@@ -4,13 +4,13 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTML-SimpleLinkExtor",
    "no_index" : {
@@ -31,6 +31,8 @@
       },
       "runtime" : {
          "requires" : {
+            "AutoLoader" : "0",
+            "Carp" : "0",
             "HTML::LinkExtor" : "1.28",
             "LWP::UserAgent" : "0",
             "URI" : "1.09",
@@ -41,6 +43,7 @@
       "test" : {
          "requires" : {
             "Test::More" : "0.94",
+            "Test::Most" : "0",
             "Test::Output" : "0"
          }
       }
@@ -48,15 +51,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor/issues"
+         "web" : "https://github.com/nigelhorne/HTML-SimpleLinkExtor/issues",
+         "x_url" : "https://github.com/nigelhorne/HTML-SimpleLinkExtor/issues"
       },
-      "homepage" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor.git",
-         "web" : "https://github.com/CPAN-Adoptable-Modules/html-simplelinkextor"
+         "url" : "git://github.com/nigelhorne/HTML-SimpleLinkExtor.git",
+         "web" : "https://github.com/nigelhorne/HTML-SimpleLinkExtor",
+         "x_repository" : "https://github.com/nigelhorne/HTML-SimpleLinkExtor"
       }
    },
-   "version" : "1.272",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.273",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

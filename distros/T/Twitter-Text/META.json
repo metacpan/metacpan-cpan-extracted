@@ -46,7 +46,7 @@
             "Carp" : "0",
             "Exporter" : "0",
             "File::Share" : "0",
-            "JSON::XS" : "0",
+            "JSON" : "0",
             "List::Util" : "0",
             "List::UtilsBy" : "0",
             "Net::IDN::Encode" : "0",
@@ -59,6 +59,7 @@
       "test" : {
          "requires" : {
             "Test2::Plugin::GitHub::Actions::AnnotateFailedTest" : "0",
+            "Test2::Plugin::NoWarnings" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0.98",
             "Unicode::GCString" : "0"
@@ -68,7 +69,7 @@
    "provides" : {
       "Twitter::Text" : {
          "file" : "lib/Twitter/Text.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -82,7 +83,7 @@
          "web" : "https://github.com/utgwkk/Twitter-Text"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

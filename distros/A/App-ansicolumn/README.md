@@ -5,7 +5,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # SYNOPSIS
 
@@ -226,7 +226,7 @@ option. See \`perldoc Getopt::EX\` for detail.
     or
     $ curl -sL http://cpanmin.us | perl - App::ansicolumn
 
-Until CPAN release, use this:
+To get the latest code, use this:
 
     $ cpanm https://github.com/kaz-utashiro/App-ansicolumn.git
 

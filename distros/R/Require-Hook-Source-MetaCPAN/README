@@ -1,0 +1,62 @@
+NAME
+    Require::Hook::Source::MetaCPAN - Load module source code from MetaCPAN
+
+VERSION
+    This document describes version 0.002 of Require::Hook::Source::MetaCPAN
+    (from Perl distribution Require-Hook-Source-MetaCPAN), released on
+    2020-11-13.
+
+SYNOPSIS
+     {
+         local @INC = (@INC, Require::Hook::Source::MetaCPAN->new);
+         require Foo::Bar; # will be searched from MetaCPAN
+         # ...
+     }
+
+DESCRIPTION
+    Warning: this is most probably not suitable for use in production or
+    real-world code.
+
+METHODS
+  new([ %args ]) => obj
+    Constructor. Known arguments:
+
+    *   die
+
+        Bool. Default is true.
+
+        If set to 1 (the default) will die if module source code can't be
+        fetched (e.g. the module does not exist on CPAN, or there is network
+        error). If set to 0, will simply decline so "require()" will try the
+        next entry in @INC.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Require-Hook-Source-MetaCPAN>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Require-Hook-Source-MetaCPAN>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Require-Hook-Source-M
+    etaCPAN>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other "Require::Hook::*" modules.
+
+    Require::HookChain::source::metacpan uses us.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

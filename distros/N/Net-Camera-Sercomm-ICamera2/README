@@ -1,0 +1,58 @@
+NAME
+    Net::Camera::Sercomm::ICamera2 - Interface for Sercomm ICamera2 network
+    camera
+
+SYNOPSIS
+      use Net::Camera::Sercomm::ICamera2;
+      my $camera = Net::Camera::Sercomm::ICamera2->new(hostname => 'mycamera.example.com');
+      my $jpeg   = $camera->getSnapshot;
+
+DESCRIPTION
+    The Sercomm ICamera2 is network camera that can be accessed via a web
+    interface. This module provides methods to retrieve an image from the
+    camera.
+
+PROPERTIES
+  hostname
+  port
+    Default: 80
+
+  imageSettingsSize
+    Size setting passed on the url.
+
+      size=2 320x240
+      size=3 640x480
+      size=4 1280x720
+
+    Default: 4
+
+    All other values return 320x240
+
+  imageSettingsQuality
+    JPEG compression quality.
+
+      quality=1 JPEG quality 85
+      quality=2 JPEG quality 70
+      quality=3 JPEG quality 55
+      quality=4 JPEG quality 40
+      quality=5 JPEG quality 25
+
+    Default: 1
+
+METHODS
+  getSnapshot
+    Returns a JPEG image.
+
+SEE ALSO
+    https://github.com/edent/Sercomm-API, Net::Camera::Edimax::IC1500
+
+AUTHOR
+    Michael R. Davis mrdvt at cpan
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2020 by Michael R. Davis
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

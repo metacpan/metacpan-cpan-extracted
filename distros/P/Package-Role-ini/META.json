@@ -4,9 +4,9 @@
       "Michael R. Davis <mrdvt at cpan>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,10 +33,22 @@
       "runtime" : {
          "requires" : {
             "Config::IniFiles" : "0",
-            "Path::Class" : "0"
+            "Package::New" : "0",
+            "Path::Class" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Package-Role-ini/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Package-Role-ini",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Package-Role-ini.git"
+      }
+   },
+   "version" : "0.07"
 }

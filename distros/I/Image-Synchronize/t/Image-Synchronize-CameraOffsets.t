@@ -1,91 +1,108 @@
 #!/usr/bin/perl -w
-use strict;
-use warnings;
+use Modern::Perl;
 
 use Image::Synchronize::CameraOffsets;
 use Image::Synchronize::Logger qw(log_message set_printer);
+use Image::Synchronize::Timestamp;
 use Test::More;
 use YAML::Any qw(Dump Load);
 
+sub t {
+  Image::Synchronize::Timestamp->new($_[0]);
+}
+
+sub v {
+  my $t = Image::Synchronize::Timestamp->new($_[0]);
+  return $t->time_utc // $t->time_local;
+}
+
 my $co = Image::Synchronize::CameraOffsets->new;
 isa_ok( $co, 'Image::Synchronize::CameraOffsets' );
-is( $co->get( 'A', 1000 ), undef, 'no data yet for camera A' );
+is( $co->get( 'A', t('2020-08-12T10:00:00') ), undef,
+    'no data yet for camera A' );
 
-$co->set( 'A', 1234, -5 );
+$co->set( 'A', t('2020-08-12T12:34:00'), -5 );
 is_deeply(
   $co->{added},
-  { A => { 1234 => { offset => -5 } } },
+  { A => { v('2020-08-12T12:34:00') => { offset => '-00:00:05' } } },
   'set first item'
 );
 is_deeply( $co->{effective}, {}, 'not synchronized yet' );
-is( $co->get( 'B', 1000 ), undef, 'no data for camera B' );
-is_deeply( $co->{effective}, { A => { 1234 => -5 } }, 'synchronized' );
-is( $co->get( 'A', 1233 ), -5, 'before first' );
-is( $co->get( 'A', 1234 ), -5, 'begin of segment' );
-is( $co->get( 'A', 1235 ), -5, 'after last' );
+is( $co->get( 'B', t('2020-08-12T10:00:00') ), undef,
+    'no data for camera B' );
+is_deeply( $co->{effective}, { A => { v('2020-08-12T12:34:00') => '-00:00:05' } },
+           'synchronized' );
+is( $co->get( 'A', t('2020-08-12T12:33:00') ), '-00:00:05', 'before first' );
+is( $co->get( 'A', t('2020-08-12T12:34:00') ), '-00:00:05', 'begin of segment' );
+is( $co->get( 'A', t('2020-08-12T12:35:00') ), '-00:00:05', 'after last' );
 
-$co->set( 'A', 1265, -5 );
+$co->set( 'A', t('2020-08-12T13:05:00'), '-00:00:05' );
 is_deeply(
   $co->{added},
   {
     A => {
-      1234 => { offset => -5 },
-      1265 => { offset => -5 }
+      v('2020-08-12T12:34:00') => { offset => '-00:00:05' },
+      v('2020-08-12T13:05:00') => { offset => '-00:00:05' }
     }
   },
   'extend segment'
 );
-is( $co->get( 'A', 1233 ), -5, '1233 before first' );
+is( $co->get( 'A', v('2020-08-12T12:33:00') ), '-00:00:05',
+    '2020-08-12T12:33:00 before first' );
 is_deeply(
   $co->{effective},
   {
     A => {
-      1234 => -5,
-      1265 => -5
+      v('2020-08-12T12:34:00') => '-00:00:05',
+      v('2020-08-12T13:05:00') => '-00:00:05'
     }
   },
   'synchronized'
 );
-is( $co->get( 'A', 1234 ), -5, '1234 in segment 1' );
-is( $co->get( 'A', 1235 ), -5, '1235 in segment 1' );
-is( $co->get( 'A', 1265 ), -5, '1265 in segment 1' );
-is( $co->get( 'A', 1266 ), -5, '1266 after last ' );
+is( $co->get( 'A', t('2020-08-12T12:34:00') ), '-00:00:05',
+    '2020-08-12T12:34:00 in segment 1' );
+is( $co->get( 'A', t('2020-08-12T12:35:00') ), '-00:00:05',
+    '2020-08-12T12:35:00 in segment 1' );
+is( $co->get( 'A', t('2020-08-12T13:05:00') ), '-00:00:05',
+    '2020-08-12T13:05:00 in segment 1' );
+is( $co->get( 'A', t('2020-08-12T13:06:00') ), '-00:00:05',
+    '2020-08-12T13:06:00 after last ' );
 
-$co->set( 'A', 1400, -5 );
+$co->set( 'A', t('2020-08-12T14:00:00'), '-00:00:05' );
 is_deeply(
   $co->{added},
   {
     A => {
-      1234 => { offset => -5 },
-      1265 => { offset => -5 },
-      1400 => { offset => -5 }
+      v('2020-08-12T12:34:00') => { offset => '-00:00:05' },
+      v('2020-08-12T13:05:00') => { offset => '-00:00:05' },
+      v('2020-08-12T14:00:00') => { offset => '-00:00:05' }
     }
   },
   'extend segment'
 );
-$co->set( 'A', 1445, 0 );
+$co->set( 'A', t('2020-08-12T14:45:00'), 0 );
 is_deeply(
   $co->{added},
   {
     A => {
-      1234 => { offset => -5 },
-      1265 => { offset => -5 },
-      1400 => { offset => -5 },
-      1445 => { offset => 0 }
+      v('2020-08-12T12:34:00') => { offset => '-00:00:05' },
+      v('2020-08-12T13:05:00') => { offset => '-00:00:05' },
+      v('2020-08-12T14:00:00') => { offset => '-00:00:05' },
+      v('2020-08-12T14:45:00') => { offset => '+00:00' }
     }
   },
   'new segment'
 );
-$co->set( 'A', 1500, 0 );
+$co->set( 'A', t('2020-08-12T15:00:00'), 0 );
 is_deeply(
   $co->{added},
   {
     A => {
-      1234 => { offset => -5 },
-      1265 => { offset => -5 },
-      1400 => { offset => -5 },
-      1445 => { offset => 0 },
-      1500 => { offset => 0 }
+      v('2020-08-12T12:34:00') => { offset => '-00:00:05' },
+      v('2020-08-12T13:05:00') => { offset => '-00:00:05' },
+      v('2020-08-12T14:00:00') => { offset => '-00:00:05' },
+      v('2020-08-12T14:45:00') => { offset => '+00:00' },
+      v('2020-08-12T15:00:00') => { offset => '+00:00' }
     }
   },
   'extend segment'
@@ -95,35 +112,35 @@ is_deeply(
   $co->{effective},
   {
     A => {
-      1234 => -5,
-      1265 => -5
+      v('2020-08-12T12:34:00') => '-00:00:05',
+      v('2020-08-12T13:05:00') => '-00:00:05'
     }
   },
   'not resynchronized'
 );
-is( $co->get( 'A', 1233 ), -5, 'before first' );
+is( $co->get( 'A', t('2020-08-12T12:33:00') ), '-00:00:05', 'before first' );
 is_deeply(
   $co->{effective},
   {
     A => {
-      1234 => -5,
-      1445 => 0,
-      1500 => 0
+      v('2020-08-12T12:34:00') => '-00:00:05',
+      v('2020-08-12T14:45:00') => '+00:00',
+      v('2020-08-12T15:00:00') => '+00:00'
     }
   },
   'resynchronized'
 );
-is( $co->get( 'A', 1444 ), -5, 'first' );
-is( $co->get( 'A', 1445 ), 0,  'begin of last' );
-is( $co->get( 'A', 1500 ), 0,  'end of last' );
-is( $co->get( 'A', 1500 ), 0,  'beyond last' );
+is( $co->get( 'A', t('2020-08-12T14:44:00') ), '-00:00:05', 'first' );
+is( $co->get( 'A', t('2020-08-12T14:45:00') ), '+00:00',  'begin of last' );
+is( $co->get( 'A', t('2020-08-12T15:00:00') ), '+00:00',  'end of last' );
+is( $co->get( 'A', t('2020-08-12T15:00:00') ), '+00:00',  'beyond last' );
 
 my $two_ranges = <<EOD;
 ---
 A:
-  1000 : -5
-  2000 : 0
-  2500 : 0
+  '2020-08-12T10:00:00' : -00:00:05
+  '2020-08-12T20:00:00' : '+00:00'
+  '2020-08-13T01:00:00' : '+00:00'
 EOD
 
 sub test_id {
@@ -136,277 +153,277 @@ sub test_id {
 my @tests = (
   {    # conflict
     input => <<EOD,
-1500: -5
-2000: -5
+'2020-08-12T15:00:00': '-00:00:05'
+'2020-08-12T20:00:00': '-00:00:05'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new before first, other offset
     input => <<EOD,
-400 : -7
-800 : -7
+'2020-08-12T04:00:00' : -7
+'2020-08-12T08:00:00' : -7
 EOD
     expect => <<EOD,
 ---
 A:
-  400: -7
-  1000: -5
-  2000: 0
-  2500: 0
+  2020-08-12T04:00:00: -00:00:07
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new before first, same offset
     input => <<EOD,
-400: -5
-800: -5
+'2020-08-12T04:00:00': '-00:00:05'
+'2020-08-12T08:00:00': '-00:00:05'
 EOD
     expect => <<EOD,
 ---
 A:
-  400: -5
-  2000: 0
-  2500: 0
+  2020-08-12T04:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new equal to first
     input => <<EOD,
-1000: -5
-1500: -5
+'2020-08-12T10:00:00': '-00:00:05'
+'2020-08-12T15:00:00': '-00:00:05'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new after first, same offset
     input => <<EOD,
-1500: -5
-1700: -5
+'2020-08-12T15:00:00': '-00:00:05'
+'2020-08-12T17:00:00': '-00:00:05'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new between first and second, other offset
     input => <<EOD,
-1600: 77
-1700: 77
+'2020-08-12T16:00:00': 77
+'2020-08-12T17:00:00': 77
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  1600: 77
-  2000: 0
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T16:00:00: +00:01:17
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new between first and second, touching second
     input => <<EOD,
-1700: 0
-2000: 0
+'2020-08-12T17:00:00': '+00:00'
+'2020-08-12T20:00:00': '+00:00'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  1700: 0
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T17:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new equal to existing
     input => <<EOD,
-2000: 0
-2500: 0
+'2020-08-12T20:00:00': '+00:00'
+'2020-08-13T01:00:00': '+00:00'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new range encompassing second, merge
     input => <<EOD,
-1800: 0
-2700: 0
+'2020-08-12T18:00:00': '+00:00'
+'2020-08-13T03:00:00': '+00:00'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  1800: 0
-  2700: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T18:00:00: +00:00
+  2020-08-13T03:00:00: +00:00
 EOD
   },
 
   {    # new range after and touching last, merge
     input => <<EOD,
-2000: 0
-2700: 0
+'2020-08-12T20:00:00': '+00:00'
+'2020-08-13T03:00:00': '+00:00'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2700: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T03:00:00: +00:00
 EOD
   },
 
   {    # new range after and touching last, merge
     input => <<EOD,
-2500: 0
-2800: 0
+'2020-08-13T01:00:00': '+00:00'
+'2020-08-13T04:00:00': '+00:00'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2800: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T04:00:00: +00:00
 EOD
   },
 
   {    # new range after last, merge
     input => <<EOD,
-2700: 0
-2800: 0
+'2020-08-13T03:00:00': '+00:00'
+'2020-08-13T04:00:00': '+00:00'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2800: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T04:00:00: +00:00
 EOD
   },
 
   {    # new range after last, other offset
     input => <<EOD,
-2700: 22
-2800: 22
+'2020-08-13T03:00:00': 22
+'2020-08-13T04:00:00': 22
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2700: 22
-  2800: 22
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T03:00:00: +00:00:22
+  2020-08-13T04:00:00: +00:00:22
 EOD
   },
 
   {
     input => <<EOD,
-900: -10
-1300: -10
+'2020-08-12T09:00:00': -10
+'2020-08-12T13:00:00': -10
 EOD
     expect => <<EOD,
 ---
 A:
-  900: -10
-  1000: -5
-  1300: -10
-  2000: 0
-  2500: 0
+  2020-08-12T09:00:00: -00:00:10
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T13:00:00: -00:00:10
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new range after and overlapping first, conflict
     input => <<EOD,
-1300: -10
-1600: -10
+'2020-08-12T13:00:00': -10
+'2020-08-12T16:00:00': -10
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  1300: -10
-  2000: 0
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T13:00:00: -00:00:10
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new range overlapping first and second, conflict
     input => <<EOD,
-1300: -5
-2200: -5
+'2020-08-12T13:00:00': '-00:00:05'
+'2020-08-12T22:00:00': '-00:00:05'
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  2000: 0
-  2200: -5
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-12T22:00:00: -00:00:05
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new range before and overlapping second, conflict
     input => <<EOD,
-1700: -10
-2200: -10
+'2020-08-12T17:00:00': -10
+'2020-08-12T22:00:00': -10
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  1700: -10
-  2000: 0
-  2200: -10
-  2500: 0
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T17:00:00: -00:00:10
+  2020-08-12T20:00:00: +00:00
+  2020-08-12T22:00:00: -00:00:10
+  2020-08-13T01:00:00: +00:00
 EOD
   },
 
   {    # new range encompassing second, conflict
     input => <<EOD,
-1700: -10
-2700: -10
+'2020-08-12T17:00:00': -10
+'2020-08-13T03:00:00': -10
 EOD
     expect => <<EOD,
 ---
 A:
-  1000: -5
-  1700: -10
-  2000: 0
-  2700: -10
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T17:00:00: -00:00:10
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T03:00:00: -00:00:10
 EOD
   },
 
   {    # new encompassing both
     input => <<EOD,
-800: -10
-2700: -10
+'2020-08-12T08:00:00': -10
+'2020-08-13T03:00:00': -10
 EOD
     expect => <<EOD,
 ---
 A:
-  800: -10
-  1000: -5
-  2000: 0
-  2700: -10
+  2020-08-12T08:00:00: -00:00:10
+  2020-08-12T10:00:00: -00:00:05
+  2020-08-12T20:00:00: +00:00
+  2020-08-13T03:00:00: -00:00:10
 EOD
   },
 
@@ -414,17 +431,19 @@ EOD
 
 foreach my $test (@tests) {
   $co =
-    Image::Synchronize::CameraOffsets->new( log_callback => sub { print @_ } );
+    Image::Synchronize::CameraOffsets
+      ->new( log_callback => sub { print @_ } );
   $co->parse( Load($two_ranges) );
   if ( $test->{expect} ) {
     my $input = Load( $test->{input} );
     while ( my ( $time, $offset ) = each %{$input} ) {
+      $time = Image::Synchronize::Timestamp->new($time);
       $co->set( 'A', $time, $offset );
     }
     $co->make_effective;
     is(
-      Dump( $co->{effective} ),
-      Dump( Load( $test->{expect} ) ),
+      Dump(Image::Synchronize::CameraOffsets::export_internal($co->{effective})),
+      $test->{expect},
       'merge ' . test_id( $test->{input} )
     );
   }
@@ -432,5 +451,13 @@ foreach my $test (@tests) {
     fail("bad merge?");
   }
 }
+
+# Test offsets with timezones
+
+$co = $co->new;
+my $t = Image::Synchronize::Timestamp->new('-0:1:2+05:00');
+$co->set('A', t('2020-08-12T12:34:00'), $t);
+my $t2 = $co->get('A', t('2020-08-12T10:00:00'));
+is($t2->display_time, '-00:01:02+05:00', 'offset with timezone');
 
 done_testing;

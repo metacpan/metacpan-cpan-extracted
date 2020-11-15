@@ -1,0 +1,51 @@
+{
+   "abstract" : "provides zsh completion for OO-Modulinos",
+   "author" : [
+      "KOBAYASHI, Hiroaki <hkoba@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-oo_modulino_zsh_completion_helper",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Module::CPANfile" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MOP4Import::Declare" : "0.050",
+            "Module::Runtime" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::AddInc" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::oo_modulino_zsh_completion_helper" : {
+         "file" : "lib/App/oo_modulino_zsh_completion_helper.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/hkoba/perl-App-oo_modulino_zsh_completion_helper.git"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

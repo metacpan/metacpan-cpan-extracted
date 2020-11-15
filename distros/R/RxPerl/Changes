@@ -1,5 +1,13 @@
 Revision history for Perl extension RxPerl
 
+v6.1.1 2020-11-14T18:20:39Z
+
+    - included behavior subjects in documentation
+
+v6.1.0 2020-11-14T18:14:57Z
+
+    - added rx_behavior_subject
+
 v6.0.3 2020-11-07T07:14:05Z
 
     - fixed documentation

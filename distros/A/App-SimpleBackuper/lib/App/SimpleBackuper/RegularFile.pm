@@ -120,7 +120,7 @@ sub compress {
 	$status = $z->flush($out);
 	die "$status\n" if $status != LZMA_STREAM_END;
 	
-	my $ratio = length($out) / length($self->{data});
+	my $ratio = length($out) / (length($self->{data}) || 1);
 	$self->{data} = $out;
 	
 	return $ratio;

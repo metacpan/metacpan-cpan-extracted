@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 Titan
+
+This is a script to upload content to a Titan-enabled site like Gemini Wiki. It
+takes a varying number of arguments:
+
+B<--url=URL> specifies the Titan URL to use; this should be really similar to
+the Gemini URL you used to read the page.
+
+B<--token=TOKEN> specifies the token to use; this is optional but spammers and
+vandals basically ensured that any site out on the Internet needs some sort of
+protection; how to get a token depends on the site you're editing.
+
+B<--mime=MIMETYPE> specifies the MIME type to send to the server. If you don't
+specify a MIME type, the C<file> utility is used to determine the MIME type of
+the file you're uploading.
+
+B<FILES...> are the files to upload, if any; this is optional: you can also use
+a pipe, or type a few words by hand (terminating it with a Ctrl-D, the end of
+transmission byte).
+
+Note that if you specify multiple files, the URL must end in a slash and all the
+filenames are used as page names. So, uploading F<Alex.gmi> and F<Berta.gmi> to
+C<titan://localhost/> will create C<gemini://localhost/Alex> and
+C<gemini://localhost/Berta>.
+
+The following two options control the use of client certificates:
+
+B<--cert_file=FILE> specifies an optional client certificate to use; if you
+don't specify one, the default is to try to use F<client-cert.pem> in the
+current directory.
+
+B<--key_file=FILE> specifies an optional client certificate key to use; if you
+don't specify one, the default is to try to use F<client-key.pem> in the current
+directory.
+
+Usage:
+
+    echo "This is my test." > test.txt
+    titan --url=titan://transjovian.org/test/raw/testing --token=hello text.txt
+
+Or from a pipe:
+
+    echo "This is my test." \
+      | titan --url=titan://transjovian.org/test/raw/testing --token=hello
+
+=cut
+
+use Modern::Perl '2018';
+use Pod::Text;
+use URI::Escape;
+use File::Basename;
+use File::Temp qw(tempfile);
+use IO::Socket::SSL;
+use Getopt::Long;
+
+my $cert_file;
+my $cert_key;
+my $token;
+my $help;
+my $mime;
+my $url;
+
+GetOptions ("cert_file=s" => \$cert_file,
+	    "cert_key=s" => \$cert_key,
+	    "token=s"  => \$token,
+	    "mime=s"  => \$mime,
+	    "help"  => \$help,
+	    "url=s"  => \$url,)
+    or die("Error in command line arguments\n");
+
+# Help comes first
+if ($help) {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+  exit;
+}
+
+# Remaining arguments
+my (@files) = @ARGV;
+$token //= '';
+
+die "⚠ You must provide an URL\n" unless $url;
+
+my($scheme, $authority, $path, $query, $fragment) =
+    $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+
+die "⚠ The URL '$url' must use the titan scheme\n" unless $scheme and $scheme eq 'titan';
+die "⚠ The URL '$url' must have an authority\n" unless $authority;
+die "⚠ The URL '$url' must have a path\n" unless $path;
+die "⚠ The URL '$url' must not have a query\n" if $query;
+die "⚠ The URL '$url' must not have a fragment\n" if $fragment;
+
+if (@files > 1) {
+  die "⚠ The URL '$url' must have a path that ends in a slash\n" if $path !~ /\/$/;
+} elsif (not @files) {
+  die "⚠ The URL '$url' must have a path that does not end in a slash\n" if $path =~ /\/$/;
+}
+
+for my $file (@files) {
+  die "⚠ The file '$file' does not exist\n" unless -e $file;
+  die "⚠ The file '$file' cannot be read\n" unless -r $file;
+}
+warn "Without a token chances are slim… 😅\n" unless $token;
+say "Start typing and end your input with Ctrl-D… 😁" if -t and not @files;
+say "Reading from the pipe… 😁" if not -t and not @files;
+
+my ($host, $port) = split(/:/, $authority, 2);
+$port //= 1965;
+
+undef $/;
+my $temp_fh;
+
+unless (@files) {
+  my $data = <STDIN>;
+  my $file;
+  ($temp_fh, $file) = tempfile();
+  print $temp_fh $data;
+  close($temp_fh);
+  push(@files, $file);
+}
+
+my %args = (PeerHost => $host,
+	    PeerService => $port,
+	    SSL_verify_mode => SSL_VERIFY_NONE);
+# Default certs
+$args{SSL_cert_file} = 'client-cert.pem' if -f 'client-cert.pem';
+$args{SSL_key_file} = 'client-key.pem' if -f 'client-key.pem';
+# Read --cert_file and --key_file
+for (grep(/--(key|cert)_file=/, @ARGV)) {
+  $args{SSL_cert_file} = $1 if /--cert_file=(.*)/;
+  $args{SSL_key_file} = $1 if /--key_file=(.*)/;
+}
+
+for my $file (@files) {
+  open(my $fh, '<', $file) or die "⚠ The file '$file' cannot be read: $!\n";
+  my $data = <$fh>;
+  close($fh);
+  my $size = length($data);
+  my $type = $mime;
+  $type //= qx(/usr/bin/file --mime-type --brief "$file");
+  $type =~ s/\s+$//; # remove trailing whitespace
+
+  # If the URL ends in a slash, append the URI-escaped filename without suffix
+  my $furl = $url;
+  if ($path =~ /\/$/) {
+    my ($name) = fileparse($file, '.gmi');
+    $furl .= uri_escape($name);
+  }
+
+  # create client
+  my $socket = IO::Socket::SSL->new(%args)
+      or die "Cannot construct client socket: $@";
+
+  # send data in one go
+  print $socket "$furl;size=$size;mime=$type;token=$token\r\n$data";
+
+  # print response
+  my $response = <$socket>;
+  if ($response) {
+    $response =~ s/\r//g;
+    print $response;
+  } else {
+    warn "No response for $file: $!\n";
+  }
+}

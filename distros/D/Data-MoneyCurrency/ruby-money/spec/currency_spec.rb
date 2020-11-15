@@ -321,7 +321,11 @@ describe Money::Currency do
 
   describe "#inspect" do
     it "works as documented" do
-      expect(described_class.new(:usd).inspect).to eq %Q{#<Money::Currency id: usd, priority: 1, symbol_first: true, thousands_separator: ,, html_entity: $, decimal_mark: ., name: United States Dollar, symbol: $, subunit_to_unit: 100, exponent: 2, iso_code: USD, iso_numeric: 840, subunit: Cent, smallest_denomination: 1>}
+      expect(described_class.new(:usd).inspect).to eq %Q{#<Money::Currency id: usd, priority: 1, symbol_first: true, thousands_separator: ,, html_entity: $, decimal_mark: ., name: United States Dollar, symbol: $, subunit_to_unit: 100, exponent: 2, iso_code: USD, iso_numeric: 840, subunit: Cent, smallest_denomination: 1, format: >}
+    end
+
+    it "works as documented" do
+      expect(described_class.new(:aed).inspect).to eq %Q{#<Money::Currency id: aed, priority: 100, symbol_first: false, thousands_separator: ,, html_entity: , decimal_mark: ., name: United Arab Emirates Dirham, symbol: د.إ, subunit_to_unit: 100, exponent: 2, iso_code: AED, iso_numeric: 784, subunit: Fils, smallest_denomination: 25, format: %n %u>}
     end
   end
 
@@ -393,6 +397,30 @@ describe Money::Currency do
       register_foo
       expect(described_class.new(:foo).decimal_places).to eq 3
       unregister_foo
+    end
+  end
+
+  describe '#reset!' do
+    let(:modified_mark) { '&&' }
+
+    before do
+      cad = described_class.find(:cad)
+
+      described_class.register(
+        :priority            => 100,
+        :iso_code            => cad.iso_code,
+        :name                => cad.name,
+        :subunit             => cad.subunit,
+        :subunit_to_unit     => cad.subunit_to_unit,
+        :thousands_separator => cad.thousands_separator,
+        :decimal_mark        => modified_mark
+      )
+    end
+
+    it "resets modified currency" do
+      expect(described_class.find(:cad).decimal_mark).to eq modified_mark
+      described_class.reset!
+      expect(described_class.find(:cad).decimal_mark).not_to eq modified_mark
     end
   end
 end

@@ -14,6 +14,7 @@ t/compile.t
 t/example.html
 t/example2.html
 t/parse.t
+t/pod-cm.t
 t/pod.t
 t/pod_coverage.t
 t/relative_links.t

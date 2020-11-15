@@ -1,6 +1,6 @@
 package Cassandra::Client::Policy::Throttle::Adaptive;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Policy::Throttle::Adaptive::VERSION = '0.17';
+$Cassandra::Client::Policy::Throttle::Adaptive::VERSION = '0.18';
 use parent 'Cassandra::Client::Policy::Throttle::Default';
 use 5.010;
 use strict;
@@ -67,7 +67,7 @@ Cassandra::Client::Policy::Throttle::Adaptive
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

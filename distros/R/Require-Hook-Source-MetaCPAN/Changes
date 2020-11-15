@@ -1,0 +1,14 @@
+0.002   2020-11-13  Released-By: PERLANCAR; Urgency: high
+
+        - Update to make it work again.
+
+        - Rename distro (add category) from RH:MetaCPAN -> RH:Source::MetaCPAN.
+
+        - Add logging.
+
+        - [doc] Add some description.
+
+
+0.001   2017-01-09  Released-By: PERLANCAR
+
+        - First release.

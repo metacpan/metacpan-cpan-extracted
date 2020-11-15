@@ -1,0 +1,16 @@
+^\.git
+^MYMETA.*$
+^Makefile$
+~$
+\.old(?:\..*)?$
+\.swp$
+\.o$
+\.bs$
+\.bak$
+\.orig$
+\.cache\.cm$
+^blib
+^pm_to_blib
+^Indexed\.c$
+^devel/
+Tie-Hash-Indexed.*\.tar\.gz$

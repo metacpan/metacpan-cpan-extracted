@@ -8,7 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/CekBpom.pm
-script/cek-bpom
+script/cek-bpom-products
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

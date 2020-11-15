@@ -31,7 +31,7 @@ extern "C" {
 
 /* tags longer than TAGREADER_MAX_TAGLEN produce a warning about
 * not terminated tags, must be much smaler than BUFFLEN */
-#define TAGREADER_MAX_TAGLEN 300
+#define TAGREADER_MAX_TAGLEN 400
 /* BUFFLEN is the units in which we re-allocate mem, must be much bigger than
 * TAGREADER_MAX_TAGLEN */
 #define BUFFLEN 6000
@@ -73,7 +73,7 @@ tr_new(class, filename)
 	SV *class
 	SV *filename
 CODE:
-	int i;
+	STRLEN i; // int
 	char *str;
 	if (!SvPOKp(filename)){
 		croak("ERROR: filename must be a string scalar");

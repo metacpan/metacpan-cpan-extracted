@@ -5,3 +5,4 @@ README
 t/Lingua-FR-Nums2Words.t
 lib/Lingua/FR/Nums2Words.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

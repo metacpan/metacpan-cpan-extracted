@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Device::Chip::UI;
+
+use Device::Chip::Adapter;
+use Getopt::Long;
+
+GetOptions(
+   'adapter|A=s' => \( my $ADAPTER ),
+   'mode|M=s'    => \( my $STARTMODE = "GPIO" ),
+) or exit 1;
+
+defined $ADAPTER or die "Need --adapter\n";
+
+App::Device::Chip::UI->run(
+   Device::Chip::Adapter->new_from_description( $ADAPTER ),
+   startmode => $STARTMODE,
+);

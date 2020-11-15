@@ -1,0 +1,13 @@
+0.003   2020-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist (add category): RH-DzilBuild -> RH-Source-DzilBuild.
+
+
+0.002   2017-01-21  Released-By: PERLANCAR
+
+        - Add attribute: debug.
+
+
+0.001   2017-01-09  Released-By: PERLANCAR
+
+        - First release.

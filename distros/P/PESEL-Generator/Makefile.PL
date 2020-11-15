@@ -6,7 +6,7 @@ WriteMakefile(
     ABSTRACT_FROM	=> 'lib/PESEL/Generator.pm',
     PL_FILES		=> {},
     PREREQ_PM		=> {
-		'Exporter::Tiny'			=> 0.042,
-		'Identifier::PL::PESEL'		=> 0.2,
+		'Exporter::Tiny'			=> 0,
+		'Identifier::PL::PESEL'		=> 0,
     },
 );
