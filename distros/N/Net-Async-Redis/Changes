@@ -1,5 +1,15 @@
 Revision history for Net-Async-Redis
 
+3.005     2020-11-16 05:20:49+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->zdiff and ->zdiffstore commands from latest Redis release
+    - provide RESP2/RESP3 compatibility when hashrefs option is not enabled,
+    otherwise some commands such as ->xreadgroup can return inconsistent
+    results between versions (thanks Eyad, Paul and Nael for the patch)
+    - cluster mode now provides basic slot calculation caching, since this
+    yields a small performance improvement
+
 3.004     2020-11-04 12:40:40+08:00 Asia/Kuala_Lumpur
     No new features.
 

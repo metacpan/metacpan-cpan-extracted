@@ -6,7 +6,6 @@ build_requires:
   Perl::Critic: '0'
   Test2::V0: '0'
   Test::More: '0.98'
-  Test::Perl::Critic: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -29,7 +28,7 @@ no_index:
 provides:
   Perl::Critic::Policy::ProhibitOrReturn:
     file: lib/Perl/Critic/Policy/ProhibitOrReturn.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Perl::Critic::Policy: '0'
   Perl::Critic::Utils: '0'
@@ -38,7 +37,7 @@ resources:
   bugtracker: https://github.com/utgwkk/Perl-Critic-Policy-ProhibitOrReturn/issues
   homepage: https://github.com/utgwkk/Perl-Critic-Policy-ProhibitOrReturn
   repository: git://github.com/utgwkk/Perl-Critic-Policy-ProhibitOrReturn.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:UTGWKK
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

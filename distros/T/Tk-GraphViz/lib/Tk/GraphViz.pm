@@ -4,10 +4,11 @@ package Tk::GraphViz;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 use Tk 800.020;
 use Tk::Font;
+use Tk::IO;
 
 # Parse::Yapp-generated Parser for parsing record node labels
 use Tk::GraphViz::parseRecordLabel;
@@ -16,12 +17,11 @@ use base qw(Tk::Derived Tk::Canvas);
 
 use IO qw(Handle File Pipe);
 use Carp;
-use Reaper qw( reapPid pidStatus );
 
 use IPC::Open3;
 use POSIX qw( :sys_wait_h :errno_h );
 use Fcntl;
-
+use Text::ParseWords qw(parse_line);
 
 # Initialize as a derived Tk widget
 Construct Tk::Widget 'GraphViz';
@@ -80,7 +80,7 @@ sub show
 
   # Layout is actually done in the background, so the graph
   # will get updated when the new layout is ready
-  $self->_startGraphLayout ( $graph, fit => 1, %opt );
+  $self->_startGraphLayout ( $graph, %opt );
 }
 
 
@@ -94,123 +94,9 @@ sub show
 sub _startGraphLayout
 {
   my ($self, $graph, %opt) = @_;
-
   my ($filename,$delete_file) = $self->_createDotFile ( $graph, %opt );
-
-  # If a previous layout process is running, it needs to be killed
-  $self->_stopGraphLayout( %opt );
-
   $self->{layout} = [];
-
-  if ( ($self->{layout_process} =
-	$self->_startDot ( $filename, delete_file => $delete_file,
-			   %opt )) ) {
-    $self->{layout_process}{filename} = $filename;
-    $self->{layout_process}{delete_file} = $delete_file;
-    $self->{layout_process}{opt} = \%opt;
-    $self->_checkGraphLayout ();
-  } else {
-    $self->_showGraphLayout( %opt );
-  }
-}
-
-
-######################################################################
-# Stop a layout task running in the background.
-# It is important to do a waitpid() on all the background processes
-# to prevent them from becoming orphans/zombies
-######################################################################{
-sub _stopGraphLayout
-{
-  my ($self, %opt) = @_;
-
-  my $proc = $self->{layout_process};
-  return 0 unless defined $proc;
-
-  if ( defined $proc->{pid} ) {
-    my @sig = qw( TERM TERM TERM TERM KILL );
-    for ( my $i = 0; $i < 5; ++$i ) {
-      last unless defined $proc->{pid};
-      kill $sig[$i], $proc->{pid};
-      if ( $self->_checkGraphLayout( noafter => 1 ) ) {
-	sleep $i+1;
-      }
-    }
-  }
-
-  unlink $proc->{filename} if ( $proc->{delete_file} );
-  delete $self->{layout_process};
-}
-
-
-######################################################################
-# Check whether the background layout task has finished
-# Also reads any available output the command has generated to
-# this point.
-# If the command is not finished, schedules for this method to be
-# called again in the future, after some period.
-######################################################################
-sub _checkGraphLayout
-{
-  my ($self, %opt) = @_;
-
-  my $proc = $self->{layout_process};
-  if ( !defined $proc ) { return 0; }
-
-  if ( !defined $proc->{pid} ) { return 0; }
-
-  my $finished = 0;
-  if ( defined(my $stat = pidStatus($proc->{pid})) ) {
-    # Process has exited
-    if ( $stat == 0xff00 ) {
-      $proc->{error} = "exec failed";
-    }
-    elsif ( $stat > 0x80 ) {
-      $stat >>= 8;
-    }
-    else {
-      if ( $stat & 0x80 ) {
-	$stat &= ~0x80;
-	$proc->{error} = "Killed by signal $stat (coredump)";
-      } else {
-	$proc->{error} = "Kill by signal $stat";
-      }
-    }
-    $proc->{status} = $stat;
-    $finished = 1;
-  }
-
-  else {
-    my $kill = kill ( 0 => $proc->{pid} );
-    if ( !$kill ) {
-      $proc->{status} = 127;
-      $proc->{error} = "pid $proc->{pid} gone, but no status!";
-      $finished = 1;
-    }
-  }
-
-  # Read available output...
-  while ( $self->_readGraphLayout () ) { last if !$finished; }
-
-  # When finished, show the new contents
-  if ( $finished ) {
-    $proc->{pid} = undef;
-    $self->_stopGraphLayout();
-
-    $self->_showGraphLayout ( %{$proc->{opt}} );
-    return 0;
-  }
-
-  else {
-    # Not yet finished, so schedule to check again soon
-    if ( !defined($opt{noafter}) || !$opt{noafter} ) {
-      my $checkDelay = 500;
-      if ( defined($proc->{goodread}) ) { $checkDelay = 0; }
-      $self->after ( $checkDelay, sub { $self->_checkGraphLayout(%opt); } );
-    }
-
-    return 1;
-  }
+  $self->_startDot ( $filename, delete_file => $delete_file, %opt );
 }
 
 
@@ -337,7 +223,7 @@ sub _mktemp
   my $tempDir = $ENV{TEMP} || $ENV{TMP} || '/tmp';
   my $filename = sprintf ( "%s/Tk-GraphViz.dot.$$.%d.dot",
 			   $tempDir, $_mktemp_count++ );
-  my $fh = new IO::File ( $filename, 'w' ) ||
+  my $fh = IO::File->new( $filename, 'w' ) ||
     confess "Can't write temp file: $filename: $!";
   binmode($fh);
   ($filename, $fh);
@@ -359,49 +245,43 @@ sub _startDot
 
   my @layout_cmd = $self->_makeLayoutCommand ( $filename, %opt );
 
+  my $delete_file = delete $opt{delete_file};
+  my $then = sub {
+    unlink $filename if $delete_file;
+    $self->_showGraphLayout( %opt );
+  };
   # Simple, non-asynchronous mode: execute the
   # process synchnronously and wait for all its output
   if ( !defined($opt{async}) || !$opt{async} ) {
-    my $pipe = new IO::Pipe;
+    my $pipe = IO::Pipe->new;
     $pipe->reader ( @layout_cmd );
     while ( <$pipe> ) { push @{$self->{layout}}, $_; }
-    if ( $opt{delete_file} ) {
-      unlink $filename;
-    }
-    return undef;
+    $then->();
+    return 1;
   }
 
-  # Now execute it
-  my $in = new IO::Handle;
-  my $out = new IO::Handle;
-  $in->autoflush;
-
-  local $@ = undef;
-  my $proc = {};
-  my $ppid = $$;
-  eval {
-    $proc->{pid} = open3 ( $in, $out, '>&STDERR', @layout_cmd );
-    reapPid ( $proc->{pid} );
-
-    # Fork failure?
-    exit(127) if ( $$ != $ppid );
-  };
-  if ( defined($@) && $@ ne '' ) {
-    $self->{error} = $@;
-  }
-
-  # Close stdin so child process sees eof on its input
-  $in->close;
-
-  $proc->{output} = $out;
-  $proc->{buf} = '';
-  $proc->{buflen} = 0;
-  $proc->{eof} = 0;
-
-  # Enable non-blocking reads on the output
-  $self->_disableBlocking ( $out );
-
-  return $proc;
+  my $fh  = Tk::IO->new(
+    -linecommand  => sub {
+      push @{$self->{layout}}, @_;
+    },
+    -childcommand => sub {
+      my ($stat) = @_;
+      my ($error, $status); # not used but captured in case
+      if ( $stat == 0xff00 ) {
+        $error = "exec failed";
+      } elsif ( $stat > 0x80 ) {
+        $stat >>= 8;
+      } elsif ( $stat & 0x80 ) {
+        $stat &= ~0x80;
+        $error = "Killed by signal $stat (coredump)";
+      } else {
+        $error = "Kill by signal $stat";
+      }
+      $status = $stat;
+      $then->();
+    },
+  );
+  $fh->exec(@layout_cmd);
 }
 
 
@@ -475,69 +355,6 @@ sub _makeLayoutCommand
 
 
 ######################################################################
-# Read data from the background layout process, in a non-blocking
-# mode.  Reads all the data currently available, up to some reasonable
-# buffer size.
-######################################################################
-sub _readGraphLayout
-{
-  my ($self) = @_;
-
-  my $proc = $self->{layout_process};
-  if ( !defined $proc ) { return; }
-
-  delete $proc->{goodread};
-  my $rv = sysread ( $proc->{output}, $proc->{buf}, 10240,
-		     $proc->{buflen} );
-  if ( !defined($rv) && $! == EAGAIN ) {
-    # Would block, don't do anything right now
-    return 0;
-  }
-
-  elsif ( $rv == 0 ) {
-    # 0 bytes read -- EOF
-    $proc->{eof} = 1;
-    return 0;
-  }
-
-  else {
-    $proc->{buflen} += $rv;
-    $proc->{goodread} = 1;
-
-    # Go ahead and split the output that's available now,
-    # so that this part at least is potentially spread out in time
-    # while the background process keeps running.
-    $self->_splitGraphLayout ();
-
-    return $rv;
-  }
-}
-
-
-######################################################################
-# Split the buffered data read from the background layout task
-# into individual lines
-######################################################################
-sub _splitGraphLayout
-{
-  my ($self) = @_;
-
-  my $proc = $self->{layout_process};
-  if ( !defined $proc ) { return; }
-
-  my @lines = split ( /\n/, $proc->{buf} );
-  
-  # If not at eof, keep the last line in the buffer
-  if ( !$proc->{eof} ) {
-    $proc->{buf} = pop @lines;
-    $proc->{buflen} = length($proc->{buf});
-  }
-
-  push @{$self->{layout}}, @lines;
-}
-
-
-######################################################################
 # Parse the layout data in dot 'text' format, as returned
 # by _dot2layout.  Nodes / edges / etc defined in the layout
 # are added as object in the canvas
@@ -547,11 +364,9 @@ sub _parseLayout
   my ($self, $layoutLines, %opt) = @_;
 
   my $directed = 1;
-  my %allNodeAttrs = ();
-  my %allEdgeAttrs = ();
-  my %graphAttrs = ();
+  my $context = { node => {}, edge => {}, graph => {} };
   my ($minX, $minY, $maxX, $maxY) = ( undef, undef, undef, undef );
-  my @saveStack = ();
+  my @saveStack;
 
   my $accum = undef;
 
@@ -572,102 +387,82 @@ sub _parseLayout
       next;
     }
 
-    #STDERR->print ( "gv _parse: '$_'\n" );
+    s/^\s+//;
 
-    if ( /^\s*(?:di)?graph\s*.*\{\s*$/ ) {
+    #STDERR->print ( "gv _parse: '$_'\n" );
+    my @words = parse_line '\s+', 1, $_;
+
+    if ($words[0] =~ /^(?:di)?graph$/ and $words[-1] eq '{') {
       # starting line, ignore
       next;
     }
 
-    if ( /^\s*\]\s*;\s*$/ ) {
+    if ( $words[0] =~ /^\]\s*;$/ ) {
       # end of attributes not finishing on same line as important info, ignore
       next;
     }
 
-    if ( /^\s+node\s*\[(.+)(?:\];)?/ ) {
-      $self->_parseAttrs ( "$1", \%allNodeAttrs );
+    if ($context->{my $c = $words[0]}) {
+      shift @words;
+      %{ $context->{$c} } = (%{ $context->{$c} }, %{ _parseAttrs(join ' ', @words) });
       next;
     }
 
-    if ( /^\s+edge\s*\[(.+)(?:\];)?/ ) {
-      $self->_parseAttrs ( "$1", \%allEdgeAttrs );
+    if ( ($words[0] eq 'subgraph' and $words[-1] eq '{') or $words[0] eq '{') {
+      push @saveStack, $context;
+      $context = { map +($_ => {%{ $context->{$_} }}), keys %$context };
+      delete $context->{graph}{label};
+      delete $context->{graph}{bb};
       next;
     }
 
-    if ( /^\s+graph\s*\[(.+)(?:\];)?/ ) {
-      $self->_parseAttrs ( "$1", \%graphAttrs );
-      next;
-    }
-
-    if ( /^\s+subgraph\s*.*\s*\{/ ||
-         /^\s+\{/ ) {
-      push @saveStack, [ {%graphAttrs},
-			 {%allNodeAttrs},
-			 {%allEdgeAttrs} ];
-      delete $graphAttrs{label};
-      delete $graphAttrs{bb};
-      next;
-    }
-
-    if ( /^\s*\}/ ) {
+    if ( $words[0] eq '}' ) {
       # End of a graph section
       if ( @saveStack ) {
 	# Subgraph
-	if ( defined($graphAttrs{bb}) && $graphAttrs{bb} ne '' ) {
-	  my ($x1,$y1,$x2,$y2) = split ( /\s*,\s*/, $graphAttrs{bb} );
+	if ( defined($context->{graph}{bb}) && $context->{graph}{bb} ne '' ) {
+	  my ($x1,$y1,$x2,$y2) = split ( /\s*,\s*/, $context->{graph}{bb} );
 	  $minX = min($minX,$x1);
 	  $minY = min($minY,$y1);
 	  $maxX = max($maxX,$x2);
 	  $maxY = max($maxY,$y2);
-	  $self->_createSubgraph ( $x1, $y1, $x2, $y2, %graphAttrs );
+	  $self->_createSubgraph($x1, $y1, $x2, $y2, %{ $context->{graph} });
 	}
-
-	my ($g,$n,$e) = @{pop @saveStack};
-	%graphAttrs = %$g;
-	%allNodeAttrs = %$n;
-	%allEdgeAttrs = %$e;
+	$context = pop @saveStack;
 	next;
       } else {
 	# End of the graph
 	# Create any whole-graph label
-	if ( defined($graphAttrs{bb}) ) {
-	  my ($x1,$y1,$x2,$y2) = split ( /\s*,\s*/, $graphAttrs{bb} );
+	if ( defined($context->{graph}{bb}) ) {
+	  my ($x1,$y1,$x2,$y2) = split ( /\s*,\s*/, $context->{graph}{bb} );
 	  $minX = min($minX,$x1);
 	  $minY = min($minY,$y1);
 	  $maxX = max($maxX,$x2);
 	  $maxY = max($maxY,$y2);
-
 	  # delete bb attribute so rectangle is not drawn around whole graph
-	  delete  $graphAttrs{bb};
-
-	  $self->_createSubgraph ( $x1, $y1, $x2, $y2, %graphAttrs );
+	  delete $context->{graph}{bb};
+	  $self->_createSubgraph ($x1, $y1, $x2, $y2, %{ $context->{graph} });
 	}
 	last;
       }
     }
 
-    if ( /\s*(.+)\s+-[>\-]\s*(.+?)\s*\[(.+)\];/ ) {
+    if ( ($words[1] || '') =~ /^-[>\-]$/ ) {
       # Edge
-      my ($n1,$n2,$attrs) = ($1,$2,$3);
-      my %edgeAttrs = %allEdgeAttrs;
-      $self->_parseAttrs ( $attrs, \%edgeAttrs );
-
+      my ($n1, undef, $n2) = splice @words, 0, 3;
+      my %edgeAttrs = (%{ $context->{edge} }, %{ _parseAttrs(join ' ', @words) });
       my ($x1,$y1,$x2,$y2) = $self->_createEdge ( $n1, $n2, %edgeAttrs );
       $minX = min($minX,$x1);
       $minY = min($minY,$y1);
       $maxX = max($maxX,$x2);
       $maxY = max($maxY,$y2);
-    } elsif ( /\s+(.+?)\s*(?:\[(.+)\];)?\s*$/ ) {
+    } elsif ( /(.+?)\s*(?:\[(.+)\];)?\s*$/ ) {
       # Node
-      my ($name,$attrs) = ($1,$2);
-
-      # Get rid of any leading/tailing quotes
+      my ($name) = splice @words, 0, 1;
+      # Get rid of any leading/trailing quotes
       $name =~ s/^\"//;
-      $name =~ s/\"$//;
-
-      my %nodeAttrs = %allNodeAttrs;
-      $self->_parseAttrs ( $attrs, \%nodeAttrs ) if $attrs;
-
+      $name =~ s/\"?;?$//;
+      my %nodeAttrs = (%{ $context->{node} }, %{ _parseAttrs(join ' ', @words) });
       my ($x1,$y1,$x2,$y2) = $self->_createNode ( $name, %nodeAttrs );
       $minX = min($minX,$x1);
       $minY = min($minY,$y1);
@@ -676,9 +471,7 @@ sub _parseLayout
     } else {
       warn "Failed to parse DOT line: '$_'";
     }
-
   }
-
 }
 
 
@@ -686,39 +479,17 @@ sub _parseLayout
 # Parse attributes of a node / edge / graph / etc,
 # store the values in a hash
 ######################################################################
-sub _parseAttrs
-{
-  my ($self, $attrs, $attrHash) = @_;
-
-  while ( $attrs =~ s/^,?\s*([^=]+)=// ) {
-    my ($key) = ($1);
-
-    # Scan forward until end of value reached -- the first
-    # comma not in a quoted string.
-    # Probably a more efficient method for doing this, but...
-    my @chars = split(//, $attrs);
-    my $quoted = 0;
-    my $val = '';
-    my $last = '';
-    my ($i,$n);
-    for ( ($i,$n) = (0, scalar(@chars)); $i < $n; ++$i ) {
-       my $ch = $chars[$i];
-       last if $ch eq ',' && !$quoted;
-       if ( $ch eq '"' ) { $quoted = !$quoted unless $last eq '\\'; }
-       $val .= $ch;
-       $last = $ch;
-    }
-    $attrs = join('', splice ( @chars, $i ) );
-
-    # Strip leading and trailing ws in key and value
-    $key =~ s/^\s+|\s+$//g;
-    $val =~ s/^\s+|\s+$//g;
-
-    if ( $val =~ /^\"(.*)\"$/ ) { $val = $1; }
-    $val =~ s/\\\"/\"/g; # Un-escape quotes
-    $attrHash->{$key} = $val;
+sub _parseAttrs {
+  my ($attrs) = @_;
+  my %attrHash;
+  $attrs =~ s/^\[(.*?)\]?;?\s*$/$1/;
+  for (parse_line '\s*,\s*', 1, $attrs) {
+    my ($key, $val) = split /\s*=\s*/, $_, 2;
+    $val =~ s/^"(.*)"$/$1/;
+    $val =~ s/\\(.)/ $1 eq '"' ? $1 : "\\$1" /ge;
+    $attrHash{$key} = $val;
   }
-
+  \%attrHash;
 }
 
 
@@ -808,8 +579,12 @@ sub _createNode
   my $y2 = $y + $h/2.0;
 
   my $label = $attrs{label};
-  $label = $attrs{label} = $name unless defined $label;
-  if ( $label eq '\N' ) { $label = $attrs{label} = $name; }
+  if (defined $label) {
+    $label =~ s/\\(.)/ $1 eq 'N' ? $name : "\\$1" /ge;
+  } else {
+    $label = $name;
+  }
+  $attrs{label} = $label;
 
   #STDERR->printf ( "createNode: $name \"$label\" ($x1,$y1) ($x2,$y2)\n" );
 
@@ -851,17 +626,12 @@ sub _createNode
   push @args, -fill => $fill if ( defined($fill) );
 
   my $orient = $attrs{orientation} || 0.0;
-
-  # Node label
-  $label =~ s/\\n/\n/g;
-
-  unless ( $shape eq 'record' ) {
-    # Normal non-record node types
+  if ( $shape eq 'record' ) {
+    $self->_createRecordNode ( $label, \@args, %attrs, tags => $tags );
+  } else {
     $self->_createShapeNode ( $shape, $x1, -1*$y2, $x2, -1*$y1,
 			      $orient, @args, -tags => $tags );
-
     $label = undef if ( $shape eq 'point' );
-
     # Node label
     if ( defined $label ) {
       $tags->[0] = 'nodelabel'; # Replace 'node' w/ 'nodelabel'
@@ -869,12 +639,9 @@ sub _createNode
 		-anchor => 'center', -justify => 'center',
 		-tags => $tags, -fill => $fontcolor );
       push @args, ( -state => 'disabled' );
+      push @args, -font => $self->_getFont(@attrs{qw(fontname fontsize)});
       $self->createText ( @args );
     }
-  }
-  else {
-    # Record node types
-    $self->_createRecordNode ( $label, %attrs, tags => $tags );
   }
 
   # Return the bounding box of the node
@@ -913,6 +680,18 @@ my %polyShapes =
                    [ -0.03, 0.7 ], [ -0.03, 0.9 ], [ 0.03 , 0.9 ],
                    [ 0.03, 0.7 ], [ 0.03 , 0.9 ], [ 0 , 0.9 ],
                    [ 0, 1 ], [ 1, 1 ], [ 1, 0 ] ],
+    Msquare => [
+      [0, 0], [0, 0.2], [0.2, 0], [0, 0.2], [0, 0], # non-closed triangle = stays filled
+      [1, 0], [1, 0.2], [0.8, 0], [1, 0.2], [1, 0],
+      [1, 1], [1, 0.8], [0.8, 1], [1, 0.8], [1, 1],
+      [0, 1], [0, 0.8], [0.2, 1], [0, 0.8], [0, 1],
+      ],
+    Mdiamond => [
+      [0.0, 0.5], [0.1, 0.4], [0.1, 0.6], [0.1, 0.4], [0.0, 0.5],
+      [0.5, 0.0], [0.6, 0.1], [0.4, 0.1], [0.6, 0.1], [0.5, 0.0],
+      [1.0, 0.5], [0.9, 0.6], [0.9, 0.4], [0.9, 0.6], [1.0, 0.5],
+      [0.5, 1.0], [0.4, 0.9], [0.6, 0.9], [0.4, 0.9], [0.5, 1.0],
+      ],
 );
 
 sub _createShapeNode
@@ -1064,34 +843,40 @@ sub _createPolyShape
   $self->createPolygon ( @pts, %args );
 }
 
+sub _parse {
+  my ($label, $debug) = @_;
+  # Setup to parse the label (Label parser object created using Parse::Yapp)
+  my $parser = Tk::GraphViz::parseRecordLabel->new;
+  $parser->YYData->{INPUT} = $label;
+  # And parse it...
+  $parser->YYParse(
+    yylex => \&Tk::GraphViz::parseRecordLabel::Lexer,
+    yyerror => \&Tk::GraphViz::parseRecordLabel::Error,
+    yydebug => ($debug && 0x1F),
+  ) or die __PACKAGE__.": Error Parsing Record Node Label '$label'\n";
+}
+
+# parsing now preserves deep structure but for this we just want flat list
+sub _flatten {
+  my ($data) = @_;
+  return $data if ref($data) ne 'ARRAY';
+  map _flatten($_), @$data;
+}
 
 ######################################################################
 # Draw the node record shapes
 ######################################################################
+my $TEXT_MARGIN = 8; # arbitrarily chosen
 sub _createRecordNode
 {
-  my ($self, $label, %attrs) = @_;
+  my ($self, $label, $shape_args, %attrs) = @_;
 
   my $tags = $attrs{tags};
 
   # Get Rectangle Coords
-  my $rects = $attrs{rects};
-  my @rects = split(' ', $rects);
-  my @rectsCoords = map [ split(',',$_) ], @rects;
+  my @rectsCoords = map [ split ',', $_ ], split ' ', $attrs{rects};
 
-  # Setup to parse the label (Label parser object created using Parse::Yapp)
-  my $parser = new Tk::GraphViz::parseRecordLabel();
-  $parser->YYData->{INPUT} = $label;
-
-  # And parse it...
-  my $structure = $parser->YYParse
-    ( yylex => \&Tk::GraphViz::parseRecordLabel::Lexer,
-      yyerror => \&Tk::GraphViz::parseRecordLabel::Error,
-      yydebug => 0 );
-  die __PACKAGE__.": Error Parsing Record Node Label '$label'\n"
-    unless $structure;
-
-  my @labels = @$structure;
+  my @labels = _flatten(_parse($label));
 
   # Draw the rectangles
   my $portIndex = 1;  # Ports numbered from 1. This is used for the port name
@@ -1112,13 +897,25 @@ sub _createRecordNode
     $portTags{label} = $text;
 
     my ($x1,$y1,$x2,$y2) = @$rectCoords;
-    $self->createRectangle ( $x1, -$y1, $x2, -$y2, -tags => [%portTags] );
-
-    # Find midpoint for label anchor point
-    my $midX = ($x1 + $x2)/2;
-    my $midY = ($y1 + $y2)/2;
+    $self->createRectangle ( $x1, -$y1, $x2, -$y2, @$shape_args, -tags => [%portTags] );
+    my ($y_anchor, $anchor_arg, $x_anchor) = (-($y1 + $y2)/2);
+    my %label_attrs = _label2attrs($text);
+    if ($label_attrs{-justify} eq 'left') {
+      $x_anchor = $x1 + $TEXT_MARGIN;
+      $anchor_arg = 'w';
+    } elsif ($label_attrs{-justify} eq 'right') {
+      $x_anchor = $x2 - $TEXT_MARGIN;
+      $anchor_arg = 'e';
+    } else {
+      $x_anchor = ($x1 + $x2)/2;
+      $anchor_arg = 'center';
+    }
     $portTags{nodelabel} = delete $portTags{node}; # Replace 'node' w/ 'nodelabel'
-    $self->createText ( $midX, -$midY, -text => $text, -tags => [%portTags]);
+    $self->createText(
+      $x_anchor, $y_anchor, -anchor => $anchor_arg,
+      -text => $text, -tags => [%portTags],
+      -font => $self->_getFont(@attrs{qw(fontname fontsize)}),
+    );
 
     $portIndex++;
   }
@@ -1150,8 +947,8 @@ sub _createEdge
 
   my @args = ();
 
-  # Convert Biezer control points to 4 real points to smooth against
-  #  Canvas line smoothing doesn't use beizers, so we supply more points
+  # Convert Bezier control points to 4 real points to smooth against
+  #  Canvas line smoothing doesn't use beziers, so we supply more points
   #   along the manually-calculated bezier points.
 
   @coords = map @$_, @coords; #flatten coords array
@@ -1338,7 +1135,7 @@ sub _parseEdgePos
 #   $lastFlag: Flag = 1 to generate the last point (where t = 1)
 #
 #  Output;
-#   @outputPoints: Array of points along the biezier curve
+#   @outputPoints: Array of points along the bezier curve
 #
 #  Equations used
 #Found Bezier Equations at http://pfaedit.sourceforge.net/bezier.html
@@ -1519,7 +1316,7 @@ sub createBindings
   if ( defined $opt{'-keypad'} ) {
     $self->_createKeypadBindings( %opt );
   }
-
+  $self;
 }
 
 
@@ -1956,83 +1753,67 @@ sub zoomToRect
 sub createText
 {
   my ($self, $x, $y, %attrs) = @_;
-
   if( defined($attrs{-text}) ) {
-
-    # Set Justification, based on any \n \l \r in the text label
-    my $label = $attrs{-text};
-    my $justify = 'center';
-
-    # Per the dotguide.pdf, a '\l', '\r', or '\n' is
-    #  just a line terminator, not a newline. So in cases
-    #   where the label ends in one of these characters, we are
-    #   going to remove the newline char later
-    my $removeNewline;
-    if( $label =~ /\\[nlr]$/){
-      $removeNewline = 1;
-    }
-
-    if( $label =~ s/\\l/\n/g ){
-      $justify = 'left';
-    }
-    if( $label =~ s/\\r/\n/g ){
-      $justify = 'right';
-    }
-
-    # Change \n to actual \n
-    if( $label =~ s/\\n/\n/g ){
-      $justify  = 'center';
-    }
-
-    # remove ending newline if flag set
-    if( $removeNewline){
-      $label =~ s/\n$//;
-    }
-
-    # Fix  any escaped chars
-    #   like \} to }, and \\{ to \{
-    $label =~ s/\\(?!\\)(.)/$1/g;
-
-    $attrs{-text} = $label;
-    $attrs{-justify} = $justify;
-
+    %attrs = (%attrs, _label2attrs($attrs{-text}));
     # Fix the label tag, if there is one
-    my $tags;
-    if( defined($tags = $attrs{-tags})){
+    if( defined(my $tags = $attrs{-tags})){
       my %tags = (@$tags);
-      $tags{label} = $label if(defined($tags{label}));
+      $tags{label} = $attrs{-text} if defined $tags{label};
       $attrs{-tags} = [%tags];
     }
-
-    # Get the default font, if not defined already
-    my $fonts = $self->{fonts};
-    unless(defined($fonts->{_default}) ){
-
-      # Create dummy item, so we can see what font is used
-      my $dummyID = $self->SUPER::createText 
-	( 100,25, -text => "You should never see this" );
-      my $defaultfont = $self->itemcget($dummyID,-font);
-
-      # Make a copy that we will mess with:
-      $defaultfont = $defaultfont->Clone;
-      $fonts->{_default}{font}     = $defaultfont;
-      $fonts->{_default}{origSize} = $defaultfont->actual(-size);
-
-      # Delete the dummy item
-      $self->delete($dummyID);
-    }
-
-    # Assign the default font
-    unless( defined($attrs{-font}) ){
-      $attrs{-font} = $fonts->{_default}{font};
-    }
-
+    $attrs{-font} = $self->_defaultFont unless defined $attrs{-font};
   }
-
-  # Call Inherited createText
   $self->SUPER::createText ( $x, $y, %attrs );
 }
 
+my %JUSTIFY = (l => 'left', n => 'center', r => 'right');
+sub _label2attrs {
+  my ($label) = @_;
+  return if !defined $label;
+  my %attrs;
+  my $justify = 'center';
+  $label =~ s/\\(.)/
+    if (my $j = $JUSTIFY{$1}) {
+      $justify = $j;
+      "\n";
+    } else {
+      $1
+    }
+  /ge;
+  $label =~ s/\n$//;
+  $attrs{-text} = $label;
+  $attrs{-justify} = $justify;
+  %attrs;
+}
+
+sub _defaultFont {
+  my ($self) = @_;
+  my $fonts = $self->{fonts};
+  return $fonts->{_default}{font} if defined $fonts->{_default}{font};
+  # Create dummy item, so we can see what font is used
+  my $dummyID = $self->SUPER::createText(100,25, -text => "Should never see");
+  # Make a copy that we will mess with:
+  my $defaultfont = $self->itemcget($dummyID,-font)->Clone;
+  $fonts->{_default}{font}     = $defaultfont;
+  $fonts->{_default}{origSize} = $defaultfont->actual(-size);
+  # Delete the dummy item
+  $self->delete($dummyID);
+  $fonts->{_default}{font};
+}
+
+my $FONTSCALE = 0.7; # arbitrary
+sub _getFont {
+  my ($self, $family, $size) = @_;
+  return $self->_defaultFont unless defined $family;
+  my $fonts = $self->{fonts};
+  my $key = join '-', grep defined, $family, $size;
+  return $fonts->{$key}{font} if defined $fonts->{$key}{font};
+  my @args = (-family => $family);
+  push @args, -size => $size * $FONTSCALE if defined $size;
+  my $font = $self->Font(@args)->Clone;
+  $fonts->{$key}{origSize} = $font->actual(-size);
+  return $fonts->{$key}{font} = $font;
+}
 
 ######################################################################
 #  Sub to try a color name, returns the color name if recognized
@@ -2153,7 +1934,7 @@ Tk::GraphViz - Render an interactive GraphViz graph
 
 =head1 DESCRIPTION
 
-The B<GraphViz> widget is derived from B<Tk::Canvas>.  It adds the ability to render graphs in the canvas.  The graphs can be specified either using the B<DOT> graph-description language, or using via a L<GraphViz> or L<GraphViz2> object.
+The B<GraphViz> widget is derived from L<Tk::Canvas>.  It adds the ability to render graphs in the canvas.  The graphs can be specified either using the B<DOT> graph-description language, or using via a L<GraphViz> or L<GraphViz2> object.
 
 When B<show()> is called, the graph is passed to the B<dot> command to generate the layout info.  That info is then used to create rectangles, lines, etc in the canvas that reflect the generated layout.
 
@@ -2196,6 +1977,11 @@ Allows additional default node attributes to be specified.  Each name => value p
 =item edgeattrs => [ name => value, ... ]
 
 Allows additional default edge attributes to be specified.  Each name => value pair will be passed to dot as '-Ename=value' on the command-line.
+
+=item fit => $boolean
+
+If true, calls the L<< /$gv->fit() >> method after parsing the DOT output.
+As of 1.05, this no longer defaults to true.
 
 =back
 
@@ -2286,7 +2072,7 @@ The following example creates a GraphViz widgets to display a graph from a file 
     use GraphViz;
     use Tk;
 
-    my $mw = new MainWindow ();
+    my $mw = MainWindow->new();
     my $gv = $mw->Scrolled ( 'GraphViz',
                              -background => 'white',
                              -scrollbars => 'sw' )
@@ -2318,7 +2104,7 @@ Lots of DOT language features not yet implemented
 
 =head1 ACKNOWLEDGEMENTS
 
-See http://www.graphviz.org/ for more info on the graphviz tools.
+See L<http://www.graphviz.org/> for more info on the graphviz tools.
 
 =head1 AUTHOR
 

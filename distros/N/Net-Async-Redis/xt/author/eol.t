@@ -34,6 +34,7 @@ my @files = (
     't/multi.t',
     't/pipeline.t',
     't/protocol.t',
+    't/protocol_compatibility_test.t',
     't/psubscribe.t',
     't/pubsub.t',
     't/watch_keyspace.t',

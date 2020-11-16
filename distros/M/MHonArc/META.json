@@ -58,6 +58,6 @@
          "web" : "https://github.com/sympa-community/mhonarc"
       }
    },
-   "version" : "v2.6.23",
+   "version" : "v2.6.24",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

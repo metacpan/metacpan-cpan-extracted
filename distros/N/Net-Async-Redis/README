@@ -135,6 +135,17 @@ DESCRIPTION
     method extensively; often only calling it in one place at the top level
     in the code.
 
+  RESP3 and RESP2 compatibility
+
+    In RESP3 some of the responses are structured differently from RESP2.
+    Net::Async::Redis guarantees the same structure unless you have
+    explicitly requested the new types using the "configure" hashrefs
+    option, which is disabled by default.
+
+    Generally RESP3 is recommended if you have Redis version 6 or later
+    installed: it allows subscription operations to share the same
+    connection as regular Redis traffic.
+
  Error handling
 
     Since Future is used for deferred results, failure is indicated by a

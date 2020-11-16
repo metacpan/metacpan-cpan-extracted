@@ -4,7 +4,7 @@
       "Gabor Szabo <szabgab@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,9 +53,9 @@
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/szabgab/App-PerlTidy-Tk.git",
-         "web" : "https://github.com/szabgab/App-PerlTidy-Tk.com"
+         "web" : "https://github.com/szabgab/App-PerlTidy-Tk"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

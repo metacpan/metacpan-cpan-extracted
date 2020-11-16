@@ -22,19 +22,18 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Exporter" => 0,
     "IPC::Open3" => 0,
-    "Moo" => 0,
+    "POSIX" => 0,
     "Symbol" => 0,
-    "Types::Standard" => 0,
-    "base" => 0
+    "base" => 0,
+    "overload" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Guard" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,14 +48,13 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Guard" => 0,
   "IPC::Open3" => 0,
-  "Moo" => 0,
+  "POSIX" => 0,
   "Symbol" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,
-  "Types::Standard" => 0,
-  "base" => 0
+  "base" => 0,
+  "overload" => 0
 );
 
 

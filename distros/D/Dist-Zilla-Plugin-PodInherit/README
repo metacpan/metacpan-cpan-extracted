@@ -1,13 +1,53 @@
+NAME
 
+    Dist::Zilla::Plugin::PodInherit - use Pod::Inherit to provide INHERITED
+    METHODS sections in POD
 
-This archive contains the distribution Dist-Zilla-Plugin-PodInherit,
-version 0.007:
+SYNOPSIS
 
-  autogenerate inherited POD sections for Dist::Zilla distributions
+    Just add [PodInherit] to dist.ini. Currently there's no config options
+    at all.
 
-This software is copyright (c) 2013 by Tom Molesworth.
+DESCRIPTION
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+    Simple wrapper around Pod::Inherit to provide an 'inherited methods'
+    section for any modules in this distribution. See the documentation for
+    Pod::Inherit for more details.
 
+METHODS
+
+ gather_files
+
+    Called for each matching file (using :InstallModules so we expect to
+    find all the .pm files), we'll attempt to do pod generation for the
+    ones which end in .pm (case insensitive, will also match .PM).
+
+ process_pod
+
+    Calls Pod::Inherit to generate the merged .pod documentation files.
+
+BUGS
+
+    Some of the path and extension handling may be non-portable, should
+    probably use File::Basename and File::Spec.
+
+    Also, generating an entire .pod output file which is identical apart
+    from the extra inherited methods section seems suboptimal, other
+    plugins such as Dist::Zilla::Plugin::PodVersion manage to update the
+    source .pm file directly so perhaps that would be a better approach.
+
+SEE ALSO
+
+      * Pod::POM
+
+      * Pod::Inherit
+
+AUTHOR
+
+    Tom Molesworth <TEAM@cpan.org>
+
+LICENSE
+
+    Copyright Tom Molesworth 2012-2020. Licensed under the same terms as
+    Perl itself.
 

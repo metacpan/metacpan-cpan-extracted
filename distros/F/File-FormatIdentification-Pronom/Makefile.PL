@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.021000;
 
 use ExtUtils::MakeMaker;
 
@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "bin/pronomidentify.pl"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.021000",
   "NAME" => "File::FormatIdentification::Pronom",
   "PREREQ_PM" => {
     "Moose" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::File" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/File/FormatIdentification/*.t"
   }

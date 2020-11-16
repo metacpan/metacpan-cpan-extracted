@@ -1,0 +1,14 @@
+App-GhaInstall
+==============
+
+Created:      2020-11-16
+Home page:    <https://metacpan.org/release/App-GhaInstall>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaInstall>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2020-11-16
+
+ [ Bug Fixes ]
+ - Install Devel::Cover, etc if GHA_TESTING_COVER is true.
+
+0.001	2020-11-16	Initial release

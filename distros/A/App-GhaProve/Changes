@@ -6,10 +6,31 @@ Home page:    <https://metacpan.org/release/App-GhaProve>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
-0.004	2020-11-14	I really hate exit codes
+0.005	2020-11-15
 
-0.003	2020-11-14	Really fixed exit code
+ [ Documentation ]
+ - Add a SYNOPSIS and DESCRIPTION.
+ - Add pod to the script itself.
 
-0.002	2020-11-13	Fixed exit code
+ [ Test Suite ]
+ - Test that the module does more than just compile okay.
+
+ [ Other ]
+ - Move the bulk of the work from the script to the module.
+
+0.004	2020-11-14
+
+ [ Bug Fixes ]
+ - Actually fix exit code.
+
+0.003	2020-11-14
+
+ [ Bug Fixes ]
+ - Another attempt at fixing exit code.
+
+0.002	2020-11-13
+
+ [ Bug Fixes ]
+ - Attempt at fixing exit code.
 
 0.001	2020-11-13	Initial release

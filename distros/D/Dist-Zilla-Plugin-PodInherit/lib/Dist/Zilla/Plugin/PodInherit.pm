@@ -2,18 +2,19 @@ package Dist::Zilla::Plugin::PodInherit;
 # ABSTRACT: autogenerate inherited POD sections for Dist::Zilla distributions
 use strict;
 use warnings;
+
 use Moose;
 use Pod::Inherit;
+use Module::Load;
 
-our $VERSION = '0.007';
+use Dist::Zilla::File::InMemory;
+
+our $VERSION = '0.009';
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
 
 Dist::Zilla::Plugin::PodInherit - use L<Pod::Inherit> to provide C<INHERITED METHODS> sections in POD
-
-=head1 VERSION
-
-version 0.007
 
 =head1 SYNOPSIS
 
@@ -27,11 +28,10 @@ details.
 
 =cut
 
-use Dist::Zilla::File::InMemory;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::FileInjector';
 with 'Dist::Zilla::Role::FileFinderUser' => {
-	default_finders => [ qw( :InstallModules ) ],
+    default_finders => [ qw( :InstallModules ) ],
 };
 
 has generated => is => 'rw', default => 0;
@@ -49,11 +49,11 @@ the ones which end in .pm (case insensitive, will also match .PM).
 =cut
 
 sub gather_files {
-	my ($self) = @_;
-	foreach my $file (@{ $self->found_files }) {
-		$self->process_pod($file) if $file->name =~ /\.pm$/i;
-	}
-	$self->log("Generated " . $self->generated . " POD files");
+    my ($self) = @_;
+    foreach my $file (@{ $self->found_files }) {
+        $self->process_pod($file) if $file->name =~ /\.pm$/i;
+    }
+    $self->log("Generated " . $self->generated . " POD files");
 }
 
 =head2 process_pod
@@ -63,30 +63,38 @@ Calls L<Pod::Inherit> to generate the merged C<.pod> documentation files.
 =cut
 
 sub process_pod {
-	my ($self, $file) = @_;
-	unless(-r $file->name) {
-		$self->log_debug("Skipping " . $file->name . " because we can't read it, probably InMemory/FromCode");
-		return;
-	}
+    my ($self, $file) = @_;
+    unless(-r $file->name) {
+        $self->log_debug("Skipping " . $file->name . " because we can't read it, probably InMemory/FromCode");
+        return;
+    }
 
-	$self->log_debug("Processing " . $file->name . " for inherited methods");
-	local @INC = ('lib/', @INC);
-	my $cfg = Pod::Inherit->new({
-		input_files => [$file->name],
-		skip_underscored => 1,
-		method_format => 'L<%m|%c/%m>',
-		debug => 0,
-	});
-	my $content = $cfg->create_pod($file->name) or return;
-	(my $output = $file->name) =~ s{\.pm$}{.pod}i;
-	$self->add_file(
-		my $new = Dist::Zilla::File::InMemory->new({
-			name    => $output,
-			content => $content,
-		})
-	);
-	$self->log_debug("Generated POD for " . $file->name . " in " . $new->name);
-	$self->generated($self->generated + 1);
+    $self->log_debug("Processing " . $file->name . " for inherited methods");
+    local @INC = ('lib/', @INC);
+    my $name = $file->name;
+    my $cfg = Pod::Inherit->new({
+        input_files => [$name],
+        skip_underscored => 1,
+        method_format => 'L<%m|%c/%m>',
+        debug => 0,
+    });
+    Module::Load::load($cfg->_file_to_package($name));
+    my $content = $cfg->create_pod($name) or return;
+
+    # The encoding line does not make it through to the target file, so we
+    # hardcode a value here. Ideally it'd match the original source... but
+    # even more ideally, everything uses UTF-8 everywhere.
+    $content = "=encoding utf8\n\n$content" unless $content =~ /^=encoding/;
+
+    (my $output = $file->name) =~ s{\.pm$}{.pod}i;
+    $self->add_file(
+        my $new = Dist::Zilla::File::InMemory->new({
+            name    => $output,
+            content => $content,
+        })
+    );
+    $self->log_debug("Generated POD for " . $file->name . " in " . $new->name);
+    $self->generated($self->generated + 1);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -118,8 +126,9 @@ directly so perhaps that would be a better approach.
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2012-2013. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2012-2020. Licensed under the same terms as Perl itself.
+

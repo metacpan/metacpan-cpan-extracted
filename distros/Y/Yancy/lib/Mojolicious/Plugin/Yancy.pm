@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.066';
+our $VERSION = '1.067';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -560,6 +560,11 @@ our $VERSION = '1.066';
 #pod Get or set the JSON schema for the given schema C<$name>. If no
 #pod schema name is given, returns a hashref of all the schema.
 #pod
+#pod =head2 log_die
+#pod
+#pod Raise an exception with L<Mojo::Exception/raise>, first logging
+#pod using L<Mojo::Log/fatal> (through the L<C<log> helper|Mojolicious::Plugin::DefaultHelpers/log>.
+#pod
 #pod =head1 TEMPLATES
 #pod
 #pod This plugin uses the following templates. To override these templates
@@ -700,6 +705,7 @@ sub register {
     $app->helper( 'yancy.create' => \&_helper_create );
     $app->helper( 'yancy.validate' => \&_helper_validate );
     $app->helper( 'yancy.routify' => \&_helper_routify );
+    $app->helper( 'log_die' => \&_helper_log_die );
 
     # Default form is Bootstrap4. Any form plugin added after this will
     # override this one
@@ -992,7 +998,7 @@ sub _helper_filter_apply {
         for my $filter ( @{ $prop_filters } ) {
             ( $filter, my @params ) = @$filter if ref $filter eq 'ARRAY';
             my $sub = $filters->{ $filter };
-            die "Unknown filter: $filter (schema: $schema_name, field: $key)"
+            $c->log_die( "Unknown filter: $filter (schema: $schema_name, field: $key)" )
                 unless $sub;
             $item = { %$item, $key => $sub->(
                 $key, $item->{ $key }, $schema->{properties}{ $key }, @params
@@ -1003,7 +1009,7 @@ sub _helper_filter_apply {
         for my $filter ( @{ $schema_filters } ) {
             ( $filter, my @params ) = @$filter if ref $filter eq 'ARRAY';
             my $sub = $filters->{ $filter };
-            die "Unknown filter: $filter (schema: $schema_name)"
+            $c->log_die( "Unknown filter: $filter (schema: $schema_name)" )
                 unless $sub;
             $item = $sub->( $schema_name, $item, $schema, @params );
         }
@@ -1048,6 +1054,21 @@ sub _helper_routify {
     }
 }
 
+sub _helper_log_die {
+    my ( $self, $class, $err ) = @_;
+    # XXX: Handle JSON::Validator errors
+    if ( !$err ) {
+        $err = $class;
+        $class = 'Mojo::Exception';
+    }
+    if ( !$class->can( 'new' ) ) {
+        die $@ unless eval "package $class; use Mojo::Base 'Mojo::Exception'; 1";
+    }
+    my $e = $class->new( $err )->trace( 2 );
+    $self->log->fatal( $e );
+    die $e;
+}
+
 1;
 
 __END__
@@ -1060,7 +1081,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.066
+version 1.067
 
 =head1 SYNOPSIS
 
@@ -1619,6 +1640,11 @@ the code-refs.
 
 Get or set the JSON schema for the given schema C<$name>. If no
 schema name is given, returns a hashref of all the schema.
+
+=head2 log_die
+
+Raise an exception with L<Mojo::Exception/raise>, first logging
+using L<Mojo::Log/fatal> (through the L<C<log> helper|Mojolicious::Plugin::DefaultHelpers/log>.
 
 =head1 TEMPLATES
 

@@ -17,10 +17,10 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Exporter' => '0',
                                       'IPC::Open3' => '0',
-                                      'Moo' => '0',
+                                      'POSIX' => '0',
                                       'Symbol' => '0',
-                                      'Types::Standard' => '0',
-                                      'base' => '0'
+                                      'base' => '0',
+                                      'overload' => '0'
                                     }
                     },
        'test' => {
@@ -30,7 +30,6 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Guard' => '0',
                                    'Test::More' => '0',
                                    'Test::Pod' => '0'
                                  }

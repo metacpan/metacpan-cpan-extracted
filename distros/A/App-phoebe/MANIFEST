@@ -1,9 +1,9 @@
 Changes
+CONTRIBUTING.md
 lib/App/phoebe.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-CONTRIBUTING.md
 README.md
 script/gemini
 script/phoebe
@@ -13,12 +13,10 @@ t/alex.jpg
 t/archive-spaces.t
 t/archive.t
 t/basics.t
-t/cert.pem
 t/encoding.t
 t/gemini-diagnostics.t
 t/html-spaces.t
 t/html.t
-t/key.pem
 t/locks.t
 t/spaces.t
 t/test.pl

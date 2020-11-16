@@ -15,7 +15,7 @@ plan skip_all => 'No display' if !Tk::Exists($mw);
 plan tests => 6;
 
 my $gv = $mw->GraphViz();
-ok ( $gv );
+ok $gv, 'widget';
 
 # Render the graph from the file
 ok ( eval { $gv->show ( dirname(__FILE__).'/test1.dot' ) } );

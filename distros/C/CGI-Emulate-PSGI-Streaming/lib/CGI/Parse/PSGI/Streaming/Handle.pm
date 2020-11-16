@@ -1,7 +1,7 @@
 package CGI::Parse::PSGI::Streaming::Handle;
 use strict;
 use warnings;
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 use POSIX 'SEEK_SET';
 use parent 'Tie::Handle';
 
@@ -15,6 +15,10 @@ sub TIEHANDLE {
     # to
     my $self = { cb => $callback, buffer => '' };
     open $self->{fh},'>',\($self->{buffer});
+    # make it auto-flush, otherwise we run the risk of losing bits of
+    # data in WRITE
+    my $oldfh = select($self->{fh}); $| = 1; select($oldfh); ## no critic(ProhibitOneArgSelect,RequireLocalizedPunctuationVars)
+
     return bless $self, $class;
 }
 
@@ -67,7 +71,7 @@ CGI::Parse::PSGI::Streaming::Handle - internal class for the tied handle
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 DESCRIPTION
 

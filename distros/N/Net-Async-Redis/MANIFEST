@@ -17,6 +17,7 @@ examples/incr-ratelimit.pl
 examples/job-benchmark.pl
 examples/job-hash-submit.pl
 examples/job-hash-worker.pl
+examples/job-queue.pl
 examples/job-submit.pl
 examples/job-worker.pl
 examples/lrange.pl
@@ -26,7 +27,6 @@ examples/ping.pl
 examples/pub.pl
 examples/redis-cli
 examples/sub.pl
-job-queue.pl
 lib/Net/Async/Redis.pm
 lib/Net/Async/Redis.pod
 lib/Net/Async/Redis/Cluster.pm
@@ -55,6 +55,7 @@ t/hash_slot.t
 t/multi.t
 t/pipeline.t
 t/protocol.t
+t/protocol_compatibility_test.t
 t/psubscribe.t
 t/pubsub.t
 t/watch_keyspace.t

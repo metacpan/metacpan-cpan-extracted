@@ -9,9 +9,10 @@ use List::Util qw( none first );
 use Scalar::Util;
 use YAML::XS;
 use File::FormatIdentification::Regex;
+use v5.21; # special regex syntax introduced with 5.21 needed!
 use Moose;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 # ABSTRACT Perl extension for parsing PRONOM-Signatures using DROID-Signature file
 
@@ -962,7 +963,7 @@ File::FormatIdentification::Pronom
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

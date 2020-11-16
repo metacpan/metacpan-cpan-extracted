@@ -1,7 +1,7 @@
 package CGI::Emulate::PSGI::Streaming;
 use strict;
 use warnings;
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 use parent 'CGI::Emulate::PSGI';
 use CGI::Parse::PSGI::Streaming;
 use SelectSaver;
@@ -59,7 +59,7 @@ CGI::Emulate::PSGI::Streaming - streaming PSGI adapter for CGI
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

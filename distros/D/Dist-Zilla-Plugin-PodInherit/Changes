@@ -1,5 +1,20 @@
 Revision history for Dist-Zilla-Plugin-PodInherit
 
+0.009     2020-11-16 05:19:03+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - hardcoded `=encoding utf8` in generated POD, because
+    Pod::Inherit does not seem to preserve this information.
+
+0.008     2020-11-16 04:43:13+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - work around relative-`do` in Pod::Inherit by making sure
+    that we load each file ourselves, this prepopulates in %INC
+    and means that we should skip the file-loading step
+
 0.007     2013-08-04 03:20:10 Europe/London
 	No functional changes
 

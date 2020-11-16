@@ -1,5 +1,18 @@
 Revision history for Dist-Zilla-PluginBundle-Author-TEAM
 
+0.005     2020-11-16 05:00:39+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Functional changes:
+
+    - AutoPrereqs removed, since it was causing more trouble that it's worth
+    (picks up "require" and other lines and can lead to dependency cycles)
+
+    Bugs fixed:
+
+    - pull in PodInherit 0.008 so that builds work without a
+    patched Pod::Inherit.
+
 0.004     2020-06-08 14:39:00+08:00 Asia/Kuala_Lumpur
     Avoid running xt/ tests twice
 

@@ -51,15 +51,14 @@
          "requires" : {
             "Perl::Critic" : "0",
             "Test2::V0" : "0",
-            "Test::More" : "0.98",
-            "Test::Perl::Critic" : "0"
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "Perl::Critic::Policy::ProhibitOrReturn" : {
          "file" : "lib/Perl/Critic/Policy/ProhibitOrReturn.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -73,7 +72,7 @@
          "web" : "https://github.com/utgwkk/Perl-Critic-Policy-ProhibitOrReturn"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTGWKK",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

@@ -5,7 +5,7 @@ use lib '../blib/lib';
 use Tk;
 use Tk::GraphViz;
 
-my $mw = new MainWindow ();
+my $mw = MainWindow->new();
 my $gv = $mw->Scrolled ( 'GraphViz',
 			 -background => 'white',
 			 -scrollbars => 'sw' )

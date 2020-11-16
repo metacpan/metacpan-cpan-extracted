@@ -1,28 +1,21 @@
 package IPC::Simple::Channel;
-$IPC::Simple::Channel::VERSION = '0.03';
+$IPC::Simple::Channel::VERSION = '0.04';
 use strict;
 use warnings;
 
-use AnyEvent;
-use Moo;
-use Types::Standard -types;
+use AnyEvent qw();
 
-has waiters =>
-  is => 'ro',
-  isa => ArrayRef[InstanceOf['AnyEvent::CondVar']],
-  default => sub{ [] };
+sub new {
+  my ($class) = @_;
 
-has buffer =>
-  is => 'ro',
-  isa => ArrayRef,
-  default => sub{ [] };
+  bless{
+    waiters     => [],
+    buffer      => [],
+    is_shutdown => 0,
+  }, $class;
+}
 
-has is_shutdown =>
-  is => 'rw',
-  isa => Bool,
-  default => 0;
-
-sub DEMOLISH {
+sub DESTROY {
   my $self = shift;
   $self->shutdown;
 }
@@ -30,28 +23,38 @@ sub DEMOLISH {
 sub shutdown {
   my $self = shift;
 
-  $self->is_shutdown(1);
+  $self->{is_shutdown} = 1;
 
   # flush any remaining messages that have pending receivers
   $self->flush;
 
   # send undef to any remaining receivers
-  $_->send for @{ $self->waiters };
+  $_->send for @{ $self->{waiters} };
 }
 
 sub size {
   my $self = shift;
-  return scalar @{ $self->buffer };
+  return scalar @{ $self->{buffer} };
 }
 
 sub put {
   my $self = shift;
-  push @{ $self->buffer }, @_;
+  push @{ $self->{buffer} }, @_;
   $self->flush;
-  return $self->size;
+  return $self->{size};
 }
 
 sub get {
+  my $self = shift;
+  $self->async->recv;
+}
+
+sub recv {
+  my $self = shift;
+  $self->async->recv;
+}
+
+sub next {
   my $self = shift;
   $self->async->recv;
 }
@@ -60,13 +63,13 @@ sub async {
   my $self = shift;
   my $cv = AnyEvent->condvar;
 
-  if ($self->is_shutdown) {
-    my $msg = shift @{ $self->buffer };
+  if ($self->{is_shutdown}) {
+    my $msg = shift @{ $self->{buffer} };
     $cv->send($msg);
     return $cv;
   }
   else {
-    push @{ $self->waiters }, $cv;
+    push @{ $self->{waiters} }, $cv;
     $self->flush;
     return $cv;
   }
@@ -74,9 +77,9 @@ sub async {
 
 sub flush {
   my $self = shift;
-  while (@{ $self->waiters } && @{ $self->buffer }) {
-    my $cv = shift @{ $self->waiters };
-    $cv->send( shift @{ $self->buffer } );
+  while (@{ $self->{waiters} } && @{ $self->{buffer} }) {
+    my $cv = shift @{ $self->{waiters} };
+    $cv->send( shift @{ $self->{buffer} } );
   }
 }
 
@@ -94,7 +97,7 @@ IPC::Simple::Channel
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

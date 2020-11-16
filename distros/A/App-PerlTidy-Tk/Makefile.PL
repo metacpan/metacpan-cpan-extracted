@@ -30,7 +30,7 @@ WriteMakefile(
              repository => {
                  type => 'git',
                  url  => 'https://github.com/szabgab/App-PerlTidy-Tk.git',
-                 web  => 'https://github.com/szabgab/App-PerlTidy-Tk.com',
+                 web  => 'https://github.com/szabgab/App-PerlTidy-Tk',
              },
              bugtracker => {web => 'https://github.com/szabgab/App-PerlTidy-Tk/issues'},
              homepage   => 'https://perlmaven.com/tk',

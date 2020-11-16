@@ -1,0 +1,10 @@
+#!perl
+
+use 5.006;
+use strict;
+use warnings;
+use lib 'lib';
+
+use App::GhaInstall;
+
+exit( 'App::GhaInstall'->go( @ARGV ) );

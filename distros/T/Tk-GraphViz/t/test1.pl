@@ -6,7 +6,7 @@ use Tk::GraphViz;
 use Tk;
 use GraphViz;
 
-my $mw = new MainWindow ();
+my $mw = MainWindow->new();
 
 my $gv = $mw->Scrolled ( 'GraphViz',
 			-background => 'white',

@@ -4,7 +4,7 @@ use Test::More;
 
 use App::PerlTidy::Tk;
 
-if (not $ENV{TRAVIS}) {
+if (not $ENV{TRAVIS} and not $ENV{GITHUB_ACTIONS}) {
     App::PerlTidy::Tk->new;
 }
 

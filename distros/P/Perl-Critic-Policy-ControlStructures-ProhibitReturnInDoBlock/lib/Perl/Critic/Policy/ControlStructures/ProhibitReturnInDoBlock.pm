@@ -8,11 +8,11 @@ use Perl::Critic::Utils qw(:severities);
 use constant DESC => '"return" statement in "do" block.';
 use constant EXPL => 'A "return" in "do" block causes confusing behavior.';
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub supported_parameters { return (); }
 sub default_severity     { return $SEVERITY_HIGHEST; }
-sub default_themes       { return qw(core bugs); }
+sub default_themes       { return qw(bugs complexity); }
 sub applies_to           { return 'PPI::Structure::Block'; }
 
 sub violates {

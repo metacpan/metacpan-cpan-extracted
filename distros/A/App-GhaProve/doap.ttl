@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "App-GhaProve";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-app-ghaprove>;
@@ -42,30 +42,68 @@
 
 <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>
 	a                    doap:Version;
-	rdfs:label           "Fixed exit code";
 	dc:identifier        "App-GhaProve-0.002"^^xsd:string;
 	dc:issued            "2020-11-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Attempt at fixing exit code.";
+		];
+	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>
 	a                    doap:Version;
-	rdfs:label           "Really fixed exit code";
 	dc:identifier        "App-GhaProve-0.003"^^xsd:string;
 	dc:issued            "2020-11-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Another attempt at fixing exit code.";
+		];
+	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.003.tar.gz>;
 	doap:revision        "0.003"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>
 	a                    doap:Version;
-	rdfs:label           "I really hate exit codes";
 	dc:identifier        "App-GhaProve-0.004"^^xsd:string;
 	dc:issued            "2020-11-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Actually fix exit code.";
+		];
+	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.004.tar.gz>;
 	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "App-GhaProve-0.005"^^xsd:string;
+	dc:issued            "2020-11-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Add a SYNOPSIS and DESCRIPTION.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add pod to the script itself.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Move the bulk of the work from the script to the module.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test that the module does more than just compile okay.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -1,0 +1,74 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Dist::Zilla::Plugin::PodInherit
+at lib/Dist/Zilla/Plugin/PodInherit.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Dist::Zilla::Plugin::PodInherit - use L<Pod::Inherit> to provide C<INHERITED METHODS> sections in POD
+
+=head1 SYNOPSIS
+
+Just add [PodInherit] to dist.ini. Currently there's no config options at all.
+
+=head1 DESCRIPTION
+
+Simple wrapper around L<Pod::Inherit> to provide an 'inherited methods' section for
+any modules in this distribution. See the documentation for L<Pod::Inherit> for more
+details.
+
+=head1 METHODS
+
+=head2 gather_files
+
+Called for each matching file (using :InstallModules so we expect
+to find all the .pm files), we'll attempt to do pod generation for
+the ones which end in .pm (case insensitive, will also match .PM).
+
+=head2 process_pod
+
+Calls L<Pod::Inherit> to generate the merged C<.pod> documentation files.
+
+=head1 BUGS
+
+Some of the path and extension handling may be non-portable, should probably
+use L<File::Basename> and L<File::Spec>.
+
+Also, generating an entire .pod output file which is identical apart from the
+extra inherited methods section seems suboptimal, other plugins such as
+L<Dist::Zilla::Plugin::PodVersion> manage to update the source .pm file
+directly so perhaps that would be a better approach.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Pod::POM>
+
+=item * L<Pod::Inherit>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2020. Licensed under the same terms as Perl itself.
+

@@ -59,7 +59,7 @@
    "provides" : {
       "Perl::Critic::Policy::ControlStructures::ProhibitReturnInDoBlock" : {
          "file" : "lib/Perl/Critic/Policy/ControlStructures/ProhibitReturnInDoBlock.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/utgwkk/Perl-Critic-Policy-ControlStructures-ProhibitReturnInDoBlock"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:UTGWKK",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

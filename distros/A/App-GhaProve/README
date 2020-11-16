@@ -1,22 +1,48 @@
 NAME
     App::GhaProve - provides gha-prove app
 
+SYNOPSIS
+    From command-line:
+
+      $ gha-prove -b -r -v 't'
+      ...
+
+    In script:
+
+      use App::GhaProve;
+      my @args = qw( -b -r -v t );
+      my $exit = 'App::GhaProve'->go( @args );
+      exit( $exit );
+
+    With a callback (instead of `CORE::system`):
+
+      use App::GhaProve;
+      my @args = qw( -b -r -v t );
+      my $exit = 'App::GhaProve'->go( sub { ... }, @args );
+      exit( $exit );
+
+DESCRIPTION
+    `gha-prove` is just a small wrapper around the `prove` command. It will
+    inspect `GHA_*` environment variables and this will affect how it calls
+    `prove`, perhaps calling `prove` multiple times. It is intended to be used
+    in continuous integration environments, such as GitHub Actions.
+
+    Setting `$App::GhaProve::QUIET = 1` will suppress additional output from
+    App::GhaProve, showing only output from `prove`. (There is very little
+    output from App::GhaProve anyway.)
+
 ENVIRONMENT
     `GHA_TESTING_COVER=1` or `GHA_TESTING_COVER=true`
-
-    Turn on Devel::Cover.
+        Turn on Devel::Cover.
 
     `GHA_TESTING_MODE=0` or `GHA_TESTING_MODE=standard`
-
-    Run test suite without EXTENDED_TESTING.
+        Run test suite without EXTENDED_TESTING.
 
     `GHA_TESTING_MODE=1` or `GHA_TESTING_MODE=extended`
-
-    Run test suite with EXTENDED_TESTING=1.
+        Run test suite with EXTENDED_TESTING=1.
 
     `GHA_TESTING_MODE=2` or `GHA_TESTING_MODE=both`
-
-    Run test suite twice, using each of the above.
+        Run test suite twice, using each of the above.
 
 BUGS
     Please report any bugs to

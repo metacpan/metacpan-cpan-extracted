@@ -1,0 +1,48 @@
+NAME
+    App::GhaInstall - provides the gha-install command
+
+SYNOPSIS
+    Install dependencies for a distribution, assuming you're in the distro's
+    root directory (where Makefile.PL and META.json live):
+
+      $ gha-install --configure
+      $ perl Makefile.PL
+      $ gha-install --auto
+
+    Install things by name:
+
+      $ gha-install HTTP::Tiny
+
+    Install things by name, but ignore failures:
+
+      $ gha-install --allow-fail HTTP::Tiny
+
+DESCRIPTION
+    This is a wrapper around App::cpanminus, App::cpm, or CPAN, depending on
+    what is available. Mostly because App::cpanminus doesn't work on Perl 5.6.
+
+    Copies of YAML::Tiny and JSON::Tiny are bundled, just in case.
+
+    `gha-install` is intended to be packable with App::FatPacker.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaInstall>.
+
+SEE ALSO
+    App::cpanminus, App::cpm, CPAN.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

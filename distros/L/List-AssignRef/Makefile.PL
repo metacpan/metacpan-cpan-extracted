@@ -4,43 +4,44 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "assign an arrayref to an array sensibly",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "List-AssignRef",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => { "Exporter::Shiny" => 0, "LV" => 0, "perl" => 5.006 },
+  "abstract"         => "assign an arrayref to an array sensibly",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => { requires => { "List::MoreUtils" => 0, "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "List::AssignRef" => { file => "lib/List/AssignRef.pm", version => 0.004 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=List-AssignRef",
-                                        },
-                        homepage     => "https://metacpan.org/release/List-AssignRef",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-list-assignref.git",
-                                          web  => "https://github.com/tobyink/p5-list-assignref",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/List-AssignRef/project",
-                      },
-  "version"        => 0.004,
+  "name"             => "List-AssignRef",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => { "Exporter::Shiny" => 0, "LV" => 0, "parent" => 0, "perl" => 5.006 },
+                          },
+                          test => { requires => { "List::MoreUtils" => 0, "Test::More" => 0.61 } },
+                        },
+  "provides"         => {
+                          "List::AssignRef" => { file => "lib/List/AssignRef.pm", version => 0.005 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=List-AssignRef",
+                                          },
+                          homepage     => "https://metacpan.org/release/List-AssignRef",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-list-assignref.git",
+                                            web  => "https://github.com/tobyink/p5-list-assignref",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/List-AssignRef/project",
+                        },
+  "version"          => 0.005,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;
@@ -114,28 +115,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

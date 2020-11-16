@@ -12,7 +12,7 @@
 <http://purl.org/NET/cpan-uri/dist/List-AssignRef/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "LV"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "LV"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "List::MoreUtils"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=List-AssignRef>;
 	doap:created         "2012-11-01"^^xsd:date;
@@ -23,7 +23,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "List-AssignRef";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-001>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-002>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-003>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-001>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-002>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-003>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-004>, <http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-list-assignref>;
@@ -90,6 +90,21 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/List-AssignRef-0.004.tar.gz>;
 	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/List-AssignRef/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "seventy-four months later...";
+	dc:identifier        "List-AssignRef-0.005"^^xsd:string;
+	dc:issued            "2020-11-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing parent.pm dependency.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/List-AssignRef-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

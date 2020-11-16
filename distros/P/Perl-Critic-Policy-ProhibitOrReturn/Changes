@@ -1,5 +1,10 @@
 Revision history for Perl extension Perl-Critic-Policy-ProhibitOrReturn
 
+0.02 2020-11-16T02:06:43Z
+
+    - Change default themes (github PR: #1)
+    - Remove Test::Perl::Critic dependency (github PR: #2)
+
 0.01 2020-11-12T05:56:07Z
 
     - original version

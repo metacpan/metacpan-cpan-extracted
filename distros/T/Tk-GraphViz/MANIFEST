@@ -59,7 +59,9 @@ t/graphs/directed/unix2.dot
 t/graphs/directed/unix2k.dot
 t/graphs/directed/viewfile.dot
 t/graphs/directed/world.dot
+t/graphs/makefile-small.dot
 t/graphs/makefile.dot
+t/record.t
 t/test1.dot
 t/test1.pl
 t/test2.pl

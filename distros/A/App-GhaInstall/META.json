@@ -1,0 +1,86 @@
+{
+   "abstract" : "provides the gha-install command",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-GhaInstall",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "App::GhaInstall" : {
+         "file" : "lib/App/GhaInstall.pm",
+         "version" : "0.002"
+      },
+      "JSON::Tiny" : {
+         "file" : "lib/App/GhaInstall/JSON.pm",
+         "version" : "0.58"
+      },
+      "YAML::Tiny" : {
+         "file" : "lib/App/GhaInstall/YAML.pm",
+         "version" : "1.56"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=App-GhaInstall"
+      },
+      "homepage" : "https://metacpan.org/release/App-GhaInstall",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-app-ghainstall.git",
+         "web" : "https://github.com/tobyink/p5-app-ghainstall"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-GhaInstall/project"
+   },
+   "version" : "0.002",
+   "x_provides_scripts" : {
+      "gha-install" : {
+         "file" : "bin/gha-install"
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

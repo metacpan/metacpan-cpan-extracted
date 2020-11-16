@@ -1,8 +1,7 @@
 package Net::Jabber::Bot;
 
 use Moose;
-use MooseX::Types
-    -declare => [qw( JabberClientObject PosInt PosNum HundredInt )];
+use MooseX::Types -declare => [qw( JabberClientObject PosInt PosNum HundredInt )];
 
 # import builtin types
 use MooseX::Types::Moose qw/Int HashRef Str Maybe ArrayRef Bool CodeRef Object Num/;
@@ -15,60 +14,72 @@ use Log::Log4perl qw(:easy);
 use Mozilla::CA;
 
 coerce Bool, from Str,
-    via {($_ =~ m/(^on$)|(^true$)/i) + 0}; # True if it's on or true. Otherwise false.
+  via { ( $_ =~ m/(^on$)|(^true$)/i ) + 0 };    # True if it's on or true. Otherwise false.
 
 subtype JabberClientObject, as Object, where { $_->isa('Net::Jabber::Client') };
 
 subtype PosInt,     as Int, where { $_ > 0 };
 subtype PosNum,     as Num, where { $_ > 0 };
-subtype HundredInt, as Num,  where { $_ > 100 };
+subtype HundredInt, as Num, where { $_ > 100 };
 
-has jabber_client               => (isa => Maybe[JabberClientObject],
-                                    is => 'rw',
-                                    default => sub {Net::Jabber::Client->new});
+has jabber_client => (
+    isa     => Maybe [JabberClientObject],
+    is      => 'rw',
+    default => sub { Net::Jabber::Client->new }
+);
+
 #my %connection_hash : ATTR; # Keep track of connection options fed to client.
 
-has 'client_session_id'   => (isa => Str, is => 'rw');
-has 'connect_time'        => (isa => PosInt, is => 'rw', default => 9_999_999_999);
-has 'forum_join_grace'    => (isa => PosNum, is => 'rw', default => 10);
-has 'server_host'         => (isa => Str, is => 'rw', lazy => 1, default => sub{shift->server });
-has 'server'              => (isa => Str, is => 'rw');
-has 'port'                => (isa => PosInt, is => 'rw', default => 5222);
-has 'tls'                 => (isa => Bool, is => 'rw', default => '0');
-has 'ssl_ca_path'         => (isa => Str, is => 'rw', default => Mozilla::CA::SSL_ca_file());
-has 'ssl_verify'          => (isa => Bool, is => 'rw', default => '1');
-has 'connection_type'     => (isa => Str, is => 'rw', default => 'tcpip');
-has 'conference_server'   => (isa => Str, is => 'rw');
-has 'username'            => (isa => Str, is => 'rw');
-has 'password'            => (isa => Str, is => 'rw');
-has 'alias'               => (isa => Str, lazy => 1, is => 'rw', default => 'net_jabber_bot');
+has 'client_session_id' => ( isa => Str,    is   => 'rw' );
+has 'connect_time'      => ( isa => PosInt, is   => 'rw', default => 9_999_999_999 );
+has 'forum_join_grace'  => ( isa => PosNum, is   => 'rw', default => 10 );
+has 'server_host'       => ( isa => Str,    is   => 'rw', lazy    => 1, default => sub { shift->server } );
+has 'server'            => ( isa => Str,    is   => 'rw' );
+has 'port'              => ( isa => PosInt, is   => 'rw', default => 5222 );
+has 'tls'               => ( isa => Bool,   is   => 'rw', default => '0' );
+has 'ssl_ca_path'       => ( isa => Str,    is   => 'rw', default => Mozilla::CA::SSL_ca_file() );
+has 'ssl_verify'        => ( isa => Bool,   is   => 'rw', default => '1' );
+has 'connection_type'   => ( isa => Str,    is   => 'rw', default => 'tcpip' );
+has 'conference_server' => ( isa => Str,    is   => 'rw' );
+has 'username'          => ( isa => Str,    is   => 'rw' );
+has 'password'          => ( isa => Str,    is   => 'rw' );
+has 'alias'             => ( isa => Str,    lazy => 1, is => 'rw', default => 'net_jabber_bot' );
+
 # Resource defaults to alias_hostname_pid
-has 'resource'            => (isa => Str, lazy => 1, is => 'rw', default => sub{shift->alias . "_" . hostname . "_" . $$});
-has 'message_function'    => (isa => Maybe[CodeRef], is => 'rw', default => sub{undef});
-has 'background_function' => (isa => Maybe[CodeRef], is => 'rw', default => sub{undef});
-has 'loop_sleep_time'     => (isa => PosNum, is => 'rw', default => 5);
-has 'process_timeout'     => (isa => PosNum, is => 'rw', default => 5);
-has 'from_full'           => (isa => Str, lazy => 1, is => 'rw', default => sub{my $self = shift;
-                                                                       $self->username || ''  .
-                                                                       '@' .
-                                                                       $self->server || '' .
-                                                                       '/' .
-                                                                       $self->alias || '' });
+has 'resource'            => ( isa => Str, lazy => 1, is => 'rw', default => sub { shift->alias . "_" . hostname . "_" . $$ } );
+has 'message_function'    => ( isa => Maybe [CodeRef], is => 'rw', default => sub { undef } );
+has 'background_function' => ( isa => Maybe [CodeRef], is => 'rw', default => sub { undef } );
+has 'loop_sleep_time'     => ( isa => PosNum, is => 'rw', default => 5 );
+has 'process_timeout'     => ( isa => PosNum, is => 'rw', default => 5 );
+has 'from_full'           => (
+    isa     => Str,
+    lazy    => 1,
+    is      => 'rw',
+    default => sub {
+        my $self = shift;
+        $self->username || '' . '@' . $self->server || '' . '/' . $self->alias || '';
+    }
+);
 
-has 'safety_mode'            => (isa => Bool, is => 'rw', default => 1, coerce => 1);
-has 'ignore_server_messages' => (isa => Bool, is => 'rw', default => 1, coerce => 1);
-has 'ignore_self_messages'   => (isa => Bool, is => 'rw', default => 1, coerce => 1);
-has 'forums_and_responses'   => (isa => HashRef[ArrayRef[Str]], is => 'rw'); # List of forums we're in and the strings we monitor for.
-has 'forum_join_time'        => (isa => HashRef[Int], is => 'rw', default => sub{{}}); # List of when we joined each forum
-has 'out_messages_per_second' => (isa => PosNum, is => 'rw', default => sub{5});
-has 'message_delay'           => (isa => PosNum, is => 'rw', default => sub {1/5});
+has 'safety_mode'             => ( isa => Bool, is => 'rw', default => 1, coerce => 1 );
+has 'ignore_server_messages'  => ( isa => Bool, is => 'rw', default => 1, coerce => 1 );
+has 'ignore_self_messages'    => ( isa => Bool, is => 'rw', default => 1, coerce => 1 );
+has 'forums_and_responses'    => ( isa => HashRef [ ArrayRef [Str] ], is => 'rw' );              # List of forums we're in and the strings we monitor for.
+has 'forum_join_time'         => ( isa => HashRef [Int], is => 'rw', default => sub { {} } );    # List of when we joined each forum
+has 'out_messages_per_second' => ( isa => PosNum, is => 'rw', default => sub { 5 } );
+has 'message_delay'           => ( isa => PosNum, is => 'rw', default => sub { 1 / 5 } );
 
-has 'max_message_size'        => (isa => HundredInt, is => 'rw', default => 1000000);
-has 'max_messages_per_hour'   => (isa => PosInt,     is => 'rw', default => 1000000);
+has 'max_message_size'      => ( isa => HundredInt, is => 'rw', default => 1000000 );
+has 'max_messages_per_hour' => ( isa => PosInt,     is => 'rw', default => 1000000 );
 
 # Initialize this hour's message count.
-has 'messages_sent_today'     => (isa => 'HashRef', is => 'ro', default => sub{{(localtime)[7] => {(localtime)[2] => 0}}});
-
+has 'messages_sent_today' => (
+    isa     => 'HashRef',
+    is      => 'ro',
+    default => sub {
+        { (localtime)[7] => { (localtime)[2] => 0 } }
+    }
+);
 
 #my %message_function : ATTR; # What is called if we are fed a new message once we are logged in.
 #my %bot_background_function : ATTR; # What is called if we are fed a new message once we are logged in.
@@ -91,11 +102,11 @@ Net::Jabber::Bot - Automated Bot creation with safeties
 
 =head1 VERSION
 
-Version 2.1.6
+Version 2.1.7
 
 =cut
 
-our $VERSION = '2.1.6';
+our $VERSION = '2.1.7';
 
 =head1 SYNOPSIS
 
@@ -311,41 +322,35 @@ safety: 166
 
 # Handle initialization of objects of this class...
 sub BUILD {
-    my ($self, $params) = @_;
+    my ( $self, $params ) = @_;
 
     # Deal with legacy bug
-    if($params->{background_activity} || $params->{message_callback}) {
-        my $warn_message = "\n\n" 
-                          . "*" x 70 . "\n"
-                          . "WARNING!!! You're using old parameters for your bot initialization\n"
-                          . "'message_callback' should be changed to 'message_function'\n"
-                          . "'background_activity' should be changed to 'background_function'\n"
-                          . "I'm correcting this, but you should fix your code\n"
-                          . "*" x 70 . "\n"
-                          . "\n\n";
+    if ( $params->{background_activity} || $params->{message_callback} ) {
+        my $warn_message = "\n\n" . "*" x 70 . "\n" . "WARNING!!! You're using old parameters for your bot initialization\n" . "'message_callback' should be changed to 'message_function'\n" . "'background_activity' should be changed to 'background_function'\n" . "I'm correcting this, but you should fix your code\n" . "*" x 70 . "\n" . "\n\n";
         warn($warn_message);
         WARN($warn_message);
 
-        $self->background_function($params->{background_activity})
-            if(!$self->background_function && $params->{background_activity});
-        $self->message_function($params->{message_callback})
-            if(!$self->message_function && $params->{message_callback});
+        $self->background_function( $params->{background_activity} )
+          if ( !$self->background_function && $params->{background_activity} );
+        $self->message_function( $params->{message_callback} )
+          if ( !$self->message_function && $params->{message_callback} );
         sleep 30;
-    } 
-    
+    }
+
     # Message delay is inverse of out_messages_per_second
-    $self->message_delay(1/$self->out_messages_per_second);
+    $self->message_delay( 1 / $self->out_messages_per_second );
 
     # Enforce all our safety restrictions here.
-    if($self->safety_mode) {
+    if ( $self->safety_mode ) {
+
         # more than 5 messages per second risks server flooding.
-        $self->message_delay(1/5) if($self->message_delay < 1/5);
+        $self->message_delay( 1 / 5 ) if ( $self->message_delay < 1 / 5 );
 
         # Messages should be small to not overwhelm rooms/people/server
-        $self->max_message_size(1000) if($self->max_message_size > 1000);
+        $self->max_message_size(1000) if ( $self->max_message_size > 1000 );
 
         # More than 4,000 messages a day is a little excessive.
-        $self->max_messages_per_hour(125) if($self->max_messages_per_hour > 166);
+        $self->max_messages_per_hour(125) if ( $self->max_messages_per_hour > 166 );
 
         # Should not be responding to self messages to prevent loops.
         $self->ignore_self_messages(1);
@@ -357,11 +362,11 @@ sub BUILD {
 
 # Return a code reference that will pass self in addition to arguements passed to callback code ref.
 sub _callback_maker {
-    my $self = shift;
+    my $self     = shift;
     my $Function = shift;
 
-#    return sub {return $code_ref->($self, @_);};
-    return sub {return $Function->($self, @_);};
+    #    return sub {return $code_ref->($self, @_);};
+    return sub { return $Function->( $self, @_ ); };
 }
 
 # Creates client object and manages connection. Called on new but also called by re-connect
@@ -372,55 +377,55 @@ sub _init_jabber {
     my $connection = $self->jabber_client;
 
     DEBUG("Set the call backs.");
-    $connection->PresenceDB(); # Init presence DB.
-    $connection->RosterDB(); # Init Roster DB.
-    $connection->SetCallBacks( 'message'  => $self->_callback_maker(\&_process_jabber_message)
-                              ,'presence' => $self->_callback_maker(\&_jabber_presence_message)
-                              ,'iq'       => $self->_callback_maker(\&_jabber_in_iq_message)
-                              );
+    $connection->PresenceDB();    # Init presence DB.
+    $connection->RosterDB();      # Init Roster DB.
+    $connection->SetCallBacks(
+        'message' => $self->_callback_maker( \&_process_jabber_message ), 'presence' => $self->_callback_maker( \&_jabber_presence_message )
+        , 'iq' => $self->_callback_maker( \&_jabber_in_iq_message )
+    );
 
-    DEBUG("Connect. hostname => " . $self->server . ", port => " . $self->port);
+    DEBUG( "Connect. hostname => " . $self->server . ", port => " . $self->port );
     my %client_connect_hash = (
-        hostname => $self->server,
-        port => $self->port,
-        tls => $self->tls,
-        ssl_ca_path => $self->ssl_ca_path,
-        ssl_verify => $self->ssl_verify,
+        hostname       => $self->server,
+        port           => $self->port,
+        tls            => $self->tls,
+        ssl_ca_path    => $self->ssl_ca_path,
+        ssl_verify     => $self->ssl_verify,
         connectiontype => $self->connection_type,
         componentname  => $self->server_host,
     );
 
     my $status = $connection->Connect(%client_connect_hash);
 
-    if(!defined $status) {
-       ERROR("ERROR:  Jabber server is down or connection was not allowed: $!");
-       die("Jabber server is down or connection was not allowed: $!");
+    if ( !defined $status ) {
+        ERROR("ERROR:  Jabber server is down or connection was not allowed: $!");
+        die("Jabber server is down or connection was not allowed: $!");
     }
 
-    DEBUG("Logging in... as user " . $self->username . " / " . $self->resource);
-    DEBUG("PW: " . $self->password);
+    DEBUG( "Logging in... as user " . $self->username . " / " . $self->resource );
+    DEBUG( "PW: " . $self->password );
 
-# Moved into connect hash via 'componentname'
-#    my $sid = $connection->{SESSION}->{id};
-#    $connection->{STREAM}->{SIDS}->{$sid}->{hostname} = $self->server_host;
+    # Moved into connect hash via 'componentname'
+    #    my $sid = $connection->{SESSION}->{id};
+    #    $connection->{STREAM}->{SIDS}->{$sid}->{hostname} = $self->server_host;
 
+    my @auth_result = $connection->AuthSend(
+        username => $self->username,
+        password => $self->password,
+        resource => $self->resource,
+    );
 
-    my @auth_result = $connection->AuthSend(username => $self->username,
-                                            password => $self->password,
-                                            resource => $self->resource,
-                                            );
-
-    if(!defined $auth_result[0] || $auth_result[0] ne "ok") {
-        ERROR("Authorization failed: for " . $self->username . " / " . $self->resource);
+    if ( !defined $auth_result[0] || $auth_result[0] ne "ok" ) {
+        ERROR( "Authorization failed: for " . $self->username . " / " . $self->resource );
         foreach my $result (@auth_result) {
             ERROR("$result");
         }
-        die("Failed to re-connect: " . join("\n", @auth_result));
+        die( "Failed to re-connect: " . join( "\n", @auth_result ) );
     }
 
     $connection->RosterRequest();
 
-    $self->client_session_id($connection->{SESSION}->{id});
+    $self->client_session_id( $connection->{SESSION}->{id} );
 
     DEBUG("Sending presence to tell world that we are logged in");
     $connection->PresenceSend();
@@ -430,12 +435,12 @@ sub _init_jabber {
     $connection->RosterGet();
     $self->Process(5);
 
-    foreach my $forum (keys %{$self->forums_and_responses}) {
+    foreach my $forum ( keys %{ $self->forums_and_responses } ) {
         $self->JoinForum($forum);
     }
 
-    INFO("Connected to server '" . $self->server . "' successfully");
-    $self->connect_time(time); # Track when we came online.
+    INFO( "Connected to server '" . $self->server . "' successfully" );
+    $self->connect_time(time);    # Track when we came online.
     return 1;
 }
 
@@ -450,18 +455,19 @@ NOTE: No error detection for join failure is present at the moment. (TODO)
 =cut
 
 sub JoinForum {
-    my $self = shift;
+    my $self       = shift;
     my $forum_name = shift;
 
-    DEBUG("Joining $forum_name on " . $self->conference_server . " as " . $self->alias);
+    DEBUG( "Joining $forum_name on " . $self->conference_server . " as " . $self->alias );
 
-    $self->jabber_client->MUCJoin(room    => $forum_name,
-                                  server => $self->conference_server,
-                                  nick   => $self->alias,
-                                  );
+    $self->jabber_client->MUCJoin(
+        room   => $forum_name,
+        server => $self->conference_server,
+        nick   => $self->alias,
+    );
 
     $self->forum_join_time->{$forum_name} = time;
-    DEBUG("Sleeping " . $self->message_delay . " seconds");
+    DEBUG( "Sleeping " . $self->message_delay . " seconds" );
     Time::HiRes::sleep $self->message_delay;
 }
 
@@ -474,12 +480,12 @@ You should mostly be calling Start() and just let the Bot kernel handle all this
 
 =cut
 
-sub Process { # Call connection process.
-    my $self = shift;
+sub Process {    # Call connection process.
+    my $self            = shift;
     my $timeout_seconds = shift;
 
     #If not passed explicitly
-    $timeout_seconds = $self->process_timeout if(!defined $timeout_seconds);
+    $timeout_seconds = $self->process_timeout if ( !defined $timeout_seconds );
 
     my $process_return = $self->jabber_client->Process($timeout_seconds);
     return $process_return;
@@ -507,31 +513,30 @@ sub Start {
     my $self = shift;
 
     my $time_between_background_routines = $self->loop_sleep_time;
-    my $process_timeout = $self->process_timeout;
-    my $background_subroutine = $self->background_function;
-    my $message_delay = $self->message_delay;
+    my $process_timeout                  = $self->process_timeout;
+    my $background_subroutine            = $self->background_function;
+    my $message_delay                    = $self->message_delay;
 
-    my $last_background = time - $time_between_background_routines - 1; # Call background process every so often...
-    my $counter = 0; # Keep track of how many times we've looped. Not sure if we'll use this long term.
+    my $last_background = time - $time_between_background_routines - 1;    # Call background process every so often...
+    my $counter         = 0;                                               # Keep track of how many times we've looped. Not sure if we'll use this long term.
 
-    while(1) { # Loop for ever!
-        # Process and re-connect if you have to.
+    while (1) {                                                            # Loop for ever!
+                                                                           # Process and re-connect if you have to.
         my $reconnect_timeout = 1;
-        eval {$self->Process($process_timeout)};
+        eval { $self->Process($process_timeout) };
 
-        if($@) { #Assume the connection is down...
+        if ($@) {                                                          #Assume the connection is down...
             ERROR("Server error: $@");
-            my $message = "Disconnected from " . $self->server . ":" . $self->port
-                        . " as " . $self->username;
+            my $message = "Disconnected from " . $self->server . ":" . $self->port . " as " . $self->username;
 
             ERROR("$message Reconnecting...");
-            sleep 5; # TODO: Make re-connect time flexible somehow
+            sleep 5;                                                       # TODO: Make re-connect time flexible somehow
             $self->ReconnectToServer();
         }
 
         # Call background function
-        if(defined $background_subroutine && $last_background + $time_between_background_routines < time) {
-            &$background_subroutine($self, ++$counter);
+        if ( defined $background_subroutine && $last_background + $time_between_background_routines < time ) {
+            &$background_subroutine( $self, ++$counter );
             $last_background = time;
         }
         Time::HiRes::sleep $message_delay;
@@ -557,13 +562,13 @@ sub ReconnectToServer {
     $self->Disconnect();
 
     my $sleep_time = 5;
-    while (!$self->IsConnected()) { # jabber_client variable defines if we're connected.
+    while ( !$self->IsConnected() ) {    # jabber_client variable defines if we're connected.
         INFO("Sleeping $sleep_time before attempting re-connect");
         sleep $sleep_time;
-        $sleep_time *= 2 if($sleep_time < 300);
+        $sleep_time *= 2 if ( $sleep_time < 300 );
         $self->InitJabber();
         INFO("Running background routine.");
-        &$background_subroutine($self, 0); # call background proc so we can check for errors while down.
+        &$background_subroutine( $self, 0 );    # call background proc so we can check for errors while down.
     }
 }
 
@@ -573,14 +578,13 @@ Disconnects from server if client object is defined. Assures the client object i
 
 =cut
 
-
 sub Disconnect {
     my $self = shift;
 
-    $self->connect_time('9' x 10); # Way in the future
+    $self->connect_time( '9' x 10 );    # Way in the future
 
     INFO("Disconnecting from server");
-    return if(!defined $self->jabber_client); # do not proceed, no object.
+    return if ( !defined $self->jabber_client );    # do not proceed, no object.
 
     $self->jabber_client->Disconnect();
     my $old_client = $self->jabber_client;
@@ -599,11 +603,12 @@ Reports connect state (true/false) based on the status of client_start_time.
 sub IsConnected {
     my $self = shift;
 
-    DEBUG("REF = " . ref($self->jabber_client));
+    DEBUG( "REF = " . ref( $self->jabber_client ) );
     return $self->connect_time;
 }
 
 # TODO: ***NEED VERY GOOD DOCUMENTATION HERE*****
+
 =item B<_process_jabber_message> - DO NOT CALL
 
 Handles incoming messages.
@@ -615,21 +620,21 @@ sub _process_jabber_message {
     DEBUG("_process_jabber_message called");
 
     my $session_id = shift;
-    my $message = shift;
+    my $message    = shift;
 
-    my $type = $message->GetType();
-    my $fromJID = $message->GetFrom("jid");
+    my $type      = $message->GetType();
+    my $fromJID   = $message->GetFrom("jid");
     my $from_full = $message->GetFrom();
 
-    my $from = $fromJID->GetUserID();
+    my $from     = $fromJID->GetUserID();
     my $resource = $fromJID->GetResource();
-    my $subject = $message->GetSubject();
-    my $body = $message->GetBody();
+    my $subject  = $message->GetSubject();
+    my $body     = $message->GetBody();
 
     my $reply_to = $from_full;
-    $reply_to =~ s/\/.*$// if($type eq 'groupchat');
+    $reply_to =~ s/\/.*$// if ( $type eq 'groupchat' );
 
-    # TODO: 
+    # TODO:
     # Don't know exactly why but when a message comes from gtalk-web-interface, it works well, but if the message comes from Gtalk client, bot dies
     #   my $message_date_text;  eval { $message_date_text = $message->GetTimeStamp(); } ; # Eval is a really bad idea. we need to understand why this is failing.
 
@@ -638,30 +643,29 @@ sub _process_jabber_message {
 
     # Ignore any messages within 'forum_join_grace' seconds of start or join of that forum
     my $grace_period = $self->forum_join_grace;
-    my $time_now = time;
-    if($self->connect_time > $time_now - $grace_period
-       || (defined $self->forum_join_time->{$from} && $self->forum_join_time->{$from} > $time_now - $grace_period)) {
+    my $time_now     = time;
+    if ( $self->connect_time > $time_now - $grace_period
+        || ( defined $self->forum_join_time->{$from} && $self->forum_join_time->{$from} > $time_now - $grace_period ) ) {
         my $cond1 = $self->connect_time . " > $time_now - $grace_period";
-        my $cond2 = $self->forum_join_time->{$from} || 'undef'
-                    . " > $time_now - $grace_period";
+        my $cond2 = $self->forum_join_time->{$from} || 'undef' . " > $time_now - $grace_period";
         DEBUG("Ignoring messages cause I'm in startup for forum $from\n$cond1\n$cond2");
-        return; # Ignore messages the first few seconds.
+        return;    # Ignore messages the first few seconds.
     }
 
     # Ignore Group messages with no resource on them. (Server Messages?)
-    if($self->ignore_server_messages) {
-        if($from_full !~ m/^([^\@]+)\@([^\/]+)\/(.+)$/) {
-        DEBUG("Server message? ($from_full) - $message");
-            return if($from_full !~ m/^([^\@]+)\@([^\/]+)\//);
+    if ( $self->ignore_server_messages ) {
+        if ( $from_full !~ m/^([^\@]+)\@([^\/]+)\/(.+)$/ ) {
+            DEBUG("Server message? ($from_full) - $message");
+            return if ( $from_full !~ m/^([^\@]+)\@([^\/]+)\// );
             ERROR("Couldn't recognize from_full ($from_full). Ignoring message: $body");
             return;
         }
     }
 
     # Are these my own messages?
-    if($self->ignore_self_messages ) { # TODO: || $self->safety_mode (this breaks tests in 06?)
-        
-        if(defined $resource && $resource eq $self->resource) { # Ignore my own messages.
+    if ( $self->ignore_self_messages ) {    # TODO: || $self->safety_mode (this breaks tests in 06?)
+
+        if ( defined $resource && $resource eq $self->resource ) {    # Ignore my own messages.
             DEBUG("Ignoring message from self...\n");
             return;
         }
@@ -671,32 +675,34 @@ sub _process_jabber_message {
     my $bot_address_from;
     my @aliases_to_respond_to = $self->get_responses($from);
 
-    if($#aliases_to_respond_to >= 0 and $type eq 'groupchat') {
+    if ( $#aliases_to_respond_to >= 0 and $type eq 'groupchat' ) {
         my $request;
         foreach my $address_type (@aliases_to_respond_to) {
             my $qm_address_type = quotemeta($address_type);
-            next if($body !~ m/^\s*$qm_address_type\s*(\S.*)$/ms);
-            $request = $1;
+            next if ( $body !~ m/^\s*$qm_address_type\s*(\S.*)$/ms );
+            $request          = $1;
             $bot_address_from = $address_type;
-            last; # do not need to loop any more.
+            last;    # do not need to loop any more.
         }
         DEBUG("Message not relevant to bot");
-        return if(!defined $request);
+        return if ( !defined $request );
         $body = $request;
     }
 
     # Call the message callback if it's defined.
-    if( defined $self->message_function) {
-        $self->message_function->(bot_object => $self,
-                                  from_full => $from_full,
-                                  body => $body,
-                                  type => $type,
-                                  reply_to => $reply_to,
-                                  bot_address_from => $bot_address_from,
-                                  message => $message
-                                  );
+    if ( defined $self->message_function ) {
+        $self->message_function->(
+            bot_object       => $self,
+            from_full        => $from_full,
+            body             => $body,
+            type             => $type,
+            reply_to         => $reply_to,
+            bot_address_from => $bot_address_from,
+            message          => $message
+        );
         return;
-    } else {
+    }
+    else {
         WARN("No handler for messages!");
         INFO("New Message: $type from $from ($resource). sub=$subject -- $body");
     }
@@ -715,19 +721,18 @@ sub get_responses {
 
     my $forum = shift;
 
-    if(!defined $forum) {
-    WARN("No forum supplied for get_responses()");
-    return;
+    if ( !defined $forum ) {
+        WARN("No forum supplied for get_responses()");
+        return;
     }
 
     my @aliases_to_respond_to;
-    if(defined $self->forums_and_responses->{$forum}) {
-        @aliases_to_respond_to = @{$self->forums_and_responses->{$forum}};
+    if ( defined $self->forums_and_responses->{$forum} ) {
+        @aliases_to_respond_to = @{ $self->forums_and_responses->{$forum} };
     }
 
     return @aliases_to_respond_to;
 }
-
 
 =item B<_jabber_in_iq_message> - DO NOT CALL
 
@@ -739,43 +744,48 @@ sub _jabber_in_iq_message {
     my $self = shift;
 
     my $session_id = shift;
-    my $iq = shift;
+    my $iq         = shift;
 
-    DEBUG("IQ Message:" . $iq->GetXML());
+    DEBUG( "IQ Message:" . $iq->GetXML() );
     my $from = $iq->GetFrom();
-#    my $type = $iq->GetType();DEBUG("Type=$type");
-    my $query = $iq->GetQuery();#DEBUG("query=" . Dumper($query));
 
-    if (!$query) {
+    #    my $type = $iq->GetType();DEBUG("Type=$type");
+    my $query = $iq->GetQuery();    #DEBUG("query=" . Dumper($query));
+
+    if ( !$query ) {
         DEBUG("iq->GetQuery() returned undef.");
         return;
     }
 
-    my $xmlns = $query->GetXMLNS();DEBUG("xmlns=$xmlns");
+    my $xmlns = $query->GetXMLNS();
+    DEBUG("xmlns=$xmlns");
     my $iqReply;
 
     # Respond to version requests with information about myself.
-    if($xmlns eq "jabber:iq:version") {
+    if ( $xmlns eq "jabber:iq:version" ) {
+
         # convert 5.010000 to 5.10.0
         my $perl_version = $];
-        $perl_version =~ s/(\d{3})(?=\d)/$1./g; 
+        $perl_version =~ s/(\d{3})(?=\d)/$1./g;
         $perl_version =~ s/\.0+(\d)/.$1/;
-        
-        $self->jabber_client
-             ->VersionSend(to=> $from,
-                           name=>__PACKAGE__,
-                           ver=> $VERSION,
-                           os=> "Perl v$perl_version");
-    } else { # Unknown request. Just ignore it.
+
+        $self->jabber_client->VersionSend(
+            to   => $from,
+            name => __PACKAGE__,
+            ver  => $VERSION,
+            os   => "Perl v$perl_version"
+        );
+    }
+    else {    # Unknown request. Just ignore it.
         return;
     }
 
-    if($iqReply) {
-        DEBUG("Reply: ", $iqReply->GetXML());
+    if ($iqReply) {
+        DEBUG( "Reply: ", $iqReply->GetXML() );
         $self->jabber_client->Send($iqReply);
     }
 
-#    INFO("IQ from $from ($type). XMLNS: $xmlns");
+    #    INFO("IQ from $from ($type). XMLNS: $xmlns");
 }
 
 =item B<_jabber_presence_message> - DO NOT CALL
@@ -789,38 +799,43 @@ sub _jabber_presence_message {
     my $self = shift;
 
     my $session_id = shift;
-    my $presence = shift;
+    my $presence   = shift;
 
     my $type = $presence->GetType();
-    if($type eq 'subscribe') { # Always allow people to subscribe to us. Why wouldn't we?
+    if ( $type eq 'subscribe' ) {    # Always allow people to subscribe to us. Why wouldn't we?
         my $from = $presence->GetFrom();
-        $self->jabber_client->Subscription(type=>"subscribe",
-                                              to=>$from);
-        $self->jabber_client->Subscription(type=>"subscribed",to=>$from);
+        $self->jabber_client->Subscription(
+            type => "subscribe",
+            to   => $from
+        );
+        $self->jabber_client->Subscription( type => "subscribed", to => $from );
         INFO("Processed subscription request from $from");
         return;
-    } elsif($type eq 'unsubscribe') { # Always allow people to subscribe to us. Why wouldn't we?
+    }
+    elsif ( $type eq 'unsubscribe' ) {    # Always allow people to subscribe to us. Why wouldn't we?
         my $from = $presence->GetFrom();
-        $self->jabber_client->Subscription(type=>"unsubscribed",
-                                              to=>$from);
+        $self->jabber_client->Subscription(
+            type => "unsubscribed",
+            to   => $from
+        );
         INFO("Processed unsubscribe request from $from");
         return;
     }
-    
+
     # Without explicitly setting a priority, XMPP::Protocol will store all JIDs with an empty
-    # priority under the same key rather than in an array. 
+    # priority under the same key rather than in an array.
     $presence->SetPriority(0) unless $presence->GetPriority();
 
-    $self->jabber_client->PresenceDBParse($presence); # Since we are always an object just throw it into the db.
+    $self->jabber_client->PresenceDBParse($presence);    # Since we are always an object just throw it into the db.
 
     my $from = $presence->GetFrom();
-    $from = "." if(!defined $from);
+    $from = "." if ( !defined $from );
 
     my $status = $presence->GetStatus();
-    $status = "." if(!defined $status);
+    $status = "." if ( !defined $status );
 
     DEBUG("Presence From $from t=$type s=$status");
-    DEBUG("Presence XML: " . $presence->GetXML());
+    DEBUG( "Presence XML: " . $presence->GetXML() );
 }
 
 =item B<respond_to_self_messages>
@@ -832,14 +847,13 @@ Tells the bot to start reacting to it\'s own messages if non-zero is passed. Def
 
 =cut
 
-
 sub respond_to_self_messages {
     my $self = shift;
 
     my $setting = shift;
-    $setting = 1 if(!defined $setting);
+    $setting = 1 if ( !defined $setting );
 
-    $self->ignore_self_messages(!$setting);
+    $self->ignore_self_messages( !$setting );
     return !!$setting;
 }
 
@@ -854,10 +868,10 @@ replys with number of messages sent so far this hour.
 sub get_messages_this_hour {
     my $self = shift;
 
-    my $yday = (localtime)[7];
-    my $hour = (localtime)[2];
+    my $yday               = (localtime)[7];
+    my $hour               = (localtime)[2];
     my $messages_this_hour = $self->messages_sent_today->{$yday}->{$hour};
-    return $messages_this_hour || 0; # Assure it's not undef to avoid math warnings
+    return $messages_this_hour || 0;    # Assure it's not undef to avoid math warnings
 }
 
 =item B<get_safety_mode>
@@ -870,13 +884,13 @@ sub get_safety_mode {
     my $self = shift;
 
     # Must be in safety mode and all thresholds met.
-    my $mode = $self->safety_mode
-          && $self->message_delay >= 1/5
-          && $self->max_message_size <= 1000
-          && $self->max_messages_per_hour <= 166
-          && $self->ignore_self_messages
-         ;
-         
+    my $mode =
+         $self->safety_mode
+      && $self->message_delay >= 1 / 5
+      && $self->max_message_size <= 1000
+      && $self->max_messages_per_hour <= 166
+      && $self->ignore_self_messages;
+
     return $mode || 0;
 }
 
@@ -889,13 +903,13 @@ Tells the bot to send a message to the recipient room name
 =cut
 
 sub SendGroupMessage {
-    my $self = shift;
+    my $self      = shift;
     my $recipient = shift;
-    my $message = shift;
+    my $message   = shift;
 
-    $recipient .= '@' . $self->conference_server if($recipient !~ m{\@});
+    $recipient .= '@' . $self->conference_server if ( $recipient !~ m{\@} );
 
-    return $self->SendJabberMessage($recipient, $message, 'groupchat');
+    return $self->SendJabberMessage( $recipient, $message, 'groupchat' );
 }
 
 =item B<SendPersonalMessage>
@@ -909,11 +923,11 @@ $recipient must read as user@server/Resource or it will not send.
 =cut
 
 sub SendPersonalMessage {
-    my $self = shift;
+    my $self      = shift;
     my $recipient = shift;
-    my $message = shift;
+    my $message   = shift;
 
-    return $self->SendJabberMessage($recipient, $message, 'chat');
+    return $self->SendJabberMessage( $recipient, $message, 'chat' );
 }
 
 =item B<SendJabberMessage>
@@ -932,10 +946,10 @@ NOTE: non-printable characters (unicode included) will be stripped before sendin
 sub SendJabberMessage {
     my $self = shift;
 
-    my $recipient = shift;
-    my $message = shift;
+    my $recipient    = shift;
+    my $message      = shift;
     my $message_type = shift;
-    my $subject = shift;
+    my $subject      = shift;
 
     my $max_size = $self->max_message_size;
 
@@ -943,12 +957,11 @@ sub SendJabberMessage {
     # Split on new line. Space if you have to or just chop at max size.
     my @message_chunks = ( $message =~ /.{1,$max_size}$|.{1,$max_size}\n|.{1,$max_size}\s|.{1,$max_size}/gs );
 
-
-    DEBUG("Max message = $max_size. Splitting...") if($#message_chunks > 0);
+    DEBUG("Max message = $max_size. Splitting...") if ( $#message_chunks > 0 );
     my $return_value;
     foreach my $message_chunk (@message_chunks) {
-        my $msg_return = $self->_send_individual_message($recipient, $message_chunk, $message_type, $subject);
-        if(defined $msg_return) {
+        my $msg_return = $self->_send_individual_message( $recipient, $message_chunk, $message_type, $subject );
+        if ( defined $msg_return ) {
             $return_value .= $msg_return;
         }
     }
@@ -965,17 +978,17 @@ sub SendJabberMessage {
 sub _send_individual_message {
     my $self = shift;
 
-    my $recipient = shift;
+    my $recipient     = shift;
     my $message_chunk = shift;
-    my $message_type = shift;
-    my $subject = shift;
+    my $message_type  = shift;
+    my $subject       = shift;
 
-    if(!defined $message_type) {
+    if ( !defined $message_type ) {
         ERROR("Undefined \$message_type");
         return "No message type!\n";
     }
 
-    if(!defined $recipient) {
+    if ( !defined $recipient ) {
         ERROR('$recipient not defined!');
         return "No recipient!\n";
     }
@@ -984,62 +997,53 @@ sub _send_individual_message {
     my $hour = (localtime)[2];
     my $messages_this_hour = $self->messages_sent_today->{$yday}->{$hour} += 1;
 
-    if($messages_this_hour > $self->max_messages_per_hour) {
-        $subject = "" if(!defined $subject); # Keep warning messages quiet.
-        $message_chunk = "" if(!defined $message_chunk); # Keep warning messages quiet.
+    if ( $messages_this_hour > $self->max_messages_per_hour ) {
+        $subject       = "" if ( !defined $subject );          # Keep warning messages quiet.
+        $message_chunk = "" if ( !defined $message_chunk );    # Keep warning messages quiet.
 
-        ERROR("Can't Send message because we've already tried to send $messages_this_hour of $self->max_messages_per_hour messages this hour.\n"
-              . "To: $recipient\n"
-              . "Subject: $subject\n"
-              . "Type: $message_type\n"
-              . "Message sent:\n"
-              . "$message_chunk"
-              );
+        ERROR( "Can't Send message because we've already tried to send $messages_this_hour of $self->max_messages_per_hour messages this hour.\n" . "To: $recipient\n" . "Subject: $subject\n" . "Type: $message_type\n" . "Message sent:\n" . "$message_chunk" );
 
         # Send 1 panic message out to jabber if this is our last message before quieting down.
         return "Too many messages ($messages_this_hour)\n";
     }
 
-    if(!$self->IsConnected) {
-        $subject = "" if(!defined $subject); # Keep warning messages quiet.
-        $message_chunk = "" if(!defined $message_chunk); # Keep warning messages quiet.
+    if ( !$self->IsConnected ) {
+        $subject       = "" if ( !defined $subject );          # Keep warning messages quiet.
+        $message_chunk = "" if ( !defined $message_chunk );    # Keep warning messages quiet.
 
-        ERROR("Can't Jabber server is down. Tried to send: \n"
-              . "To: $recipient\n"
-              . "Subject: $subject\n"
-              . "Type: $message_type\n"
-              . "Message sent:\n"
-              . "$message_chunk"
-              );
+        ERROR( "Can't Jabber server is down. Tried to send: \n" . "To: $recipient\n" . "Subject: $subject\n" . "Type: $message_type\n" . "Message sent:\n" . "$message_chunk" );
 
         # Send 1 panic message out to jabber if this is our last message before quieting down.
         return "Server is down.\n";
     }
 
-    # Strip out anything that's not a printable character
+    # Strip out anything that's not a printable character except new line, we want to be able to send multiline message, aren't we?
     # Now with unicode support?
-    $message_chunk =~ s/[^[:print:]]+/./xmsg; 
+    $message_chunk =~ s/[^\r\n[:print:]]+/./xmsg;
 
     my $message_length = length($message_chunk);
     DEBUG("Sending message $yday-$hour-$messages_this_hour $message_length bytes to $recipient");
-    $self->jabber_client->MessageSend(to => $recipient
-                     , body => $message_chunk
-                     , type => $message_type
-#                     , from => $connection_hash{$obj_ID}{'from_full'}
-                     , subject => $subject
-                     );
+    $self->jabber_client->MessageSend(
+        to => $recipient, body => $message_chunk
+        , type => $message_type
 
-    DEBUG("Sleeping " . $self->message_delay . " after sending message.");
-    Time::HiRes::sleep $self->message_delay; #Throttle messages.
+          #                     , from => $connection_hash{$obj_ID}{'from_full'}
+        , subject => $subject
+    );
 
-    if($messages_this_hour == $self->max_messages_per_hour) {
-        $self->jabber_client->MessageSend(to => $recipient
-                         , body => "Cannot send more messages this hour. "
-                         . "$messages_this_hour of " . $self->max_messages_per_hour . " already sent."
-                         , type => $message_type
-                         );
+    DEBUG( "Sleeping " . $self->message_delay . " after sending message." );
+    Time::HiRes::sleep $self->message_delay;    #Throttle messages.
+
+    if ( $messages_this_hour == $self->max_messages_per_hour ) {
+        $self->jabber_client->MessageSend(
+            to => $recipient, body => "Cannot send more messages this hour. "
+              . "$messages_this_hour of "
+              . $self->max_messages_per_hour
+              . " already sent."
+            , type => $message_type
+        );
     }
-    return; # Means we succeeded!
+    return;                                     # Means we succeeded!
 }
 
 =item B<SetForumSubject>
@@ -1054,16 +1058,16 @@ sub SetForumSubject {
     my $self = shift;
 
     my $recipient = shift;
-    my $subject = shift;
+    my $subject   = shift;
 
-    if(length $subject > $self->max_message_size) {
-    my $subject_len = length($subject);
-    ERROR("Someone tried to send a subject message $subject_len bytes long!");
-    my $subject = substr($subject, 0, $self->max_message_size);
-    DEBUG("Truncated subject: $subject");
-    return "Subject is too long!";
+    if ( length $subject > $self->max_message_size ) {
+        my $subject_len = length($subject);
+        ERROR("Someone tried to send a subject message $subject_len bytes long!");
+        my $subject = substr( $subject, 0, $self->max_message_size );
+        DEBUG("Truncated subject: $subject");
+        return "Subject is too long!";
     }
-    $self->_send_individual_message($recipient, "Setting subject to $subject", 'groupchat', $subject);
+    $self->_send_individual_message( $recipient, "Setting subject to $subject", 'groupchat', $subject );
 
     return;
 }
@@ -1079,11 +1083,11 @@ $status_string is an optional comment to go with your presence mode. It is not r
 =cut
 
 sub ChangeStatus {
-    my $self = shift;
+    my $self          = shift;
     my $presence_mode = shift;
-    my $status_string = shift; # (optional)
+    my $status_string = shift;    # (optional)
 
-    $self->jabber_client->PresenceSend(show=>$presence_mode, status=>$status_string);
+    $self->jabber_client->PresenceSend( show => $presence_mode, status => $status_string );
 
     return 1;
 }
@@ -1101,9 +1105,9 @@ sub GetRoster {
     my $self = shift;
 
     my @rosterlist;
-    foreach my $jid ($self->jabber_client->RosterDBJIDs()) {
-        my $username =$jid->GetJID();
-        push(@rosterlist, $username) ;
+    foreach my $jid ( $self->jabber_client->RosterDBJIDs() ) {
+        my $username = $jid->GetJID();
+        push( @rosterlist, $username );
     }
     return @rosterlist;
 }
@@ -1121,9 +1125,9 @@ sub GetStatus {
 
     my $Pres = $self->jabber_client->PresenceDBQuery($jid);
 
-    if (!(defined($Pres))) {
+    if ( !( defined($Pres) ) ) {
 
-        return "unavailable" ;
+        return "unavailable";
     }
 
     my $show = $Pres->GetShow();
@@ -1146,8 +1150,8 @@ sub AddUser {
     my $self = shift;
     my $user = shift;
 
-    $self->jabber_client->Subscription(type=>"subscribe", to=>$user);
-    $self->jabber_client->Subscription(type=>"subscribed",to=>$user);
+    $self->jabber_client->Subscription( type => "subscribe",  to => $user );
+    $self->jabber_client->Subscription( type => "subscribed", to => $user );
 }
 
 =item B<RmUser>
@@ -1160,9 +1164,10 @@ sub RmUser {
     my $self = shift;
     my $user = shift;
 
-    $self->jabber_client->Subscription(type=>"unsubscribe", to=>$user);
-    $self->jabber_client->Subscription(type=>"unsubscribed",to=>$user);
+    $self->jabber_client->Subscription( type => "unsubscribe",  to => $user );
+    $self->jabber_client->Subscription( type => "unsubscribed", to => $user );
 }
+
 =back
 
 =head1 AUTHOR
@@ -1219,4 +1224,4 @@ under the same terms as Perl itself.
 __PACKAGE__->meta->make_immutable;
 no Moose;
 no MooseX::Types;
-1; # End of Net::Jabber::Bot
+1;    # End of Net::Jabber::Bot

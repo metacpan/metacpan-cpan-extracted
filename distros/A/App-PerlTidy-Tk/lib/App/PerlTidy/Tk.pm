@@ -19,7 +19,7 @@ use Tk::FileSelect;
 use Tk::HyperText;
 use Tk::Table;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $zoom = 3;
 my %skip = map { $_ => 1 } qw(nocheck-syntax perl-syntax-check-flags);
@@ -343,6 +343,7 @@ sub show_about {
 <li>Mike Small</li>
 <li><a href="https://www.linkedin.com/in/n8dgr8/">Nathan Schlehlein</a></li>
 <li><a href="https://www.linkedin.com/in/pfmabry/">Paul Mabry</a></li>
+<li><a href="https://perl.careers/">Perl Careers</a></li>
 <li>Richard Leach</li>
 <li>Robert Coursen</li>
 <li><a href="https://www.linkedin.com/in/shajiindia/">Shaji Kalidasan</a></li>

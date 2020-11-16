@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 =head1 NAME
 
@@ -140,6 +140,17 @@ note that these are two very different methods:
 
 Typical async code would not be expected to use the L<Future/get> method extensively;
 often only calling it in one place at the top level in the code.
+
+=head3 RESP3 and RESP2 compatibility
+
+In RESP3 some of the responses are structured differently from RESP2.
+L<Net::Async::Redis> guarantees the same structure unless you have explicitly requested the new types
+using the L</configure> C<hashrefs> option, which is disabled by default.
+
+Generally RESP3 is recommended if you have Redis version 6 or later installed: it allows
+subscription operations to share the same connection as regular Redis traffic.
+
+=cut
 
 =head2 Error handling
 
@@ -1096,6 +1107,35 @@ sub execute_command {
      ->retain;
 }
 
+around [qw(xread xreadgroup)] => async sub {
+    my ($code, $self, @args) = @_;
+    my $response = await $self->$code(@args);
+
+    # protocol_level is detected while connecting checking before this point is wrong.
+    return $response if $self->{protocol_level} eq 'resp2' || $self->{hashrefs};
+
+    my $compatible_response = [ pairmap { [ $a, $b ] } $response->@* ];
+    $log->tracef('Transformed response of xread/xreadgroup into RESP2 format: from %s to %s', $response, $compatible_response);
+
+    return $compatible_response;
+};
+
+around [qw(zrange zrangebyscore zrevrange zrevrangebyscore)] => async sub {
+    my ($code, $self, @args) = @_;
+    return await $self->$code(@args) if $self->{hashrefs};
+
+    my $response = await $self->$code(@args);
+
+    if (ref $response->[0] eq 'ARRAY') {
+        my @compatible_response = map { $_->@* } $response->@*;
+        $log->tracef('Transformed resposne of z(rev)range(byscore) into RESP2 format: from %s, to %s', $response, [@compatible_response]);
+
+        return \@compatible_response;
+    } else {
+        return $response;
+    }
+};
+
 =head2 ryu
 
 A L<Ryu::Async> instance for source/sink creation.
@@ -1226,4 +1266,3 @@ tests and feedback:
 
 Copyright Tom Molesworth and others 2015-2020.
 Licensed under the same terms as Perl itself.
-

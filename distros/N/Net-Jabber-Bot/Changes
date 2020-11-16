@@ -1,105 +1,109 @@
 Revision history for Net-Jabber-Bot
 
-XXX
+2.1.7 2020-11-05 Todd Rinaldo
+- #15 Fix _send_individual_message to not strip new lines.
 
 2.1.6
-Fix examples for new moose code
-Spelling errors in documentation
-Display server error message when we think there was a disconnect event.
-Allow the user to specify the path to the CA cert bundle via the 'ssl_ca_path' parameter.
-Move jabber object creation to lazy moose
-Add ignore file to repo
-Clean up POD so new() documentation lays out correctly
-Remove DD from code. Moose has a helper sub already for this anyways
-Explicitly set priority of users - Adam Malone
-Allow the user to specify the path to the CA cert bundle via the 'ssl_ca_path' parameter - Jan Schaumann
-Don't bail if the IQ message doesn't contain a query - Jan Schaumann
-Allow user to disable server certificate validity check - eleksir
-Use Mozilla::CA for default path for ssl_ca_path - eleksir
-Fix undefined warnings due to insufficient Moose Laziness
-Misc distro file cleanup.
-Automated testing with github actions
-Remove author tests from user installs.
-Point support to github now.
+- Fix examples for new moose code
+- Spelling errors in documentation
+- Display server error message when we think there was a disconnect event.
+- Allow the user to specify the path to the CA cert bundle via the 'ssl_ca_path' parameter.
+- Move jabber object creation to lazy moose
+- Add ignore file to repo
+- Clean up POD so new() documentation lays out correctly
+- Remove DD from code. Moose has a helper sub already for this anyways
+- Explicitly set priority of users - Adam Malone
+- Allow the user to specify the path to the CA cert bundle via the 'ssl_ca_path' parameter - Jan Schaumann
+- Don't bail if the IQ message doesn't contain a query - Jan Schaumann
+- Allow user to disable server certificate validity check - eleksir
+- Use Mozilla::CA for default path for ssl_ca_path - eleksir
+- Fix undefined warnings due to insufficient Moose Laziness
+- Misc distro file cleanup.
+- Automated testing with github actions
+- Remove author tests from user installs.
+- Point support to github now.
 
 2.1.5
-resource now unique per instance of bot based on alias_hostname_pid
-new dependency from core modules - Sys::Hostname
-__PACKAGE__->meta->make_immutable; for performance.
-Removed gtalk option. Use tls => 1, server_host => 'gmail.com' instead.
-using 'componentname' in connect rather than after connection like we were hacking it in.
-All non-printable characters stripped and replaced with '.' via [:printable:] regex
-Added documentation on minimal connect parameters now we have quite a few optionals.
+- resource now unique per instance of bot based on alias_hostname_pid
+- new dependency from core modules - Sys::Hostname
+- __PACKAGE__->meta->make_immutable; for performance.
+- Removed gtalk option. Use tls => 1, server_host => 'gmail.com' instead.
+- using 'componentname' in connect rather than after connection like we were hacking it in.
+- All non-printable characters stripped and replaced with '.' via [:printable:] regex
+- Added documentation on minimal connect parameters now we have quite a few optionals.
 
 2.1.4
-_process_jabber_message was failing to parse multiline strings - fixed
-Move to github - http://github.com/toddr/perl-net-jabber-bot
-Tickets/Groups will stay on Google for now.
-Discussed using Backend of POE::Component::Jabber which would be a more stable/supported solution but requires perl 5.10
-MooseX::Types now.
-no Moose and no MooseX::Types at end of object for droppings
+- _process_jabber_message was failing to parse multiline strings - fixed
+- Move to github - http://github.com/toddr/perl-net-jabber-bot
+- Tickets/Groups will stay on Google for now.
+- Discussed using Backend of POE::Component::Jabber which would be a more stable/supported solution but requires perl 5.10
+- MooseX::Types now.
+- no Moose and no MooseX::Types at end of object for droppings
 
 2.1.3
-Tests were failing if people didn't have Config::Std installed which is only used for Author tests
+- Tests were failing if people didn't have Config::Std installed which is only used for Author tests
 
 2.1.2
-Added warning message for legacy users initializing with message_callback or background_activity.
+- Added warning message for legacy users initializing with message_callback or background_activity.
 
 2.1.1 
-Add proper meta data into makefile.pl
-Cleanup debug messages. Used to be able to do them inline but moose subs don't call inside a string any more.
+- Add proper meta data into makefile.pl
+- Cleanup debug messages. Used to be able to do them inline but moose subs don't call inside a string any more.
 
 2.1.0 
-MOOSE!!!
+- MOOSE!!!
 
 2.0.9
-New subroutines (AddUser, RmUser, GetStatus, GetRoster) to track ??? 
-IsConnected reports connect status now.
-ReConnect now works as expected. Calls background each re-connect attempt.
+- New subroutines (AddUser, RmUser, GetStatus, GetRoster) to track ??? 
+- IsConnected reports connect status now.
+- ReConnect now works as expected. Calls background each re-connect attempt.
 
 2.0.8
-Bot now resonds to iq requests for version info. Also added gtalk example into the manifest (forgot for 2.0.7)
+- Bot now resonds to iq requests for version info. Also added gtalk example into the manifest (forgot for 2.0.7)
 
 2.0.7
-Fix to get gtalk working, kindly provided by Yago Jesus. It's doing something really funky with setting the hostname to gmail.com.
-Need to later review why we're doing this. maybe we're ignorning connect messages from the server?
-Also added gtalk bot example courtesy of Yago
-New subs: GetRoster, ChangeStatus
+- Fix to get gtalk working, kindly provided by Yago Jesus. It's doing something really funky with setting the hostname to gmail.com.
+- Need to later review why we're doing this. maybe we're ignorning connect messages from the server?
+- Also added gtalk bot example courtesy of Yago
+- New subs: GetRoster, ChangeStatus
 
 2.0.6
-Test::Pod::Coverage not configured to skip tests if not avail. Corrected this.
+- Test::Pod::Coverage not configured to skip tests if not avail. Corrected this.
 
 2.0.5
-Missed a test file mentioning IO::Prompt (t/03)
+- Missed a test file mentioning IO::Prompt (t/03)
 
 2.0.4
-Removed some email addresses present.
-Tidy up manifest
-Referring to google project in POD now.
-Inserted gtalk fixes so the module will work with them.
-Funky eval issue with gtalk client commented out. We'll have to look at that later, but for now we don't need it at all
+- Removed some email addresses present.
+- Tidy up manifest
+- Referring to google project in POD now.
+- Inserted gtalk fixes so the module will work with them.
+- Funky eval issue with gtalk client commented out. We'll have to look at that later, but for now we don't need it at all
 
 2.0.3
-Creation of Mock Client to allow automation of testing without a server.
-Also added Example script so someone can see how to use the module.
+- Creation of Mock Client to allow automation of testing without a server.
+- Also added Example script so someone can see how to use the module.
 
 2.0.2
-Added Log::Log4Perl as dependancy. This should be in everyone's CPAN so it shouldn't be a big deal that people need to install it even though it's not necessary for people to use the module...
+- Added Log::Log4Perl as dependancy. This should be in everyone's CPAN so it shouldn't be a big deal that people need to install it even though it's not necessary for people to use the module...
 
 2.0.1
-Oops! Guess I need to make this module dependant on Net::Jabber if it's ever going to make test.
+- Oops! Guess I need to make this module dependant on Net::Jabber if it's ever going to make test.
 
 2.0.0
-Move to 3 digit version (see pause.perl.org FAQ about starting with 2 digit version and going to 3)
-internal callback maker created to reduce code.
+- Move to 3 digit version (see pause.perl.org FAQ about starting with 2 digit version and going to 3)
+- internal callback maker created to reduce code.
 
-1.2.1 Call back functions how call self funcion via anonymous subs.
-Minor bug fixes and cleanup.
+1.2.1
+- Call back functions how call self funcion via anonymous subs.
+- Minor bug fixes and cleanup.
 
-1.2.0 Re-enabled config test, plus fixed some docs. Versioning changes from here out to be 3 digit.
-Bot will respond to different addressings per forum (all messages, jbot:, etc.)
+1.2.0
+- Re-enabled config test, plus fixed some docs. Versioning changes from here out to be 3 digit.
+- Bot will respond to different addressings per forum (all messages, jbot:, etc.)
 
-1.1 Initial CPAN release - Basic tests built. Still more needed. Some of the limits are hard
-coded. Arguably, these should be more in a child module, not the base class?
+1.1
+- Initial CPAN release - Basic tests built. Still more needed. Some of the limits are hard
+- coded. Arguably, these should be more in a child module, not the base class?
 
-1.0 Initial pre-CPAN release -- Does basic stuff but no tests yet. not CPAN ready
+- 1.0 Initial pre-CPAN release -- Does basic stuff but no tests yet. not CPAN ready

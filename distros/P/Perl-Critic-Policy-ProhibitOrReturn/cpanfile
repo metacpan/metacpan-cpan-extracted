@@ -6,6 +6,5 @@ on 'test' => sub {
     requires 'Perl::Critic';
     requires 'Test::More', '0.98';
     requires 'Test2::V0';
-    requires 'Test::Perl::Critic';
 };
 

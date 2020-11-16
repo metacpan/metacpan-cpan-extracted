@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0610';
+our $VERSION = '0.0612';
 
 use PPI::Document;
 use PPI::Dumper;
@@ -232,7 +232,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0610
+version 0.0612
 
 =head1 SYNOPSIS
 
@@ -383,7 +383,8 @@ Return a hashref of the metrics and their computed values.
 
 =head1 SEE ALSO
 
-The F<bin/halstead> and F<t/01-methods.t> files in this distribution.
+The F<bin/halstead>, F<eg/git-halstead> and F<t/01-methods.t> files in
+this distribution.
 
 L<Moo>
 

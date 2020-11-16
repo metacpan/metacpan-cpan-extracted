@@ -1,9 +1,18 @@
+0.04 2020-11-15
+- NOTE: there are backward incompatible changes to the API in this release
+- New: importable convenience constructor spawn()
+- New: importable process_group() to process a combined queue of messages for a
+  group of related processes
+- Removes args constructor parameter; instead, cmd accepts either a complete
+  command string or an array ref of the command and its arguments
+- Removes IPC::Simple->async; it was unreliable and of dubious value
+
 0.03 2020-11-10
--Drop pretense of win32 support
--Messages are now sent asynchronously
+- Drop pretense of win32 support
+- Messages are now sent asynchronously
 
 0.02 2020-04-27
--Bugfix: use `eol` setting in reads
+- Bugfix: use `eol` setting in reads
 
 0.01 2020-04-27
--Initial release
+- Initial release

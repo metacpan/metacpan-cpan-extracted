@@ -1,7 +1,7 @@
 package CGI::Parse::PSGI::Streaming;
 use strict;
 use warnings;
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 use HTTP::Response;
 use CGI::Parse::PSGI::Streaming::Handle;
 use SelectSaver;
@@ -134,7 +134,7 @@ CGI::Parse::PSGI::Streaming - creates a filehandle that parses CGI output and wr
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

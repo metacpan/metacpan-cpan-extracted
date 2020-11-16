@@ -14,3 +14,4 @@ dist.ini
 doap.ttl
 lib/App/GhaProve.pm
 t/01basic.t
+t/02worksokay.t

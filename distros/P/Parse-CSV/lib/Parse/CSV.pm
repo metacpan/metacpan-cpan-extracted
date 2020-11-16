@@ -1,6 +1,6 @@
 use strict;
 package Parse::CSV;
-$Parse::CSV::VERSION = '2.06';
+$Parse::CSV::VERSION = '2.07';
 =pod
 
 =head1 NAME
@@ -9,7 +9,7 @@ Parse::CSV - Highly flexible CSV parser for large files
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -111,7 +111,7 @@ this will have no effect on anything.
 use 5.005;
 use Carp              ();
 use IO::File     1.13 ();
-use Text::CSV_XS 0.80 ();
+use Text::CSV_XS 1.22 ();
 use Params::Util 1.00 ();
 
 

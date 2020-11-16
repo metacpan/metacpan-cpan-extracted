@@ -1,39 +1,60 @@
+use 5.006;
 use strict;
 use warnings;
 
-# This test was generated via Dist::Zilla::Plugin::Test::Compile 2.013
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
-use Test::More 0.88;
+use Test::More;
 
+plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-
-use Capture::Tiny qw{ capture };
-
-my @module_files = qw(
-Dist/Zilla/Plugin/PodInherit.pm
+my @module_files = (
+    'Dist/Zilla/Plugin/PodInherit.pm'
 );
 
-my @scripts = qw(
 
-);
 
 # no fake home requested
+
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
+
+use File::Spec;
+use IPC::Open3;
+use IO::Handle;
+
+open my $stdin, '<', File::Spec->devnull or die "can't open devnull: $!";
 
 my @warnings;
 for my $lib (@module_files)
 {
-    my ($stdout, $stderr, $exit) = capture {
-        system($^X, '-Mblib', '-e', qq{require qq[$lib]});
-    };
+    # see L<perlfaq8/How can I capture STDERR from an external command?>
+    my $stderr = IO::Handle->new;
+
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
+    binmode $stderr, ':crlf' if $^O eq 'MSWin32';
+    my @_warnings = <$stderr>;
+    waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
-    warn $stderr if $stderr;
-    push @warnings, $stderr if $stderr;
+
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { +require blib; blib->VERSION('1.01') };
+
+    if (@_warnings)
+    {
+        warn @_warnings;
+        push @warnings, @_warnings;
+    }
 }
 
-is(scalar(@warnings), 0, 'no warnings found') if $ENV{AUTHOR_TESTING};
 
 
+is(scalar(@warnings), 0, 'no warnings found')
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
 
 
-
-done_testing;

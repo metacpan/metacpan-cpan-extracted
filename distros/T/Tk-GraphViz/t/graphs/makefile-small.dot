@@ -1,0 +1,23 @@
+digraph Perl {
+ ":recipe:1" [ label="" shape="diamond" ]
+ ":recipe:2" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\ $\{hallo\}\ perl\\lib\ double\\\\l \| wc -l\l|true\l}" shape="record" style="filled" ]
+ ":recipe:3" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\ Hi\l}" shape="record" style="filled" ]
+ ":recipe:4" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\ Hey\l}" shape="record" style="filled" ]
+ "all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="all" shape="box" style="filled" ]
+ "bar" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="bar" shape="box" style="filled" ]
+ "blah" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blah" shape="box" style="filled" ]
+ "boo" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="boo" shape="box" style="filled" ]
+ "buz" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="buz" shape="box" style="filled" ]
+ "foo" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="foo" shape="box" style="filled" ]
+ "howdy" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="howdy" shape="box" style="filled" ]
+ ":recipe:1" -> "foo"
+ ":recipe:2" -> "bar"
+ ":recipe:3" -> "boo"
+ ":recipe:3" -> "blah"
+ ":recipe:4" -> "buz"
+ ":recipe:4" -> "howdy"
+ "all" -> ":recipe:1"
+ "all" -> ":recipe:2"
+ "foo" -> ":recipe:3"
+ "foo" -> ":recipe:4"
+}

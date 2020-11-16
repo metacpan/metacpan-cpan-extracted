@@ -25,7 +25,7 @@ optional_features: {}
 provides:
   App::GhaProve:
     file: lib/App/GhaProve.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   perl: '5.006'
 resources:
@@ -34,7 +34,7 @@ resources:
   homepage: https://metacpan.org/release/App-GhaProve
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-app-ghaprove.git
-version: '0.004'
+version: '0.005'
 x_provides_scripts:
   gha-prove:
     file: bin/gha-prove

@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -19,6 +19,7 @@ my @files = (
     'lib/CGI/Parse/PSGI/Streaming.pm',
     'lib/CGI/Parse/PSGI/Streaming/Handle.pm',
     't/parse.t',
+    't/rt133593.t',
     't/simple.t'
 );
 

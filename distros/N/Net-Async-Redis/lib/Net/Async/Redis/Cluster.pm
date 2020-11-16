@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.004'; # VERSION
+our $VERSION = '3.005'; # VERSION
 
 =encoding utf8
 
@@ -61,6 +61,7 @@ use List::BinarySearch::XS qw(binsearch);
 use List::UtilsBy qw(nsort_by);
 use List::Util qw(first);
 use Digest::CRC qw(crc);
+use Cache::LRU;
 
 use Log::Any qw($log);
 
@@ -122,6 +123,13 @@ async sub bootstrap {
     }
 }
 
+sub _init {
+    my ($self) = @_;
+    $self->{cache} = Cache::LRU->new(
+        size => 10_000
+    );
+}
+
 =head2 hash_slot_for_key
 
 Calculates the CRC16 hash slot for the given key.
@@ -133,15 +141,19 @@ you'd likely want to convert to UTF-8 first.
 
 sub hash_slot_for_key {
     my ($self, $key) = @_;
-    # Extract out the first non-zero-length substring between the first {} character pair,
-    # if any...
-    my ($hash_string) = $key =~ /^[^\{]*\{([^\}]+)\}/;
-    # ... and if we don't have any matching substrings, we just use the full key
-    $hash_string //= $key;
-    # see Digest::CRC docs and the XMODEM protocol for more details, but essentially:
-    # input, width=16, init=0, xor constant for output = 0, reflect output = 0, polynomial = 0x1021,
-    # reflect input = 0, continuation = 0
-    return crc($hash_string, 16, 0, 0, 0, 0x1021, 0, 0) & (MAX_SLOTS - 1);
+    return $self->{cache}->get($key) // do {
+        # Extract out the first non-zero-length substring between the first {} character pair,
+        # if any...
+        my ($hash_string) = $key =~ /^[^\{]*\{([^\}]+)\}/;
+        # ... and if we don't have any matching substrings, we just use the full key
+        $hash_string //= $key;
+        # see Digest::CRC docs and the XMODEM protocol for more details, but essentially:
+        # input, width=16, init=0, xor constant for output = 0, reflect output = 0, polynomial = 0x1021,
+        # reflect input = 0, continuation = 0
+        my $slot = crc($hash_string, 16, 0, 0, 0, 0x1021, 0, 0) & (MAX_SLOTS - 1);
+        $self->{cache}->set($key => $slot);
+        $slot;
+    };
 }
 
 =head2 replace_nodes

@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -34,6 +34,7 @@
          "requires" : {
             "Exporter::Shiny" : "0",
             "LV" : "0",
+            "parent" : "0",
             "perl" : "5.006"
          }
       },
@@ -47,7 +48,7 @@
    "provides" : {
       "List::AssignRef" : {
          "file" : "lib/List/AssignRef.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -66,5 +67,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/List-AssignRef/project"
    },
-   "version" : "0.004"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

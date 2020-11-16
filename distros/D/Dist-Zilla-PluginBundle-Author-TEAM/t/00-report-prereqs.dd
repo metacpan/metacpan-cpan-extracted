@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.014'
                                       }
                       },
        'develop' => {
@@ -11,6 +12,7 @@ do { my $x = {
                                       'Software::License::Perl_5' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
+                                      'Test::CPANfile' => '0',
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
@@ -55,7 +57,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::OurPkgVersion' => '0',
                                       'Dist::Zilla::Plugin::OverridePkgVersion' => '0',
                                       'Dist::Zilla::Plugin::PodCoverageTests' => '0',
-                                      'Dist::Zilla::Plugin::PodInherit' => '0',
+                                      'Dist::Zilla::Plugin::PodInherit' => '0.008',
                                       'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::FromCPANfile' => '0',
@@ -86,6 +88,9 @@ do { my $x = {
                                       'Moose' => '0',
                                       'Perl::Version' => '0',
                                       'Test::CPAN::Meta' => '0',
+                                      'Test::CPANfile' => '0',
+                                      'Test::CheckDeps' => '0.010',
+                                      'perl' => '5.014',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -101,7 +106,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::More' => '0.94',
-                                   'perl' => '5.006'
+                                   'perl' => '5.014'
                                  }
                  }
      };

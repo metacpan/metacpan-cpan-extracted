@@ -1,3 +1,15 @@
+1.06 2020-11-16
+- fix accidental double-run of dot with async=0
+
+1.05 2020-11-16
+- fix handling of \-quoting in labels
+- record label justification now correct
+- records have fillcolor, font, etc respected
+- use Tk::IO, not own complicated scheme
+- createBindings returns $self for chaining
+- ->show no longer automatically calls ->fit by default
+- implement Msquare and Mdiamond
+
 1.04 2020-11-08
 - tests only run when can do display stuff, avoiding false negatives
 - no install if no DOT

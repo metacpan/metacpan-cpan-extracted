@@ -23,77 +23,81 @@ our $port;
 our $base;
 our $dir;
 
-require './t/test.pl';
+ SKIP: {
+   -x '/bin/tar' or skip "Missing /bin/tar on this system";
 
-# create a space
+   require './t/test.pl';
 
-my $sdir = "$dir/berta";
-mkdir($sdir);
-mkdir("$sdir/page");
-write_text("$sdir/page/Berta.gmi", "Berta Basler");
-write_text("$sdir/page/Tanka.gmi", "What a poet!");
-mkdir("$sdir/file");
-write_binary("$sdir/file/berta.jpg", read_binary("t/alex.jpg"));
-mkdir("$sdir/meta");
-write_text("$sdir/meta/berta.jpg", "content-type: image/jpeg");
-write_text("$sdir/index", join("\n", "Tanka", "Berta", ""));
-write_text("$sdir/changes.log",
-	   join("\n",
-		join("\x1f", 1593600755, "Berta", 1, 1441),
-		join("\x1f", 1593610755, "berta.jpg", 0, 1441),
-		join("\x1f", 1593620755, "Tanka", 1, 1441),
-		""));
+   # create a space
 
-# test the berta space
+   my $sdir = "$dir/berta";
+   mkdir($sdir);
+   mkdir("$sdir/page");
+   write_text("$sdir/page/Berta.gmi", "Berta Basler");
+   write_text("$sdir/page/Tanka.gmi", "What a poet!");
+   mkdir("$sdir/file");
+   write_binary("$sdir/file/berta.jpg", read_binary("t/alex.jpg"));
+   mkdir("$sdir/meta");
+   write_text("$sdir/meta/berta.jpg", "content-type: image/jpeg");
+   write_text("$sdir/index", join("\n", "Tanka", "Berta", ""));
+   write_text("$sdir/changes.log",
+	      join("\n",
+		   join("\x1f", 1593600755, "Berta", 1, 1441),
+		   join("\x1f", 1593610755, "berta.jpg", 0, 1441),
+		   join("\x1f", 1593620755, "Tanka", 1, 1441),
+		   ""));
 
-my $page = query_gemini("$base/berta/");
-like($page, qr/^=> $base\/berta\/do\/data Download data/m, "main menu contains download link");
+   # test the berta space
 
-$page = query_gemini("$base/berta/do/data");
-like($page, qr/^20 application\/tar\r\n/m, "download tar file");
+   my $page = query_gemini("$base/berta/");
+   like($page, qr/^=> $base\/berta\/do\/data Download data/m, "main menu contains download link");
 
-$page =~ s/^20 application\/tar\r\n//;
-my $tar = read_binary("$sdir/data.tar.gz");
-ok($tar eq $page, "tar bytes are correct");
+   $page = query_gemini("$base/berta/do/data");
+   like($page, qr/^20 application\/tar\r\n/m, "download tar file");
 
-open(my $fh, "tar --list --gzip --file $sdir/data.tar.gz |");
-my @files = <$fh>;
-close($fh);
-# no config file in the space
-for my $file (qw(changes.log index
-	      meta/berta.jpg file/berta.jpg
-	      page/Berta.gmi page/Tanka.gmi)) {
-  ok(grep(/$file/, @files), "found $file in the archive");
-}
+   $page =~ s/^20 application\/tar\r\n//;
+   my $tar = read_binary("$sdir/data.tar.gz");
+   ok($tar eq $page, "tar bytes are correct");
 
-# redo the main space
+   open(my $fh, "tar --list --gzip --file $sdir/data.tar.gz |");
+   my @files = <$fh>;
+   close($fh);
+   # no config file in the space
+   for my $file (qw(changes.log index
+		    meta/berta.jpg file/berta.jpg
+		    page/Berta.gmi page/Tanka.gmi)) {
+     ok(grep(/$file/, @files), "found $file in the archive");
+   }
 
-mkdir("$dir/page");
-write_text("$dir/page/Alex.gmi", "Alex Schroeder");
-write_text("$dir/page/Haiku.gmi", "What a poet!");
-mkdir("$dir/file");
-write_binary("$dir/file/alex.jpg", read_binary("t/alex.jpg"));
-mkdir("$dir/meta");
-write_text("$dir/meta/alex.jpg", "content-type: image/jpeg");
-write_text("$dir/index", join("\n", "Haiku", "Alex", ""));
-write_text("$dir/changes.log",
-	   join("\n",
-		join("\x1f", 1593600755, "Alex", 1, 1441),
-		join("\x1f", 1593610755, "alex.jpg", 0, 1441),
-		join("\x1f", 1593620755, "Haiku", 1, 1441),
-		""));
+   # redo the main space
 
-$page = query_gemini("$base/do/data");
-like($page, qr/^20 application\/tar\r\n/m, "download tar file");
-open($fh, "tar --list --gzip --file $dir/data.tar.gz |");
-@files = <$fh>;
-close($fh);
-for my $file (qw(meta/alex.jpg file/alex.jpg
-	      page/Alex.gmi page/Haiku.gmi
-	      berta/changes.log berta/index
-	      berta/meta/berta.jpg berta/file/berta.jpg
-	      berta/page/Berta.gmi berta/page/Tanka.gmi)) {
-  ok(grep(/$file/, @files), "found $file in the archive");
+   mkdir("$dir/page");
+   write_text("$dir/page/Alex.gmi", "Alex Schroeder");
+   write_text("$dir/page/Haiku.gmi", "What a poet!");
+   mkdir("$dir/file");
+   write_binary("$dir/file/alex.jpg", read_binary("t/alex.jpg"));
+   mkdir("$dir/meta");
+   write_text("$dir/meta/alex.jpg", "content-type: image/jpeg");
+   write_text("$dir/index", join("\n", "Haiku", "Alex", ""));
+   write_text("$dir/changes.log",
+	      join("\n",
+		   join("\x1f", 1593600755, "Alex", 1, 1441),
+		   join("\x1f", 1593610755, "alex.jpg", 0, 1441),
+		   join("\x1f", 1593620755, "Haiku", 1, 1441),
+		   ""));
+
+   $page = query_gemini("$base/do/data");
+   like($page, qr/^20 application\/tar\r\n/m, "download tar file");
+   open($fh, "tar --list --gzip --file $dir/data.tar.gz |");
+   @files = <$fh>;
+   close($fh);
+   for my $file (qw(meta/alex.jpg file/alex.jpg
+		    page/Alex.gmi page/Haiku.gmi
+		    berta/changes.log berta/index
+		    berta/meta/berta.jpg berta/file/berta.jpg
+		    berta/page/Berta.gmi berta/page/Tanka.gmi)) {
+     ok(grep(/$file/, @files), "found $file in the archive");
+   }
 }
 
 done_testing();

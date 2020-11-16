@@ -1,9 +1,9 @@
 package Log::ger::UseDataDumpOptions;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Log-ger-UseDataDumpOptions'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Data::Dump::Options ();
 use Log::ger ();
@@ -26,7 +26,7 @@ Log::ger::UseDataDumpOptions - Use Data::Dump::Options to dump data structures
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::UseDataDumpOptions (from Perl distribution Log-ger-UseDataDumpOptions), released on 2020-06-04.
+This document describes version 0.002 of Log::ger::UseDataDumpOptions (from Perl distribution Log-ger-UseDataDumpOptions), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -56,9 +56,25 @@ L<Log::ger>
 
 L<Data::Dump::Options>
 
-Other modules to set data dumper for Log::ger: L<Log::ger::UseDataDump>,
-L<Log::ger::UseDataDumpColor>, L<Log::ger::UseDataDumpObjectAsString>,
-L<Log::ger::UseDataDumper>, L<Log::ger::UseDataPrinter>.
+Other modules to set data dumper for Log::ger:
+
+=over
+
+=item * L<Log::ger::UseDataBahe>
+
+=item * L<Log::ger::UseDataDump>
+
+=item * L<Log::ger::UseDataDumpColor>
+
+=item * L<Log::ger::UseDataDumpObjectAsString>
+
+=item * L<Log::ger::UseDataDumper>
+
+=item * L<Log::ger::UseDataDumperCompact>
+
+=item * L<Log::ger::UseDataPrinter>
+
+=back
 
 =head1 AUTHOR
 

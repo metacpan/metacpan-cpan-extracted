@@ -1,6 +1,6 @@
 ####################################################################
 #
-#    This file was generated using Parse::Yapp version 1.05.
+#    This file was generated using Parse::Yapp version 1.21.
 #
 #        Don't edit this file, use source file instead.
 #
@@ -25,7 +25,8 @@ use strict;
 #
 # This notice should remain unchanged.
 #
-# (c) Copyright 1998-2001 Francois Desarmenien, all rights reserved.
+# Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+# Copyright © 2017 William N. Braswell, Jr.
 # (see the pod text in Parse::Yapp module for use and distribution rights)
 #
 
@@ -38,7 +39,8 @@ use strict;
 
 use vars qw ( $VERSION $COMPATIBLE $FILENAME );
 
-$VERSION = '1.05';
+# CORRELATION #py001: $VERSION must be changed in both Parse::Yapp & Parse::Yapp::Driver
+$VERSION = '1.21';
 $COMPATIBLE = '0.07';
 $FILENAME=__FILE__;
 
@@ -497,75 +499,70 @@ sub new {
         ref($class)
     and $class=ref($class);
 
-    my($self)=$class->SUPER::new( yyversion => '1.05',
+    my($self)=$class->SUPER::new( yyversion => '1.21',
                                   yystates =>
 [
 	{#State 0
 		ACTIONS => {
-			"<" => 2,
-			"{" => 3,
-			'T_string' => -9
+			'T_string' => 2,
+			"<" => 3,
+			"{" => 5
 		},
-		DEFAULT => -2,
+		DEFAULT => -6,
 		GOTOS => {
-			'optName' => 1,
-			'rlabel' => 4,
-			'field' => 6,
-			'boxlabel' => 5
+			'cell' => 1,
+			'portSpec' => 4,
+			'cellList' => 6
 		}
 	},
 	{#State 1
+		DEFAULT => -1
+	},
+	{#State 2
+		DEFAULT => -5
+	},
+	{#State 3
 		ACTIONS => {
 			'T_string' => 7
 		}
 	},
-	{#State 2
-		ACTIONS => {
-			'T_string' => 8
-		}
-	},
-	{#State 3
-		ACTIONS => {
-			"<" => 2,
-			"{" => 3,
-			'T_string' => -9
-		},
-		DEFAULT => -2,
-		GOTOS => {
-			'optName' => 1,
-			'rlabel' => 9,
-			'field' => 6,
-			'boxlabel' => 5
-		}
-	},
 	{#State 4
 		ACTIONS => {
-			'' => 10
-		}
+			'T_string' => 8
+		},
+		DEFAULT => -4
 	},
 	{#State 5
-		DEFAULT => -5
+		ACTIONS => {
+			'T_string' => 2,
+			"<" => 3,
+			"{" => 5
+		},
+		DEFAULT => -6,
+		GOTOS => {
+			'cell' => 1,
+			'portSpec' => 4,
+			'cellList' => 9
+		}
 	},
 	{#State 6
 		ACTIONS => {
+			'' => 10,
 			"|" => 11
-		},
-		DEFAULT => -4,
-		GOTOS => {
-			'optMoreFields' => 12
 		}
 	},
 	{#State 7
-		DEFAULT => -7
+		ACTIONS => {
+			">" => 12
+		}
 	},
 	{#State 8
-		ACTIONS => {
-			">" => 13
-		}
+		DEFAULT => -3
 	},
 	{#State 9
 		ACTIONS => {
-			"}" => 14
+			"}" => 13,
+			"|" => 11
 		}
 	},
 	{#State 10
@@ -573,29 +570,24 @@ sub new {
 	},
 	{#State 11
 		ACTIONS => {
-			"<" => 2,
-			"{" => 3,
-			'T_string' => -9
+			'T_string' => 2,
+			"<" => 3,
+			"{" => 5
 		},
-		DEFAULT => -2,
+		DEFAULT => -6,
 		GOTOS => {
-			'optName' => 1,
-			'rlabel' => 15,
-			'field' => 6,
-			'boxlabel' => 5
+			'cell' => 14,
+			'portSpec' => 4
 		}
 	},
 	{#State 12
-		DEFAULT => -1
-	},
-	{#State 13
 		DEFAULT => -8
 	},
-	{#State 14
-		DEFAULT => -6
+	{#State 13
+		DEFAULT => -7
 	},
-	{#State 15
-		DEFAULT => -3
+	{#State 14
+		DEFAULT => -2
 	}
 ],
                                   yyrules  =>
@@ -604,79 +596,59 @@ sub new {
 		 '$start', 2, undef
 	],
 	[#Rule 1
-		 'rlabel', 2,
+		 'cellList', 1,
 sub
-#line 14 "parseRecordLabel.yp"
-{
-					shift;	
-					my ($arg1, $arg2) = @_;
-					my (@arg1, @arg2);
-					
-					# flatten any args
-					if( ref($arg1) eq 'ARRAY' ){
-						@arg1 = @$arg1;
-					}
-					else{
-						@arg1 = ($arg1);
-					}
-					if( ref($arg2) eq 'ARRAY' ){
-						@arg2 = @$arg2;
-					}
-					elsif(defined($arg2)){
-						@arg2 = ($arg2);
-					}
-					
-					return [ @arg1, @arg2 ];
-				}
+#line 11 "parseRecordLabel.yp"
+{ [ $_[1] ] }
 	],
 	[#Rule 2
-		 'rlabel', 0, undef
+		 'cellList', 3,
+sub
+#line 12 "parseRecordLabel.yp"
+{ [ @{ $_[1] }, $_[3] ] }
 	],
 	[#Rule 3
-		 'optMoreFields', 2,
+		 'cell', 2,
 sub
-#line 39 "parseRecordLabel.yp"
-{ #print "rlabel = ".Data::Dumper::Dumper($_[2])." in optMoreFields\n";
-					return $_[2]; }
+#line 15 "parseRecordLabel.yp"
+{ +{ $_[1], $_[2] } }
 	],
 	[#Rule 4
-		 'optMoreFields', 0, undef
+		 'cell', 1,
+sub
+#line 16 "parseRecordLabel.yp"
+{ +{ $_[1], '' } }
 	],
 	[#Rule 5
-		 'field', 1,
+		 'cell', 1,
 sub
-#line 44 "parseRecordLabel.yp"
-{ return $_[1]; }
+#line 17 "parseRecordLabel.yp"
+{ +{ '', $_[1] } }
 	],
 	[#Rule 6
-		 'field', 3,
+		 'cell', 0,
 sub
-#line 45 "parseRecordLabel.yp"
-{ return $_[2]; }
+#line 18 "parseRecordLabel.yp"
+{ +{ '', '' } }
 	],
 	[#Rule 7
-		 'boxlabel', 2,
+		 'cell', 3,
 sub
-#line 48 "parseRecordLabel.yp"
-{ return { $_[1] || '', $_[2] } ;  }
+#line 19 "parseRecordLabel.yp"
+{ $_[2] }
 	],
 	[#Rule 8
-		 'optName', 3,
+		 'portSpec', 3,
 sub
-#line 51 "parseRecordLabel.yp"
-{ return $_[2] }
-	],
-	[#Rule 9
-		 'optName', 0, undef
+#line 22 "parseRecordLabel.yp"
+{ $_[2] }
 	]
 ],
                                   @_);
     bless($self,$class);
 }
 
-#line 56 "parseRecordLabel.yp"
-
-
+#line 25 "parseRecordLabel.yp"
 
 
 sub Error {
@@ -686,14 +658,15 @@ sub Error {
     my($expected)=$parse->YYExpect;
 
     my $input = $parse->YYData->{INPUT};
-    
+
     # Get rid of all but the first line
     ($input) = split("\n",$input);
 
-    print "Parse Error, Got token/value '$token', '$value'; Expected token '$expected'\n";
-    print "Near line :\n".$input."\n";
-    exit(1);
-
+    die <<EOF;
+Parse Error, Got token/value '$token', '$value'; Expected token '$expected'
+Near line :
+$input
+EOF
 }
 
 sub Lexer {
@@ -701,27 +674,22 @@ sub Lexer {
 
     my @expect = $parser->YYExpect;
 
-
     # If at the end of the string, and expecting a T_string token
     #   Return a null t_string
     #   This enables strings like '<f0> 0x10ba8| <f1>' to be parsed
     #   correctly
     if( $parser->YYData->{INPUT} eq '' && @expect == 1 && $expect[0] eq 'T_string'){
-    	return('T_string','');
+	return('T_string','');
     }
-    
+
     defined($parser->YYData->{INPUT})
-    or  return('',undef);    
+    or  return('',undef);
 
-
-	
     for( $parser->YYData->{INPUT}){
-    	# Differnt Token Types
-	
+	# Different Token Types
 
-
- 	# check for tokens '<>{} tokens (Whitespace OK)
-	if( s/^\s*([\<\>\{])//){  # <, > and { with whitespace before
+	# check for tokens '<>{} tokens (Whitespace OK)
+	if( s/^\s*([\<\>\{])\s*//){  # <, > and { with whitespace around
 		return($1, $1);
 	}
 	if( s/^(\})\s*//){  # }  with whitespace after
@@ -730,24 +698,17 @@ sub Lexer {
 	if( s/^(\|)//){  # |  with no whitespace
 		return($1, $1);
 	}
-	
 
-	# T_string 
+	# T_string
 	s/^(.*?)((?<!\\)[\>\{\|\}])/$2/s  # strings with embedded special characters (not backslashed)
-        	and return('T_string',$1);
-		
+	and return('T_string',$1);
+
 	# End of string, return everything
 	s/(.+)//s
 		and return ('T_string', $1);
-		
-	
-	# Other stuff
-        s/^(.)//s
-                and return($1,$1);
-		
+
 	return('','');
-		
   }
- }
+}
 
 1;

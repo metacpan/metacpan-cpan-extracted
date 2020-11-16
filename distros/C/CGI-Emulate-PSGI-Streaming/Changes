@@ -1,2 +1,7 @@
+1.0.1     2020-11-16 14:16:18+00:00 Europe/London
+ - Probably fixed RT#133593, thanks to David Cook for reporting
+   it. There was a possibility of losing some data if the CGI prints
+   very long lines
+
 1.0.0     2016-02-17 14:00:48+00:00 Europe/London
  - first release

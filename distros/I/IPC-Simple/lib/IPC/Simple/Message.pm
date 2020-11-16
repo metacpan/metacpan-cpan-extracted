@@ -1,33 +1,20 @@
 package IPC::Simple::Message;
-$IPC::Simple::Message::VERSION = '0.03';
+# ABSTRACT: a message received from an IPC::Simple process
+$IPC::Simple::Message::VERSION = '0.04';
+
 use strict;
 use warnings;
 
-use Moo;
-use Types::Standard -types;
-
 use overload fallback => 1,
-  '""' => sub{
-    my $self = shift;
-    return $self->message;
-  },
-  '==' => sub{
-    my ($self, $other, $swap) = @_;
+  '""' => \&message;
 
-    if ($swap) {
-      ($self, $other) = ($other, $self);
-    }
-
-    return $self->source == $other;
-  };
-
-use constant IPC_STDIN  => 0;
-use constant IPC_STDOUT => 1;
-use constant IPC_STDERR => 2;
-use constant IPC_ERROR  => 3;
+use constant IPC_STDIN  => 'stdin';
+use constant IPC_STDOUT => 'stdout';
+use constant IPC_STDERR => 'stderr';
+use constant IPC_ERROR  => 'errors';
 
 BEGIN{
-  extends 'Exporter';
+  use base 'Exporter';
 
   our @EXPORT = qw(
     IPC_STDIN
@@ -37,19 +24,22 @@ BEGIN{
   );
 }
 
-has source =>
-  is => 'ro',
-  isa => Enum[IPC_STDOUT, IPC_STDERR, IPC_ERROR],
-  required => 1;
+sub new {
+  my ($class, %param) = @_;
 
-has message =>
-  is => 'ro',
-  isa => Str,
-  required => 1;
+  bless{
+    source  => $param{source},
+    type    => $param{type},
+    message => $param{message},
+  }, $class;
+}
 
-sub stdout { $_[0] == IPC_STDOUT }
-sub stderr { $_[0] == IPC_STDERR }
-sub error  { $_[0] == IPC_ERROR }
+sub type    { $_[0]->{type} }
+sub source  { $_[0]->{source} }
+sub message { $_[0]->{message} }
+sub stdout  { $_[0]->type eq IPC_STDOUT }
+sub stderr  { $_[0]->type eq IPC_STDERR }
+sub error   { $_[0]->type eq IPC_ERROR }
 
 1;
 
@@ -61,11 +51,40 @@ __END__
 
 =head1 NAME
 
-IPC::Simple::Message
+IPC::Simple::Message - a message received from an IPC::Simple process
 
 =head1 VERSION
 
-version 0.03
+version 0.04
+
+=head1 METHODS
+
+=head2 source
+
+Returns the L<IPC::Simple> process from which this message was received.
+
+=head2 message
+
+Returns the string content of the message.
+
+=head2 stdout
+
+Returns true if this message was received from the child process' C<STDOUT>.
+
+=head2 stderr
+
+Returns true if this message was received from the child process' C<STDERR>.
+
+=head2 error
+
+Returns true if this message was generated as a result of a process
+communication error (e.g. C<SIGPIPE>).
+
+=head1 OVERLOADED
+
+=head2 stringification ("")
+
+Returns the L</message> string.
 
 =head1 AUTHOR
 

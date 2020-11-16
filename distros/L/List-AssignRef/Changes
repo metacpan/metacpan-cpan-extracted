@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/List-AssignRef>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=List-AssignRef>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005	2020-11-15	seventy-four months later...
+
+ [ Packaging ]
+ - Add missing parent.pm dependency.
+
 0.004	2014-09-15
 
  [ Packaging ]

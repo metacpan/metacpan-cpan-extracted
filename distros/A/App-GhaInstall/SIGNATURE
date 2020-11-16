@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 7845440b83ad3fd67b04dcb628cff927c86d065e5d85a524f230705b6fb3102e COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 dbdb11b0dc7af5bf6ef4feaa16a942b8cd2e174af5f8410819e5a0cf76c4a6a3 Changes
+SHA256 97fa5454dd0f6548d8c23c7c4ea76ce54354e857fbab9eee60752d57f9f28c05 INSTALL
+SHA256 1fb7395e76eabf94c421912d7d0a4f7fa745d49e1acb76b222c21d605b66bd25 LICENSE
+SHA256 68a5228b292261ef1c268a7466f2349387f8df7711d2e0dd4ba44f2d6b7a3d93 MANIFEST
+SHA256 69ea6e1ab2ab331149b1a3a7f3a4ecf6444cd81a9fa321e4eff664d37079050b META.json
+SHA256 738cc0021f0bdc6002613455957d7a97f56ec47838afe20db5f5b6f5eafed8d6 META.yml
+SHA256 ad2871f85a6df00163f6c4390fcd75587f59fb3342d03c9c987cd915284650f8 Makefile.PL
+SHA256 9017d9f1df0f65bdda918ee4afab091f04f5da4901deff711f088a29d4cfd39d README
+SHA256 7da0a2b7b203ec532ab70c8b5a9f9fdd93a7905bcd462d5646b2f6606fa6dbf1 bin/gha-install
+SHA256 1d76922e3f948fe6e7ed3814f50ec308be00642e97c84d8a772b87ce6bd487bd dist.ini
+SHA256 7c1dc974c3a9c9bb13bada15535e31e3159bca7110053c997d9f2f39d14e7588 doap.ttl
+SHA256 3ef8628adb074953f7037d2e8dab597fbc68c16b37fdf1a06efe35b3a98003c8 lib/App/GhaInstall.pm
+SHA256 41f49e8dbd691ac5f6a2b957b83bfca5a99677a981885a7c83d2f1e23e91cf0d lib/App/GhaInstall/JSON.pm
+SHA256 742476401b1318c4a1379dbd29b67b3a8fd7866dd5ebc4faef7d1be408ef6c43 lib/App/GhaInstall/YAML.pm
+SHA256 9b6877257208a22c9fbdab3dac71b0b7b3d1e7b990f1d969a6b96138eb79dec4 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCX7JtnQAKCRDOv4Eoaip9
+OZS1AKCidIm9A9si/xzWqTsDU1szuMAFOwCfe0plqzmnL2AtQsjSojV/jgtQ7Yw=
+=N9pc
+-----END PGP SIGNATURE-----

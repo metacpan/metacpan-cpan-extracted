@@ -9,11 +9,12 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.94'
-  perl: '5.006'
+  perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +30,7 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::Author::TEAM:
     file: lib/Dist/Zilla/PluginBundle/Author/TEAM.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Dist::Zilla::Plugin::ArchiveRelease: '0'
   Dist::Zilla::Plugin::Authority: '0'
@@ -63,7 +64,7 @@ requires:
   Dist::Zilla::Plugin::OurPkgVersion: '0'
   Dist::Zilla::Plugin::OverridePkgVersion: '0'
   Dist::Zilla::Plugin::PodCoverageTests: '0'
-  Dist::Zilla::Plugin::PodInherit: '0'
+  Dist::Zilla::Plugin::PodInherit: '0.008'
   Dist::Zilla::Plugin::PodSyntaxTests: '0'
   Dist::Zilla::Plugin::Prereqs::AuthorDeps: '0'
   Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
@@ -94,14 +95,17 @@ requires:
   Moose: '0'
   Perl::Version: '0'
   Test::CPAN::Meta: '0'
+  Test::CPANfile: '0'
+  Test::CheckDeps: '0.010'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM/issues
   homepage: https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM
   repository: https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:TEAM
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

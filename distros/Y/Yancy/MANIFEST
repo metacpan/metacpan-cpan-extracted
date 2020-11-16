@@ -225,9 +225,6 @@ t/schema/mysql.sql
 t/schema/openapi.pl
 t/schema/pg.sql
 t/schema/sqlite.sql
-t/selenium/.gitignore
-t/selenium/components.t
-t/selenium/editor.t
 t/share/avatar.jpg
 t/share/file.txt
 t/share/openapi-spec.json
@@ -250,4 +247,7 @@ t/standalone.t
 t/util.t
 weaver.ini
 xt/run_backend_tests.pl
+xt/selenium/.gitignore
+xt/selenium/components.t
+xt/selenium/editor.t
 xt/tmux-layout.sh

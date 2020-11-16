@@ -4,7 +4,7 @@ package Dist::Zilla::PluginBundle::Author::TEAM;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -67,7 +67,6 @@ sub configure {
         ['CopyFilesFromBuild' => {copy => [@copy_from_build]}],
         ['ExecDir'],
         ['ShareDir'],
-        ['AutoPrereqs'],
         -f 'cpanfile' ? ['Prereqs::FromCPANfile'] : (),
         ['Prereqs::AuthorDeps'],
         ['CheckPrereqsIndexed'],

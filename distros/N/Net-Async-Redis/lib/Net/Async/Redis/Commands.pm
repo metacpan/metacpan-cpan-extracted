@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.004'; # VERSION
+our $VERSION = '3.005'; # VERSION
 
 =head1 NAME
 
@@ -148,6 +148,8 @@ our %KEY_FINDER = (
     'ZADD' => 1,
     'ZCARD' => 1,
     'ZCOUNT' => 1,
+    'ZDIFF' => 2,
+    'ZDIFFSTORE' => 3,
     'ZINCRBY' => 1,
     'ZINTER' => 2,
     'ZINTERSTORE' => 3,
@@ -895,6 +897,19 @@ L<https://redis.io/commands/quit>
 sub quit : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(QUIT) => @args)
+}
+
+=head2 reset
+
+Reset the connection.
+
+L<https://redis.io/commands/reset>
+
+=cut
+
+sub reset : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(RESET) => @args)
 }
 
 =head2 select
@@ -4046,6 +4061,52 @@ sub zcount : method {
     $self->execute_command(qw(ZCOUNT) => @args)
 }
 
+=head2 zdiff
+
+Subtract multiple sorted sets.
+
+=over 4
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * [WITHSCORES]
+
+=back
+
+L<https://redis.io/commands/zdiff>
+
+=cut
+
+sub zdiff : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZDIFF) => @args)
+}
+
+=head2 zdiffstore
+
+Subtract multiple sorted sets and store the resulting sorted set in a new key.
+
+=over 4
+
+=item * destination
+
+=item * numkeys
+
+=item * key [key ...]
+
+=back
+
+L<https://redis.io/commands/zdiffstore>
+
+=cut
+
+sub zdiffstore : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZDIFFSTORE) => @args)
+}
+
 =head2 zincrby
 
 Increment the score of a member in a sorted set.
@@ -4755,7 +4816,7 @@ sub xinfo : method {
 
 =head2 xlen
 
-Return the number of entires in a stream.
+Return the number of entries in a stream.
 
 =over 4
 

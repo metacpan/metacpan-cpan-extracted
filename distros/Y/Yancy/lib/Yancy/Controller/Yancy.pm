@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.066';
+our $VERSION = '1.067';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -648,6 +648,10 @@ sub set {
                 $c->param( $key => $c->param( $key ) // $item->{ $key } );
             }
         }
+        else {
+            # Add an empty hashref for creating a new item
+            $c->stash( item => {} );
+        }
 
         $c->respond_to(
             json => {
@@ -1222,7 +1226,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.066
+version 1.067
 
 =head1 SYNOPSIS
 

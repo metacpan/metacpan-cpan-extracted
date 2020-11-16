@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl-Critic-Policy-ControlStructures-ProhibitReturnInDoBlock
 
+0.03 2020-11-16T02:12:10Z
+
+    - Change default themes (github PR: #2)
+
 0.02 2020-11-14T10:15:31Z
 
     - Do not violate return statement in do-(while|until) loop (github PR: #1)

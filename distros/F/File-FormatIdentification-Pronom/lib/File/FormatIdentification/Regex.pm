@@ -1,6 +1,6 @@
 package File::FormatIdentification::Regex;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 # ABSTRACT helper module to combine and optimize regexes
 
@@ -252,7 +252,7 @@ File::FormatIdentification::Regex
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 
