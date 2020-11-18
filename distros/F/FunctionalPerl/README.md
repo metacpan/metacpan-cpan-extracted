@@ -75,12 +75,12 @@ inputs:
     MYEXAMPLE(
         PROTOCOL_VERSION("0.123"),
         RECORDS(
-            csv_file_to_rows($inpath, {eol=> "\n", sep_char=> ";"})
+            csv_file_to_rows($inpath, {eol => "\n", sep_char => ";"})
             # skip the header row
             ->rest
             # map rows to XML elements
             ->map(sub {
-                      my ($a,$b,$c,$d)= @{$_[0]};
+                      my ($a,$b,$c,$d) = @{$_[0]};
                       RECORD(A($a), B($b), C($c), D($d))
                   })))
         # print XML document to disk
@@ -113,8 +113,8 @@ calculated you can't modify it in place; if you have multiple
 variables holding the same number, you can't (on purpose or
 accidentally) change them both at the same time:
 
-    my $x= 100; 
-    my $y= $x;
+    my $x = 100;
+    my $y = $x;
     $x++;
     is $y, 100; # still true, the number itself didn't change, only the variable
 
@@ -144,7 +144,7 @@ are more in`FP::Combinators`):
 
     # The same but takes the input items from a list instead of
     # multiple function arguments:
-    *square_of_the_sequence_sum= compose(\&square, the_method "sum");
+    *square_of_the_sequence_sum = compose(\&square, the_method "sum");
     is square_of_the_sequence_sum(list(2, 3)), 25;
 
 Functional programming matters more in the large--with small programs
@@ -324,14 +324,17 @@ in London, Berlin or Switzerland to get an introduction in person.
 * to run the test suite: `Test::Requires`
 
 * to run all the tests (otherwise some are skipped): in addition to
-  the above, `Test::Pod::Snippets`, `BSD::Resource`,
-  `Method::Signatures`, `Function::Parameters`, `Sub::Call::Tail`,
+  the above, Perl version >= 5.020, `Test::Pod::Snippets`,
+  `BSD::Resource`, `Method::Signatures`, `Sub::Call::Tail`,
   `Text::CSV`, `DBD::CSV`, `Text::CSV`, `URI`, `Text::Markdown`,
   `Clone`. Some of these are also necessary to run `htmlgen/gen` (or
   `website/gen` to build the website), see
   [Htmlgen](htmlgen/README.md) for details.
 
 (Todo: should all of the above be listed in PREREQ_PM in Makefile.PL?)
+
+You can run `meta/install-development-dependencies-on-debian` to get
+those installed if you're on a Debian system.
 
 
 ## Installation

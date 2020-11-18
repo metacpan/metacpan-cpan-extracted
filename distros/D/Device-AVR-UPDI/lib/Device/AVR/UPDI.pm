@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Device::AVR::UPDI;
+package Device::AVR::UPDI 0.04;
 
-use strict;
+use v5.20;
 use warnings;
 
 use Carp;
@@ -13,13 +13,18 @@ use Carp;
 use Future::AsyncAwait;
 use Future::IO 0.03; # ->sysread_exactly
 
-use Struct::Dumb qw( readonly_struct );
+use File::ShareDir qw( module_dir );
+use YAML ();
 
-our $VERSION = '0.03';
+my $SHAREDIR = module_dir( __PACKAGE__ );
+
+use Struct::Dumb qw( readonly_struct );
 
 use constant DEBUG => $ENV{UPDI_DEBUG};
 
 readonly_struct PartInfo => [qw(
+   name
+
    signature
    baseaddr_nvmctrl
    baseaddr_fuse
@@ -46,7 +51,7 @@ my %partinfos;
       my $fuses = [ map { length ? $_ : undef } split m/,/, pop @fields ];
       m/^0x/ and $_ = hex $_ for @fields;
 
-      my $partinfo = PartInfo( $signature, @fields, $fuses );
+      my $partinfo = PartInfo( $name, $signature, @fields, $fuses );
 
       $partinfos{lc $name} = $partinfo;
       $partinfos{"m$1"} = $partinfo if $name =~ m/^ATmega(.*)$/;
@@ -174,6 +179,8 @@ which may be useful for interacting with the chip.
 
 The returned structure provides the following fields
 
+   $name = $partinfo->name
+
    $sig = $partinfo->signature
 
    $addr = $partinfo->baseaddr_nvmctrl
@@ -195,6 +202,28 @@ sub partinfo
 {
    my $self = shift;
    return $self->{partinfo};
+}
+
+=head2 fuseinfo
+
+Returns a data structure containing information about the individual fuse
+fields defined by this device.
+
+This is parsed directly from a shipped YAML file; see the files in the
+F<share/> directory for more details.
+
+=cut
+
+sub fuseinfo
+{
+   my $self = shift;
+   return $self->{fuseinfo} //= do {
+      my $yamlpath = "$SHAREDIR/${\ $self->partinfo->name }.yaml";
+      unless( -f $yamlpath ) {
+         die "No YAML file found at $yamlpath\n";
+      }
+      YAML::LoadFile( $yamlpath );
+   };
 }
 
 =head1 METHODS
@@ -281,7 +310,7 @@ async sub _op_writeread
 
    my $fh = $self->{fh};
 
-   $fh->print( $write );
+   await Future::IO->syswrite_exactly( $fh, $write );
 
    my $buf = "";
    my $len = length( $write ) + $readlen;
@@ -698,12 +727,17 @@ Writes a single page into NVM controller in 8- or 16-bit word transfers.
 C<$addr> is within the data address space. C<$wordsize> must be either 8 or
 16.
 
+=head2 erasewrite_nvm_page
+
+Identical to L</write_nvm_page> but issues a combined erase-and-write command.
+This is the method to use for EEPROM writes.
+
 =cut
 
 async sub write_nvm_page
 {
    my $self = shift;
-   my ( $addr, $data, $wordsize ) = @_;
+   my ( $addr, $data, $wordsize, $cmd ) = @_;
 
    # clear page buffer
    await $self->nvmctrl_command( NVMCTRL_CMD_PBC );
@@ -719,8 +753,13 @@ async sub write_nvm_page
       croak "Invalid word size";
    }
 
-   await $self->nvmctrl_command( NVMCTRL_CMD_WP );
+   await $self->nvmctrl_command( $cmd // NVMCTRL_CMD_WP );
    await $self->await_nvm_not_busy;
+}
+
+sub erasewrite_nvm_page
+{
+   shift->write_nvm_page(@_[0..2], NVMCTRL_CMD_ERWP);
 }
 
 =head2 write_fuse

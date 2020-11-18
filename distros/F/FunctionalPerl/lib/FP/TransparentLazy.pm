@@ -19,7 +19,7 @@ FP::TransparentLazy - lazy evaluation with transparent evaluation
     like((eval {
         # $a's evaluation is forced here
         print $a
-    } || $@), qr/division by zero/); 
+    } || $@), qr/division by zero/);
 
     # etc., see SYNOPSIS in FP::Lazy but remove the `force` and `FORCE`
     # calls
@@ -50,20 +50,20 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::TransparentLazy;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(lazy lazyLight force FORCE is_promise);
-@EXPORT_OK=qw(delay);
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(lazy lazyLight force FORCE is_promise);
+our @EXPORT_OK   = qw(delay);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
-use FP::Lazy qw(force FORCE is_promise); # for re-export
-
+use FP::Lazy qw(force FORCE is_promise);    # for re-export
 
 sub lazy (&) {
-    bless [$_[0],undef], "FP::TransparentLazy::Promise"
+    bless [$_[0], undef], "FP::TransparentLazy::Promise"
 }
 
 # not providing for caching (1-time-only evaluation)
@@ -71,40 +71,43 @@ sub lazyLight (&) {
     bless $_[0], "FP::TransparentLazy::PromiseLight"
 }
 
-sub delay (&);  *delay = \&lazy;
-sub delayLight (&); *delayLight= \&lazyLight;
-
+sub delay (&);
+*delay = \&lazy;
+sub delayLight (&);
+*delayLight = \&lazyLight;
 
 package FP::TransparentLazy::Overloads {
-    use overload
-        ((map {
-            $_=> "FORCE"
-          } split / +/,
-          '"" 0+ bool qr &{} ${} %{} *{}'),
-         # XX hm, can't overload '@{}', why?
-         fallback=> 1);
+    use overload(
+        (map { $_ => "FORCE" } split / +/, '"" 0+ bool qr &{} ${} %{} *{}'),
+
+        # XX hm, can't overload '@{}', why?
+        fallback => 1
+    );
 }
 
 package FP::TransparentLazy::Promise {
-    our @ISA= qw(FP::TransparentLazy::Overloads
-                 FP::Lazy::Promise);
+    our @ISA = qw(FP::TransparentLazy::Overloads
+        FP::Lazy::Promise);
 }
 
 package FP::TransparentLazy::PromiseLight {
-    our @ISA= qw(FP::TransparentLazy::Overloads
-                 FP::Lazy::PromiseLight);
+    our @ISA = qw(FP::TransparentLazy::Overloads
+        FP::Lazy::PromiseLight);
 }
 
 use Chj::TEST;
 
 our $c;
-TEST { $c= lazy { sub { "foo" } };
-       ref $c }
-  'FP::TransparentLazy::Promise';
+TEST {
+    $c = lazy {
+        sub {"foo"}
+    };
+    ref $c
+}
+'FP::TransparentLazy::Promise';
 TEST { &$c() }
-  "foo";
+"foo";
 TEST { ref $c }
-  "CODE";
-
+"CODE";
 
 1

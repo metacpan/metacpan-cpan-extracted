@@ -59,14 +59,6 @@ sub task
     $p = Convert::Binary::C->new(
       %$CCCFG,
       EnumSize       => 0,
-      ShortSize      => 2,
-      IntSize        => 4,
-      LongSize       => 4,
-      LongLongSize   => 8,
-      PointerSize    => 4,
-      FloatSize      => 4,
-      DoubleSize     => 8,
-      LongDoubleSize => 12
     );
     if ($arg % 2) {
       print "# parse_file ($arg) called\n";
@@ -74,11 +66,11 @@ sub task
       print "# parse_file ($arg) returned\n";
     }
     else {
+      open FH, "tests/include/include.c" or die;
+      my $code = do { local $/; <FH> };
+      close FH;
       print "# parse ($arg) called\n";
-      $p->parse( <<END );
-#include "EXTERN.h"
-#include "perl.h"
-END
+      $p->parse($code);
       print "# parse ($arg) returned\n";
     }
   };
@@ -93,11 +85,11 @@ END
   my @union_ids    = $p->union_names;
   my @typedef_ids  = $p->typedef_names;
 
-  @enum_ids     ==   4 or return "incorrect number of enum identifiers";
-  @compound_ids == 146 or return "incorrect number of compound identifiers";
-  @struct_ids   == 141 or return "incorrect number of struct identifiers";
-  @union_ids    ==   5 or return "incorrect number of union identifiers";
-  @typedef_ids  == 329 or return "incorrect number of typedef identifiers";
+  @enum_ids     ==  1 or return "incorrect number of enum identifiers";
+  @compound_ids == 20 or return "incorrect number of compound identifiers";
+  @struct_ids   == 19 or return "incorrect number of struct identifiers";
+  @union_ids    ==  1 or return "incorrect number of union identifiers";
+  @typedef_ids  == 54 or return "incorrect number of typedef identifiers";
 
   my @enums     = $p->enum;
   my @compounds = $p->compound;
@@ -105,11 +97,11 @@ END
   my @unions    = $p->union;
   my @typedefs  = $p->typedef;
 
-  @enums      ==  35 or return "incorrect number of enums";
-  @compounds  == 287 or return "incorrect number of compounds";
-  @structs    == 200 or return "incorrect number of structs";
-  @unions     ==  87 or return "incorrect number of unions";
-  @typedefs   == 334 or return "incorrect number of typedefs";
+  @enums      == 12 or return "incorrect number of enums";
+  @compounds  == 26 or return "incorrect number of compounds";
+  @structs    == 20 or return "incorrect number of structs";
+  @unions     ==  6 or return "incorrect number of unions";
+  @typedefs   == 54 or return "incorrect number of typedefs";
 
   my %size = do { local (@ARGV, $/) = ('tests/include/sizeof.pl'); eval <> };
   my $max_size = 0;

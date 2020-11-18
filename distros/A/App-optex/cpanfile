@@ -4,6 +4,7 @@ requires 'Getopt::EX', 'v1.20.0';
 requires 'List::Util', '1.45';
 requires 'TOML', '0.95';
 requires 'Text::VisualWidth::PP', '0.05';
+requires 'Time::Piece';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

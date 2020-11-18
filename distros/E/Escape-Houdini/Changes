@@ -1,71 +1,78 @@
 Revision history for Escape-Houdini
 
-0.3.2 2019-08-14
-  [ BUG FIXES ]
-    - Set utf8 flag on all returned values (Askar Timirgazin, GH#6)
+0.3.3 2020-11-16
+ [BUG FIXES]
+ - Add missing includes for OSX (Brian Fraser, GH#8).
 
-  [ STATISTICS ]
-    - code churn: 10 files changed, 182 insertions(+), 8 deletions(-)
+ [STATISTICS]
+ - code churn: 7 files changed, 23 insertions(+), 16 deletions(-)
+
+0.3.2 2019-08-14
+ [BUG FIXES]
+ - Set utf8 flag on all returned values (Askar Timirgazin, GH#6)
+
+ [STATISTICS]
+ - code churn: 10 files changed, 182 insertions(+), 8 deletions(-)
 
 0.3.1 2019-06-22
-  [ DOCUMENTATION ]
-    - Small improvements.
+ [DOCUMENTATION]
+ - Small improvements.
 
-  [ STATISTICS ]
-    - code churn: 9 files changed, 244 insertions(+), 69 deletions(-)
+ [STATISTICS]
+ - code churn: 9 files changed, 244 insertions(+), 69 deletions(-)
 
 0.3.0 2017-03-27
-  [ ENHANCEMENTS ]
-    - Update houdini lib to latest version.
+ [ENHANCEMENTS]
+ - Update houdini lib to latest version.
 
-  [ STATISTICS ]
-    - code churn: 5 files changed, 24 insertions(+), 13 deletions(-)
+ [STATISTICS]
+ - code churn: 5 files changed, 24 insertions(+), 13 deletions(-)
 
 0.2.1 2014-02-03
-  [ BUG FIXES ]
-    - Tweak test to play nice with new Devel::Peek prototype.  (Tony Cook,
-      RT#92569)
+ [BUG FIXES]
+ - Tweak test to play nice with new Devel::Peek prototype.  (Tony Cook,
+   RT#92569)
 
-  [ STATISTICS ]
-    - code churn: 3 files changed, 18 insertions(+), 3 deletions(-)
+ [STATISTICS]
+ - code churn: 3 files changed, 18 insertions(+), 3 deletions(-)
 
 0.2.0 2014-01-01
-  [ ENHANCEMENTS ]
-    - Sync the houdini code with the actively maintained fork of Christian
-      Bundy. (GH#3)
+ [ENHANCEMENTS]
+ - Sync the houdini code with the actively maintained fork of Christian
+   Bundy. (GH#3)
 
-  [ STATISTICS ]
-    - code churn: 4 files changed, 14 insertions(+), 9 deletions(-)
-
-0.1.4 2013-05-31
-  - Promote v0.1.3_0 to stable.
-
-  [ STATISTICS ]
-    - code churn: 1 file changed, 9 insertions(+), 1 deletion(-)
+ [STATISTICS]
+ - code churn: 4 files changed, 14 insertions(+), 9 deletions(-)
 
 0.1.3_0 2013-05-26
-  [ ENHANCEMENTS ]
-    - Don't make buffer.c assumes that there's a MIN macro.
+ [ENHANCEMENTS]
+ - Don't make buffer.c assumes that there's a MIN macro.
 
-  [ STATISTICS ]
-    - code churn: 3 files changed, 11 insertions(+), 3 deletions(-)
+ [STATISTICS]
+ - code churn: 3 files changed, 11 insertions(+), 3 deletions(-)
+
+0.1.4 2013-05-31
+ - Promote v0.1.3_0 to stable.
+
+ [STATISTICS]
+ - code churn: 1 file changed, 9 insertions(+), 1 deletion(-)
 
 0.1.2 2013-05-14
-  [ BUG FIXES ]
-    - Forgot to add the tags.
+ [BUG FIXES]
+ - Forgot to add the tags.
 
-  [ STATISTICS ]
-    - code churn: 2 files changed, 13 insertions(+), 2 deletions(-)
+ [STATISTICS]
+ - code churn: 2 files changed, 13 insertions(+), 2 deletions(-)
 
 0.1.1 2013-05-14
-  [ BUG FIXES ]
-    - Fix error message in .xs file.
+ [BUG FIXES]
+ - Fix error message in .xs file.
 
-  [ STATISTICS ]
-    - code churn: 6 files changed, 434 insertions(+), 6 deletions(-)
+ [STATISTICS]
+ - code churn: 6 files changed, 434 insertions(+), 6 deletions(-)
 
 0.1.0_0 2013-05-08
-  - First (beta) version, unleashed on an unsuspecting world.
+ - First (beta) version, unleashed on an unsuspecting world.
 
-  [ STATISTICS ]
-    - code churn: 12 files changed, 345 insertions(+), 56 deletions(-)
+ [STATISTICS]
+ - code churn: 12 files changed, 345 insertions(+), 56 deletions(-)

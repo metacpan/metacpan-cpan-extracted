@@ -1,5 +1,5 @@
 Name:           perl-Net-Camera-Sercomm-ICamera2
-Version:        0.01
+Version:        0.02
 Release:        1%{?dist}
 Summary:        Perl Interface for Sercomm ICamera2 network camera
 License:        MIT

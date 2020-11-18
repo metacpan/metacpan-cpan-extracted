@@ -27,14 +27,22 @@ my %WriteMakefileArgs = (
                     "Perl::Tidy"          => "20200822",    # new formatting
                 },
             },
+            test => {
+                requires => {
+                    'Test::More' => '0.82',                 # explain
+                },
+                recommends => {
+                    'App::Prove' => '3.00',                 # prove -j4
+                },
+            },
         },
         resources => {
-            bugtracker => { web => 'http://github.com/klp2/Make/issues' },
-            homepage   => 'http://metacpan.org/pod/Make',
+            bugtracker => { web => 'https://github.com/klp2/Make/issues' },
+            homepage   => 'https://metacpan.org/pod/Make',
             repository => {
                 type => 'git',
-                url  => 'http://github.com/klp2/Make.git',
-                web  => 'http://github.com/klp2/Make',
+                url  => 'https://github.com/klp2/Make.git',
+                web  => 'https://github.com/klp2/Make',
             },
             x_IRC => 'irc://irc.perl.org/#perl'
         },

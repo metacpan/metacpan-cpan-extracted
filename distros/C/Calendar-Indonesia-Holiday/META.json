@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
@@ -36,9 +36,9 @@
             "DateTime" : "0",
             "Exporter" : "5.57",
             "Function::Fallback::CoreOrPP" : "0",
-            "Perinci::Sub::Gen::AccessTable" : "0.583",
+            "Perinci::Sub::Gen::AccessTable" : "0.586",
             "Perinci::Sub::Property::result::table" : "0",
-            "Perinci::Sub::Util" : "0.46",
+            "Perinci::Sub::Util" : "0.470",
             "experimental" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-Calendar-Indonesia-Holiday"
       }
    },
-   "version" : "0.326",
+   "version" : "0.327",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -166,7 +166,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.602"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -186,7 +186,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.041"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

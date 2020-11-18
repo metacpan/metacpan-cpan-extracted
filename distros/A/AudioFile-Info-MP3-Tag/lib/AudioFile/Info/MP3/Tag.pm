@@ -24,7 +24,7 @@ use Carp;
 
 use MP3::Tag;
 
-our $VERSION = '1.6.1';
+our $VERSION = '1.6.2';
 
 my %data = (artist => ['artist', 'TPE1'],
             title  => ['song', 'TIT2'],
@@ -62,7 +62,7 @@ sub AUTOLOAD {
       my $tag = $data{$sub}[0];
       $frame->$tag($_[1]);
       $frame->write_tag;
-    } 
+    }
     if (my $frame = $_[0]->{obj}{ID3v2}) {
       my $tag = $data{$sub}[1];
       if (exists $frame->get_frame_ids->{$tag}) {
@@ -71,8 +71,8 @@ sub AUTOLOAD {
         $frame->add_frame($tag, $_[1]);
       }
       $frame->write_tag;
-    } 
-  } 
+    }
+  }
 
   if ($_[0]->{obj}{ID3v2}) {
     return ($_[0]->{obj}{ID3v2}->get_frame($data{$sub}[1]))[0];
@@ -104,6 +104,6 @@ Dave Cross, E<lt>dave@mag-sol.comE<gt>
 Copyright (c) 2003-2009 by Magnum Solutions Ltd. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut

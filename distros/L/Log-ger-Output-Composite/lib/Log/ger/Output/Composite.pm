@@ -1,9 +1,9 @@
 package Log::ger::Output::Composite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
+our $DATE = '2020-11-17'; # DATE
 our $DIST = 'Log-ger-Output-Composite'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use strict;
 use warnings;
@@ -16,6 +16,11 @@ our $Current_Level;
 sub meta { +{
     v => 2,
 } }
+
+sub _debug {
+    return unless $ENV{LOG_GER_OUTPUT_COMPOSITE_DEBUG};
+    warn "[Log::ger::Output::Composite] debug: $_[0]\n";
+}
 
 sub _get_min_max_level {
     my $level = shift;
@@ -38,6 +43,12 @@ sub _get_min_max_level {
 
 sub get_hooks {
     my %plugin_conf = @_;
+
+    #_debug "In get_hooks()";
+
+    my $empty_hashref = {};
+    my %outputter_get_hooks_cache; # key = "$output $conf", value = result from outputter's get_hooks()
+    my %layouter_get_hooks_cache ; # key = "$output $conf", value = result from layouter's get_hooks()
 
     # check arguments
     for my $k (keys %plugin_conf) {
@@ -103,8 +114,15 @@ sub get_hooks {
                 for my $ospec (@ospecs) {
                     my $oname = $ospec->{_name};
                     my $mod = "Log::ger::Output::$oname";
-                    my $hooks = &{"$mod\::get_hooks"}(%{ $ospec->{conf} || {} })
-                        or die "Output module $mod does not return any hooks";
+                    my $ospec_conf = $ospec->{conf} || $empty_hashref;
+                    my $cache_key = "$oname $ospec_conf";
+                    my $hooks = $outputter_get_hooks_cache{$cache_key} || do {
+                        _debug("calling $oname\'s get_hooks() ...");
+                        my $res = &{"$mod\::get_hooks"}(%$ospec_conf)
+                            or die "Output module $mod does not return any hooks";
+                        $outputter_get_hooks_cache{$cache_key} = $res;
+                        $res;
+                    };
                     my @hook_args = (
                         routine_name    => $hook_args{routine_name},
                         target_type     => $hook_args{target_type},
@@ -135,13 +153,18 @@ sub get_hooks {
                     }
                     if ($ospec->{layout}) {
                         my $lname = $ospec->{layout}[0];
-                        my $lconf = $ospec->{layout}[1] || {};
+                        my $lconf = $ospec->{layout}[1] || $empty_hashref;
                         my $lmod  = "Log::ger::Layout::$lname";
                         (my $lmod_pm = "$lmod.pm") =~ s!::!/!g;
                         require $lmod_pm;
-                        my $lhooks = &{"$lmod\::get_hooks"}(%$lconf)
-                            or die "Layout module $lmod does not return ".
-                            "any hooks";
+                        my $cache_key = "$lname $lconf";
+                        my $lhooks = $layouter_get_hooks_cache{$cache_key} || do {
+                            _debug("calling layouter $lname\'s get_hooks() ...");
+                            my $res = &{"$lmod\::get_hooks"}(%$lconf)
+                                or die "Layout module $lmod does not return any hooks";
+                            $layouter_get_hooks_cache{$cache_key} = $res;
+                            $res;
+                        };
                         $lhooks->{create_layouter}
                             or die "Layout module $mod does not declare ".
                             "layouter";
@@ -287,7 +310,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -442,6 +465,10 @@ per-category and per-output levels will be set to C<trace>.
 =head2 LOG_LOG_GER_OUTPUT_COMPOSITE_CODE
 
 Bool. If set to true will print the generated logger source code to stderr.
+
+=head2 LOG_GER_OUTPUT_COMPOSITE_DEBUG
+
+Bool. If set to true, will print some debugging messages to stderr.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -41,24 +41,28 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package PXML;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(is_pxml_element);
-@EXPORT_OK=qw(pxmlbody pxmlflush is_pxmlflush);
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(is_pxml_element);
+our @EXPORT_OK   = qw(pxmlbody pxmlflush is_pxmlflush);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use PXML::Element;
 
 use FP::Predicates 'instance_of';
+use Scalar::Util qw(blessed);
 
-sub is_pxml_element ($); *is_pxml_element= instance_of("PXML::Element");
-
+sub is_pxml_element ($);
+*is_pxml_element = instance_of("PXML::Element");
 
 {
+
     package PXML::Body;
+
     # hacky?.
     *string = *PXML::Element::string;
 }
@@ -67,14 +71,16 @@ sub pxmlbody {
     bless [@_], "PXML::Body"
 }
 
-my $flush= bless [], "PXML::Flush";
+my $flush = bless [], "PXML::Flush";
+
 sub pxmlflush {
     $flush
 }
 
 sub is_pxmlflush ($) {
-    my ($v)=@_;
-    ref $v and UNIVERSAL::isa($v, "PXML::Flush")
+    my ($v) = @_;
+    blessed($v) // return;
+    $v->isa("PXML::Flush")
 }
 
 # XX make this cleaner:
@@ -82,6 +88,5 @@ sub is_pxmlflush ($) {
 # - move `string` there (and perhaps all of serialization)
 # - automatically use PXML::Body for bodies? (now that I moved away
 #   from requiring bodies to be arrays, though?)
-
 
 1

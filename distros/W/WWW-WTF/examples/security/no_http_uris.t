@@ -1,5 +1,4 @@
 use common::sense;
-use Test2::V0 '!meta';
 use WWW::WTF::Testcase;
 
 my $test = WWW::WTF::Testcase->new();
@@ -9,22 +8,29 @@ $test->run_test(sub {
 
     my $iterator = $self->ua_lwp->recurse($self->uri_for('/sitemap.xml'));
 
-    my $http_uris = {};
-
     while (my $http_resource = $iterator->next) {
-        foreach my $uri ($http_resource->get_links) {
-            if (($uri->scheme // '') eq 'http') {
-                $http_uris->{$uri}++;
-                next;
+        my $uri = $http_resource->request_uri;
+        $test->report->diag("Checking for HTTP URIs at $uri");
+
+        $self->run_subtest($uri, sub {
+            my %http_uris;
+            my %https_uris;
+
+            foreach my $uri ($http_resource->get_links) {
+                next unless (($uri->scheme // '') =~ m/^http/);
+
+                if ($uri->scheme eq 'http') {
+                    $http_uris{$uri}++;
+                } else {
+                    $https_uris{$uri}++;
+                }
             }
 
-            pass("Link is HTTPS $uri");
-        }
-    }
+            $self->report->fail("Link is HTTP: $_")
+                foreach(keys(%http_uris));
 
-    foreach(keys(%$http_uris)) {
-        fail("HTTP URI found: " . $_);
+            $self->report->pass("Link is HTTPS: $_")
+                foreach(keys(%https_uris));
+        });
     }
-
-    done_testing();
 });

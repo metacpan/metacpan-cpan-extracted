@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Log::ger::Output::Composite",
   "PREREQ_PM" => {
-    "Data::Dmp" => "0.21",
+    "Data::Dmp" => "0.240",
     "Log::ger::Util" => "0.037",
     "strict" => 0,
     "warnings" => 0
@@ -27,12 +27,12 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Log::ger" => "0.037",
     "Log::ger::Layout" => 0,
-    "Log::ger::Layout::Pattern" => "0.002",
+    "Log::ger::Layout::Pattern" => "0.007",
     "Log::ger::Output" => "0.007",
     "Log::ger::Output::String" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,13 +40,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dmp" => "0.21",
+  "Data::Dmp" => "0.240",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.037",
   "Log::ger::Layout" => 0,
-  "Log::ger::Layout::Pattern" => "0.002",
+  "Log::ger::Layout::Pattern" => "0.007",
   "Log::ger::Output" => "0.007",
   "Log::ger::Output::String" => 0,
   "Log::ger::Util" => "0.037",

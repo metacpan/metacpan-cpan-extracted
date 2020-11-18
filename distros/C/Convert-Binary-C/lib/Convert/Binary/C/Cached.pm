@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION );
 
 @ISA = qw(Convert::Binary::C);
 
-$VERSION = '0.79';
+$VERSION = '0.80';
 
 sub new
 {
@@ -366,8 +366,8 @@ Convert::Binary::C::Cached - Caching for Convert::Binary::C
   $c = Convert::Binary::C::Cached->new(
          Cache   => '/tmp/cache.c',
          Include => [
-           '/usr/lib/gcc/i686-pc-linux-gnu/4.5.2/include',
-           '/usr/lib/gcc/i686-pc-linux-gnu/4.5.2/include-fixed',
+           '/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include',
+           '/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed',
            '/usr/include',
          ],
        );
@@ -447,4 +447,3 @@ it under the same terms as Perl itself.
 See L<Convert::Binary::C>.
 
 =cut
-

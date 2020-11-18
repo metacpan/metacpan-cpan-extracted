@@ -1,3 +1,10 @@
+2.006 2020-11-18
+- internal changes
+
+2.005 2020-11-16
+- doc has_target more accurately
+- add targets method
+
 2.004 2020-11-06
 - identify default target better
 

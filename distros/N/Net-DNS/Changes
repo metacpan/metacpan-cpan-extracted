@@ -1,4 +1,11 @@
-$Id: Changes 1821 2020-10-23 14:40:41Z willem $                       -*-text-*-
+$Id: Changes 1826 2020-11-18 13:18:18Z willem $                       -*-text-*-
+
+
+**** 1.29 Nov 18, 2020
+
+	Include test number in summary of failed non-fatal tests.
+	Remove Net::DNS::SEC specific tests.
+	Fix faulty test plan in t/08-recurse.t.
 
 
 **** 1.28 Oct 23, 2020

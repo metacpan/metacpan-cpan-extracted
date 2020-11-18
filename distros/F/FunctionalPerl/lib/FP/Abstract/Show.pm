@@ -14,9 +14,9 @@ FP::Abstract::Show - data constructor protocol
 =head1 SYNOPSIS
 
     package FPShowExample::Foo {
-        sub new { my $class= shift; bless [@_], $class }
+        sub new { my $class = shift; bless [@_], $class }
         sub FP_Show_show {
-            my ($self, $show)=@_;
+            my ($self, $show) = @_;
             # $show is for recursive use
             "FPShowExample::Foo->new(".join(", ",
                  map { $show->($_) } @$self).")"
@@ -64,16 +64,14 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Abstract::Show;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
 use base qw(FP::Mixin::Utils);
 
-sub FP_Interface__method_names {
-    ("FP_Show_show")
-}
-
+sub FP_Interface__method_names { ("FP_Show_show") }
 
 1

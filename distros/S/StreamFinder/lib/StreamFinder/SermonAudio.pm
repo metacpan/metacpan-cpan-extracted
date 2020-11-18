@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::SermonAudio;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $podcast = new StreamFinder::SermonAudio($ARGV[0]);
 
@@ -86,7 +86,7 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::SermonAudio accepts a valid podcast ID or URL on 
+StreamFinder::SermonAudio accepts a valid podcast (sermon) ID or URL on 
 SermonAudio.com and returns the actual stream URL(s), title, and cover art icon.  
 The purpose is that one needs one of these URLs in order to have the option to 
 stream the podcast in one's own choice of media player software rather than 
@@ -103,9 +103,9 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ] ... ])
 
-Accepts a www.sermonaudio.com podcast ID or URL and creates and returns a 
+Accepts a www.sermonaudio.com podcast (sermon) ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
 are found.  The URL can be the full URL, ie. 
 https://www.sermonaudio.com/sermoninfo.asp?SID=B<podcast-id>, or just 
@@ -396,10 +396,12 @@ sub new
 		$self->{'year'} = $1  if ($mmddyy =~ /(\d\d\d\d)\s*$/);
 	}
 	$self->{'year'} ||= $1  if ($html =~ s#\d\, (\d\d\d\d)\<\/I\>\<\/font\>\<BR\>##s);
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'title'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'title'} =~ s#\\u0027#\"#g;
-	$self->{'description'} =~ s#\\u0027#\"#g;
+	$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	$self->{'iconurl'} = ($html =~ s#\<meta\s+property\=\"og\:image(?:\:secure\_url)?"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
 	$self->{'imageurl'} = $self->{'iconurl'};
 	if ($html =~ s#Speaker\:\<\/font\>\<BR\>\<B\>\<a\s+class\=\S+\shref\=\"([^\"]+)\"\>([^\<]*)##s) {

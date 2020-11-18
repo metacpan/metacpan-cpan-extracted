@@ -1,3 +1,9 @@
+2.20201117.2 2020-11-17 UTC
+  - Do not fail tests when internet is not available
+  - Require valid usage flags in intermediate certs
+  - Update check logic for VMC alt names to reflect the
+    current draft standard
+
 2.20201102.2 2020-11-02 UTC
   - Do not load external entities when validating SVG
     Requires XML::LibXML 2.0202

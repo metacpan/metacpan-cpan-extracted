@@ -57,79 +57,81 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 # XX Should `on` (and `cmp_complement`?) be moved to `FP::Combinators`?
 
-
 package FP::Array_sort;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(array_sort array_sortCompare on on_maybe cmp_complement);
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(array_sort array_sortCompare on on_maybe cmp_complement);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use FP::Ops qw(string_cmp number_cmp binary_operator);
 use Chj::TEST;
 
 sub array_sort ($;$) {
-    @_==1 or @_==2 or die "wrong number of arguments";
-    my ($in,$maybe_cmp)=@_;
+    @_ == 1 or @_ == 2 or die "wrong number of arguments";
+    my ($in, $maybe_cmp) = @_;
     if (defined $maybe_cmp) {
-        [
-         sort {
-             &$maybe_cmp($a,$b)
-         } @$in
-        ]
+        [sort { &$maybe_cmp($a, $b) } @$in]
     } else {
         [
-         # To use the FP::Abstract::Compare protocol, use
-         # array_sortCompare instead--we need to be backwards compatible
-         # here.
-         sort @$in
+
+            # To use the FP::Abstract::Compare protocol, use
+            # array_sortCompare instead--we need to be backwards compatible
+            # here.
+            sort @$in
         ]
     }
 }
 
 sub array_sortCompare ($) {
-    @_==1 or die "wrong number of arguments";
-    my ($in)=@_;
-    [
-     sort {
-         $a->FP_Compare_compare($b)
-     } @$in
-    ]
+    @_ == 1 or die "wrong number of arguments";
+    my ($in) = @_;
+    [sort { $a->FP_Compare_compare($b) } @$in]
 }
 
 sub on ($ $) {
-    @_==2 or die "expecting 2 arguments";
-    my ($select, $cmp)=@_;
+    @_ == 2 or die "expecting 2 arguments";
+    my ($select, $cmp) = @_;
     sub {
-        @_==2 or die "expecting 2 arguments";
-        my ($a,$b)=@_;
+        @_ == 2 or die "expecting 2 arguments";
+        my ($a, $b) = @_;
         &$cmp(&$select($a), &$select($b))
     }
 }
 
 sub on_maybe ($$) {
-    @_==2 or die "expecting 2 arguments";
-    my ($maybe_select, $cmp)=@_;
+    @_ == 2 or die "expecting 2 arguments";
+    my ($maybe_select, $cmp) = @_;
     defined $maybe_select ? on($maybe_select, $cmp) : $cmp
 }
 
-
 # see also `complement` from FP::Predicates
 sub cmp_complement ($) {
-    @_==1 or die "expecting 1 argument";
-    my ($cmp)=@_;
+    @_ == 1 or die "expecting 1 argument";
+    my ($cmp) = @_;
     sub {
         -&$cmp(@_)
     }
 }
 
-TEST { my $f= cmp_complement binary_operator "cmp";
-       [map { &$f(@$_) }
-        ([2,4], [4,2], [3,3], ["abc","bbc"], ["ab","ab"], ["bbc", "abc"])] }
-  [1, -1, 0, 1, 0, -1];
+TEST {
+    my $f = cmp_complement binary_operator "cmp";
+    [
+        map { &$f(@$_) } (
+            [2,     4],
+            [4,     2],
+            [3,     3],
+            ["abc", "bbc"],
+            ["ab",  "ab"],
+            ["bbc", "abc"]
+        )
+    ]
+}
+[1, -1, 0, 1, 0, -1];
 
 1

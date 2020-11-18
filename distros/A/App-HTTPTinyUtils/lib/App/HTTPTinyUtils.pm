@@ -1,9 +1,9 @@
 package App::HTTPTinyUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-11'; # DATE
+our $DATE = '2020-11-17'; # DATE
 our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -239,7 +239,7 @@ _
                 DirWriteRotate => {
                     conf => {
                         path => $args{dir},
-                        max_size => 10_000,
+                        max_files => 10_000,
                     },
                     level => 'off',
                     category_level => {
@@ -283,7 +283,7 @@ App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.008 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2020-11-11.
+This document describes version 0.009 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2020-11-17.
 
 =head1 SYNOPSIS
 

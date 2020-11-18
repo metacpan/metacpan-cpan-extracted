@@ -21,6 +21,7 @@ use File::Path qw(rmtree);
 use File::Spec;
 use List::Util qw(max);
 use LaTeXML::Common::Config;
+use LaTeXML::Common::Error qw(generateMessage colorizeString);
 use LaTeXML::Core;
 use LaTeXML::Util::Pack;
 use LaTeXML::Util::Pathname;
@@ -29,7 +30,7 @@ use LaTeXML::Util::ObjectDB;
 use LaTeXML::Post::Scan;
 use vars qw($VERSION);
 # This is the main version of LaTeXML being claimed.
-use version; our $VERSION = version->declare("0.8.4");
+use version; our $VERSION = version->declare("0.8.5");
 use LaTeXML::Version;
 # Derived, more informative version numbers
 our $FULLVERSION = "LaTeXML version $LaTeXML::VERSION"
@@ -191,7 +192,7 @@ sub convert {
   if ($$opts{whatsout} =~ /^archive/) {
     $$opts{archive_sitedirectory} = $$opts{sitedirectory};
     $$opts{archive_destination}   = $$opts{destination};
-    my $destination_name = $$opts{destination} ? pathname_name($$opts{destination}) : 'document';
+    my $destination_name  = $$opts{destination} ? pathname_name($$opts{destination}) : 'document';
     my $sandbox_directory = File::Temp->newdir(TMPDIR => 1);
     my $extension         = $$opts{format};
     $extension =~ s/\d+$//;
@@ -205,6 +206,20 @@ sub convert {
     else {
       $$opts{destination} = pathname_concat($sandbox_directory, $sandbox_destination); }
   }
+  # 1.4.1 Since we can allow "virtual" destinations for archives / webservice APIs,
+  #       we postpone the auxiliary resource sanity check (logically of LaTeXML::Config)
+  #       to this time, where we can be certain if a user has run a local job without --dest
+  if ((!$$opts{destination})
+    && ($$opts{dographics} || $$opts{picimages} || grep { $_ eq 'images' or $_ eq 'svg' } @{ $$opts{math_formats} })) {
+    print STDERR generateMessage(colorizeString("Warning:expected:options", 'warning'), undef,
+      "must supply --destination to support auxilliary files", 0,
+      "  disabling: --nomathimages --nographicimages --nopictureimages");
+    # default resources is sorta ok: we might not copy, but we'll still have the links/script/etc
+    $$opts{dographics} = 0;
+    $$opts{picimages}  = 0;
+    removeMathFormat($opts, 'images');
+    removeMathFormat($opts, 'svg');
+    maybeAddMathFormat($opts, 'pmml'); }
 
   # 1.5 Prepare a daemon frame
   my $latexml = $$self{latexml};
@@ -212,7 +227,7 @@ sub convert {
       my ($state) = @_;    # Sandbox state
       $$state{status} = {};
       $state->pushDaemonFrame;
-      $state->assignValue('_authlist', $$opts{authlist}, 'global');
+      $state->assignValue('_authlist',      $$opts{authlist}, 'global');
       $state->assignValue('REMOTE_REQUEST', (!$$opts{local}), 'global');
   });
 
@@ -254,7 +269,17 @@ sub convert {
   # End daemon run, by popping frame:
   $latexml->withState(sub {
       my ($state) = @_;    # Remove current state frame
+      ## TODO: This section of option preparations can be factored out as a subroutine if it grows further
+      ##       the general idea is that right before the "pop" of the daemon frame, we have access to all meaningful
+      ##       global state values, and we can preserve the relevant ones for the post-processing stage
+      ## BEGIN POST-PROCESSING-PREP
       $$opts{searchpaths} = $state->lookupValue('SEARCHPATHS'); # save the searchpaths for post-processing
+      if ($state->lookupValue('LEXEMATIZE_MATH')) {  # save potential request for serializing math lexemes
+        $$opts{math_formats} ||= [];
+        push @{ $$opts{math_formats} }, 'lexemes';
+        # recheck need for parallel
+        $$opts{parallelmath} = 1 if (@{ $$opts{math_formats} } > 1); }
+      ## END POST-PROCESSING-PREP
       $state->popDaemonFrame;
   });
   if ($LaTeXML::UNSAFE_FATAL) {
@@ -275,7 +300,7 @@ sub convert {
 
     # Close and restore STDERR to original condition.
     my $log = $self->flush_log;
-    $serialized = $dom if ($$opts{format} eq 'dom');
+    $serialized = $dom           if ($$opts{format} eq 'dom');
     $serialized = $dom->toString if ($dom && (!defined $serialized));
     # Using the Core::Document::serialize_aux, so need an explicit encode into bytes
     $serialized = Encode::encode('UTF-8', $serialized) if $serialized;
@@ -435,10 +460,10 @@ sub convert_post {
     if ($$opts{crossref}) {
       require LaTeXML::Post::CrossRef;
       push(@procs, LaTeXML::Post::CrossRef->new(
-          db        => $DB, urlstyle => $$opts{urlstyle},
+          db => $DB, urlstyle => $$opts{urlstyle},
           extension => $$opts{extension},
-          ($$opts{numbersections} ? (number_sections => 1) : ()),
-          ($$opts{navtoc} ? (navigation_toc => $$opts{navtoc}) : ()),
+          ($$opts{numbersections} ? (number_sections => 1)              : ()),
+          ($$opts{navtoc}         ? (navigation_toc  => $$opts{navtoc}) : ()),
           %PostOPS)); }
     if ($$opts{picimages}) {
       require LaTeXML::Post::PictureImages;
@@ -468,20 +493,20 @@ sub convert_post {
           require LaTeXML::Post::MathML::Presentation;
           push(@mprocs, LaTeXML::Post::MathML::Presentation->new(
               linelength => $$opts{linelength},
-              (defined $$opts{plane1} ? (plane1 => $$opts{plane1}) : (plane1 => 1)),
-              ($$opts{hackplane1} ? (hackplane1 => 1) : ()),
+              (defined $$opts{plane1} ? (plane1     => $$opts{plane1}) : (plane1 => 1)),
+              ($$opts{hackplane1}     ? (hackplane1 => 1)              : ()),
               %PostOPS)); }
         elsif ($fmt eq 'cmml') {
           require LaTeXML::Post::MathML::Content;
           push(@mprocs, LaTeXML::Post::MathML::Content->new(
-              (defined $$opts{plane1} ? (plane1 => $$opts{plane1}) : (plane1 => 1)),
-              ($$opts{hackplane1} ? (hackplane1 => 1) : ()),
+              (defined $$opts{plane1} ? (plane1     => $$opts{plane1}) : (plane1 => 1)),
+              ($$opts{hackplane1}     ? (hackplane1 => 1)              : ()),
               %PostOPS)); }
         elsif ($fmt eq 'om') {
           require LaTeXML::Post::OpenMath;
           push(@mprocs, LaTeXML::Post::OpenMath->new(
-              (defined $$opts{plane1} ? (plane1 => $$opts{plane1}) : (plane1 => 1)),
-              ($$opts{hackplane1} ? (hackplane1 => 1) : ()),
+              (defined $$opts{plane1} ? (plane1     => $$opts{plane1}) : (plane1 => 1)),
+              ($$opts{hackplane1}     ? (hackplane1 => 1)              : ()),
               %PostOPS)); }
         elsif ($fmt eq 'images') {
           require LaTeXML::Post::MathImages;
@@ -495,7 +520,7 @@ sub convert_post {
         elsif ($fmt eq 'mathtex') {
           require LaTeXML::Post::TeXMath;
           push(@mprocs, LaTeXML::Post::TeXMath->new(%PostOPS)); }
-        elsif ($fmt eq 'mathlex') {
+        elsif ($fmt eq 'lexemes') {
           require LaTeXML::Post::LexMath;
           push(@mprocs, LaTeXML::Post::LexMath->new(%PostOPS)); }
       }
@@ -627,15 +652,18 @@ sub new_latexml {
       push @pre, $pre;
     }
   }
+  my $includepathpis = !(exists $$opts{xsltparameters} &&
+    (grep { $_ eq 'LATEXML_VERSION:TEST' } @{ $$opts{xsltparameters} }));
   require LaTeXML;
   my $latexml = LaTeXML::Core->new(preload => [@pre], searchpaths => [@{ $$opts{paths} }],
     graphicspaths   => ['.'],
     verbosity       => $$opts{verbosity}, strict => $$opts{strict},
     includecomments => $$opts{comments},
+    includepathpis  => $includepathpis,
     inputencoding   => $$opts{inputencoding},
     includestyles   => $$opts{includestyles},
     documentid      => $$opts{documentid},
-    nomathparse     => $$opts{nomathparse},                           # Backwards compatibility
+    nomathparse     => $$opts{nomathparse},     # Backwards compatibility
     mathparse       => $$opts{mathparse});
 
   if (my @baddirs = grep { !-d $_ } @{ $$opts{paths} }) {

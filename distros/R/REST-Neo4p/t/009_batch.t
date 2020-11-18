@@ -4,7 +4,7 @@ use Test::More;
 use Test::Exception;
 use Module::Build;
 use lib '../lib';
-use lib 't/lib';
+use lib qw'lib t/lib';
 use Neo4p::Connect;
 use REST::Neo4p;
 use REST::Neo4p::Batch;
@@ -13,14 +13,14 @@ use warnings;
 no warnings qw(once);
 
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
     $build = Module::Build->current;
     $user = $build->notes('user');
     $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 59;
 
 my $not_connected = connect($TEST_SERVER,$user,$pass);
@@ -29,7 +29,7 @@ diag "Test server unavailable (".$not_connected->message.") : tests skipped" if 
 my ($idx,$idx2);
 SKIP : {
   skip 'no local connection to neo4j', $num_live_tests if $not_connected;
-
+  skip 'batch unimplemented for Neo4j::Driver', $num_live_tests-1 if ref(REST::Neo4p->agent) =~ /Neo4j::Driver/;
   my $node_assigned_inside_batch;
   my $rel;
   ok( !(
@@ -63,7 +63,7 @@ SKIP : {
   ok $rel, 'reln assigned inside batch';
   ok !$rel->is_batch, 'and not a batch relationship';
   is $rel->type, 'one2two', 'correct type';
-
+  $DB::single=1;
   ok  my $idx2 = REST::Neo4p::Index->new('node' => 'pals_of_bob'), "new index";
   my $name = 'fred';
   my $node2;
@@ -91,14 +91,16 @@ SKIP : {
 }
 
 END {
-  CLEANUP : {
-      my @nodes = $idx->find_entries('name:*') if $idx;
-      for my $n (@nodes) {
-	  ok ($_->remove, 'remove relationship') for $n->get_all_relationships;
-      }
-      ok($_->remove,'remove node') for @nodes;
-      ok ($idx->remove, 'remove index') if $idx;
-      ok ($idx2->remove, 'remove index') if $idx2;
+    CLEANUP : {
+	eval {
+	    my @nodes = $idx->find_entries('name:*') if $idx;
+	    for my $n (@nodes) {
+		$_->remove for $n->get_all_relationships;
+	    }
+	    $_->remove for @nodes;
+	    $idx->remove if $idx;
+	    $idx2->remove if $idx2;
+	};
   }
   done_testing;
 }

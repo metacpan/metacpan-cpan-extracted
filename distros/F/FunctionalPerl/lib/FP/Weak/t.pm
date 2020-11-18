@@ -25,38 +25,43 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Weak::t;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
 use FP::Weak ":all";
 use Chj::TEST;
 
 sub t {
-    my $foo= []; weaken $foo; $foo
+    my $foo = [];
+    weaken $foo;
+    $foo
 }
 
-TEST { my $foo= []; noweaken $foo; $foo }
-  [];
-TEST { t }
-  undef;
-TEST { with_noweaken { t } }
-  [];
-TEST { &with_noweaken (*t) }
-  [];
-TEST { t }
-  undef;
+TEST { my $foo = []; noweaken $foo; $foo }
+[];
+TEST {t}
+undef;
+TEST {
+    with_noweaken {t}
+}
+[];
+TEST { &with_noweaken(*t) }
+[];
+TEST {t}
+undef;
 TEST {
     my @w;
-    local $SIG{__WARN__}= sub {
-        my ($msg)= @_;
-        $msg=~ s/0x[0-9a-f]*/0x.../s;
-        $msg=~ s/ at .*/ .../s;
+    local $SIG{__WARN__} = sub {
+        my ($msg) = @_;
+        $msg =~ s/0x[0-9a-f]*/0x.../s;
+        $msg =~ s/ at .*/ .../s;
         push @w, $msg
     };
-    [ &with_warnweaken (*t), @w]
+    [&with_warnweaken(*t), @w]
 }
-  [undef, "weaken (ARRAY(0x...)) ..."];
+[undef, "weaken (ARRAY(0x...)) ..."];
 
 1

@@ -123,7 +123,7 @@ sub image_graphicx_parse {
   my ($v, $clip, $trim, $width, $height, $xscale, $yscale,
     $aspect, $angle, $rotfirst, $mag, @bb, @vp,) = ('', '', '', 0, 0, 0, 0, '', 0, '', 1, 0);
   my @unknown = ();
-  my @ignore = @{ $options{ignore_options} || [] };
+  my @ignore  = @{ $options{ignore_options} || [] };
   foreach (split(',', $transformstring || '')) {
     if (/^\s*(\w+)(?:=\s*(.*))?\s*$/) {
       $_ = $1; $v = $2 || '';
@@ -321,8 +321,10 @@ sub image_graphicx_complex {
   my $notes = '';
   foreach my $trans (@transform) {
     my ($op, $a1, $a2, $a3, $a4) = @$trans;
+    return unless $w && $h;
     if ($op eq 'scale') {                                                            # $a1 => scale
       ($w, $h) = (ceil($w * $a1), ceil($h * ($a2 || $a1)));
+      return unless $w && $h;
       $notes .= " scale to $w x $h";
       image_internalop($image, 'Scale', width => $w, height => $h) or return; }
     elsif ($op eq 'scale-to') {
@@ -433,6 +435,11 @@ sub image_setvalue {
     Error('imageprocessing', 'setvalue', undef, "No image object!"); return; }
   return image_internalop($image, 'Set', @args); }
 
+# Apparently ignorable warnings from Image::Magick
+our %ignorable = map { $_ => 1; } (
+  350,    # profile 'icc' not permitted on grayscale PNG
+);
+
 sub image_internalop {
   my ($image, $operation, @args) = @_;
   if (!$image) {
@@ -444,7 +451,8 @@ sub image_internalop {
     $retcode = $1; }
   if ($retcode < 400) {    # Warning
     Warn('imageprocessing', $operation, undef,
-      "Image processing operation $operation (" . join(', ', @args) . ") returned $retval");
+      "Image processing operation $operation (" . join(', ', @args) . ") returned $retval")
+      unless $ignorable{$retcode};
     return 1; }
   else {                   # Error
     Error('imageprocessing', $operation, undef,

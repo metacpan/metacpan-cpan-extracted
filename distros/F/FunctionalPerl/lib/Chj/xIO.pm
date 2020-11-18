@@ -37,30 +37,29 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::xIO;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw();
-@EXPORT_OK=qw(
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
+
+our @EXPORT    = qw();
+our @EXPORT_OK = qw(
     capture_stdout capture_stdout_
     capture_stderr capture_stderr_
-    );
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
-
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 sub capture_stdout_ {
-    my ($thunk)=@_;
-    my $buf="";
-    open my $out, ">", \$buf
-      or die $!;
+    my ($thunk) = @_;
+    my $buf = "";
+    open my $out, ">", \$buf or die $!;
     {
         # XX threadsafe or not?
-        local *STDOUT= $out;
-        &$thunk(); # dropping results
+        local *STDOUT = $out;
+        &$thunk();    # dropping results
     }
-    close $out
-      or die $!;
+    close $out or die $!;
     $buf
 }
 
@@ -71,23 +70,20 @@ sub capture_stdout (&) {
 # stupid COPY-PASTE
 
 sub capture_stderr_ {
-    my ($thunk)=@_;
-    my $buf="";
-    open my $out, ">", \$buf
-      or die $!;
+    my ($thunk) = @_;
+    my $buf = "";
+    open my $out, ">", \$buf or die $!;
     {
         # XX threadsafe or not?
-        local *STDERR= $out;
-        &$thunk(); # dropping results
+        local *STDERR = $out;
+        &$thunk();    # dropping results
     }
-    close $out
-      or die $!;
+    close $out or die $!;
     $buf
 }
 
 sub capture_stderr (&) {
     capture_stderr_(@_)
 }
-
 
 1

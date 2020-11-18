@@ -2,7 +2,7 @@ use inc::Module::Install;
 
 name 'WWW-WTF';
 license 'perl';
-version '0.3';
+version '0.4';
 
 requires 'common::sense';
 requires 'Cache::FastMmap';
@@ -15,6 +15,7 @@ requires 'Moose';
 requires 'URI';
 requires 'WWW::Mechanize';
 requires 'XML::Simple';
+requires 'List::Util';
 
 recommends 'WWW::WebKit2' => 0.127;
 

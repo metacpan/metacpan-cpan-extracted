@@ -1,45 +1,38 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
 use Test::More;
-use Test::EasyMock qw( create_mock expect reset replay verify );
-use Test::Deep qw( ignore );
+use Test::EasyMock qw( create_mock );
+use Test::Future::IO;
 
 use Device::AVR::UPDI;
 
-my $mockfh = create_mock();
-my $mockfio = create_mock();
-Future::IO->override_impl( "TestFutureIO" );
+my $mockfio = Test::Future::IO->controller;
 
-my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
+my $updi = Device::AVR::UPDI->new( fh => create_mock(), part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
 
-# init
+# ->request_reset
 {
-   reset ( $mockfh, $mockfio );
-   expect( $mockfh->print( "\x55\xC8\x59" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\xC8\x59" ) );
+   $mockfio->expect_syswrite( "\x55\xC8\x59" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\xC8\x59" );
+   $mockfio->expect_sleep( 0.1 );
 
-   replay( $mockfh, $mockfio );
    $updi->request_reset( 1 )->get;
-   verify( $mockfh, $mockfio );
 
-   reset ( $mockfh, $mockfio );
-   expect( $mockfh->print( "\x55\xC8\x00" ) ); # SYNC
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\xC8\x00" ) );
+   $mockfio->check_and_clear( "->request_reset on" );
 
-   replay( $mockfh, $mockfio );
+   $mockfio->expect_syswrite( "\x55\xC8\x00" ); # SYNC
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\xC8\x00" );
+   $mockfio->expect_sleep( 0.1 );
+
    $updi->request_reset( 0 )->get;
-   verify( $mockfh, $mockfio );
+
+   $mockfio->check_and_clear( "->request_reset off" );
 }
 
 done_testing;
-
-package TestFutureIO;
-sub sleep           { Future->new }
-sub sysread         { $mockfio->sysread(@_[2..$#_]) }
-sub sysread_exactly { $mockfio->sysread(@_[2..$#_]) }

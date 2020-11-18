@@ -21,7 +21,7 @@ use Data::Dumper;
 use strict;
 
 my($NAME) = $0 =~ /([\w\.]+)$/;
-my $VERSION = '0.79';
+my $VERSION = '0.80';
 my $MESSAGE = "\nThis is $NAME, v$VERSION ($0).\n";
 my %OPT = (
   'output-format' => 'dumper',

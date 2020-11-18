@@ -25,7 +25,7 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2019 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -34,31 +34,35 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: dist.ini
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/06tn-moo.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Type/Nano.pm
-Copyright: This software is copyright (c) 2018-2019 by Toby Inkster.
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/03prototypicalweirdness.t
 Copyright: This software is copyright (c) 2014, 2018-2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: lib/Type/Nano.pm
+Copyright: This software is copyright (c) 2018-2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/06storable.t
+Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

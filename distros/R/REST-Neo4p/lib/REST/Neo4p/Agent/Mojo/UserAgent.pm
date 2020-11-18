@@ -1,4 +1,3 @@
-#$Id$
 use v5.10;
 package REST::Neo4p::Agent::Mojo::UserAgent;
 use base qw/Mojo::UserAgent REST::Neo4p::Agent/;
@@ -10,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Agent::Mojo::UserAgent::VERSION = '0.3030';
+  $REST::Neo4p::Agent::Mojo::UserAgent::VERSION = '0.4000';
 }
 
 our @default_headers;

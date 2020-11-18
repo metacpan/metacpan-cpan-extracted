@@ -4,11 +4,10 @@ CONTENTS
 2. INSTALLATION
 3. UPGRADING
 4. DOCUMENTATION
-5. MAILING LIST
-6. CONFIGURATION
-7. COMPATIBILITY
-8. FEATURES
-9. COPYRIGHT
+5. CONFIGURATION
+6. COMPATIBILITY
+7. FEATURES
+8. COPYRIGHT
 
 
 --------------
@@ -92,20 +91,8 @@ you can start the examples like this after building the module:
 
 Otherwise just run the example scripts like any other Perl script.
 
----------------
-5. MAILING LIST
----------------
-
-There's also a mailing list that you can join:
-
-  convert-binary-c@yahoogroups.com
-
-To subscribe, simply send mail to:
-
-  convert-binary-c-subscribe@yahoogroups.com
-
 ----------------
-6. CONFIGURATION
+5. CONFIGURATION
 ----------------
 
 Configuring a Convert::Binary::C object correctly can be quite
@@ -132,7 +119,7 @@ As the tool is very experimental, any feedback on 'ccconfig'
 is really appreciated!
 
 ----------------
-7. COMPATIBILITY
+6. COMPATIBILITY
 ----------------
 
 The module should build on most of the platforms that Perl runs on.
@@ -162,7 +149,7 @@ Multithreaded perl binaries are explicitly supported, as the module
 is intended to be thread-safe.
 
 -----------
-8. FEATURES
+7. FEATURES
 -----------
 
 You can enable or disable certain features at compile time by adding
@@ -198,7 +185,7 @@ Makefile.PL, like
   perl Makefile.PL enable-debug OPTIMIZE=-O3
 
 ------------
-9. COPYRIGHT
+8. COPYRIGHT
 ------------
 
 Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
@@ -209,9 +196,3 @@ The ucpp library is (c) 1998-2002 Thomas Pornin. For license
 and redistribution details refer to 'ctlib/ucpp/README'.
 
 Portions copyright (c) 1989, 1990 James A. Roskind.
-
-The include files located in 'tests/include/include', which are used in
-some of the test scripts are (c) 1991-1999, 2000, 2001 Free Software
-Foundation, Inc. They are neither required to create the binary nor
-linked to the source code of this module in any other way.
-

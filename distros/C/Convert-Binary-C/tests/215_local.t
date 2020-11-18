@@ -12,7 +12,7 @@ use Convert::Binary::C @ARGV;
 $^W = 1;
 
 BEGIN {
-  plan tests => 10;
+  plan tests => 9;
 }
 
 my $CCCFG = require './tests/include/config.pl';
@@ -99,9 +99,3 @@ ok( scalar @type, 1, "got more/less typedefs than expected" );
 ok( $enum[0]{identifier}, "Zoo" );
 ok( $comp[0]{identifier}, "_bar" );
 ok( $type[0]{declarator}, "u_32" );
-
-# this file has some local types, just check if it parses correctly
-eval {
-  $c->clean->configure(%$CCCFG)->parse_file('tests/include/util.c');
-};
-ok($@,'',"failed to parse file");

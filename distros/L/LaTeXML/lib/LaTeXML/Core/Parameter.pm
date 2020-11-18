@@ -86,10 +86,12 @@ sub read {
   my $value = &{ $$self{reader} }($gullet, @{ $$self{extra} || [] });
   $value = $value->neutralize(@{ $$self{semiverbatim} }) if $$self{semiverbatim} && (ref $value)
     && $value->can('neutralize');
+  $value = $value->packParameters if $value && $$self{packParameters};
   $self->revertCatcodes;
   if ((!defined $value) && !$$self{optional}) {
     Error('expected', $self, $gullet,
-      "Missing argument " . Stringify($self) . " for " . Stringify($fordefn));
+      "Missing argument " . Stringify($self) . " for " . Stringify($fordefn),
+      "Ended at " . ToString($gullet->getLocator));
     $value = T_OTHER('missing'); }
   return $value; }
 
@@ -101,6 +103,7 @@ sub reparse {
   my ($self, $gullet, $tokens) = @_;
   # Needs neutralization, since the keyvals may have been tokenized already???
   # perhaps a better test would involve whether $tokens is, in fact, Tokens?
+  $tokens = $tokens->packParameters if $tokens && $$self{packParameters};
   if (($$self{type} eq 'Plain') || $$self{undigested}) {    # Gack!
     return $tokens; }
   elsif ($$self{semiverbatim}) {                            # Needs neutralization
@@ -152,7 +155,7 @@ sub revert {
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 

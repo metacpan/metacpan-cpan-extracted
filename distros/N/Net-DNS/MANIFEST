@@ -200,8 +200,6 @@ t/43-DNSKEY-keylength.t
 t/51-DS-SHA1.t
 t/52-DS-SHA256.t
 t/54-DS-SHA384.t
-t/61-SIG0-RSAMD5.t
-t/65-RRSIG-RSASHA1.t
 t/71-TSIG-create.t
 t/72-TSIG-verify.t
 t/99-cleanup.t

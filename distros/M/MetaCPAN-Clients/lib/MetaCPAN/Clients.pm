@@ -1,5 +1,5 @@
 package MetaCPAN::Clients;
-$MetaCPAN::Clients::VERSION = '0.05';
+$MetaCPAN::Clients::VERSION = '1.00';
 use strict;
 use warnings;
 

@@ -26,6 +26,12 @@
       <foaf:mbox rdf:resource="mailto:doherty@cs.dal.ca" />
     </foaf:Person>
   </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Tony Cook</foaf:name>
+      <foaf:mbox rdf:resource="mailto:tonyc@cpan.org" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/yanick/Escape-Houdini" />
   <bug-database rdf:resource="https://github.com/yanick/Escape-Houdini/issues" />
@@ -55,14 +61,14 @@
   </release>
   <release>
     <Version>
-      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.3_0</revision>
-      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-26</dc:issued>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.4</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-31</dc:issued>
     </Version>
   </release>
   <release>
     <Version>
-      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.4</revision>
-      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-31</dc:issued>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.3_0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-26</dc:issued>
     </Version>
   </release>
   <release>
@@ -87,6 +93,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.3.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-06-22</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.3.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-08-14</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

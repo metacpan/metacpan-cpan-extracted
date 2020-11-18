@@ -9,6 +9,9 @@ lib/REST/Neo4p/Agent.pm
 lib/REST/Neo4p/Agent/HTTP/Thin.pm
 lib/REST/Neo4p/Agent/LWP/UserAgent.pm
 lib/REST/Neo4p/Agent/Mojo/UserAgent.pm
+lib/REST/Neo4p/Agent/Neo4j/ResultProcessor.pm
+lib/REST/Neo4p/Agent/Neo4j/DriverActions.pm
+lib/REST/Neo4p/Agent/Neo4j/Driver.pm
 lib/REST/Neo4p/Batch.pm
 lib/REST/Neo4p/Constrain.pm
 lib/REST/Neo4p/Constraint.pm
@@ -38,6 +41,7 @@ t/008_batch_agent.t
 t/009_batch.t
 t/010_batch_synopsis.t
 t/011_neo4p_synopsis.t
+t/0012_connect.t
 t/020_constraint.t
 t/021_validation.t
 t/022_constrain.t
@@ -55,6 +59,7 @@ t/agent_mod.t
 t/lib/Neo4p/Connect.pm
 t/lib/Neo4p/Test.pm
 t/lib/Neo4p/TestAgent.pm
+t/lib/NeoCon.pm
 t/id_roundtrip.t
 t/issue_5.t
 t/jparse_json_v4.t
@@ -69,9 +74,19 @@ t/rt_91640.t
 t/rt_91748.t
 t/rt_92135.t
 t/rt_96847.t
+t/samples/3.5-db-data-response.txt
+t/samples/3.5-response.txt
+t/samples/4.0-response.txt
 t/samples/batch-response.txt
 t/samples/null-txn-response.txt
 t/samples/qry-response.txt
 t/samples/txn-response.txt
+t/neodriver/0010_load.t
+t/neodriver/0020_calls.t
+t/neodriver/0030_neo.t
+t/neodriver/0040_json.t
+t/neodriver/0050_neo4.t
+t/neodriver/samples/test.cypher
+t/neodriver/samples/test.4.cypher
 META.yml
 META.json

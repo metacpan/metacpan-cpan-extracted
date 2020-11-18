@@ -1,10 +1,11 @@
 {
    "abstract" : "transforms TeX and LaTeX into XML/HTML/MathML",
    "author" : [
-      "Bruce Miller <bruce.miller@nist.gov>"
+      "Bruce Miller <bruce.miller@nist.gov>",
+      "Deyan Ginev <deyan.ginev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -62,6 +63,6 @@
          "web" : "https://github.com/brucemiller/LaTeXML"
       }
    },
-   "version" : "0.8.4",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.8.5",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

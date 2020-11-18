@@ -42,7 +42,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Subclass::Of" => { file => "lib/Subclass/Of.pm", version => 0.008 },
+                        "Subclass::Of" => { file => "lib/Subclass/Of.pm", version => 0.009 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -56,13 +56,13 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project",
                       },
-  "version"        => 0.008,
+  "version"        => 0.009,
 };
 
 my %dynamic_config;
 do {
 # Hash::Util::FieldHash was first released with perl v5.9.4
-$meta->{prereqs}{runtime}{requires}{'Hash::FieldHash'} = 0 if $] < 5.009004;
+$meta->{prereqs}{runtime}{requires}{'Hash::Util::FieldHash::Compat'} = 0 if $] < 5.009004;
 
 };
 
@@ -135,28 +135,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

@@ -16,27 +16,27 @@ FP::Hash
     use FP::Equal 'is_equal';
     use FP::Hash;
 
-    my $a= {a=>1, b=>2};
-    my $b= hash_set($a, "b", 3);
-    my $c= hash_delete($b, "a");
-    if (my ($v)= hash_perhaps_ref ($c, "x")) {
+    my $a = {a => 1, b => 2};
+    my $b = hash_set($a, "b", 3);
+    my $c = hash_delete($b, "a");
+    if (my ($v) = hash_perhaps_ref ($c, "x")) {
        is_equal $v, "XXX";
     }
     is_equal hash_update($a, 'a', sub { $_[0]+10 }),
-             +{ a=> 11, b=> 2 };
+             +{ a => 11, b => 2 };
     is_equal hash_update($a, 'x', sub { [@_] }),
-             +{ a=> 1, b=> 2, x=>[] };
+             +{ a => 1, b => 2, x => [] };
 
     # The function passed to hash_update is run in list context! Empty
     # list means, delete the item.
-    my $e= hash_update $a, 'a', sub { () };
-    is_equal $e, +{ b=> 2 };
+    my $e = hash_update $a, 'a', sub { () };
+    is_equal $e, +{ b => 2 };
 
     is_equal $c, +{b => 3};
     is_equal $a, +{a => 1, b => 2};
 
-    is_equal subhash({a=>10, b=>11, c=>12}, "a", "c"),
-             +{a=>10, c=>12};
+    is_equal subhash({a => 10, b => 11, c => 12}, "a", "c"),
+             +{a => 10, c => 12};
 
 
 =head1 DESCRIPTION
@@ -55,20 +55,22 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Hash;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(hash_set hash_perhaps_ref hash_maybe_ref hash_xref hash_ref_or hash_cache
-           hash_delete hash_update hash_diff
-           hash_length
-           subhash
-           hashes_keys $empty_hash
-           hash2_set
-         );
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT
+    = qw(hash_set hash_perhaps_ref hash_maybe_ref hash_xref hash_ref_or hash_cache
+    hash_delete hash_update hash_diff
+    hash_length
+    subhash
+    hashes_keys $empty_hash
+    hash2_set
+);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
 
@@ -81,7 +83,7 @@ use Hash::Util 'lock_hash';
 my %empty_hash;
 lock_hash %empty_hash;
 
-our $empty_hash= \%empty_hash;
+our $empty_hash = \%empty_hash;
 
 #TEST_EXCEPTION { $$empty_hash{a} }
 #  undef;
@@ -92,63 +94,62 @@ our $empty_hash= \%empty_hash;
 # solved in the future."
 
 TEST_EXCEPTION { $$empty_hash{a} = 1 }
-  'Attempt to access disallowed key \'a\' in a restricted hash';
+'Attempt to access disallowed key \'a\' in a restricted hash';
 
 sub hash_set ($$$) {
-    my ($h,$k,$v)=@_;
-    my $h2= +{%$h};
-    $$h2{$k}=$v;
+    my ($h, $k, $v) = @_;
+    my $h2 = +{%$h};
+    $$h2{$k} = $v;
     $h2
 }
 
-my $h= {a=>1, b=>2};
-TEST { hash_set $h, b=>3 }
-+{
-    'a' => 1,
-    'b' => 3
-};
-TEST { $h }
-+{
-    'a' => 1,
-    'b' => 2
-};
+my $h = { a => 1, b => 2 };
+TEST { hash_set $h, b => 3 }
++{ 'a' => 1, 'b' => 3 };
+TEST {$h}
++{ 'a' => 1, 'b' => 2 };
 
 sub hash_delete ($$) {
-    my ($h,$k)=@_;
-    my $h2= +{%$h};
+    my ($h, $k) = @_;
+    my $h2 = +{%$h};
     delete $$h2{$k};
     $h2
 }
 
 sub hash_update ($$$) {
-    my ($h,$k,$fn)=@_;
-    my $h2= +{%$h};
-    if (my ($v)= &$fn (exists $$h{$k} ? $$h{$k} : ())) {
-        $$h2{$k}= $v;
+    my ($h, $k, $fn) = @_;
+    my $h2 = +{%$h};
+    if (my ($v) = &$fn(exists $$h{$k} ? $$h{$k} : ())) {
+        $$h2{$k} = $v;
     } else {
         delete $$h2{$k}
     }
     $h2
 }
 
-TEST { hash_update $h, 'a', sub { $_[0]+10 } }
-  +{ a=> 11, b=> 2 };
-TEST { hash_update $h, 'x', sub { [@_] } }
-  +{ a=> 1, b=> 2, x=>[] };
-TEST { hash_update $h, 'a', sub { () } }
-  +{ b=> 2 };
+TEST {
+    hash_update $h, 'a', sub { $_[0] + 10 }
+}
++{ a => 11, b => 2 };
+TEST {
+    hash_update $h, 'x', sub { [@_] }
+}
++{ a => 1, b => 2, x => [] };
+TEST {
+    hash_update $h, 'a', sub { () }
+}
++{ b => 2 };
 
 sub hash_length ($) {
-    my ($h)=@_;
+    my ($h) = @_;
     scalar keys %$h
 }
 
 TEST { hash_length +{} } 0;
-TEST { hash_length +{a=>4, b=>5} } 2;
-
+TEST { hash_length +{ a => 4, b => 5 } } 2;
 
 sub hash_perhaps_ref ($$) {
-    my ($h,$k)=@_;
+    my ($h, $k) = @_;
     if (exists $$h{$k}) {
         $$h{$k}
     } else {
@@ -159,7 +160,7 @@ sub hash_perhaps_ref ($$) {
 # difference of the following to just $$h{$k} is that it won't die on
 # locked hashes
 sub hash_maybe_ref ($$) {
-    my ($h,$k)=@_;
+    my ($h, $k) = @_;
     if (exists $$h{$k}) {
         $$h{$k}
     } else {
@@ -168,17 +169,17 @@ sub hash_maybe_ref ($$) {
 }
 
 sub hash_xref ($$) {
-    my ($h,$k)=@_;
+    my ($h, $k) = @_;
     if (exists $$h{$k}) {
         $$h{$k}
     } else {
-        die "unbound table key"; # no such key. unknown key. unbound
-                                 # hash key. ?
+        die "unbound table key";    # no such key. unknown key. unbound
+                                    # hash key. ?
     }
 }
 
 sub hash_ref_or ($$$) {
-    my ($h,$k,$other)=@_;
+    my ($h, $k, $other) = @_;
     if (exists $$h{$k}) {
         $$h{$k}
     } else {
@@ -187,87 +188,71 @@ sub hash_ref_or ($$$) {
 }
 
 sub hash_cache ($$$) {
+
     # only allowing for scalar context
-    my ($h,$k,$generate)=@_;
+    my ($h, $k, $generate) = @_;
     if (exists $$h{$k}) {
         $$h{$k}
     } else {
-        $$h{$k}= &$generate()
+        $$h{$k} = &$generate()
     }
 }
-
 
 # looking for definedness, not exists. Ok? Also, only handles strings
 # as values.
 sub hash_diff ($$) {
-    my ($h1,$h2)=@_;
-    my $changes={};
+    my ($h1, $h2) = @_;
+    my $changes = {};
     for my $key (keys %$h2) {
-        my $old= $$h1{$key};
-        my $new= $$h2{$key};
-        if (defined ($old) and defined ($new)) {
-            $$changes{$key}= ($old eq $new) ? "unchanged" : "changed";
+        my $old = $$h1{$key};
+        my $new = $$h2{$key};
+        if (defined($old) and defined($new)) {
+            $$changes{$key} = ($old eq $new) ? "unchanged" : "changed";
         } else {
-            $$changes{$key}= defined ($old) ? "deleted" : "added";
+            $$changes{$key} = defined($old) ? "deleted" : "added";
         }
     }
     for my $key (keys %$h1) {
         next if defined $$h2{$key};
-        $$changes{$key}= "deleted";
+        $$changes{$key} = "deleted";
     }
     $changes
 }
 
-TEST {hash_diff {a=>1,b=>2}, {a=>1,b=>3}}
-+{
-    'a' => 'unchanged',
-    'b' => 'changed'
-};
-TEST {hash_diff {a=>1,b=>2}, {a=>1,b=>3,c=>5}}
-+{
-    'c' => 'added',
-    'a' => 'unchanged',
-    'b' => 'changed'
-};
-TEST {hash_diff {a=>1,b=>2}, {b=>3,c=>5}}
-+{
-    'c' => 'added',
-    'a' => 'deleted',
-    'b' => 'changed'
-};
-TEST {hash_diff {a=>1,b=>2,x=>9}, {a=>undef,b=>3,c=>5,x=>9}}
-+{
-    'c' => 'added',
-    'a' => 'deleted',
-    'b' => 'changed',
-    'x' => 'unchanged'
-};
-
+TEST { hash_diff { a => 1, b => 2 }, { a => 1, b => 3 } }
++{ 'a' => 'unchanged', 'b' => 'changed' };
+TEST { hash_diff { a => 1, b => 2 }, { a => 1, b => 3, c => 5 } }
++{ 'c' => 'added', 'a' => 'unchanged', 'b' => 'changed' };
+TEST { hash_diff { a => 1, b => 2 }, { b => 3, c => 5 } }
++{ 'c' => 'added', 'a' => 'deleted', 'b' => 'changed' };
+TEST {
+    hash_diff { a => 1, b => 2, x => 9 },
+        { a => undef, b => 3, c => 5, x => 9 }
+}
++{ 'c' => 'added', 'a' => 'deleted', 'b' => 'changed', 'x' => 'unchanged' };
 
 sub subhash {
-    my $s=shift;
+    my $s = shift;
     my %r;
     for (@_) {
-        $r{$_}= $$s{$_}
+        $r{$_} = $$s{$_}
     }
     \%r
 }
 
-TEST{ subhash({a=>10, b=>11, c=>12}, "a", "c") }
-  +{a=>10, c=>12};
+TEST { subhash({ a => 10, b => 11, c => 12 }, "a", "c") }
++{ a => 10, c => 12 };
 
 use FP::HashSet;
 
 sub hashes_keys {
-    keys %{array_to_hashset( [map { keys %$_ } @_] )}
+    keys %{ array_to_hashset([map { keys %$_ } @_]) }
 }
-
 
 # set leafs in 2-level hash structure:
 sub hash2_set ($$$$) {
-    my ($h,$k0,$k1,$v)=@_;
-    hash_update $h, $k0, sub { my ($h1)=@_; hash_set $h1, $k1, $v }
+    my ($h, $k0, $k1, $v) = @_;
+    hash_update $h, $k0, sub { my ($h1) = @_; hash_set $h1, $k1, $v }
 }
-
 
 1

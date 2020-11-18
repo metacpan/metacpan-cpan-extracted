@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::RadioNet;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $station = new StreamFinder::RadioNet($ARGV[0]);
 
@@ -103,7 +103,7 @@ One or more streams can be returned for each station.
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, "debug" [ => 0|1|2 ]])
 
 Accepts a Radio.net station ID or URL and creates and returns a new station 
 object, or I<undef> if the URL is not a valid Radio.net station or no 

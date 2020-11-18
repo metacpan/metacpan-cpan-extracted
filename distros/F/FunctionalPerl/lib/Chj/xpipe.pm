@@ -14,7 +14,7 @@ Chj::xpipe
 =head1 SYNOPSIS
 
     use Chj::xpipe;
-    my ($read,$write)=xpipe; # or xpipe READ,WRITE ? hmmm. not yet.
+    my ($read,$write) = xpipe; # or xpipe READ,WRITE ? hmmm. not yet.
     $read->xclose;
     $write->xprint("Hello");
 
@@ -38,12 +38,13 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::xpipe;
-@ISA='Exporter';
+@ISA = 'Exporter';
 require Exporter;
-@EXPORT= qw(xpipe);
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT = qw(xpipe);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
 use Chj::IO::Pipe;
 use Carp;
@@ -52,10 +53,10 @@ sub xpipe {
     if (@_) {
         confess "form with arguments not yet supported";
     } else {
-        my $r=new Chj::IO::Pipe;
-        my $w=new Chj::IO::Pipe;
-        pipe $r,$w or croak "xpipe: $!";
-        ($r,$w)
+        my $r = new Chj::IO::Pipe;
+        my $w = new Chj::IO::Pipe;
+        pipe $r, $w or croak "xpipe: $!";
+        ($r, $w)
     }
 }
 

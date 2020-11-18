@@ -1,17 +1,15 @@
 #-*-perl-*-
-use Test::More tests => 35;
+use Test::More;
 use Test::Exception;
 use Module::Build;
-use lib '../lib';
+use lib qw|../lib lib|;
 use lib 't/lib';
 use Neo4p::Connect;
 use strict;
 use warnings;
 my @cleanup;
-use_ok('REST::Neo4p');
-
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 my $build;
-my ($user,$pass);
 
 eval {
   $build = Module::Build->current;
@@ -19,7 +17,7 @@ eval {
   $pass = $build->notes('pass');
 };
 
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 
 my $not_connected = connect($TEST_SERVER,$user,$pass);
 diag "Test server unavailable (".$not_connected->message.") : tests skipped" if $not_connected;
@@ -30,7 +28,7 @@ SKIP : {
 
   my $n1 = REST::Neo4p::Node->new();
   ok $n1, 'new node' and push @cleanup, $n1;
-  my $q = REST::Neo4p::Query->new("MATCH (n) WHERE id(n) = {id} RETURN n");
+  my $q = REST::Neo4p::Query->new('MATCH (n) WHERE id(n) = $id RETURN n');
   $q->{RaiseError} = 1;
   my $row;
 
@@ -42,7 +40,7 @@ SKIP : {
   # 
   # Example code:
   # 
-  #  my $q = REST::Neo4p::Query->new("MATCH (n) WHERE id(n) = {id} RETURN n");
+  #  my $q = REST::Neo4p::Query->new('MATCH (n) WHERE id(n) = $id RETURN n');
   #  my $id = REST::Neo4p::Node->new()->id();
   #  $q->execute( id => $id );
   #  $q->fetch;
@@ -74,7 +72,7 @@ SKIP : {
   ok $n2, '2nd node' and push @cleanup, $n2;
   my $r = REST::Neo4p::Relationship->new( $n1 => $n2, 'TEST' );
   ok $r, 'new rel' and push @cleanup, $r;
-  $q = REST::Neo4p::Query->new("MATCH ()-[r]->() WHERE id(r) = {id} RETURN r");
+  $q = REST::Neo4p::Query->new('MATCH ()-[r]->() WHERE id(r) = $id RETURN r');
   $q->{RaiseError} = 1;
 
   eval {

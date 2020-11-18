@@ -1,0 +1,5 @@
+
+0.02 2020-11-16
+  - Refactor code.
+  - Remove unneded 'under_cors' route shortcut.
+

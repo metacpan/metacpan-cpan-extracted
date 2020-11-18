@@ -9,16 +9,8 @@
 ********************************************************************************
 *
 * Copyright (c) 2002-2020 Marcus Holland-Moritz. All rights reserved.
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of either the Artistic License or the
-* GNU General Public License as published by the Free Software
-* Foundation; either version 2 of the License, or (at your option)
-* any later version.
-*
-* THIS PROGRAM IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
-* IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-* WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+* This program is free software; you can redistribute it and/or modify
+* it under the same terms as Perl itself.
 *
 *******************************************************************************/
 

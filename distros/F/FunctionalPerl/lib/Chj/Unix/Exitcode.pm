@@ -23,40 +23,38 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::Unix::Exitcode;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(exitcode);
-@EXPORT_OK=qw(exitcode);
-%EXPORT_TAGS=(all=>\@EXPORT_OK);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(exitcode);
+our @EXPORT_OK   = qw(exitcode);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 package Chj::Unix::Exitcode::Exitcode {
 
     use Chj::Unix::Signal;
 
-    use Chj::Class::Array -fields=>
-      -publica=>
-      'code',
-      ;
-
+    use Chj::Class::Array -fields => -publica => 'code',
+        ;
 
     sub new {
-        my $class=shift;
-        my $s= $class->SUPER::new;
-        ($$s[Code])=@_;
+        my $class = shift;
+        my $s     = $class->SUPER::new;
+        ($$s[Code]) = @_;
         $s
     }
 
     sub as_string {
-        my $s=shift;
-        my $code= $$s[Code];
+        my $s    = shift;
+        my $code = $$s[Code];
         if ($code < 256) {
-            "signal $code (".Chj::Unix::Signal->new($code)->as_string.")"
+            "signal $code (" . Chj::Unix::Signal->new($code)->as_string . ")"
         } else {
             if (($code & 255) == 0) {
-                "exit value ".($code >> 8)
+                "exit value " . ($code >> 8)
             } else {
                 warn "does this ever happen?";
                 "both exit value and signal ($code)"
@@ -67,9 +65,8 @@ package Chj::Unix::Exitcode::Exitcode {
     end Chj::Class::Array;
 }
 
-
 sub exitcode ( $ ) {
-    my ($code)=@_;
+    my ($code) = @_;
     Chj::Unix::Exitcode::Exitcode->new($code)->as_string;
 }
 

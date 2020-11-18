@@ -20,7 +20,6 @@ my @methods	= (
 	[ add_node => { args => [ name => 'TestNode1', label => 'n1' ] } ],
 	[ add_edge => { args => [ from => 'TestNode1', to	=> '' ] } ],
 	[ default_subgraph  => { } ],
-	[ escape_some_chars => { args => [ "abc123[]()" ] } ],
 	[ push_subgraph => {
 		args => [
 			name  => 'subgraph_test',
@@ -57,5 +56,7 @@ foreach my $tuple ( @methods ) {
 		"Run $subname with -> " . ((explain $data->{args})[0] || '')
 		;
 }
+
+is GraphViz2::escape_some_chars(q{\\\\"}, '\\{\\}\\|<>\\s"'), '\\\\\\"', 'quoting';
 
 done_testing;

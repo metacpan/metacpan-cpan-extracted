@@ -14,7 +14,7 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaInstall>;
 	doap:created         "2020-11-16"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "App-GhaInstall";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-004>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-app-ghainstall>;
@@ -53,6 +53,37 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaInstall-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "App-GhaInstall-0.003"^^xsd:string;
+	dc:issued            "2020-11-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Call CPAN.pm directly rather than shelling out to it.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Support GHA_INSTALL_BACKEND env var.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaInstall-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-GhaInstall/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "App-GhaInstall-0.004"^^xsd:string;
+	dc:issued            "2020-11-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support older versions of Test::More.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaInstall-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

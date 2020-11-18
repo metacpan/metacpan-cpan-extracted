@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::Spreaker;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $podcast = new StreamFinder::Spreaker($ARGV[0]);
 
@@ -103,7 +103,7 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<ID>|I<url> [, I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts a spreaker.com podcast ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
@@ -413,16 +413,18 @@ sub new
 		my $copyright = $1;
 		$self->{'year'} = $1  if ($copyright =~ /(\d\d\d\d)/s);
 	}
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'title'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'title'} =~ s#\\u0027#\"#g;
-	$self->{'description'} =~ s#\\u0027#\"#g;
+	$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	$self->{'iconurl'} = ($html =~ s#\,\"image_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'iconurl'} =~ s#\\##g;
 	unless ($self->{'iconurl'}) {
 		if ($html =~ s#\s+class\=\"track\_head\_image\"\>(.+?)\<\/span\>##s) {
-			my $imagehtml = $1;
-			$self->{'iconurl'} = $1  if ($imagehtml =~ m#\s+src\=\"([^\"]+)\"#s);
+			my $iconhtml = $1;
+			$self->{'iconurl'} = $1  if ($iconhtml =~ m#\s+src\=\"([^\"]+)\"#s);
 		}
 	}
 	if ($html =~ s#\s+class\=\"track\_head\_info\_show\"\>(.+?)\<\/span\>##s) {
@@ -432,6 +434,7 @@ sub new
 	}
 	$self->{'imageurl'} = ($html =~ s#\,\"image_original_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'imageurl'} =~ s#\\##g;
+	$self->{'imageurl'} ||= $self->{'iconurl'};  #MAKE SURE WE HAVE BOTH, OTHERWISE IMAGE:=ICON.
 	$self->{'total'} = $self->{'cnt'};
 	print STDERR "-(all)count=".$self->{'total'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);

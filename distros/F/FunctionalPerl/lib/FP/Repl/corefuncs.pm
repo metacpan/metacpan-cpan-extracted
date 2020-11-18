@@ -24,16 +24,17 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Repl::corefuncs;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(corefuncs);
+use Exporter "import";
+our @EXPORT = qw(corefuncs);
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
 {
     # for some reason I can't seem to find out how to get at that otherwise.
-    my $txt=<<'END';
+    my $txt = <<'END';
     
        Functions for SCALARs or strings
            "chomp", "chop", "chr", "crypt", "hex", "index", "lc", "lcfirst", "length",
@@ -120,19 +121,17 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
            "readpipe", "ref", "sub*", "sysopen", "tie", "tied", "uc", "ucfirst", "untie",
            "use"
 END
-  ;
-    $txt=~ s/(\w)[-­]\s*(\w)/$1$2/sg;# careful: the -­ are two different chars.
-    #print $txt;
-    my @corefuncs= grep {
-        length($_)>=3
-    }
-      $txt=~ /"(\w+)"/g;
+
+    $txt =~ s/(\w)[-­]\s*(\w)/$1$2/sg
+        ;    # careful: the -­ are two different chars.
+             #print $txt;
+    my @corefuncs = grep { length($_) >= 3 } $txt =~ /"(\w+)"/g;
     no warnings 'redefine';
-    *corefuncs= sub {
+    *corefuncs = sub {
         @corefuncs
     };
 }
 
-*FP::Repl::corefuncs= \&corefuncs;
+*FP::Repl::corefuncs = \&corefuncs;
 
 1

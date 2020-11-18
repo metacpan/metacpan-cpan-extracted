@@ -1,3 +1,23 @@
+1.000042  2020-11-17 22:44:35-08:00 America/Los_Angeles
+
+    - Fix pipe size setting to actually use the value we want
+    - Fix pipe size setting code for older perls
+
+1.000041  2020-11-17 22:28:55-08:00 America/Los_Angeles
+
+    - When possible use a larger pipe buffer
+
+1.000040  2020-11-17 21:59:41-08:00 America/Los_Angeles
+
+    - Fix bug in collector that made it marginally less efficient
+    - Fix bug that prevented no-max from working in JobDir poll
+    - Fix bug that prevented the active status display from updating
+
+1.000039  2020-11-17 19:54:08-08:00 America/Los_Angeles
+
+    - yath watch shows aux output
+    - Minor no-op code improvement in Runner.pm
+
 1.000038  2020-11-02 20:49:12-08:00 America/Los_Angeles
 
     - Add shellcall and aux output capture for plugins

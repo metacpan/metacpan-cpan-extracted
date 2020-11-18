@@ -5,7 +5,7 @@ use base qw{Package::New};
 use LWP::UserAgent;
 use HTTP::Request;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -20,7 +20,7 @@ Net::Camera::Sercomm::ICamera2 - Perl Interface for Sercomm ICamera2 network cam
 
 =head1 DESCRIPTION
 
-The Sercomm ICamera2 is network camera that can be accessed via a web interface.
+The Sercomm ICamera2 is a network camera that can be accessed via a web interface.
 This module provides methods to retrieve an image from the camera.
 
 =head1 PROPERTIES
@@ -124,7 +124,9 @@ Michael R. Davis mrdvt at cpan
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Michael R. Davis
+MIT License
+
+Copyright (c) 2020 Michael R. Davis
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

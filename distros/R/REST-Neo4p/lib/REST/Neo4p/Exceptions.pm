@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Exceptions::VERSION = '0.3030';
+  $REST::Neo4p::Exceptions::VERSION = '0.4000';
 }
 use Exception::Class (
   'REST::Neo4p::Exception',
@@ -56,9 +56,21 @@ use Exception::Class (
 		  'neo4j_exception', 'neo4j_stacktrace' ],
       description => 'Cypher query language syntax error'
      },
+  'REST::Neo4p::SchemaConstraintExistsException' =>
+    {
+      isa => 'REST::Neo4p::Neo4jException',
+      fields => [qw/error_list neo4j_message code/],
+      description => 'Attempt to create a schema constraint that already exists'
+     },
+  'REST::Neo4p::IndexExistsException' =>
+    {
+      isa => 'REST::Neo4p::Neo4jException',
+      fields => [qw/error_list neo4j_message code/],
+      description => 'Attempt to create an index that already exists'
+     },
   'REST::Neo4p::NotImplException' => {
     isa => 'REST::Neo4p::LocalException',
-    description => 'Attempt to call an currently unimplemented method'
+    description => 'Attempt to call a currently unimplemented method'
    },
   'REST::Neo4p::NotSuppException' => {
     isa => 'REST::Neo4p::LocalException',
@@ -103,7 +115,13 @@ use Exception::Class (
   'REST::Neo4p::ConstraintSpecException' => {
     isa => 'REST::Neo4p::LocalException',
     description => 'Constraint specification syntax incorrect',
-  }
+  },
+  'REST::Neo4p::Neo4jTightwadException' => {
+    isa => 'REST::Neo4p::LocalException',
+    fields => ['code','message'],
+    description => 'This feature only works in enterprise edition'
+  },
+  
    );
 
 =head1 NAME
@@ -208,7 +226,7 @@ L<REST::Neo4p>, L<Exception::Class>
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

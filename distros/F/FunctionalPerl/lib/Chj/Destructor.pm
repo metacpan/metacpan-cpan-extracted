@@ -15,9 +15,9 @@ Chj::Destructor
 
     use Chj::Destructor;
 
-    my $z=0;
+    my $z = 0;
     {
-       my $x= ["foo", Destructor { $z++ }];
+       my $x = ["foo", Destructor { $z++ }];
     }
     is $z, 1;
 
@@ -40,23 +40,26 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::Destructor;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(Destructor);
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(Destructor);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 {
+
     package Chj::_::Destructor;
     use FP::Predicates ":all";
-    use FP::Struct [[*is_procedure, "thunk"]],
-        'FP::Struct::Show', 'FP::Abstract::Pure';
+    use FP::Struct [[*is_procedure, "thunk"]], 'FP::Struct::Show',
+        'FP::Abstract::Pure';
+
     sub DESTROY {
-        my ($self)=@_;
-        local ($@,$!,$?,$^E,$.);
+        my ($self) = @_;
+        local ($@, $!, $?, $^E, $.);
         $self->thunk->()
     }
     _END_
@@ -64,18 +67,18 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 
 # Chj::_::Destructor::constructors->import -- no, special prototype:
 sub Destructor (&) {
-    Chj::_::Destructor->new ($_[0])
+    Chj::_::Destructor->new($_[0])
 }
 
 use Chj::TEST;
 
 TEST {
-    my $z=0;
+    my $z = 0;
     {
-        my $x= ["foo", Destructor { $z++ }];
+        my $x = ["foo", Destructor { $z++ }];
     }
     $z
-} 1;
-
+}
+1;
 
 1

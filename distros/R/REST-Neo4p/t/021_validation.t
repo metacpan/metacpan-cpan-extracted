@@ -13,14 +13,14 @@ no warnings qw(once);
 
 my @cleanup;
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
     $build = Module::Build->current;
     $user = $build->notes('user');
     $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 47;
 
 my $not_connected = connect($TEST_SERVER,$user,$pass);
@@ -261,7 +261,6 @@ ok my $position_constraint = REST::Neo4p::Constraint->get_constraint('position')
 is_deeply $position_constraint->rtype, [], 'position constraint rtype is wildcard';
 
 ok $position_constraint->validate($position), 'relationship property constraint satisfied by \'position\'';
-$DB::single=1;
 is $allowed_has_relns->validate( $module => $teh_shizznit, 'has' ), 1, 'module can have method (1)';
 is $allowed_has_relns->validate( $module => $bizzity_bomb, 'has'), 1,  'module can have method (2)';
 is $allowed_contains_relns->validate( $module => $teh_shizznit, 'contains' ), 1, 'module can also contain a method';
@@ -312,6 +311,7 @@ SKIP : {
       $c1->set_condition('none');
       is $c1->validate($nodeset), $expected->[2], "nodeset $ctr : none";
   }
+  $DB::single=1;
   push @cleanup, my $bad_node_no_biscuit = REST::Neo4p::Node->new( { bad => 'node' } );
   push @cleanup, my $module_node = REST::Neo4p::Node->new($module);
   push @cleanup, my $teh_shizznit_node = REST::Neo4p::Node->new($teh_shizznit);

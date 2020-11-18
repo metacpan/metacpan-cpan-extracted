@@ -1,3 +1,13 @@
+2020-11-17  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.8.1
+
+  * Code tidying
+
+  * Packaging improvements
+
+  * CI improvements
+
 2016-12-08  Dave Cross <dave@dave.org.uk>
 
   * Build.PL: Packaging fixes

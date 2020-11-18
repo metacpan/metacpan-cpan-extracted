@@ -1,5 +1,8 @@
 Revision history for Perl extension PESEL::Generator.
 
+1.3 Tue, 17 Nov 2020 07:41:13 +0100
+	- Bug fix.
+
 1.2 Sun, 15 Nov 2020 11:25:50 +0100
 	- Little fixation in tests.
 

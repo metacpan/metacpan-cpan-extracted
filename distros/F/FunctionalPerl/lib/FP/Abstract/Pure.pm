@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -14,17 +14,14 @@ FP::Abstract::Pure - functional purity protocol
 =head1 SYNOPSIS
 
     use FP::List;
-    my $v= list(1); # or any other data structure that implements
+    use Safe::Isa;
+    my $v = list(1); # or any other data structure that implements
                     # FP::Abstract::Pure
-    is UNIVERSAL::isa($v, "FP::Abstract::Pure"), 1;
-    # Or use Safe::Isa instead of UNIVERSAL::isa, but I don't understand
-    # why overriding isa is useful (why fake inherit as opposed to real
-    # inheriting but then shadowing what needs to be shadowed? NEXT method
-    # and that needs to be supported in mock classes? TODO figure out.)
+    is $v->$_isa("FP::Abstract::Pure"), 1;
 
     # but usually:
     use FP::Predicates;
-    is_pure ($v) # true if $v does (officially) not support mutation
+    is_pure($v) # true if $v does (officially) not support mutation
 
 =head1 DESCRIPTION
 
@@ -42,14 +39,12 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Abstract::Pure;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
-sub FP_Interface__method_names {
-    ()
-}
-
+sub FP_Interface__method_names { () }
 
 1

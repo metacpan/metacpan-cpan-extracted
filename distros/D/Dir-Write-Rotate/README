@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    Dir::Write::Rotate - Write files to a directory, with rotate options
 
+VERSION
+    This document describes version 0.004 of Dir::Write::Rotate (from Perl
+    distribution Dir-Write-Rotate), released on 2020-11-17.
+
+SYNOPSIS
      use Dir::Write::Rotate;
-    
+
      my $dwr = Dir::Write::Rotate->new(
          path               => 'somedir.log',            # required
          filename_pattern   => '%Y-%m-%d-%H%M%S.pid-%{pid}.%{ext}', # optional
@@ -11,117 +17,129 @@ SYNOPSIS
          max_age            => undef,                    # optional
          rotate_probability => 0.25,                     # optional
      );
-    
+
      # will write to a file in the dir and return its name
      $dwr->write("some\ncontents\n");
 
-    To limit total size of files in the directory, e.g. 10MB, set max_size
-    to 10*1024*1024. To limit number of files, e.g. 5000, set max_files to
-    5000. To keep only files that are at most 10 days old, set max_age to
+    To limit total size of files in the directory, e.g. 10MB, set "max_size"
+    to 10*1024*1024. To limit number of files, e.g. 5000, set "max_files" to
+    5000. To keep only files that are at most 10 days old, set "max_age" to
     10*24*3600.
 
 DESCRIPTION
-
     This module provides a simple object for writing files to directory.
     There are options to delete older files to keep the size of the
     directory in check.
 
 METHODS
-
- new
-
+  new
     Syntax: $dwr = Dir::Write::Rotate->new(%args);
 
     Constructor. Arguments:
 
-      * path => str
+    *   path => str
 
-      The directory path to write to. Must already exist.
+        The directory path to write to. Must already exist.
 
-      * filename_pattern => str
+    *   filename_pattern => str
 
-      Names to give to each file, expressed in pattern a la strftime()'s.
-      Optional. Default is '%Y-%m-%d-%H%M%S.pid-%{pid}.%{ext}'. Time is
-      expressed in local time.
+        Names to give to each file, expressed in pattern a la strftime()'s.
+        Optional. Default is '%Y-%m-%d-%H%M%S.pid-%{pid}.%{ext}'. Time is
+        expressed in local time.
 
-      If file of the same name already exists, a suffix ".1", ".2", and so
-      on will be appended.
+        If file of the same name already exists, a suffix ".1", ".2", and so
+        on will be appended.
 
-      Available pattern:
+        Available pattern:
 
-      %Y - 4-digit year number, e.g. 2009
+        %Y - 4-digit year number, e.g. 2009
+        %y - 2-digit year number, e.g. 09 for year 2009
+        %m - 2-digit month, e.g. 04 for April
+        %d - 2-digit day of month, e.g. 28
+        %H - 2-digit hour, e.g. 01
+        %M - 2-digit minute, e.g. 57
+        %S - 2-digit second, e.g. 59
+        %z - the time zone as hour offset from GMT
+        %Z - the time zone or name or abbreviation
+        %{pid} - Process ID
+        %{ext} - Guessed file extension
+                Try to detect appropriate file extension based on the
+                content using File::LibMagic (if that module is available).
+                For example, if message message looks like an HTML document,
+                then 'html'. If File::LibMagic is not available or type
+                cannot be detected, defaults to 'log'.
 
-      %y - 2-digit year number, e.g. 09 for year 2009
+        %% - literal '%' character
 
-      %m - 2-digit month, e.g. 04 for April
+    *   filename_sub => code
 
-      %d - 2-digit day of month, e.g. 28
+        A more generic mechanism for filename_pattern. If filename_sub is
+        given, filename_pattern will be ignored. The code will be called
+        with the same arguments as log_message() and is expected to return a
+        filename. Will die if code returns undef.
 
-      %H - 2-digit hour, e.g. 01
+    *   max_size => num
 
-      %M - 2-digit minute, e.g. 57
+        Maximum total size of files, in bytes. After the size is surpassed,
+        oldest files (based on ctime) will be deleted. Optional. Default is
+        undefined, which means unlimited.
 
-      %S - 2-digit second, e.g. 59
+    *   max_files => int
 
-      %z - the time zone as hour offset from GMT
+        Maximum number of files. After this number is surpassed, oldest
+        files (based on ctime) will be deleted. Optional. Default is
+        undefined, which means unlimited.
 
-      %Z - the time zone or name or abbreviation
+    *   max_age => num
 
-      %{pid} - Process ID
+        Maximum age of files (based on ctime), in seconds. After the age is
+        surpassed, files older than this age will be deleted. Optional.
+        Default is undefined, which means unlimited.
 
-      %{ext} - Guessed file extension
+    *   rotate_probability => num
 
-	Try to detect appropriate file extension based on the content using
-	File::LibMagic (if that module is available). For example, if
-	message message looks like an HTML document, then 'html'. If
-	File::LibMagic is not available or type cannot be detected,
-	defaults to 'log'.
+        A number between 0 and 1 which specifies the probability that
+        write() will call rotate(). This is a balance between performance
+        and rotate size accuracy. 1 means always rotate, 0 means never
+        rotate. Optional. Default is 0.25.
 
-      %% - literal '%' character
-
-      * filename_sub => code
-
-      A more generic mechanism for filename_pattern. If filename_sub is
-      given, filename_pattern will be ignored. The code will be called with
-      the same arguments as log_message() and is expected to return a
-      filename. Will die if code returns undef.
-
-      * max_size => num
-
-      Maximum total size of files, in bytes. After the size is surpassed,
-      oldest files (based on ctime) will be deleted. Optional. Default is
-      undefined, which means unlimited.
-
-      * max_files => int
-
-      Maximum number of files. After this number is surpassed, oldest files
-      (based on ctime) will be deleted. Optional. Default is undefined,
-      which means unlimited.
-
-      * max_age => num
-
-      Maximum age of files (based on ctime), in seconds. After the age is
-      surpassed, files older than this age will be deleted. Optional.
-      Default is undefined, which means unlimited.
-
-      * rotate_probability => num
-
-      A number between 0 and 1 which specifies the probability that write()
-      will call rotate(). This is a balance between performance and rotate
-      size accuracy. 1 means always rotate, 0 means never rotate. Optional.
-      Default is 0.25.
-
- write
-
+  write
     Syntax: $dwr->write($msg) => $filename
 
     Write a file with content $msg.
 
- rotate
-
+  rotate
     Will be called automatically by write.
 
-SEE ALSO
+ENVIRONMENT
+  DIR_WRITE_ROTATE_DEBUG
+    Bool. If set to true, will print debug messages to stderr (particularly
+    when instantiated and when deleting rotated files).
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dir-Write-Rotate>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dir-Write-Rotate>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dir-Write-Rotate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     File::Write::Rotate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

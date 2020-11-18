@@ -38,9 +38,10 @@ our @EXPORT = qw( &pathname_find &pathname_findall &pathname_kpsewhich
   &pathname_split &pathname_directory &pathname_name &pathname_type
   &pathname_timestamp
   &pathname_concat
-  &pathname_relative &pathname_absolute
+  &pathname_relative &pathname_absolute &pathname_to_url
   &pathname_is_absolute &pathname_is_contained
   &pathname_is_url &pathname_is_literaldata
+  &pathname_is_raw &pathname_is_reloadable
   &pathname_protocol
   &pathname_cwd &pathname_chdir &pathname_mkdir &pathname_copy
   &pathname_installation);
@@ -54,10 +55,10 @@ our @EXPORT = qw( &pathname_find &pathname_findall &pathname_kpsewhich
 # Some indicators that this is not sufficient? (calls to libraries/externals???)
 # PRELIMINARY test, probably need to be even more careful
 my $ISWINDOWS   = $^O =~ /^(MSWin|NetWare|cygwin)/i;
-my $SEP         = ($ISWINDOWS ? '\\' : '/');           # [CONSTANT]
-my $KPATHSEP    = ($ISWINDOWS ? ';' : ':');            # [CONSTANT]
-my $LITERAL_RE  = '(?:literal)(?=:)';                  # [CONSTANT]
-my $PROTOCOL_RE = '(?:https|http|ftp)(?=:)';           # [CONSTANT]
+my $SEP         = ($ISWINDOWS ? '\\' : '/');    # [CONSTANT]
+my $KPATHSEP    = ($ISWINDOWS ? ';'  : ':');    # [CONSTANT]
+my $LITERAL_RE  = '(?:literal)(?=:)';           # [CONSTANT]
+my $PROTOCOL_RE = '(?:https|http|ftp)(?=:)';    # [CONSTANT]
 
 #======================================================================
 # pathname_make(dir=>dir, name=>name, type=>type);
@@ -72,7 +73,7 @@ sub pathname_make {
     foreach my $d (@dirs) {
       $pathname =~ s|\Q$SEP\E$||; $dir =~ s|^\Q$SEP\E||;
       $pathname .= $SEP . $dir; } }
-  $pathname .= $SEP if $pathname && $pieces{name} && $pathname !~ m|\Q$SEP\E$|;
+  $pathname .= $SEP                if $pathname && $pieces{name} && $pathname !~ m|\Q$SEP\E$|;
   $pathname .= $pieces{name}       if $pieces{name};
   $pathname .= '.' . $pieces{type} if $pieces{type};
   return pathname_canonical($pathname); }
@@ -173,6 +174,20 @@ sub pathname_is_contained {
   # If the relative pathname starts with "../" that it apparently is NOT underneath base!
   return ($rel =~ m|^\.\.(?:/\|\Q$SEP\E)| ? undef : $rel); }
 
+# Check whether a pathname is a raw TeX source or definition
+sub pathname_is_raw {
+  my ($pathname) = @_;
+  return ($pathname =~ /\.(tex|pool|sty|cls|clo|cnf|cfg|ldf|def|dfu)$/); }
+
+# Check whether a pathname is reloadable as a TeX definition
+sub pathname_is_reloadable {
+  my ($pathname) = @_;
+  my ($dir, $name, $type) = pathname_split($pathname);
+  # babel.sty exception:
+  # we know the same .ldf file may be reloaded with a different option,
+  # to load an adjacently defined language, so allow that.
+  return $type eq 'ldf'; }
+
 # pathname_relative($pathname,$base) => $relativepathname
 # If $pathname is an absolute, non-URL pathname,
 # return the pathname relative to $base,
@@ -192,6 +207,12 @@ sub pathname_absolute {
   return (!pathname_is_absolute($pathname) && !pathname_is_url($pathname)
     ? File::Spec->rel2abs($pathname, ($base ? pathname_canonical($base) : pathname_cwd()))
     : $pathname); }
+
+sub pathname_to_url {
+  my $relative_pathname = pathname_relative($_[0]);
+  if ($SEP ne '/') {
+    $relative_pathname = join('/', split(/\Q$SEP\E/, $relative_pathname)); }
+  return $relative_pathname; }
 
 #======================================================================
 # Actual file system operations.
@@ -310,7 +331,7 @@ sub candidate_pathnames {
           $pathdir);
         push(@dirs, $pp) unless grep { $pp eq $_ } @dirs; } }    # but only include each dir ONCE
     push(@dirs, pathname_concat($cwd, $pathdir)) unless @dirs;    # At least have the current directory!
-           # And, if installation dir specified, append it.
+        # And, if installation dir specified, append it.
     if (my $subdir = $options{installation_subdir}) {
       push(@dirs, map { pathname_concat($_, $subdir) } @INSTALLDIRS); } }
 
@@ -320,12 +341,12 @@ sub candidate_pathnames {
     push(@exts, '.' . $options{type}); }
   if ($options{types}) {
     foreach my $ext (@{ $options{types} }) {
-      if ($ext eq '') { push(@exts, ''); }
+      if    ($ext eq '') { push(@exts, ''); }
       elsif ($ext eq '*') {
         push(@exts, '.*', ''); }
-      elsif ($pathname =~ /\.\Q$ext\E$/i) {
-        push(@exts, ''); }
       else {
+        if ($pathname =~ /\.\Q$ext\E$/i) {
+          push(@exts, ''); }
         push(@exts, '.' . $ext); } } }
   push(@exts, '') unless @exts;
 
@@ -357,7 +378,7 @@ our $kpse_toolchain = "";
 
 sub pathname_kpsewhich {
   my (@candidates) = @_;
-  return unless $kpsewhich;
+  return             unless $kpsewhich;
   build_kpse_cache() unless $kpse_cache;
   foreach my $file (@candidates) {
     if (my $result = $$kpse_cache{$file}) {
@@ -400,11 +421,11 @@ sub build_kpse_cache {
       while (<$LSR>) {
         chop;
         next unless $_;
-        if (/^%/) { }
+        if    (/^%/) { }
         elsif (/^(.*?):$/) {    # Move to a new subdirectory
           $subdir = $1;
-          $subdir =~ s|^\./||;    # remove prefix
-          my $d = $dir . '/' . $subdir;    # Hopefully OS safe, for comparison?
+          $subdir =~ s|^\./||;                             # remove prefix
+          my $d = $dir . '/' . $subdir;                    # Hopefully OS safe, for comparison?
           $skip = !grep { $d =~ /^\Q$_\E/ } @filters; }    # check if one of the TeX paths
         elsif (!$skip) {
           # Is it safe to use '/' here?
@@ -418,7 +439,7 @@ sub build_kpse_cache {
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 
@@ -475,6 +496,20 @@ Returns whether the pathname C<$path> appears to be an absolute pathname.
 
 Returns whether the pathname C<$path> appears to be a url, rather than local file.
 
+=item C<< $boole = pathname_is_literaldata($path); >>
+
+Returns whether the pathname C<$path> is actually a blob of literal data,
+with a leading "literal:" protocol.
+
+=item C<< $boole = pathname_is_raw($path); >>
+
+Check if pathname indicates a raw TeX source or definition file.
+
+=item C<< $boole = pathname_is_reloadable($path); >>
+
+Check for pathname exceptions where the same TeX definition file
+can be meaningfully reloaded. For example, babel.sty ".ldf" files
+
 =item C<< $rel = pathname_is_contained($path,$base); >>
 
 Checks whether C<$path> is underneath the directory C<$base>; if so
@@ -491,6 +526,11 @@ otherwise simply returns the canonical form of C<$path>.
 Returns the absolute pathname resulting from interpretting
 C<$path> relative to the directory C<$base>.  If C<$path>
 is already absolute, it is returned unchanged.
+
+=item C<< $relative_url = pathname_to_url($path); >>
+
+Creates a local, relative URL for a given pathname,
+also ensuring proper path separators on non-Unix systems.
 
 =back
 
@@ -520,9 +560,9 @@ It preserves the timestamp of C<$source>.
 
 =item C<< $path = pathname_find($name,%options); >>
 
-Finds the first file named C<$name> that exists 
+Finds the first file named C<$name> that exists
 and that matches the specification
-in the keywords C<%options>.  
+in the keywords C<%options>.
 An absolute pathname is returned.
 
 If C<$name> is not already an absolute pathname, then
@@ -545,6 +585,13 @@ The type C<*> matches any extension.
 Like C<pathname_find>,
 but returns I<all> matching (absolute) paths that exist.
 
+=item C<< $path = pathname_kpsewhich(@names); >>
+
+Attempt to find a candidate name via the external C<kpsewhich>
+capability of the system's TeX toolchain. If C<kpsewhich> is
+not available, or the file is not found, returns a
+Perl undefined value.
+
 =back
 
 =head1 AUTHOR
@@ -557,4 +604,3 @@ Public domain software, produced as part of work done by the
 United States Government & not subject to copyright in the US.
 
 =cut
-

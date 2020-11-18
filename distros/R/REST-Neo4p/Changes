@@ -1,4 +1,9 @@
 Revision history for Perl module REST::Neo4p
+0.4000 2020-11-14 
+    - Major refactor
+    - Enable Neo4j v4.0+ using Neo4j::Driver
+    - Remove antiquated Cypher constructions from pod and tests
+    - Rationalize build process somewhat
 0.3030 2019-12-21
     - Fix a parsing issue occuring with JSON::XS >= 4.00
 0.3021 2018-04-24

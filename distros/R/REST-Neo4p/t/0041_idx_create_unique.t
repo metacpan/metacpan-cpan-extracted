@@ -2,21 +2,21 @@
 use Test::More tests => 24;
 use Module::Build;
 use lib '../lib';
-use lib 't/lib';
+use lib qw'lib t/lib';
 use Neo4p::Connect;
 use strict;
 use warnings;
 no warnings qw(once);
 my @cleanup;
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
   $build = Module::Build->current;
   $user = $build->notes('user');
   $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 23;
 
 use_ok('REST::Neo4p');
@@ -30,6 +30,7 @@ SKIP : {
   if ( my $i = REST::Neo4p->get_index_by_name('nidx555','node') ) { $i->remove }
   if ( my $i = REST::Neo4p->get_index_by_name('ridx555','relationship') ) { $i->remove }
   ok my $n1 = REST::Neo4p::Node->new({name => 'A', type => 'purine'}), "create a new node";
+
   push @cleanup, $n1;
   ok my $nidx = REST::Neo4p::Index->new('node', 'nidx555'), "create a node index";
   ok $nidx->add_entry( $n1, name => 'A' ), 'add created node to index';
@@ -39,12 +40,14 @@ SKIP : {
   ok my $n3 = $nidx->create_unique( name => 'A', { name => 'A', type => 'purine' } ), 'get a node from create_unique, same properties as first node created...';
   is $$n3, $$n1, "..and they are the same node in db";
   push @cleanup, $n3 unless ($$n3 == $$n1);
+
   ok my ($n4) = $nidx->find_entries(name => 'T'), 'second node was added to index by create_unique';
   is $$n4, $$n2, '..they are the same node';
   $n4 = $nidx->create_unique( name => 'T', { name => 'T', type => 'pyrimidine'}, 'fail');
   ok !$n4, 'create_unique returned nothing with on_not_found == fail';
   push @cleanup, $n4 unless !$n4;
-  ok my $ridx = REST::Neo4p::Index->new('relationship', 'ridx555'), "create a relationship index";
+
+  ok my $ridx = REST::Neo4p::Index->new('relationship', 'ridx555', { rtype => 'transversion'}), "create a relationship index";
   push @cleanup, $ridx;
   ok my $r = $n1->relate_to($n2, 'transversion'), 'create relationship';
   push @cleanup, $r;
@@ -53,6 +56,7 @@ SKIP : {
   is $$r, $$r1, '.. and get the same relationship object returned';
   push @cleanup, $r1 unless $$r == $$r1;
   my $r2;
+
     ok $r2 = $ridx->create_unique( name => 'transversion_back', $n2 => $n1, 'transversion', { extra => 'screlb' }), 'create_unique relationship with properties';
     is $r2->get_property('extra'), 'screlb', 'property correctly set';
   isnt $$r1, $$r2, 'this is a different, new relationship';

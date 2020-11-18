@@ -1,23 +1,21 @@
 package Net::DNS::Parameters;
 
-use strict;
-use warnings;
-
-our $VERSION = (qw$Id: Parameters.pm 1812 2020-10-07 18:09:53Z willem $)[2];
-
-
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2020-07-20)
+##	(last updated 2020-10-26)
 ##
 ################################################
 
+use strict;
+use warnings;
+our $VERSION = (qw$Id: Parameters.pm 1823 2020-11-16 16:29:45Z willem $)[2];
 
 use integer;
 use Carp;
 
 use base qw(Exporter);
+
 our @EXPORT_OK = qw(
 		classbyname classbyval %classbyname
 		typebyname typebyval %typebyname
@@ -26,6 +24,7 @@ our @EXPORT_OK = qw(
 		ednsoptionbyname ednsoptionbyval
 		dsotypebyname dsotypebyval
 		);
+
 our %EXPORT_TAGS = (
 	class	   => [qw(classbyname classbyval)],
 	type	   => [qw(typebyname typebyval)],
@@ -205,7 +204,7 @@ my @ednsoptionbyname = (
 	PADDING		 => 12,					# RFC7830
 	CHAIN		 => 13,					# RFC7901
 	'KEY-TAG'	 => 14,					# RFC8145
-	'EXTENDED-ERROR' => 15,					# RFC-ietf-dnsop-extended-error-16
+	'EXTENDED-ERROR' => 15,					# RFC8914
 	'CLIENT-TAG'	 => 16,					# draft-bellis-dnsop-edns-tags
 	'SERVER-TAG'	 => 17,					# draft-bellis-dnsop-edns-tags
 	DEVICEID	 => 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
@@ -379,8 +378,9 @@ use constant EXTLANG => defined eval { require Net::DNS::Extlang };
 
 our $DNSEXTLANG = EXTLANG ? eval { Net::DNS::Extlang->new()->domain } : undef;
 
-sub _typespec {				## draft-levine-dnsextlang
-	eval <<'END' if EXTLANG && $DNSEXTLANG;## no critic
+sub _typespec {
+	eval {				## draft-levine-dnsextlang
+		<<'END' } if EXTLANG && $DNSEXTLANG;
 	my ($node) = @_;
 
 	require Net::DNS::Resolver;

@@ -7,6 +7,8 @@ use Algorithm::CheckDigits;
 use Getopt::Long;
 use Pod::Usage;
 
+use version; our $VERSION = qv('v1.3.5');
+
 my %opt;
 
 GetOptions(\%opt, 'algorithm=s', 'help', 'man');
@@ -159,7 +161,7 @@ Mathias Weidner C<< mamawe@cpan.org >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2010, Mathias Weidner C<< mamawe@cpan.org >>.
+Copyright (c) 2010-2020, Mathias Weidner C<< mamawe@cpan.org >>.
 All rights reserved.
 
 This module is free software; you can redistribute it and/or

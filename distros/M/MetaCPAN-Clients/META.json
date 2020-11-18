@@ -4,42 +4,51 @@
       "Gabor Szabo <szabgab@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MetaCPAN-Clients",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
             "Getopt::Long" : "0",
+            "JSON" : "0",
             "MetaCPAN::API" : "0.43",
+            "MetaCPAN::Client" : "2.028000",
             "Path::Tiny" : "0.015"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/MetaCPAN-Clients/issues"
+      },
+      "homepage" : "https://perlmaven.com/metacpan",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/szabgab/MetaCPAN-Clients.git",
          "web" : "https://github.com/szabgab/MetaCPAN-Clients"
       }
    },
-   "version" : "0.05",
+   "version" : "1.00",
    "x_contributors" : [
       "SZABGAB",
       "DAGOLDEN"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

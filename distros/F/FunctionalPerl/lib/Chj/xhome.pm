@@ -49,16 +49,17 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::xhome;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(xhome);
-@EXPORT_OK=qw(xHOME
-              xeffectiveuserhome
-              xsafehome);
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT    = qw(xhome);
+our @EXPORT_OK = qw(xHOME
+    xeffectiveuserhome
+    xsafehome);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 # use File::HomeDir qw(home);
 
@@ -66,57 +67,60 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 # Perl. Also, HomeDir's `home` returns undef for non-existing paths.
 
 sub xcheck_home {
-    my ($home)= @_;
-    length ($home)
-      or die "environment variable HOME is the empty string";
-    $home
-      or die "environment variable HOME is false";
+    my ($home) = @_;
+    length($home) or die "environment variable HOME is the empty string";
+    $home         or die "environment variable HOME is false";
     if ($^O eq 'MSWin32') {
-        $home=~ m|^[a-z]+:|i # XX correct letter syntax?
-            or die "environment variable HOME does not start with a drive designator: '$home'";
+        $home =~ m|^[a-z]+:|i    # XX correct letter syntax?
+            or die
+            "environment variable HOME does not start with a drive designator: '$home'";
     } else {
-        $home=~ m|^/|
-            or die "environment variable HOME does not start with a slash: '$home'";
+        $home =~ m|^/|
+            or die
+            "environment variable HOME does not start with a slash: '$home'";
     }
 }
 
 sub xHOME () {
-    defined (my $home=$ENV{HOME})
+    defined(my $home = $ENV{HOME})
         or die "environment variable HOME is not set";
     xcheck_home $home;
     $home
 }
 
 sub xeffectiveuserhome () {
+
     # (Don't bother about caching, premature opt & dangerous.)
-    my $uid= $>;
-    my ($name,$passwd,$_uid,$gid,
-        $quota,$comment,$gcos,$dir,$shell,$expire)
-      = getpwuid $uid
+    my $uid = $>;
+    my (
+        $name,    $passwd, $_uid, $gid,   $quota,
+        $comment, $gcos,   $dir,  $shell, $expire
+        )
+        = getpwuid $uid
         or die "unknown user for uid $uid";
     $dir
 }
 
 sub xsafehome () {
     if ($^O eq 'MSWin32') {
+
         # XX or how to look it up on Windows again? If implemented, update pod.
         xhome()
     } else {
-        my $effectiveuserhome= xeffectiveuserhome;
-        if (my $e= $ENV{HOME}) {
+        my $effectiveuserhome = xeffectiveuserhome;
+        if (my $e = $ENV{HOME}) {
             $e eq $effectiveuserhome
-              or die "HOME environment variable is set to something other ".
-                "than the effective user home: '$e' vs. '$effectiveuserhome'";
+                or die "HOME environment variable is set to something other "
+                . "than the effective user home: '$e' vs. '$effectiveuserhome'";
         }
         $effectiveuserhome
     }
 }
 
-
 our $warned = 0;
 
 sub xchecked_home ($$) {
-    my ($home, $what)= @_;
+    my ($home, $what) = @_;
     xcheck_home $home;
     if (-d $home) {
         $home
@@ -128,7 +132,7 @@ sub xchecked_home ($$) {
 }
 
 sub maybe_HOME {
-    if (my $home= $ENV{HOME}) {
+    if (my $home = $ENV{HOME}) {
         xchecked_home $home, '$ENV{HOME}'
     } else {
         undef
@@ -136,7 +140,7 @@ sub maybe_HOME {
 }
 
 sub maybe_globhome {
-    my ($home)= glob "~";
+    my ($home) = glob "~";
     if (defined $home) {
         xchecked_home $home, "glob '~'";
     } else {
@@ -144,10 +148,8 @@ sub maybe_globhome {
     }
 }
 
-
 sub xhome () {
     maybe_HOME() // maybe_globhome() // xeffectiveuserhome()
 }
-
 
 1

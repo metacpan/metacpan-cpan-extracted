@@ -21,6 +21,7 @@ require DynaLoader;
 use overload '""' => sub { "Exception: ".$_[0]->get_msg };
 
 use Search::Xapian::DatabaseVersionError;
+use Search::Xapian::DatabaseNotFoundError;
 
 our @ISA = qw(DynaLoader Search::Xapian::DatabaseError);
 

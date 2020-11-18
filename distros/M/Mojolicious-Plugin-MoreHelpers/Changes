@@ -1,0 +1,9 @@
+
+0.01 2020-10-04
+  - Resurrect plugin and reset version.
+
+0.02 2020-11-16
+  - Remove reponse headers from reply->success helper.
+  - Helpers headers_more and route_params added.
+  - Basic module documentation.
+

@@ -8,7 +8,7 @@ use Readonly;
 Readonly my $FLOAT_EPS    => 0.01;
 Readonly my $RIGHT_BUTTON => 3;
 
-our $VERSION = 4;
+our $VERSION = 6;
 
 sub button_pressed {
     my $self  = shift;

@@ -25,3 +25,4 @@ imageSettingsQuality
 imageSettingsSize
 mrdvt
 sublicense
+ICamera

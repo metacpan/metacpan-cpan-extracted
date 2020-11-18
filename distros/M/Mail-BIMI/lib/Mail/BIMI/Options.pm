@@ -1,6 +1,6 @@
 package Mail::BIMI::Options;
 # ABSTRACT: Shared options
-our $VERSION = '2.20201102.2'; # VERSION
+our $VERSION = '2.20201117.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -22,6 +22,8 @@ has dns_client_timeout  => ( is => 'rw', lazy => 1, default => sub {return $ENV{
   documentation => 'Timeout value for DNS' );
 has no_location_with_vmc => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_NO_LOCATION_WITH_VMC}},
   documentation => 'Do not check location if VMC was present' );
+has cert_subdomain_is_valid => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_CERT_SUBDOMAIN_IS_VALID}//0},
+  documentation => 'Should VMCs be valid for any subdomain of their altname' );
 has no_validate_cert => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_NO_VALIDATE_CERT}},
   documentation => 'Do not validate VMC' );
 has no_validate_svg => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_NO_VALIDATE_SVG}},
@@ -63,7 +65,7 @@ Mail::BIMI::Options - Shared options
 
 =head1 VERSION
 
-version 2.20201102.2
+version 2.20201117.2
 
 =head1 DESCRIPTION
 
@@ -90,6 +92,12 @@ Shared cache file when using FastMmap backend
 is=rw
 
 Directory to store Cache files in when using File backend
+
+=head2 cert_subdomain_is_valid
+
+is=rw
+
+Should VMCs be valid for any subdomain of their altname
 
 =head2 dns_client_timeout
 

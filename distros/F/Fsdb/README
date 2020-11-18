@@ -144,22 +144,11 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.70, 2020-11-12 Some small quality-of-life enhancements and corner-case[0m
-       [1mbugfixes.[0m
-       ENHANCEMENT
-           dbcol can now take an option "-a" to include all columns, allowing
-           reordering of certain columns while passing the rest through.
-
-       ENHANCEMENT
-           dbrowuniq and dbmerge now buffer comments in a way that the last
-           row of data output is no longer in the last block of comments.
-           (The data is identical, but for humans looking at output, this
-           change makes it less likely to lose the last row.)
-
+   [1m2.71, 2020-11-16 Fix a race condition breaking test suites.[0m
        BUG FIX
-           dbmultistats and dbpipeline documentation now indicates that they
-           support "--header" (something they did since version 2.62 in
-           2016-11-29, but now documented.
+           Suppress a race condition in dbcolmerge was sometimes throwing the
+           error "Fsdb::Support::Freds: ending, but running process:
+           dbmerge:xargs" in the dbmerge_0_xargs test case, on exit.
 
        ENHANCEMENT
            dbcolcreate now supports "--header".
@@ -2415,6 +2404,38 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
            We now detect and report that case as 0 stddev.  Thanks to Hang Guo
            for providing a test case.
 
+   [1m2.70, 2020-11-12 Some small quality-of-life enhancements and corner-case[0m
+       [1mbugfixes.[0m
+       ENHANCEMENT
+           dbcol can now take an option "-a" to include all columns, allowing
+           reordering of certain columns while passing the rest through.
+
+       ENHANCEMENT
+           dbrowuniq and dbmerge now buffer comments in a way that the last
+           row of data output is no longer in the last block of comments.
+           (The data is identical, but for humans looking at output, this
+           change makes it less likely to lose the last row.)
+
+       BUG FIX
+           dbmultistats and dbpipeline documentation now indicates that they
+           support "--header" (something they did since version 2.62 in
+           2016-11-29, but now documented.
+
+       ENHANCEMENT
+           dbcolcreate now supports "--header".
+
+       BUG FIX
+           Fixed several spelling errors in deprecated programs and removed
+           information about the no-longer existing FreeBSD and MacOS ports.
+           Thanks to Calvin Ardi for the patch.
+
+       BUG FIX
+           dbmerge now handles --xargs when only one file is provided (and
+           passes the file through unchanged).  It also throws a clean error
+           with --xargs if zero files are provided.  (To support dbmerge,
+           dbcol now has an internal "--saveoutput" option.)  Thanks to Yuri
+           Pradkin for reporting the unhandled corner-case.
+
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"
 
@@ -2446,4 +2467,4 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 
 
-perl v5.30.3                      2020-11-12                           Fsdb(3)
+perl v5.30.3                      2020-11-17                           Fsdb(3)

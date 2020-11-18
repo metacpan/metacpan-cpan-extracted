@@ -1,12 +1,19 @@
 package Dir::Write::Rotate;
 
-our $DATE = '2017-06-26'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-17'; # DATE
+our $DIST = 'Dir-Write-Rotate'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
 use Fcntl qw(:DEFAULT);
+
+sub _debug {
+    return unless $ENV{DIR_WRITE_ROTATE_DEBUG};
+    warn "[Dir::Write::Rotate] debug: $_[0]\n";
+}
 
 sub new {
     my ($pkg, %args) = @_;
@@ -42,6 +49,8 @@ sub new {
     if (keys %args) {
         die "Unknown argument(s): ".join(", ", sort keys %args);
     }
+    _debug "instantiated with params: ".
+        join(", ", map {"$_=$self->{$_}"} sort keys %$self);
     bless $self, $pkg;
 }
 
@@ -154,6 +163,7 @@ sub rotate {
     if (defined($mf) && @entries > $mf) {
         for (splice @entries, $mf) {
             my $fpath = "$path/$_->{name}";
+            _debug "rotate: unlinking $fpath (max_files $mf exceeded)";
             unlink $fpath or warn "Can't unlink $fpath: $!";
         }
     }
@@ -165,6 +175,7 @@ sub rotate {
             if ($_->{age} > $ma) {
                 for (splice @entries, $i) {
                     my $fpath = "$path/$_->{name}";
+                    _debug "rotate: unlinking $fpath (age=$_->{age}) (max_age $ma exceeded)";
                     unlink $fpath or warn "Can't unlink $fpath: $!";
                 }
                 last;
@@ -182,6 +193,7 @@ sub rotate {
             if ($tot_size > $ms) {
                 for (splice @entries, $i) {
                     my $fpath = "$path/$_->{name}";
+                    _debug "rotate: unlinking $fpath (size=$_->{size}) (max_size $ms exceeded)";
                     unlink $fpath or warn "Can't unlink $fpath: $!";
                 }
                 last;
@@ -206,7 +218,7 @@ Dir::Write::Rotate - Write files to a directory, with rotate options
 
 =head1 VERSION
 
-This document describes version 0.003 of Dir::Write::Rotate (from Perl distribution Dir-Write-Rotate), released on 2017-06-26.
+This document describes version 0.004 of Dir::Write::Rotate (from Perl distribution Dir-Write-Rotate), released on 2020-11-17.
 
 =head1 SYNOPSIS
 
@@ -333,6 +345,13 @@ Write a file with content C<$msg>.
 
 Will be called automatically by write.
 
+=head1 ENVIRONMENT
+
+=head2 DIR_WRITE_ROTATE_DEBUG
+
+Bool. If set to true, will print debug messages to stderr (particularly when
+instantiated and when deleting rotated files).
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dir-Write-Rotate>.
@@ -359,7 +378,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

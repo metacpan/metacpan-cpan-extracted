@@ -23,6 +23,12 @@ my $builder = Module::Build->new(
         'perl'          => '5.10.1',
     	'version'       => 0,
     },
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/matwei/perl-Algorithm-CheckDigits',
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-CheckDigits',
+        }
+    },
     script_files        => [
         'bin/checkdigits.pl',
     ],

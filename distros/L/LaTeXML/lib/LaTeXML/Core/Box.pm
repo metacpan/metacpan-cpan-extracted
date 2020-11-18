@@ -13,6 +13,7 @@ package LaTeXML::Core::Box;
 use strict;
 use warnings;
 use LaTeXML::Global;
+use LaTeXML::Common::Dimension qw(Dimension);
 use LaTeXML::Common::Object;
 use base qw(LaTeXML::Common::Object);
 use base qw(Exporter);
@@ -31,7 +32,8 @@ sub Box {
   my $state = $STATE;
   if ($state->lookupValue('IN_MATH')) {
     my $attr = (defined $string) && $state->lookupValue('math_token_attributes_' . $string);
-    return LaTeXML::Core::Box->new($string, $font->specialize($string), $locator, $tokens,
+    my $usestring = ($attr && $$attr{replace}) || $string;
+    return LaTeXML::Core::Box->new($usestring, $font->specialize($string), $locator, $tokens,
       mode => 'math', ($attr ? %$attr : ()), %properties); }
   else {
     return LaTeXML::Core::Box->new($string, $font, $locator, $tokens, %properties); } }
@@ -233,15 +235,12 @@ sub computeSize {
   $$props{cdepth}  = $d unless defined $$props{depth};
   return; }
 
-#**********************************************************************
-# What about Kern, Glue, Penalty ...
-
 #======================================================================
 1;
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 

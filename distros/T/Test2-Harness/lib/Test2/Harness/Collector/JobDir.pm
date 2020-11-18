@@ -2,7 +2,7 @@ package Test2::Harness::Collector::JobDir;
 use strict;
 use warnings;
 
-our $VERSION = '1.000038';
+our $VERSION = '1.000042';
 
 use File::Spec();
 
@@ -87,7 +87,7 @@ sub poll {
         return undef if $want < 1;
         return $want;
         }
-        : sub { 0 };
+        : sub { 1 };
 
     while (!defined($max) || @out < $max) {
         push @new => $self->_poll_streams($check->() // last);

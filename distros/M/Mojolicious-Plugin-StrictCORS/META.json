@@ -37,6 +37,19 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bitnoize/mojolicious-plugin-strictcors/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bitnoize/mojolicious-plugin-strictcors.git",
+         "web" : "https://github.com/bitnoize/mojolicious-plugin-strictcors"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

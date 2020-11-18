@@ -5,27 +5,10 @@ use warnings;
 package App::GhaInstall;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.004';
 
 our $ALLOW_FAIL = 0;
 our $DRY_RUN    = 0;
-
-sub maybe_die {
-	my $exit = shift;
-	if ( $exit ) {
-		if ( $ALLOW_FAIL ) {
-			warn "Failed, but continuing anyway...\n";
-		}
-		else {
-			die "Failed; stopping!\n";
-		}
-	}
-	return;
-}
-
-sub CPAN_CONFIG_FILENAME () {
-	$ENV{HOME} . '/' . 'GhaInstallConfig.pm'
-}
 
 sub SHOULD_INSTALL_OPTIONAL_DEPS () {
 	no warnings;
@@ -43,6 +26,34 @@ sub SHOULD_INSTALL_GITHUB_DEPS () {
 	!! $ENV{CI}
 }
 
+my $installer;
+sub INSTALLER () {
+	return $installer if defined $installer;
+	if ( $ENV{GHA_INSTALL_BACKEND} ) {
+		$installer = $ENV{GHA_INSTALL_BACKEND};
+	}
+	elsif ( $] lt '5.008001' ) {
+		$installer = 'cpan';
+	}
+	else {
+		my $output = `cpanm --version`;
+		if ( $output =~ /cpanminus/ ) {
+			$installer = 'cpanm';
+		}
+		else {
+			$output = `cpm --help`;
+			if ( $output =~ /install/ ) {
+				$installer = 'cpm';
+			}
+			else {
+				$installer = 'cpan';
+			}
+		}
+	}
+	ensure_configured_cpan() if $installer eq 'cpan';
+	return $installer;
+}
+
 sub go {
 	shift;
 	
@@ -54,6 +65,11 @@ sub go {
 		}
 		elsif ( /--dry-run/ ) {
 			$DRY_RUN = 1;
+		}
+		elsif ( /--bootstrap/ ) {
+			install_module( __PACKAGE__ );
+			local $ALLOW_FAIL = 1;
+			install_module( 'CPAN' ) if INSTALLER eq 'cpan';
 		}
 		elsif ( /--configure/ ) {
 			install_configure_dependencies();
@@ -203,24 +219,17 @@ sub install_dependencies {
 	return;
 }
 
-my $installer;
-sub INSTALLER () {
-	return $installer if defined $installer;
-	my $output = `cpanm --version`;
-	if ( $output =~ /cpanminus/ ) {
-		$installer = 'cpanm';
-	}
-	else {
-		$output = `cpm --help`;
-		if ( $output =~ /install/ ) {
-			$installer = 'cpm';
+sub maybe_die {
+	my $exit = shift;
+	if ( $exit ) {
+		if ( $ALLOW_FAIL ) {
+			warn "Failed, but continuing anyway...\n";
 		}
 		else {
-			ensure_configured_cpan();
-			$installer = 'cpan';
+			die "Failed; stopping!\n";
 		}
 	}
-	return $installer;
+	return;
 }
 
 sub install_modules {
@@ -239,7 +248,7 @@ sub install_modules {
 		return maybe_die system 'cpm', 'install', '-g', @modules;
 	}
 
-	install_module $_ for @_;
+	install_module($_) for @_;
 }
 
 sub install_module {
@@ -258,83 +267,89 @@ sub install_module {
 		return maybe_die system 'cpm', 'install', '-g', $module;
 	}
 	
-	return maybe_die system 'cpan', '-J', CPAN_CONFIG_FILENAME, '-T', $module;
+	if ( INSTALLER eq 'cpan' ) {
+		my @notest = grep /^notest$/, @CPAN::EXPORT;
+		'CPAN::Shell'->rematein( @notest, 'install', $module );
+		if ( 'CPAN::Shell'->can('mandatory_dist_failed') ) {
+			return scalar 'CPAN::Shell'->mandatory_dist_failed();
+		}
+		return;
+	}
+	
+	return maybe_die system( split(/ /, INSTALLER), $module );
 }
 
 sub ensure_configured_cpan {
-	return if -f CPAN_CONFIG_FILENAME;
-	open my $fh, '>', CPAN_CONFIG_FILENAME; print { $fh } <<'CONFIG';
-use Cwd ();
+	use Cwd ();
+	require CPAN;
+	eval { require CPAN::Shell };
 
-my $home = $ENV{HOME};
-my $cwd  = Cwd::cwd;
-
-$CPAN::Config = {
-  'applypatch' => q[],
-  'auto_commit' => q[0],
-  'build_cache' => q[100],
-  'build_dir' => qq[$home/.cpan/build],
-  'build_dir_reuse' => q[0],
-  'build_requires_install_policy' => q[yes],
-  'bzip2' => q[/bin/bzip2],
-  'cache_metadata' => q[1],
-  'check_sigs' => q[0],
-  'colorize_output' => q[0],
-  'commandnumber_in_prompt' => q[1],
-  'connect_to_internet_ok' => q[1],
-  'cpan_home' => qq[$home/.cpan],
-  'ftp_passive' => q[1],
-  'ftp_proxy' => q[],
-  'getcwd' => q[cwd],
-  'gpg' => q[/usr/bin/gpg],
-  'gzip' => q[/bin/gzip],
-  'halt_on_failure' => q[0],
-  'histfile' => qq[$home/.cpan/histfile],
-  'histsize' => q[100],
-  'http_proxy' => q[],
-  'inactivity_timeout' => q[0],
-  'index_expire' => q[1],
-  'inhibit_startup_message' => q[0],
-  'keep_source_where' => qq[$home/.cpan/sources],
-  'load_module_verbosity' => q[none],
-  'make' => q[/usr/bin/make],
-  'make_arg' => q[],
-  'make_install_arg' => q[],
-  'make_install_make_command' => q[/usr/bin/make],
-  'makepl_arg' => q[INSTALLDIRS=site],
-  'mbuild_arg' => q[],
-  'mbuild_install_arg' => q[],
-  'mbuild_install_build_command' => q[./Build],
-  'mbuildpl_arg' => q[--installdirs site],
-  'no_proxy' => q[],
-  'pager' => q[/usr/bin/less],
-  'patch' => q[/usr/bin/patch],
-  'perl5lib_verbosity' => q[none],
-  'prefer_external_tar' => q[1],
-  'prefer_installer' => q[MB],
-  'prefs_dir' => qq[$home/.cpan/prefs],
-  'prerequisites_policy' => q[follow],
-  'scan_cache' => q[atstart],
-  'shell' => q[/bin/sh],
-  'show_unparsable_versions' => q[0],
-  'show_upload_date' => q[0],
-  'show_zero_versions' => q[0],
-  'tar' => q[/bin/tar],
-  'tar_verbosity' => q[none],
-  'term_is_latin' => q[1],
-  'term_ornaments' => q[1],
-  'test_report' => q[0],
-  'trust_test_report_history' => q[0],
-  'unzip' => q[/usr/bin/unzip],
-  'urllist' => [q[http://cpan.mirrors.uk2.net/], q[http://cpan.singletasker.co.uk/], q[http://cpan.cpantesters.org/]],
-  'use_sqlite' => q[0],
-  'version_timeout' => q[15],
-  'wget' => q[/usr/bin/wget],
-  'yaml_load_code' => q[0],
-  'yaml_module' => q[YAML],
-};
-1;
-CONFIG
+	my $home = $ENV{HOME};
+	my $cwd  = Cwd::cwd;
+	$CPAN::Config = {
+	  'applypatch' => q[],
+	  'auto_commit' => q[0],
+	  'build_cache' => q[100],
+	  'build_dir' => qq[$home/.cpan/build],
+	  'build_dir_reuse' => q[0],
+	  'build_requires_install_policy' => q[yes],
+	  'bzip2' => q[/bin/bzip2],
+	  'cache_metadata' => q[1],
+	  'check_sigs' => q[0],
+	  'colorize_output' => q[0],
+	  'commandnumber_in_prompt' => q[1],
+	  'connect_to_internet_ok' => q[1],
+	  'cpan_home' => qq[$home/.cpan],
+	  'ftp_passive' => q[1],
+	  'ftp_proxy' => q[],
+	  'getcwd' => q[cwd],
+	  'gpg' => q[/usr/bin/gpg],
+	  'gzip' => q[/bin/gzip],
+	  'halt_on_failure' => q[0],
+	  'histfile' => qq[$home/.cpan/histfile],
+	  'histsize' => q[100],
+	  'http_proxy' => q[],
+	  'inactivity_timeout' => q[0],
+	  'index_expire' => q[1],
+	  'inhibit_startup_message' => q[0],
+	  'keep_source_where' => qq[$home/.cpan/sources],
+	  'load_module_verbosity' => q[none],
+	  'make' => q[/usr/bin/make],
+	  'make_arg' => q[],
+	  'make_install_arg' => q[],
+	  'make_install_make_command' => q[/usr/bin/make],
+	  'makepl_arg' => q[INSTALLDIRS=site],
+	  'mbuild_arg' => q[],
+	  'mbuild_install_arg' => q[],
+	  'mbuild_install_build_command' => q[./Build],
+	  'mbuildpl_arg' => q[--installdirs site],
+	  'no_proxy' => q[],
+	  'pager' => q[/usr/bin/less],
+	  'patch' => q[/usr/bin/patch],
+	  'perl5lib_verbosity' => q[none],
+	  'prefer_external_tar' => q[1],
+	  'prefer_installer' => q[MB],
+	  'prefs_dir' => qq[$home/.cpan/prefs],
+	  'prerequisites_policy' => q[follow],
+	  'scan_cache' => q[atstart],
+	  'shell' => q[/bin/sh],
+	  'show_unparsable_versions' => q[0],
+	  'show_upload_date' => q[0],
+	  'show_zero_versions' => q[0],
+	  'tar' => q[/bin/tar],
+	  'tar_verbosity' => q[none],
+	  'term_is_latin' => q[1],
+	  'term_ornaments' => q[1],
+	  'test_report' => q[0],
+	  'trust_test_report_history' => q[0],
+	  'unzip' => q[/usr/bin/unzip],
+	  'urllist' => [q[http://cpan.mirrors.uk2.net/], q[http://cpan.singletasker.co.uk/], q[http://cpan.cpantesters.org/]],
+	  'use_sqlite' => q[0],
+	  'version_timeout' => q[15],
+	  'wget' => q[/usr/bin/wget],
+	  'yaml_load_code' => q[0],
+	  'yaml_module' => q[YAML],
+	};
 }
 
 1;

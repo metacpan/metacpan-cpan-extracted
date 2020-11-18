@@ -8,19 +8,24 @@ usage information.
 
 PAR::Dist uses the standard perl module install process:
 
-perl Makefile.PL
-make			# or 'nmake' on Win32
-make test
-make install
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+* Source Repository
+
+You can check out the most recent revision from PAR's GitHub repository:
+
+    https://github.com/rschupp/PAR-Dist
 
 * Contact
 
-PAR has a mailing list, <par@perl.org>, that you can write to;
-send an empty mail to <par-subscribe@perl.org> to join the list
-and participate in the discussion.  For web-accessible archives,
-see <http://nntp.x.perl.org/group/perl.par/>.
+You can write
+to the mailing list at <par@perl.org>, or send an empty mail to
+<par-subscribe@perl.org> to participate in the discussion.
 
-Please send bug reports to <bug-par@rt.cpan.org>.
+Please submit bug reports to <bug-par-dist@rt.cpan.org>.
 
 * Copyright
 
@@ -29,4 +34,4 @@ Copyright 2003-2011 by Audrey Tang <autrijus@autrijus.org>.
 All rights reserved.  You can redistribute and/or modify
 this bundle under the same terms as Perl itself.
 
-See <http://www.perl.com/perl/misc/Artistic.html>.
+See LICENSE.

@@ -20,6 +20,7 @@ build_requires:
   Test::Differences: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::RequiresInternet: '0'
   Try::Tiny: '0'
   lib: '0'
 configure_requires:
@@ -71,7 +72,7 @@ requires:
 resources:
   bugtracker: https://github.com/marcbradshaw/mail-bimi/issues
   repository: git://github.com/marcbradshaw/mail-bimi.git
-version: 2.20201102.2
+version: 2.20201117.2
 x_contributors:
   - 'Marc Bradshaw <marc@fastmailteam.com>'
 x_generated_by_perl: v5.30.1

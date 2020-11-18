@@ -8,7 +8,7 @@ use Scalar::Util ();
 package Type::Nano;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 our @ISA       = qw( Exporter::Tiny );
 our @EXPORT_OK = qw(
 	Any Defined Undef Ref ArrayRef HashRef CodeRef Object Str Bool Num Int Object

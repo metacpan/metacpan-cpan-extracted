@@ -1,0 +1,16 @@
+{
+  "extensions" : { },
+  "node" : "http://localhost:32805/db/data/node",
+  "relationship" : "http://localhost:32805/db/data/relationship",
+  "node_index" : "http://localhost:32805/db/data/index/node",
+  "relationship_index" : "http://localhost:32805/db/data/index/relationship",
+  "extensions_info" : "http://localhost:32805/db/data/ext",
+  "relationship_types" : "http://localhost:32805/db/data/relationship/types",
+  "batch" : "http://localhost:32805/db/data/batch",
+  "cypher" : "http://localhost:32805/db/data/cypher",
+  "indexes" : "http://localhost:32805/db/data/schema/index",
+  "constraints" : "http://localhost:32805/db/data/schema/constraint",
+  "transaction" : "http://localhost:32805/db/data/transaction",
+  "node_labels" : "http://localhost:32805/db/data/labels",
+  "neo4j_version" : "3.5.22"
+}

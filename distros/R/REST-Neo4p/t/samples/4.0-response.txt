@@ -1,0 +1,7 @@
+{
+  "bolt_routing" : "neo4j://localhost:7687",
+  "transaction" : "http://localhost:32808/db/{databaseName}/tx",
+  "bolt_direct" : "bolt://localhost:7687",
+  "neo4j_version" : "4.0.7",
+  "neo4j_edition" : "community"
+}

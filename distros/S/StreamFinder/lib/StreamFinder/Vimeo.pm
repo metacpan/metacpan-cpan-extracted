@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::Vimeo;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $video = new StreamFinder::Vimeo($ARGV[0]);
 
@@ -111,7 +111,7 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "quality" => I<quality>)
+=item B<new>(I<ID>|I<url> [, "debug" [ => 0|(1)|2 ]] [, "quality" => I<quality>)
 
 Accepts a vimeo.com ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Vimeo video or no streams are 

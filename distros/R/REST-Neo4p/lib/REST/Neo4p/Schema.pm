@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Schema::VERSION = '0.3030';
+  $REST::Neo4p::Schema::VERSION = '0.4000';
 }
 
 #require 'REST::Neo4p';
@@ -41,6 +41,9 @@ sub create_index {
     if (my $e = REST::Neo4p::ConflictException->caught) {
       1; # ignore, already present
     }
+    elsif ( $e = REST::Neo4p::IndexExistsException->caught ) {
+      1;
+    }
     elsif ($e = Exception::Class->caught()) {
       (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
     }
@@ -53,8 +56,9 @@ sub get_indexes {
   my $self = shift;
   my ($label) = @_;
   REST::Neo4p::LocalException->throw("Arg 1 must be a label\n") unless defined $label;
+  my $decoded_resp;
   eval {
-    $self->_agent->get_data(qw/schema index/, $label);
+    $decoded_resp = $self->_agent->get_data(qw/schema index/, $label);
   };
   if (my $e = REST::Neo4p::NotFoundException->caught) {
     return;
@@ -63,7 +67,8 @@ sub get_indexes {
     (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
   }
   my @ret;
-  foreach (@{$self->_agent->decoded_content}) {
+  # kludge for Neo4j::Driver
+  foreach (@{$self->_agent->decoded_content // $decoded_resp}) {
     push @ret, $_->{property_keys}[0];
   }
   return @ret;
@@ -122,8 +127,9 @@ sub get_constraints {
   my ($label, $c_type) = @_;
   $c_type ||= 'uniqueness';
   REST::Neo4p::LocalException->throw("Arg 1 must be a label\n") unless defined $label;
+  my $decoded_resp;
   eval {
-    $self->_agent->get_data(qw/schema constraint/, $label, $c_type);
+    $decoded_resp = $self->_agent->get_data(qw/schema constraint/, $label, $c_type);
   };
   if (my $e = REST::Neo4p::NotFoundException->caught) {
     return;
@@ -132,7 +138,8 @@ sub get_constraints {
     (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
   }
   my @ret;
-  foreach (@{$self->_agent->decoded_content}) {
+  # kludge for Neo4j::Driver
+  foreach (@{$self->_agent->decoded_content // $decoded_resp}) {
     push @ret, $_->{property_keys}[0];
   }
   return @ret;
@@ -177,18 +184,11 @@ REST::Neo4p::Schema - Label-based indexes and constraints
 
 =head1 DESCRIPTION
 
-L<Neo4j|http://neo4j.org> v2.0 provides a way to schematize the graph
+L<Neo4j|http://neo4j.org> v2.0+ provides a way to schematize the graph
 on the basis of node labels, associated indexes, and property
 uniqueness constraints. C<REST::Neo4p::Schema> allows access to this
 system via the Neo4j REST API. Use a C<Schema> object to create, list,
 and drop indexes and constraints.
-
-Note that as of v2.0.0, the Neo4j server can only create indexes on
-single properties within a label, and only uniqueness constraints on
-single properties. v2.0.1 is required for this module, which is
-dependent on a bug fix in that release.
-
-
 
 =head1 METHODS
 
@@ -224,6 +224,11 @@ Remove indexes on given property or properties for a given label.
 Create uniqueness constraints on a given property or properties for a
 given label.
 
+I<Note>: For some inexplicable reason, this one schema feature went behind
+the paywall in Neo4j version 4.0. Unless you are using the Enterprise
+Edition, this method will throw the dreaded
+L<REST::Neo4p::Neo4jTightwadException>.
+
 =item get_constraints()
 
  @properties = $schema->get_constraints('Label');
@@ -253,7 +258,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Index>, L<REST::Neo4p::Query>
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

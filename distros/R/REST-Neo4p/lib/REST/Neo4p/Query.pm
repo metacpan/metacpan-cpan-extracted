@@ -1,5 +1,3 @@
-
-#$Id$
 use v5.10;
 package REST::Neo4p::Query;
 use REST::Neo4p::Path;
@@ -13,8 +11,9 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 no warnings qw(once);
+
 BEGIN {
-  $REST::Neo4p::Query::VERSION = '0.3030';
+  $REST::Neo4p::Query::VERSION = '0.4000';
 }
 
 our $BUFSIZE = 50000;
@@ -57,7 +56,7 @@ sub execute {
   my $agent = REST::Neo4p->agent;
 
   if ($agent->batch_mode) {
-    REST::Neo4p::NotSuppException->throw("Query execution not supported in batch mode (yet)\n");
+    REST::Neo4p::NotSuppException->throw("Query execution not supported in batch mode\n");
   }
   delete $self->{_error};
   delete $self->{_error_list};
@@ -72,16 +71,16 @@ sub execute {
      );
   }
   eval {
-    use experimental qw/smartmatch/;
-    given ($endpt) {
-      when (/cypher/) {
+    for ($endpt) {
+      /cypher/ && do {
 	$agent->$endpt(
 	  [], 
 	  { query => $self->query, params => $self->params },
 	  {':content_file' => $self->tmpf->filename}
 	 );
-      }
-      when (/transaction/) {
+	last;
+      };
+      /transaction/ && do {
 	# unfortunately, the order of 'statement' and 'parameters'
 	# is strict in the content (2.0.0-M06)
 	tie my %stmt, 'Tie::IxHash';
@@ -94,8 +93,9 @@ sub execute {
 	   },
 	  {':content_file' => $self->tmpf->filename}
 	 );
-      }
-      default {
+	last;
+      };
+      do {
 	REST::Neo4p::TxException->throw(
 	  "Unknown query REST endpoint '".REST::Neo4p->q_endpoint."'\n"
 	 );
@@ -116,10 +116,124 @@ sub execute {
   elsif ( $e = Exception::Class->caught) {
     (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
   }
+  if ( ref(REST::Neo4p->agent) !~ /Neo4j::Driver/ ) {
+    $self->_parse_response;
+  }
+  else { # Neo4j::Driver
+    $self->_wrap_statement_result;
+  }
+  1;
+}
+
+sub fetchrow_arrayref { 
+  my $self = shift;
+  unless ( defined $self->{_iterator} ) {
+    REST::Neo4p::LocalException->throw("Can't run fetch(), query not execute()'d yet\nCheck query object for error with err()/errstr()\n");
+  }
+  $self->{_iterator}->();
+}
+
+sub fetch { shift->fetchrow_arrayref(@_) }
+
+sub column_names {
+  my $self = shift;
+  return $self->{_column_names} && @{$self->{_column_names}};
+}
+
+sub err { 
+  my $self = shift;
+  return $self->{_error} && ($self->{_error}->code || 599);
+}
+
+sub errstr { 
+  my $self = shift;
+  return $self->{_error} && ( $self->{_error}->message || $self->{_error}->neo4j_message );
+}
+
+sub errobj { shift->{_error} }
+
+sub err_list {
+  my $self = shift;
+  return $self->{_error} && $self->{_error_list};
+}
+
+
+sub query { shift->{_query} }
+sub params { shift->{_params} }
+
+
+sub _wrap_statement_result {
+  my $self = shift;
+  my $result = REST::Neo4p->agent->last_result;
+  my $errors = REST::Neo4p->agent->last_errors;
+  $self->{NAME} = $result->keys;
+  my $n = $self->{NUM_OF_FIELDS} = scalar @{$self->{NAME}};
+  $self->{_iterator} = sub {
+    my @row;
+    my $rec =  $result->fetch;
+    return unless $rec;
+    eval {
+      my $as_object = $self->{ResponseAsObjects};
+      for (my $i=0;$i<$n;$i++) {
+	my $elt = $rec->get($i);
+	my $cvt = sub {
+	  return $_[0] unless ref($_[0]) =~ /Driver/;
+	  my ($type) = ref($_[0]) =~ /::([^:]+)$/;
+	  my $cls = "REST::Neo4p::$type";
+	  return $as_object ? $cls->new_from_json_response($_[0]) :
+	    $cls->simple_from_json_response($_[0]);
+	  };
+	for (ref($elt)) {
+	  /Driver/ && do {
+	    $elt = $cvt->($elt);
+	  };
+	  /HASH/ && do {
+	    for (keys %$elt) {
+	      $elt->{$_} = $cvt->($elt->{$_})
+	    }
+	  };
+	  /ARRAY/ && do {
+	    for (@$elt) {
+	      $_ = $cvt->($_);
+	    }
+	  };
+	  #else
+	  push @row, $elt;
+	}
+      }
+    };
+    if (my $e = Exception::Class->caught()) {
+      if ($e =~ /j_parse|json/i) {
+	$e = REST::Neo4p::StreamException->new(message => $e);
+	$self->{_error} = $e;
+	$e->throw if $self->{RaiseError};
+	return;
+      }
+      else {
+	die $e;
+      }
+    }
+    # flatten if single array ref returned
+    if (@row==1 and ref($row[0]) eq 'ARRAY') {
+      return $row[0];
+    }
+    else {
+      return \@row;
+    }
+  };
+  return;
+}
+
+# _parse_response sets up an iterator that pulls a row's worth of objects from
+# the servers JSON stream, parses the row into objects, and returns the row.
+# this iterator is placed in $self->{_iterator} as a side effect.
+# It is hit in fetchrow_arrayref.
+
+sub _parse_response {
+  my $self = shift;
   my $jsonr = JSON::XS->new->utf8;
   my ($buf,$res,$str,$rowstr,$obj);
   my $row_count;
-  use experimental 'smartmatch';
   $self->tmpf->read($buf, $BUFSIZE);
   $jsonr->incr_parse($buf);
   eval { # capture j_parse errors
@@ -214,7 +328,7 @@ sub execute {
 	    if ($row_str) {
 	      $row = drop($row_str);
 	      if (ref $row && ref $row->[1]) {
-		$ret =  $self->_process_row($row->[1]->{row});
+		$ret =  $self->_process_row($row->[1]->{row}, $row->[1]->{meta});
 	      }
 	      elsif (!defined $row) {
 		$item = drop($res_str);
@@ -309,62 +423,28 @@ sub execute {
       }
     }
   }
-  1;
 }
-
-sub fetchrow_arrayref { 
-  my $self = shift;
-  unless ( defined $self->{_iterator} ) {
-    REST::Neo4p::LocalException->throw("Can't run fetch(), query not execute()'d yet\nCheck query object for error with err()/errstr()\n");
-  }
-  $self->{_iterator}->();
-}
-
-sub fetch { shift->fetchrow_arrayref(@_) }
-
-sub column_names {
-  my $self = shift;
-  return $self->{_column_names} && @{$self->{_column_names}};
-}
-
-sub err { 
-  my $self = shift;
-  return $self->{_error} && ($self->{_error}->code || 599);
-}
-
-sub errstr { 
-  my $self = shift;
-  return $self->{_error} && ( $self->{_error}->message || $self->{_error}->neo4j_message );
-}
-
-sub errobj { shift->{_error} }
-
-sub err_list {
-  my $self = shift;
-  return $self->{_error} && $self->{_error_list};
-}
-
-
-sub query { shift->{_query} }
-sub params { shift->{_params} }
-
 sub _response_entity {
-  my ($resp) = @_;
-  use experimental qw/smartmatch/;
+  my ($resp,$meta) = @_;
   if ( ref($resp) eq '' ) { #handle arrays of barewords
     return 'bareword';
   }
+  elsif ($meta) {
+    my $type = $meta->{type};
+    $type =~ s/^(.)/\U$1\E/;
+    return $type;
+  }
   elsif (defined $resp->{self}) {
-    given ($resp->{self}) {
-      when (m|data/node|) {
+    for ($resp->{self}) {
+      m|data/node| && do {
 	return 'Node';
-      }
-      when (m|data/relationship|) {
+      };
+      m|data/relationship| && do {
 	return 'Relationship';
-      }
-      default {
+      };
+      do {
 	REST::Neo4p::QueryResponseException->throw(message => "Can't identify object type by JSON response\n");
-      }
+      };
     }
   }
   elsif (defined $resp->{start} && defined $resp->{end}
@@ -378,18 +458,29 @@ sub _response_entity {
 
 sub _process_row {
   my $self = shift;
-  my ($row) = @_;
-  use experimental qw/smartmatch/;
+  my ($row,$meta) = @_;
   my @ret;
   foreach my $elt (@$row) {
-    given ($elt) {
-       when (!ref) { #bareword
-	push @ret, $elt;
-      }
-      when (ref =~ /HASH/) {
+    my $info;
+    if ($meta) {
+      $info = shift @$meta;
+    }
+    for ($elt) {
+       !ref && do { #bareword
+	 push @ret, $elt;
+	 last;
+       };
+      (ref =~ /HASH/) && do {
 	my $entity_type;
 	eval {
-	  $entity_type = _response_entity($elt);
+	  if ($info && $info->{type}) {
+	    $elt->{self} = "$$info{type}/$$info{id}";
+	    $entity_type = $info->{type};
+	    $entity_type =~ s/^(.)/\U$1\E/;
+	  }
+	  else {
+	    $entity_type = _response_entity($elt);
+	  }
 	};
 	my $e;
 	if ($e = Exception::Class->caught()) {
@@ -398,14 +489,22 @@ sub _process_row {
 	my $entity_class = 'REST::Neo4p::'.$entity_type;
 	push @ret, $self->{ResponseAsObjects} ?
 	  $entity_class->new_from_json_response($elt) :
-	    $entity_class->simple_from_json_response($elt);
-      }
-      when (ref =~ /ARRAY/) {
+	  $entity_class->simple_from_json_response($elt);
+	last;
+      };
+      (ref =~ /ARRAY/) && do {
 	my $array;
 	for my $ary_elt (@$elt) {
 	  my $entity_type;
 	  eval {
-	    $entity_type = _response_entity($ary_elt);
+	    if ($info && $info->{type}) {
+	      $elt->{self} = "$$info{type}/$$info{id}";
+	      $entity_type = $info->{type};
+	      $entity_type =~ s/^(.)/\U$1\E/;
+	    }
+	    else {
+	      $entity_type = _response_entity($ary_elt);
+	    }
 	  };
 	  my $e;
 	  if ($e = Exception::Class->caught()) {
@@ -421,17 +520,19 @@ sub _process_row {
 		$entity_class->simple_from_json_response($ary_elt) ;
 	  }
 	}
-	# guess whether to flatten response:
-	# if more than one row element, don't flatten, 
-	# return an array reference in the response
-	push @ret, @$row > 1 ? $array : @$array;
-      }
-      default {
+	push @ret, $array;
+	last;
+      };
+      do {
 	REST::Neo4p::QueryResponseException->throw("Can't parse query response (row doesn't make sense)\n");
-      }
+	last;
+      };
     }
   }
-  return \@ret;
+  # guess whether to flatten response:
+  # if more than one row element, don't flatten, 
+  # return an array reference in the response
+  return (@ret == 1 and ref($ret[0]) eq 'ARRAY') ? $ret[0] : \@ret;
 }
 
 sub finish {
@@ -451,7 +552,7 @@ REST::Neo4p::Query - Execute Neo4j Cypher queries
 =head1 SYNOPSIS
 
  REST::Neo4p->connect('http:/127.0.0.1:7474');
- $query = REST::Neo4p::Query->new('START n=node(0) RETURN n');
+ $query = REST::Neo4p::Query->new('MATCH (n) WHERE n.name = "Boris" RETURN n');
  $query->execute;
  $node = $query->fetch->[0];
  $node->relate_to($other_node, 'link');
@@ -476,15 +577,21 @@ destruction, whichever comes first.
 
 C<REST::Neo4p::Query> understands Cypher L<query
 parameters|http://docs.neo4j.org/chunked/stable/cypher-parameters.html>. These
-are represented in Cypher as simple tokens surrounded by curly braces.
+are represented in Cypher, unfortunately, as dollar-prefixed tokens.
 
- MATCH (n) WHERE n.first_name = {name} RETURN n
+ MATCH (n) WHERE n.first_name = $name RETURN n
 
-Here, C<{name}> is the named parameter. A single query object can be executed
-multiple times with different parameter values:
+Here, C<$name> is the named parameter. 
+
+Don't forget to escape the dollar sign if you're also doing string interpolation:
+
+ $prop = "n.name";
+ $qry = "MATCH (n) WHERE $prop = \$name RETURN n";
+ 
+A single query object can be executed multiple times with different parameter values:
 
  my $q = REST::Neo4p::Query->new(
-           'MATCH (n) WHERE n.first_name = {name} RETURN n'
+           'MATCH (n) WHERE n.first_name = $name RETURN n'
          );
  foreach (@names) {
    $q->execute(name => $_);
@@ -505,9 +612,8 @@ This is very highly recommended over creating multiple query objects like so:
 
 As with any database engine, a large amount of overhead is saved by
 planning a parameterized query once. In addition, the REST side of the
-Neo4j server currently (Feb 2014) will balk at handling 1000s of
-individual queries in a row. Parameterizing queries gets around this
-issue.
+Neo4j server will balk at handling 1000s of individual queries in a row.
+Parameterizing queries gets around this issue.
 
 =head2 Paths
 
@@ -517,16 +623,7 @@ Relationships.
 
 =head2 Transactions
 
-See L<REST::Neo4p/Transaction Support (Neo4j Server Version 2 only)>.
-
-NOTE: Rows returned from the Neo4j transaction endpoint are not
-completely specified database objects (see
-L<Neo4j docs|http://docs.neo4j.org/chunked/stable/rest-api-transactional.html>). Fetches
-on transactional queries will return an array of simple Perl
-structures (hashes and arrays) that correspond to the row as returned
-in JSON by the server, rather than as REST::Neo4p objects. This is
-regardless of the setting of the
-L<ResponseAsObjects|REST::Neo4p::Query/ResponseAsObjects> attribute.
+See L<REST::Neo4p/Transaction Support (Neo4j Version 2.0+)>.
 
 =head1 METHODS
 
@@ -534,7 +631,7 @@ L<ResponseAsObjects|REST::Neo4p::Query/ResponseAsObjects> attribute.
 
 =item new()
 
- $stmt = 'START n=node({node_id}) RETURN n';
+ $stmt = 'MATCH (n) WHERE id(n) = $node_id RETURN n';
  $query = REST::Neo4p::Query->new($stmt,{node_id => 1});
 
 Create a new query object. First argument is the Cypher query
@@ -552,7 +649,7 @@ Execute the query on the server. Not supported in batch mode.
 
 =item fetchrow_arrayref()
 
- $query = REST::Neo4p::Query->new('START n=node(0) RETURN n, n.name');
+ $query = REST::Neo4p::Query->new('MATCH (n) RETURN n, n.name LIMIT 10');
  $query->execute;
  while ($row = $query->fetch) { 
    print 'It works!' if ($row->[0]->get_property('name') == $row->[1]);
@@ -634,7 +731,7 @@ L<DBD::Neo4p>, L<REST::Neo4p>, L<REST::Neo4p::Path>, L<REST::Neo4p::Agent>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
+our $DATE = '2020-11-17'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.326'; # VERSION
+our $VERSION = '0.327'; # VERSION
 
 use 5.010001;
 use strict;
@@ -858,6 +858,44 @@ my %year_holidays;
     );
 }
 
+# decreed sep 11, 2020
+#
+# ref:
+# - https://www.menpan.go.id/site/berita-terkini/libur-nasional-dan-cuti-bersama-tahun-2021-sebanyak-23-hari
+
+{
+    my $isramiraj2021;
+    my $eidulf2021;
+    $year_holidays{2021} = [
+        # - new year
+        _h_chnewyear ({_expand_dm("12-02")}, {hyear=>2572}),
+        ($isramiraj2021 = _h_isramiraj ({_expand_dm("11-03")}, {hyear=>1442})),
+        _h_nyepi     ({_expand_dm("14-03")}, {hyear=>1943}),
+        _h_goodfri   ({_expand_dm("02-04")}),
+        # - labor day
+        _h_ascension ({_expand_dm("13-05")}),
+        ($eidulf2021 = _h_eidulf    ({_expand_dm("13-05")}, {hyear=>1442, day=>1})),
+        _h_eidulf    ({_expand_dm("14-05")}, {hyear=>1442, day=>1}),
+        _h_vesakha   ({_expand_dm("26-05")}, {hyear=>2565}),
+        # - pancasila day
+        _h_eidula ({_expand_dm("20-07")}, {hyear=>1442}),
+        _h_hijra   ({_expand_dm("10-08")}, {hyear=>1443}),
+        # - independence day
+        _h_mawlid({_expand_dm("19-10")}, {hyear=>1443}),
+        # - christmas
+    ];
+
+    push @{ $year_holidays{2021} }, (
+        _jointlv     ({_expand_dm("12-03")}, {holiday=>$isramiraj2021}),
+        _jointlv     ({_expand_dm("12-05")}, {holiday=>$eidulf2021}),
+        _jointlv     ({_expand_dm("17-05")}, {holiday=>$eidulf2021}),
+        _jointlv     ({_expand_dm("18-05")}, {holiday=>$eidulf2021}),
+        _jointlv     ({_expand_dm("19-05")}, {holiday=>$eidulf2021}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("27-12")}, {holiday=>$christmas}),
+    );
+}
+
 
 my @years     = sort keys %year_holidays;
 our $min_year = $years[0];
@@ -1182,7 +1220,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.326 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-08-18.
+This document describes version 0.327 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-11-17.
 
 =head1 SYNOPSIS
 
@@ -1274,8 +1312,8 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2020 (joint leave days until
-2020).
+Contains data from years 2002 to 2021 (joint leave days until
+2021).
 
 This function is not exported by default, but exportable.
 
@@ -1334,8 +1372,8 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2020 (joint leave days until
-2020).
+Contains data from years 2002 to 2021 (joint leave days until
+2021).
 
 This function is not exported by default, but exportable.
 
@@ -1391,8 +1429,8 @@ List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 2002 to 2020 (joint leave days until
-2020).
+Contains data from years 2002 to 2021 (joint leave days until
+2021).
 
 This function is not exported by default, but exportable.
 

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Index::VERSION = '0.3030';
+  $REST::Neo4p::Index::VERSION = '0.4000';
 }
 
 my $unsafe = "^A-Za-z0-9\-\._\ ~";
@@ -33,7 +33,13 @@ sub new {
 		    _addl_components => [$index_type],
 		    name => $name
 		   };
+  $properties->{type} = delete $config->{rtype};
   $properties->{config} = $config if defined $config;
+  my $idx;
+  eval {
+    $idx = $class->_entity_by_id($name,$index_type);
+  };
+  return $idx if $idx;
   return $class->SUPER::new($properties);
 }
 
@@ -340,6 +346,19 @@ REST::Neo4p::Index - Neo4j index object
 
 REST::Neo4p::Index objects represent Neo4j node and relationship indexes.
 
+=head1 USAGE NOTE - VERSION 4.0
+
+I<TL;DR - Using indexes in REST::Neo4p on Neo4j 4.0 should just work.>
+
+Index objects were originally designed to encapsulate Neo4j "explicit"
+indexes, which map nodes/relationships to a key-value pair.
+
+As of Neo4j version 4.0, explicit indexes are not supported. Since
+there may be applications using REST::Neo4p depending on the Index
+functionality, the agent based on L<Neo4j::Driver> uses fulltext
+indexes under the hood to emulate explicit indexes. This agent is used
+automatically with Neo4j version 4.0 servers.
+
 =head1 METHODS
 
 =over
@@ -351,11 +370,19 @@ REST::Neo4p::Index objects represent Neo4j node and relationship indexes.
  $fulltext_idx = REST::Neo4p::Index->new('node', 'my_ft_index',
                                     { type => 'fulltext',
                                       provider => 'lucene' });
+ # Neo4j 4.0+
+ $rel_idx = REST::Neo4p::Index->new('relationship', 'my_rel_index', {rtype => "my_reln_type"});
+
 
 Creates a new index of the type given in the first argument, with the
 name given in the second argument. The optional third argument is a
 hashref containing an index configuration as provided for in the Neo4j
 API.
+
+I<Note>: For Neo4j 4.0+, REST::Neo4p emulates an explicit index using a
+fulltext index. Fulltext indexes on relationships require specifying a
+relationship type. To do this, include the key C<rtype> in the third
+argument hashref.
 
 =item remove()
 
@@ -424,7 +451,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Relationship>, L<REST::Neo4p::Node>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

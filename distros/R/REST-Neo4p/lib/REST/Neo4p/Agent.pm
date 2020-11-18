@@ -1,4 +1,3 @@
-#$Id$
 use v5.10;
 package REST::Neo4p::Agent;
 use REST::Neo4p::Exceptions;
@@ -11,7 +10,7 @@ use warnings;
 our @ISA;
 our $VERSION;
 BEGIN {
-  $REST::Neo4p::Agent::VERSION = '0.3030';
+  $REST::Neo4p::Agent::VERSION = '0.4000';
 }
 
 our $AUTOLOAD;
@@ -100,7 +99,6 @@ sub connect {
 # _add_to_batch_queue
 # takes a request and converts to a Neo4j REST batch-friendly
 # hash
-# VERY internal and experimental
 # $url : rest endpoint that would be called ordinarily
 # $rq : [get|delete|post|put]
 # $content : hashref of rq content (post and put)
@@ -161,11 +159,17 @@ sub no_stream { shift->remove_header('X-Stream') }
 sub stream { shift->add_header('X-Stream' => 'true') }
 
 # autoload getters for discovered neo4j rest urls
+# when the agent module is Neo4j::Driver, all actions are explicitly defined,
+# so any call falling through to AUTOLOAD is an error
 
 sub AUTOLOAD {
   my $self = shift;
   my $method = $AUTOLOAD;
   $method =~ s/.*:://;
+  if ($self->isa('REST::Neo4p::Agent::Neo4j::Driver')) {
+    # an error
+    REST::Neo4p::LocalException->throw( "REST::Neo4p::Agent::Neo4j::Driver does not define method '$method'\n" );
+  }
   my ($rq, $action) = $method =~ /^(get_|post_|put_|delete_)*(.*)$/;
   unless (grep /^$action$/,keys %{$self->{_actions}}) {
     REST::Neo4p::LocalException->throw( __PACKAGE__." does not define method '$method'\n" );
@@ -222,7 +226,7 @@ sub __do_request {
       }
       $url.='?'.join('&',@params) if @params;
       if ($self->batch_mode) {
-	$url = ($url_components[0] =~ /{[0-9]+}/) ? $url_components[0] : $url; # index batch object kludge
+	$url = (@url_components && ($url_components[0] =~ /{[0-9]+}/)) ? $url_components[0] : $url; # index batch object kludge
 
 	@_ = ($self, 
 	      $url,
@@ -297,6 +301,21 @@ sub __do_request {
   }
   $self->{_location} = $resp->header('Location');
 }
+
+sub neo4j_version {
+  my $self = shift;
+  my $v = my $a = $self->{_actions}{neo4j_version};
+  return unless defined $v;
+  my ($major, $minor, $patch, $milestone) =
+    $a =~ /^(?:([0-9]+)\.)(?:([0-9]+)\.)?([0-9]+)?(?:-M([0-9]+))?/;
+  wantarray ? ($major,$minor,$patch,$milestone) : $v;
+}
+
+sub is_version_4 {
+  my ($maj,@rest) = shift->neo4j_version;
+  return $maj >= 4;
+}
+
 
 sub DESTROY {}
 
@@ -423,7 +442,7 @@ Returns the Neo4j server admin url.
 
 =item relationship_index()
 
-=item extensions_info
+=item extensions_info()
 
 =item relationship_types()
 
@@ -445,8 +464,9 @@ methods to make requests directly.
 =item neo4j_version()
 
  $version = $agent->neo4j_version;
+ ($major, $minor, $patch, $milestone) = $agent->neo4j_version;
 
-Returns the version string of the connected Neo4j server.
+Returns the version string/components of the connected Neo4j server.
 
 =item available_actions()
 
@@ -486,7 +506,7 @@ present, is a hashref containing additional request headers.
  # create a new node with given properties
  $agent->post_node({ name => 'Wanda' });
  # do a cypher query and save content to file
- $agent->post_cypher([], { query => 'START n=node(*) RETURN n', params=>{}},
+ $agent->post_cypher([], { query => 'MATCH (n) RETURN n', params=>{}},
                      { ':content_file' => $my_file_name });
 
 Makes a POST request to the REST endpoint mapped to {action}. The first
@@ -534,6 +554,10 @@ Adds C<X-Stream: true> to the default headers.
 =back
 
 =head1 Batch Mode
+
+B<Neo4j version 4.0+>: I<Batch mode is a Neo4j REST API feature that bit
+the big one along with that API. The Neo4j::Driver agent will complain
+if you use these methods.>
 
 When the agent is in batch mode, the usual request calls are not
 executed immediately, but added to a queue. The L</execute_batch()>
@@ -601,7 +625,7 @@ has default value of 1024.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

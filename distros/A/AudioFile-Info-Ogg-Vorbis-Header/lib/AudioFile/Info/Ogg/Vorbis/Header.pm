@@ -26,7 +26,7 @@ use Ogg::Vorbis::Header;
 require Inline;
 Inline->init;
 
-our $VERSION = '1.8.1';
+our $VERSION = '1.8.2';
 
 my %data = (artist => 'ARTIST',
             title  => 'TITLE',
@@ -53,7 +53,8 @@ sub AUTOLOAD {
   croak "Invalid attribute '$sub'" unless $data{$sub};
 
   if ($_[1]) {
-    if (grep { $_ eq $data{$sub} } $_[0]->{obj}->comment_tags) {
+    my @matches = grep { $_ eq $data{$sub} } $_[0]->{obj}->comment_tags;
+    if (@matches) {
       $_[0]->{obj}->edit_comment($data{$sub}, $_[1]);
     } else {
       $_[0]->{obj}->add_comments($data{$sub}, $_[1]);
@@ -83,6 +84,6 @@ Dave Cross, E<lt>dave@dave.org.ukE<gt>
 Copyright 2003 by Dave Cross
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut

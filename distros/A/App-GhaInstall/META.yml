@@ -3,7 +3,7 @@ abstract: 'provides the gha-install command'
 author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
-  Test::More: '0.96'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -25,7 +25,7 @@ optional_features: {}
 provides:
   App::GhaInstall:
     file: lib/App/GhaInstall.pm
-    version: '0.002'
+    version: '0.004'
   JSON::Tiny:
     file: lib/App/GhaInstall/JSON.pm
     version: '0.58'
@@ -40,7 +40,7 @@ resources:
   homepage: https://metacpan.org/release/App-GhaInstall
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-app-ghainstall.git
-version: '0.002'
+version: '0.004'
 x_provides_scripts:
   gha-install:
     file: bin/gha-install

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -29,22 +29,23 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::BuiltinTypePredicates;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(is_filehandle);
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(is_filehandle);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Scalar::Util 'reftype';
-
 
 # for tests, see FP::Predicates
 
 sub is_filehandle ($) {
-    my ($v)=@_;
+    my ($v) = @_;
+
     # NOTE: never returns true for strings, even though plain strings
     # naming globals containing filehandles in their IO slot will work
     # for IO, too! Let's just leave that depreciated and
@@ -61,23 +62,13 @@ sub is_filehandle ($) {
     # take reference to the bare glob and treat it the same then,
     # though; but still.)
 
-    if (defined (my $rt= reftype ($v))) {
-        (($rt eq "GLOB" and *{$v}{IO})
-         or
-         $rt eq "IO") ? 1 : '';
+    if (defined(my $rt = reftype($v))) {
+        (($rt eq "GLOB" and *{$v}{IO}) or $rt eq "IO") ? 1 : '';
+
         # explicitely return '' instead of undef
     } else {
         ''
     }
 }
-
-# sub is_filehandle ($) {
-#     my ($v)=@_;
-#     my $r= ref ($v);
-#     (length $r and ($r eq "GLOB" ? (*{$v}{IO} ? 1 : '')
-#                   : UNIVERSAL::isa($v, "IO"))) ? 1 : ''
-# }
-# fails for bless $in, "MightActullyBeIO" case
-
 
 1

@@ -20,10 +20,10 @@ my $meta = {
                             configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                             develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                             runtime   => { requires => { perl => 5.006 } },
-                            test      => { requires => { "Test::More" => 0.96 } },
+                            test      => { requires => { "Test::More" => 0 } },
                           },
   "provides"           => {
-                            "App::GhaInstall" => { file => "lib/App/GhaInstall.pm", version => 0.002 },
+                            "App::GhaInstall" => { file => "lib/App/GhaInstall.pm", version => 0.004 },
                             "JSON::Tiny"      => { file => "lib/App/GhaInstall/JSON.pm", version => 0.58 },
                             "YAML::Tiny"      => { file => "lib/App/GhaInstall/YAML.pm", version => 1.56 },
                           },
@@ -41,7 +41,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-GhaInstall/project",
                           },
-  "version"            => 0.002,
+  "version"            => 0.004,
   "x_provides_scripts" => { "gha-install" => { file => "bin/gha-install" } },
 };
 

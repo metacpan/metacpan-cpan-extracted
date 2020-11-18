@@ -32,6 +32,7 @@ use Search::Xapian::NetworkError;
 use Search::Xapian::QueryParserError;
 use Search::Xapian::SerialisationError;
 use Search::Xapian::RangeError;
+use Search::Xapian::WildcardError;
 
 our @ISA = qw(DynaLoader Search::Xapian::Error);
 

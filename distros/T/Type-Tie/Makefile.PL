@@ -34,12 +34,12 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Type::Nano"        => { file => "lib/Type/Nano.pm", version => 0.014 },
-                        "Type::Tie"         => { file => "lib/Type/Tie.pm", version => 0.014 },
-                        "Type::Tie::ARRAY"  => { file => "lib/Type/Tie.pm", version => 0.014 },
-                        "Type::Tie::BASE"   => { file => "lib/Type/Tie.pm", version => 0.014 },
-                        "Type::Tie::HASH"   => { file => "lib/Type/Tie.pm", version => 0.014 },
-                        "Type::Tie::SCALAR" => { file => "lib/Type/Tie.pm", version => 0.014 },
+                        "Type::Nano"        => { file => "lib/Type/Nano.pm", version => 0.015 },
+                        "Type::Tie"         => { file => "lib/Type/Tie.pm", version => 0.015 },
+                        "Type::Tie::ARRAY"  => { file => "lib/Type/Tie.pm", version => 0.015 },
+                        "Type::Tie::BASE"   => { file => "lib/Type/Tie.pm", version => 0.015 },
+                        "Type::Tie::HASH"   => { file => "lib/Type/Tie.pm", version => 0.015 },
+                        "Type::Tie::SCALAR" => { file => "lib/Type/Tie.pm", version => 0.015 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -53,13 +53,17 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tie/project",
                       },
-  "version"        => 0.014,
+  "version"        => 0.015,
+  "x_contributors" => ["Peter Valdemar M\xF8rch <peter\@morch.com>"],
 };
 
 my %dynamic_config;
 do {
 # Hash::Util::FieldHash was first released with perl v5.9.4
-$meta->{prereqs}{runtime}{requires}{'Hash::FieldHash'} = 0 if $] < 5.009004;
+if ( $] < 5.009004 ) {
+	$meta->{prereqs}{runtime}{recommends}{'Hash::FieldHash'} = 0;
+	$meta->{prereqs}{runtime}{requires}{'Hash::Util::FieldHash::Compat'} = 0;
+}
 
 };
 
@@ -132,6 +136,9 @@ else
 	}
 }
 
+
+my $mm = WriteMakefile(%WriteMakefileArgs);
+
 sub FixMakefile
 {
 	return unless -d 'inc';
@@ -153,7 +160,7 @@ sub FixMakefile
 	close MAKEFILE or die $!;
 }
 
-my $mm = WriteMakefile(%WriteMakefileArgs);
 FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Chain;
 # ABSTRACT: Class to model a VMC Chain
-our $VERSION = '2.20201102.2'; # VERSION
+our $VERSION = '2.20201117.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -51,6 +51,10 @@ sub _build_is_valid($self) {
     }
     if ( !$cert->is_valid ) {
       $self->log_verbose("Certificate $i is not valid");
+      next;
+    }
+    if ( !$cert->has_valid_usage ) {
+      $self->log_verbose("Certificate $i does not have valid usage flags for BIMI");
       next;
     }
     my $is_valid = 0;
@@ -190,7 +194,7 @@ Mail::BIMI::VMC::Chain - Class to model a VMC Chain
 
 =head1 VERSION
 
-version 2.20201102.2
+version 2.20201117.2
 
 =head1 DESCRIPTION
 

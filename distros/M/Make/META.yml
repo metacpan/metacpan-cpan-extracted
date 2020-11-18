@@ -4,7 +4,7 @@ author:
   - 'Nick Ing-Simmons'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '1.00'
+  Test::More: '0.82'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -31,8 +31,8 @@ requires:
   warnings: '0'
 resources:
   IRC: irc://irc.perl.org/#perl
-  bugtracker: http://github.com/klp2/Make/issues
-  homepage: http://metacpan.org/pod/Make
-  repository: http://github.com/klp2/Make.git
-version: '2.004'
+  bugtracker: https://github.com/klp2/Make/issues
+  homepage: https://metacpan.org/pod/Make
+  repository: https://github.com/klp2/Make.git
+version: '2.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

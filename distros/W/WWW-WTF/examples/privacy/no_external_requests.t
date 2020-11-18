@@ -1,5 +1,5 @@
+# HARNESS-NO-TIMEOUT
 use common::sense;
-use Test2::V0 '!meta';
 use WWW::WTF::Testcase;
 
 my $test = WWW::WTF::Testcase->new(
@@ -8,28 +8,30 @@ my $test = WWW::WTF::Testcase->new(
             'resource-load-started' => sub {
                 my ($view, $resource, $request) = @_;
 
-                check_request($request->get_uri);
+                check_request($view->get_uri, $request->get_uri);
             }
         }
     ),
 );
 
-my %seen_uris;
+my %requests;
 
 sub check_request {
-    my $uri = shift;
+    my ($browser_location, $requested_uri) = @_;
+
+    $test->report->diag("Checking external request $requested_uri at $browser_location");
 
     my $base_uri = $test->base_uri->as_string;
 
-    return if exists $seen_uris{$uri};
+    $base_uri =~ s/^https?/https\?/;
 
-    return if $uri =~ m!^data:!;
+    return if $requested_uri =~ m!^data:!;
 
-    $uri =~ m!$base_uri!
-        ? pass("URI request isn't external: $uri")
-        : fail("URI request to external detected: $uri");
-
-    $seen_uris{$uri} = 1;
+    if($requested_uri =~ m!$base_uri!) {
+        $requests{$browser_location}{internal}{$requested_uri}++;
+    } else {
+        $requests{$browser_location}{external}{$requested_uri}++;
+    }
 }
 
 $test->run_test(sub {
@@ -37,10 +39,17 @@ $test->run_test(sub {
 
     my $iterator = $self->ua_webkit2->recurse($self->uri_for('/sitemap.xml'));
 
-    while (my $http_resource = $iterator->next) {
-
+    while ($iterator->next) {
         # checked by callback
     }
 
-    done_testing();
+    while (my ($browser_location, $requests) = each(%requests)) {
+        $self->run_subtest($browser_location, sub {
+            $self->report->pass("Internal Request $_")
+                foreach(keys(%{ $requests->{internal} }));
+
+            $self->report->fail("External Request $_")
+                foreach(keys(%{ $requests->{external} }));
+        });
+    }
 });

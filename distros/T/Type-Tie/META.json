@@ -57,27 +57,27 @@
    "provides" : {
       "Type::Nano" : {
          "file" : "lib/Type/Nano.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Type::Tie" : {
          "file" : "lib/Type/Tie.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Type::Tie::ARRAY" : {
          "file" : "lib/Type/Tie.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Type::Tie::BASE" : {
          "file" : "lib/Type/Tie.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Type::Tie::HASH" : {
          "file" : "lib/Type/Tie.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Type::Tie::SCALAR" : {
          "file" : "lib/Type/Tie.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -96,6 +96,9 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Type-Tie/project"
    },
-   "version" : "0.014",
+   "version" : "0.015",
+   "x_contributors" : [
+      "Peter Valdemar Mørch <peter@morch.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

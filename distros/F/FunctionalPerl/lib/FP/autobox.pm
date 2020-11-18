@@ -17,7 +17,7 @@ FP::autobox
 
     is [12,4,2]->product, 96;
 
-    my $arr= [55,10];
+    my $arr = [55,10];
     is ref($arr), "ARRAY";
 
     use FP::Div ":all"; use FP::Ops ":all";
@@ -61,26 +61,25 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::autobox;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
 require FP::PureArray;
 require autobox;
 
-our @ISA="autobox";
+our @ISA = "autobox";
 
 sub import {
-    my ($pack, @args)= @_;
-    my %args= @args;
+    my ($pack, @args) = @_;
+    my %args = @args;
     if (not $args{ARRAY}) {
-        push @_, ARRAY=> 'FP::PureArray::autobox';
+        push @_, ARRAY => 'FP::PureArray::autobox';
     }
-    my $m= $pack->can("SUPER::import")
-        or die "bug";
+    my $m = $pack->can("SUPER::import") or die "bug";
     goto $m
 }
-
 
 1

@@ -1,0 +1,54 @@
+NAME
+    Log::ger::Output::Test::Counter - Increase internal counter
+
+VERSION
+    This document describes version 0.001 of Log::ger::Output::Test::Counter
+    (from Perl distribution Log-ger-Output-Test-Counter), released on
+    2020-11-17.
+
+SYNOPSIS
+     BEGIN { our $counter_get_hooks; our $counter_outputter }
+     use Log::ger::Output "Test::Counter" => (
+         counter_get_hooks => \$counter_get_hooks,
+         counter_outputter => \$counter_outputter,
+     );
+
+DESCRIPTION
+    This output is for testing only. Instead of actually outputting
+    something, it increases counters.
+
+CONFIGURATION
+  counter_get_hooks
+    Reference to scalar. Will be increased whenever "get_hooks" is called.
+
+  counter_outputter
+    Reference to scalar. Will be increased whenever outputter is called.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Output-Test-Counter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Output-Test-Counter>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Output-Test-C
+    ounter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

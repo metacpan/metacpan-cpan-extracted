@@ -14,9 +14,9 @@ FP::Abstract::Equal - equality protocol
 =head1 SYNOPSIS
 
     package FPEqualExample::Foo {
-        sub new { my $class= shift; bless [@_], $class }
+        sub new { my $class = shift; bless [@_], $class }
         sub FP_Equal_equal {
-            my ($a, $b)=@_;
+            my ($a, $b) = @_;
             # If you know you've got numbers in here only:
             $$a[0] == $$b[0]
             # For generic values, you would instead:
@@ -64,14 +64,12 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Abstract::Equal;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
-sub FP_Interface__method_names {
-    ("FP_Equal_equal")
-}
-
+sub FP_Interface__method_names { ("FP_Equal_equal") }
 
 1

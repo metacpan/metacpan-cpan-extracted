@@ -83,6 +83,7 @@
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
+            "Test::RequiresInternet" : "0",
             "Try::Tiny" : "0",
             "lib" : "0"
          }
@@ -99,7 +100,7 @@
          "web" : "https://github.com/marcbradshaw/mail-bimi"
       }
    },
-   "version" : "2.20201102.2",
+   "version" : "2.20201117.2",
    "x_contributors" : [
       "Marc Bradshaw <marc@fastmailteam.com>"
    ],

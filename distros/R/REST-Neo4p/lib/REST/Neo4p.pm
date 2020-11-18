@@ -1,10 +1,12 @@
-#$Id$
 use v5.10;
 package REST::Neo4p;
 use Carp qw(croak carp);
 use lib '../../lib';
 use JSON;
+use URI;
 use URI::Escape;
+use HTTP::Tiny;
+use JSON::ize;
 use REST::Neo4p::Agent;
 use REST::Neo4p::Node;
 use REST::Neo4p::Index;
@@ -14,7 +16,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::VERSION = '0.3030';
+  $REST::Neo4p::VERSION = '0.4000';
 }
 
 our $CREATE_AUTO_ACCESSORS = 0;
@@ -35,8 +37,9 @@ sub set_handle {
 
 sub create_and_set_handle {
   my $class = shift;
+  my @args = @_;
   $HANDLE = @HANDLES;
-  $HANDLES[$HANDLE]->{_agent} = REST::Neo4p::Agent->new(agent_module => $AGENT_MODULE);
+  $HANDLES[$HANDLE]->{_agent} = REST::Neo4p::Agent->new(agent_module => $AGENT_MODULE, @args);
   $HANDLES[$HANDLE]->{_q_endpoint} = 'cypher';
   return $HANDLE;
 }
@@ -106,9 +109,10 @@ sub handle {
 
 sub agent {
   my $neo4p = shift;
+  my @args = @_;
   unless (defined $HANDLES[$HANDLE]->{_agent}) {
     eval {
-      $HANDLES[$HANDLE]->{_agent} = REST::Neo4p::Agent->new(agent_module => $AGENT_MODULE);
+      $HANDLES[$HANDLE]->{_agent} = REST::Neo4p::Agent->new(agent_module => $AGENT_MODULE, @args);
     };
     if (my $e = REST::Neo4p::Exception->caught()) {
       # TODO : handle different classes
@@ -125,12 +129,60 @@ sub agent {
 sub connect {
   my $neo4p = shift;
   my ($server_address, $user, $pass) = @_;
-  $HANDLES[$HANDLE]->{_user} = $user;
-  $HANDLES[$HANDLE]->{_pass} = $pass;
+  my $uri = URI->new($server_address);
+  my ($u, $p);
+  $uri->userinfo and ($u, $p) = split(/:/,$uri->userinfo);
+  $HANDLES[$HANDLE]->{_user} = $user // $u;
+  $HANDLES[$HANDLE]->{_pass} = $pass // $p;
   REST::Neo4p::LocalException->throw("Server address not set\n")  unless $server_address;
+  my ($major, $minor, $patch, $milestone);
+  eval {
+    ($major, $minor, $patch, $milestone) = get_neo4j_version($server_address);
+  };
+  if (my $e = Exception::Class->caught) {
+    REST::Neo4p::CommException->throw("On version pre-check: $e");
+  }
+  if ($major >= 4) {
+    unless ($AGENT_MODULE eq 'Neo4j::Driver') {
+      unless (eval "require Neo4j::Driver; 1") {
+	REST::Neo4j::Exception->throw("Neo4j version 4 or higher requires Neo4j::Driver as agent module, but Neo4j::Driver is not installed in your system");
+      }
+      warn "Neo4j version 4 or higher requires Neo4j::Driver as agent module; using this instead of $AGENT_MODULE";
+      $AGENT_MODULE = 'Neo4j::Driver';
+    }
+  }
   $neo4p->agent->credentials($server_address,'Neo4j',$user,$pass) if defined $user;
   my $connected = $neo4p->agent->connect($server_address);
   return $HANDLES[$HANDLE]->{_connected} = $connected;
+}
+
+sub get_neo4j_version {
+  my ($url) = @_;
+  my $version;
+  my $resp = HTTP::Tiny->new( default_headers => { 'Content-Type' => 'application/json'})
+    ->get($url);
+  if ($resp->{success}) {
+    my $content = J($resp->{content});
+    $version = $content->{neo4j_version};
+    unless (defined $version) {
+      $resp = HTTP::Tiny->new( default_headers => { 'Content-Type' => 'application/json'})
+	->get("$url/db/data/");
+      if ($resp->{success}) {
+	$content = J($resp->{content});
+	$version = $content->{neo4j_version};
+      }
+      else {
+	die "$resp->{status} $resp->{reason}";
+      }
+    }
+    die "Neo4j version not found (is $url a Neo4j endpoint?)" unless defined $version;
+  }
+  else {
+    die "$resp->{status} $resp->{reason}";
+  }
+  my ($major, $minor, $patch, $milestone) = 
+    $version =~ /^(?:([0-9]+)\.)(?:([0-9]+)\.)?([0-9]+)?(?:-M([0-9]+))?/;
+  return wantarray ? ($major, $minor, $patch, $milestone) : $version;
 }
 
 sub connected {
@@ -352,7 +404,6 @@ sub rollback {
   };
   if (my $e = REST::Neo4p::Exception->caught()) {
     # TODO : handle different classes
-    $DB::single=1;
     $e->rethrow;
   }
   elsif ($e = Exception::Class->caught()) {
@@ -414,15 +465,17 @@ REST::Neo4p - Perl object bindings for a Neo4j database
   $new_neighbor = REST::Neo4p::Node->new({'name' => 'Donkey Hoty'});
   $my_reln = $my_node->relate_to($new_neighbor, 'neighbor');
 
-  $query = REST::Neo4p::Query->new("START n=node(".$my_node->id.")
-                                    MATCH p = (n)-[]->()
-                                    RETURN p");
+  $query = REST::Neo4p::Query->new("MATCH p = (n)-[]->()
+                                    WHERE id(n) = \$id
+                                    RETURN p", { id => $my_node->id });
   $query->execute;
   $path = $query->fetch->[0];
   @path_nodes = $path->nodes;
   @path_rels = $path->relationships;
 
 Batch processing (see L<REST::Neo4p::Batch> for more)
+
+I<Not available for Neo4j v4.0+>
 
  #!perl
  # loader...
@@ -449,6 +502,13 @@ work exclusively with Perl objects, and
 
 (2) to exploit the API's self-discovery mechanisms, avoiding as much
 as possible internal hard-coding of URLs.
+
+B<Neo4j version 4.0+>: The REST API and the "cypher endpoint" are no
+longer found in Neo4j servers after version 3.5. Never fear: the
+C<Neo4j::Driver> user agent, based on AJNN's L<Neo4j::Driver>,
+emulates both of these deprecated endpoints for REST::Neo4p. The goal
+is that REST::Neo4p will plug and play with version 4.0+. Be sure to
+report any bugs.
 
 Neo4j entities are represented by corresponding classes:
 
@@ -510,7 +570,8 @@ constrain properties and the values of properties for those nodes, and
 then specify allowable relationships between kinds of nodes.
 
 Constraints can be enforced automatically, causing exceptions to be
-thrown when constraints are violated. Alternatively, you can use
+thrown
+ when constraints are violated. Alternatively, you can use
 validation functions to test properties and relationships, including
 those already present in the database.
 
@@ -518,9 +579,9 @@ This is a mixin that is not I<use>d automatically by REST::Neo4p. For
 details and examples, see L<REST::Neo4p::Constrain> and
 L<REST::Neo4p::Constraint>.
 
-=head2 Server-side constraints (Neo4j server version 2.0.1+ only)
+=head2 Server-side constraints (Neo4j server version 2.0.1+)
 
-Neo4j L<"schema" constraints"|http://docs.neo4j.org/chunked/stable/cypher-schema.html>
+Neo4j L<"schema" constraints|http://docs.neo4j.org/chunked/stable/cypher-schema.html>
 based on labels can be manipulated via REST using
 L<REST::Neo4p::Schema>.
 
@@ -532,6 +593,7 @@ C<$REST::Neo4p::AGENT_MODULE> to one of the following
  LWP::UserAgent
  Mojo::UserAgent
  HTTP::Thin
+ Neo4j::Driver
 
 The L<REST::Neo4p::Agent> created will be a subclass of the selected
 backend agent. It can be accessed with L</agent()>.
@@ -539,6 +601,10 @@ backend agent. It can be accessed with L</agent()>.
 The initial value of C<$REST::Neo4p::AGENT_MODULE> will be the value
 of the environment variable C<REST_NEO4P_AGENT_MODULE> or
 C<LWP::UserAgent> by default.
+
+If your Neo4j database is version 4.0 or greater, C<Neo4j::Driver>
+will be used automatically and a warning will ensue if this overrides
+a different choice.
 
 =head1 CLASS METHODS
 
@@ -558,9 +624,10 @@ Returns the underlying L<REST::Neo4p::Agent> object.
 
 =item neo4j_version()
 
- $version = REST::Neo4p->neo4j_version;
+ $version_string = REST::Neo4p->neo4j_version;
+ ($major, $minor, $patch, $milestone) = REST::Neo4p->neo4j_version;
 
-Returns the server's neo4j version number, or undef if not connected.
+Returns the server's neo4j version string/components, or undef if not connected.
 
 =item get_node_by_id()
 
@@ -593,7 +660,7 @@ Returns false if index C<$name> does not exist in database.
 
 =back
 
-=head2 Label Support (Neo4j Server Version 2 only) 
+=head2 Label Support (Neo4j version 2.0+)
 
 =over
 
@@ -610,7 +677,7 @@ Returns false if no nodes with given label in database.
 
 =back
 
-=head2 Transaction Support (Neo4j Server Version 2 only)
+=head2 Transaction Support (Neo4j version 2.0+)
 
 Initiate, commit, or rollback L<queries|REST::Neo4p::Query> in transactions.
 
@@ -623,10 +690,10 @@ Initiate, commit, or rollback L<queries|REST::Neo4p::Query> in transactions.
 =item rollback()
  
  $q = REST::Neo4p::Query->new(
-   'start n=node(0) match n-[r:pal]->m create r'
+   'match (n)-[r:pal]->(m) where id(n)=0 create r'
  );
  $r = REST::Neo4p::Query->new(
-    'start n=node(0) match n-[r:pal]->u create unique u'
+    'match (n)-[r:pal]->(u) where id(n)=0 merge u'
  );
  REST::Neo4p->begin_work;
  $q->execute;
@@ -668,7 +735,7 @@ L<REST::Neo4p::Schema>,L<REST::Neo4p::Constrain>, L<REST::Neo4p::Constraint>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

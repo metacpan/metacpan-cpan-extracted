@@ -4,7 +4,7 @@ package Tk::GraphViz;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Tk 800.020;
 use Tk::Font;
@@ -1111,7 +1111,7 @@ sub _parseEdgePos
   my %startEnd;
 
   # Process all start/end points (could be none, 1, or 2)
-  while ( $pos =~ s/^([se])\s*\,\s*([\d.]+)\s*\,\s*([\d.]+)\s+// ) {
+  while ( $pos =~ s/^([se])\s*\,\s*([\d.e\+]+)\s*\,\s*([\d.e\+]+)\s+// ) {
     my ($where, $x, $y) = ($1, $2, $3);
     $startEnd{$where} = [ $x, $y ];
   }

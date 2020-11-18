@@ -35,15 +35,17 @@ use base qw(LaTeXML::Common::Object);
 
 sub new {
   my ($class, %options) = @_;
-  my $state = LaTeXML::Core::State->new(catcodes => 'standard',
-    stomach => LaTeXML::Core::Stomach->new(),
+  my $verbosity = defined $options{verbosity} ? $options{verbosity} : 0;
+  my $state     = LaTeXML::Core::State->new(catcodes => 'standard',
+    stomach => LaTeXML::Core::Stomach->new(verbosity => $verbosity),
     model   => $options{model} || LaTeXML::Common::Model->new());
-  $state->assignValue(VERBOSITY => (defined $options{verbosity} ? $options{verbosity} : 0),
+  $state->assignValue(VERBOSITY => $verbosity,
     'global');
   $state->assignValue(STRICT => (defined $options{strict} ? $options{strict} : 0),
     'global');
   $state->assignValue(INCLUDE_COMMENTS => (defined $options{includecomments} ? $options{includecomments} : 1),
     'global');
+  $state->assignValue(INCLUDE_PATH_PIS => (defined $options{includepathpis} ? $options{includepathpis} : 1), 'global');
   $state->assignValue(DOCUMENTID => (defined $options{documentid} ? $options{documentid} : ''),
     'global');
   $state->assignValue(SEARCHPATHS => [map { pathname_absolute(pathname_canonical($_)) }
@@ -51,7 +53,9 @@ sub new {
     'global');
   $state->assignValue(GRAPHICSPATHS => [map { pathname_absolute(pathname_canonical($_)) }
         @{ $options{graphicspaths} || [] }], 'global');
-  $state->assignValue(INCLUDE_STYLES => $options{includestyles} || 0, 'global');
+ # For now the "includestyles" option passed from --includestyles will accept both classes and styles?
+  $state->assignValue(INCLUDE_STYLES  => $options{includestyles} || 0, 'global');
+  $state->assignValue(INCLUDE_CLASSES => $options{includestyles} || 0, 'global');
   # Core has to ensure a default input encoding, and we default towards modern utf-8 documents
   # This can be removed when all executables rely on LaTeXML::Common::Config
   $options{inputencoding} = "utf-8" unless $options{inputencoding};
@@ -201,7 +205,7 @@ sub convertDocument {
       NoteBegin("Building");
       $model->loadSchema();                                  # If needed?
       if (my $paths = $state->lookupValue('SEARCHPATHS')) {
-        if ($state->lookupValue('INCLUDE_COMMENTS')) {
+        if ($state->lookupValue('INCLUDE_PATH_PIS')) {
           $document->insertPI('latexml', searchpaths => join(',', @$paths)); } }
       foreach my $preload_by_reference (@{ $$self{preload} }) {
         my $preload = $preload_by_reference; # copy preload value, as we want to preserve the hash as-is, for (potential) future daemon calls
@@ -255,7 +259,7 @@ sub initializeState {
   foreach my $preload (@files) {
     my ($options, $type);
     $options = $1 if $preload =~ s/^\[([^\]]*)\]//;
-    $type = ($preload =~ s/\.(\w+)$// ? $1 : 'sty');
+    $type    = ($preload =~ s/\.(\w+)$// ? $1 : 'sty');
     my $handleoptions = ($type eq 'sty') || ($type eq 'cls');
     if ($options) {
       if ($handleoptions) {

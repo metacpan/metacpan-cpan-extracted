@@ -1,0 +1,5 @@
+{
+  "data" : "http://localhost:32805/db/data/",
+  "management" : "http://localhost:32805/db/manage/",
+  "bolt" : "bolt://localhost:7687"
+}

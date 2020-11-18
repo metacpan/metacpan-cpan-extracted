@@ -63,44 +63,48 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::ruse;
 require Exporter;
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 use Carp;
-our $DEBUG=0; # -1 = more than normal-silent. 0 = no debugging. 1,2,3= debugging levels.
+our $DEBUG = 0
+    ; # -1 = more than normal-silent. 0 = no debugging. 1,2,3= debugging levels.
 
-our $orig_import= \&Exporter::import;
+our $orig_import = \&Exporter::import;
 
-our %rdep; # moduleclassname => caller => [ import-arguments ]
+our %rdep;    # moduleclassname => caller => [ import-arguments ]
 
 sub new_import {
-    warn "new_import called" if $DEBUG>2;
-    my $caller=caller;
-    my ($class)=@_;
-    $rdep{$class}{$caller}=[@_];
+    warn "new_import called" if $DEBUG > 2;
+    my $caller = caller;
+    my ($class) = @_;
+    $rdep{$class}{$caller} = [@_];
     goto &$orig_import;
 }
 
 {
     no warnings "redefine";
-    local $^W= ($DEBUG>0);
-    *Exporter::import= \&new_import;
+    local $^W = ($DEBUG > 0);
+    *Exporter::import = \&new_import;
 }
 
 {
+
     package Chj::ruse::Reload;
+
     # modified copy from Module::Reload
 
     our %Stat;
     our $Debug;
 
     sub wipeout_namespace {
-        my ($key)=@_;
-        my $class=$key;
-        $class=~ s|/|::|sg;##COPY!!below.
-        $class=~ s|\.pm$||s;
-        my $h= do {
+        my ($key) = @_;
+        my $class = $key;
+        $class =~ s|/|::|sg;    ##COPY!!below.
+        $class =~ s|\.pm$||s;
+        my $h = do {
             no strict 'refs';
             \%{"${class}::"}
         };
@@ -113,60 +117,60 @@ sub new_import {
     }
 
     sub check {
-        $Debug= $Chj::ruse::DEBUG;  # so that it works when that one's local'ized
-        my $c=0;
+        $Debug
+            = $Chj::ruse::DEBUG;   # so that it works when that one's local'ized
+        my $c = 0;
         my @ignores;
-        push @ignores,$INC{"Module/Reload.pm"}
-          if exists $INC{"Module/Reload.pm"};
-        push @ignores,$INC{"Chj/ruse.pm"}
-          if exists $INC{"Chj/ruse.pm"};
-        local $^W= ($Debug>=0);
-        my $memq_ignores= sub {
-            my ($f)=@_;
+        push @ignores, $INC{"Module/Reload.pm"}
+            if exists $INC{"Module/Reload.pm"};
+        push @ignores, $INC{"Chj/ruse.pm"} if exists $INC{"Chj/ruse.pm"};
+        local $^W = ($Debug >= 0);
+        my $memq_ignores = sub {
+            my ($f) = @_;
             for (@ignores) {
                 return 1 if $_ eq $f
             }
             0
         };
-        my %inc= %INC;
+        my %inc = %INC;
         while (my ($key, $file) = each %inc) {
-            my $reload= sub {
+            my $reload = sub {
                 delete $INC{$key};
                 wipeout_namespace($key);
                 eval {
-                    local $SIG{__WARN__} = \&warn;  # (cj: what does that do?)
+                    local $SIG{__WARN__} = \&warn;    # (cj: what does that do?)
                     require $key;
                 };
                 if ($@) {
                     warn "Module::Reload: error during reload of '$key': $@\n"
-                }
-                else {
-                    if ($Debug>0) {
+                } else {
+                    if ($Debug > 0) {
                         warn "Module::Reload: process $$ reloaded '$key'\n"
-                          if $Debug == 1;
-                        warn("Module::Reload: process $$ reloaded '$key' (\@INC=".
-                             join(', ',@INC).")\n")
-                          if $Debug >= 2;
+                            if $Debug == 1;
+                        warn(
+                            "Module::Reload: process $$ reloaded '$key' (\@INC = "
+                                . join(', ', @INC) . ")\n")
+                            if $Debug >= 2;
                     }
                     Chj::ruse::reimport($key);
                 }
                 ++$c;
             };
-            if (! defined $file) {
+            if (!defined $file) {
                 &$reload;
                 my $file2 = $INC{$key};
                 my $mtime = (stat $file2)[9];
                 $Stat{$file2} = $mtime;
             } else {
-                next if $memq_ignores->($file); # too confusing
-                #local $^W = 0; XX nope, only shut down redefinition warnings please.
+                next if $memq_ignores->($file);    # too confusing
+                 #local $^W = 0; XX nope, only shut down redefinition warnings please.
                 my $mtime = (stat $file)[9];
-                $Stat{$file} = $^T
-                  unless defined $Stat{$file};
+                $Stat{$file} = $^T unless defined $Stat{$file};
                 warn "Module::Reload: stat '$file' got $mtime >? $Stat{$file}\n"
-                  if $Debug >= 3;
+                    if $Debug >= 3;
                 &$reload if ($mtime > $Stat{$file});
                 $Stat{$file} = $mtime;
+
                 # (XX shouldn't let it warn forever if it couldn't reload?)
             }
         }
@@ -174,59 +178,57 @@ sub new_import {
     }
 }
 
-our $verbose= 0;
+our $verbose = 0;
 
 sub reimport {
-    my ($key)=@_;
-    my $class=$key;
-    $class=~ s|/|::|sg;##COPY above !!
-    $class=~ s|\.pm$||s;
-    if (my $importer= $class->can("import")) {
-        my $imports= $rdep{$class};
+    my ($key) = @_;
+    my $class = $key;
+    $class =~ s|/|::|sg;    ##COPY above !!
+    $class =~ s|\.pm$||s;
+    if (my $importer = $class->can("import")) {
+        my $imports = $rdep{$class};
         for my $caller (keys %$imports) {
-            my $code= "package $caller; "
-              .'$Chj::ruse::orig_import->(@{$$imports{$caller}})';
-            eval $code; # XX is this safe? (security)
+            my $code = "package $caller; "
+                . '$Chj::ruse::orig_import->(@{$$imports{$caller}})';
+            eval $code;     # XX is this safe? (security)
             if (ref $@ or $@) {
                 warn "reimport WARNING: evaling '$code' gave: $@";
             }
         }
     } else {
-        warn ("reimport WARNING: $class->can('import') didn't yield true, ".
-              "apparently the module doesn't inherit from Exporter")
-          if $verbose;
+        warn(     "reimport WARNING: $class->can('import') didn't yield true, "
+                . "apparently the module doesn't inherit from Exporter")
+            if $verbose;
     }
 }
 
-
 sub ruse {
     @_ > 1 and croak "ruse only takes 0 or 1 arguments";
-    local $DEBUG=( @_ ? $_[0] : $DEBUG);
+    local $DEBUG = (@_ ? $_[0] : $DEBUG);
     Chj::ruse::Reload->check;
 }
 
 sub import {
-    my $class= shift;
-    my $caller= caller;
+    my $class  = shift;
+    my $caller = caller;
     no strict 'refs';
-    warn "Copying ruse function to '${caller}::ruse'" if $DEBUG>1;
+    warn "Copying ruse function to '${caller}::ruse'" if $DEBUG > 1;
     if (@_) {
         for my $name (@_) {
             if ($name eq 'r') {
-                *{"${caller}::r"}= \&ruse;
+                *{"${caller}::r"} = \&ruse;
             } elsif ($name eq 'ruse') {
-                *{"${caller}::ruse"}= \&ruse;
+                *{"${caller}::ruse"} = \&ruse;
             } elsif ($name eq ':all') {
-                *{"${caller}::r"}= \&ruse;
-                *{"${caller}::ruse"}= \&ruse;
+                *{"${caller}::r"}    = \&ruse;
+                *{"${caller}::ruse"} = \&ruse;
             } else {
                 die "no such export: $name";
             }
         }
     } else {
-        *{"${caller}::ruse"}= \&ruse;
+        *{"${caller}::ruse"} = \&ruse;
     }
 }
-
 
 1

@@ -25,3 +25,4 @@ INCLUDE: XS/NetworkError.xs
 INCLUDE: XS/QueryParserError.xs
 INCLUDE: XS/SerialisationError.xs
 INCLUDE: XS/RangeError.xs
+INCLUDE: XS/WildcardError.xs

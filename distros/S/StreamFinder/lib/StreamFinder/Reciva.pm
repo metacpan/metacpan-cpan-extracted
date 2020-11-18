@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::Reciva;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $station = new StreamFinder::Reciva($ARGV[0]);
 
@@ -113,7 +113,7 @@ StreamFinder::Reciva, use 'ssl_opts' instead of 'reciva_ssl_opts'.
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, "debug" [ => 0|1|2 ]])
 
 Accepts a reciva.com station ID or URL and creates and returns a new station 
 object, or I<undef> if the URL is not a valid Reciva station or no streams 

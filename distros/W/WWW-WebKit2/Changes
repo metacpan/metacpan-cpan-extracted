@@ -38,3 +38,6 @@ Change to how page loading is checked in fire events.
 
 0.127 Mon Oct 19 10:00 CET 2020
 - fix memory leak in get_html_source
+
+0.128 Wed Nov 18 10:20:00 CET 2020
+- better error handling for get_html_source

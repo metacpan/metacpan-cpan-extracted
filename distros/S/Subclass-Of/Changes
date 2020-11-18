@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Subclass-Of>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Subclass-Of>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.009	2020-11-18
+
+ - Require Hash::Util::FieldHash::Compat instead of Hash::FieldHash on Perl
+   5.8 because the latter seems to have issues installing. (Urgh
+   Module::Build.)
+
 0.008	2019-02-28
 
  - Added: Support fieldhash=>1 to allow attributes to be stored inside-out

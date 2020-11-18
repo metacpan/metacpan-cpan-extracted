@@ -10,7 +10,7 @@ use warnings;
 
 # base class for nodes, relationships, indexes...
 BEGIN {
-  $REST::Neo4p::Entity::VERSION = '0.3030';
+  $REST::Neo4p::Entity::VERSION = '0.4000';
 }
 
 our $ENTITY_TABLE = {};
@@ -39,18 +39,21 @@ sub new {
   };
   if (my $e = REST::Neo4p::Exception->caught()) {
     # TODO : handle cases
+    $DB::single=1;
     $e->rethrow;
   }
   elsif ($e = Exception::Class->caught()) {
+    $DB::single=1;
     (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
   }
-
+  # TODO: examine following line in Neo4j::Driver context
   $decoded_resp->{self} ||= $agent->location if ref $decoded_resp;
   return ref($decoded_resp) ?
     $class->new_from_json_response($decoded_resp) :
       $class->new_from_batch_response($decoded_resp, @$url_components);
 }
 
+# TODO: refactor for when response is from Neo4j::Driver (a Result)
 sub new_from_json_response {
   my $class = shift;
   my ($entity_type) = $class =~ /.*::(.*)/;
@@ -62,26 +65,46 @@ sub new_from_json_response {
   unless (defined $decoded_resp) {
     REST::Neo4p::LocalException->throw("new_from_json_response() called with undef argument\n");
   }
-  unless ($ENTITY_TABLE->{$entity_type}{_actions}) {
+  my $is_json = !(ref($decoded_resp) =~ /Neo4j::Driver/);
+  unless ($ENTITY_TABLE->{$entity_type}{_actions} || !$is_json) {
     # capture the url suffix patterns for the entity actions:
     for (keys %$decoded_resp) {
+      next unless defined $decoded_resp->{$_};
       my ($suffix) = $decoded_resp->{$_} =~ m|.*$entity_type/[0-9]+/(.*)|;
       $ENTITY_TABLE->{$entity_type}{_actions}{$_} = $suffix;
     }
   }
   # "template" in next line is a kludge for get_indexes
-  my $self_url  = $decoded_resp->{self} || $decoded_resp->{template};
-  $self_url =~ s/{key}.*$//; # another kludge for get_indexes
-  my ($obj) = $self_url =~ /([a-z0-9_]+)\/?$/i;
+  my ($self_url, $obj);
+  if ($is_json) {
+    $self_url  = $decoded_resp->{self} || $decoded_resp->{template};
+    $self_url =~ s/{key}.*$//; # another kludge for get_indexes
+    ($obj) = $self_url =~ /([a-z0-9_]+)\/?$/i;
+  }
+  else { # Driver
+    $obj = $decoded_resp->id;
+    $self_url = "$entity_type/$obj";
+  }
   my $tbl_entry = $ENTITY_TABLE->{$entity_type}{$obj};
-  my ($start_id,$end_id);
-  if ($decoded_resp->{start}) {
-    ($start_id) = $decoded_resp->{start} =~ /([0-9]+)\/?$/;
-    ($end_id) = $decoded_resp->{end} =~ /([0-9]+)\/?$/;
+  my ($start_id,$end_id,$type);
+  if ($is_json) {
+    if ($decoded_resp->{start}) {
+      ($start_id) = $decoded_resp->{start} =~ /([0-9]+)\/?$/;
+      ($end_id) = $decoded_resp->{end} =~ /([0-9]+)\/?$/;
+      $type = $decoded_resp->{type};
+    }
+  }
+  else { # Driver
+    if ($decoded_resp->can('start_id')) {
+      $start_id = $decoded_resp->start_id;
+      $end_id = $decoded_resp->end_id;
+      $type = $decoded_resp->type;
+    }
   }
   unless (defined $tbl_entry) {
-    if ($decoded_resp->{template}) {     # another kludge for get_indexes
+    if ($is_json && $decoded_resp->{template}) {     # another kludge for get_indexes
       ($decoded_resp->{type}) = $decoded_resp->{template} =~ m|index/([a-z]+)/|;
+      $type = $decoded_resp->{type};
     }
     $tbl_entry = $ENTITY_TABLE->{$entity_type}{$obj} = {};
     $tbl_entry->{entity_type} = $entity_type;
@@ -90,12 +113,12 @@ sub new_from_json_response {
     $tbl_entry->{start_id} = $start_id;
     $tbl_entry->{end_id} = $end_id;
     $tbl_entry->{batch} = 0;
-    $tbl_entry->{type} = $decoded_resp->{type};
+    $tbl_entry->{type} = $type;
     $tbl_entry->{_handle} = REST::Neo4p->handle; # current db handle
   }
   if ($REST::Neo4p::CREATE_AUTO_ACCESSORS && ($entity_type ne 'index')) {
     my $self =  $tbl_entry->{self};
-    my $props = $self->get_properties;
+    my $props = ($is_json ? $self->get_properties : $decoded_resp->properties);
     for (keys %$props) { $self->_create_accessors($_) unless $self->can($_); }
   }
   return $tbl_entry->{self};
@@ -152,7 +175,7 @@ sub set_property {
   local $REST::Neo4p::HANDLE;
   REST::Neo4p->set_handle($self->_handle);
   my $agent = REST::Neo4p->agent;
-  my $suffix = $self->_get_url_suffix('property');
+  my $suffix = ($self->_get_url_suffix('property') // 'properties/{key}');
   my @ret;
   $suffix =~ s|/[^/]*$||; # strip the '{key}' placeholder
   for (keys %$props) {
@@ -186,7 +209,7 @@ sub get_property {
   REST::Neo4p->set_handle($self->_handle);
   my $agent = REST::Neo4p->agent;
   REST::Neo4p::CommException->throw("Not connected\n") unless $agent;
-  my $suffix = $self->_get_url_suffix('property');
+  my $suffix = ($self->_get_url_suffix('property') // 'properties/{key}');
   my @ret;
   $suffix =~ s|/[^/]*$||; # strip the '{key}' placeholder
   for (@props) {
@@ -202,6 +225,7 @@ sub get_property {
       (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
     }
     else {
+      # TODO: handle in Neo4j::Driver case
       _unescape($decoded_resp);
       push @ret, $decoded_resp;
     }
@@ -218,7 +242,7 @@ sub get_properties {
   REST::Neo4p->set_handle($self->_handle);
   my $agent = REST::Neo4p->agent;
   REST::Neo4p::CommException->throw("Not connected\n") unless $agent;
-  my $suffix = $self->_get_url_suffix('property');
+  my $suffix = ($self->_get_url_suffix('property') // 'properties/{key}');
   $suffix =~ s|/[^/]*$||; # strip the '{key}' placeholder
   my $decoded_resp;
   eval {
@@ -231,6 +255,7 @@ sub get_properties {
   elsif ($e = Exception::Class->caught()) {
     (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
   }
+  # TODO: handle in Neo4j::Driver case
   _unescape($decoded_resp);
   return $decoded_resp;
 }
@@ -263,7 +288,7 @@ sub remove_property {
   REST::Neo4p->set_handle($self->_handle);
   my $agent = REST::Neo4p->agent;
   REST::Neo4p::CommException->throw("Not connected\n") unless $agent;
-  my $suffix = $self->_get_url_suffix('property');
+  my $suffix = ($self->_get_url_suffix('property') // 'properties/{key}');
   $suffix =~ s|/[^/]*$||; # strip the '{key}' placeholder
   foreach (@props) {
     eval {
@@ -336,6 +361,7 @@ sub _entity_by_id {
       elsif ($@) {
 	ref $@ ? $@->rethrow : die $@;
       }
+      # TODO: handle for Neo4j::Driver case
       $decoded_resp = $decoded_resp->{$id};
       unless (defined $decoded_resp) {
 	REST::Neo4p::NotFoundException->throw
@@ -363,6 +389,8 @@ sub _entity_by_id {
 	(ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
       }
     }
+    # TODO: check this works for Neo4j::Driver case after new_from_json_response refactor
+    return unless defined $decoded_resp;
     $new = ref($decoded_resp) ? $class->new_from_json_response($decoded_resp) :
       $class->new_from_batch_response($decoded_resp);
   }
@@ -374,8 +402,8 @@ sub _get_url_suffix {
   my ($action) = @_;
   my $entity_type = ref $self;
   $entity_type =~ s/.*::(.*)/\L$1\E/;
-  return unless $ENTITY_TABLE->{$entity_type}{_actions};
-  my $suffix = $ENTITY_TABLE->{$entity_type}{_actions}{$action};
+  my $a = $ENTITY_TABLE->{$entity_type}{_actions};
+  my $suffix = ($a && $a->{$action}) // REST::Neo4p->agent->{_actions}{$action};
 }
 
 # get the $ENTITY_TABLE entry for the object
@@ -435,7 +463,8 @@ use strict;
 use warnings;
 no warnings qw/once/;
 BEGIN {
-  $REST::Neo4p::Simple::VERSION = '0.3030';
+  $REST::Neo4p::Simple::VERSION = '0.4000';
+  $REST::Neo4p::Simple::VERSION = '0.4000';
 }
 
 sub new { $_[1] }
@@ -477,7 +506,7 @@ L<REST::Neo4p::Index>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

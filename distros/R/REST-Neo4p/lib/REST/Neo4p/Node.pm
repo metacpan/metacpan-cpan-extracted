@@ -8,7 +8,7 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Node::VERSION = '0.3030';
+  $REST::Neo4p::Node::VERSION = '0.4000';
 }
 
 # creation, deletion and property manipulation are delegated
@@ -76,8 +76,9 @@ sub get_relationships {
     };
   }
   my $decoded_resp;
-  eval { 
-    $decoded_resp = $agent->get_node($$self,$self->_get_url_suffix($action) );
+  eval {
+    my @a = split /\//,$self->_get_url_suffix($action);
+    $decoded_resp = $agent->get_node($$self,@a);
   };
   my $e;
   if ($e = Exception::Class->caught('REST::Neo4p::Exception')) {
@@ -88,6 +89,7 @@ sub get_relationships {
     ref $@ ? $@->rethrow : die $@;
   }
   my @ret;
+  # TODO: handle Neo4j::Driver case 
   if (ref $decoded_resp eq 'HASH') {
     $decoded_resp = [$decoded_resp];
   }
@@ -167,6 +169,7 @@ sub get_labels {
   elsif ($@) {
     ref $@ ? $@->rethrow : die $@;
   }
+  # TODO: handle Neo4j::Driver case
   return @$decoded_resp;
 }
 
@@ -219,10 +222,28 @@ sub simple_from_json_response {
   my $class = shift;
   my ($decoded_resp) = @_;
   my $ret;
-  # node id
-  ($ret->{_node}) = $decoded_resp->{self} =~ m{.*/([0-9]+)$};
-  # node properties
-  $ret->{$_} = $decoded_resp->{data}->{$_} for keys %{$decoded_resp->{data}};
+  for (ref $decoded_resp) {
+    /HASH/ && do {
+      # node id
+      ($ret->{_node}) = $decoded_resp->{self} =~ m{.*/([0-9]+)$};
+      # node properties
+      if ($decoded_resp->{data}) {
+	$ret->{$_} = $decoded_resp->{data}->{$_} for keys %{$decoded_resp->{data}};
+      }
+      else { # use top-level keys except self
+	$ret->{$_} = $decoded_resp->{$_} for grep !/^self$/, keys %{$decoded_resp};
+      }
+      last;
+    };
+    /Driver/ && do {
+      $ret->{_node} = $decoded_resp->id;
+      $ret->{$_} = $decoded_resp->properties->{$_} for keys %{$decoded_resp->properties};
+      last;
+    };
+    do {
+      die "?";
+    };
+  }
   return $ret;
 }
 
@@ -250,7 +271,7 @@ REST::Neo4p::Node objects represent Neo4j nodes.
 =item new()
 
  $node = REST::Neo4p::Node->new();
- $node_with_properties = Rest::Neo4p::Node( \%props );
+ $node_with_properties = REST::Neo4p::Node->new( \%props );
 
 Instantiates a new Node object and creates corresponding node in the database.
 
@@ -326,9 +347,9 @@ Get node as a simple hashref.
 
 =back
 
-=head2 METHODS - Neo4j Version 2.0
+=head2 METHODS - Neo4j Version 2.0+
 
-These methods are supported by v2.0 of the Neo4j server.
+These methods are supported by v2.0+ of the Neo4j server.
 
 =over
 
@@ -370,7 +391,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Relationship>, L<REST::Neo4p::Index>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

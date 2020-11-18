@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '1.000038';
+our $VERSION = '1.000042';
 
 use Test2::Util::Term qw/term_size/;
 use Test2::Harness::Util qw/hub_truth apply_encoding/;
@@ -281,8 +281,8 @@ sub write {
     $should_show ||= $lines && @$lines;
     unless ($should_show || $self->{+VERBOSE}) {
         if (my $last = $self->{last_rendered}) {
-            $self->{last_rendered} = time;
             return if time - $last < 0.2;
+            $self->{last_rendered} = time;
         }
         else {
             $self->{last_rendered} = time;

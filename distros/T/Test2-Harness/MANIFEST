@@ -233,6 +233,7 @@ t/integration/test-symlinks/symlink_to_base.xt
 t/integration/test.t
 t/integration/test/fail.txx
 t/integration/test/pass.tx
+t/integration/test/pass.txxx
 t/integration/times.t
 t/integration/times/pass.tx
 t/integration/times/pass2.tx

@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,7 +24,6 @@ resources:
   MailingList: convert-binary-c@yahoogroups.com
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-Binary-C
   homepage: http://search.cpan.org/~mhx/Convert-Binary-C/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/mhx/Convert-Binary-C.git
-version: '0.79'
+version: '0.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,6 +14,18 @@ extern "C" {
 void handle_exception(void) {
     try {
         throw;
+    } catch (const Xapian::DatabaseClosedError & error) {
+	SV * errsv = get_sv("@", TRUE);
+	sv_setref_pv(errsv, "Search::Xapian::DatabaseClosedError", (void *) new Xapian::DatabaseClosedError(error));
+        croak(Nullch);
+    } catch (const Xapian::DatabaseNotFoundError & error) {
+	SV * errsv = get_sv("@", TRUE);
+	sv_setref_pv(errsv, "Search::Xapian::DatabaseNotFoundError", (void *) new Xapian::DatabaseNotFoundError(error));
+        croak(Nullch);
+    } catch (const Xapian::WildcardError & error) {
+	SV * errsv = get_sv("@", TRUE);
+	sv_setref_pv(errsv, "Search::Xapian::WildcardError", (void *) new Xapian::WildcardError(error));
+        croak(Nullch);
     } catch (const Xapian::RangeError & error) {
 	SV * errsv = get_sv("@", TRUE);
 	sv_setref_pv(errsv, "Search::Xapian::RangeError", (void *) new Xapian::RangeError(error));

@@ -1,36 +1,20 @@
-#Resource:
+ * Have runner spawn the test
+ * Have main process monitor for jobs to start/end
 
-sub fetch_resource {
-    my $self = shift;
-    my ($job) = @_;
+  * New job:
+   * spawn processor with pipe (collect and audit, one process)
+   * Update running status display
 
-    return undef;    # Resource not yet available
+  * Job End:
+   * Update running status display (but note that it is processing still if processor is not done)
 
-    return 0; # Resource not necessary
+The main process will read all the ongoing pipes and render the output, it will also launch processors as needed.
 
-    # Resource
-    return {
-        env  => {...},
-        args => [...],
+Do we want an option to produce job-logs with -k instead of using pipes?
 
-        ...,
-    };
+
+if (defined &Fcntl::F_SETPIPE_SZ) {
+    # Set pipe buffer to 5mb
+    my $size = fcntl($out_wh, Fcntl::F_SETPIPE_SZ, (5 * 1024 * 1014));
 }
 
-sub assign_resource {
-    my $self = shift;
-    my ($pid, $res) = @_;
-
-    ...;
-
-    return;    # Ignored
-}
-
-sub release_resource {
-    my $self = shift;
-    my ($pid) = @_;
-
-    ...;
-
-    return;    #ignored
-}

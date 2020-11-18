@@ -3,7 +3,7 @@ package Make;
 use strict;
 use warnings;
 
-our $VERSION = '2.004';
+our $VERSION = '2.006';
 
 use Carp qw(confess croak);
 use Config;
@@ -23,8 +23,8 @@ my $DEFAULTS_AST;
 my %date;
 my %fs_function_map = (
     glob          => sub { glob $_[0] },
-    fh_open       => sub { open my $fh, $_[0], $_[1] or die "open @_: $!"; $fh },
-    fh_write      => sub { my $fh = shift;                                 print {$fh} @_ },
+    fh_open       => sub { open my $fh, $_[0], $_[1] or confess "open @_: $!"; $fh },
+    fh_write      => sub { my $fh = shift;                                     print {$fh} @_ },
     file_readable => sub { -r $_[0] },
     mtime         => sub { ( stat $_[0] )[9] },
 );
@@ -68,7 +68,15 @@ sub target {
 
 sub has_target {
     my ( $self, $target ) = @_;
+    confess "Trying to has_target undef value" unless defined $target;
     return exists $self->{Depend}{$target};
+}
+
+sub targets {
+    my ($self) = @_;
+    ## no critic ( BuiltinFunctions::RequireBlockGrep )
+    return grep !/%|^\./, keys %{ $self->{Depend} };
+    ## use critic
 }
 
 # Utility routine for patching %.o type 'patterns'
@@ -90,7 +98,9 @@ sub patmatch {
 
 sub in_dir {
     my ( $file, $dir ) = @_;
-    defined $dir ? "$dir/$file" : $file;
+    ## no critic ( BuiltinFunctions::RequireBlockGrep )
+    join '/', grep defined, $dir, $file;
+    ## use critic
 }
 
 sub locate {
@@ -357,7 +367,7 @@ sub parse_makefile {
         elsif (/^\s*([\w._]+)\s*:?=\s*(.*)$/) {
             push @ast, [ 'var', $1, $2 ];
         }
-        elsif (/^vpath\s+(\S+)\s+(.*)$/) {
+        elsif (/^vpath\s+(\S+)\s+([^#]*)/) {
             my ( $pattern, $path ) = ( $1, $2 );
             my @path = @{ tokenize $path, $Config{path_sep} };
             push @ast, [ 'vpath', $pattern, @path ];
@@ -416,12 +426,18 @@ sub pseudos {
 }
 
 sub find_makefile {
-    my ( $file, $extra_names, $fsmap, $dir ) = @_;
+    my ( $self, $file, $dir ) = @_;
+    ## no critic ( BuiltinFunctions::RequireBlockGrep )
+    my @dirs = grep defined, $self->{InDir}, $dir;
+    $dir = join '/', @dirs if @dirs;
+    ## use critic
     return in_dir $file, $dir if defined $file;
-    my @search = ( qw(makefile Makefile), @{ $extra_names || [] } );
+    my @search = qw(makefile Makefile);
+    unshift @search, 'GNUmakefile' if $self->{GNU};
     ## no critic (BuiltinFunctions::RequireBlockMap)
     @search = map in_dir( $_, $dir ), @search;
     ## use critic
+    my $fsmap = $self->fsmap;
     for (@search) {
         return $_ if $fsmap->{file_readable}->($_);
     }
@@ -430,14 +446,14 @@ sub find_makefile {
 
 sub parse {
     my ( $self, $file ) = @_;
-    $file = find_makefile $file, $self->{GNU} ? ['GNUmakefile'] : [], $self->fsmap, $self->{InDir};
     my $fh;
     if ( ref $file eq 'SCALAR' ) {
         open my $tfh, "+<", $file;
         $fh = $tfh;
     }
     else {
-        $fh = $self->fsmap->{fh_open}->( '<', $file );
+        $file = $self->find_makefile($file);
+        $fh   = $self->fsmap->{fh_open}->( '<', $file );
     }
     my $ast = parse_makefile($fh);
     $self->process_ast_bit(@$_) for @$ast;
@@ -718,7 +734,13 @@ Find or create L<Make::Target> for given target-name.
 
 =head2 has_target
 
-Find L<Make::Target> for given target-name, or undef.
+Returns boolean on whether the given target-name is known to this object.
+
+=head2 targets
+
+List all "real" (non-dot, non-inference) target-names known to this object
+at the time called, unsorted. Note this might change when C<Make> is
+called, as targets will be added as part of the dependency-search process.
 
 =head2 patrule
 

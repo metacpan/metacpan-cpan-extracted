@@ -19,5 +19,9 @@ no_index:
     - inc
 requires:
   Mojolicious: '8.12'
-version: '0.01'
+resources:
+  bugtracker: https://github.com/bitnoize/mojolicious-plugin-strictcors/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: git://github.com/bitnoize/mojolicious-plugin-strictcors.git
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,6 @@
+1.07 2020-11-17
+- fix edge-parsing on Really Big coordinates (with e-notation)
+
 1.06 2020-11-16
 - fix accidental double-run of dot with async=0
 

@@ -1,4 +1,4 @@
-# $Id: NonFatal.pm 1818 2020-10-18 15:24:42Z willem $	-*-perl-*-
+# $Id: NonFatal.pm 1823 2020-11-16 16:29:45Z willem $	-*-perl-*-
 
 # Test::More calls functions from Test::Builder. Those functions all eventually
 # call Test::Builder::ok (on a builder instance) for reporting the status.
@@ -33,7 +33,7 @@ sub ok {
 
 	$self->SUPER::ok( 1, "NOT OK (tolerating failure)  @name" );
 
-	push @failed, scalar(@name) ? "@name" : 'undef';
+	push @failed, join( "\t", $self->current_test, @name );
 	return $test;
 }
 

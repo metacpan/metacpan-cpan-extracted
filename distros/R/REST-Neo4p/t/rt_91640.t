@@ -15,7 +15,7 @@ no warnings qw(once);
 my @cleanup;
 
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
   $build = Module::Build->current;
@@ -23,7 +23,7 @@ eval {
   $pass = $build->notes('pass');
 };
 
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 27;
 my $not_connected = connect($TEST_SERVER,$user,$pass);
 diag "Test server unavailable (".$not_connected->message.") : tests skipped" if $not_connected;
@@ -38,8 +38,7 @@ SKIP : {
   skip 'no local connection to neo4j', $num_live_tests if $not_connected;
   ok $t = Neo4p::Test->new, 'test graph object';
   ok $t->create_sample, 'create sample graph';
-  my $idx_name = $t->nix->name;
-  ok my ($n) = $t->nix->find_entries( name => 'I' ), 'get I node';
+  ok my ($n) = $t->find_sample( name => 'I' ), 'get I node';
   ok my $cyr_string = 'Сохранить', 'create $cyr_string in utf8 context';
   diag('use utf8');
   lives_ok { $n->set_property( { utf8 => $cyr_string } ); } 'cyrillic $string allowed by set_property';
@@ -47,8 +46,9 @@ SKIP : {
   lives_ok { $n->set_property( { utf8lit => 'Сохранить' } ) } 'cyrillic literal allowed by set_property';
   is $n->get_property('utf8lit'), $cyr_string, 'cyrillic literal value correctly set';
   ok my $stmt =<<STMT1, 'create $stmt in utf8 context';
- START n = node:${idx_name}(name = 'I')
- WHERE n.utf8 = 'Сохранить'
+ MATCH (n) 
+ WHERE id(n) = $$n 
+ AND n.utf8 = 'Сохранить'
  RETURN n
 STMT1
   my $q;
@@ -64,8 +64,9 @@ STMT1
   diag('no utf8');
   ok $cyr_string = 'Сохранить', 'create $cyr_string in no utf8 context';
   ok $stmt =<<STMT1, 'create $stmt in no utf8 context';
- START n = node:${idx_name}(name = 'I')
- WHERE n.utf8 = 'Сохранить'
+ MATCH (n) 
+ WHERE id(n) = $$n 
+ AND n.utf8 = 'Сохранить'
  RETURN n
 STMT1
   lives_ok { $n->set_property( { utf8 => $cyr_string } ); } 'cyrillic $string allowed by set_property';
@@ -81,6 +82,7 @@ STMT1
 }
 #}
 
-END {
-  $t && $t->delete_sample;
-}
+  END {
+    
+    eval { $t && $t->delete_sample; };
+  }

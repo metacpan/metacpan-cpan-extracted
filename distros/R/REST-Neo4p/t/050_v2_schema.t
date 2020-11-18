@@ -3,6 +3,7 @@ use Test::More tests => 29;
 use Test::Exception;
 use Module::Build;
 use lib '../lib';
+use lib 'lib';
 use lib 't/lib';
 use Neo4p::Connect;
 use REST::Neo4p;
@@ -14,14 +15,14 @@ no warnings qw(once);
 my $test_label =  'L79ed3b3a_515d_4f2b_89dc_9d1f0868b50c';
 my ($n1, $n2);
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
     $build = Module::Build->current;
     $user = $build->notes('user');
     $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 29;
 
 my $not_connected = connect($TEST_SERVER,$user,$pass);
@@ -38,6 +39,7 @@ SKIP : {
     is $schema->_handle, REST::Neo4p->handle, 'handle correct';
     isa_ok $schema->_agent, 'REST::Neo4p::Agent';
     ok $schema->create_index($test_label,'name'), 'create name index on test label';
+
     is_deeply [$schema->get_indexes($test_label)],['name'], 'name index listed';
     ok $schema->create_index($test_label => 'number'), 'create number index on test label';
     is_deeply [sort $schema->get_indexes($test_label)], [sort qw/name number/], 'both indexes now listed';
@@ -61,6 +63,7 @@ SKIP : {
     ok $n1 = REST::Neo4p::Node->new(), 'create node';
     ok $n1->set_labels($test_label), 'set label on node';
     ok $n1->set_property({name => 'Fred'}), 'set name property on node';
+
     ok $n2 =  REST::Neo4p::Node->new(), 'create second node';
     ok $n2->set_labels($test_label), 'set label on second node';
     ok $n2->set_property({name => 'Wilma'}), 'set name property on node';

@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::Brighteon;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $video = new StreamFinder::Brighteon($ARGV[0]);
 
@@ -111,7 +111,7 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<url> [, I<-youtube> => (yes)|no|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-youtube> => (yes)|no|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
 
 Accepts a brighteon.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Brighteon video or no streams are found.  

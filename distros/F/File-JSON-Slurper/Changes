@@ -1,5 +1,10 @@
 Revision history for Perl module File::JSON::Slurper
 
+1.00 2020-11-18 NEILB
+    - Fixed bug where we were double-encoding. We now assume/require UTF-8.
+      Thanks to Dan Book.
+      This is a breaking change, so bumped major version.
+
 0.03 2017-08-16 NEILB
     - Corrected the repository URL in the doc.
       Thanks to Ed Freyfogle (EDF) for the pull request.

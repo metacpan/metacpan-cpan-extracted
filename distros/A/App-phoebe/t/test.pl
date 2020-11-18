@@ -87,12 +87,17 @@ if (!defined $pid) {
   say "This is the server...";
   if (not -f "t/cert.pem" or not -f "t/key.pem") {
     my $version = qx(openssl version);
-    warn "\nCreating new certificate using $version\n";
-    # create certificates for the test if we don't have them
-    my $cmd = qq(openssl req -new -x509 -newkey ec -subj "/CN=localhost" )
-	. qq(-pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out t/cert.pem -keyout t/key.pem);
-    system($cmd) == 0 or die "openssl failed to create t/cert.pem and t/key.pem: $?";
-    warn qx(openssl x509 -in t/cert.pem -text); # debug
+    if (not $version) {
+      die "Cannot invoke openssl to create certificates\n";
+    } elsif ($version =~ /^OpenSSL 1\.0\./) {
+      my $cmd = qq(openssl req -new -x509 -newkey rsa -subj /CN=localhost )
+	  . qq( -days 1825 -nodes -out t/cert.pem -keyout t/key.pem);
+      system($cmd) == 0 or die "openssl failed to create t/cert.pem and t/key.pem: $?";
+    } else {
+      my $cmd = qq(openssl req -new -x509 -newkey ec -subj /CN=localhost )
+	  . qq(-pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out t/cert.pem -keyout t/key.pem);
+      system($cmd) == 0 or die "openssl failed to create t/cert.pem and t/key.pem: $?";
+    }
   }
   use Config;
   my $secure_perl_path = $Config{perlpath};

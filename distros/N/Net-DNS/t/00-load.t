@@ -1,16 +1,13 @@
 #!/usr/bin/perl
-# $Id: 00-load.t 1818 2020-10-18 15:24:42Z willem $	-*-perl-*-
+# $Id: 00-load.t 1823 2020-11-16 16:29:45Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use Test::More;
 
-use Net::DNS::RR::RRSIG;		## preempt Net::DNS::SEC configuration
-
 my @module = qw(
 		Net::DNS
-		Net::DNS::SEC
 		Digest::BubbleBabble
 		Digest::HMAC
 		Digest::MD5
@@ -19,10 +16,8 @@ my @module = qw(
 		File::Spec
 		IO::File
 		IO::Select
-		IO::Socket::INET
 		IO::Socket::IP
 		MIME::Base64
-		Net::LibIDN
 		Net::LibIDN2
 		PerlIO
 		Scalar::Util

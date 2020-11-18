@@ -4,13 +4,13 @@
       "Dave Cross, E<lt>dave@dave.org.ukE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AudioFile-Info-Ogg-Vorbis-Header",
    "prereqs" : {
@@ -39,7 +39,7 @@
       },
       "AudioFile::Info::Ogg::Vorbis::Header" : {
          "file" : "lib/AudioFile/Info/Ogg/Vorbis/Header.pm",
-         "version" : "v1.8.1"
+         "version" : "v1.8.2"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header"
       }
    },
-   "version" : "v1.8.1",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v1.8.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

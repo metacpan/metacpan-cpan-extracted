@@ -2,12 +2,13 @@
 abstract: 'transforms TeX and LaTeX into XML/HTML/MathML'
 author:
   - 'Bruce Miller <bruce.miller@nist.gov>'
+  - 'Deyan Ginev <deyan.ginev@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   version: '0.77'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,5 +40,5 @@ requires:
   version: '0'
 resources:
   repository: https://github.com/brucemiller/LaTeXML.git
-version: 0.8.4
+version: 0.8.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

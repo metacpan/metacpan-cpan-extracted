@@ -73,6 +73,8 @@ ACCESSORS
 
     The returned structure provides the following fields
 
+       $name = $partinfo->name
+    
        $sig = $partinfo->signature
     
        $addr = $partinfo->baseaddr_nvmctrl
@@ -87,6 +89,14 @@ ACCESSORS
        $bytes = $partinfo->size_eeprom
     
        $fusenames = $partinfo->fusenames
+
+ fuseinfo
+
+    Returns a data structure containing information about the individual
+    fuse fields defined by this device.
+
+    This is parsed directly from a shipped YAML file; see the files in the
+    share/ directory for more details.
 
 METHODS
 
@@ -174,6 +184,11 @@ METHODS
     Writes a single page into NVM controller in 8- or 16-bit word
     transfers. $addr is within the data address space. $wordsize must be
     either 8 or 16.
+
+ erasewrite_nvm_page
+
+    Identical to "write_nvm_page" but issues a combined erase-and-write
+    command. This is the method to use for EEPROM writes.
 
  write_fuse
 

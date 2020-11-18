@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h> /* for strchr() */
 
 #define ALPHANUM(c) ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
 #define URL_SAFE(c) (ALPHANUM(c) || c == '-' || c == '_' || c == '.')

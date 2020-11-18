@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 =head1 SYNOPSIS
 
@@ -235,28 +235,16 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.70, 2020-11-12
-Some small quality-of-life enhancements and corner-case bugfixes.
+=head2 2.71, 2020-11-16
+Fix a race condition breaking test suites.
 
 =over 4
 
-=item ENHANCEMENT
-
-L<dbcol> can now take an option C<-a> to include all columns,
-allowing reordering of certain columns while passing the rest through.
-
-=item ENHANCEMENT
-
-L<dbrowuniq> and L<dbmerge> now buffer comments in a way
-that the last row of data output is no longer in the last block of comments.
-(The data is identical, but for humans looking at output,
-this change makes it less likely to lose the last row.)
-
 =item BUG FIX
 
-L<dbmultistats> and L<dbpipeline> documentation now indicates
-that they support C<--header> (something they did since version 2.62 in 2016-11-29,
-but now documented.
+Suppress a race condition in L<dbcolmerge> was sometimes throwing the error
+"Fsdb::Support::Freds: ending, but running process: dbmerge:xargs"
+in the dbmerge_0_xargs test case, on exit.
 
 =item ENHANCEMENT
 
@@ -3640,6 +3628,48 @@ Thanks to Hang Guo for providing a test case.
 
 =back
 
+=head2 2.70, 2020-11-12
+Some small quality-of-life enhancements and corner-case bugfixes.
+
+=over 4
+
+=item ENHANCEMENT
+
+L<dbcol> can now take an option C<-a> to include all columns,
+allowing reordering of certain columns while passing the rest through.
+
+=item ENHANCEMENT
+
+L<dbrowuniq> and L<dbmerge> now buffer comments in a way
+that the last row of data output is no longer in the last block of comments.
+(The data is identical, but for humans looking at output,
+this change makes it less likely to lose the last row.)
+
+=item BUG FIX
+
+L<dbmultistats> and L<dbpipeline> documentation now indicates
+that they support C<--header> (something they did since version 2.62 in 2016-11-29,
+but now documented.
+
+=item ENHANCEMENT
+
+L<dbcolcreate> now supports C<--header>.
+
+=item BUG FIX
+
+Fixed several spelling errors in deprecated programs
+and removed information about the no-longer existing FreeBSD and MacOS ports.
+Thanks to Calvin Ardi for the patch.
+
+=item BUG FIX
+
+L<dbmerge> now handles --xargs when only one file is provided
+(and passes the file through unchanged).
+It also throws a clean error with --xargs if zero files are provided.
+(To support L<dbmerge>, L<dbcol> now has an internal C<--saveoutput> option.)
+Thanks to Yuri Pradkin for reporting the unhandled corner-case.
+
+=back
 
 =head1 AUTHOR
 

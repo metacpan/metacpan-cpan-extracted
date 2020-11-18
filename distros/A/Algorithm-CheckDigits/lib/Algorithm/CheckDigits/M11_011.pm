@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use integer;
 
-use version; our $VERSION = 'v1.3.3';
+use version; our $VERSION = 'v1.3.5';
 
 our @ISA = qw(Algorithm::CheckDigits);
 
@@ -193,7 +193,7 @@ Mathias Weidner, C<< <mamawe@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004,2005 by Mathias Weidner
+Copyright 2004-2020 by Mathias Weidner
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

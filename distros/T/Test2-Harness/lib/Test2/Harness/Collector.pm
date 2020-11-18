@@ -2,7 +2,7 @@ package Test2::Harness::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '1.000038';
+our $VERSION = '1.000042';
 
 use Carp qw/croak/;
 
@@ -68,7 +68,7 @@ sub process {
             my $e_count = 0;
             for my $event ($jdir->poll(1000)) {
                 $self->{+ACTION}->($event);
-                $count++;
+                $e_count++;
             }
 
             $count += $e_count;

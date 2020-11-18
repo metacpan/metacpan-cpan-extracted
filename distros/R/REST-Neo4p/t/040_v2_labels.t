@@ -12,14 +12,14 @@ no warnings qw(once);
 
 my @cleanup;
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
     $build = Module::Build->current;
     $user = $build->notes('user');
     $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 30;
 
 my $not_connected = connect($TEST_SERVER,$user,$pass);
@@ -51,6 +51,9 @@ SKIP : {
     ok my @sisters = REST::Neo4p->get_nodes_by_label('sister'), 'get nodes by label';
     ok ((grep {$$_ == $$n1} @sisters), 'retrieved node 1');
     ok ((grep {$$_ == $$n2} @sisters), 'retrieved node 2');
+
+    $DB::single=1;
+
     ok @sisters = REST::Neo4p->get_nodes_by_label('sister', type => 'half'), 'get nodes by label plus property';
     is @sisters, 1, 'retrieved only one sister...';
     is $sisters[0]->get_property('type'), 'half', 'with right property';

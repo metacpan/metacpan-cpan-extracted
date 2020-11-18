@@ -19,7 +19,7 @@ FP::Failure - failure values
     # but there is more in EXPORT_OK...
     use FP::Failure '*trace_failures';
 
-    my $vals= do {
+    my $vals = do {
         local $trace_failures = 0;
         list(failure("not good"),
              failure(666),
@@ -32,7 +32,7 @@ FP::Failure - failure values
     is_equal $vals->map(*is_failure),
              list(1, 1, 1, undef, undef, undef);
 
-    is_equal $vals->map(sub { my ($v)= @_; $v ? "t" : "f" }),
+    is_equal $vals->map(sub { my ($v) = @_; $v ? "t" : "f" }),
              list("f", "f", "f", "t", "f", "f");
 
     # failure dies when called in void context (for safety, failures have
@@ -49,7 +49,7 @@ FP::Failure - failure values
              "failure: 'not good'\n";
 
     # record backtraces
-    my $v= do {
+    my $v = do {
         local $trace_failures = 1;
         failure(666, [$vals->first])
     };
@@ -61,8 +61,8 @@ FP::Failure - failure values
     use Path::Tiny;
     is_equal regex_substitute(sub { # cleaning up bt
                                   s/line \d+/line .../g;
-                                  my $btlines=0;
-                                  $_= join("\n",
+                                  my $btlines = 0;
+                                  $_ = join("\n",
                                            grep { not /^    \S/ or ++$btlines < 2 }
                                            split /\n/)
                               },
@@ -79,9 +79,9 @@ FP::Failure - failure values
     use FP::Failure qw(*use_failure fails);
     use FP::Show;
 
-    is show(do { local $use_failure=0; fails("hi") }),
+    is show(do { local $use_failure = 0; fails("hi") }),
        0;
-    is show(do { local $use_failure=1; fails("hi") }),
+    is show(do { local $use_failure = 1; fails("hi") }),
        "Failure('hi', undef, undef)";
 
 
@@ -146,201 +146,192 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Failure;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(failure is_failure);
-@EXPORT_OK=qw(*trace_failures *use_failure fails
-    message messagefmt);
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT    = qw(failure is_failure);
+our @EXPORT_OK = qw(*trace_failures *use_failure fails
+    message messagefmt);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use FP::Lazy 'force';
+use Safe::Isa;
 
 package FP::Failure::Failure {
 
     use FP::Show;
+    use Safe::Isa;
 
     # avoid circular dependency on FP::Predicates
     sub maybe_array {
-        my ($v)=@_;
-        !defined $v
-            or ref($v) eq "ARRAY"
+        my ($v) = @_;
+        !defined $v or ref($v) eq "ARRAY"
     }
 
     use FP::Struct [
         "value",
-        [*maybe_array, "maybe_parents"
-         # Array of failures that are the reason for this
-         # failure. Values other than FP::Failure::Failure are
-         # (mostly) ignored; allow anything to be stored so no
-         # complicated logic is needed for capture.
-         ],
-        "maybe_trace", # [[caller(0)],...]
+        [
+            *maybe_array, "maybe_parents"
+
+                # Array of failures that are the reason for this
+                # failure. Values other than FP::Failure::Failure are
+                # (mostly) ignored; allow anything to be stored so no
+                # complicated logic is needed for capture.
         ],
-        'FP::Abstract::Pure',
-        'FP::Struct::Show';
+        "maybe_trace",    # [[caller(0)],...]
+        ],
+        'FP::Abstract::Pure', 'FP::Struct::Show';
 
     use overload
-        bool=> sub { undef },
+        bool => sub {undef},
+
         # Have to provide stringification, too, or it will stringify
         # to undef and then fail to use the undef value in strings
         # because of fatal warnings... and it can't be avoided by
         # checking with `defined $v` first, as that returns
         # false. Tricky Perl features.
-        '""'=> sub { show $_[0] },
-        # '0+'=> sub { warn "hello0+"; '' },
-        # fallback=> 0
+        '""' => sub { show $_[0] },
+
+        # '0+' => sub { warn "hello0+"; '' },
+        # fallback => 0
         ;
 
     sub message {
-        my $s=shift;
-        my ($showtrace, $maybe_indent)= @_;
-        my $indent= $maybe_indent // "";
-        my $tracestr= do {
-            if ($showtrace and my $t= $s->maybe_trace) {
-                my $seen=0;
-                join("\n$indent    ",
-                     map {
-                         my (undef, $file, $line, $subname)= @$_;
-                         $subname="" unless $seen;
-                         $seen=1;
-                         "$subname at $file line $line"
-                     } @$t)
+        my $s = shift;
+        my ($showtrace, $maybe_indent) = @_;
+        my $indent   = $maybe_indent // "";
+        my $tracestr = do {
+            if ($showtrace and my $t = $s->maybe_trace) {
+                my $seen = 0;
+                join(
+                    "\n$indent    ",
+                    map {
+                        my (undef, $file, $line, $subname) = @$_;
+                        $subname = "" unless $seen;
+                        $seen    = 1;
+                        "$subname at $file line $line"
+                    } @$t
+                )
             } else {
                 ""
             }
         };
 
-        my $valuestr= do {
-            my $value= $s->value;
-            UNIVERSAL::isa($value, 'FP::Failure::Abstract::Message') ?
-                $value->message
+        my $valuestr = do {
+            my $value = $s->value;
+            $value->$_isa('FP::Failure::Abstract::Message')
+                ? $value->message
                 : show($value)
         };
-        $indent."failure: ".$valuestr.$tracestr."\n".do {
-            my @parents= grep {
-                FP::Failure::is_failure($_)
-            } @{$s->maybe_parents // []};
+        $indent . "failure: " . $valuestr . $tracestr . "\n" . do {
+            my @parents = grep { FP::Failure::is_failure($_) }
+                @{ $s->maybe_parents // [] };
             if (@parents) {
-                $indent."  because:\n"
-                    .join("",
-                          map {
-                              $_->message($showtrace, $indent."  ")
-                          } @parents)
+                $indent
+                    . "  because:\n"
+                    . join("",
+                    map { $_->message($showtrace, $indent . "  ") } @parents)
             } else {
                 ""
             }
         }
     }
-    
+
     _END_
 }
 
-our $trace_failures= 0; # bool
+our $trace_failures = 0;    # bool
 
 sub failure ($;$) {
-    my ($value, $maybe_parents)= @_;
-    my $v= FP::Failure::Failure->new($value, $maybe_parents, $trace_failures ?
-                                     do {
-                                         my @t;
-                                         my $i=0;
-                                         while (1) {
-                                             my $t= [caller $i];
-                                             last unless @$t;
-                                             push @t, $t;
-                                             $i++
-                                         }
-                                         \@t
-                                     } : undef);
-    defined wantarray ?
-        $v
-        : die $v
+    my ($value, $maybe_parents) = @_;
+    my $v = FP::Failure::Failure->new(
+        $value,
+        $maybe_parents,
+        $trace_failures
+        ? do {
+            my @t;
+            my $i = 0;
+            while (1) {
+                my $t = [caller $i];
+                last unless @$t;
+                push @t, $t;
+                $i++
+            }
+            \@t
+            }
+        : undef
+    );
+    defined wantarray ? $v : die $v
 }
 
 sub is_failure($) {
-    UNIVERSAL::isa(force($_[0]), "FP::Failure::Failure")
+    force($_[0])->$_isa("FP::Failure::Failure")
 }
 
-
-our $use_failure= 0; # bool
+our $use_failure = 0;    # bool
 
 sub fails ($;$) {
-    $use_failure ? &failure(@_) :
-        defined wantarray ? 0 : die "fails called in void context";
+    $use_failure            ? &failure(@_)
+        : defined wantarray ? 0
+        :                     die "fails called in void context";
 }
 
-
 package FP::Failure::Abstract::Message {
-    use FP::Struct [],
-        'FP::Abstract::Pure',
-        'FP::Struct::Show';
+    use FP::Struct [], 'FP::Abstract::Pure', 'FP::Struct::Show';
     _END_
 }
 
 package FP::Failure::Message {
     use FP::Show;
 
-    use FP::Struct [
-        'messagestring',
-        'arguments'
-        ],
+    use FP::Struct ['messagestring', 'arguments'],
         'FP::Failure::Abstract::Message';
 
     sub message {
-        @_==1 or die "wrong number of arguments";
-        my $s=shift;
-        my $args= $s->arguments;
-        my $msg= $s->messagestring;
-        @$args ?
-            "$msg: ".join(", ",
-                        map {
-                            show $_
-                        } @$args)
-            : $msg
+        @_ == 1 or die "wrong number of arguments";
+        my $s    = shift;
+        my $args = $s->arguments;
+        my $msg  = $s->messagestring;
+        @$args ? "$msg: " . join(", ", map { show $_ } @$args) : $msg
     }
     _END_
 }
 
 sub message {
-    my ($msgstr, @args)=@_;
-    FP::Failure::Message->new ($msgstr, \@args)
+    my ($msgstr, @args) = @_;
+    FP::Failure::Message->new($msgstr, \@args)
 }
 
 package FP::Failure::MessageFmt {
     use FP::Show;
 
-    use FP::Struct [
-        'formatstring',
-        'arguments'
-        ],
+    use FP::Struct ['formatstring', 'arguments'],
         'FP::Failure::Abstract::Message';
-    
+
     sub message {
-        @_==1 or die "wrong number of arguments";
-        my $s=shift;
-        sprintf($s->formatstring,
-                map {
-                    show $_
-                } @{$s->arguments})
+        @_ == 1 or die "wrong number of arguments";
+        my $s = shift;
+        sprintf($s->formatstring, map { show $_ } @{ $s->arguments })
     }
 
     _END_
 }
 
 sub messagefmt {
-    my ($fmtstr, @args)=@_;
-    if (not $fmtstr=~ /\%\%/) {
-        if (($fmtstr=~ tr/%/%/) == @args) {
-            FP::Failure::MessageFmt->new ($fmtstr, \@args)
+    my ($fmtstr, @args) = @_;
+    if (not $fmtstr =~ /\%\%/) {
+        if (($fmtstr =~ tr/%/%/) == @args) {
+            FP::Failure::MessageFmt->new($fmtstr, \@args)
         } else {
-            die "wrong number of arguments (".@args.") for given format string '$fmtstr'"
+            die "wrong number of arguments (" . @args
+                . ") for given format string '$fmtstr'"
         }
     } else {
-        die "full fmt parsing support not implemented yet" # XX todo
+        die "full fmt parsing support not implemented yet"    # XX todo
     }
 }
-
 
 1

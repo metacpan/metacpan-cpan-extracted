@@ -69,6 +69,7 @@ t/pod-coverage.t
 t/pod.t
 t/script-checkdigits.t
 t/sedol.t
+t/tin_ie.t
 t/upc.t
 t/ustid_be.t
 t/valid.data

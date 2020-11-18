@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +18,17 @@ no_index:
     - t
     - inc
 requires:
+  Clone: '0'
   IO::Interactive: '0'
   Image::ExifTool: '10.14'
+  Modern::Perl: '0'
   Path::Class: '0'
   Path::Iterator::Rule: '0'
   Term::ProgressBar: '0'
   XML::Twig: '0'
   YAML::Any: '0'
-version: '2.001'
+resources:
+  bugtracker: https://github.com/LouisStrous/p5-Image-Synchronize/issues
+  repository: https://github.com/LouisStrous/p5-Image-Synchronize.git
+version: '2.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

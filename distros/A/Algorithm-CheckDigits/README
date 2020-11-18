@@ -1,4 +1,4 @@
-CheckDigits v1.3.3
+CheckDigits v1.3.5
 ==================
 
 This library provides several modules to compute or validate check
@@ -26,6 +26,6 @@ This module requires no other modules and libraries.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2003-2010 Mathias Weidner
+Copyright (C) 2003-2020 Mathias Weidner
 
 This module may be distributed under the same license as perl itself.

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1822 2020-10-29 10:54:43Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -20,8 +20,6 @@ my @hints = Net::DNS::Resolver->new()->_hints;
 
 exit( plan skip_all => 'Online tests disabled.' ) if -e 't/online.disabled';
 exit( plan skip_all => 'Online tests disabled.' ) unless -e 't/online.enabled';
-
-plan tests => 10;
 
 
 eval {
@@ -52,6 +50,8 @@ eval {
 	1;
 } || exit( plan skip_all => 'Unable to reach global root nameservers' );
 
+
+plan tests => 10;
 
 NonFatalBegin();
 

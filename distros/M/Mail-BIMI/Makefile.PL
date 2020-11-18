@@ -74,10 +74,11 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
+    "Test::RequiresInternet" => 0,
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.20201102.2",
+  "VERSION" => "2.20201117.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -130,6 +131,7 @@ my %FallbackPrereqs = (
   "Test::Differences" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::RequiresInternet" => 0,
   "Try::Tiny" => 0,
   "XML::LibXML" => "2.0202",
   "base" => 0,

@@ -54,24 +54,27 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "App::Prove" : "3.00"
+         },
          "requires" : {
-            "Test::More" : "1.00"
+            "Test::More" : "0.82"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/klp2/Make/issues"
+         "web" : "https://github.com/klp2/Make/issues"
       },
-      "homepage" : "http://metacpan.org/pod/Make",
+      "homepage" : "https://metacpan.org/pod/Make",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/klp2/Make.git",
-         "web" : "http://github.com/klp2/Make"
+         "url" : "https://github.com/klp2/Make.git",
+         "web" : "https://github.com/klp2/Make"
       },
       "x_IRC" : "irc://irc.perl.org/#perl"
    },
-   "version" : "2.004",
+   "version" : "2.006",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

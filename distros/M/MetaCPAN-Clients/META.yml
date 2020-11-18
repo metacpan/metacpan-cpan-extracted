@@ -4,22 +4,29 @@ author:
   - 'Gabor Szabo <szabgab@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MetaCPAN-Clients
 requires:
-  Data::Dumper: 0
-  Getopt::Long: 0
-  MetaCPAN::API: 0.43
-  Path::Tiny: 0.015
+  Data::Dumper: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  MetaCPAN::API: '0.43'
+  MetaCPAN::Client: '2.028000'
+  Path::Tiny: '0.015'
 resources:
+  bugtracker: https://github.com/szabgab/MetaCPAN-Clients/issues
+  homepage: https://perlmaven.com/metacpan
   repository: https://github.com/szabgab/MetaCPAN-Clients.git
-version: 0.05
+version: '1.00'
 x_contributors:
   - SZABGAB
   - DAGOLDEN
+x_generated_by_perl: v5.30.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

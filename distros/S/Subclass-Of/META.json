@@ -69,7 +69,7 @@
    "provides" : {
       "Subclass::Of" : {
          "file" : "lib/Subclass/Of.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -88,6 +88,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project"
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

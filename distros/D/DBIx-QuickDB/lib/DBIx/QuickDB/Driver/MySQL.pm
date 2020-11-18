@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000017';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -19,19 +19,21 @@ use DBIx::QuickDB::Util::HashBase qw{
     -dbd_driver
     -mysqld_provider
     -use_bootstrap
+    -use_installdb
 
     -character_set_server
 
     -config
 };
 
-my ($MYSQLD, $MYSQL, $DBDMYSQL, $DBDMARIA);
+my ($MYSQLD, $MYSQL, $DBDMYSQL, $DBDMARIA, $INSTALLDB);
 
 BEGIN {
     local $@;
 
     $MYSQLD = can_run('mysqld');
     $MYSQL  = can_run('mysql');
+    $INSTALLDB = can_run('mysql_install_db');
 
     $DBDMYSQL = eval { require DBD::mysql;   'DBD::mysql' };
     $DBDMARIA = eval { require DBD::MariaDB; 'DBD::MariaDB' };
@@ -190,6 +192,8 @@ sub init {
 
                 if ($help =~ m/--bootstrap/) {
                     $self->{+USE_BOOTSTRAP} = 1;
+
+                    $self->{+USE_INSTALLDB} = $INSTALLDB ? 1 : 0;
                 }
             }
         }
@@ -318,12 +322,17 @@ sub bootstrap {
     my $provider = $self->{+MYSQLD_PROVIDER};
 
     if ($provider eq 'percona') {
-        $self->write_config();
 
         if ($self->{+USE_BOOTSTRAP}) {
+            if($self->{+USE_INSTALLDB}) {
+                local $ENV{PERL5LIB} = "";
+                $self->run_command([$INSTALLDB, '--datadir=' . $data_dir]);
+            }
+            $self->write_config();
             $self->run_command([$self->start_command, '--bootstrap'], {stdin => $init_file});
         }
         else {
+            $self->write_config();
             $self->run_command([$self->start_command, '--initialize']);
             $self->start;
             $self->load_sql("", $init_file);

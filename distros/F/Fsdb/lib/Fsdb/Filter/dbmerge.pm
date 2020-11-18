@@ -774,6 +774,12 @@ sub segments_merge_all($) {
 		$self->segments_merge1_run($out_fn, $in0);
             } elsif ($deepest == 0 && $#{$self->{_work}[$deepest]} == -1) {
                 # special case: xargs and no files.
+                # (must reap xargs, otherwise get Fsdb::Support::Freds: ending, but running process: dbmerge:xargs, sometimes)
+                print "# waiting on xargs fred\n" if ($self->{_debug});
+                if ($self->{_xargs_fred}) {
+                    $self->{_xargs_fred}->join();
+                    $self->{_xargs_fred} = undef;
+                };
                 croak($self->{_prog} . ": xargs, but no files for input\n")
                     if ($self->{_xargs});
             };

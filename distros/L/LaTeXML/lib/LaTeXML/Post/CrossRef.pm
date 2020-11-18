@@ -19,6 +19,8 @@ use charnames qw(:full);
 use LaTeXML::Post;
 use base qw(LaTeXML::Post::Processor);
 
+my $NBSP = pack('U', 0xA0);    # CONSTANT
+
 sub new {
   my ($class, %options) = @_;
   my $self = $class->SUPER::new(%options);
@@ -29,7 +31,7 @@ sub new {
   $$self{toc_show} = 'toctitle';
   # Default format for regular ltx:ref's
   # [BTW: Does number_sections really still make sense?]
-  $$self{ref_show} = ($options{number_sections} ? "refnum" : "title");
+  $$self{ref_show}       = ($options{number_sections}        ? "refnum"                 : "title");
   $$self{min_ref_length} = (defined $options{min_ref_length} ? $options{min_ref_length} : 1);
   $$self{ref_join} = (defined $options{ref_join} ? $options{ref_join} : " \x{2023} "); # or " in " or ... ?
   $$self{navigation_toc} = $options{navigation_toc};
@@ -51,6 +53,7 @@ sub process {
   $self->fill_in_refs($doc);
   $self->fill_in_RDFa_refs($doc);
   $self->fill_in_bibrefs($doc);
+  $self->fill_in_mathlinks($doc);
   $self->copy_resources($doc);
 
   if (keys %LaTeXML::Post::CrossRef::MISSING) {
@@ -211,7 +214,7 @@ sub fill_in_tocs {
       $types = { map { ($_ => 1) } split(/\s*\|\s*/, $selector) }; }
     # global vs children of THIS or Document node?
     my $id     = $doc->getDocumentElement->getAttribute('xml:id');
-    my $scope  = $toc->getAttribute('scope') || 'current';
+    my $scope  = $toc->getAttribute('scope')  || 'current';
     my $format = $toc->getAttribute('format') || 'normal';
     my $lists;
     if (my $listname = $toc->getAttribute('lists')) {
@@ -274,7 +277,7 @@ sub gentocentry {
           . (defined $selfid && ($selfid eq $id) ? ' ltx_ref_self' : "") },
       ($before ? $self->generateRef_simple($doc, $id, $before) : ()),
       ['ltx:ref', { show => $show, idref => $id }],
-      ($after ? $self->generateRef_simple($doc, $id, $after) : ()),
+      ($after    ? $self->generateRef_simple($doc, $id, $after)                       : ()),
       (@children ? (['ltx:toclist', { class => "ltx_toclist_$typename" }, @children]) : ())]); }
 
 # Generate a "context" TOC, that shows what's on the current page,
@@ -389,6 +392,59 @@ sub fill_in_RDFa_refs {
   NoteProgressDetailed(" [Filled in $n RDFa refs]");
   return; }
 
+sub fill_in_mathlinks {
+  my ($self, $doc) = @_;
+  my $db = $$self{db};
+  my $n  = 0;
+  foreach my $sym ($doc->findnodes('descendant::*[@decl_id or @meaning]')) {
+    my $tag = $doc->getQName($sym);
+    next if $tag eq 'ltx:XMRef';               # Blech; list those TO fill-in, or list those to exclude?
+    next if $sym->hasAttribute('href');
+    my $decl_id = $sym->getAttribute('decl_id');
+    my $meaning = $sym->getAttribute('meaning');
+    my $entry;
+    if ($decl_id
+      && !$doc->findnodes('ancestor::ltx:glossaryphrase | ancestor::ltx:declare[@type]', $sym)) {
+      $entry = $$self{db}->lookup("DECLARATION:local:$decl_id"); }
+    elsif ($meaning) {
+      $entry = $$self{db}->lookup("DECLARATION:global:$meaning"); }
+    if ($entry) {
+      $n++;
+      ## HACK: DLMF copies $meaning to ltxx:meaning for search indexing
+      ## This should evolve into using (future) mml @mathrole?
+##      if ($meaning && $$doc{namespaces}{ltxx}) {
+##        $$node[1]{'ltxx:meaning'} = $meaning; }
+      if (my $id = $self->getIDForDeclaration($entry)) {    # Where defined
+        $sym->setAttribute(href => $self->generateURL($doc, $id));
+        if (my $tag = $entry->getValue('tag:short') || $entry->getValue('description')) {
+          $sym->setAttribute(title => getTextContent($doc, $tag)); }
+  } } }
+  NoteProgressDetailed(" [Filled in $n math links]");
+  return; }
+
+# Given a declaration entry (ltx:declare, or ltx:mark or ...)
+# Return the id of an appropriate link target.
+# Basically this is the parent, except (DLMF specific?) it should be a table ROW, not CELL
+# Or the numbered equationgroup, not the unnumbered equation
+sub getIDForDeclaration {
+  my ($self, $entry) = @_;
+  if (my $pid = $entry && $entry->getValue('parent')) {
+    if (my $pentry = $$self{db}->lookup("ID:$pid")) {
+      my $ptype = $pentry->getValue('type') || '';
+      # If definition is in a table cell, the correct id will be that of the row
+      if ($ptype eq 'ltx:td') {
+        if (my $gpid = $pentry->getValue('parent')) {
+          return $gpid; } }
+      # If definition is in unnumbered equation within an equation group, use id of the group
+      elsif (($ptype eq 'ltx:equation') && !$pentry->getValue('refnum')) {
+        if (my $gpid = $pentry->getValue('parent')) {
+          if (my $gpentry = $$self{db}->lookup("ID:$gpid")) {
+            my $gptype = $gpentry->getValue('type') || '';
+            if ($gptype eq 'ltx:equationgroup') {
+              return $gpid; } } } }
+    }
+    return $pid; } }
+
 # Needs to evolve into the combined stuff that we had in DLMF.
 # (eg. concise author/year combinations for multiple bibrefs)
 sub fill_in_bibrefs {
@@ -415,15 +471,19 @@ sub make_bibcite {
     $show = 'refnum'; }
   if ($show eq 'nothing') {    # Ad Hoc support for \nocite!t
     return (); }
-  my $sep   = $bibref->getAttribute('separator')   || ',';
-  my $yysep = $bibref->getAttribute('yyseparator') || ',';
+  my $sep     = $bibref->getAttribute('separator')   || ',';
+  my $yysep   = $bibref->getAttribute('yyseparator') || ',';
   my @phrases = element_nodes($bibref);    # get the ltx;bibrefphrase's in the bibref!
                                            # Collect all the data from the bibliography
   my @data    = ();
+  my @lists   = split(/\s+/, $bibref->getAttribute('inlist') || 'bibliography');
   foreach my $key (@keys) {
     my ($bentry, $id, $entry);
     # NOTE: bibkeys are downcased when we look them up!
-    if (($bentry = $$self{db}->lookup("BIBLABEL:" . lc($key)))
+    foreach my $list (@lists) {            # Find the first of the lists that contains this bibkey
+      $bentry = $$self{db}->lookup("BIBLABEL:" . $list . ':' . lc($key));
+      last if $bentry; }
+    if ($bentry
       && ($id    = $bentry->getValue('id'))
       && ($entry = $$self{db}->lookup("ID:$id"))) {
       my $authors  = $entry->getValue('authors');
@@ -448,8 +508,8 @@ sub make_bibcite {
                                                                                      # fullnames ?
       push(@data, {
           key         => $key,
-          authors     => [$doc->trimChildNodes($authors || $fauthors || $keytag)],
-          fullauthors => [$doc->trimChildNodes($fauthors || $authors || $keytag)],
+          authors     => [$doc->trimChildNodes($authors  || $fauthors || $keytag)],
+          fullauthors => [$doc->trimChildNodes($fauthors || $authors  || $keytag)],
           authortext  => ($authors || $fauthors ? ($authors || $fauthors)->textContent : ''),
           year        => [$doc->trimChildNodes($year || $typetag)],
           rawyear     => $rawyear,
@@ -481,57 +541,70 @@ sub make_bibcite {
       $show   = '';
     }
 
+    # Add delimeters for parsing...
+    $show =~ s/(\w)year/$1\{\}year/gi;
+    $show =~ s/(\w)phrase/$1\{\}phrase/gi;
     while ($show) {
-      if ($show =~ s/^authors?//i) {
-        push(@stuff, $doc->cloneNodes(@{ $$datum{authors} })); }
-      elsif ($show =~ s/^fullauthors?//i) {
-        push(@stuff, $doc->cloneNodes(@{ $$datum{fullauthors} })); }
-      elsif ($show =~ s/^title//i) {
-        push(@stuff, $doc->cloneNodes(@{ $$datum{title} })); }
-      elsif ($show =~ s/^refnum//i) {
-        push(@stuff, $doc->cloneNodes(@{ $$datum{refnum} })); }
-      elsif ($show =~ s/^phrase(\d)//i) {
-        # HACK! Avoid empty () from situations where we've set the show (CITE_STYLE) too early
-        # and don't actually have author-year information!
-        my $n = $1;
-        if (($n == 1) && ($show =~ /^\s*year\s*phrase2/i) && !scalar(@{ $$datum{year} })
-          && (!$phrases[0] || (length($phrases[0]->textContent) <= 1))
-          && (!$phrases[1] || (length($phrases[1]->textContent) <= 1))) {
-          $show =~ s/^\s*year\s*phrase2//i; }
-        else {
-          push(@stuff, $phrases[$n - 1]->childNodes) if $phrases[$n - 1]; } }
-      elsif ($show =~ s/^year//i) {
-        if (!$$datum{year}) {
-          $self->note_missing('warn', 'Date for citation', $$datum{key}); }
-        elsif (@{ $$datum{year} }) {
-          push(@stuff, ['ltx:ref', $$datum{attr}, @{ $$datum{year} }]);
+      if ($show =~ s/^(\w+)//) {
+        my $role = lc($1); $role =~ s/s$//;    # remove trailing plural
+        if ($role eq 'author') {
+          push(@stuff, $doc->cloneNodes(@{ $$datum{authors} })); }
+        elsif ($role eq 'fullauthor') {
+          push(@stuff, $doc->cloneNodes(@{ $$datum{fullauthors} })); }
+        elsif ($role eq 'title') {
+          push(@stuff, $doc->cloneNodes(@{ $$datum{title} })); }
+        elsif ($role eq 'refnum') {
+          push(@stuff, $doc->cloneNodes(@{ $$datum{refnum} })); }
+        elsif ($role =~ /^phrase(\d)$/) {
+          # HACK! Avoid empty () from situations where we've set the show (CITE_STYLE) too early
+          # and don't actually have author-year information!
+          my $n = $1;
+          if (($n == 1) && ($show =~ /^\{\}year\{\}phrase2/i) && !scalar(@{ $$datum{year} })
+            && (!$phrases[0] || (length($phrases[0]->textContent) <= 1))
+            && (!$phrases[1] || (length($phrases[1]->textContent) <= 1))) {
+            $show =~ s/^\{\}year\{\}phrase2//i; }
+          else {
+            push(@stuff, $phrases[$n - 1]->childNodes) if $phrases[$n - 1]; } }
+        elsif ($role eq 'year') {
+          if (!$$datum{year}) {
+            $self->note_missing('warn', 'Date for citation', $$datum{key}); }
+          elsif (@{ $$datum{year} }) {
+            push(@stuff, ['ltx:ref', $$datum{attr}, @{ $$datum{year} }]);
+            $didref = 1;
+            while ($checkdups && @data && ($$datum{authortext} eq $data[0]{authortext})) {
+              my $next = shift(@data);
+              push(@stuff, $yysep, ' ');
+              if ((($$datum{rawyear} || 'no_year_1') eq ($$next{rawyear} || 'no_year_2')) && $$next{suffix}) {
+                push(@stuff, ['ltx:ref', $$next{attr}, $$next{suffix}]); }
+              else {
+                push(@stuff, ['ltx:ref', $$next{attr}, @{ $$next{year} }]); } } } }
+        elsif ($role eq 'number') {
+          push(@stuff, ['ltx:ref', $$datum{attr}, @{ $$datum{number} }]);
           $didref = 1;
           while ($checkdups && @data && ($$datum{authortext} eq $data[0]{authortext})) {
             my $next = shift(@data);
-            push(@stuff, $yysep, ' ');
-            if ((($$datum{rawyear} || 'no_year_1') eq ($$next{rawyear} || 'no_year_2')) && $$next{suffix}) {
-              push(@stuff, ['ltx:ref', $$next{attr}, $$next{suffix}]); }
-            else {
-              push(@stuff, ['ltx:ref', $$next{attr}, @{ $$next{year} }]); } } } }
-      elsif ($show =~ s/^number//i) {
-        push(@stuff, ['ltx:ref', $$datum{attr}, @{ $$datum{number} }]);
-        $didref = 1;
-        while ($checkdups && @data && ($$datum{authortext} eq $data[0]{authortext})) {
-          my $next = shift(@data);
-          push(@stuff, $yysep, ' ', ['ltx:ref', $$next{attr}, @{ $$next{number} }]); } }
-      elsif ($show =~ s/^super//i) {
-        my @r = ();
-        push(@r, ['ltx:ref', $$datum{attr}, @{ $$datum{number} }]);
-        $didref = 1;
-        while ($checkdups && @data && ($$datum{authortext} eq $data[0]{authortext})) {
-          my $next = shift(@data);
-          push(@r, $yysep, ' ', ['ltx:ref', $$next{attr}, @{ $$next{number} }]); }
-        push(@stuff, ['ltx:sup', {}, @r]); }
-      elsif ($show =~ s/^(.)//) {
+            push(@stuff, $yysep, ' ', ['ltx:ref', $$next{attr}, @{ $$next{number} }]); } }
+        elsif ($role eq 'super') {
+          my @r = ();
+          push(@r, ['ltx:ref', $$datum{attr}, @{ $$datum{number} }]);
+          $didref = 1;
+          while ($checkdups && @data && ($$datum{authortext} eq $data[0]{authortext})) {
+            my $next = shift(@data);
+            push(@r, $yysep, ' ', ['ltx:ref', $$next{attr}, @{ $$next{number} }]); }
+          push(@stuff, ['ltx:sup', {}, @r]); }
+        else {
+          print STDERR "CITE ignoring show key '$role'\n"; } }
+      elsif ($show =~ s/^\{([^\}]*)\}//) {    # pass-thru literal, quoted with {}
+        push(@stuff, $1) if $1; }
+      elsif ($show =~ s/^~//) {               # Pass-thru spaces
+        push(@stuff, $NBSP) if @stuff; }
+      elsif ($show =~ s/^(\s+)//) {           # Pass-thru spaces
+        push(@stuff, $1) if @stuff; }
+      elsif ($show =~ s/^(\W+)//) {           # Pass-thru non show keywords
         push(@stuff, $1); } }
     push(@refs,
-      (@refs ? ($sep, ' ') : ()),
-      ($didref ? @stuff : (['ltx:ref', $$datum{attr}, @stuff]))); }
+      (@refs   ? ($sep, ' ') : ()),
+      ($didref ? @stuff      : (['ltx:ref', $$datum{attr}, @stuff]))); }
   return @refs; }
 
 sub generateURL {
@@ -565,7 +638,6 @@ sub generateURL {
     $self->note_missing('warn', 'DB Entry for ID', $id); }
   return; }
 
-my $NBSP = pack('U', 0xA0);    # CONSTANT
 # Generate the contents of a <ltx:ref> of the given id.
 # show is a string containing substrings 'type', 'refnum' and 'title'
 # (standing for the type prefix, refnum and title of the id'd object)
@@ -585,6 +657,13 @@ sub generateRef {
         return @stuff if $self->checkRefContent($doc, @stuff);
         $pending = $$self{ref_join}; } # inside/outside this brace determines if text can START with the join.
       $id = $entry->getValue('parent'); } }
+  if (!@stuff) {                       # Try first child for a title-less document?
+    my $entry = $$self{db}->lookup("ID:$reqid");
+    if (($entry->getValue('type') || '') eq 'ltx:document') {
+      foreach my $c (@{ $entry->getValue('children') }) {
+        if (my $centry = $$self{db}->lookup("ID:$c")) {
+          if (my @s = $self->generateRef_aux($doc, $centry, $reqshow)) {
+            push(@stuff, @s); last; } } } } }
   if (@stuff) {
     return @stuff; }
   else {
@@ -628,70 +707,46 @@ sub text_content_aux {
   else {
     return $n; } }
 
-# Interpret a "Show" pattern for a given DB entry.
-# The pattern can contain substrings to be substituted
-#   type   => the type prefix (eg Ch. or similar)
-#   refnum => the reference number
-#   title  => the title.
-# and any other random characters which are preserved.
+my %ref_fallbacks = (    # Alternative fields, when not found
+  typerefnum  => [qw(refnum)],
+  rrefnum     => [qw(typerefnum frefnum refnum)],    # obsolete?
+  toctitle    => [qw(title toccaption)],
+  title       => [qw(toccaption)],
+  rawtoctitle => [qw(toctitle title toccaption)],
+  rawtitle    => [qw(title toccaption)],
+);
+
+# Generate text to fill in an ltx:ref from a database entry for some object.
+# The show pattern indicates what data to use; usually a single keyword
+# (or keywords separated by spaces, ~ or {} enclosed literal text)
+# The keywords are things like refnum, title, caption, etc
+# (possibly coming from ltx:tag or other data; see Scan)
 sub generateRef_aux {
   my ($self, $doc, $entry, $show) = @_;
   my @stuff = ();
   my $OK    = 0;
   while ($show) {
-    if ($show =~ s/^typerefnum(\.?\s*)//) {
-      if (my $frefnum = $entry->getValue('typerefnum')
-        || $entry->getValue('refnum')) {
+    if ($show =~ s/^(\w+)//) {    # peel off next keyword
+      my $key   = lc($1);
+      my $class = ($key =~ /title/ ? 'ltx_ref_title' : 'ltx_ref_tag');
+      my @keys  = ($key, 'tag:' . $key,
+        ($ref_fallbacks{$key} ? @{ $ref_fallbacks{$key} } : ()));
+      my $value;
+      foreach my $k (@keys) {     # lookup the data for that keyword (or an alternative)
+        $value = $entry->getValue($k);
+        last if $value; }
+      if ($value) {
         $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_tag' },
-            $self->prepRefText($doc, $frefnum)]); } }
-    elsif ($show =~ s/^rrefnum(\.?\s*)//) {    # to be obsolete?
-###      if (my $refnum = $entry->getValue('rrefnum') || $entry->getValue('frefnum')  || $entry->getValue('refnum')) {
-      if (my $refnum = $entry->getValue('typerefnum') || $entry->getValue('frefnum') || $entry->getValue('refnum')) {
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_tag' },
-            $self->prepRefText($doc, $refnum)]); } }
-    elsif ($show =~ s/^refnum(\.?\s*)//) {
-###      if (my $refnum = $entry->getValue('refnum') || $entry->getValue('frefnum')) {
-      if (my $refnum = $entry->getValue('refnum')) {
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_tag' },
-            $self->prepRefText($doc, $refnum)]); } }
-    elsif ($show =~ s/^toctitle//) {
-      if (my $title = $entry->getValue('toctitle') || $entry->getValue('title')
-        || $entry->getValue('toccaption')) {
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_title' },
-            $self->prepRefText($doc, $title)]); } }
-    elsif ($show =~ s/^title//) {
-      if (my $title = $entry->getValue('title') || $entry->getValue('toccaption')) {    # !!!
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_title' },
-            $self->prepRefText($doc, $title)]); } }
-    elsif ($show =~ s/^rawtoctitle//) {
-      if (my $title = $entry->getValue('toctitle') || $entry->getValue('title')
-        || $entry->getValue('toccaption')) {
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_title' },
-            $self->prepRawRefText($doc, $title)]); } }
-    elsif ($show =~ s/^rawtitle//) {
-      if (my $title = $entry->getValue('title') || $entry->getValue('toccaption')) {    # !!!
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_title' },
-            $self->prepRawRefText($doc, $title)]); } }
-    # The beginnings of extensibility!
-    elsif ($show =~ s/^(\w+)//) {
-      my $role = $1;
-      if (my $tag = $entry->getValue($role) || $entry->getValue('tag:' . $role)) {
-        $OK = 1;
-        push(@stuff, ['ltx:text', { class => 'ltx_ref_tag' },
-            $self->prepRefText($doc, $tag)]); }
-      else {
-        push(@stuff, $role); } }
-    elsif ($show =~ s/^(~)//) {
-      push(@stuff, ' '); }
-    elsif ($show =~ s/^(.)//) {
+        push(@stuff, ['ltx:text', { class => $class }, $self->prepRefText($doc, $value)]); } }
+    elsif ($show =~ s/^\{([^\}]*)\}//) {    # pass-thru literal, quoted with {}
+      push(@stuff, $1) if $1; }
+    elsif ($show =~ s/^~//) {               # Pass-thru spaces
+      push(@stuff, $NBSP) if @stuff; }
+    elsif ($show =~ s/^(\s+)//) {           # Pass-thru spaces
+      push(@stuff, $1) if @stuff; }
+    elsif ($show =~ s/^(\W+)//) {           # Pass-thru non show keywords
       push(@stuff, $1); } }
+  # Maybe nothing found for this entry (probably retry on parent?)
   return ($OK ? @stuff : ()); }
 
 sub prepRefText {
@@ -720,9 +775,6 @@ sub generateTitle {
         || $entry->getValue('frefnum') || $entry->getValue('refnum'));
     #    $title = $title->textContent if $title && ref $title;
     $title = getTextContent($doc, $title) if $title && ref $title;
-    $title =~ s/^\s+//s  if $title;    # Trim leading whitespace
-    $title =~ s/\s+$//s  if $title;    # and trailing
-    $title =~ s/\s+/ /gs if $title;    # and normalize all other whitespace.
     if ($title) {
       $string .= $$self{ref_join} if $string;
       $string .= $title; }
@@ -730,6 +782,14 @@ sub generateTitle {
   return $string || $altstring; }
 
 sub getTextContent {
+  my ($doc, $title) = @_;
+  $title = getTextContent_rec($doc, $title) if $title && ref $title;
+  $title =~ s/^\s+//s  if $title;    # Trim leading whitespace
+  $title =~ s/\s+$//s  if $title;    # and trailing
+  $title =~ s/\s+/ /gs if $title;    # and normalize all other whitespace.
+  return $title; }
+
+sub getTextContent_rec {
   my ($doc, $node) = @_;
   my $type = $node->nodeType;
   if ($type == XML_TEXT_NODE) {
@@ -738,12 +798,12 @@ sub getTextContent {
     my $tag = $doc->getQName($node);
     if ($tag eq 'ltx:tag') {
       return ($node->getAttribute('open') || '')
-        . $node->textContent    # assuming no nested ltx:tag
+        . $node->textContent         # assuming no nested ltx:tag
         . ($node->getAttribute('close') || ''); }
     else {
-      return join('', map { getTextContent($doc, $_); } $node->childNodes); } }
+      return join('', map { getTextContent_rec($doc, $_); } $node->childNodes); } }
   elsif ($type == XML_DOCUMENT_FRAG_NODE) {
-    return join('', map { getTextContent($doc, $_); } $node->childNodes); }
+    return join('', map { getTextContent_rec($doc, $_); } $node->childNodes); }
   else {
     return ''; } }
 
@@ -847,4 +907,3 @@ sub copy_resources {
 
 # ================================================================================
 1;
-

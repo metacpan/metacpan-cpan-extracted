@@ -2,6 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #include <buffer.h>
+#include <houdini.h>
 
 #define WRAPPER(name)                                          \
 	SV *_##name(SV *input){                                    \

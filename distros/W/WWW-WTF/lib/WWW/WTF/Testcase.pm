@@ -3,11 +3,13 @@ use Moose;
 use common::sense;
 
 use Getopt::Long;
-
 use URI;
+
+use Test2::Tools::Subtest qw/subtest_buffered/;
 
 use WWW::WTF::UserAgent::LWP;
 use WWW::WTF::UserAgent::WebKit2;
+use WWW::WTF::Testcase::Report;
 
 use namespace::autoclean;
 
@@ -42,6 +44,15 @@ has 'ua_webkit2' => (
 );
 
 
+#Report
+has 'report' => (
+    is      => 'ro',
+    lazy    => 1,
+    isa     => 'WWW::WTF::Testcase::Report',
+    default => sub { WWW::WTF::Testcase::Report->new(); },
+);
+
+
 #Helpers
 sub uri_for {
     my ($self, $target) = @_;
@@ -53,6 +64,14 @@ sub run_test {
     my ($self, $test) = @_;
 
     $test->($self);
+
+    $self->report->done;
+}
+
+sub run_subtest {
+    my ($self, $name, $test) = @_;
+
+    subtest_buffered($name, $test);
 }
 
 __PACKAGE__->meta->make_immutable;

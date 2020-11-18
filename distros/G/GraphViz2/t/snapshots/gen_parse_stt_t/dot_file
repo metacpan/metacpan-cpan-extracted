@@ -3,10 +3,10 @@
  node [ color="blue" shape="oval" ]
  edge [ color="grey" ]
  graph [ concentrate="true" rankdir="TB" ]
- "attribute" [ label="{<[%5cw %3a;]+> /\\[\\\\w\\ :;\\]+/}|<state> attribute" shape="record" ]
+ "attribute" [ label="{<[%5cw %3a;]+> /[\\\\w\\ :;]+/}|<state> attribute" shape="record" ]
  "attribute":"state" -> "attribute":"[%5cw %3a;]+":"w"
  "attribute":"state" -> "post_attribute":"%7d":"w"
- "class" [ label="{<[a-z][a-z0-9_]*> /\\[a-z\\]\\[a-z0-9_\\]*/|<%5cs+> /\\\\s+/}|<state> class" shape="record" ]
+ "class" [ label="{<[a-z][a-z0-9_]*> /[a-z][a-z0-9_]*/|<%5cs+> /\\\\s+/}|<state> class" shape="record" ]
  "class":"state" -> "class":"%5cs+":"w"
  "class":"state" -> "class_daisy_chain":",":"w"
  "class":"state" -> "edge":"[-%3c=%3e~.]+":"w"
@@ -14,7 +14,7 @@
  "class":"state" -> "start_group":"%5c(":"w"
  "class":"state" -> "start_node":"%5c[":"w"
  "class":"state" -> "start_subclass":"%5c.":"w"
- "class_attribute" [ label="{<[%5cw %3a;]+> /\\[\\\\w\\ :;\\]+/}|<state> class_attribute" shape="record" ]
+ "class_attribute" [ label="{<[%5cw %3a;]+> /[\\\\w\\ :;]+/}|<state> class_attribute" shape="record" ]
  "class_attribute":"state" -> "class_attribute":"[%5cw %3a;]+":"w"
  "class_attribute":"state" -> "post_class_attribute":"%7d":"w"
  "class_daisy_chain" [ label="{<,> /,/|<%5cs+> /\\\\s+/}|<state> class_daisy_chain" shape="record" ]
@@ -25,7 +25,7 @@
  "daisy_chain":"state" -> "daisy_chain":"%5cs+":"w"
  "daisy_chain":"state" -> "edge":"[-%3c=%3e~.]+":"w"
  "daisy_chain":"state" -> "start_node":"%5c[":"w"
- "edge" [ label="{<[-%3c=%3e~.]+> /\\[-\\<=\\>~.\\]+/|<%5cs+> /\\\\s+/}|<state> edge" shape="record" ]
+ "edge" [ label="{<[-%3c=%3e~.]+> /[-\\<=\\>~.]+/|<%5cs+> /\\\\s+/}|<state> edge" shape="record" ]
  "edge":"state" -> "daisy_chain":",":"w"
  "edge":"state" -> "edge":"%5cs+":"w"
  "edge":"state" -> "post_group":"%5c)":"w"
@@ -39,12 +39,12 @@
  "global":"state" -> "start_class_attribute":"%7b":"w"
  "global":"state" -> "start_group":"%5c(":"w"
  "global":"state" -> "start_node":"%5c[":"w"
- "group" [ label="{<[%5cw.]+%3a> /\\[\\\\w.\\]+:/|<%5cs+> /\\\\s+/}|<state> group" shape="record" ]
+ "group" [ label="{<[%5cw.]+%3a> /[\\\\w.]+:/|<%5cs+> /\\\\s+/}|<state> group" shape="record" ]
  "group":"state" -> "class":"[a-z][a-z0-9_]*":"w"
  "group":"state" -> "edge":"[-%3c=%3e~.]+":"w"
  "group":"state" -> "group":"%5cs+":"w"
  "group":"state" -> "start_node":"%5c[":"w"
- "node" [ label="{<[%5cw.]+> /\\[\\\\w.\\]+/|<%5c[> /\\\\[/|<%5cs+> /\\\\s+/}|<state> node" shape="record" ]
+ "node" [ label="{<[%5cw.]+> /[\\\\w.]+/|<%5c[> /\\\\[/|<%5cs+> /\\\\s+/}|<state> node" shape="record" ]
  "node":"state" -> "node":"%5cs+":"w"
  "node":"state" -> "post_node":"]":"w"
  "post_attribute" [ label="{<%5cs+> /\\\\s+/|<%7d> /\\}/}|<state> post_attribute" shape="record" ]
@@ -65,7 +65,7 @@
  "post_group":"state" -> "post_group":"%5cs+":"w"
  "post_group":"state" -> "start_group":"%5c(":"w"
  "post_group":"state" -> "start_node":"%5c[":"w"
- "post_node" [ label="{<%5cs+> /\\\\s+/|<]> /\\]/}|<state> post_node" shape="record" ]
+ "post_node" [ label="{<%5cs+> /\\\\s+/|<]> /]/}|<state> post_node" shape="record" ]
  "post_node":"state" -> "daisy_chain":",":"w"
  "post_node":"state" -> "edge":"[-%3c=%3e~.]+":"w"
  "post_node":"state" -> "post_group":"%5c)":"w"
@@ -88,7 +88,7 @@
  "start_node":"state" -> "start_node":"%5cs+":"w"
  "start_subclass" [ label="{<%5c.> /\\\\./}|<state> start_subclass" shape="record" ]
  "start_subclass":"state" -> "subclass":"[a-z][a-z0-9_]*":"w"
- "subclass" [ label="{<[a-z][a-z0-9_]*> /\\[a-z\\]\\[a-z0-9_\\]*/|<%5c.> /\\\\./|<%5cs+> /\\\\s+/}|<state> subclass" shape="record" ]
+ "subclass" [ label="{<[a-z][a-z0-9_]*> /[a-z][a-z0-9_]*/|<%5c.> /\\\\./|<%5cs+> /\\\\s+/}|<state> subclass" shape="record" ]
  "subclass":"state" -> "class_daisy_chain":",":"w"
  "subclass":"state" -> "edge":"[-%3c=%3e~.]+":"w"
  "subclass":"state" -> "node":"%5c[":"w"

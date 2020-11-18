@@ -16,7 +16,7 @@ FP::StrictList - an FP::List that enforces list semantics
     use FP::StrictList;
     use FP::Div 'inc'; use FP::List;
 
-    my $l= strictlist (4,5)->map(*inc);
+    my $l = strictlist (4,5)->map(*inc);
     ok is_strictlist $l; # O(1)
 
     use FP::Equal qw(equal is_equal); use FP::List 'null';
@@ -73,38 +73,40 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::StrictList;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(strictnull is_strictlist strictlist);
-@EXPORT_OK=qw(
-                 cons
-                 first second rest car cdr car_and_cdr first_and_rest
-                 strictlist_reverse__map_with_length_with_tail
-                 strictlist_reverse__map_with_length
-                 strictlist_array__reverse__map_with_length
-                 strictlist_array__map_with_length
-            );
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT    = qw(strictnull is_strictlist strictlist);
+our @EXPORT_OK = qw(
+    cons
+    first second rest car cdr car_and_cdr first_and_rest
+    strictlist_reverse__map_with_length_with_tail
+    strictlist_reverse__map_with_length
+    strictlist_array__reverse__map_with_length
+    strictlist_array__map_with_length
+);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use FP::List;
 use Chj::TEST;
 use FP::Combinators qw(flip2of3 flip);
-
+use Scalar::Util qw(blessed);
 
 package FP::StrictList::List {
 
     sub strictlist {
-        @_==1 or die "wrong number of arguments";
-        my $s=shift;
+        @_ == 1 or die "wrong number of arguments";
+        my $s = shift;
         $s
     }
 
     sub list {
-        @_==1 or die "wrong number of arguments";
-        my $s=shift;
+        @_ == 1 or die "wrong number of arguments";
+        my $s = shift;
+
         # Should it *really* convert to a non-strict list? This is
         # just a list with the added information that it's proper,
         # after all; equality should work just fine, in fact the
@@ -116,8 +118,9 @@ package FP::StrictList::List {
     }
 
     sub stream {
-        @_==1 or die "wrong number of arguments";
-        my ($l)= @_;
+        @_ == 1 or die "wrong number of arguments";
+        my ($l) = @_;
+
         # XX isn't this stupid? Same as above. The current load test
         # in FP::Abstract::Sequence::t requires this behaviour.
         FP::Stream::stream($l->values)
@@ -125,14 +128,15 @@ package FP::StrictList::List {
 }
 
 package FP::StrictList::Null {
-    our @ISA= qw(FP::StrictList::List FP::List::Null);
+    our @ISA = qw(FP::StrictList::List FP::List::Null);
 
-    sub pair_namespace { "FP::StrictList::Pair" }
-    *null= \&FP::StrictList::strictnull;
+    sub pair_namespace {"FP::StrictList::Pair"}
+    *null = \&FP::StrictList::strictnull;
 
     sub cons {
-        @_==2 or die "wrong number of arguments";
-        my $s=shift;
+        @_ == 2 or die "wrong number of arguments";
+        my $s = shift;
+
         # different than FP::List::Null::cons in that it needs to set
         # the length field, too:
         bless [$_[0], $s, 1], $s->pair_namespace
@@ -141,7 +145,7 @@ package FP::StrictList::Null {
     # simply inherit FP_Equal_equal
 
     sub FP_Show_show {
-        my ($s,$show)=@_;
+        my ($s, $show) = @_;
         "strictnull"
     }
 
@@ -150,16 +154,16 @@ package FP::StrictList::Null {
 }
 
 package FP::StrictList::Pair {
-    our @ISA= qw(FP::StrictList::List FP::List::Pair);
+    our @ISA = qw(FP::StrictList::List FP::List::Pair);
 
-    *null= \&FP::StrictList::strictnull;
+    *null = \&FP::StrictList::strictnull;
 
     # represented as blessed [ v, pair-or-null, length]
 
     sub cons {
-        @_==2 or die "wrong number of arguments";
-        my $s=shift;
-        bless [$_[0], $s, $$s[2]+1], ref $s
+        @_ == 2 or die "wrong number of arguments";
+        my $s = shift;
+        bless [$_[0], $s, $$s[2] + 1], ref $s
     }
 
     sub length {
@@ -169,210 +173,218 @@ package FP::StrictList::Pair {
     # simply inherit FP_Equal_equal
 
     sub FP_Show_show {
-        my ($s,$show)=@_;
-        ("strictlist(".
-         $s->map($show)->strings_join(", ").
-         ")")
+        my ($s, $show) = @_;
+        ("strictlist(" . $s->map($show)->strings_join(", ") . ")")
     }
 
     use FP::Interfaces;
     FP::Interfaces::implemented qw(FP::Abstract::Equal);
 }
 
-
 # nil
-my $null= bless [], "FP::StrictList::Null";
+my $null = bless [], "FP::StrictList::Null";
 
 sub strictnull () {
     $null
 }
 
 TEST { strictnull->cons(1)->cons(2)->array }
-  [2,1];
+[2, 1];
 
 TEST { strictnull->length }
-  0;
+0;
 TEST { strictnull->cons(8)->length }
-  1;
+1;
 TEST { strictnull->cons(1)->cons(9)->length }
-  2;
+2;
 
-TEST { require FP::Show;
-       FP::Show::show (cons 1, cons 2, strictnull) }
-  "strictlist(1, 2)";
+TEST {
+    require FP::Show;
+    FP::Show::show(cons 1, cons 2, strictnull)
+}
+"strictlist(1, 2)";
 
 sub strictlist {
-    my $res= strictnull;
-    for (my $i= $#_; $i>=0; $i--) {
-        $res= $res-> cons ($_[$i]);
+    my $res = strictnull;
+    for (my $i = $#_; $i >= 0; $i--) {
+        $res = $res->cons($_[$i]);
     }
     $res
 }
 
-
 TEST {
-    strictlist (4,5)->map (sub{$_[0]+1})
+    strictlist(4, 5)->map (sub { $_[0] + 1 })
 }
-  cons (5, cons (6, strictnull));
-
+cons(5, cons(6, strictnull));
 
 sub is_strictlist ($) {
-    my ($v)=@_;
-    if (length (my $r= ref $v)) {
-        UNIVERSAL::isa($v, "FP::StrictList::List")
-            or
-        # XX evil: inlined `is_promise`
-        UNIVERSAL::isa($v, "FP::Lazy::Promise")
-            && &is_strictlist (force $v)
-            or
-        ''
-    } else {
-        ''
-    }
+    my ($v) = @_;
+    my $r = blessed($v) // return;
+    (
+               $r eq "FP::StrictList::List"
+            or $v->isa("FP::StrictList::List")
+            or $v->isa("FP::Lazy::Promise") && &is_strictlist(force $v)
+    )
 }
-
-TEST { [map { is_strictlist $_ } 
-        null, strictnull, cons (1,null), cons (1,strictnull)] }
-  ['', 1, '', 1];
 
 TEST {
-    is_strictlist (strictlist (4,5)->map (sub{$_[0]+1}))
+    [
+        map { is_strictlist $_ } null,
+        strictnull,
+        cons(1, null),
+        cons(1, strictnull)
+    ]
 }
-  1;
+['', 1, '', 1];
 
 TEST {
-    is_strictlist (list (4,5)->map (sub{$_[0]+1}))
+    is_strictlist(strictlist(4, 5)->map (sub { $_[0] + 1 }))
 }
-  '';
+1;
 
-TEST { require FP::Lazy;
-       is_strictlist (FP::Lazy::lazy{cons 1, strictnull}) }
-  1;
+TEST {
+    is_strictlist(list(4, 5)->map (sub { $_[0] + 1 }))
+}
+'';
+
+TEST {
+    require FP::Lazy;
+    is_strictlist(FP::Lazy::lazy { cons 1, strictnull })
+}
+1;
 
 # heh, can cheat it this way:
-TEST { is_strictlist (cons 0, FP::Lazy::lazy {cons 1, cons 2, strictnull }) }
-  '';
+TEST {
+    is_strictlist(cons 0, FP::Lazy::lazy { cons 1, cons 2, strictnull })
+}
+'';
+
 # interesting, +-luck:
-TEST { require FP::List;
-       FP::List::is_list (cons 0, FP::Lazy::lazy {cons 1, cons 2, strictnull }) }
-  1;
+TEST {
+    require FP::List;
+    FP::List::is_list(cons 0, FP::Lazy::lazy { cons 1, cons 2, strictnull })
+}
+1;
 
 use FP::DumperEqual;
 
 TEST {
-    dumperequal strictnull->cons(1), cons (1, strictnull)
-} 1;
-
-TEST {
-    dumperequal strictnull->cons(1), cons (1, null)
-} '';
-
-TEST {
-    my $l= strictlist (7,8,9)->reverse;
-    [is_strictlist $l, $l->car, $l->length]
-} [1, 9, 3];
-
-TEST {
-    strictlist (7)->reverse_with_tail (8)
+    dumperequal strictnull->cons(1), cons(1, strictnull)
 }
-  # falls back on the default list type since '8' is not a List (a
-  # strictlist would not accept such a value as the tail anyway; hm,
-  # hopefully nobody expects this operation to give an exception?)
-  bless( [
-          7,
-          8
-         ], 'FP::List::Pair' );
+1;
 
+TEST {
+    dumperequal strictnull->cons(1), cons(1, null)
+}
+'';
 
+TEST {
+    my $l = strictlist(7, 8, 9)->reverse;
+    [is_strictlist $l, $l->car, $l->length]
+}
+[1, 9, 3];
+
+TEST {
+    strictlist(7)->reverse_with_tail(8)
+}
+
+# falls back on the default list type since '8' is not a List (a
+# strictlist would not accept such a value as the tail anyway; hm,
+# hopefully nobody expects this operation to give an exception?)
+bless([7, 8], 'FP::List::Pair');
 
 sub make_reverse__map_with_length_with_tail {
-    my ($cons)= @_;
+    my ($cons) = @_;
+
     sub ($$$) {
-        @_==3 or die "wrong number of arguments";
-        my ($fn,$l,$tail)=@_;
+        @_ == 3 or die "wrong number of arguments";
+        my ($fn, $l, $tail) = @_;
         my $a;
-        while (! $l->is_null) {
-            my $i= $l->length;
-            ($a,$l)= $l->first_and_rest;
-            $tail= &$cons (&$fn ($a,$i), $tail);
+        while (!$l->is_null) {
+            my $i = $l->length;
+            ($a, $l) = $l->first_and_rest;
+            $tail = &$cons(&$fn($a, $i), $tail);
         }
         $tail
     }
 }
 
 sub strictlist_reverse__map_with_length_with_tail ($$$);
-*strictlist_reverse__map_with_length_with_tail=
-  make_reverse__map_with_length_with_tail(\&cons);
+*strictlist_reverse__map_with_length_with_tail
+    = make_reverse__map_with_length_with_tail(\&cons);
 
-*FP::StrictList::List::reverse__map_with_length_with_tail=
-  flip2of3 \&strictlist_reverse__map_with_length_with_tail;
+*FP::StrictList::List::reverse__map_with_length_with_tail
+    = flip2of3 \&strictlist_reverse__map_with_length_with_tail;
 
 TEST {
-    my $l= strictlist (qw(a b c))
-      ->reverse__map_with_length_with_tail(sub { [@_] }, null);
-    [ is_strictlist ($l), $l->array ]
+    my $l = strictlist(qw(a b c))
+        ->reverse__map_with_length_with_tail(sub { [@_] }, null);
+    [is_strictlist($l), $l->array]
 }
-  ['', [[c=> 1], [b=> 2], [a=> 3]]];
+['', [[c => 1], [b => 2], [a => 3]]];
 
 sub strictlist_reverse__map_with_length ($$) {
-    @_==2 or die "wrong number of arguments";
-    my ($fn,$l)=@_;
-    strictlist_reverse__map_with_length_with_tail ($fn, $l, strictnull)
+    @_ == 2 or die "wrong number of arguments";
+    my ($fn, $l) = @_;
+    strictlist_reverse__map_with_length_with_tail($fn, $l, strictnull)
 }
 
-*FP::StrictList::List::reverse__map_with_length=
-  flip \&strictlist_reverse__map_with_length;
+*FP::StrictList::List::reverse__map_with_length
+    = flip \&strictlist_reverse__map_with_length;
 
 TEST {
-    my $l= strictlist (qw(a b c))
-      ->reverse__map_with_length(sub { [@_] });
-    [ is_strictlist ($l), $l->array ]
+    my $l = strictlist(qw(a b c))->reverse__map_with_length(sub { [@_] });
+    [is_strictlist($l), $l->array]
 }
-  [1, [[c=> 1], [b=> 2], [a=> 3]]];
+[1, [[c => 1], [b => 2], [a => 3]]];
 
 sub strictlist_array__reverse__map_with_length ($$) {
-    @_==2 or die "wrong number of arguments";
-    my ($fn,$l)=@_;
-    my $i= $l->length;
-    make_reverse__map_with_length_with_tail
-      (sub {
-           my ($v,$ary)=@_;
-           #unshift @$ary, $v; is this faster?:
-           $$ary[--$i]= $v;
-           $ary
-       })->($fn, $l, []);
+    @_ == 2 or die "wrong number of arguments";
+    my ($fn, $l) = @_;
+    my $i = $l->length;
+    make_reverse__map_with_length_with_tail(
+        sub {
+            my ($v, $ary) = @_;
+
+            #unshift @$ary, $v; is this faster?:
+            $$ary[--$i] = $v;
+            $ary
+        }
+    )->($fn, $l, []);
 }
 
-*FP::StrictList::List::array__reverse__map_with_length=
-  flip \&strictlist_array__reverse__map_with_length;
+*FP::StrictList::List::array__reverse__map_with_length
+    = flip \&strictlist_array__reverse__map_with_length;
 
 TEST {
-    strictlist (qw(a b c))->array__reverse__map_with_length(sub { [@_] });
+    strictlist(qw(a b c))->array__reverse__map_with_length(sub { [@_] });
 }
-  [[c=> 1], [b=> 2], [a=> 3]];
+[[c => 1], [b => 2], [a => 3]];
 
 sub strictlist_array__map_with_length ($$) {
-    @_==2 or die "wrong number of arguments";
-    my ($fn,$l)=@_;
-    my $i= 0;
-    my $len= $l->length;
-    my $ary= []; $$ary[$len-1]=undef; # preallocate array, faster?
-    make_reverse__map_with_length_with_tail
-      (sub {
-           my ($v,$ary)=@_;
-           #push @$ary, $v;
-           $$ary[$i++]= $v;
-           $ary
-       })->($fn, $l, $ary);
+    @_ == 2 or die "wrong number of arguments";
+    my ($fn, $l) = @_;
+    my $i   = 0;
+    my $len = $l->length;
+    my $ary = [];
+    $$ary[$len - 1] = undef;    # preallocate array, faster?
+    make_reverse__map_with_length_with_tail(
+        sub {
+            my ($v, $ary) = @_;
+
+            #push @$ary, $v;
+            $$ary[$i++] = $v;
+            $ary
+        }
+    )->($fn, $l, $ary);
 }
 
-*FP::StrictList::List::array__map_with_length=
-  flip \&strictlist_array__map_with_length;
+*FP::StrictList::List::array__map_with_length
+    = flip \&strictlist_array__map_with_length;
 
 TEST {
-    strictlist (qw(a b c))->array__map_with_length(sub { [@_] });
+    strictlist(qw(a b c))->array__map_with_length(sub { [@_] });
 }
-  [[a=> 3], [b=> 2], [c=> 1]];
-
+[[a => 3], [b => 2], [c => 1]];
 
 1

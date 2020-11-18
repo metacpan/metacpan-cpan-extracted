@@ -119,7 +119,14 @@ sub get_html_source {
     #wait for the callback to fire
     Gtk3::main_iteration while Gtk3::events_pending or not defined $result;
 
-    my $html_source = $resource->get_data_finish($result);
+    my $html_source;
+
+    eval {
+        $html_source = $resource->get_data_finish($result);
+    } or do {
+        $html_source = [];
+        warn "get_html_source(): error encountered: $@";
+    };
 
     # get_data_finish returns a byte-array, turn it into a human readable string
     my $html_string = decode_utf8(join('', map chr, @$html_source));

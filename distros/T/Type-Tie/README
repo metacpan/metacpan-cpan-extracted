@@ -65,6 +65,11 @@ DESCRIPTION
 
     *   Type::Tiny
 
+  About Cloning with Storage::dclone (and Clone::clone)
+    Cloning variables with Storage::dclone works, but cloning with
+    Clone::clone is not possible. See Bug #127576 for Type-Tie: Doesn't work
+    with Clone::clone <https://rt.cpan.org/Public/Bug/Display.html?id=127576>
+
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tie>.

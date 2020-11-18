@@ -3,7 +3,7 @@ package Log::ger::UseDataDumpColor;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Log-ger-UseDataDumpColor'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Data::Dump::Color ();
 use Log::ger ();
@@ -26,7 +26,7 @@ Log::ger::UseDataDumpColor - Use Data::Dump::Color to dump data structures
 
 =head1 VERSION
 
-This document describes version 0.004 of Log::ger::UseDataDumpColor (from Perl distribution Log-ger-UseDataDumpColor), released on 2020-06-06.
+This document describes version 0.005 of Log::ger::UseDataDumpColor (from Perl distribution Log-ger-UseDataDumpColor), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ Other modules to set data dumper for Log::ger:
 
 =over
 
-=item * L<Log::ger::UseDataBahe>
+=item * L<Log::ger::UseBaheForDump>
 
 =item * L<Log::ger::UseDataDump>
 
@@ -73,6 +73,10 @@ Other modules to set data dumper for Log::ger:
 =item * L<Log::ger::UseDataDumperCompact>
 
 =item * L<Log::ger::UseDataPrinter>
+
+=item * L<Log::ger::UseJSONForDump>
+
+=item * L<Log::ger::UseYAMLForDump>
 
 =back
 

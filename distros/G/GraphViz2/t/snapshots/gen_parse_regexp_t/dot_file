@@ -52,7 +52,7 @@
  "40" [ label="END" ]
  "5" [ label="START $2" ]
  "5" -> "7"
- "7" [ color="red" label="\\[0-9a-d\\]" shape="box" ]
+ "7" [ color="red" label="[0-9a-d]" shape="box" ]
  "7" -> "18"
 }
 '

@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1812 2020-10-07 18:09:53Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1823 2020-11-16 16:29:45Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -280,7 +280,7 @@ sub _decompose {
 sub _image { join ' => ', &_decompose; }
 
 
-package Net::DNS::RR::OPT::COOKIE;				# draft-ietf-dnsop-server-cookies
+package Net::DNS::RR::OPT::COOKIE;				# RFC7873
 
 my @field10 = qw(VERSION RESERVED TIMESTAMP HASH);
 
@@ -366,7 +366,7 @@ sub _decompose {
 sub _image { &_decompose; }
 
 
-package Net::DNS::RR::OPT::EXTENDED_ERROR;			# draft-ietf-dnsop-extended-error
+package Net::DNS::RR::OPT::EXTENDED_ERROR;			# RFC8914
 
 my @field15 = qw(INFO-CODE EXTRA-TEXT);
 

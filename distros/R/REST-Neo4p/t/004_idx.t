@@ -1,23 +1,19 @@
-#$Id$
-
-use Test::More tests => 68;
+use Test::More;
 use Module::Build;
-use lib '../lib';
-use lib 't/lib';
+use lib qw'lib ../lib t/lib';
 use Neo4p::Connect;
 use strict;
 use warnings;
 no warnings qw(once);
 my @cleanup;
 my $build;
-my ($user,$pass);
-
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 eval {
   $build = Module::Build->current;
   $user = $build->notes('user');
   $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 67;
 
 use_ok('REST::Neo4p');
@@ -61,14 +57,15 @@ SKIP : {
   diag("rt80440");
   ok $nt_names->add_entry($T, 'nickname' => 'old_thymy',
 			      'friends_call_him' => 'Mr_T'), 
-  'add multiple key/values (rt80440)';
+				'add multiple key/values (rt80440)';
+
   ok my ($mrt) = $nt_names->find_entries('friends_call_him' => 'Mr_T'), 'found multiply added entry';
   is $mrt->get_property('name'), 'T', 'found right node';
 
   ok $nt_comment->add_entry($C, 'comment' => 'Man, this is my fave nucleotide!'), 'funky value added';
   ok $nt_comment->add_entry($T, 'comment' => 'This one & A spell "at"'), 'funky value added';
 
-  ok my $nt_muts = REST::Neo4p::Index->new('relationship','nt_muts'), 'create relationship index';
+  ok my $nt_muts = REST::Neo4p::Index->new('relationship','nt_muts',{rtype=>'transition'}), 'create relationship index';
   push @cleanup, $nt_muts if $nt_muts;
   ok $nt_muts->add_entry( $cleanup[@cleanup] =
 			 $A->relate_to($T,'transition'),
@@ -134,14 +131,18 @@ SKIP : {
   ok my @nts = $nt_names->find_entries( fullname => 'adenine' ), 'find A on fullname key';
   cmp_ok scalar @nts,'>=', 1, 'found nt';
   is $nts[0]->get_property('name'),'A', 'found A as adenine';
+  my @commented;
 
-  ok my @commented = $nt_comment->find_entries('comment:*spell*'), 'find T in comment index with lucene query';
-  cmp_ok scalar @commented, '>=', 1, 'found one';
-  is $commented[0]->get_property('name'), 'T', 'found T with comment';
-}
-
+  SKIP : {
+    skip "Skip this on Neo4j 4.0", 3 if REST::Neo4p->agent->is_version_4;
+    ok @commented = $nt_comment->find_entries('comment:*spell*'), 'find T in comment index with lucene query';
+    cmp_ok scalar @commented, '>=', 1, 'found one';
+    is $commented[0]->get_property('name'), 'T', 'found T with comment';
+  }
+  }
 END {
   CLEANUP : {
     ok ($_->remove, 'entity removed') for reverse @cleanup;
+    done_testing;
   }
   }

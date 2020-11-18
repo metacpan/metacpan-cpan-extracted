@@ -23,29 +23,27 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FunctionalPerl::Htmlgen::Cost;
-#@ISA="Exporter"; require Exporter;
-#@EXPORT=qw();
-#@EXPORT_OK=qw();
-#%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
-
-use strict; use warnings; use warnings FATAL => 'uninitialized';
-use Function::Parameters qw(:strict);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use experimental "signatures";
 use Sub::Call::Tail;
+
+#use Exporter "import";
+#@EXPORT = qw();
+#@EXPORT_OK = qw();
+#%EXPORT_TAGS = (all => [@EXPORT,@EXPORT_OK]);
 
 package FunctionalPerl::Htmlgen::Cost::_::Cost {
     use FP::Array ":all";
 
     use FP::Struct [qw(name is_purchaseable basecosts val)];
 
-    method cost ($index) {
+    sub cost ($self, $index) {
         $$self{_cost} ||= do {
             add($self->val,
-                map {
-                    $$index{$_}->cost ($index)
-                } @{$self->basecosts}
-               );
+                map { $$index{$_}->cost($index) } @{ $self->basecosts });
         }
     }
     _END_
@@ -56,22 +54,22 @@ package FunctionalPerl::Htmlgen::Cost::_::Totalcost {
 
     use FP::Struct [qw(costs)];
 
-    method range () {
-        @{$$self{costs}} or die "no costs given";#
+    sub range($self) {
+        @{ $$self{costs} } or die "no costs given";    #
         my $index;
-        for (@{$$self{costs}}) {
-            if (defined (my $name= $_->name)) {
-                $$index{$name}= $_
+        for (@{ $$self{costs} }) {
+            if (defined(my $name = $_->name)) {
+                $$index{$name} = $_
             }
         }
-        my $purchaseable= [grep { $_->is_purchaseable } @{$$self{costs}}];
-        @$purchaseable or die "no purchaseable costs";#
-        local our $all= array_sort
-          ( $purchaseable,
-            on the_method ("cost",$index), \&number_cmp );
-        (@$all == 1
-         ? $$all[0]->cost ($index)
-         : $$all[0]->cost ($index)."..".$$all[-1]->cost($index)),
+        my $purchaseable = [grep { $_->is_purchaseable } @{ $$self{costs} }];
+        @$purchaseable or die "no purchaseable costs";    #
+        local our $all
+            = array_sort($purchaseable, on the_method("cost", $index),
+            \&number_cmp);
+        (     @$all == 1
+            ? $$all[0]->cost($index)
+            : $$all[0]->cost($index) . ".." . $$all[-1]->cost($index))
     }
     _END_
 }

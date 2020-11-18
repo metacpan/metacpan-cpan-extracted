@@ -21,4 +21,5 @@ t/02moosextypes.t
 t/03prototypicalweirdness.t
 t/04nots.t
 t/05typetiny.t
+t/06storable.t
 t/06tn-moo.t

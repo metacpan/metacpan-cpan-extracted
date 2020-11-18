@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2019-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -16,13 +16,13 @@ FP::MutableArray
     use FP::MutableArray;
     use FP::Div 'inc';
 
-    my $a= mutablearray(1,4,5)->map(*inc);
+    my $a = mutablearray(1,4,5)->map(*inc);
     is $a->sum, 13;
     $a->[0]++;
     is $a->sum, 14;
 
     # They can be turned into immutable ones:
-    my $b= $a->pure;
+    my $b = $a->pure;
     like( (eval { $b->[0]++; 1 } || $@),
           qr/^Modification of a read-only value attempted/);
 
@@ -54,28 +54,31 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::MutableArray;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(is_mutablearray mutablearray array_to_mutablearray);
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(is_mutablearray mutablearray array_to_mutablearray);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
+use Scalar::Util 'blessed';
 
 sub is_mutablearray ($) {
-    length ref ($_[0]) and UNIVERSAL::isa($_[0], "FP::_::MutableArray")
+    my ($v) = @_;
+    my $r = blessed($v) // return;
+    ($r eq "FP::_::MutableArray" or $v->isa("FP::_::MutableArray"))
 }
 
 sub mutablearray {
-    FP::_::MutableArray->new_from_array ([@_])
+    FP::_::MutableArray->new_from_array([@_])
 }
 
 sub array_to_purearray ($) {
-    FP::_::MutableArray->new_from_array ($_[0])
+    FP::_::MutableArray->new_from_array($_[0])
 }
-
 
 package FP::_::MutableArray {
     use base qw(FP::Array::Mixin);
@@ -84,50 +87,53 @@ package FP::_::MutableArray {
     use Chj::NamespaceCleanAbove;
 
     sub new_from_array {
-        @_==2 or die "wrong number of arguments";
-        my ($class, $a)=@_;
+        @_ == 2 or die "wrong number of arguments";
+        my ($class, $a) = @_;
         bless $a, $class
     }
 
     sub mutablearray {
-        @_==1 or die "wrong number of arguments";
-        my $s=shift;
+        @_ == 1 or die "wrong number of arguments";
+        my $s = shift;
         $s
     }
 
     sub purearray {
-        @_==1 or die "wrong number of arguments";
-        my $s=shift;
+        @_ == 1 or die "wrong number of arguments";
+        my $s = shift;
         FP::_::PureArray->new_from_array($s)
     }
 
     sub null {
-        my $proto=shift;
-        my $class= ref($proto) || $proto;
+        my $proto = shift;
+        my $class = ref($proto) || $proto;
+
         # can't cache this since mutation is allowed!:
-        $class->new_from_array([]) 
+        $class->new_from_array([])
     }
 
     sub constructor_name {
         "mutablearray"
     }
- 
+
     sub pure {
-        @_==1 or die "wrong number of arguments";
+        @_ == 1 or die "wrong number of arguments";
+
         # same as `array_to_purearray`
-        require FP::PureArray; # cost?
+        require FP::PureArray;    # cost?
         FP::_::PureArray->new_from_array($_[0])
     }
 
-    our $unsafe_mutable_warned= 0;
+    our $unsafe_mutable_warned = 0;
+
     sub unsafe_mutable {
-        @_==1 or die "wrong number of arguments";
-        my $a=shift;
+        @_ == 1 or die "wrong number of arguments";
+        my $a = shift;
         carp "is already mutable" unless $unsafe_mutable_warned++;
         $a
     }
 
-    _END_; # Chj::NamespaceCleanAbove
+    _END_;    # Chj::NamespaceCleanAbove
 
     FP::Interfaces::implemented qw(
         FP::Abstract::Sequence

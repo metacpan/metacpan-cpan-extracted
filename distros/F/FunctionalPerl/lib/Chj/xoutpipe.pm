@@ -15,9 +15,9 @@ Chj::xoutpipe
 
     use Chj::xoutpipe;
     {
-        my $p= xoutpipe "sendmail","-t";
+        my $p = xoutpipe "sendmail","-t";
         $p->xprint("From: $from\n");
-        my $rv= $p->xfinish; # does close and waitpid, returns $?
+        my $rv = $p->xfinish; # does close and waitpid, returns $?
         # see Chj::IO::Command for more methods.
     }
 
@@ -37,18 +37,18 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::xoutpipe;
-@ISA='Exporter';
+@ISA = 'Exporter';
 require Exporter;
-@EXPORT= qw(xoutpipe);
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT = qw(xoutpipe);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 use Chj::IO::Command;
 
 sub xoutpipe {
     Chj::IO::Command->new_receiver(@_);
 }
-*Chj::xoutpipe= \&xoutpipe;
-
+*Chj::xoutpipe = \&xoutpipe;
 
 1

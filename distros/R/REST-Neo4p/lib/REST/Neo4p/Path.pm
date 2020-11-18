@@ -5,7 +5,7 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Path::VERSION = '0.3030';
+  $REST::Neo4p::Path::VERSION = '0.4000';
 }
 
 sub new {
@@ -16,6 +16,7 @@ sub new {
 sub new_from_json_response {
   my $class = shift;
   my ($decoded_resp) = @_;
+  return $class->new_from_driver_obj(@_) if (ref($decoded_resp) =~ /Neo4j::Driver/);
   REST::Neo4p::LocalException->throw("Arg does not describe a Neo4j path response\n") unless $decoded_resp->{start} && $decoded_resp->{end} && $decoded_resp->{relationships} && $decoded_resp->{nodes};
   my $obj = bless {}, $class;
   $obj->{_length} = $decoded_resp->{length};
@@ -51,6 +52,45 @@ sub new_from_json_response {
     push @{$obj->{_relationships}}, $relationship if $relationship;
   }
   REST::Neo4p::LocalException->throw("Extra relationships in path\n") if @reln_urls;
+  return $obj;
+}
+
+sub new_from_driver_obj {
+  my $class = shift;
+  my ($pth_obj) = @_;
+  my $obj = bless {}, $class;
+
+  my @nodes = $pth_obj->nodes;
+  my @relns = $pth_obj->relationships;
+  $obj->{_length} = scalar @relns;
+
+  while (my $n = shift @nodes) {
+    my $r = shift @relns;
+    my ($node, $relationship);
+    eval {
+      $node = REST::Neo4p::Node->_entity_by_id($n->id);
+    };
+    if (my $e = REST::Neo4p::Exception->caught()) {
+      # TODO : handle different classes
+      $e->rethrow;
+    }
+    elsif ($e = Exception::Class->caught()) {
+      (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
+    }
+    push @{$obj->{_nodes}}, $node;
+    eval {
+      $relationship =  REST::Neo4p::Relationship->_entity_by_id($r->id) if defined $r;
+    };
+    if (my $e = REST::Neo4p::Exception->caught()) {
+      # TODO : handle different classes
+      $e->rethrow;
+    }
+    elsif ($e = Exception::Class->caught()) {
+      (ref $e && $e->can("rethrow")) ? $e->rethrow : die $e;
+    }
+    push @{$obj->{_relationships}}, $relationship if $relationship;
+  }
+  REST::Neo4p::LocalException->throw("Extra relationships in path\n") if @relns;
   return $obj;
 }
 
@@ -100,8 +140,7 @@ REST::Neo4p::Path - Container for Neo4j path elements
 REST::Neo4p::Path provides a simple container for Neo4j paths as returned
 by Cypher queries. Nodes and relationships are stored in path order.
 
-Currently, creating de novo instances of this class is really the job
-of L<REST::Neo4p::Query>.
+Creating de novo instances of this class is really the job of L<REST::Neo4p::Query>.
 
 =head1 METHODS
 
@@ -144,7 +183,7 @@ L<REST::Neo4p::Query>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

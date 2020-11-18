@@ -51,14 +51,6 @@ eval {
   $p = Convert::Binary::C->new(
     %$CCCFG,
     EnumSize       => 0,
-    ShortSize      => 2,
-    IntSize        => 4,
-    LongSize       => 4,
-    LongLongSize   => 8,
-    PointerSize    => 4,
-    FloatSize      => 4,
-    DoubleSize     => 8,
-    LongDoubleSize => 12
   );
 };
 ok($@,'',"failed to create Convert::Binary::C object");
@@ -84,11 +76,11 @@ ok($@,'',"failed to parse C-file");
 
 $s1 = @enums; $s2 = $p->enum;
 ok($s1,$s2,"context not evaluated correctly in 'enum'");
-ok($s1,35,"incorrect number of enums");
+ok($s1,12,"incorrect number of enums");
 
 $s1 = @compounds; $s2 = $p->compound;
 ok($s1,$s2,"context not evaluated correctly in 'compound'");
-ok($s1,287,"incorrect number of compounds");
+ok($s1,26,"incorrect number of compounds");
 
 map {
   push @{$_->{type} eq 'union' ? \@r_unions : \@r_structs}, $_
@@ -98,17 +90,17 @@ $s1 = @structs; $s2 = $p->struct;
 ok($s1,$s2,"context not evaluated correctly in 'struct'");
 $s2 = @r_structs;
 ok($s1,$s2,"direct/indirect counts differ in 'struct'");
-ok($s1,200,"incorrect number of structs");
+ok($s1,20,"incorrect number of structs");
 
 $s1 = @unions; $s2 = $p->union;
 ok($s1,$s2,"context not evaluated correctly in 'union'");
 $s2 = @r_unions;
 ok($s1,$s2,"direct/indirect counts differ in 'union'");
-ok($s1,87,"incorrect number of unions");
+ok($s1,6,"incorrect number of unions");
 
 $s1 = @typedefs; $s2 = $p->typedef;
 ok($s1,$s2,"context not evaluated correctly in 'typedef'");
-ok($s1,334,"incorrect number of typedefs");
+ok($s1,54,"incorrect number of typedefs");
 
 @enum_ids     = $p->enum_names;
 @compound_ids = $p->compound_names;
@@ -118,23 +110,23 @@ ok($s1,334,"incorrect number of typedefs");
 
 $s1 = @enum_ids; $s2 = $p->enum_names;
 ok($s1,$s2,"context not evaluated correctly in 'enum_names'");
-ok($s1,4,"incorrect number of enum identifiers");
+ok($s1,1,"incorrect number of enum identifiers");
 
 $s1 = @compound_ids; $s2 = $p->compound_names;
 ok($s1,$s2,"context not evaluated correctly in 'compound_names'");
-ok($s1,146,"incorrect number of compound identifiers");
+ok($s1,20,"incorrect number of compound identifiers");
 
 $s1 = @struct_ids; $s2 = $p->struct_names;
 ok($s1,$s2,"context not evaluated correctly in 'struct_names'");
-ok($s1,141,"incorrect number of struct identifiers");
+ok($s1,19,"incorrect number of struct identifiers");
 
 $s1 = @union_ids; $s2 = $p->union_names;
 ok($s1,$s2,"context not evaluated correctly in 'union_names'");
-ok($s1,5,"incorrect number of union identifiers");
+ok($s1,1,"incorrect number of union identifiers");
 
 $s1 = @typedef_ids; $s2 = $p->typedef_names;
 ok($s1,$s2,"context not evaluated correctly in 'typedef_names'");
-ok($s1,329,"incorrect number of typedef identifiers");
+ok($s1,54,"incorrect number of typedef identifiers");
 
 # catch warnings
 
@@ -345,13 +337,13 @@ eval {
     typedef_sx     => scalar $p->typedef( $p->typedef_names ),
     typedef_ax     => [$p->typedef( $p->typedef_names )],
 
-    sizeof         => $p->sizeof( 'AMT' ),
-    typeof         => $p->typeof( 'AMT.table[2]' ),
-    offsetof       => $p->offsetof( 'AMT', 'table[2]' ),
-    member_sxx     => scalar $p->member( 'AMT', 100 ),
-    member_axx     => [$p->member( 'AMT', 100 )],
-    member_sx      => scalar $p->member( 'AMT' ),
-    member_ax      => [$p->member( 'AMT' )],
+    sizeof         => $p->sizeof( '_PDCLIB_file_t' ),
+    typeof         => $p->typeof( '_PDCLIB_file_t.ungetbuf[2]' ),
+    offsetof       => $p->offsetof( '_PDCLIB_file_t', 'ungetbuf[2]' ),
+    member_sxx     => scalar $p->member( '_PDCLIB_file_t', 100 ),
+    member_axx     => [$p->member( '_PDCLIB_file_t', 100 )],
+    member_sx      => scalar $p->member( '_PDCLIB_file_t' ),
+    member_ax      => [$p->member( '_PDCLIB_file_t' )],
 
     dependencies_s => scalar $p->dependencies,
     dependencies_a => [$p->dependencies],

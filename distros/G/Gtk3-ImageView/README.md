@@ -8,9 +8,9 @@ authors, join gtk-perl-list@gnome.org at lists.gnome.org.
 
 ## INSTALLATION
 
-Soon will be available from CPAN.
+This module is available from [CPAN](https://metacpan.org/pod/Gtk3::ImageView).
 
-To install this module from source type the following:
+To install it from source instead, type the following:
 
 ```shell
 perl Makefile.PL

@@ -1,7 +1,6 @@
-$Id$
 REST::Neo4p - Perl bindings for a Neo4j database via REST
 
-Mark A. Jensen, SRA International
+(c) 2012-2020 Mark A. Jensen
 
 See LICENSE for copyright and license info.
 

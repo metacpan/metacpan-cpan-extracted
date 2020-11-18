@@ -2,8 +2,8 @@ NAME
     App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 VERSION
-    This document describes version 0.008 of App::HTTPTinyUtils (from Perl
-    distribution App-HTTPTinyUtils), released on 2020-11-11.
+    This document describes version 0.009 of App::HTTPTinyUtils (from Perl
+    distribution App-HTTPTinyUtils), released on 2020-11-17.
 
 SYNOPSIS
 DESCRIPTION

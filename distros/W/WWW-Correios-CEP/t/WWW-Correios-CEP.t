@@ -1,6 +1,6 @@
 use utf8;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 BEGIN { use_ok('WWW::Correios::CEP') }
 use Test::RequiresInternet ( 'www.buscacep.correios.com.br' => 80 );
 
@@ -19,8 +19,9 @@ my $expt = {
     status        => '',
     address_count => 1
 };
+ok delete $got->{raw}, 'has raw output';
 is_deeply( $got, $expt, 'testing address for 03640-000' ) || diag explain $got;
 
 my $got2 = $cepper->find( '03640-000', 1 );
-is( ref $got2, 'HTML::Element' );
+is( ref $got2, 'HASH', 'is hash' );
 

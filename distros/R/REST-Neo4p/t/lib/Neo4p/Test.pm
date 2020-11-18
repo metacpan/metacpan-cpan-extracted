@@ -1,5 +1,6 @@
 package Neo4p::Test;
 use REST::Neo4p;
+use Scalar::Util qw/looks_like_number/;
 use strict;
 use warnings;
 
@@ -35,19 +36,12 @@ sub new {
       return;
     }
   }
-  my $nix = REST::Neo4p->get_index_by_name("N$uuid", 'node') ||
-    REST::Neo4p::Index->new( node => "N$uuid" );
-  my $rix = REST::Neo4p->get_index_by_name("R$uuid", 'node') ||
-    REST::Neo4p::Index->new( relationship => "R$uuid" );
   bless {
-    nix => $nix,
-    rix => $rix,
     uuid => $uuid
    }, $class;
 }
-sub nix {shift->{nix}}
-sub rix {shift->{rix}}
 sub uuid {shift->{uuid}}
+sub lbl {"N".shift->{uuid}}
 sub agent {REST::Neo4p->agent}
 
 sub create_sample {
@@ -55,28 +49,41 @@ sub create_sample {
   die "No connection"  unless REST::Neo4p->connected;
   my @node_objs;
   foreach (@nodes) {
-    $_->{uuid} = $uuid; # add uniquifier
-    push @node_objs, 
-      my $n = $self->nix->create_unique( name => $_->{name}, $_);
+    $_->{uuid} = $self->uuid;
+    push @node_objs, REST::Neo4p::Node->new($_);
+    $node_objs[-1]->set_labels($self->lbl);
   }
   foreach (@relns) {
     my ($n1, $n2, $type) = @$_;
-#    my $r = $node_objs[$n1]->relate_to( $node_objs[$n2], $type, {hash => "$n1$n2$type"});
-#    $self->rix->add_entry($r, hash => "$n1$n2$type");
-    $self->rix->create_unique( hash => "$n1$n2$type",
-			       $node_objs[$n1] => $node_objs[$n2], $type);
+    my $r = $node_objs[$n1]->relate_to( $node_objs[$n2],
+					$type, {
+					  uuid => $self->uuid,
+					  hash => "$n1$n2$type"
+					 }); 
   }
   return 1;
+}
+
+sub find_sample {
+  my $self = shift;
+  my ($k,$v) = @_;
+  $v+=0 if looks_like_number $v;
+  my $lbl = $self->lbl;
+  my $q = REST::Neo4p::Query->new("MATCH (n:$lbl) where n.$k = \$value return n");
+  $q->execute({value => $v});
+  my @ret;
+  while (my $r = $q->fetch) {
+    push @ret, $r->[0];
+  }
+  return @ret;
 }
 
 sub delete_sample {
   my $self = shift;
   die "No connection"  unless REST::Neo4p->connected;
-  my @r = $self->rix->find_entries("hash:*");
-  my @n = $self->nix->find_entries("name:*");
-  $_->remove for @r, @n;
-  $self->nix->remove;
-  $self->rix->remove;
+  my $lbl = $self->lbl;
+  my $q = REST::Neo4p::Query->new("match (n:$lbl) where n.uuid = \$uuid detach delete n",{uuid => $self->uuid});
+  $q->execute();
   return 1;
 }
 

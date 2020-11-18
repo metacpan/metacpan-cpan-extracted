@@ -8,7 +8,7 @@ package Subclass::Of;
 
 BEGIN {
 	$Subclass::Of::AUTHORITY = 'cpan:TOBYINK';
-	$Subclass::Of::VERSION   = '0.008';
+	$Subclass::Of::VERSION   = '0.009';
 }
 
 use B qw(perlstring);
@@ -295,8 +295,9 @@ sub _apply_attributes_raw
 		{
 			$fieldhash ||= do {
 				my $impl;
-				$impl ||= eval { require Hash::FieldHash;       'Hash::FieldHash' };
-				$impl ||= do   { require Hash::Util::FieldHash; 'Hash::Util::FieldHash' };
+				$impl ||= eval { require Hash::FieldHash;               'Hash::FieldHash' };
+				$impl ||= eval { require Hash::Util::FieldHash;         'Hash::Util::FieldHash' };
+				$impl ||= do   { require Hash::Util::FieldHash::Compat; 'Hash::Util::FieldHash::Compat' };
 				$impl->can('fieldhash');
 			};
 			my %data;
@@ -713,7 +714,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013, 2017, 2019 by Toby Inkster.
+This software is copyright (c) 2013, 2017, 2019, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

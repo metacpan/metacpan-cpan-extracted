@@ -12,14 +12,14 @@ no warnings qw(once);
 #$SIG{__DIE__} = sub { print $_[0] };
 
 my $build;
-my ($user,$pass);
+my ($user,$pass) = @ENV{qw/REST_NEO4P_TEST_USER REST_NEO4P_TEST_PASS/};
 
 eval {
     $build = Module::Build->current;
     $user = $build->notes('user');
     $pass = $build->notes('pass');
 };
-my $TEST_SERVER = $build ? $build->notes('test_server') : 'http://127.0.0.1:7474';
+my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_SERVER} // 'http://127.0.0.1:7474';
 my $num_live_tests = 1;
 
 use_ok('REST::Neo4p');
@@ -30,6 +30,7 @@ diag "Test server unavailable (".$not_connected->message.") : tests skipped" if 
 SKIP : {
   skip 'no local connection to neo4j', $num_live_tests if $not_connected;
   ok my $agent = REST::Neo4p->agent, 'got agent';
+  skip 'batch unimplemented for Neo4j::Driver', $num_live_tests-1 if ref($agent) =~ /Neo4j::Driver/;
   throws_ok { $agent->batch_length } 'REST::Neo4p::LocalException', 'not in batch mode ok';
   ok $agent->batch_mode(1), 'set batch mode';
   ok !$agent->batch_length, 'queue empty';

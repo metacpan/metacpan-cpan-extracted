@@ -1,6 +1,6 @@
 # Fri Oct 29 16:30:48 2004  Chris Tarnutzer, tarnutzer@ethlife.ethz.ch
-# 
-# Copyright 2004 by Chris Tarnutzer
+#
+# Copyright 2004 by Chris Tarnutzer, 2005-2020 by Christian Jaeger
 # Published under the same terms as perl itself
 #
 
@@ -23,10 +23,12 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::Backtrace;
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 use Carp;
+use Safe::Isa;
 
 # Carp::longmess 'usually' inserts a needless repetition
 # if the argument was already created by confess:
@@ -38,8 +40,8 @@ use Carp;
 # (croak creates a different text so the double duty is not removed.)
 
 sub Clean {
-    my ($str)=@_;
-    $str=~ s/(at [^\n]* line \d+)\.\n (at [^\n]* line \d+)\n/
+    my ($str) = @_;
+    $str =~ s/(at [^\n]* line \d+)\.\n (at [^\n]* line \d+)\n/
        if ($1 eq $2) {
           $1.".\n"
        } else {
@@ -49,30 +51,32 @@ sub Clean {
     $str
 }
 
-our $singlestep=0;#?.
-our $only_confess_if_not_already=1;
-our $do_confess_objects=0;
+our $singlestep                  = 0;    #?.
+our $only_confess_if_not_already = 1;
+our $do_confess_objects          = 0;
 
 sub import {
 
     # Do not override any handler that a previous FP::Repl::Trap may
     # have installed (HACKY):
-    return if UNIVERSAL::isa($SIG{__DIE__}, "FP::Repl::WithRepl::Handler");
+    return if $SIG{__DIE__}->$_isa("FP::Repl::WithRepl::Handler");
 
     $SIG{__DIE__} = sub {
-        $DB::single=1 if $singlestep;
+        $DB::single = 1 if $singlestep;
         if ($only_confess_if_not_already) {
             if (!$do_confess_objects and ref $_[0]) {
+
                 # exception object
                 # (ah well, confess does that check anyway!)
                 die @_
             } else {
+
                 #print STDERR "\n------\n@_\n------\n";
-                if ($_[0]=~ /^[^\n]*line \d+\.\n/s) { # die, not confess.
+                if ($_[0] =~ /^[^\n]*line \d+\.\n/s) {    # die, not confess.
                     die Clean Carp::longmess @_
-                } elsif ($_[0]=~ /^[^\n]*line \d+\n\t/s) { # confess
+                } elsif ($_[0] =~ /^[^\n]*line \d+\n\t/s) {    # confess
                     die @_
-                } else { # unsure
+                } else {                                       # unsure
                     die Clean Carp::longmess @_
                 }
             }
@@ -81,6 +85,5 @@ sub import {
         }
     };
 }
-
 
 1;

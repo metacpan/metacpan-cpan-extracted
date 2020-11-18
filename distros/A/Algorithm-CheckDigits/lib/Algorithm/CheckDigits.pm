@@ -28,7 +28,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( CheckDigits );
 
-use version; our $VERSION = qv('v1.3.3');
+use version; our $VERSION = qv('v1.3.5');
 
 my %methods = (
     'upc'                => [ 'Algorithm::CheckDigits::MBase_001',
@@ -175,6 +175,8 @@ my %methods = (
                               'Umsatzsteuer-Identifikationsnummer (IE)' ],
     'vatrn_ie'           => [ 'Algorithm::CheckDigits::M23_002',
                               'Value Added Tax number, VAT (IE)' ],
+    'tin_ie'             => [ 'Algorithm::CheckDigits::M23_002',
+                              'Tax Identification Number (IE)' ],
     'code_39'            => [ 'Algorithm::CheckDigits::M43_001',
                               'Code39, 3 of 9' ],
     'ustid_lu'           => [ 'Algorithm::CheckDigits::M89_001',
@@ -667,7 +669,7 @@ Brian T. Wightman made me think about and implement the plugin interface.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2013 by Mathias Weidner
+Copyright 2004-2020 by Mathias Weidner
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. See L<perlartistic>.

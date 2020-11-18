@@ -4,7 +4,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-use strict;
+use v5.20;
 use warnings;
 
 use Device::AVR::UPDI;
@@ -156,35 +156,37 @@ sub _generic_read
       $data .= $updi->ld( $baseaddr + $addr, $pagesize )->get;
 
       $addr += $pagesize;
-      printf "\rRead %d (%.2f%%)", $addr, 100 * $addr / $size;
+      printf STDERR "\rRead %d (%.2f%%)", $addr, 100 * $addr / $size;
    }
-   print "\n";
-   print "Done\n";
+   print STDERR "\n";
+   print STDERR "Done\n";
 
    return $data;
 }
 
 sub _generic_write
 {
-   my ( $data, $baseaddr, $pagesize, $size, $wordsize ) = @_;
+   my ( $data, $baseaddr, $pagesize, $size, $wordsize, $is_eeprom ) = @_;
+
+   my $method = $is_eeprom ? "erasewrite_nvm_page" : "write_nvm_page";
 
    die "Too much data to write in $size bytes\n"
       if $size < length $data;
 
    $size = length $data;
 
-   printf "Need to write %d bytes\n", $size;
+   printf STDERR "Need to write %d bytes\n", $size;
 
    my $addr = 0;
    while( $addr < $size ) {
       my $chunk = substr $data, $addr, $pagesize;
 
-      $updi->write_nvm_page( $baseaddr + $addr, $chunk, $wordsize )->get;
+      $updi->$method( $baseaddr + $addr, $chunk, $wordsize )->get;
 
       $addr += length $chunk;
-      printf "\rWritten %d (%.2f%%)", $addr, 100 * $addr / $size;
+      printf STDERR "\rWritten %d (%.2f%%)", $addr, 100 * $addr / $size;
    }
-   print "\n";
+   print STDERR "\n";
 
    # Verify
    $addr = 0;
@@ -199,13 +201,13 @@ sub _generic_write
       }
 
       $addr += length $chunk;
-      printf "\rVerified %d (%.2f%%)", $addr, 100 * $addr / $size;
+      printf STDERR "\rVerified %d (%.2f%%)", $addr, 100 * $addr / $size;
    }
-   print "\n";
+   print STDERR "\n";
 
    reset_chip;
 
-   print "Done\n";
+   print STDERR "Done\n";
 }
 
 =head2 reset
@@ -223,7 +225,7 @@ sub run_reset
    $PART //= "ATtiny814"; # part doesn't matter just for reset
    make_updi;
 
-   print "Issuing Reset over UPDI\n";
+   print STDERR "Issuing Reset over UPDI\n";
    reset_chip;
 }
 
@@ -306,7 +308,7 @@ sub run_write_eeprom
 
    _generic_write( $data,
       $updi->partinfo->baseaddr_eeprom, $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom,
-      8 );
+      8, "EEPROM" );
 }
 
 =head2 read-fuses
@@ -314,14 +316,18 @@ sub run_write_eeprom
 Reads fuse values.
 
    $ avr-updi read-fuses -p t814
-   WDTCFG    : 00
-   BODCFG    : 00
-   OSCCFG    : 02
-   TCD0CFG   : 00
-   SYSCFG0   : F6
-   SYSCFG1   : 07
-   APPEND    : 00
-   BOOTEND   : 00
+   WDTCFG : 00
+     WDTCFG.PERIOD    : OFF
+     WDTCFG.WINDOW    : OFF
+   BODCFG : 00
+     BODCFG.ACTIVE    : DIS
+     BODCFG.LVL       : BODLEVEL0
+     BODCFG.SAMPFREQ  : 1KHz
+     BODCFG.SLEEP     : DIS
+   OSCCFG : 02
+   ...
+
+Decoded values of fields are also printed.
 
 =cut
 
@@ -331,13 +337,29 @@ sub run_read_fuses
    check_signature;
 
    my @FUSES = @{ $updi->partinfo->fusenames };
+   my $fuseinfo = $updi->fuseinfo;
 
    foreach my $idx ( 0 .. $#FUSES ) {
-      my $fuse = $FUSES[$idx];
-      next if !defined $fuse;
+      my $regname = $FUSES[$idx];
+      next if !defined $regname;
 
-      my $value = $updi->read_fuse( $idx )->get;
-      printf "%-10s: %02X\n", $fuse, $value;
+      my $regvalue = $updi->read_fuse( $idx )->get;
+      printf "%-7s: %02X\n", $regname, $regvalue;
+
+      foreach my $fusename ( @{ $fuseinfo->{fuses} } ) {
+         my $fuse = $fuseinfo->{fusemap}{$fusename};
+         next unless $fuse->{reg} eq $regname;
+
+         my $val = $regvalue & $fuse->{mask};
+
+         if( $fuse->{values} ) {
+            my $chosen = first { $_->{value} == $val } $fuse->{values}->@*;
+            printf "  %s.%-10s: %s\n", $regname, $fusename, $chosen->{name};
+         }
+         else {
+            printf "  %s.%-10s: %d\n", $regname, $fusename, $val ? 1 : 0;
+         }
+      }
    }
 
    reset_chip;  # is this necessary?
@@ -347,7 +369,10 @@ sub run_read_fuses
 
 Writes fuse values.
 
-   $ avr-updi write-fuses -p t814 BODCFG=02
+   $ avr-updi write-fuses -p t814 BODCFG=02 SYSCFG0.RSTPINCFG=GPIO
+
+Fuses may be specified as numerical values for entire registers, or symbolic
+names for individual fields.
 
 =cut
 
@@ -356,21 +381,58 @@ sub run_write_fuses
    make_updi;
 
    if( $ERASE ) {
-      print "Erasing chip...\n";
+      print STDERR "Erasing chip...\n";
       $updi->erase_chip( no_reset => 1 )->get;
    }
 
    check_signature;
 
    my @FUSES = @{ $updi->partinfo->fusenames };
+   my $fuseinfo = $updi->fuseinfo;
+
+   my @values;
 
    foreach( @ARGV ) {
       my ( $name, $value ) = split m/=/, $_;
-      my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $name } 0 .. $#FUSES or
-         die "Unrecognised fuse";
 
-      $value = hex $value if $value =~ m/^0x/;
-      printf "Setting %s to %x\n", $name, $value;
+      if( $name =~ m/\./ ) {
+         my ( $regname, $fusename ) = $name =~ m/^(.*?)\.(.*)$/;
+         my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $regname } 0 .. $#FUSES or
+            die "Unrecognised fuse register $regname";
+         my $fuse = $fuseinfo->{fusemap}{$fusename} or
+            die "Unrecognised fuse $fusename";
+         $fuse->{reg} eq $regname or
+            die "Fuse $fusename does not live in register $regname";
+
+         my $mask = 0+$fuse->{mask};
+
+         if( $fuse->{values} ) {
+            my $chosen = first { $_->{name} eq $value } $fuse->{values}->@* or
+               die "Fuse $fusename does not have a value $value";
+            $value = $chosen->{value};
+         }
+         else {
+            $value = $value ? $mask : 0;
+         }
+
+         $values[$idx] //= $updi->read_fuse( $idx )->get;
+
+         $values[$idx] &= ~$mask;
+         $values[$idx] |= $value;
+      }
+      else {
+         my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $name } 0 .. $#FUSES or
+            die "Unrecognised fuse";
+
+         $value = hex $value if $value =~ m/^0x/;
+
+         $values[$idx] = $value;
+      }
+   }
+
+   foreach my $idx ( 0 .. $#values ) {
+      next unless defined( my $value = $values[$idx] );
+      printf "Setting %s to 0x%02X\n", $FUSES[$idx], $value;
 
       $updi->write_fuse( $idx, $value )->get;
    }

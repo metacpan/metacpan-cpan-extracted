@@ -2,7 +2,7 @@ package PESEL::Generator;
 
 #-----------------------------------------------------------------------
 use vars qw( $VERSION );
-$VERSION = 1.2;
+$VERSION = 1.3;
 #-----------------------------------------------------------------------
 use warnings;
 use strict;
@@ -15,17 +15,20 @@ sub new {
 }
 #=======================================================================
 sub pesel {
-	my $psl = 	sprintf( '%02d', rand 100 			) .
-				sprintf( '%02d', rand 13 			) .
-				sprintf( '%02d', rand 28 			) .
-				sprintf( '%03d', rand 1000 			) .
-				sprintf( '%d'  , rand > 0.5 ? 1 : 0 ) ;
-				
-	my @dig = split( //, $psl );
-	my $chk = $dig[ 0 ] * 1 + $dig[ 1 ] * 3 + $dig[ 2 ] * 7 + $dig[ 3 ] * 9 + $dig[ 4 ] * 1 + $dig[ 5 ] * 3 + $dig[ 6 ] * 7 + $dig[ 7 ] * 9 + $dig[ 8 ] * 1 + $dig[ 9 ] * 3;
-	my $lst = substr( $chk, -1, 1 );
-	
-	return $psl . ( ( 10 - $lst ) % 10 );
+	while( 1 ){
+		my $psl = 	sprintf( '%02d', rand 100 			) .
+					sprintf( '%02d', rand 13 			) .
+					sprintf( '%02d', rand 28 			) .
+					sprintf( '%03d', rand 1000 			) .
+					sprintf( '%d'  , rand > 0.5 ? 1 : 0 ) ;
+					
+		my @dig = split( //, $psl );
+		my $chk = $dig[ 0 ] * 1 + $dig[ 1 ] * 3 + $dig[ 2 ] * 7 + $dig[ 3 ] * 9 + $dig[ 4 ] * 1 + $dig[ 5 ] * 3 + $dig[ 6 ] * 7 + $dig[ 7 ] * 9 + $dig[ 8 ] * 1 + $dig[ 9 ] * 3;
+		my $lst = substr( $chk, -1, 1 );
+		
+		return $psl . ( 10 - $lst ) if $lst;
+		#return $psl . ( ( 10 - $lst ) % 10 );
+	}
 }
 #=======================================================================
 1;

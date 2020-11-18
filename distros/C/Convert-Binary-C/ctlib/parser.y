@@ -607,8 +607,8 @@ static        void  parser_error(ParserState *pState, const char *msg);
 %lex-param { ParserState *pState }
 
 %expect 1
-%pure-parser
-%error-verbose
+%define api.pure
+%define parse.error verbose
 
 %start source_file
 

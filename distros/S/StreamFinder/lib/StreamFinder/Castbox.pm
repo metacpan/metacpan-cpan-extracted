@@ -400,10 +400,13 @@ sub new
 		$self->{'year'} = $1  if ($datestuff =~ /(\d\d\d\d)\s*$/);
 	}
 	$self->{'year'} ||= $1  if ($html =~ s#\<span\s+class\=\"item\s+icon\s+date\"\>(\d\d\d\d)##s);
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+#	$self->{'title'} =~ s#\\u0027#\"#g;
+	$self->{'title'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'title'} =~ s#\\u0027#\"#g;
-	$self->{'description'} =~ s#\\u0027#\"#g;
+	$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	$self->{'iconurl'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
 	$self->{'iconurl'} ||= $1  if ($html =~ s#\"\,\"image\"\:\"([^\"]+)\"\}\}\]\}##s);
 	$self->{'imageurl'} = $self->{'iconurl'};

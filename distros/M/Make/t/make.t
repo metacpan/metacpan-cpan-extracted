@@ -191,7 +191,11 @@ for my $tuple ( [ undef, undef ], [ undef, 'subdir' ], [qw(GNUmakefile subdir)] 
     is_deeply $got, [qw(a.o b.o)] or diag explain $got;
     $got = $m->target('a.o')->rules->[0]->prereqs;
     is_deeply $got, ['src/a.c'] or diag explain $got;
+    $got = [ sort $m->targets ];
+    is_deeply $got, [qw(a.o all b.o)], 'targets' or diag explain $got;
     $m->Make('all');
+    $got = [ sort $m->targets ];
+    is_deeply $got, [qw(a.o all b.c b.o src/a.c)], 'targets after' or diag explain $got;
     $contents = do { local $/; open my $fh, '<', $tempfile; <$fh> };
     is $contents, "COMPILE -c -o a.o src/a.c\nCOMPILE -c -o b.o b.c\n";
 }
@@ -215,7 +219,7 @@ sub make_fsmap {
         },
         fh_open => sub {
             require Carp;
-            Carp::croak "@_: No such file or directory" unless exists $vfs_copy{ $_[1] };
+            Carp::confess "open @_: No such file or directory" unless exists $vfs_copy{ $_[1] };
             my $file_tuple = $vfs_copy{ $_[1] };
             open my $fh, "+$_[0]", \$file_tuple->[1];
             $fh2file_tuple{$fh} = $file_tuple;

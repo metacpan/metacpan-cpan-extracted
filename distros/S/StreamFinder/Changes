@@ -185,3 +185,7 @@ Revision history for StreamFinder
         - "internationalize" several sites (eliminate the ".com" from the 
         required matching regices (allow for ".eu", ".net", etc. to match").
 1.35    - Fix regex glitch breaking the sites we "internationalized" in v1.34.
+1.36    - StreamFinder::Apple: Return correct description for podcast episodes.
+        - StreamFinder::Spreaker: Fix minor title and image issues.
+        - StreamFinder::Youtube: (For now): convert www.youtube.com to 
+        youtube.be to get around youtube.com seeming to block youtube-dl.

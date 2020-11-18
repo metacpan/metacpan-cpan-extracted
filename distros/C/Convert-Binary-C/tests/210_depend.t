@@ -11,7 +11,7 @@ use Convert::Binary::C @ARGV;
 
 $^W = 1;
 
-BEGIN { plan tests => 483 }
+BEGIN { plan tests => 90 }
 
 my $CCCFG = require './tests/include/config.pl';
 

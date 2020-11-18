@@ -23,37 +23,36 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FunctionalPerl::Htmlgen::UriUtil;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw();
-@EXPORT_OK=qw(uri_add URI_is_internal);
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
-
-use strict; use warnings; use warnings FATAL => 'uninitialized';
-use Function::Parameters qw(:strict);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use experimental "signatures";
 use Sub::Call::Tail;
+use Exporter "import";
+
+our @EXPORT      = qw();
+our @EXPORT_OK   = qw(uri_add URI_is_internal);
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
+
 use FP::Docstring;
 use Chj::TEST;
 use URI;
 
-fun uri_add ($base,$rel) {
-    __  '($basestr,$relstr) -> $str '.
-        '-- (via URI.pm)';
-    URI->new($rel)->abs(URI->new($base)).""
+sub uri_add ($base, $rel) {
+    __ '($basestr,$relstr) -> $str ' . '-- (via URI.pm)';
+    URI->new($rel)->abs(URI->new($base)) . ""
 }
 
-TEST { uri_add "http://bar.com/baz/", "/zoo#hm" } "http://bar.com/zoo#hm";
-TEST { uri_add "http://bar.com/baz/", "zoo" } "http://bar.com/baz/zoo";
-TEST { uri_add "http://bar.com/baz", "zoo" } "http://bar.com/zoo";
+TEST { uri_add "http://bar.com/baz/",    "/zoo#hm" } "http://bar.com/zoo#hm";
+TEST { uri_add "http://bar.com/baz/",    "zoo" } "http://bar.com/baz/zoo";
+TEST { uri_add "http://bar.com/baz",     "zoo" } "http://bar.com/zoo";
 TEST { uri_add "http://bar.com/baz/#ax", "#bx" } "http://bar.com/baz/#bx";
-
 
 # Instead of monkey-patching into the URI package, use a local
 # name. (We're in need of lexical method definitions!)
-method URI_is_internal () {
+sub URI_is_internal($self) {
     not defined $self->scheme
 }
-
 
 1

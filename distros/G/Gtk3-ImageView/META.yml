@@ -28,5 +28,7 @@ requires:
   Glib: '1.21'
   Gtk3: '0'
   Readonly: '0'
-version: '4'
+resources:
+  repository: https://github.com/carygravel/gtk3-imageview.git
+version: '6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

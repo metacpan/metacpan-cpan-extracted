@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::Youtube;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $video = new StreamFinder::Youtube($ARGV[0]);
 
@@ -112,7 +112,7 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "fast" [ => 0|(1) ]])
+=item B<new>(I<ID>|I<url> [, "debug" [ => 0|(1)|2 ]] [, "fast" [ => 0|(1) ]])
 
 Accepts a youtube.com video ID, or any full URL that youtube-dl supports 
 and creates and returns a new video object, or I<undef> if the URL is 
@@ -378,12 +378,13 @@ sub new
 	(my $url2fetch = $url);
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 	if ($url2fetch =~ m#^https?\:#) {
+$url2fetch =~ s/www\.youtube\.com/youtube\.be/;  #WWW.YOUTUBE.COM SEEMS TO NOW BE BLOCKING youtube-dl?! :/
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 		$self->{'id'} =~ s/^watch\?v\=//;
 		$self->{'id'} =~ s/[\?\&].*$//;
 	} else {
 		$self->{'id'} = $url;
-		$url2fetch = 'https://www.youtube.com/watch?v=' . $url;
+		$url2fetch = 'https://youtube.be/watch?v=' . $url;
 	}
 	print STDERR "-1 FETCHING URL=$url= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'iconurl'} = '';

@@ -29,14 +29,15 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package Chj::pp;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(pp pp_);
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(pp pp_);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Data::Dumper;
 use Chj::TerseDumper;
@@ -46,15 +47,14 @@ sub Dump {
 }
 
 sub pp {
-    print STDERR Dump (@_);
+    print STDERR Dump(@_);
     wantarray ? @_ : $_[-1]
 }
 
 sub pp_ {
-    my $msg=shift;
-    print STDERR "$msg:", (@_>1 ? "\n" : " "), Dump (@_);
+    my $msg = shift;
+    print STDERR "$msg:", (@_ > 1 ? "\n" : " "), Dump(@_);
     wantarray ? @_ : $_[-1]
 }
-
 
 1

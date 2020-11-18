@@ -1,6 +1,6 @@
 package Mail::BIMI::App::Command::checkvmc;
 # ABSTRACT: Check an VMC for validation
-our $VERSION = '2.20201102.2'; # VERSION
+our $VERSION = '2.20201117.2'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
@@ -18,6 +18,7 @@ sub opt_spec {
   return (
     [ 'profile=s', 'SVG Profile to validate against ('.join('|',@Mail::BIMI::Indicator::VALIDATOR_PROFILES).')' ],
     [ 'domain=s', 'Domain' ],
+    [ 'selector=s', 'Selector' ],
     [ 'fromfile', 'Fetch from file instead of from URI' ],
   );
 }
@@ -26,6 +27,7 @@ sub validate_args($self,$opt,$args) {
  $self->usage_error('No URI specified') if !@$args;
  $self->usage_error('Multiple URIs specified') if scalar @$args > 1;
  $self->usage_error('Unknown SVG Profile') if $opt->profile && !grep {;$_ eq $opt->profile} @Mail::BIMI::Indicator::VALIDATOR_PROFILES;
+ $self->usage_error('Selector requires domain') if $opt->selector && !$opt->domain;
 }
 
 sub execute($self,$opt,$args) {
@@ -44,7 +46,7 @@ sub execute($self,$opt,$args) {
 
   my $bimi = Mail::BIMI->new(%bimi_opt);
 
-  my $vmc = Mail::BIMI::VMC->new( check_domain => $opt->domain//'', uri => $uri, bimi_object => $bimi );
+  my $vmc = Mail::BIMI::VMC->new( check_domain => $opt->domain//'', check_selector => $opt->selector//'default', uri => $uri, bimi_object => $bimi );
   #  $indicator->validator_profile($opt->profile) if $opt->profile;
   say "BIMI VMC checker";
   say '';
@@ -75,11 +77,11 @@ Mail::BIMI::App::Command::checkvmc - Check an VMC for validation
 
 =head1 VERSION
 
-version 2.20201102.2
+version 2.20201117.2
 
 =head1 DESCRIPTION
 
-App::Cmd class implementing the 'mailbimi checksvg' command
+App::Cmd class implementing the 'mailbimi checkvmc' command
 
 =head1 REQUIRES
 

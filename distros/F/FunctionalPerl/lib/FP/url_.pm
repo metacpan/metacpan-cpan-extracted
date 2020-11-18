@@ -14,7 +14,7 @@ FP::url_
 =head1 SYNOPSIS
 
     use FP::url_;
-    my $u= url_ path=> "index.html", fragment=> "foo#bar";
+    my $u = url_ path => "index.html", fragment => "foo#bar";
     # $u is an URI object
     is "$u", 'index.html#foo%23bar';
 
@@ -28,34 +28,32 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::url_;
-@ISA="Exporter"; require Exporter;
-@EXPORT=qw(url_);
-@EXPORT_OK=qw();
-%EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use Exporter "import";
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+our @EXPORT      = qw(url_);
+our @EXPORT_OK   = qw();
+our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use URI;
 
-our @keys=
-  qw(scheme path fragment);
+our @keys = qw(scheme path fragment);
 
-our %keys=
-  map { $_=> $_ } @keys;
+our %keys = map { $_ => $_ } @keys;
 
 sub url_ {
-    my $u= new URI;
+    my $u = new URI;
     while (@_) {
-        my $k=shift;
+        my $k = shift;
         @_ or die "url_: uneven number of arguments";
-        my $v=shift;
-        my $m= $keys{$k} // die "url_: unknown key '$k'";
+        my $v = shift;
+        my $m = $keys{$k} // die "url_: unknown key '$k'";
         $u->$m($v);
     }
     $u
 }
-
 
 1

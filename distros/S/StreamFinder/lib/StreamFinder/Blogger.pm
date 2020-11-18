@@ -113,7 +113,7 @@ and the separate application program:  youtube-dl.
 
 =item B<new>(I<url> [, I<-youtube> => (yes)|no|only ] [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, "debug" [ => 0|(1)|2 ]])
 
-Accepts a blogger.com video ID or URL and creates and returns a new video object, 
+Accepts a blogger.com video URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Blogger video or no streams are found.  
 The URL can be the full URL, ie. https://www.blogger.com/B<video-id>, 
 or just I<video-id>.
@@ -391,7 +391,7 @@ sub new
 	print STDERR "-0(Blogger): URL=$url=\n"  if ($DEBUG);
 	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
 	(my $url2fetch = $url);
-	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-1 FETCHING URL=$url2fetch=\n"  if ($DEBUG);
 	$self->{'iconurl'} = '';
 	$self->{'title'} = 'untitled Blogger.com video';
 	$self->{'description'} = '';

@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Composite - Composite output
 
 VERSION
-    version 0.016
+    version 0.017
 
 SYNOPSIS
      use Log::ger::Output Composite => (
@@ -144,6 +144,9 @@ ENVIRONMENT
   LOG_LOG_GER_OUTPUT_COMPOSITE_CODE
     Bool. If set to true will print the generated logger source code to
     stderr.
+
+  LOG_GER_OUTPUT_COMPOSITE_DEBUG
+    Bool. If set to true, will print some debugging messages to stderr.
 
 SEE ALSO
 AUTHOR

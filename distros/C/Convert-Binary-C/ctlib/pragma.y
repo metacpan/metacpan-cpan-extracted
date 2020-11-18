@@ -208,8 +208,8 @@ static        void         packelem_delete(PackElement *pPack);
 %parse-param { PragmaState *pState }
 %lex-param { PragmaState *pState }
 
-%pure-parser
-%error-verbose
+%define api.pure
+%define parse.error verbose
 
 %start pragma
 %%

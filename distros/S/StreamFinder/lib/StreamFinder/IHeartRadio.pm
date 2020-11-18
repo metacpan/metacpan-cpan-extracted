@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::IHeartRadio;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $station = new StreamFinder::IHeartRadio($ARGV[0], -keep => 
 			{'secure_shoutcast', 'secure', 'any'}, -skip => 'rtmp');
@@ -108,7 +108,7 @@ One or more stream URLs can be returned for each station or podcast.
 
 =over 4
 
-=item B<new>(I<url> [, I<-keep|-skip> => I<streamtypes> | I<-debug> [ => 0|1|2 ] ... ])
+=item B<new>(I<ID>|I<url> [, I<-keep|-skip> => I<streamtypes> | I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
 new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 

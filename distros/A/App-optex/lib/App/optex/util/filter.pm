@@ -23,7 +23,9 @@ util::filter - optex fitler utility module
 
 B<optex> [ --if/--of I<command> ] I<command>
 
-B<optex> [ --isub/--osub I<function> ] I<command>
+B<optex> [ --if/--of I<&function> ] I<command>
+
+B<optex> [ --isub/--osub/--psub I<function> ] I<command>
 
 B<optex> I<command> -Mutil::I<filter> [ options ]
 
@@ -51,7 +53,8 @@ you to share information between pre-fork and output filter processes.
 
 =item B<--psub> I<function>
 
-Set input/output function.  Tis is shortcut for B<--if> B<&>I<function>.
+Set filter function.  These are shortcut for B<--if> B<&>I<function>
+and such.
 
 =item B<--set-io-color> IO=I<color>
 
@@ -296,6 +299,10 @@ Gzip standard input.
 ######################################################################
 
 =back
+
+=head1 SEE ALSO
+
+L<App::optex::xform>
 
 =cut
 

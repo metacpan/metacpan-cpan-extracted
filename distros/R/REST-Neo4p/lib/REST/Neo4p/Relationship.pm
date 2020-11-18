@@ -6,7 +6,7 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Relationship::VERSION = '0.3030';
+  $REST::Neo4p::Relationship::VERSION = '0.4000';
 }
 
 sub new {
@@ -49,15 +49,31 @@ sub simple_from_json_response {
   my $class = shift;
   my ($decoded_resp) = @_;
   my $ret;
-  # reln id
-  ($ret->{_relationship}) = $decoded_resp->{self} =~ m{.*/([0-9]+)$};
-  # reln type
-  $ret->{_type} = $decoded_resp->{type};
-  # reln properties
-  $ret->{$_} = $decoded_resp->{data}->{$_} for keys %{$decoded_resp->{data}};
-  # start and end nodes (by id)
-  ($ret->{_start}) = $decoded_resp->{start} =~ m{.*/([0-9]+)$};
-  ($ret->{_end}) = $decoded_resp->{end} =~ m{.*/([0-9]+)$};
+  for (ref $decoded_resp) {
+    /HASH/ && do {
+      # reln id
+      ($ret->{_relationship}) = $decoded_resp->{self} =~ m{.*/([0-9]+)$};
+      # reln type
+      $ret->{_type} = $decoded_resp->{type};
+      # reln properties
+      $ret->{$_} = $decoded_resp->{data}->{$_} for keys %{$decoded_resp->{data}};
+      # start and end nodes (by id)
+      ($ret->{_start}) = $decoded_resp->{start} =~ m{.*/([0-9]+)$};
+      ($ret->{_end}) = $decoded_resp->{end} =~ m{.*/([0-9]+)$};
+      last;
+    };
+    /Driver/ && do {
+      $ret->{_relationship} = $decoded_resp->id;
+      $ret->{_type} = $decoded_resp->type;
+      $ret->{$_} = $decoded_resp->properties->{$_} for keys %{$decoded_resp->properties};
+      $ret->{_start} = $decoded_resp->start_id;
+      $ret->{_end} = $decoded_resp->end_id;
+      last;
+    };
+    do {
+      die "?";
+    };
+  }
   return $ret;
 }
 
@@ -166,7 +182,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Node>, L<REST::Neo4p::Index>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

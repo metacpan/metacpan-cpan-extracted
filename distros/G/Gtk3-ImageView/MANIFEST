@@ -8,8 +8,10 @@ lib/Gtk3/ImageView/Tool/Selector.pm
 lib/Gtk3/ImageView/Tool/SelectorDragger.pm
 t/1_basics.t
 t/2_transparent.t
+t/2color.svg
 t/3_zoom.t
 t/4_select.t
+t/5_filter.t
 t/90_MANIFEST.t
 t/91_critic.t
 t/bigpic.svg

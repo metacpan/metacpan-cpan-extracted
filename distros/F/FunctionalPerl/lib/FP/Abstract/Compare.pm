@@ -16,7 +16,7 @@ FP::Abstract::Compare - comparison protocol
     package FPCompareExample::Foo {
         use FP::Struct ["num"];
         sub FP_Compare_compare {
-            my ($a, $b)=@_;
+            my ($a, $b) = @_;
             # let's make the default sort order reversed for the sake
             # of a more interesting example:
             $b->num cmp $a->num
@@ -53,14 +53,12 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Abstract::Compare;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
-sub FP_Interface__method_names {
-    ("FP_Compare_compare")
-}
-
+sub FP_Interface__method_names { ("FP_Compare_compare") }
 
 1

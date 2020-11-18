@@ -1,3 +1,6 @@
+2.62 2020-11-16
+- fix label quoting
+
 2.61 2020-11-08
 - support Perl 5.8.8
 

@@ -1,26 +1,26 @@
 package File::JSON::Slurper;
-$File::JSON::Slurper::VERSION = '0.03';
+$File::JSON::Slurper::VERSION = '1.00';
 use 5.006;
 use strict;
 use warnings;
 
 use parent 'Exporter';
 use JSON::MaybeXS qw/ encode_json decode_json /;
-use File::Slurper qw/ read_text write_text /;
+use File::Slurper qw/ read_binary write_binary /;
 
 our @EXPORT_OK = qw/ read_json write_json /;
 
 sub read_json
 {
-    my $json = read_text(@_);
+    my $json = read_binary(@_);
     return decode_json($json);
 }
 
 sub write_json
 {
-    my ($filename, $ref, @args) = @_;
+    my ($filename, $ref) = @_;
     my $json = encode_json($ref);
-    return write_text($filename, $json, @args);
+    return write_binary($filename, $json);
 }
 
 1;
@@ -57,22 +57,18 @@ you must specify which function(s) you want to import.
 
 =head1 FUNCTIONS
 
-=head2 read_json($filename, $encoding)
+=head2 read_json($filename)
 
-Read JSON from C<$filename> and convert it to a Perl data structure.
+Read JSON from C<$filename> as UTF-8
+and convert it to a Perl data structure.
 You'll get back either an arrayref or a hashref.
 
-You can optionally specify the C<$encoding> of the file,
-which defaults to UTF-8.
 
-
-=head2 write_json($filename, $ref, $encoding)
+=head2 write_json($filename, $ref)
 
 Takes a Perl data structure C<$ref>,
-converts it to JSON and then writes it to file C<$filename>.
-
-You can optionally specify an C<$encoding>,
-which defaults to UTF-8.
+converts it to JSON and then writes it to file C<$filename>
+as UTF-8.
 
 
 =head1 SEE ALSO

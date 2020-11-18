@@ -24,7 +24,7 @@ file.
 
 	use StreamFinder::Tunein;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|ID/ID|URL\n"  unless ($ARGV[0]);
 
 	my $station = new StreamFinder::Tunein($ARGV[0]);
 
@@ -119,7 +119,7 @@ calling youtube-dl.
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<ID/ID>|I<url> [, "debug" [ => 0|1|2 ]])
 
 Accepts a tunein.com station / podcast ID or URL and creates and returns a new 
 station object, or I<undef> if the URL is not a valid Tunein station or podcast, 

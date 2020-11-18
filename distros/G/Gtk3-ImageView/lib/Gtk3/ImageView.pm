@@ -17,7 +17,7 @@ use Readonly;
 Readonly my $HALF     => 0.5;
 Readonly my $MAX_ZOOM => 100;
 
-our $VERSION = 4;
+our $VERSION = 6;
 
 use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     'zoom-changed' => {
@@ -103,6 +103,13 @@ use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
         100.0,                     # default_value
         [qw/readable writable/]    # flags
     ),
+    Glib::ParamSpec->string(
+        'interpolation',                                      # name
+        'interpolation',                                      # nick
+        'Interpolation method to use, from Cairo::Filter',    # blurb
+        'good',                                               # default
+        [qw/readable writable/],                              # flags
+    ),
   ];
 
 sub INIT_INSTANCE {
@@ -177,6 +184,10 @@ sub SET_PROPERTY {
                 }
             }
             when ('resolution-ratio') {
+                $self->{$name} = $newval;
+                $invalidate = TRUE;
+            }
+            when ('interpolation') {
                 $self->{$name} = $newval;
                 $invalidate = TRUE;
             }
@@ -309,6 +320,7 @@ sub _draw {
         my $offset = $self->get_offset;
         $context->translate( $offset->{x}, $offset->{y} );
         Gtk3::Gdk::cairo_set_source_pixbuf( $context, $pixbuf, 0, 0 );
+        $context->get_source->set_filter( $self->get_interpolation );
     }
     else {
         my $bgcol = $style->get( 'normal', 'background-color' );
@@ -625,6 +637,17 @@ sub update_cursor {
     return;
 }
 
+sub set_interpolation {
+    my ( $self, $interpolation ) = @_;
+    $self->set( 'interpolation', $interpolation );
+    return;
+}
+
+sub get_interpolation {
+    my ($self) = @_;
+    return $self->get('interpolation');
+}
+
 1;
 
 __END__
@@ -637,7 +660,7 @@ Gtk3::ImageView - Image viewer widget for Gtk3
 
 =head1 VERSION
 
-4
+6
 
 =head1 SYNOPSIS
 
@@ -782,6 +805,14 @@ with non-square pixels to be correctly displayed.
 
 Returns the current resolution ratio.
 
+=head2 $view->set_interpolation
+
+The interpolation method to use, from L<C<cairo_filter_t>|https://www.cairographics.org/manual/cairo-cairo-pattern-t.html#cairo-filter-t> type. Possible values are lowercase strings like C<nearest>. To use different interpolation depending on zoom, set it in the C<zoom-changed> signal.
+
+=head2 $view->get_interpolation
+
+Returns the current interpolation method.
+
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -808,7 +839,7 @@ Returns the current resolution ratio.
      background-image: url('checkers.svg');
  }
 
-=item * C<set_interpolation()> is not yet implemented.
+=item * C<set_interpolation()> now accepts L<C<cairo_filter_t>|https://www.cairographics.org/manual/cairo-cairo-pattern-t.html#cairo-filter-t> instead of L<C<GdkInterpType>|https://developer.gnome.org/gdk-pixbuf/stable/gdk-pixbuf-Scaling.html#GdkInterpType>.
 
 =back
 

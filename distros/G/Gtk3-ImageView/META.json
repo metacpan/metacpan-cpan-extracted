@@ -50,6 +50,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "4",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/carygravel/gtk3-imageview.git",
+         "web" : "https://github.com/carygravel/gtk3-imageview"
+      }
+   },
+   "version" : "6",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

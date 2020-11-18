@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::StrictCORS;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 $VERSION = eval $VERSION;
 
 use constant DEFAULT_MAX_AGE => 3600;
@@ -12,33 +12,47 @@ sub register {
   $conf->{max_age}  //= DEFAULT_MAX_AGE;
   $conf->{expose}   //= [];
 
-  # Get route options
-  my $route_opts = sub {
-    my ($route) = @_;
+  # Recursive get route params
+  my $route_params = sub {
+    my ($c) = @_;
 
-    my %opts;
+    my $route = $c->match->endpoint;
 
+    my %params;
     my @fields = qw/origin credentials expose methods headers/;
 
     while ($route) {
       for my $name (@fields) {
-        next if exists $opts{$name};
+        next if exists $params{$name};
         next unless exists $route->to->{"cors_${name}"};
 
-        $opts{$name} = $route->to->{"cors_${name}"}
+        $params{$name} = $route->to->{"cors_${name}"};
       }
 
       $route = $route->parent;
     }
 
-    return %opts;
+    return \%params;
+  };
+
+  my $check_preflight = sub {
+    my ($c) = @_;
+
+    my $h = $c->req->headers;
+
+    return 1 if $h->header('Origin') =~ qr/\S/ms
+      and $h->header('Access-Control-Request-Method') =~ qr/\S/ms;
+
+    return; # Fail
   };
 
   # Check Origin header
   my $check_origin = sub {
     my ($c, @allow) = @_;
 
-    my $origin = $c->req->headers->origin;
+    my $h = $c->req->headers;
+
+    my $origin = $h->origin;
     return unless defined $origin;
 
     return $origin if grep { not ref $_ and $_ eq '*' } @allow;
@@ -46,7 +60,7 @@ sub register {
     return $origin if grep {
       if    (not ref $_)          { lc $origin eq lc $_ }
       elsif (ref $_ eq 'Regexp')  { $origin =~ $_ }
-      else  { die "Wrong router config 'cors_origin'" }
+      else  { die "Router 'cors_origin' param must be scalar or Regexp\n" }
     } @allow;
 
     $app->log->debug("Reject CORS Origin '$origin'");
@@ -58,14 +72,16 @@ sub register {
   my $check_methods = sub {
     my ($c, @allow) = @_;
 
-    my $method = $c->req->headers->header('Access-Control-Request-Method');
+    my $h = $c->req->headers;
+
+    my $method = $h->header('Access-Control-Request-Method');
     return unless defined $method;
 
     my $allow = join ", ", @allow;
 
     return $allow if grep {
       if    (not ref $_)  { uc $method eq uc $_ }
-      else  { die "Wrong router config 'cors_methods'" }
+      else  { die "Router 'cors_methods' param must be scalar\n" }
     } @allow;
 
     $app->log->debug("Reject CORS Method '$method'");
@@ -76,6 +92,8 @@ sub register {
   # Check request headers
   my $check_headers = sub {
     my ($c, @allow) = @_;
+
+    my $h = $c->req->headers;
 
     my @safe_headers = qw/
       Cache-Control
@@ -89,14 +107,14 @@ sub register {
     my %safe_headers = map { lc $_ => 1 } @safe_headers;
     my $allow = join ", ", @allow;
 
-    my $headers = $c->req->headers->header('Access-Control-Request-Headers');
+    my $headers = $h->header('Access-Control-Request-Headers');
     my @headers = map { lc } grep { $_ } split /,\s*/ms, $headers || '';
 
     return $allow unless @headers;
 
     return $allow unless grep {
       if    (not ref $_)  { not $safe_headers{ lc $_ } }
-      else  { die "Wrong router config 'cors_headers'" }
+      else  { die "Router 'cors_headers' param must be scalar\n" }
     } @allow;
 
     $app->log->debug("Reject CORS Headers '$headers'");
@@ -113,26 +131,27 @@ sub register {
     # Do not process preflight requests
     return $next->() if $c->req->method eq 'OPTIONS';
 
-    my %opts = $route_opts->($c->match->endpoint);
+    my $params = $route_params->($c);
 
-    my @opts_origin = @{$opts{origin} //= []};
-    return $next->() unless @opts_origin;
+    # Do not process routes without cors_origin configured
+    my @params_origin = @{$params->{origin} //= []};
+    return $next->() unless @params_origin;
 
     my $h = $c->res->headers;
     $h->append('Vary' => 'Origin');
 
-    my $origin = $check_origin->($c, @opts_origin);
+    my $origin = $check_origin->($c, @params_origin);
     return $next->() unless defined $origin;
 
     $h->header('Access-Control-Allow-Origin' => $origin);
 
     $h->header('Access-Control-Allow-Credentials' => 'true')
-      if $opts{credentials} //= 0;
+      if $params->{credentials} //= 0;
 
-    my @opts_expose = (@{$conf->{expose}}, @{$opts{expose} //= []});
-    if (@opts_expose) {
-      my $opts_expose = join ", ", @opts_expose;
-      $h->header('Access-Control-Expose-Headers' => $opts_expose);
+    my @params_expose = (@{$conf->{expose}}, @{$params->{expose} //= []});
+    if (@params_expose) {
+      my $params_expose = join ", ", @params_expose;
+      $h->header('Access-Control-Expose-Headers' => $params_expose);
     }
 
     $app->log->debug("Allow CORS Origin '$origin'");
@@ -140,70 +159,44 @@ sub register {
     return $next->();
   });
 
-  # CORS Under
-  $app->routes->add_shortcut(under_cors => sub {
-    my ($r, @args) = @_;
-
-    $r->under(@args)->to(
-      cb => sub {
-        my ($c) = @_;
-
-        # Not a CORS request, success
-        return 1 unless defined $c->req->headers->origin;
-
-        my %opts = $route_opts->($c->match->endpoint);
-
-        # Route configured for CORS, success
-        return 1 if @{$opts{origin} //= []};
-
-        $c->render(status => 403, text => "CORS Forbidden");
-        $app->log->debug("Forbidden CORS request");
-
-        return; # Fail
-      }
-    );
-  });
-
   # CORS Preflight
   $app->routes->add_shortcut(cors => sub {
     my ($r, @args) = @_;
 
-    $r->route(@args)->options->over(
-      headers => {
-        'Origin' => qr/\S/ms,
-        'Access-Control-Request-Method' => qr/\S/ms
-      }
-    )->to(
+    $r->options(@args)->to(
       cb => sub {
         my ($c) = @_;
 
-        my %opts = $route_opts->($c->match->endpoint);
-
-        my @opts_origin = @{$opts{origin} //= []};
         return $c->render(status => 204, data => '')
-          unless @opts_origin;
+          unless $check_preflight->($c);
+
+        my $params = $route_params->($c);
+
+        my @params_origin = @{$params->{origin} //= []};
+        return $c->render(status => 204, data => '')
+          unless @params_origin;
 
         my $h = $c->res->headers;
         $h->append('Vary' => 'Origin');
 
-        my $origin = $check_origin->($c, @opts_origin);
+        my $origin = $check_origin->($c, @params_origin);
         return $c->render(status => 204, data => '')
           unless defined $origin;
 
-        my @opts_methods = @{$opts{methods} //= []};
-        push @opts_methods, 'HEAD'
-          if grep { uc $_ eq 'GET' } @opts_methods
-            and not grep { uc $_ eq 'HEAD' } @opts_methods;
+        my @params_methods = @{$params->{methods} //= []};
+        push @params_methods, 'HEAD'
+          if grep { uc $_ eq 'GET' } @params_methods
+            and not grep { uc $_ eq 'HEAD' } @params_methods;
         return $c->render(status => 204, data => '')
-          unless @opts_methods;
+          unless @params_methods;
 
-        my $methods = $check_methods->($c, @opts_methods);
+        my $methods = $check_methods->($c, @params_methods);
         return $c->render(status => 204, data => '')
           unless defined $methods;
 
-        my @opts_headers = @{$opts{headers} //= []};
+        my @params_headers = @{$params->{headers} //= []};
 
-        my $headers = $check_headers->($c, @opts_headers);
+        my $headers = $check_headers->($c, @params_headers);
         return $c->render(status => 204, data => '')
           unless defined $headers;
 
@@ -214,12 +207,11 @@ sub register {
           if $headers;
 
         $h->header('Access-Control-Allow-Credentials' => 'true')
-          if $opts{credentials} //= 0;
+          if $params->{credentials} //= 0;
 
         $h->header('Access-Control-Max-Age' => $conf->{max_age});
 
         $app->log->debug("Accept CORS '$origin' => '$methods'");
-
         return $c->render(status => 204, data => '');
       }
     );
@@ -263,9 +255,6 @@ Mojolicious::Plugin::StrictCORS - Strict and secure control over CORS
     # allow non-simple (with preflight) CORS on this route
     $r->cors(...);
 
-    # create under to protect all nested routes
-    $r = $app->routes->under_cors("/v1");
-
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::StrictCORS> is a plugin that allow you to configure
@@ -288,8 +277,6 @@ Don't use the lazy cors_origin => ['*'] for resources which should be
 available only from some known websites - otherwise other malicious website
 will be able to attack your site by injecting JavaScript into the victim's
 browser.
-
-Consider using C<under_cors()> - it won't "save" you but may helps.
 
 =head1 INTERFACE
 
@@ -432,20 +419,6 @@ This route use 'headers' condition, so you can add your own handler for
 OPTIONS method on same path after this one, to handle non-CORS OPTIONS
 requests on same path.
 
-=head2 under_cors
-
-    $route = $app->routes->under_cors(...)
-
-Accept same params as L<Mojolicious::Routes::Route/"under">.
-
-Under returned route CORS requests to any route which isn't configured
-for CORS (i.e. won't have C<cors_origin> in route's default parameters)
-will be rendered as "403 Forbidden".
-
-This feature should make it harder to attack your site by injecting
-JavaScript into the victim's browser on vulnerable website. More details:
-L<https://code.google.com/p/html5security/wiki/CrossOriginRequestSecurity#Processing_rogue_COR:>.
-
 =head1 OPTIONS
 
 L<Mojolicious::Plugin::StrictCORS> supports the following options.
@@ -506,7 +479,7 @@ Dmitry Krutikov E<lt>monstar@cpan.orgE<gt>
 
 Copyright 2020 Dmitry Krutikov.
 
-You may distribute under the terms of either the GNU General Public
-License or the Artistic License, as specified in the README file.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

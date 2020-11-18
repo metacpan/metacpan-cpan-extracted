@@ -1,0 +1,51 @@
+{
+   "abstract" : "mixin class for 802.1D spanning tree information from Cisco NXOS devices.",
+   "author" : [
+      "Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-SNMP-Mixin-NXOSDot1dStp",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::SNMP" : "v6.0.0",
+            "Net::SNMP::Mixin" : "0.14",
+            "Sub::Exporter" : "0.978",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SNMP::Mixin::NXOSDot1dStp" : {
+         "file" : "lib/Net/SNMP/Mixin/NXOSDot1dStp.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

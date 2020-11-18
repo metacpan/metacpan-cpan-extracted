@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-11'; # DATE
+our $DATE = '2020-11-17'; # DATE
 our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ http-tiny-plugin - Perform request(s) with HTTP::Tiny::Plugin
 
 =head1 VERSION
 
-This document describes version 0.008 of http-tiny-plugin (from Perl distribution App-HTTPTinyUtils), released on 2020-11-11.
+This document describes version 0.009 of http-tiny-plugin (from Perl distribution App-HTTPTinyUtils), released on 2020-11-17.
 
 =head1 SYNOPSIS
 

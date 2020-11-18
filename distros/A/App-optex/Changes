@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.4.1 2020-11-17T00:14:33Z
+
+    - Add dependency for Time::Piece.
+
 v0.4 2020-10-27T02:15:02Z
 
     - Show modules in standard search path by -M option.

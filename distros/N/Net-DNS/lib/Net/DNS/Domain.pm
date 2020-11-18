@@ -3,7 +3,7 @@ package Net::DNS::Domain;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Domain.pm 1816 2020-10-16 09:44:21Z willem $)[2];
+our $VERSION = (qw$Id: Domain.pm 1825 2020-11-18 13:15:01Z willem $)[2];
 
 
 =head1 NAME
@@ -26,8 +26,8 @@ Each domain object instance represents a single DNS domain which
 has a fixed identity throughout its lifetime.
 
 Internally, the primary representation is a (possibly empty) list
-of ASCII domain name labels, and optional link to an arbitrary
-origin domain object topologically closer to the DNS root.
+of ASCII domain name labels, and optional link to an origin domain
+object topologically closer to the DNS root.
 
 The computational expense of Unicode character-set conversion is
 partially mitigated by use of caches.

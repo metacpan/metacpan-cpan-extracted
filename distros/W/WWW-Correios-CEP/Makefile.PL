@@ -17,7 +17,8 @@ my %WriteMakefileArgs = (
   "NAME" => "WWW::Correios::CEP",
   "PREREQ_PM" => {
     "Encode" => 0,
-    "HTML::TreeBuilder::XPath" => 0,
+    "JSON" => 0,
+    "LWP::Protocol::https" => "6.09",
     "LWP::UserAgent" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::RequiresInternet" => "0.05"
   },
-  "VERSION" => "1.031",
+  "VERSION" => "1.041",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +37,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Encode" => 0,
-  "HTML::TreeBuilder::XPath" => 0,
+  "JSON" => 0,
+  "LWP::Protocol::https" => "6.09",
   "LWP::UserAgent" => 0,
   "Test::More" => 0,
   "Test::RequiresInternet" => "0.05",

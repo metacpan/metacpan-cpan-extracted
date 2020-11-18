@@ -1,5 +1,14 @@
 Revision history for Perl extension CheckDigits.
 
+v1.3.5 Wed Nov 18 16:18:35 CET 2020
+	- added links to repository and bugtracker
+	- added entry to changelog
+	- fix Bug #133767
+
+v1.3.4 Thu 17. Nov 15:13:54 CET 2020
+	- revise lib/Algorithm/CheckDigits/M23_002.pm (irish TIN)
+	- fix Bug #133031
+
 v1.3.3 Di 14. Jul 19:20:56 CEST 2020
 	- reworked lib/Algorithm/CheckDigits.pm, allow 10-digit numbers,
 	  allow prepending of 'BE' before the digits

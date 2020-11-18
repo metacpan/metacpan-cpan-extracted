@@ -25,7 +25,7 @@ file.
 
 	use StreamFinder::Apple;
 
-	die "..usage:  $0 URL\n"  unless ($ARGV[0]);
+	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $podcast = new StreamFinder::Apple($ARGV[0]);
 
@@ -116,7 +116,7 @@ https://music.apple.com/I<country>/album/I<album-description>/idB<album#>?i=B<so
 
 =over 4
 
-=item B<new>(I<url> [, "debug" [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, "debug" [ => 0|1|2 ]])
 
 Accepts a podcasts.apple.com ID or URL or music.apple.com URL and creates and 
 returns a new podcast object, or I<undef> if the URL is not a valid podcast, 
@@ -444,7 +444,11 @@ sub new
 		$self->{'streams'}->[0] = $1;
 		my $rest = $2;
 		$self->{'title'} = $1  if ($pre =~ m#\"mediaKind\"\:\"[^\"]*\"\,\"name\"\:\"([^\"]+)\"#s);
-		$self->{'description'} = $1  if ($pre =~ m#\"description\"\:\{\"standard\"\:\"([^\"]+)\"#s);
+		if ($pre =~ m#episode-description\>(.+?)\<\/section\>#s) {
+			$self->{'description'} = $1;
+			$self->{'description'} =~ s#\<p[^\>]*\>(.+?)\<\/p\>#$1#s;
+		}
+		$self->{'description'} ||= $1  if ($pre =~ m#\"description\"\:\{\"standard\"\:\"([^\"]+)\"#s);
 		$self->{'description'} ||= $1  if ($pre =~ m#\"short\"\:\"([^\"]+)\"#s);
 		$self->{'created'} = $1  if ($pre =~ m#\"datePublished\"\:\"([^\"]+)#s);
 	} else {   #PAGE (multiple episodes):
@@ -495,6 +499,7 @@ sub new
 	$self->{'imageurl'} = $self->{'iconurl'};
 	if ($self->{'description'} =~ /\w/) {
 		$self->{'description'} =~ s/\s+$//;
+		$self->{'description'} =~ s/^\s+//;
 	} else {
 		$self->{'description'} = $self->{'title'};
 	}

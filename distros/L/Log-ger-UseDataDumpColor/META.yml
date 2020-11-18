@@ -23,7 +23,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseDataDumpColor
   homepage: https://metacpan.org/release/Log-ger-UseDataDumpColor
   repository: git://github.com/perlancar/perl-Log-ger-UseDataDumpColor.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

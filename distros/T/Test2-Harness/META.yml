@@ -66,9 +66,9 @@ requires:
   parent: '0'
   perl: '5.010000'
 resources:
-  bugtracker: http://github.com/Test-More/Test2-Harness/issues
-  repository: http://github.com/Test-More/Test2-Harness/
-version: '1.000038'
+  bugtracker: https://github.com/Test-More/Test2-Harness/issues
+  repository: https://github.com/Test-More/Test2-Harness/
+version: '1.000042'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

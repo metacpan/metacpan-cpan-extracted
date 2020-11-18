@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '2.20201102.2'; # VERSION
+our $VERSION = '2.20201117.2'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -20,6 +20,8 @@ has uri => ( is => 'rw', isa => 'Str', traits => ['CacheKey'],
   documentation => 'inputs: URI of this VMC', );
 has check_domain => ( is => 'ro', isa => 'Str', required => 1, traits => ['CacheKey'],
   documentation => 'inputs: Domain to check the alt_name against', );
+has check_selector => ( is => 'ro', isa => 'Str', required => 1, traits => ['CacheKey'],
+  documentation => 'inputs: Selector to check the alt_name against', );
 has data => ( is => 'rw', isa => 'Str', lazy => 1, builder => '_build_data', traits => ['Cacheable'],
   documentation => 'inputs: Raw data of the VMC contents; Fetched from authority URI if not given', );
 has cert_list => ( is => 'rw', isa => 'ArrayRef', lazy => 1, builder => '_build_cert_list', traits => ['Cacheable'],
@@ -155,13 +157,16 @@ sub is_valid_alt_name($self) {
   return 1 if $self->bimi_object->options->vmc_no_check_alt;
   return 0 if !$self->alt_name;
   my @alt_names = split( ',', lc $self->alt_name );
+  my $check_full_record = lc join('.', $self->check_selector, '_bimi', $self->check_domain );
+  my $check_domain = lc $self->check_domain;
   foreach my $alt_name ( @alt_names ) {
     $alt_name =~ s/^\s+//;
     $alt_name =~ s/\s+$//;
     next if ! $alt_name =~ /^dns:/;
     $alt_name =~ s/^dns://;
-    my $check_domain = lc $self->check_domain;
     return 1 if $alt_name eq $check_domain;
+    return 1 if $alt_name eq $check_full_record;
+    next if !$self->bimi_object->options->cert_subdomain_is_valid;
     my $alt_name_re = quotemeta($alt_name);
     return 1 if $check_domain =~ /\.$alt_name_re$/;
   }
@@ -286,7 +291,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 2.20201102.2
+version 2.20201117.2
 
 =head1 DESCRIPTION
 
@@ -301,6 +306,12 @@ These values are used as inputs for lookups and verifications, they are typicall
 is=ro required
 
 Domain to check the alt_name against
+
+=head2 check_selector
+
+is=ro required
+
+Selector to check the alt_name against
 
 =head2 data
 

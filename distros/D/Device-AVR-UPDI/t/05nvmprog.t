@@ -1,69 +1,55 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
 use Test::More;
-use Test::EasyMock qw( create_mock expect reset replay verify );
-use Test::Deep qw( ignore );
+use Test::EasyMock qw( create_mock );
+use Test::Future::IO;
 
 use Device::AVR::UPDI;
 
-my $mockfh = create_mock();
-my $mockfio = create_mock();
-Future::IO->override_impl( "TestFutureIO" );
+my $mockfio = Test::Future::IO->controller;
 
-my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
+my $updi = Device::AVR::UPDI->new( fh => create_mock(), part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
 
 # enable_nvmprog
 {
-   reset ( $mockfh, $mockfio );
    # KEY
-   expect( $mockfh->print( "\x55\xE0" . " gorPMVN" ) );
-   expect( $mockfio->sysread( 10 ) )
-      ->and_scalar_return( Future->done( "\x55\xE0" . " gorPMVN" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
+   $mockfio->expect_syswrite( "\x55\xE0" . " gorPMVN" );
+   $mockfio->expect_sysread( 10 )
+      ->returns( "\x55\xE0" . " gorPMVN" );
+   $mockfio->expect_sleep( 0.1 );
    # read ASI_KEY_STATUS
-   expect( $mockfh->print( "\x55\x87" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\x87" . "\x10" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
+   $mockfio->expect_syswrite( "\x55\x87" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\x87" . "\x10" );
+   $mockfio->expect_sleep( 0.1 );
    # Reset
-   expect( $mockfh->print( "\x55\xC8\x59" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\xC8\x59" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
-   expect( $mockfh->print( "\x55\xC8\x00" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\xC8\x00" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
+   $mockfio->expect_syswrite( "\x55\xC8\x59" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\xC8\x59" );
+   $mockfio->expect_sleep( 0.1 );
+   $mockfio->expect_syswrite( "\x55\xC8\x00" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\xC8\x00" );
+   $mockfio->expect_sleep( 0.1 );
    # read ASI_SYS_STATUS
-   expect( $mockfh->print( "\x55\x8B" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\x8B\x00" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
-   expect( $mockfio->sleep( 0.05 ) )
-      ->and_scalar_return( Future->done );
-   expect( $mockfh->print( "\x55\x8B" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\x8B\x08" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
+   $mockfio->expect_syswrite( "\x55\x8B" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\x8B\x00" );
+   $mockfio->expect_sleep( 0.1 );
+   $mockfio->expect_sleep( 0.05 )
+      ->returns();
+   $mockfio->expect_syswrite( "\x55\x8B" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\x8B\x08" );
+   $mockfio->expect_sleep( 0.1 );
 
-   replay( $mockfh, $mockfio );
    $updi->enable_nvmprog->get;
-   verify( $mockfh, $mockfio );
+
+   $mockfio->check_and_clear( "->enable_nvmprog" );
 }
 
 done_testing;
-
-package TestFutureIO;
-sub sleep           { $mockfio->sleep($_[1]) }
-sub sysread         { $mockfio->sysread(@_[2..$#_]) }
-sub sysread_exactly { $mockfio->sysread(@_[2..$#_]) }

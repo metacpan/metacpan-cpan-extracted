@@ -1,57 +1,56 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
 use Test::More;
 use Test::EasyMock qw( create_mock expect reset replay verify );
-use Test::Deep qw( ignore );
+use Test::Future::IO;
 
 use Device::AVR::UPDI;
 
 my $mockfh = create_mock();
-my $mockfio = create_mock();
-Future::IO->override_impl( "TestFutureIO" );
+my $mockfio = Test::Future::IO->controller;
 
 # init
 {
-   reset ( $mockfh, $mockfio );
+   reset ( $mockfh );
    expect( $mockfh->cfmakeraw );
    expect( $mockfh->set_mode( "115200,8,e,2" ) );
    expect( $mockfh->setflag_clocal( 1 ) );
    expect( $mockfh->autoflush );
 
-   replay( $mockfh, $mockfio );
-   my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
-   verify( $mockfh, $mockfio );
+   replay( $mockfh );
 
-   reset( $mockfh, $mockfio );
+   my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
+
+   verify( $mockfh );
+   $mockfio->check_and_clear( "->new" );
+
+   reset( $mockfh );
    # BREAK
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->done );
+   $mockfio->expect_sleep( 0.1 )
+      ->returns();
    expect( $mockfh->getobaud )->and_scalar_return( 115200 );
    expect( $mockfh->setbaud( 300 ) );
    expect( $mockfh->print( "\0" ) );
-   expect( $mockfio->sysread( 1 ) )
-      ->and_scalar_return( Future->done( "\0" ) );
-   expect( $mockfio->sleep( 0.05 ) )
-      ->and_scalar_return( Future->done );
+   $mockfio->expect_sysread( 1 )
+      ->returns( "\0" );
+   $mockfio->expect_sleep( 0.05 )
+      ->returns();
    expect( $mockfh->setbaud( 115200 ) );
    # OP
-   expect( $mockfh->print( "\x55\xC3\x08" ) );
-   expect( $mockfio->sysread( 3 ) )
-      ->and_scalar_return( Future->done( "\x55\xC3\x08" ) );
-   expect( $mockfio->sleep( 0.1 ) )
-      ->and_scalar_return( Future->new );
+   $mockfio->expect_syswrite( "\x55\xC3\x08" );
+   $mockfio->expect_sysread( 3 )
+      ->returns( "\x55\xC3\x08" );
+   $mockfio->expect_sleep( 0.1 );
 
-   replay( $mockfh, $mockfio );
+   replay( $mockfh );
+
    $updi->init_link->get;
-   verify( $mockfh, $mockfio );
+
+   verify( $mockfh );
+   $mockfio->check_and_clear( "->init_link" );
 }
 
 done_testing;
-
-package TestFutureIO;
-sub sleep           { $mockfio->sleep($_[1]) }
-sub sysread         { $mockfio->sysread(@_[2..$#_]) }
-sub sysread_exactly { $mockfio->sysread(@_[2..$#_]) }

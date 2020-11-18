@@ -36,10 +36,11 @@ or on the L<website|http://functional-perl.org/>.
 
 =cut
 
-
 package FP::Repl::AutoTrap;
 
-use strict; use warnings; use warnings FATAL => 'uninitialized';
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
 
 # Interesting, FP::Repl::Repl::maybe_tty works differently; well makes
 # sense. So this is the "non-forcing" way to check:
@@ -49,7 +50,7 @@ sub possibly_activate {
     if (isatty(0) and isatty(1)) {
         require FP::Repl::WithRepl;
         import FP::Repl::WithRepl;
-        push_withrepl (0);
+        push_withrepl(0);
         1
     } else {
         require Chj::Backtrace;
@@ -58,7 +59,7 @@ sub possibly_activate {
     }
 }
 
-if (($ENV{RUN_TESTS}//'') eq '1') {
+if (($ENV{RUN_TESTS} // '') eq '1') {
     warn "not activating since running in test mode";
 } else {
     possibly_activate

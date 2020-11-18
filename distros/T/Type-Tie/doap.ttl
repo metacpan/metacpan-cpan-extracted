@@ -34,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tie";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-014>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-015>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tie>;
@@ -266,6 +266,28 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.014.tar.gz>;
 	doap:revision        "0.014"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.015"^^xsd:string;
+	dc:issued            "2020-11-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support Hash::Util::FieldHash::Compat as an alternative to Hash::FieldHash because it seems to pass its tests better on Perl 5.8.";
+		], [
+			rdfs:label "Set up Storable hooks to play nice with Storable::dclone.";
+			doap-changeset:blame <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that Clone::clone will not work.";
+			doap-changeset:blame <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>;
+			rdfs:seeAlso <https://rt.cpan.org/Public/Bug/Display.html?id=127576>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;
 	foaf:name            "Graham Knop";
@@ -278,4 +300,8 @@
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>
+	foaf:mbox            <mailto:peter@morch.com>;
+	foaf:name            "Peter Valdemar Mørch".
 

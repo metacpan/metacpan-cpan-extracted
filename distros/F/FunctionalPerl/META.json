@@ -4,13 +4,13 @@
       "Christian Jaeger <copying@christianjaeger.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "FunctionalPerl",
    "no_index" : {
@@ -41,7 +41,6 @@
             "Clone" : "0",
             "Encode" : "0",
             "Eval::WithLexicals" : "0",
-            "Function::Parameters" : "0",
             "LWP::UserAgent" : "0",
             "Method::Signatures" : "0",
             "PadWalker" : "0",
@@ -55,6 +54,7 @@
             "Import::Into" : "0",
             "Math::BigInt" : "0",
             "NEXT" : "0",
+            "Safe::Isa" : "0",
             "Scalar::Util" : "0",
             "Symbol" : "0",
             "Test::More" : "0.96",
@@ -88,6 +88,6 @@
          "web" : "https://github.com/pflanze/functional-perl"
       }
    },
-   "version" : "v0.72.36",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "v0.72.38",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

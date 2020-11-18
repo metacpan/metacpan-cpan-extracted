@@ -1260,33 +1260,21 @@ This application uses the following non-core Perl modules:
 
 =over
 
-=item
+=item L<IO::Interactive>
 
-L<IO::Interactive>
+=item L<Image::ExifTool> version 10.14 or up
 
-=item
+=item L<Modern::Perl>
 
-L<Image::ExifTool> version 10.14 or up
+=item L<Path::Class>
 
-=item
+=item L<Path::Iterator::Rule>
 
-L<Path::Class>
+=item L<Term::ProgressBar>
 
-=item
+=item L<XML::Twig>
 
-L<Path::Iterator::Rule>
-
-=item
-
-L<Term::ProgressBar>
-
-=item
-
-L<XML::Twig>
-
-=item
-
-L<YAML::Any>
+=item L<YAML::Any>
 
 =back
 
