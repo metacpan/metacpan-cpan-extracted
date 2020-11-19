@@ -26,18 +26,18 @@ no_index:
 provides:
   App::optex::xform:
     file: lib/App/optex/xform.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   App::optex: v0.4.0
   Getopt::EX: v1.21.0
   Text::ANSI::Fold::Util: '0.04'
-  Text::VisualPrintf: '3.11'
+  Text::Conceal: '0.99'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/optex-xform/issues
   homepage: https://github.com/kaz-utashiro/optex-xform
   repository: git://github.com/kaz-utashiro/optex-xform.git
-version: '1.01'
+version: '1.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

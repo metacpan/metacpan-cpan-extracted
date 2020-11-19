@@ -1,4 +1,14 @@
 -------------------------
+Version 0.07 (2020-11-19)
+-------------------------
+
+* minor tweaks to improve compatibility with Hash::Ordered
+
+* a few more tests
+
+* fully document the OO interface
+
+-------------------------
 Version 0.06 (2020-11-14)
 -------------------------
 

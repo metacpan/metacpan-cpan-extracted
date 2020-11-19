@@ -1,4 +1,11 @@
-#!./perl -w
+################################################################################
+#
+# Copyright (c) Marcus Holland-Moritz. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+################################################################################
+
 use Test;
 use Tie::Hash::Indexed;
 use strict;

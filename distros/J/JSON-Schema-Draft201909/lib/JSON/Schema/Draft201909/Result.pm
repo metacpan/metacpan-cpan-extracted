@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -70,20 +70,34 @@ sub format {
     };
   }
   if ($style eq 'terse') {
+    # we can also drop errors for unevaluatedItems, unevaluatedProperties
+    # when there is another error at the same instance location (indicating that "unevaluated"
+    # is actually "unsuccessfully evaluated").
+    my %instance_locations;
+
     my @errors = grep {
         my ($keyword, $error) = ($_->keyword, $_->error);
+
+        ++$instance_locations{$_->instance_location}->{unevaluatedItems}
+          if $keyword and grep $keyword eq $_, qw(items additionalItems unevaluatedItems);
+        ++$instance_locations{$_->instance_location}->{unevaluatedProperties}
+          if $keyword and grep $keyword eq $_, qw(properties additionalProperties patternProperties unevaluatedProperties);
+
         not $keyword
           or ($keyword =~ /^unevaluated(?:Items|Properties)$/
             and $error =~ /"$keyword" keyword present, but/)
           or (
-            not grep $keyword eq $_, qw(allOf anyOf if then else dependentSchemas items propertyNames)
+            not grep $keyword eq $_, qw(allOf anyOf if then else dependentSchemas propertyNames)
             and ($keyword ne 'oneOf' or $error ne 'no subschemas are valid')
-            and (not grep $keyword eq $_, qw(additionalItems unevaluatedItems)
-              or $error eq 'additional item not permitted')
+            and ($keyword ne 'items' or $error eq 'item not permitted')
+            and ($keyword ne 'additionalItems' or $error eq 'additional item not permitted')
+            and ($keyword ne 'unevaluatedItems'
+              or ($error eq 'additional item not permitted' and $instance_locations{$_->instance_location}{$keyword} == 1))
             and (not grep $keyword eq $_, qw(properties patternProperties)
               or $error eq 'property not permitted')
-            and (not grep $keyword eq $_, qw(additionalProperties unevaluatedProperties)
-              or $error eq 'additional property not permitted'))
+            and ($keyword ne 'additionalProperties' or $error eq 'additional property not permitted'))
+            and ($keyword ne 'unevaluatedProperties'
+              or ($error eq 'additional item not permitted' and $instance_locations{$_->instance_location}{$keyword} == 1))
       }
       $self->errors;
 
@@ -121,7 +135,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -157,6 +171,10 @@ A boolean. Indicates whether validation was successful or failed.
 =head2 errors
 
 Returns an array of L<JSON::Schema::Draft201909::Error> objects.
+
+=head2 annotations
+
+Returns an array of L<JSON::Schema::Draft201909::Annotation> objects.
 
 =head2 output_format
 

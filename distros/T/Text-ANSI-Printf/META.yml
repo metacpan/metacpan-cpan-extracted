@@ -26,17 +26,16 @@ no_index:
 provides:
   Text::ANSI::Printf:
     file: lib/Text/ANSI/Printf.pm
-    version: '1.03'
+    version: '2.01'
 requires:
-  Text::ANSI::Fold: '2.02'
-  Text::ANSI::Fold::Util: '0'
-  Text::VisualPrintf: '3.11'
+  Text::ANSI::Fold::Util: '0.04'
+  Text::Conceal: '0.99'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Printf/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Printf
   repository: git://github.com/kaz-utashiro/Text-ANSI-Printf.git
-version: '1.03'
+version: '2.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

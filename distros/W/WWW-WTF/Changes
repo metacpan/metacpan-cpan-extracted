@@ -5,3 +5,7 @@ Revision history for WWW-WTF
 
 0.4     2020-11-17 12:00
         structured test reports
+
+0.5     2020-11-19 12:00
+        get_a_tags for HTTPResource::Types::HTML
+        new class WWW::WTF::HTTPResource::Content

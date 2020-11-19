@@ -1,0 +1,10 @@
+prefix=/prefix
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib/arch
+includedir=${prefix}/include
+
+Name: MyLib2
+Description: My Fucking Lib2
+Version: 1.1.1d
+Libs: -L${libdir} -lmylib2
+Cflags: -I${includedir}

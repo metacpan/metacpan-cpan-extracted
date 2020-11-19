@@ -24,6 +24,7 @@ my @files = (
     't/additional-tests/id.json',
     't/additional-tests/invalid-id-and-anchor.json',
     't/additional-tests/keyword-independence.json',
+    't/additional-tests/loose-types-const-enum.json',
     't/additional-tests/not-an-anchor.json',
     't/additional-tests/not-an-id.json',
     't/additional-tests/recursiveRef.json',
@@ -50,6 +51,7 @@ my @files = (
     'xt/author/00-compile.t',
     'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
     'xt/author/minimum-version.t',
@@ -61,8 +63,7 @@ my @files = (
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

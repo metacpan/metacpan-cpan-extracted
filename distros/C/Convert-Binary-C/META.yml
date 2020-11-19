@@ -21,9 +21,8 @@ no_index:
   file:
     - bin/elf.PL
 resources:
-  MailingList: convert-binary-c@yahoogroups.com
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-Binary-C
-  homepage: http://search.cpan.org/~mhx/Convert-Binary-C/
+  bugtracker: https://github.com/mhx/Convert-Binary-C/issues
+  homepage: https://metacpan.org/release/Convert-Binary-C
   repository: https://github.com/mhx/Convert-Binary-C.git
-version: '0.80'
+version: '0.83'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

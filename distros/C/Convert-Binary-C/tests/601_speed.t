@@ -18,6 +18,9 @@ BEGIN {
 
 my $CCCFG = require './tests/include/config.pl';
 
+push @{$CCCFG->{Define}}, 'CACHE_TEST=1';
+push @{$CCCFG->{Include}}, 'tests/include';
+
 eval { require Data::Dumper }; $Data_Dumper = $@;
 eval { require IO::File };     $IO_File = $@;
 
@@ -63,8 +66,9 @@ $tests = 5;
 $next_test_time = 0;
 $iterations = 0;
 $start_time = mytime();
+$elapsed_time = 0;
 $fail = 0;
-do {
+while ($elapsed_time < $required_time) {
   eval {
     $c = Convert::Binary::C->new( %$CCCFG );
     $c->parse_file( 'tests/include/include.c' );
@@ -79,7 +83,7 @@ do {
     $next_test_time += $time_per_test;
     ok(1);
   }
-} while( $elapsed_time < $required_time );
+}
 
 ok(1) while $tests-- > 0;
 

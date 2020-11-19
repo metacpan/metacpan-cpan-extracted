@@ -31,11 +31,12 @@ Service::Engine - a framework for getting things done!
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 0.45 -- Adding Elasticsearch
 0.46 -- Updating Mysql to use utf8mb4
 0.47 -- Removing unused code
+0.48 -- Updating Email Lib
 
 =cut
 

@@ -6,7 +6,7 @@ use v5.12;
 
 use Moose;
 
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 
 __PACKAGE__->meta->make_immutable;
 
@@ -19,8 +19,6 @@ __PACKAGE__->meta->make_immutable;
 WWW::WTF WebTestFramework - automated tests for your website
 
 =head1 SYNOPSIS
-
-see exmaples
 
     yath test examples/ --jobs=4 :: --base_url=https://www.<DOMAIN>
 

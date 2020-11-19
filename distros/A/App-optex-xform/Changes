@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-xform
 
+1.02 2020-11-19T10:20:25Z
+
+    - Update to use Text::Conceal.
+
 1.01 2020-11-07T14:59:12Z
 
     - CPAN release.

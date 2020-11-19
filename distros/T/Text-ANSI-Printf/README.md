@@ -5,7 +5,7 @@ Text::ANSI::Printf - printf function for string with ANSI sequence
 
 # VERSION
 
-Version 1.03
+Version 2.01
 
 # SYNOPSIS
 
@@ -38,13 +38,13 @@ capability of handling:
 
 # IMPLEMENTATION NOTES
 
-This module uses [Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf) and [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util)
+This module uses [Text::Conceal](https://metacpan.org/pod/Text::Conceal) and [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util)
 internally.
 
 # SEE ALSO
 
-[Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf),
-[https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
+[Text::Conceal](https://metacpan.org/pod/Text::Conceal),
+[https://github.com/kaz-utashiro/Text-Conceal](https://github.com/kaz-utashiro/Text-Conceal)
 
 [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util),
 [https://github.com/kaz-utashiro/Text-ANSI-Fold-Util](https://github.com/kaz-utashiro/Text-ANSI-Fold-Util)

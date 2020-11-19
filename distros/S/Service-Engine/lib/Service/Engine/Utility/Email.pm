@@ -26,6 +26,8 @@ sub send {
     my ($self,$args) = @_;
     
     my $msg = $args->{'msg'};
+    my $body = $args->{'body'};
+    $body ||= $msg;
     my $to = $args->{'to'};
     my $smtp_ip = $args->{'smtp_ip'};
     my $smtp_port = $args->{'smtp_port'};
@@ -47,7 +49,7 @@ sub send {
         return 0;
     }
     
-    return $self->_send_email({to=>$to, from=>$from, subject=>$subject, alt_body=>$msg, force_text=>$force_text, 'smtp_ip'=>$smtp_ip, 'smtp_port'=>$smtp_port});
+    return $self->_send_email({to=>$to, from=>$from, subject=>$subject, alt_body=>$msg, body=>$body, force_text=>$force_text, 'smtp_ip'=>$smtp_ip, 'smtp_port'=>$smtp_port});
 
 }
 
@@ -84,13 +86,11 @@ sub _send_email {
     $h->{subject} ||= '';
     $h->{alt_body} ||= '';
     
-	$h->{body} =~ s/[^\x00-\x7f]//g;
     $h->{from} =~ s/[^\x00-\x7f]//g;
     $h->{to} =~ s/[^\x00-\x7f]//g;
     $h->{cc} =~ s/[^\x00-\x7f]//g;
-    $h->{subject} =~ s/[^\x00-\x7f]//g;
-    $h->{alt_body} =~ s/[^\x00-\x7f]//g;
-
+    $h->{bcc} =~ s/[^\x00-\x7f]//g;
+   
      # create sendgrid header 
 	my $sg_header = Mail::SendGrid::SmtpApiHeader->new();
 	$sg_header->addFilterSetting( bypass_list_management => 'enable', 1 );
@@ -147,6 +147,7 @@ sub _send_email {
 			'Reply-To' => $h->{replyto},
 			Subject => $h->{subject},
 			Type    => $type,
+			Charset => 'UTF-8',
 			'X-NetSocial-CID' => $h->{cid},
 			'X-Delivery-ID' => $h->{delivery_id},
 			'X-Mailer'  => $mailer,
@@ -170,6 +171,7 @@ sub _send_email {
 		### Alternative #2 is the HTML-with-content: 
 		$content->attach(
 			Type => 'text/html',
+			Charset => 'UTF-8',
 			Data => $h->{body},
 			Encoding => 'quoted-printable'
 			);
@@ -197,6 +199,7 @@ sub _send_email {
 			'Reply-To' => $h->{replyto}, 
 			Subject => $h->{subject},
 			Type    => $type,
+			Charset => 'UTF-8',
 			'X-Geekwarriors-CID' => $h->{cid},
 			'X-Delivery-ID' => $h->{delivery_id},
 			'X-Mailer'  => $mailer,

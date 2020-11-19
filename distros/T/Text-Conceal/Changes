@@ -1,0 +1,10 @@
+Revision history for Perl extension Text-Conceal
+
+0.99 2020-11-19T00:34:03Z
+
+    - CPAN release.
+
+0.98 2020-11-18T02:44:32Z
+
+    - Spin off from Text::VisualPrintf::Transform.
+

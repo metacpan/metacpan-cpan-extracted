@@ -1,3 +1,6 @@
+2.54 2020-10-19
+- drop Class::Load for Module::Runtime
+
 2.53 2020-10-16
 - improve POD
 - zap now-irrelevant scripts/dependency.pl

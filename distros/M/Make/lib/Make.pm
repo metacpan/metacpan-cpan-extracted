@@ -3,7 +3,7 @@ package Make;
 use strict;
 use warnings;
 
-our $VERSION = '2.006';
+our $VERSION = '2.007';
 
 use Carp qw(confess croak);
 use Config;
@@ -270,16 +270,22 @@ sub get_full_line {
     my ($fh) = @_;
     my $final = my $line = <$fh>;
     return if !defined $line;
+    my $raw = $line;
+    $raw   =~ s/^\t//;
     $final =~ s/\r?\n\z//;
     while ( $final =~ /\\$/ ) {
         $final =~ s/\s*\\\z//;
         $line = <$fh>;
         last if !defined $line;
+        my $raw_line = $line;
+        $raw_line =~ s/^\t//;
+        $raw .= $raw_line;
         $line =~ s/\s*\z//;
         $line =~ s/^\s*/ /;
         $final .= $line;
     }
-    return $final;
+    $raw =~ s/\r?\n\z//;
+    return ( $final, $raw );
 }
 
 sub set_var {
@@ -332,7 +338,7 @@ sub process_ast_bit {
         $self->{Vpath}{$pattern} = \@vpath;
     }
     elsif ( $type eq 'rule' ) {
-        my ( $targets, $kind, $prereqs, $cmnds ) = @args;
+        my ( $targets, $kind, $prereqs, $cmnds, $cmnds_raw ) = @args;
         ($prereqs) = tokenize( $self->expand($prereqs) );
         ($targets) = tokenize( $self->expand($targets) );
         $self->{Vars}{'.DEFAULT_GOAL'} ||= $targets->[0]
@@ -340,7 +346,7 @@ sub process_ast_bit {
         unless ( @$targets == 1 and $targets->[0] =~ /^\.[A-Z]/ ) {
             $self->target($_) for @$prereqs;    # so "exist or can be made"
         }
-        my $rule = Make::Rule->new( $kind, $prereqs, $cmnds );
+        my $rule = Make::Rule->new( $kind, $prereqs, $cmnds, $cmnds_raw );
         $self->target($_)->add_rule($rule) for @$targets;
     }
     return;
@@ -353,7 +359,8 @@ sub process_ast_bit {
 sub parse_makefile {
     my ($fh) = @_;
     my @ast;
-    local $_ = get_full_line($fh);
+    my $raw;
+    ( local $_, $raw ) = get_full_line($fh);
     while (1) {
         last unless ( defined $_ );
         s/^\s+//;
@@ -385,17 +392,19 @@ sub parse_makefile {
             )
         {
             my ( $target, $kind, $prereqs, $maybe_cmd ) = ( $1, $2, $3, $4 );
-            my @cmnds = defined $maybe_cmd ? ($maybe_cmd) : ();
+            my @cmnds     = defined $maybe_cmd ? ($maybe_cmd) : ();
+            my @cmnds_raw = @cmnds;
             $prereqs =~ s/\s*#.*//;
-            while ( defined( $_ = get_full_line($fh) ) ) {
-                next if (/^\s*#/);
-                next if (/^\s*$/);
-                last unless (/^\t/);
-                next if (/^\s*$/);
+            while ( ( $_, $raw ) = get_full_line($fh) ) {
+                next if /^\s*#/;
+                next if /^\s*$/;
+                last unless /^\t/;
+                next if /^\s*$/;
                 s/^\s+//;
-                push( @cmnds, $_ );
+                push @cmnds,     $_;
+                push @cmnds_raw, $raw;
             }
-            push @ast, [ 'rule', $target, $kind, $prereqs, \@cmnds ];
+            push @ast, [ 'rule', $target, $kind, $prereqs, \@cmnds, \@cmnds_raw ];
             redo;
         }
         else {
@@ -403,7 +412,7 @@ sub parse_makefile {
         }
     }
     continue {
-        $_ = get_full_line($fh);
+        ( $_, $raw ) = get_full_line($fh);
     }
     return \@ast;
 }

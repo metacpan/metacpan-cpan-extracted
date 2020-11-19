@@ -8,7 +8,7 @@ use Make::Rule::Vars;
 use constant DEBUG => $ENV{MAKE_DEBUG};
 ## use critic
 
-our $VERSION = '2.006';
+our $VERSION = '2.007';
 
 sub prereqs {
     return shift->{PREREQS};
@@ -16,6 +16,10 @@ sub prereqs {
 
 sub recipe {
     return shift->{RECIPE};
+}
+
+sub recipe_raw {
+    return shift->{RECIPE_RAW};
 }
 
 # The key make test - is target out-of-date as far as this rule is concerned
@@ -61,15 +65,16 @@ sub exp_recipe {
 }
 
 sub new {
-    my ( $class, $kind, $prereqs, $recipe ) = @_;
+    my ( $class, $kind, $prereqs, $recipe, $recipe_raw ) = @_;
     confess "prereqs $prereqs are not an array reference"
         if 'ARRAY' ne ref $prereqs;
     confess "recipe $recipe not an array reference"
         if 'ARRAY' ne ref $recipe;
     return bless {
-        KIND    => $kind,       # : or ::
-        PREREQS => $prereqs,    # right hand args
-        RECIPE  => $recipe,     # recipe
+        KIND       => $kind,         # : or ::
+        PREREQS    => $prereqs,      # right hand args
+        RECIPE     => $recipe,       # recipe
+        RECIPE_RAW => $recipe_raw,
     }, $class;
 }
 
@@ -121,6 +126,7 @@ Make::Rule - a rule with prerequisites and recipe
     my @deps = @{ $rule->prereqs };
     my @cmds = @{ $rule->recipe };
     my @expanded_cmds = @{ $rule->exp_recipe($target) }; # vars expanded
+    my @raw_cmds = @{ $rule->recipe_raw }; # with any \ still on line-ends
     my @ood = $rule->out_of_date($target);
     my $vars = $rule->auto_vars($target); # tied hash-ref
 

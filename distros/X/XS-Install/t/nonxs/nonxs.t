@@ -4,7 +4,7 @@ use Test::More;
 use Test::Deep;
 use XS::Install;
 
-chdir 't/testmod_noxs' or die $!;
+chdir 't/nonxs/mod' or die $!;
 
 my $args;
 

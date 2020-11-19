@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.12'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.13'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -3148,7 +3148,7 @@ Alias for nelem().
 =item _ccs_nvperp()
 
 Returns number of virtually addressable elements per physically
-adressable element, which should be a positive integer.
+addressable element, which should be a positive integer.
 
 
 =item nstored_p()

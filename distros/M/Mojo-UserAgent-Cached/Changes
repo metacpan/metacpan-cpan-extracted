@@ -1,0 +1,19 @@
+1.12 (2020-11-19)
+    (nicomen) Add insecure and max_response_size attributes
+
+1.11 (2019-11-13)
+    (nicomen) Fix regression when local_dir was set but asking for a real URL
+
+1.10 (2019-11-11)
+    (nicomen) Hook into start and build_tx method rather than just get, to allow caching otther methods, and _p variants
+
+1.09 (2019-11-05)
+    (nicomen) Typo fix, to actually respect cache options
+
+1.08 (2019-11-05)
+    (nicomen) Allow passing in cache options directly
+
+1.07 (2019-07-03)
+    (nicomen) Try to adhere to updated Mojo::UserAgent tests
+    (nicomen) Default to same timeouts as Mojo::UserAgent
+    (nicomen) Check for always_return_file when trying to find out if we are trying to get a local file

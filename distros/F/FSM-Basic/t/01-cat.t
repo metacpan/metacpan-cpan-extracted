@@ -55,6 +55,6 @@ my $out;
 ( $final, $out ) = $fsm->run( 'default' );
 ( $final, $out ) = $fsm->run( 'cat' );
 
-ok( $out eq "Hello World\nSwitch> " );
+ok($out =~ /^Hello World/ );
 last if $final;
 

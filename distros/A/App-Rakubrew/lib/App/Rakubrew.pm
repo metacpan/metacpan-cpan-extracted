@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '13';
+our $VERSION = '14';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -35,7 +35,6 @@ sub new {
 sub run_script {
     my ($self) = @_;
     my @args = @{$self->{args}};
-
 
     sub _cant_access_home {
         say STDERR "Can't create rakubrew home directory in $prefix";
@@ -85,9 +84,11 @@ sub run_script {
         && !(@args && $args[0] =~ /^internal_/)
     || @args && $args[0] eq 'shell'
     || @args >= 2 && $args[0] eq 'mode' && $args[1] eq 'env') {
-        say STDERR "The shell hook required to use rakubrew in 'env' mode or use the 'shell' command seems not to be installed.";
-        say STDERR "Run '$brew_name init' for installation instructions if you want to use those features,";
-        say STDERR "or run '$brew_name mode shim' to use 'shim' mode which doesn't require a shell hook.";
+        say STDERR << "EOL";
+The shell hook required to run rakubrew in either 'env' mode or with the 'shell' command seems not to be installed.
+Run '$brew_name init' for installation instructions if you want to use those features,
+or run '$brew_name mode shim' to use 'shim' mode which doesn't require a shell hook.
+EOL
         exit 1;
     }
 

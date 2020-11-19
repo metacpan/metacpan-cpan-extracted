@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
@@ -73,15 +73,18 @@ sub new {
         connect_timeout
         cookie_jar
         inactivity_timeout
+        insecure
         ioloop
         key
         local_address
         max_connections
         max_redirects
+        max_response_size
         proxy
         request_timeout
         server
         transactor
+
     /;
 
     my $ua = $class->SUPER::new(%mojo_agent_config);

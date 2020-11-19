@@ -17,17 +17,22 @@ t/01-catWRAND.t
 t/01-exec.t
 t/02-alternation.t
 t/02-caseinsensitive.t
-t/02-swapregex.t 
+t/02-swapregex.t
+t/03-output_file.t 
 t/test_cat1.txt
 t/test_cat.txt
 t/manifest.t
+t/output.txt
 t/pod-coverage.t
 t/pod.t
 examples/telnet_server.pl
 examples/fake_bash.pl
 examples/FSM_fake_bash.json
 examples/FSM_telnet_cisco_switch.json
+examples/fake_bash_ssh.pl
+examples/fake_bash_ssh.json
 examples/fake_bash_ssh1.pl
 examples/fake_bash_ssh1.json
+examples/hello.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

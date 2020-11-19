@@ -1,0 +1,1 @@
+tar -czf WWW-WTF-0.4.tar.gz WWW-WTF/

@@ -19,6 +19,10 @@
 #include <ctype.h>
 #include <assert.h>
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdint.h>
+#endif
+
 
 /*===== LOCAL INCLUDES =======================================================*/
 
@@ -29,6 +33,12 @@
 
 #ifndef NULL
 #define NULL ((void *) 0)
+#endif
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+typedef uintptr_t uintptr_type;
+#else
+typedef unsigned long uintptr_type;
 #endif
 
 /*----------------------------------------------------------*/
@@ -137,7 +147,7 @@
 
 #define GET_BE_WORD(ptr, value, sign)                                          \
           do {                                                                 \
-            if (((unsigned long) (ptr)) % 2)                                   \
+            if (((uintptr_type) (ptr)) % 2)                                    \
               value = (sign ## _16)                                            \
                       ( ( (u_16) *( (const u_8 *) ((ptr)+0) ) <<  8)           \
                       | ( (u_16) *( (const u_8 *) ((ptr)+1) ) <<  0)           \
@@ -148,7 +158,7 @@
 
 #define GET_BE_LONG(ptr, value, sign)                                          \
           do {                                                                 \
-            switch (((unsigned long) (ptr)) % 4)                               \
+            switch (((uintptr_type) (ptr)) % 4)                                \
             {                                                                  \
               case 0:                                                          \
                 value = (sign ## _32) ( *( (const u_32 *) (ptr) ) );           \
@@ -191,7 +201,7 @@
 
 #define SET_BE_WORD(ptr, value)                                                \
           do {                                                                 \
-            if (((unsigned long) (ptr)) % 2)                                   \
+            if (((uintptr_type) (ptr)) % 2)                                    \
             {                                                                  \
               register u_16 v = (u_16) value;                                  \
               *((u_8 *) ((ptr)+0)) = (u_8) ((v >> 8) & 0xFF);                  \
@@ -203,7 +213,7 @@
 
 #define SET_BE_LONG(ptr, value)                                                \
           do {                                                                 \
-            switch (((unsigned long) (ptr)) % 4)                               \
+            switch (((uintptr_type) (ptr)) % 4)                                \
             {                                                                  \
               case 0:                                                          \
                 *( (u_32 *) (ptr) ) = (u_32) value;                            \
@@ -348,7 +358,7 @@
 
 #define GET_LE_WORD(ptr, value, sign)                                          \
           do {                                                                 \
-            if (((unsigned long) (ptr)) % 2)                                   \
+            if (((uintptr_type) (ptr)) % 2)                                    \
               value = (sign ## _16)                                            \
                       ( ( (u_16) *( (const u_8 *) ((ptr)+0) ) <<  0)           \
                       | ( (u_16) *( (const u_8 *) ((ptr)+1) ) <<  8)           \
@@ -359,7 +369,7 @@
 
 #define GET_LE_LONG(ptr, value, sign)                                          \
           do {                                                                 \
-            switch (((unsigned long) (ptr)) % 4)                               \
+            switch (((uintptr_type) (ptr)) % 4)                                \
             {                                                                  \
               case 0:                                                          \
                 value = (sign ## _32) ( *( (const u_32 *) (ptr) ) );           \
@@ -402,7 +412,7 @@
 
 #define SET_LE_WORD(ptr, value)                                                \
           do {                                                                 \
-            if (((unsigned long) (ptr)) % 2)                                   \
+            if (((uintptr_type) (ptr)) % 2)                                    \
             {                                                                  \
               register u_16 v = (u_16) value;                                  \
               *((u_8 *) ((ptr)+0)) = (u_8) ((v >> 0) & 0xFF);                  \
@@ -414,7 +424,7 @@
 
 #define SET_LE_LONG(ptr, value)                                                \
           do {                                                                 \
-            switch (((unsigned long) (ptr)) % 4)                               \
+            switch (((uintptr_type) (ptr)) % 4)                                \
             {                                                                  \
               case 0:                                                          \
                 *( (u_32 *) (ptr) ) = (u_32) value;                            \

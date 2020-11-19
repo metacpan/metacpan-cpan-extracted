@@ -8,7 +8,7 @@ configure_requires:
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -18,6 +18,8 @@ no_index:
     - examples
     - inc
     - t
+recommends:
+  WWW::WebKit2: 0.127
 requires:
   Cache::FastMmap: 0
   Digest::SHA: 0
@@ -25,10 +27,13 @@ requires:
   HTML::TokeParser: 0
   HTTP::Headers: 0
   LWP::UserAgent: 0
+  List::Util: 0
   Moose: 0
+  Test::LongString: 0
   URI: 0
   WWW::Mechanize: 0
-  WWW::WebKit2: 0.127
   XML::Simple: 0
   common::sense: 0
-version: '1.0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.4'

@@ -42,9 +42,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Text::ANSI::Fold" : "2.02",
+            "Text::Conceal" : "0.99",
             "Text::VisualWidth::PP" : "0.05",
-            "perl" : "5.014"
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -56,13 +56,10 @@
    "provides" : {
       "Text::VisualPrintf" : {
          "file" : "lib/Text/VisualPrintf.pm",
-         "version" : "3.11"
+         "version" : "4.01"
       },
       "Text::VisualPrintf::IO" : {
          "file" : "lib/Text/VisualPrintf/IO.pm"
-      },
-      "Text::VisualPrintf::Transform" : {
-         "file" : "lib/Text/VisualPrintf/Transform.pm"
       }
    },
    "release_status" : "stable",
@@ -76,7 +73,7 @@
          "web" : "https://github.com/kaz-utashiro/Text-VisualPrintf"
       }
    },
-   "version" : "3.11",
+   "version" : "4.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -26,20 +26,18 @@ no_index:
 provides:
   Text::VisualPrintf:
     file: lib/Text/VisualPrintf.pm
-    version: '3.11'
+    version: '4.01'
   Text::VisualPrintf::IO:
     file: lib/Text/VisualPrintf/IO.pm
-  Text::VisualPrintf::Transform:
-    file: lib/Text/VisualPrintf/Transform.pm
 requires:
-  Text::ANSI::Fold: '2.02'
+  Text::Conceal: '0.99'
   Text::VisualWidth::PP: '0.05'
-  perl: '5.014'
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/Text-VisualPrintf/issues
   homepage: https://github.com/kaz-utashiro/Text-VisualPrintf
   repository: git://github.com/kaz-utashiro/Text-VisualPrintf.git
-version: '3.11'
+version: '4.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

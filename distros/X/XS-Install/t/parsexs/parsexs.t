@@ -15,7 +15,7 @@ my $deftm  = $extutils_dir.'typemap';
 plan skip_all => 'xsubpp not found' unless -f $xsubpp;
 plan skip_all => 'default typemap not found' unless -f $deftm;
 
-my $res = process('t/12-parsexs.txt');
+my $res = process('t/parsexs/xs.txt');
 print $res;
 
 done_testing;
@@ -23,7 +23,7 @@ done_testing;
 sub process {
     my $file = shift;
 
-    @ARGV = (qw# -hiertype -C++ -csuffix .cc -typemap #, $deftm, qw# -typemap ../typemap #, $file);
+    @ARGV = (qw# -hiertype -C++ -csuffix .cc -typemap #, $deftm, qw# -typemap ../../typemap #, $file);
 
     pipe(my $r, my $w) or die $!;
     

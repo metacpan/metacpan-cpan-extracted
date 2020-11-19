@@ -1,6 +1,6 @@
 package App::optex::xform;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 =encoding utf-8
 
@@ -31,7 +31,7 @@ Transform ANSI terminal sequence into printable string, and recover.
 
 =item B<--xform-utf8>
 
-Transform multibyte Non-ASCII chracters into singlebyte sequene, and
+Transform multibyte Non-ASCII chracters into single-byte sequene, and
 recover.
 
 =back
@@ -42,7 +42,12 @@ recover.
 
 =head1 SEE ALSO
 
-L<Text::VisualPrintf::Transform>
+L<App::optex::xform>, L<https://github.com/kaz-utashiro/optex-xform>,
+
+L<App::optex>, L<https://github.com/kaz-utashiro/optex>,
+L<https://qiita.com/kaz-utashiro/items/2df8c7fbd2fcb880cee6>
+
+L<Text::Conceal>
 
 =head1 AUTHOR
 
@@ -64,11 +69,11 @@ use utf8;
 use open IO => 'utf8', ':std';
 use Data::Dumper;
 
-use Text::VisualPrintf::Transform;
+use Text::Conceal;
 use Text::VisualWidth::PP qw(vwidth);
 use Text::ANSI::Fold::Util qw(ansi_width);
 
-my @xform;
+my @concealer;
 
 my %param = (
     ansi => {
@@ -86,11 +91,11 @@ my %param = (
 sub encode {
     my %arg = @_;
     my $param = $param{$arg{mode}} or die "$arg{mode}: unkown mode";
-    my $xform = Text::VisualPrintf::Transform->new(%$param);
+    my $conceal = Text::Conceal->new(%$param);
     local $_ = do { local $/; <> };
-    if ($xform) {
-	$xform->encode($_);
-	push @xform, $xform;
+    if ($conceal) {
+	$conceal->encode($_);
+	push @concealer, $conceal;
     }
     return $_;
 }
@@ -98,8 +103,8 @@ sub encode {
 sub decode {
     my %arg = @_;
     local $_ = do { local $/; <> };
-    if (my $xform = pop @xform) {
-	$xform->decode($_);
+    if (my $conceal = pop @concealer) {
+	$conceal->decode($_);
     } else {
 	die "Not encoded.\n";
     }
@@ -110,7 +115,7 @@ sub decode {
 
 __DATA__
 
-option default -Mutil::filter
+autoload -Mutil::filter --isub --osub --psub
 
 option --xform-encode --psub __PACKAGE__::encode=mode=$<shift>
 option --xform-decode --osub __PACKAGE__::decode

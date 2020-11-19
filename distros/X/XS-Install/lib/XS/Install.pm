@@ -12,7 +12,7 @@ use XS::Install::Payload;
 use XS::Install::CMake;
 use Data::Dumper;
 
-our $VERSION = '1.2.21';
+our $VERSION = '1.3.0';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -70,6 +70,8 @@ sub makemaker_args {
     process_CPLUS($params);
     process_CCFLAGS($params);
     $params->{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params->{OPTIMIZE});
+    process_PKG_CONFIG($params);
+    process_SANITIZE($params);
     process_CLIB($params);
     process_LD($params);
     
@@ -125,8 +127,10 @@ sub pre_process {
         STATIC_LIBS   => [],
         SHARED_LIBS   => [],
         ORIG          => {
-            INC     => $params->{INC} || '',
-            CCFLAGS => $params->{CCFLAGS},
+            INC       => $params->{INC} || '',
+            CCFLAGS   => $params->{CCFLAGS},
+            LDDLFLAGS => $params->{LDDLFLAGS},
+            LINK      => $params->{LINK},
         },  
     };
     
@@ -251,10 +255,12 @@ sub _apply_BIN_DEPS {
         _string_merge($params->{INC}, "-I$incdir");
     }
 
-    _string_merge($params->{INC},     $info->{INC});
-    _string_merge($params->{CCFLAGS}, $info->{CCFLAGS});
-    _string_merge($params->{DEFINE},  $info->{DEFINE});
-    _string_merge($params->{XSOPT},   $info->{XSOPT});
+    _string_merge($params->{INC},       $info->{INC});
+    _string_merge($params->{CCFLAGS},   $info->{CCFLAGS});
+    _string_merge($params->{LDDLFLAGS}, $info->{LDDLFLAGS});
+    _string_merge($params->{LINK},      $info->{LINK});
+    _string_merge($params->{DEFINE},    $info->{DEFINE});
+    _string_merge($params->{XSOPT},     $info->{XSOPT});
 
     _merge_libs($params, $info->{LIBS});
     
@@ -461,6 +467,40 @@ sub process_CLIB {
     push @{$params->{postamble}}, "\$(INST_DYNAMIC) : $clibs";
 }
 
+sub process_PKG_CONFIG {
+    my $params = shift;
+    canonize_array_split($params->{PKG_CONFIG});
+    my $pkgs = $params->{PKG_CONFIG};
+    
+    my @bin_share_auto;
+    for my $pkg (@$pkgs) {
+        push @bin_share_auto, $pkg unless $pkg =~ s/^\s*-//;
+    }
+    
+    set_pkg_config($params, $pkgs);
+    
+    my $bin_share = $params->{BIN_SHARE} or return;
+    my $bin_share_pkgs = delete $bin_share->{PKG_CONFIG};
+    canonize_array_split($bin_share_pkgs);
+    set_pkg_config($bin_share, [@bin_share_auto, @$bin_share_pkgs]);
+}
+
+sub set_pkg_config {
+    my ($params, $pkgs) = @_;
+    return unless @$pkgs;
+    require XS::Install::PkgConfigFixed;
+    
+    for my $pkg (@$pkgs) {
+        my $res = PkgConfig->find($pkg);
+        warn $res->errmsg if $res->errmsg;
+        my @ccargs = $res->get_cflags;
+
+        _string_merge($params->{INC},     join ' ', grep /^-I/,  @ccargs);
+        _string_merge($params->{CCFLAGS}, join ' ', grep !/^-I/, @ccargs);
+        _string_merge($params->{LINK},    scalar $res->get_ldflags);
+    }
+}
+
 sub process_BIN_SHARE {
     my $params = shift;
     my $bin_share = delete $params->{BIN_SHARE} or return;
@@ -539,6 +579,43 @@ cpanm -f @$list
 EOF
 }
 
+sub process_SANITIZE {
+    my $params = shift;
+    my $mode = $ENV{SANITIZE} or return;
+    
+    my @preload;
+    
+    if ($mode =~ /a/i) {
+        push @preload, _cc_get_so_path($params, 'libasan.so');
+        _string_merge($params->{CCFLAGS}, '-fsanitize=address -fno-omit-frame-pointer');
+        _string_merge($params->{LINK}, '-lasan');
+    }
+    
+    if ($mode =~ /u/i) {
+        push @preload, _cc_get_so_path($params, 'libubsan.so');
+        _string_merge($params->{CCFLAGS}, '-fsanitize=undefined');
+        _string_merge($params->{LINK}, '-lubsan');
+    }
+    
+    @preload = grep {$_} @preload;
+    
+    if (@preload and !$win32) {
+        my $preload = 'LD_PRELOAD='.join($win32 ? ';' : ':', @preload);
+        push @{$params->{postamble}}, "ABSPERL = $preload \$(PERL)";
+        push @{$params->{postamble}}, "PERLRUN = $preload \$(PERL)";
+        push @{$params->{postamble}}, "FULLPERLRUN = $preload \$(FULLPERL)";
+    }
+}
+
+sub _cc_get_so_path {
+    my ($params, $so) = @_;
+    my $cc = $params->{CC} || $Config{cc};
+    my $file = `$cc -print-file-name=$so`;
+    chomp($file);
+    return if $file eq $so;
+    return $file;
+}
+
 sub process_CPLUS {
     my $params = shift;
     my $use_cpp = $params->{CPLUS} or return;
@@ -609,29 +686,31 @@ sub process_test {
     $ldfrom .= ' '.module_so($params) unless $mac; # MacOSX doesn't allow for linking with bundles :(
     
     my %args = (
-        NAME      => $tp->{NAME} || 'MyTest',
-        VERSION   => $tp->{VERSION} || '0.0.0',
-        ABSTRACT  => "test module",
-        SRC       => $tp->{SRC},
-        XS        => $tp->{XS},
-        BIN_DEPS  => $array_merge->([keys %{$params->{MODULE_INFO}{BIN_DEPS}||{}}], $tp->{BIN_DEPS}),
-        TYPEMAPS  => $array_merge->($params->{TYPEMAPS}, $tp->{TYPEMAPS}),
-        CPLUS     => $tp->{CPLUS} // $params->{CPLUS},
-        CC        => $tp->{CC} || $params->{CC},
-        LD        => $tp->{LD} || $params->{LD},
-        LDFROM    => $ldfrom,
-        LDDLFLAGS => string_merge($params->{LDDLFLAGS}, $tp->{LDDLFLAGS}),
-        INC       => string_merge($params->{MODULE_INFO}{ORIG}{INC}, $tp->{INC}),
-        CCFLAGS   => string_merge($params->{MODULE_INFO}{ORIG}{CCFLAGS}, $tp->{CCFLAGS}),
-        DEFINE    => string_merge($params->{DEFINE}, $tp->{DEFINE}),
-        XSOPT     => string_merge($params->{XSOPT}, $tp->{XSOPT}),
-        LIBS      => $params->{LIBS},
-        CLIB      => $tp->{CLIB},
-        MAKEFILE  => 'Makefile.test',
-        OPTIMIZE  => merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE}, $ENV{TEST_OPTIMIZE}),
-        PARSE_XS  => $tp->{PARSE_XS} || $params->{PARSE_XS},
-        NO_MYMETA => 1,
-        _XSTEST   => 1,
+        NAME       => $tp->{NAME} || 'MyTest',
+        VERSION    => $tp->{VERSION} || '0.0.0',
+        ABSTRACT   => "test module",
+        SRC        => $tp->{SRC},
+        XS         => $tp->{XS},
+        BIN_DEPS   => $array_merge->([keys %{$params->{MODULE_INFO}{BIN_DEPS}||{}}], $tp->{BIN_DEPS}),
+        TYPEMAPS   => $array_merge->($params->{TYPEMAPS}, $tp->{TYPEMAPS}),
+        CPLUS      => $tp->{CPLUS} // $params->{CPLUS},
+        CC         => $tp->{CC} || $params->{CC},
+        LD         => $tp->{LD} || $params->{LD},
+        LDFROM     => $ldfrom,
+        INC        => string_merge($params->{MODULE_INFO}{ORIG}{INC}, $tp->{INC}),
+        CCFLAGS    => string_merge($params->{MODULE_INFO}{ORIG}{CCFLAGS}, $tp->{CCFLAGS}),
+        DEFINE     => string_merge($params->{DEFINE}, $tp->{DEFINE}),
+        LDDLFLAGS  => string_merge($params->{MODULE_INFO}{ORIG}{LDDLFLAGS}, $tp->{LDDLFLAGS}),
+        LINK       => string_merge($params->{MODULE_INFO}{ORIG}{LINK}, $tp->{LINK}),
+        XSOPT      => string_merge($params->{XSOPT}, $tp->{XSOPT}),
+        PKG_CONFIG => $array_merge->($params->{PKG_CONFIG}, $tp->{PKG_CONFIG}),
+        LIBS       => $params->{LIBS},
+        CLIB       => $tp->{CLIB},
+        MAKEFILE   => 'Makefile.test',
+        OPTIMIZE   => merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE}, $ENV{TEST_OPTIMIZE}),
+        PARSE_XS   => $tp->{PARSE_XS} || $params->{PARSE_XS},
+        NO_MYMETA  => 1,
+        _XSTEST    => 1,
     );
     
     my $mm_args = makemaker_args(%args);
@@ -716,17 +795,20 @@ sub apply_CMAKE {
         _string_merge($params->{INC}, "-I$i");
         _string_merge($params->{test}{INC}, "-I$i") if $params->{test};
     }
-    _uniq_list($props->{LIBS});
-    my $libs_str = string_merge(@{$props->{LIBS}});
+    _uniq_list($props->{INC});
+    my @incs = map {"-I$_"} @{$props->{INC}};
+    _string_merge($params->{INC}, @incs);
+    _string_merge($params->{test}{INC}, @incs) if $params->{test};
 
     $params->{BIN_SHARE} ||= {};
-    _merge_libs($params->{BIN_SHARE}, [$libs_str]);
     _string_merge($params->{BIN_SHARE}->{CCFLAGS}, @{$props->{CCFLAGS}});
     _string_merge($params->{BIN_SHARE}->{DEFINE}, @{$props->{DEFINE}});
+    _string_merge($params->{BIN_SHARE}->{INC}, @incs);
+    _string_merge($params->{BIN_SHARE}->{LINK}, @{$props->{LIBS}});
 
-    _merge_libs($params, [$libs_str]);
     $params->{CCFLAGS} = string_merge($params->{CCFLAGS}, @{$props->{CCFLAGS}});
     $params->{DEFINE} = string_merge($params->{DEFINE}, @{$props->{DEFINE}});
+    $params->{LINK} = string_merge($params->{LINK}, @{$props->{LIBS}});
 }
 
 sub post_process {
@@ -734,8 +816,13 @@ sub post_process {
     my $postamble = $params->{postamble};
     my $mi = $params->{MODULE_INFO};
     
+    if  (my $link = $params->{LINK}) {
+        my $dl = $params->{dynamic_lib} ||= {};
+        _string_merge($dl->{OTHERLDFLAGS}, $link);
+    }
+    
     delete @$params{qw/C H OBJECT XS CCFLAGS LDFROM OPTIMIZE XSOPT/} unless has_binary($params);
-    delete @$params{qw/CPLUS PARSE_XS SRC MODULE_INFO _XSTEST CMAKE_PARAMS/};
+    delete @$params{qw/CPLUS PARSE_XS SRC MODULE_INFO _XSTEST CMAKE_PARAMS PKG_CONFIG LINK/};
     
     # convert array to hash for postamble
     $params->{postamble} = {};

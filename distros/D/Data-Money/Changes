@@ -1,5 +1,8 @@
 Revision history for Data::Money
 
+0.18  2020-11-19 MANWAR
+      - Addressed issue #2 raised by @pjlsergeant.
+
 0.17  2016-03-05 MANWAR
       - Added key 'provides' to the Makefile.PL script.
       - Added test script t/meta-json.t and t/meta-yml.t.

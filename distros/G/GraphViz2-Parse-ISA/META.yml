@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.54, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,14 +20,15 @@ no_index:
     - t
     - inc
 requires:
-  Class::Load: '0.23'
   GraphViz2: '2.48'
+  Module::Runtime: '0.016'
   Moo: '2.001001'
-  perl: '5.010001'
+  parent: '0'
+  perl: '5.008008'
 resources:
   X_dynamic_config: 0
   bugtracker: https://github.com/graphviz-perl/GraphViz2-Parse-ISA/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphviz-perl/GraphViz2-Parse-ISA.git
-version: '2.53'
+version: '2.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

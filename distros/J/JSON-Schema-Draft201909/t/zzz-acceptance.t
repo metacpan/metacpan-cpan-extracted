@@ -23,6 +23,11 @@ use Test::JSON::Schema::Acceptance 1.000;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Draft201909' => 'share' } };
 use JSON::Schema::Draft201909;
 
+foreach my $env (qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING NO_TODO TEST_DIR NO_SHORT_CIRCUIT)) {
+  note $env.': '.($ENV{$env} // '');
+}
+note '';
+
 my $accepter = Test::JSON::Schema::Acceptance->new(
   $ENV{TEST_DIR} ? (test_dir => $ENV{TEST_DIR}) : (specification => 'draft2019-09'),
   include_optional => 1,
@@ -46,13 +51,15 @@ $accepter->acceptance(
   validate_data => sub {
     my ($schema, $instance_data) = @_;
     my $result = $js->evaluate($instance_data, $schema);
-    my $result_short = $js_short_circuit->evaluate($instance_data, $schema);
+    my $result_short = $ENV{NO_SHORT_CIRCUIT} || $js_short_circuit->evaluate($instance_data, $schema);
 
     note 'result: ', $encoder->encode($result);
-    note 'short-circuited result: ', $encoder->encode($result_short) if $result xor $result_short;
+    note 'short-circuited result: ', $encoder->encode($result_short)
+      if not $ENV{NO_SHORT_CIRCUIT} and ($result xor $result_short);
 
     die 'results inconsistent between short_circuit = false and true'
-      if ($result xor $result_short)
+      if not $ENV{NO_SHORT_CIRCUIT}
+        and ($result xor $result_short)
         and not grep $_->error =~ /but short_circuit is enabled/, $result_short->errors;
 
     # if any errors contain an exception, propagate that upwards as an exception so we can be sure
@@ -101,6 +108,11 @@ $accepter->acceptance(
       { file => 'const.json',
         group_description => 'float and integers are equal up to 64-bit representation limits',
         test_description => 'float is valid' }
+      : (),
+    $Config{nvsize} >= 16 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
+      { file => 'multipleOf.json',
+        group_description => 'invalid instance should not raise error when float division = inf',
+        test_description => 'always invalid, but naive implementations may raise an overflow error' }
       : (),
   ] ),
 );

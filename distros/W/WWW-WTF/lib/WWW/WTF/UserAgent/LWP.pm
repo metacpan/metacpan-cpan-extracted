@@ -9,6 +9,7 @@ use Digest::SHA qw(sha1_hex);
 use LWP::UserAgent;
 
 use WWW::WTF::HTTPResource;
+use WWW::WTF::HTTPResource::Content;
 use WWW::WTF::UserAgent::LWP::Iterator;
 
 extends 'WWW::WTF::UserAgent';
@@ -53,7 +54,7 @@ sub get {
 
         $http_resource = WWW::WTF::HTTPResource->new(
             headers     => $response->headers,
-            content     => $response->content,
+            content     => WWW::WTF::HTTPResource::Content->new( data => $response->content ),
             successful  => ($response->is_success ? 1 : 0),
             request_uri => $uri,
         );

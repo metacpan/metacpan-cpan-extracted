@@ -15,14 +15,15 @@
 #     BUILD_REQUIRES => { ExtUtils::MakeMaker=>q[6.36], Plack=>q[0], Test2::Suite=>q[0] }
 #     CONFIGURE_REQUIRES => {  }
 #     DISTNAME => q[WWW-WTF]
+#     LICENSE => q[perl]
 #     NAME => q[WWW::WTF]
 #     NO_META => q[1]
-#     PREREQ_PM => { Cache::FastMmap=>q[0], Digest::SHA=>q[0], Export::Attrs=>q[0], ExtUtils::MakeMaker=>q[6.36], HTML::TokeParser=>q[0], HTTP::Headers=>q[0], LWP::UserAgent=>q[0], Moose=>q[0], Plack=>q[0], Test2::Suite=>q[0], URI=>q[0], WWW::Mechanize=>q[0], WWW::WebKit2=>q[0.127], XML::Simple=>q[0], common::sense=>q[0] }
+#     PREREQ_PM => { Cache::FastMmap=>q[0], Digest::SHA=>q[0], Export::Attrs=>q[0], ExtUtils::MakeMaker=>q[6.36], HTML::TokeParser=>q[0], HTTP::Headers=>q[0], LWP::UserAgent=>q[0], List::Util=>q[0], Moose=>q[0], Plack=>q[0], Test2::Suite=>q[0], Test::LongString=>q[0], URI=>q[0], WWW::Mechanize=>q[0], XML::Simple=>q[0], common::sense=>q[0] }
 #     TEST_REQUIRES => {  }
-#     VERSION => q[1.0]
+#     VERSION => q[0.4]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
 #     realclean => { FILES=>q[MYMETA.yml] }
-#     test => { TESTS=>q[t/lwp_get_image_uris.t t/lwp_get_image_uris_filter.t t/lwp_get_links.t t/lwp_get_links_filter.t t/lwp_recurse_iterator.t t/lwp_report_errors.t t/webkit2_get_links.t t/webkit2_recurse_iterator.t t/webkit2_report_errors.t t/webkit2_test_js_injection.t] }
+#     test => { TESTS=>q[t/lwp_get_content.t t/lwp_get_headings.t t/lwp_get_image_uris.t t/lwp_get_image_uris_filter.t t/lwp_get_links.t t/lwp_get_links_filter.t t/lwp_recurse_iterator.t t/lwp_report_errors.t t/webkit2_get_headings.t t/webkit2_get_links.t t/webkit2_recurse_iterator.t t/webkit2_report_errors.t t/webkit2_test_callbacks.t] }
 
 # --- MakeMaker post_initialize section:
 
@@ -61,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = WWW::WTF
 NAME_SYM = WWW_WTF
-VERSION = 1.0
+VERSION = 0.4
 VERSION_MACRO = VERSION
-VERSION_SYM = 1_0
+VERSION_SYM = 0_4
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 1.0
+XS_VERSION = 0.4
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -167,7 +168,8 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = 
+MAN3PODS = lib/Test2/Formatter/WWWWTF.pm \
+	lib/WWW/WTF.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
@@ -190,8 +192,12 @@ PERL_ARCHIVEDEP    =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/WWW/WTF/HTTPResource.pm \
+TO_INST_PM = lib/App/Yath/Plugin/Formatter.pm \
+	lib/Test2/Formatter/WWWWTF.pm \
+	lib/WWW/WTF.pm \
+	lib/WWW/WTF/HTTPResource.pm \
 	lib/WWW/WTF/HTTPResource/HTML.pm \
+	lib/WWW/WTF/HTTPResource/Helpers/Content.pm \
 	lib/WWW/WTF/HTTPResource/PDF.pm \
 	lib/WWW/WTF/HTTPResource/Plaintext.pm \
 	lib/WWW/WTF/HTTPResource/SVG.pm \
@@ -200,6 +206,7 @@ TO_INST_PM = lib/WWW/WTF/HTTPResource.pm \
 	lib/WWW/WTF/Helpers/Google/PageSpeed.pm \
 	lib/WWW/WTF/Helpers/QRCode.pm \
 	lib/WWW/WTF/Testcase.pm \
+	lib/WWW/WTF/Testcase/Report.pm \
 	lib/WWW/WTF/UserAgent.pm \
 	lib/WWW/WTF/UserAgent/LWP.pm \
 	lib/WWW/WTF/UserAgent/LWP/Iterator.pm \
@@ -276,7 +283,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = WWW-WTF
-DISTVNAME = WWW-WTF-1.0
+DISTVNAME = WWW-WTF-0.4
 
 
 # --- MakeMaker macro section:
@@ -432,8 +439,12 @@ POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
 
 
-manifypods : pure_all config 
-	$(NOECHO) $(NOOP)
+manifypods : pure_all config  \
+	lib/Test2/Formatter/WWWWTF.pm \
+	lib/WWW/WTF.pm
+	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
+	  lib/Test2/Formatter/WWWWTF.pm $(INST_MAN3DIR)/Test2::Formatter::WWWWTF.$(MAN3EXT) \
+	  lib/WWW/WTF.pm $(INST_MAN3DIR)/WWW::WTF.$(MAN3EXT) 
 
 
 
@@ -772,7 +783,7 @@ $(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 TEST_VERBOSE=0
 TEST_TYPE=test_$(LINKTYPE)
 TEST_FILE = test.pl
-TEST_FILES = t/lwp_get_image_uris.t t/lwp_get_image_uris_filter.t t/lwp_get_links.t t/lwp_get_links_filter.t t/lwp_recurse_iterator.t t/lwp_report_errors.t t/webkit2_get_links.t t/webkit2_recurse_iterator.t t/webkit2_report_errors.t t/webkit2_test_js_injection.t
+TEST_FILES = t/lwp_get_content.t t/lwp_get_headings.t t/lwp_get_image_uris.t t/lwp_get_image_uris_filter.t t/lwp_get_links.t t/lwp_get_links_filter.t t/lwp_recurse_iterator.t t/lwp_report_errors.t t/webkit2_get_headings.t t/webkit2_get_links.t t/webkit2_recurse_iterator.t t/webkit2_report_errors.t t/webkit2_test_callbacks.t
 TESTDB_SW = -d
 
 testdb :: testdb_$(LINKTYPE)
@@ -806,7 +817,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="WWW-WTF" VERSION="1.0">' > WWW-WTF.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="WWW-WTF" VERSION="0.4">' > WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT></ABSTRACT>' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR></AUTHOR>' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> WWW-WTF.ppd
@@ -816,10 +827,11 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTML::TokeParser" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTTP::Headers" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="LWP::UserAgent" />' >> WWW-WTF.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="List::Util" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Moose::" />' >> WWW-WTF.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::LongString" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="URI::" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="WWW::Mechanize" />' >> WWW-WTF.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="WWW::WebKit2" VERSION="0.127" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XML::Simple" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="common::sense" />' >> WWW-WTF.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.26" />' >> WWW-WTF.ppd
@@ -832,8 +844,12 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
+	  'lib/App/Yath/Plugin/Formatter.pm' 'blib/lib/App/Yath/Plugin/Formatter.pm' \
+	  'lib/Test2/Formatter/WWWWTF.pm' 'blib/lib/Test2/Formatter/WWWWTF.pm' \
+	  'lib/WWW/WTF.pm' 'blib/lib/WWW/WTF.pm' \
 	  'lib/WWW/WTF/HTTPResource.pm' 'blib/lib/WWW/WTF/HTTPResource.pm' \
 	  'lib/WWW/WTF/HTTPResource/HTML.pm' 'blib/lib/WWW/WTF/HTTPResource/HTML.pm' \
+	  'lib/WWW/WTF/HTTPResource/Helpers/Content.pm' 'blib/lib/WWW/WTF/HTTPResource/Helpers/Content.pm' \
 	  'lib/WWW/WTF/HTTPResource/PDF.pm' 'blib/lib/WWW/WTF/HTTPResource/PDF.pm' \
 	  'lib/WWW/WTF/HTTPResource/Plaintext.pm' 'blib/lib/WWW/WTF/HTTPResource/Plaintext.pm' \
 	  'lib/WWW/WTF/HTTPResource/SVG.pm' 'blib/lib/WWW/WTF/HTTPResource/SVG.pm' \
@@ -842,6 +858,7 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/WWW/WTF/Helpers/Google/PageSpeed.pm' 'blib/lib/WWW/WTF/Helpers/Google/PageSpeed.pm' \
 	  'lib/WWW/WTF/Helpers/QRCode.pm' 'blib/lib/WWW/WTF/Helpers/QRCode.pm' \
 	  'lib/WWW/WTF/Testcase.pm' 'blib/lib/WWW/WTF/Testcase.pm' \
+	  'lib/WWW/WTF/Testcase/Report.pm' 'blib/lib/WWW/WTF/Testcase/Report.pm' \
 	  'lib/WWW/WTF/UserAgent.pm' 'blib/lib/WWW/WTF/UserAgent.pm' \
 	  'lib/WWW/WTF/UserAgent/LWP.pm' 'blib/lib/WWW/WTF/UserAgent/LWP.pm' \
 	  'lib/WWW/WTF/UserAgent/LWP/Iterator.pm' 'blib/lib/WWW/WTF/UserAgent/LWP/Iterator.pm' \
@@ -906,14 +923,14 @@ installdeps_notest ::
 	$(NOECHO) $(NOOP)
 
 upgradedeps ::
-	$(PERL) Makefile.PL --config= --upgradedeps=Plack,0,Test2::Suite,0,common::sense,0,Cache::FastMmap,0,Digest::SHA,0,Export::Attrs,0,HTML::TokeParser,0,HTTP::Headers,0,LWP::UserAgent,0,Moose,0,URI,0,WWW::Mechanize,0,WWW::WebKit2,0.127,XML::Simple,0
+	$(PERL) Makefile.PL --config= --upgradedeps=Plack,0,Test2::Suite,0,common::sense,0,Cache::FastMmap,0,Digest::SHA,0,Export::Attrs,0,HTML::TokeParser,0,HTTP::Headers,0,LWP::UserAgent,0,Moose,0,URI,0,WWW::Mechanize,0,XML::Simple,0,List::Util,0,Test::LongString,0
 
 upgradedeps_notest ::
-	$(PERL) Makefile.PL --config=notest,1 --upgradedeps=Plack,0,Test2::Suite,0,common::sense,0,Cache::FastMmap,0,Digest::SHA,0,Export::Attrs,0,HTML::TokeParser,0,HTTP::Headers,0,LWP::UserAgent,0,Moose,0,URI,0,WWW::Mechanize,0,WWW::WebKit2,0.127,XML::Simple,0
+	$(PERL) Makefile.PL --config=notest,1 --upgradedeps=Plack,0,Test2::Suite,0,common::sense,0,Cache::FastMmap,0,Digest::SHA,0,Export::Attrs,0,HTML::TokeParser,0,HTTP::Headers,0,LWP::UserAgent,0,Moose,0,URI,0,WWW::Mechanize,0,XML::Simple,0,List::Util,0,Test::LongString,0
 
 listdeps ::
 	@$(PERL) -le "print for @ARGV" 
 
 listalldeps ::
-	@$(PERL) -le "print for @ARGV" Plack Test2::Suite common::sense Cache::FastMmap Digest::SHA Export::Attrs HTML::TokeParser HTTP::Headers LWP::UserAgent Moose URI WWW::Mechanize WWW::WebKit2 XML::Simple
+	@$(PERL) -le "print for @ARGV" Plack Test2::Suite common::sense Cache::FastMmap Digest::SHA Export::Attrs HTML::TokeParser HTTP::Headers LWP::UserAgent Moose URI WWW::Mechanize XML::Simple List::Util Test::LongString
 

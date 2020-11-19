@@ -11,6 +11,7 @@ write_makefile(
         'Exporter'            => '5.58',
         'ExtUtils::MakeMaker' => '7.12',
         'ExtUtils::ParseXS'   => '3.24',
+        'PkgConfig'           => '0.24',
     },
     BIN_SHARE        => {
     	PARSE_XS => 'XS::Install::ParseXS',
@@ -21,4 +22,5 @@ write_makefile(
     	TYPEMAPS => {typemap => ''},
         XSOPT    => '-hiertype',
     },
+    test => { RECURSIVE_TEST_FILES => 1 },
 );

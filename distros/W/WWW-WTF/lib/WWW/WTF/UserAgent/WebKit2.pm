@@ -7,6 +7,7 @@ use Moose;
 use HTTP::Headers;
 
 use WWW::WTF::HTTPResource;
+use WWW::WTF::HTTPResource::Content;
 use WWW::WTF::UserAgent::WebKit2::Browser;
 use WWW::WTF::UserAgent::WebKit2::Iterator;
 
@@ -47,7 +48,7 @@ sub get {
 
     my $http_resource = WWW::WTF::HTTPResource->new(
         headers     => HTTP::Headers->new( Content_Type => $response->get_mime_type ),
-        content     => $self->ua->get_html_source,
+        content     => WWW::WTF::HTTPResource::Content->new( data => $self->ua->get_html_source ),
         successful  => ($response->get_status_code =~ m/^2\d\d$/ ? 1 : 0),
         request_uri => $uri,
     );

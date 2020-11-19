@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Copyright (c) 2002-2016 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -8,7 +8,7 @@
 
 use Test;
 
-BEGIN { plan tests => 90 };
+BEGIN { plan tests => 113 };
 
 use Tie::Hash::Indexed;
 ok(1);
@@ -21,12 +21,12 @@ ok($h->has('bar'));
 ok(!$h->has('xxx'));
 ok(scalar $h->keys, 4);
 
-$h->set('xxx', 5);
+ok($h->set('xxx', 5), 5);
 ok(join(',', $h->keys), 'foo,bar,zoo,baz,xxx');
 ok($h->has('xxx'));
 ok(scalar $h->keys, 5);
 
-$h->set('foo', 6);
+ok($h->set('foo', 6), 6);
 ok(join(',', $h->keys), 'foo,bar,zoo,baz,xxx');
 ok($h->exists('foo'));
 ok(scalar $h->keys, 5);
@@ -34,6 +34,27 @@ ok(scalar $h->keys, 5);
 ok(join(',', $h->keys('xxx', 'bar')), 'xxx,bar');
 ok(join(',', $h->values('xxx', 'bar')), '5,2');
 ok(join(',', $h->as_list('xxx', 'bar')), 'xxx,5,bar,2');
+
+ok(join(',', $h->keys('abc', 'xxx', 'def')), 'abc,xxx,def');
+
+{
+  my @val = $h->values('abc', 'xxx', 'def');
+  ok(scalar @val, 3);
+  ok(scalar $h->values('abc', 'xxx', 'def'), 3);
+  ok(not defined($val[0]));
+  ok($val[1], 5);
+  ok(not defined($val[2]));
+}
+
+{
+  my @items = $h->items('abc', 'xxx', 'def');
+  ok(scalar @items, 6);
+  ok(scalar $h->items('abc', 'xxx', 'def'), 6);
+  ok(not defined($items[1]));
+  ok($items[3], 5);
+  ok(not defined($items[5]));
+  ok(join(',', @items[0,2,4]), 'abc,xxx,def');
+}
 
 my $i = $h->iterator;
 my(@key, @val);
@@ -64,6 +85,16 @@ $i = $h->reverse_iterator;
 while (my($k,$v) = $i->next) {
   push @key, $k;
   push @val, $v;
+}
+
+ok(join(',', @key), 'xxx,baz,zoo,bar,foo');
+ok(join(',', @val), '5,4,3,2,6');
+
+@key = ();
+@val = ();
+for (my $i = $h->reverse_iterator; $i->valid; $i->next) {
+  push @key, $i->key;
+  push @val, $i->value;
 }
 
 ok(join(',', @key), 'xxx,baz,zoo,bar,foo');
@@ -194,3 +225,19 @@ ok($h->or_assign('foo', 1), 1);
 $h->set('foo', undef);
 ok(not defined $h->get('foo'));
 ok($h->dor_assign('foo', 0), 0);
+
+$h->set('foo', 0);
+ok($h->get('foo'), 0);
+ok($h->dor_equals('foo', 1), 0);
+ok($h->or_equals('foo', 1), 1);
+
+$h->set('foo', undef);
+ok(not defined $h->get('foo'));
+ok($h->dor_equals('foo', 0), 0);
+
+{
+  my $h1 = Tie::Hash::Indexed->new(test => "Hello ");
+  my $h2 = Tie::Hash::Indexed->new(test => "Hello ");
+  ok($h1->concat("test", "World!"), $h2->set("test", $h2->get("test") . "World!"));
+  ok($h1->get("test"), "Hello World!");
+}

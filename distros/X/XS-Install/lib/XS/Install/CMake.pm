@@ -92,6 +92,18 @@ function(get_all_libs_locations ret tgt)
     set(${ret} ${self_loc} PARENT_SCOPE)
 endfunction()
 
+function(write_all_libs_inc tgt)
+    get_target_property(deps ${tgt} INTERFACE_LINK_LIBRARIES)
+    message(STATUS "deps inc:" ${deps} "for" ${tgt})
+    foreach(lib ${deps})
+        if (TARGET ${lib})
+            get_target_property(lret ${lib} INTERFACE_INCLUDE_DIRECTORIES)
+            message(STATUS "GOT_INC=" ${lret})
+            write_all_libs_inc(${lib})
+        endif()
+    endforeach()
+endfunction()
+
 foreach(PROP ${REQUESTED_PROPS})
 get_target_property(GOT_RES ${REQUESTED_TARGET} ${PROP})
     if (GOT_RES)
@@ -119,6 +131,8 @@ endforeach()
 get_all_libs_locations(locs ${REQUESTED_TARGET})
 message(STATUS "GOT_LOCATIONS=" "${locs}")
 
+write_all_libs_inc(${REQUESTED_TARGET})
+
 EOS
 
     close(CMAKELISTS);
@@ -134,14 +148,14 @@ sub import_cmake_properites {
     my $source = shift;
     my $result = {
         INCLUDE => _get_prop($source, 'INTERFACE_INCLUDE_DIRECTORIES', 'BUILD_INTERFACE'),
+        INC => _get_prop($source, 'INC', 'INSTALL_INTERFACE'),
     };
 
     my $libs = _get_prop($source, 'FILTERED_LINK_LIBRARIES');
     my $link_opts = _get_prop($source, 'INTERFACE_LINK_OPTIONS');
     my $locations = _get_prop($source, 'LOCATIONS');
 
-    push ( @$link_opts, map({"-l$_"} @$libs), map {_split_lib($_)} @$locations );
-    @$link_opts = grep /^-.*/, @$link_opts;
+    push ( @$link_opts, map({"-l$_"} @$libs), @$locations );
     $result->{"LIBS"} = $link_opts;
 
     $result->{"DEFINE"} = [map {"-D$_"} @{_get_prop($source, 'INTERFACE_COMPILE_DEFINITIONS')}];
@@ -154,15 +168,6 @@ sub _get_raw_prop {
     my ($source, $prop_name) = @_;
     my @result = ($source =~ /(?<=GOT_$prop_name=)(.+?)$/gm);
     return \@result;
-}
-
-sub _split_lib {
-    my $arg = shift;
-    if ($arg =~ /(.*)\/?lib(.*)\..*/) {
-        return "-L$1 -l$2"
-    } else {
-        return $arg;
-    }
 }
 
 sub _split_cmake_generator {

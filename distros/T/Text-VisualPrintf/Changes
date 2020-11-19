@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-VisualPrintf
 
+4.01 2020-11-19T02:56:21Z
+
+    - Release VisualPrintf/Transform.pm as Text::Conceal module.
+
 3.11 2020-11-04T07:38:20Z
 
     - Support backspaces.

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
-our $VERSION = '2.53';
+our $VERSION = '2.54';
 
-use Class::Load 'try_load_class';
+use Module::Runtime 'require_module';
 use GraphViz2;
 use Moo;
 
@@ -37,7 +37,7 @@ sub add {
 	my $ignore = delete $arg{ignore} || [];
 	die "Error. The class parameter must not be a ref\n" if ref $class;
 	die "Error. The ignore parameter's value must be an arrayref\n" if ref $ignore ne 'ARRAY';
-	die "Error: Unable to load class '$class'\n" if !try_load_class $class;
+	die "Error: Unable to load class '$class'\n" if !require_module $class;
 	_process_is_a($class, +{ map +($_=>1), @$ignore }, $self->is_a);
 	return $self;
 }

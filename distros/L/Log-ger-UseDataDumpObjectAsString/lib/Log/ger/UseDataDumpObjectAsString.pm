@@ -3,7 +3,7 @@ package Log::ger::UseDataDumpObjectAsString;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Log-ger-UseDataDumpObjectAsString'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Data::Dump::ObjectAsString ();
 use Log::ger ();
@@ -26,7 +26,7 @@ Log::ger::UseDataDumpObjectAsString - Use Data::Dump::ObjectAsString to dump dat
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::UseDataDumpObjectAsString (from Perl distribution Log-ger-UseDataDumpObjectAsString), released on 2020-06-06.
+This document describes version 0.003 of Log::ger::UseDataDumpObjectAsString (from Perl distribution Log-ger-UseDataDumpObjectAsString), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ Other modules to set data dumper for Log::ger:
 
 =over
 
-=item * L<Log::ger::UseDataBahe>
+=item * L<Log::ger::UseBaheForDump>
 
 =item * L<Log::ger::UseDataDump>
 
@@ -73,6 +73,10 @@ Other modules to set data dumper for Log::ger:
 =item * L<Log::ger::UseDataDumperCompact>
 
 =item * L<Log::ger::UseDataPrinter>
+
+=item * L<Log::ger::UseJSONForDump>
+
+=item * L<Log::ger::UseYAMLForDump>
 
 =back
 

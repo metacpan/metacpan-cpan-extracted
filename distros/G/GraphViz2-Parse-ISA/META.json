@@ -4,7 +4,7 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.54, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,10 +38,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Load" : "0.23",
             "GraphViz2" : "2.48",
+            "Module::Runtime" : "0.016",
             "Moo" : "2.001001",
-            "perl" : "5.010001"
+            "parent" : "0",
+            "perl" : "5.008008"
          }
       },
       "test" : {
@@ -66,6 +67,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2-Parse-ISA"
       }
    },
-   "version" : "2.53",
+   "version" : "2.54",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -351,11 +351,10 @@ sub configure
         file      => [qw( bin/elf.PL )],
       },
       resources => {
-        homepage    => 'http://search.cpan.org/~mhx/Convert-Binary-C/',
+        homepage    => 'https://metacpan.org/release/Convert-Binary-C',
         bugtracker  => {
-          web => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-Binary-C',
+          web => 'https://github.com/mhx/Convert-Binary-C/issues',
         },
-        MailingList => 'convert-binary-c@yahoogroups.com',
         repository  => {
           type => 'git',
           url  => 'https://github.com/mhx/Convert-Binary-C.git',
@@ -376,10 +375,10 @@ sub MY::c_o
   package MY;
   my $c_o = shift->SUPER::c_o(@_);
   if (!$ENV{CBC_MAKEFILE_DEBUG} and eval $ExtUtils::MakeMaker::VERSION >= 6.17) {
-    $c_o =~ s/^(\s+)(\$\(CCCMD\).*)$/$1\$(NOECHO) \$(ECHO) Compiling [\$(CC) \$(OPTIMIZE)] \$<\n$1\$(NOECHO) $2\n$1\$(NOECHO) \$(MV) \$(\@F) t_object.tmp\n$1\$(NOECHO) \$(MV) t_object.tmp \$\@/mg;
+    $c_o =~ s/^(\s+)(\$\(CCCMD\).*)$/$1\$(NOECHO) \$(ECHO) Compiling [\$(CC) \$(OPTIMIZE)] \$<\n$1\$(NOECHO) $2\n$1\$(NOECHO) \$(MV) \$(\@F) tmp\$(\@F)\n$1\$(NOECHO) \$(MV) tmp\$(\@F) \$\@/mg;
   }
   else {
-    $c_o =~ s/^\s+\$\(CCCMD\).*$/$&\n\t\$(MV) \$(\@F) t_object.tmp\n\t\$(MV) t_object.tmp \$\@/mg;
+    $c_o =~ s/^\s+\$\(CCCMD\).*$/$&\n\t\$(MV) \$(\@F) tmp\$(\@F)\n\t\$(MV) tmp\$(\@F) \$\@/mg;
   }
   $c_o;
 }
@@ -456,16 +455,22 @@ sub MY::postamble
       dst => ['token/t_blproperty.h',
               'token/t_blproperty.c'],
     },
+    {
+      cmd => '$(PERL) {src} tests/include/stuff',
+      src => 'tests/include/stuff/generate.pl',
+      dst => [map { "tests/include/stuff/$_.h" } 'aa' .. 'az'],
+    },
   );
 
   my(@gen, @old_dst, @old_src, @missing);
 
   for my $s (@spec) {
+    my %seen;
     for my $dst (@{$s->{dst}}) {
       my $cmd = $s->{cmd};
       $cmd =~ s/\{dst\}/$dst/g;
       $cmd =~ s/\{(\w+)\}/$s->{$1}/g;
-      push @gen, $cmd;
+      push @gen, $cmd unless $seen{$cmd}++;
       if (-f $dst) {
         if (-M $s->{src} < -M $dst) {
           push @old_dst, $dst;

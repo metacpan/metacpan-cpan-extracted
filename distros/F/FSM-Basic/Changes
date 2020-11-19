@@ -1,5 +1,13 @@
 Revision history for FSM-Basic
 
+0.24    Wed Now 18 22:04:03 2020 +0200
+            add 'output_file' and test files
+            escape special regex character (. * ?) from input
+            tidy
+
+0.23    Thu Oct 25 18:04:02 2020 +0200
+            add 'alternation' tag and related test
+
 0.22    Wed 21 Oct 17:14:05 2020 +0200
             add tag "caseinsensitive" and "swapregex"
             update test files

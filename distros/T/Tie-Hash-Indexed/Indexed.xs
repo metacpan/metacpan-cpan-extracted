@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 *
-* Copyright (c) 2002-2016 Marcus Holland-Moritz. All rights reserved.
+* Copyright (c) Marcus Holland-Moritz. All rights reserved.
 * This program is free software; you can redistribute it and/or modify
 * it under the same terms as Perl itself.
 *
@@ -553,11 +553,17 @@ IXHV::STORE(key, value)
     PUTBACK;
     THI_DEBUG_METHOD2("'%s', '%s'", SvPV_nolen(key), SvPV_nolen(value));
     THI_CHECK_OBJECT;
-    (void) ix;
 
     THI_INVALIDATE_ITERATORS;
 
     ixhv_store(aTHX_ THIS, key, value, SM_SET);
+
+    if (ix == 1 && GIMME_V != G_VOID)
+    {
+      ST(0) = value;
+      XSRETURN(1);
+    }
+
     return;
 
 ################################################################################
@@ -727,7 +733,6 @@ IXHV::CLEAR()
   PPCODE:
     THI_DEBUG_METHOD;
     THI_CHECK_OBJECT;
-    (void) ix;
 
     THI_INVALIDATE_ITERATORS;
 
@@ -801,7 +806,7 @@ IXHV::items(...)
 
     if (GIMME_V == G_SCALAR)
     {
-      mXPUSHi(num_items);
+      XSRETURN_IV(num_items);
     }
     else
     {
@@ -1077,7 +1082,9 @@ IXHV::add(key, val)
     modulo = 4
     concat = 5
     dor_assign = 6
-    or_assign = 7
+    dor_equals = 7
+    or_assign = 8
+    or_equals = 9
 
   PREINIT:
     THI_METHOD(add);
@@ -1090,6 +1097,8 @@ IXHV::add(key, val)
       OP_MODULO,
       OP_CONCAT,
       MY_OP_DOR,
+      MY_OP_DOR,
+      OP_OR,
       OP_OR
     };
 

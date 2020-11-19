@@ -1,3 +1,6 @@
+v1.23.13 Thu, 19 Nov 2020 06:54:54 +0100 moocow
+	+ fix RT bug #133772, reported by Sebastiaan Couwenberg (spelling error in POD)
+
 v1.23.12 Tue, 28 Aug 2018 09:20:08 +0200 moocow
 	+ RT bug #126924, part III
 	  - added exception to CCS::Nd::borover() test in CCS/t/03_ufuncs.t

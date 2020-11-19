@@ -15,7 +15,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 # VERSION
 
-Version 3.11
+Version 4.01
 
 # DESCRIPTION
 
@@ -43,8 +43,15 @@ space.
 
 - $VISUAL\_WIDTH
 
-    Hold a function pointer to calculate visual width of given string.
+    Hold a function reference to calculate visual width of given string.
     Default function is `Text::VisualWidth::PP::width`.
+
+- $IS\_TARGET
+
+    Hold a regexp object of funciton reference to test if the given string
+    is subject of replacement.  Default is `qr/[\e\b\P{ASCII}]/`, and
+    test if the string include `ESCAPE` or `BACKSPACE` or non-ASCII
+    characters.
 
 # IMPLEMENTATION NOTES
 
@@ -58,11 +65,12 @@ one.
 
 # SEE ALSO
 
-[Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf), [Text::VisualPrintf::IO](https://metacpan.org/pod/Text::VisualPrintf::IO)
-
+[Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf), [Text::VisualPrintf::IO](https://metacpan.org/pod/Text::VisualPrintf::IO),
 [https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
 
-[Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf)
+[Text::Conceal](https://metacpan.org/pod/Text::Conceal), [https://github.com/kaz-utashiro/Text-Conceal](https://github.com/kaz-utashiro/Text-Conceal)
+
+[Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf), [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
 
 # AUTHOR
 

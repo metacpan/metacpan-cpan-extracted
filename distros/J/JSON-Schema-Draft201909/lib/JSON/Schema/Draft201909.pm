@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.014-7-gff049fa
+package JSON::Schema::Draft201909; # git description: v0.015-20-gf6ed44f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -122,12 +122,11 @@ sub add_schema {
     }
     else {
       $self->_add_resources(map +($_->[0] => +{ %{$_->[1]}, document => $document }),
-        $document->_resource_pairs);
+        $document->resource_pairs);
     }
   }
 
   if ("$uri") {
-    $document->_add_resources($uri, { path => '', canonical_uri => $document->canonical_uri });
     $self->_add_resources($uri => { path => '', canonical_uri => $document->canonical_uri, document => $document });
   }
 
@@ -243,8 +242,14 @@ sub _eval {
   abort($state, 'maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
 
+  # find all schema locations in effect at this data path + canonical_uri combination
+  # if any of them are absolute prefix of this schema location, we are in a loop.
+  my $canonical_uri = canonical_schema_uri($state);
+  my $schema_location = $state->{traversed_schema_path}.$state->{schema_path};
   abort($state, 'infinite loop detected (same location evaluated twice)')
-    if $state->{seen}{$state->{data_path}}{canonical_schema_uri($state)}++;
+    if grep substr($schema_location, 0, length) eq $_,
+      keys %{$state->{seen}{$state->{data_path}}{$canonical_uri}};
+  $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
 
   my $schema_type = $self->_get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
@@ -297,7 +302,7 @@ sub _eval_keyword_id {
   abort($state, '$id value "%s" cannot have a non-empty fragment', $schema->{'$id'})
     if length Mojo::URL->new($schema->{'$id'})->fragment;
 
-  if (my $canonical_uri = $state->{document}->_path_to_canonical_uri($state->{document_path}.$state->{schema_path})) {
+  if (my $canonical_uri = $state->{document}->path_to_canonical_uri($state->{document_path}.$state->{schema_path})) {
     $state->{canonical_schema_uri} = $canonical_uri->clone;
     $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
     $state->{document_path} = $state->{document_path}.$state->{schema_path};
@@ -800,7 +805,11 @@ sub _eval_keyword_items {
     my $valid = 1;
     foreach my $idx (0 .. $#{$data}) {
       my @annotations = @orig_annotations;
-      if ($self->_eval($data->[$idx], $schema->{items},
+      if ($self->_is_type('boolean', $schema->{items})) {
+        next if $schema->{items};
+        $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx }, 'item not permitted');
+      }
+      elsif ($self->_eval($data->[$idx], $schema->{items},
           +{ %$state, annotations => \@annotations,
             data_path => $state->{data_path}.'/'.$idx,
             schema_path => $state->{schema_path}.'/items' })) {
@@ -826,7 +835,12 @@ sub _eval_keyword_items {
     $last_index = $idx;
 
     my @annotations = @orig_annotations;
-    if ($self->_eval($data->[$idx], $schema->{items}[$idx],
+    if ($self->_is_type('boolean', $schema->{items}[$idx])) {
+      next if $schema->{items}[$idx];
+      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx,
+        _schema_path_suffix => $idx }, 'item not permitted');
+    }
+    elsif ($self->_eval($data->[$idx], $schema->{items}[$idx],
         +{ %$state, annotations => \@annotations,
           data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/items/'.$idx })) {
@@ -1378,14 +1392,14 @@ sub _eval_keyword_examples {
 }
 
 sub _eval_keyword_definitions {
-  my ($self, $schema, $state) = @_;
+  my ($self, $data, $schema, $state) = @_;
   carp 'no-longer-supported "definitions" keyword present (at '
     .canonical_schema_uri($state).'): this should be rewritten as "$defs"';
   return 1;
 }
 
 sub _eval_keyword_dependencies {
-  my ($self, $schema, $state) = @_;
+  my ($self, $data, $schema, $state) = @_;
   carp 'no-longer-supported "dependencies" keyword present (at'
     .canonical_schema_uri($state)
     .'): this should be rewritten as "dependentSchemas" or "dependentRequired"';
@@ -1527,13 +1541,9 @@ around _add_resources => sub {
   foreach my $pair (sort { $a->[0] cmp $b->[0] } pairs @_) {
     my ($key, $value) = @$pair;
     if (my $existing = $self->_get_resource($key)) {
-      if ($key eq '') {
-        # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of schemas that
-        # lack all identifiers altogether; we drop *all* resources from that document
-        $self->_remove_resource(
-          grep $self->_get_resource($_)->{document} == $existing->{document}, $self->_resource_keys);
-      }
-      else {
+      # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of schemas that
+      # lack all identifiers altogether, but preserve other resources from the original document
+      if ($key ne '') {
         next if $existing->{path} eq $value->{path}
           and $existing->{canonical_uri} eq $value->{canonical_uri}
           and $existing->{document} == $value->{document};
@@ -1585,7 +1595,7 @@ sub _get_or_load_resource {
     # we have already performed the appropriate collision checks, so we bypass them here
     $self->_add_resources_unsafe(
       map +($_->[0] => +{ %{$_->[1]}, document => $document }),
-        $document->_resource_pairs
+        $document->resource_pairs
     );
 
     return $self->_get_resource($uri);
@@ -1742,7 +1752,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

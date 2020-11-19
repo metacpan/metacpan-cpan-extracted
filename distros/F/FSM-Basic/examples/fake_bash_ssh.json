@@ -1,0 +1,81 @@
+{
+  "close": {
+    "final": 1,
+    "output": "__PROMPT__"
+  },
+  "prompt": {
+    "expect": {
+      "default": {
+        "do": "return \"not the correct IP \n\n\""
+      },
+      "exit": {
+        "final": 0,
+        "matching": "close"
+      },
+      "timeout": {
+        "final": 0,
+        "caseinsensitive": "1",
+        "matching": "timeout"
+      },
+      "help": {
+        "swapregex": "1",
+        "output": "default\nexit\ntimeout\n__PROMPT__"
+      },
+      "t[ruc]": {
+        "caseinsensitive": "1",
+        "alternation": "1",
+        "output": "TRUC\n__PROMPT__"
+      },
+      "c[onfiguration] [terminal]": {
+        "caseinsensitiveA": "1",
+        "alternation": "1",
+        "output": "TERMINAL\n__PROMPT__"
+      }
+    },
+    "not_matching": "prompt",
+    "not_matching_info": "% Unknown command or computer name, or unable to find computer address",
+    "output": "__PROMPT__",
+    "timeout": "timeout",
+    "timer": 5
+  },
+  "timeout": {
+    "expect": {
+      "prompt": {
+        "final": 0,
+        "matching": "prompt"
+      },
+      "read": {
+        "final": 0,
+        "output_file": "hello.txt",
+      },
+      "quit": {
+        "final": 0,
+        "matching": "close"
+      },
+      "exit": {
+        "final": 0,
+        "matching": "prompt"
+      },
+      "h(elp)?|\\?": {
+        "output": "\nexit\nquit\ntest\n__PROMPT__"
+      },
+      "test /tmp/test/((\\w)(\\d))": {
+        "exec": "ls /tmp/test/a__3__"
+      },
+      "catA /tmp/test/((\\w)(\\d))": {
+        "cat": "/tmp/test/__1__"
+      },
+      "more /tmp/test/((\\w)(\\d))": {
+        "more": "../t/test_cat.txt"
+      },
+      "cat": {
+         "catSEQ": "/tmp/test/a1 /tmp/test/a2",
+         "catSEQ_idx": "/tmp/test/test_cat_seq.idx"
+      },
+      "copy tftp://166.59.83.136/(.*) disk0:/(.*)": {
+        "exec": "echo '(cd firmware; rm -f asdm* ; /usr/bin/tftp 127.0.0.1 -c get __1__)'"
+      }
+    },
+    "output": "__PROMPT__(timeout) "
+  }
+}

@@ -235,6 +235,17 @@ Examples (given that $payload is a directory where payload is installed and $dis
     'mydir'    => 'a/b/c', # $dist/mydir/*  => $payload/a/b/c/*
     'mydir'    => '/',     # $dist/mydir/*  => $payload/*
 
+=item PKG_CONFIG
+
+List of system packages current module depends on. They will be searched via L<PkgConfig> and their C<inc>, C<cflags> and C<ldflags> will be automatically added
+to makefile. Also if your module has BIN_SHARE section then all packages in PKG_CONFIG goes to BIN_SHARE/PKG_CONFIG unless package name is prefixed
+with '-' (minus).
+
+Examples:
+
+    PKG_CONFIG => 'openssl'
+    PKG_CONFIG => ['libzip', '-libcap']
+
 =item BIN_DEPS
 
 List of modules current module binary depends on. That means all that those modules specified in BIN_SHARE section will be applied
@@ -295,6 +306,10 @@ You don't need to manually manage this setting as it's managed automatically (se
 If set to true, will use c++ when building descendant modules. If > 1, then will use this version -std=c++<CPLUS> for building descendant modules
 (however if a descendant module sets its own CPLUS version then the highest version will be in use). Propagates all behaviour of C<CPLUS> for
 descendant modules.
+
+=item BIN_SHARE/PKG_CONFIG
+
+All dependant modules will automatically get C<inc>, C<cflags> and C<ldflags> of these system packages
 
 =item CLIB
 

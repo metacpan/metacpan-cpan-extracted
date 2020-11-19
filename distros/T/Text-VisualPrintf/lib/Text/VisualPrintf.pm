@@ -1,9 +1,8 @@
 package Text::VisualPrintf;
 
-our $VERSION = "3.11";
+our $VERSION = "4.01";
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 use Carp;
 
@@ -11,7 +10,7 @@ use Exporter 'import';
 our @EXPORT_OK = qw(&vprintf &vsprintf);
 
 use Data::Dumper;
-use Text::VisualPrintf::Transform;
+use Text::Conceal;
 
 sub vprintf  { &printf (@_) }
 sub vsprintf { &sprintf(@_) }
@@ -22,15 +21,15 @@ our $VISUAL_WIDTH = \&Text::VisualWidth::PP::width;
 
 sub sprintf {
     my($format, @args) = @_;
-    my $xform = Text::VisualPrintf::Transform
-	->new(except => $format,
-	      test   => $IS_TARGET,
-	      length => $VISUAL_WIDTH,
-	      max    => int @args,
+    my $conceal = Text::Conceal->new(
+	except => $format,
+	test   => $IS_TARGET,
+	length => $VISUAL_WIDTH,
+	max    => int @args,
 	);
-    $xform->encode(@args) if $xform;
+    $conceal->encode(@args) if $conceal;
     my $s = CORE::sprintf $format, @args;
-    $xform->decode($s) if $xform;
+    $conceal->decode($s)    if $conceal;
     $s;
 }
 
@@ -61,7 +60,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 =head1 VERSION
 
-Version 3.11
+Version 4.01
 
 =head1 DESCRIPTION
 
@@ -98,8 +97,15 @@ to work with FILEHANDLE and printf.
 
 =item $VISUAL_WIDTH
 
-Hold a function pointer to calculate visual width of given string.
+Hold a function reference to calculate visual width of given string.
 Default function is C<Text::VisualWidth::PP::width>.
+
+=item $IS_TARGET
+
+Hold a regexp object of funciton reference to test if the given string
+is subject of replacement.  Default is C<qr/[\e\b\P{ASCII}]/>, and
+test if the string include C<ESCAPE> or C<BACKSPACE> or non-ASCII
+characters.
 
 =back
 
@@ -115,11 +121,12 @@ one.
 
 =head1 SEE ALSO
 
-L<Text::VisualPrintf>, L<Text::VisualPrintf::IO>
-
+L<Text::VisualPrintf>, L<Text::VisualPrintf::IO>,
 L<https://github.com/kaz-utashiro/Text-VisualPrintf>
 
-L<Text::ANSI::Printf>
+L<Text::Conceal>, L<https://github.com/kaz-utashiro/Text-Conceal>
+
+L<Text::ANSI::Printf>, L<https://github.com/kaz-utashiro/Text-ANSI-Printf>
 
 =head1 AUTHOR
 

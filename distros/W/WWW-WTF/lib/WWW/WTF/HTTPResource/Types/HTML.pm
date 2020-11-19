@@ -1,4 +1,4 @@
-package WWW::WTF::HTTPResource::HTML;
+package WWW::WTF::HTTPResource::Types::HTML;
 
 use common::sense;
 
@@ -12,19 +12,46 @@ has 'parser' => (
     lazy    => 1,
     default => sub {
         my ($self) = @_;
-        my $parser = HTML::TokeParser->new(\$self->content) or die "Can't parse: $!";
+        my $parser = HTML::TokeParser->new(\$self->content->data) or die "Can't parse: $!";
         return $parser;
     },
 );
+
+sub get_a_tags {
+    my ($self, $o) = @_;
+
+    my @tags;
+
+    while (my $token = $self->parser->get_tag(qw/a/)) {
+
+        if (exists $o->{external}) {
+            my $href = $token->[1]->{href};
+            my $base_uri = $self->request_uri->authority;
+
+            next unless defined $href;
+            next unless ($href =~ m/^http/);
+
+            my $href_uri = URI->new($href);
+            $href_uri->authority;
+
+            next if($href_uri =~ m/$base_uri/);
+        }
+
+        push @tags, $token;
+
+    }
+
+    return @tags;
+}
 
 sub get_links {
     my ($self, $o) = @_;
 
     my @links;
 
-    while (my $token = $self->parser->get_tag(qw/a/)) {
+    foreach my $token ($self->get_a_tags) {
         if (exists $o->{filter}->{title}) {
-            next unless(($token->[1]->{title} // '') =~ m/$o->{filter}->{title}/);
+            next unless(($token->[1]->{title} // '') =~ m/$o->{filter}->{title}/i);
         }
 
         push @links, URI->new($token->[1]->{href});

@@ -26,7 +26,7 @@ ENDWARN
     };
   }
   else {
-    eval { $thv = `$^X -MTest::Harness -le'print \$Test::Harness::VERSION'` };
+    eval { $thv = `$^X -MTest::Harness -leprint\$Test::Harness::VERSION` };
 
     eval q{ use lib './support' } unless defined $thv && $thv >= 2.62;
 

@@ -1,4 +1,25 @@
 ----------------------------
+Version 0.83 (2020-11-19)
+----------------------------
+
+* more Windows fixes
+
+----------------------------
+Version 0.82 (2020-11-19)
+----------------------------
+
+* fix speed tests (the new smaller code was parsing too
+  quickly for caching to have a strong impact)
+
+* update documentation, e.g. bugtracker
+
+----------------------------
+Version 0.81 (2020-11-18)
+----------------------------
+
+* fix parallel builds
+
+----------------------------
 Version 0.80 (2020-11-17)
 ----------------------------
 

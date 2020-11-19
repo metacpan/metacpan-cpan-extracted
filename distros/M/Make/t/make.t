@@ -5,11 +5,15 @@ use Make;
 use File::Spec;
 use File::Temp qw(tempfile);
 
-my @LINES = ( [ "all : one \\\n  two\n", 'all : one two' ], [ "all : one \\\r\n  two\r\n", 'all : one two' ] );
+my @LINES = (
+    [ "all : one \\\n  two\n",     [ 'all : one two', "all : one \\\n  two" ] ],
+    [ "all : one \\\r\n  two\r\n", [ 'all : one two', "all : one \\\r\n  two" ] ],
+    [ "all : one \\\n\t two\n",    [ 'all : one two', "all : one \\\n two" ] ],
+);
 for my $l (@LINES) {
     my ( $in, $expected ) = @$l;
     open my $fh, '+<', \$in or die "open: $!";
-    is Make::get_full_line($fh), $expected;
+    is_deeply [ Make::get_full_line($fh) ], $expected;
 }
 
 my @ASTs = (
@@ -17,16 +21,20 @@ my @ASTs = (
     [
         "\n.SUFFIXES: .o .c .y .h .sh .cps # comment\n\n.c.o :\n\t\$(CC) \$(CFLAGS) \$(CPPFLAGS) -c -o \$@ \$<\n\n",
         [
-            [ 'rule', '.SUFFIXES', ':', '.o .c .y .h .sh .cps', [] ],
-            [ 'rule', '.c.o',      ':', '',                     ['$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<'] ],
+            [ 'rule', '.SUFFIXES', ':', '.o .c .y .h .sh .cps', [], [] ],
+            [
+                'rule', '.c.o', ':', '',
+                ['$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<'],
+                ['$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<']
+            ],
         ],
     ],
     [
         "# header\n.c.o :\n\techo hi\n# comment\n\n\techo yo\n",
-        [ [ 'comment', 'header' ], [ 'rule', '.c.o', ':', '', [ 'echo hi', 'echo yo' ] ], ],
+        [ [ 'comment', 'header' ], [ 'rule', '.c.o', ':', '', [ 'echo hi', 'echo yo' ], [ 'echo hi', 'echo yo' ] ], ],
     ],
-    [ "all : other ; echo hi # keep\n", [ [ 'rule', 'all', ':', 'other', ['echo hi # keep'] ] ], ],
-    [ "all : other # drop ; echo hi\n", [ [ 'rule', 'all', ':', 'other', [] ] ], ],
+    [ "all : other ; echo hi # keep\n", [ [ 'rule', 'all', ':', 'other', ['echo hi # keep'], ['echo hi # keep'] ] ], ],
+    [ "all : other # drop ; echo hi\n", [ [ 'rule', 'all', ':', 'other', [],                 [] ] ], ],
     [ "x = y\n",                        [ [ 'var',  'x',   'y', ] ], ],
     [ "x = y\r\n",                      [ [ 'var',  'x',   'y', ] ], ],
 );
@@ -128,7 +136,8 @@ targets = other
 all: $(targets)
 
 other: Changes README
-	@echo $@ $^ $< $(var) >"$(tempfile)"
+	@echo $@ $^ $< $(var) \
+	   >"$(tempfile)"
 EOF
 ok !$m->target('all')->has_recipe, 'all has no recipe';
 ok $m->target('other')->has_recipe, 'other has recipe';
@@ -140,6 +149,8 @@ like $contents, qr/^other Changes README Changes value/;
 my ($other_rule) = @{ $m->target('other')->rules };
 my $got = $other_rule->recipe;
 is_deeply $got, ['@echo $@ $^ $< $(var) >"$(tempfile)"'] or diag explain $got;
+$got = $other_rule->recipe_raw;
+is_deeply $got, [qq{\@echo \$@ \$^ \$< \$(var) \\\n   >"\$(tempfile)"}] or diag explain $got;
 my $all_target = $m->target('all');
 my ($all_rule) = @{ $all_target->rules };
 $got = $all_rule->prereqs;

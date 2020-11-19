@@ -1,6 +1,6 @@
 package Data::Money::BaseException::MismatchCurrencyType;
 
-$Data::Money::BaseException::MismatchCurrencyType::VERSION   = '0.17';
+$Data::Money::BaseException::MismatchCurrencyType::VERSION   = '0.18';
 $Data::Money::BaseException::MismatchCurrencyType::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money::BaseException::MismatchCurrencyType - Exception handle for 'mismatc
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

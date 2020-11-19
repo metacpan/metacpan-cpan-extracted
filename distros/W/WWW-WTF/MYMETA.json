@@ -41,10 +41,11 @@
             "HTML::TokeParser" : "0",
             "HTTP::Headers" : "0",
             "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "Moose" : "0",
+            "Test::LongString" : "0",
             "URI" : "0",
             "WWW::Mechanize" : "0",
-            "WWW::WebKit2" : "0.127",
             "XML::Simple" : "0",
             "common::sense" : "0"
          }

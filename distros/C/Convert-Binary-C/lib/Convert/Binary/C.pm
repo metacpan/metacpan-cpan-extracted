@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD );
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.80';
+$VERSION = '0.83';
 
 bootstrap Convert::Binary::C $VERSION;
 
@@ -5402,11 +5402,9 @@ algorithm.
 =head1 BUGS
 
 I'm sure there are still lots of bugs in the code for this
-module. If you find any bugs, Convert::Binary::C doesn't
-seem to build on your system or any of its tests fail, please
-use the CPAN Request Tracker at L<http://rt.cpan.org/> to
-create a ticket for the module. Alternatively, just send a
-mail to E<lt>mhx@cpan.orgE<gt>.
+module. If you find any bugs, Convert::Binary::C doesn't seem
+to build on your system or any of its tests fail, please report
+the issue at L<https://github.com/mhx/Convert-Binary-C/issues>.
 
 =head1 EXPERIMENTAL FEATURES
 

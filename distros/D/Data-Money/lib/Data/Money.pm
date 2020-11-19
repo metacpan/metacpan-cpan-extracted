@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.17';
+$Data::Money::VERSION   = '0.18';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -110,7 +110,7 @@ with proper rounding (via L<Math::BigFloat>) and formatting via L<Locale::Curren
     use strict; use warnings;
     use Data::Money;
 
-    my $price = Data::Money->new(value => 1.2. code => 'USD');
+    my $price = Data::Money->new(value => 1.2, code => 'USD');
     print $price;            # $1.20
     print $price->code;      # USD
     print $price->format;    # FMT_COMMON

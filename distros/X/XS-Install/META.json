@@ -31,6 +31,7 @@
             "Exporter" : "5.58",
             "ExtUtils::MakeMaker" : "7.12",
             "ExtUtils::ParseXS" : "3.24",
+            "PkgConfig" : "0.24",
             "perl" : "5.010000"
          }
       },
@@ -43,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.21",
+   "version" : "v1.3.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

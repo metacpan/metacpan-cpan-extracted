@@ -1,10 +1,10 @@
 package Text::ANSI::Printf;
 
+our $VERSION = "2.01";
+
 use v5.14;
 use warnings;
 use Carp;
-
-our $VERSION = "1.03";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(&ansi_printf &ansi_sprintf);
@@ -12,13 +12,21 @@ our @EXPORT_OK = qw(&ansi_printf &ansi_sprintf);
 sub ansi_printf  { &printf (@_) }
 sub ansi_sprintf { &sprintf(@_) }
 
-use Text::VisualPrintf;
-use Text::ANSI::Fold::Util;
+use Text::Conceal;
+use Text::ANSI::Fold::Util qw(ansi_width);
 
 sub sprintf {
-    local $Text::VisualPrintf::IS_TARGET = qr/[\e\b\P{ASCII}]/;
-    local $Text::VisualPrintf::VISUAL_WIDTH = \&Text::ANSI::Fold::Util::width;
-    Text::VisualPrintf::sprintf(@_);
+    my($format, @args) = @_;
+    my $conceal = Text::Conceal->new(
+	except => $format,
+	test   => qr/[\e\b\P{ASCII}]/,
+	length => \&ansi_width,
+	max    => int @args,
+	);
+    $conceal->encode(@args) if $conceal;
+    my $s = CORE::sprintf $format, @args;
+    $conceal->decode($s)    if $conceal;
+    $s;
 }
 
 sub printf {
@@ -38,7 +46,7 @@ Text::ANSI::Printf - printf function for string with ANSI sequence
 
 =head1 VERSION
 
-Version 1.03
+Version 2.01
 
 =head1 SYNOPSIS
 
@@ -78,13 +86,13 @@ except that I<printf> does not take FILEHANDLE.
 
 =head1 IMPLEMENTATION NOTES
 
-This module uses L<Text::VisualPrintf> and L<Text::ANSI::Fold::Util>
+This module uses L<Text::Conceal> and L<Text::ANSI::Fold::Util>
 internally.
 
 =head1 SEE ALSO
 
-L<Text::VisualPrintf>,
-L<https://github.com/kaz-utashiro/Text-VisualPrintf>
+L<Text::Conceal>,
+L<https://github.com/kaz-utashiro/Text-Conceal>
 
 L<Text::ANSI::Fold::Util>,
 L<https://github.com/kaz-utashiro/Text-ANSI-Fold-Util>

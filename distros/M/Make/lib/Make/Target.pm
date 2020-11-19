@@ -6,7 +6,7 @@ use warnings;
 use constant DEBUG => $ENV{MAKE_DEBUG};
 ## use critic
 
-our $VERSION = '2.006';
+our $VERSION = '2.007';
 
 # Intermediate 'target' package
 # There is an instance of this for each 'target' that apears on

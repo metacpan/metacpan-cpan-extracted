@@ -10,11 +10,19 @@ CONTENTS
 1. DESCRIPTION
 --------------
 
-Tie::Hash::Indexed is very similar to Tie::IxHash. However,
-it is written completely in XS and usually about twice as
-fast as Tie::IxHash. It's quite a lot faster when it comes
-to clearing or deleting entries from large hashes.
-Currently, only the plain tying mechanism is supported.
+Tie::Hash::Indexed is intentionally very similar to other
+ordered hash modules, most prominently Hash::Ordered.
+However, Tie::Hash::Indexed is written completely in XS
+and is, often significantly, faster than other modules.
+For a lot of operations, it's more than twice as fast as
+Hash::Ordered, especially when using the object-oriented
+interface instead of the tied interface. Other modules,
+for example Tie::IxHash, are even slower.
+
+The object-oriented interface of Tie::Hash::Indexed is
+almost identical to that of Hash::Ordered, so in most
+cases you should be able to easily replace one with the
+other.
 
 ---------------
 2. INSTALLATION
@@ -64,7 +72,7 @@ Makefile.PL, like
 4. COPYRIGHT
 ------------
 
-Copyright (c) 2003 Marcus Holland-Moritz. All rights reserved.
+Copyright (c) Marcus Holland-Moritz. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

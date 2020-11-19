@@ -26,7 +26,7 @@ sub BUILD {
 
     my $http_resource = $self->ua->get($self->sitemap_uri);
 
-    my $data = XMLin($http_resource->content);
+    my $data = XMLin($http_resource->content->data);
 
     push @{ $self->locations }, URI->new($_->{loc}) foreach uniq(@{ $data->{url} });
 }

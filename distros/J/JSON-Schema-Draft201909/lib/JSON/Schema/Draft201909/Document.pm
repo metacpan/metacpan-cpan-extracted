@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -45,10 +45,10 @@ has resource_index => (
   handles_via => 'Hash',
   handles => {
     resource_index => 'elements',
+    resource_pairs => 'kv',
     _add_resources => 'set',
     _get_resource => 'get',
     _remove_resource => 'delete',
-    _resource_pairs => 'kv',
   },
   init_arg => undef,
   lazy => 1,
@@ -60,8 +60,8 @@ has canonical_uri_index => (
   isa => HashRef[InstanceOf['Mojo::URL']],
   handles_via => 'Hash',
   handles => {
+    path_to_canonical_uri => 'get',
     _add_canonical_uri => 'set',
-    _path_to_canonical_uri => 'get',
   },
   init_arg => undef,
   lazy => 1,
@@ -177,7 +177,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -215,6 +215,9 @@ only when no other suitable identifier can be found for the root schema.
 This attribute should only be used by L<JSON::Schema::Draft201909> and not intended for use
 externally (you should use the public accessors in L<JSON::Schema::Draft201909> instead).
 
+When called as a method, returns the flattened list of tuples (path, uri). You can also use
+C<resource_pairs> which returns a list of tuples as arrayrefs.
+
 =head2 canonical_uri_index
 
 An index of json paths (from the document root) to canonical URIs. This is the inversion of
@@ -223,6 +226,14 @@ L</resource_index> and is constructed as that is built up.
 =head1 METHODS
 
 =for Pod::Coverage BUILD FOREIGNBUILDARGS
+
+=head2 path_to_canonical_uri
+
+=for stopwords fragmentless
+
+Given a JSON path within this document, returns the canonical URI corresponding to that location.
+Only fragmentless URIs can be looked up in this manner, so it is only suitable for finding the
+canonical URI corresponding to a subschema known to have an C<$id> keyword.
 
 =head2 contains
 

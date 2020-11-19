@@ -1,4 +1,6 @@
-package Text::VisualPrintf::Transform;
+package Text::Conceal;
+
+our $VERSION = '0.99';
 
 use v5.14;
 use warnings;
@@ -59,14 +61,14 @@ sub configure {
 sub encode {
     my $obj = shift;
     $obj->{replace} = [];
-    my $guard = $obj->guard_maker($obj->{except} // '', @_)
+    my $conceal = $obj->concealer(grep defined, $obj->{except}, @_)
 	or return @_;
     my $match = $obj->{match} or die;
     my $test = $obj->{test};
-    for my $arg (grep { defined } @_) {
+    for my $arg (grep defined, @_) {
 	not $test or $test->($arg) or next;
 	$arg =~ s{$match}{
-	    if (my($replace, $regex, $len) = $guard->(${^MATCH})) {
+	    if (my($replace, $regex, $len) = $conceal->(${^MATCH})) {
 		push @{$obj->{replace}}, [ $regex, ${^MATCH}, $len ];
 		$replace;
 	    } else {
@@ -121,7 +123,7 @@ sub _trim {
     }
 }
 
-sub guard_maker {
+sub concealer {
     my $obj = shift;
     my $max = $obj->{max};
     local $_ = join '', @_;
@@ -164,18 +166,22 @@ __END__
 
 =head1 NAME
 
-Text::VisualPrintf::Transform - transform and recover interface for text processing
+Text::Conceal - conceal and recover interface for text processing
+
+=head1 VERSION
+
+Version 0.99
 
 =head1 SYNOPSIS
 
-    use Text::VisualPrintf::Transform;
-    my $xform = Text::VisualPrintf::Transform->new(
+    use Text::Conceal;
+    my $conceal = Text::Conceal->new(
         length => \&sub,
         match  => qr/regex/,
         );
-    $xform->encode(@args);
+    $conceal->encode(@args);
     $_ = foo(@args);
-    $xform->decode($_);
+    $conceal->decode($_);
 
 =head1 DESCRIPTION
 
@@ -188,47 +194,49 @@ to calculate string width.  So next program does not work as we wish.
     use Text::Tabs;
     print expand <>;
 
-In this case, make transform object with B<length> function which can
+In this case, make conceal object with B<length> function which can
 correctly handle wide character width, and the pattern of string to be
-replaced.
+concealed.
 
-    use Text::VisualPrintf::Transform;
+    use Text::Conceal;
     use Text::VisualWidth::PP;
-    my $xform = Text::VisualPrintf::Transform
-        ->new(length => \&Text::VisualWidth::PP::width,
-              match  => qr/\P{ASCII}+/);
+    my $conceal = Text::Conceal->new(
+        length => \&Text::VisualWidth::PP::width,
+        match  => qr/\P{ASCII}+/,
+    );
 
 Then next program encode data, call B<expand>() function, and recover
 the result into original text.
 
     my @lines = <>;
-    $xform->encode(@lines);
+    $conceal->encode(@lines);
     my @expanded = expand @lines;
-    $xform->decode(@expanded);
+    $conceal->decode(@expanded);
     print @expanded;
 
 Be aware that B<encode> and B<decode> method alter the values of given
 arguments.  Because they return results as a list too, this can be
 done more simply.
 
-    print $xform->decode(expand($xform->encode(<>)));
+    print $conceal->decode(expand($conceal->encode(<>)));
 
 Next program implements ANSI terminal sequence aware expand command.
 
     use Text::ANSI::Fold::Util qw(ansi_width);
 
-    my $xform = Text::VisualPrintf::Transform
-        ->new(length => \&ansi_width,
-              match  => qr/[^\t\n]+/);
+    my $conceal = Text::Conceal->new(
+        length => \&ansi_width,
+        match  => qr/[^\t\n]+/,
+    );
     while (<>) {
-        print $xform->decode(expand($xform->encode($_)));
+        print $conceal->decode(expand($conceal->encode($_)));
     }
 
 Calling B<decode> method with many arguments is not a good idea, since
 replacement cycle is performed against all entries.  So collect them
 into single chunk if possible.
 
-    print $xform->decode(join '', @expanded);
+    print $conceal->decode(join '', @expanded);
 
 =head1 METHODS
 
@@ -236,7 +244,7 @@ into single chunk if possible.
 
 =item B<new>
 
-Create transform object.  Takes following parameters.
+Create conceal object.  Takes following parameters.
 
 =over 4
 
@@ -248,16 +256,21 @@ Function to calculate text width.  Default is C<length>.
 
 Specify text area to be replaced.  Default is C<qr/.+/s>.
 
+=item B<max> => I<number>
+
+When the maximum number of replacement is known, give it by B<max>
+parameter to avoid unnecessary work.
+
 =item B<test> => I<regex> or I<sub>
 
 Specify regex or subroutine to test if the argument is to be processed
-or not.  Default is B<undef>, so all arguments will be subject to
+or not.  Default is B<undef>, and all arguments will be subject to
 replace.
 
 =item B<except> => I<string>
 
-Transformation is done by replacing text with different string which
-can not be found in all arguments.  This parameter gives additional
+Text concealing is done by replacing text with different string which
+can not be found in any arguments.  This parameter gives additional
 string which also to be taken care of.
 
 =item B<visible> => I<number>
@@ -268,19 +281,19 @@ string which also to be taken care of.
 
 With default value 0, this module uses characters in the range:
 
-    [0x01=>0x07], [0x10=>0x1f], [0x21=>0x7e], [0x81=>0xfe]
+    [0x01 => 0x07], [0x10 => 0x1f], [0x21 => 0x7e], [0x81 => 0xfe]
 
 =item L<1>
 
 Use printable characters first, then use non-printable characters.
 
-    [0x21=>0x7e], [0x01=>0x07], [0x10=>0x1f], [0x81=>0xfe]
+    [0x21 => 0x7e], [0x01 => 0x07], [0x10 => 0x1f], [0x81 => 0xfe]
 
 =item L<2>
 
 Use only printable characters.
 
-    [0x21=>0x7e]
+    [0x21 => 0x7e]
 
 =back
 
@@ -312,7 +325,7 @@ original, or it can even disappear.
 If an argument is trimmed down to single byte in a result, and it have
 to be recovered to wide character, it is replaced by single space.
 
-Replacement string is made of characters those can not be found in all
+Replacement string is made of characters those are not found in any
 arguments.  So if they contains all characters in the given range,
 B<encode> stop to work.  It requires at least two.
 

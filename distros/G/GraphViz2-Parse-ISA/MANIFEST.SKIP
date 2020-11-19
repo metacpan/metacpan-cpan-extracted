@@ -45,3 +45,4 @@
 
 ^GraphViz2-.*
 \.swp$
+^\.github/
