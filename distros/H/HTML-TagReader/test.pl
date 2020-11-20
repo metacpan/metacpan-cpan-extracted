@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..24\n"; }
+BEGIN { $| = 1; print "1..26\n"; }
 END {print "nok ok 1\n" unless $loaded;}
 use HTML::TagReader;
 $loaded = 1;
@@ -245,3 +245,57 @@ if ($readfile eq $entirefile){
 $i++;
 
 unlink("$tf");
+
+$tf=".pltest_getbytoken3.$$";
+open(OUT,"> $tf")||die "ERROR: can not write $tf\n";
+my $entirefile="<bla a=x> < <tag \t\n1>\n<!DOCTYPE xx><TITLE>The web</TITLE>"; # no newline at the end
+print OUT $entirefile;
+close OUT;
+
+open(FF,"$tf")||die;
+$p=HTML::TagReader->new_from_iofh(\FF);
+
+my $readfile="";
+while(@tag = $p->getbytoken(0)){
+	$readfile.=$tag[0];
+}
+close FF;
+if ($readfile eq $entirefile){
+	print "ok $i\n";
+}else{
+	print "nok $i (orig:\"$entirefile\" and re-read:\"$readfile\" differ)\n";
+}
+$i++;
+
+unlink("$tf");
+
+my $str = "<h2>\n<i>test perl code</i>\n</h2><hr>";
+open my $io, "<", \$str;
+my $p = HTML::TagReader->new_from_iofh($io);
+my @tag;
+my $tok=1;
+@tag = $p->gettag(1);
+$tok=0 unless($tag[1] == 1 && $tag[0] eq "<h2>");
+
+@tag = $p->gettag(1);
+$tok=0 unless($tag[1] == 2 && $tag[0] eq "<i>");
+
+@tag = $p->gettag(1);
+$tok=0 unless($tag[1] == 2 && $tag[0] eq "</i>");
+
+@tag = $p->gettag(1);
+$tok=0 unless($tag[1] == 3 && $tag[0] eq "</h2>");
+
+@tag = $p->gettag(1);
+$tok=0 unless($tag[1] == 3 && $tag[0] eq "<hr>");
+
+close $io;
+
+if ($tok){
+	print "ok $i\n";
+}else{
+	print "nok $i, parsing $str via new_from_iofh\n";
+}
+$i++;
+
+#---

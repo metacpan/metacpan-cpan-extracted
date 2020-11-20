@@ -61,18 +61,7 @@ tr_httpcheck -- check if a particular web-pages exists
              but may be used as post processor for blck   
              If you are interessted in a link checker to check
              links only via the web-server then this is not the
-             right program for you. Other programs like e.g 
-
-              http://linkchecker.sourceforge.net/ or
-	      http://www.linklint.org/ or
-              http://linkchecker.stacken.kth.se/ (webpage where
-              you can enter a url to check) or
-	      http://htcheck.sourceforge.net/ or
-	      http://www.jmarshall.com/tools/cl/
-
-             can be used if you want to check your web-pages only 
-             remotely via a web server. 
-
+             right program for you. 
 tr_tagcontentgrep -- grep for a tag e.g "img src" 
 tr_imgaddsize -- add width and height to <img src=...>
                  (needs Image::Size from 
@@ -95,6 +84,10 @@ and/or modify it under the same terms as Perl itself.
 Installation requirements: Perl and a c-compiler (e.g gcc)
                            Needs Image::Size if you want to use
                            tr_imgaddsize
+                           Needs curl if you want tr_httpcheck
+Note: to minimize dependencyl checks we don't enforce the requirement for Image::Size and curl.
+      The software will just install and work except for tr_imgaddsize 
+      and tr_httpcheck 
 ------------------- ------------------- -------------------
 NAME
     TagReader - Perl extension module for reading html/sgml/xml files by

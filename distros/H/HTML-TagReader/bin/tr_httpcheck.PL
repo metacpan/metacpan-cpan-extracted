@@ -1,7 +1,7 @@
 #!/usr/bin/perl
+# vim: set sw=4 ts=4 si et:
 no locale;
 use Config;
-# vim: set sw=4 ts=4 si et:
 use File::Basename qw(basename dirname);
 chdir(dirname($0));
 ($file = basename($0)) =~ s/\.PL$//;
@@ -44,6 +44,7 @@ use Getopt::Std;
 require 5.003;
 use Socket;
 # 
+sub geturlres($);
 sub help();
 #------------------
 my $url;
@@ -52,13 +53,6 @@ my $exitstat=0;
 my $err=1;
 my $dotcnt=0;
 #------------------
-#
-# The http 1.0 proctocol is described in 
-# RFC 1945
-# This script uses also 1.1 elemets
-#
-#------------------
-#
 $opt_e=0;
 $opt_E=0;
 &getopts("ehE")||die "ERROR: No such option. -h for help.\n";
@@ -77,25 +71,12 @@ if (scalar @ARGV < 1){
             # encode space URL encoding:
             $url=~s/ /%20/g;
             if ($url=~m%^https?://%i){
-                open(PP,"curl -i -G -k -m 4 -s '$url' |")||die;
+		($err,$res)=geturlres($url);
                 if ($opt_E){
                     print ".";
                     $dotcnt=($dotcnt+1)%40;
                     print "\n" if ($dotcnt==0);
                 }
-                $err=1;
-                # read only the status code on the first line
-                while(<PP>){
-                    # first line is something like: HTTP/1.1 404 Not Found
-                    chomp;
-                    $res=$_;
-                    #print "\nurl $url, dbg $_\n";
-                    if (m/HTTP\S+\s[23]/){
-                        $err=0;
-                    }
-                    last;
-                }
-                close PP;
                 if ($opt_e || $opt_E){
                     if ($opt_E && $err){
                         print "\n";
@@ -118,24 +99,8 @@ if (scalar @ARGV < 1){
 }else{
     for $url (@ARGV){
         if ($url=~m%^https?://%i){
+	    ($err,$res)=geturlres($url);
             open(PP,"curl -i -G -k -m 4 -s '$url' |")||die;
-            if ($opt_E){
-                print ".";
-                $dotcnt=($dotcnt+1)%40;
-                print "\n" if ($dotcnt==0);
-            }
-            $err=1;
-            # read only the status code on the first line
-            while(<PP>){
-                # first line is something like: HTTP/1.1 404 Not Found
-                chomp;
-                $res=$_;
-                if (m/HTTP\S+\s[23]/){
-                    $err=0;
-                }
-                last;
-            }
-            close PP;
             if ($opt_e || $opt_E){
                 if ($opt_E && $err){
                     print "\n";
@@ -156,6 +121,32 @@ if (scalar @ARGV < 1){
     exit($exitstat);
 }
 #------------------
+sub geturlres($){
+    my $url =shift;
+    open(PP,"curl -i -G -k -m 4 -s '$url' |")||die;
+    my $res="no data received";
+    my $err=1;
+    # read only the status code on the first line, we can not use "last" here otherwise curl will complain
+    # about a broken pipe and not all body written
+    my $ignorerest=0;
+    while(<PP>){
+	# first line is something like: HTTP/1.1 404 Not Found
+	#print "\nurl $url, dbg $_\n";
+	if ($ignorerest==0){
+	    chomp;
+	    $res=$_;
+	    unless(defined $res && $res){
+		$res="no status code";
+	    }
+	    if (m/^HTTP\S+\s[23]/){
+		$err=0;
+	    }
+	    $ignorerest=1;
+	}
+    }
+    close PP;
+    return($err,$res);
+}
 #------------------
 sub help(){
     print "tr_httpcheck -- check if a particular web-pages exists 
@@ -171,8 +162,7 @@ OPTIONS:
 
 If no URL is given then tr_httpcheck reads output from 
 \"tr_blck -a\" on stdin and processes it. 
-Note: This program does only http and https type of protocol checks. It can e.g not
-check https or ftp.
+Note: This program does only http and https type of protocol checks. 
 
 EXAMPLES: 
  check a single url:
@@ -182,7 +172,7 @@ EXAMPLES:
  from web pages:
  tr_blck -a *.html |  tr_httpcheck -E
 
-Under the hood the program uses curl.
+tr_httpcheck uses under the hood curl (make sure you have curl installed).
 
 tr_httpcheck is part of the HTML::TagReader package.
 \n";
@@ -213,8 +203,6 @@ B<-e> print only results if an error was found
 
 B<-E> Like -e but print a . for every checked url.
 
-B<-s> print result in short format without the URL
-
 If no URL is given then tr_httpcheck reads output from 
 \"tr_blck -a\" on stdin and processes it. 
 Note: This program does only http type of protocol checks. It can e.g not
@@ -223,17 +211,17 @@ check https or ftp.
 =head1 EXAMPLES
 
 check a single url:
-tr_httpcheck http://www.oche.de/
+ tr_httpcheck http://www.tuxgraphics.org/
 
-check many URLs extracted with tr_blck
-from web pages:
+check many URLs extracted with tr_blck from web pages:
  tr_blck -a *.html |  tr_httpcheck -E
 
 =head1 ENVIRONMENT
 
-You may set the environment variable HTTP_PROXY and NO_PROXY or
-http_proxy and no_proxy to use a proxy. If both are set then the
-uppercase version takes precedence.
+tr_httpcheck uses under the hood curl (make sure you have curl installed).
+
+This software uses curl to fetch the URLs and you may use the http_proxy
+environment variable to pass a proxy to curl 
 The format of the http_proxy variable looks like "http://www-proxy:8080/"
 and the no_proxy is a comma or space seperated list of servers or domains
 for which a direct connection should be made.
@@ -251,10 +239,7 @@ just a simple addon to tr_blck.  Other programs like e.g
 
 http://linkchecker.sourceforge.net/ or
 
-http://www.linklint.org/ or
-
-http://linkchecker.stacken.kth.se/ (webpage where
-you can enter a url to check)
+http://www.linklint.org/ 
 
 can be used if you want to check your web-pages only
 remotely via a web server.
@@ -275,42 +260,6 @@ Status-Codes according to RFC 1945
 502 is Bad Gateway
 503 is Service Unavailable
 
-Here is an example of a GET request from communicator 4.7:
-GET /xxxx.html HTTP/1.0\r
-Connection: Keep-Alive\r
-User-Agent: Mozilla/4.07 [en] (X11; I; Linux 2.0.33 i586)\r
-Host: sophus.oche.de\r
-Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, image/png, */*\r
-Accept-Encoding: gzip\r
-Accept-Language: en\r
-Accept-Charset: iso-8859-1,*,utf-8\r
-\r
-
-Here are some example answers from a number of different servers/proxies:
-
-HTTP/1.1 200 OK
-Date: Tue, 04 May 1999 18:27:37 GMT
-Server: Apache/1.3.3 (Unix)  (Red Hat/Linux)
-Last-Modified: Thu, 29 Apr 1999 20:12:38 GMT
-ETag: "4b005-163f-3728bd36"
-Accept-Ranges: bytes
-Content-Length: 5695
-Connection: close
-Content-Type: text/html
- 
-HTTP/1.0 200 OK
-Content-Length: 9733
-Expires: Thu, 06 May 1999 14:00:03 GMT
-Content-Type: text/html
-Age: 0
-X-Cache: MISS from Cache.RWTH-Aachen.de
-Proxy-Connection: close
-  
-HTTP/1.0 200 OK
-Last-Modified: Tue, 04 May 1999 17:50:44 GMT
-Content-Type: text/html
-Content-Length: 13036
-Expires: Thu, 06 May 1999 17:50:46 GMT
  
 HTTP/1.1 200
 Date: Tue, 04 May 1999 18:30:15 GMT

@@ -6,14 +6,18 @@
 * and/or modify it under the same terms as Perl itself.
 */
 
-/* read the following man pages to learn how to use XS and access
-* perl from C: 
+/* read the following man pages to learn how to use XS and access perl from C: 
 * perlxs              Perl XS application programming interface
 * perlxstut           Perl XS tutorial
 * perlguts            Perl internal functions, variables, data structures for
 *                     C programmer
 * perlcall            Perl calling conventions from C
+* perlapio            IO abstraction interface
+* perlapi             Perl C api
 */
+
+// we use perlio not stdio:
+#define PERLIO_NOT_STDIO 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,7 +25,7 @@ extern "C" {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include <stdio.h>
+#include <perlio.h>
 #include <string.h>
 #include <ctype.h>
 #ifdef __cplusplus
@@ -35,7 +39,7 @@ extern "C" {
 /* BUFFLEN is the units in which we re-allocate mem, must be much bigger than
 * TAGREADER_MAX_TAGLEN */
 #define BUFFLEN 6000
-#define TAGREADER_TAGTYPELEN 20
+#define TAGREADER_TAGTYPELEN 25
 
 typedef struct trstuct{
 	char *filename;
@@ -93,6 +97,49 @@ CODE:
 	if (RETVAL->fd == NULL){
 		croak("ERROR: Can not read file \"%s\" ",str);
 	}
+	RETVAL->charpos=0;
+	RETVAL->tagcharpos=0;
+	RETVAL->fileline=1;
+	RETVAL->tagline=0;
+OUTPUT:
+	RETVAL
+
+HTML::TagReader 
+tr_new_from_iofh(class, fh)
+	SV *class
+	PerlIO *fh
+CODE:
+	STRLEN i; // int
+	char str[]="iofh";
+	char c;
+	if (fh == NULL){
+		croak("ERROR: invalid PerlIO fh");
+	}
+	// let's do some test to see if we will be able to read on this io filehandle:
+	c=PerlIO_getc(fh);
+	// c is EOF in case of error or end of file
+	if (c==EOF){
+		if (PerlIO_error(fh)){
+			croak("ERROR: can not read from IO filehandle");
+		}
+		// no ungetc in case of EOF 
+	}else{
+		if (PerlIO_ungetc(fh,c)==EOF){
+			croak("ERROR: ungetc on filehandle failed");
+		}
+	}
+	i=strlen(str);
+	// malloc and zero the struct 
+        Newz(0, RETVAL, 1, struct trstuct );
+	// malloc filename, we need it for some error printouts
+        New(0, RETVAL->filename, i+1, char );
+	strncpy(RETVAL->filename,str,i);
+	// put a zero at the end of the string, perl might not do it 
+	*(RETVAL->filename + i )=(char)0;
+	// malloc initial buffer 
+        New(0, RETVAL->buffer, BUFFLEN+1, char );
+	RETVAL->currbuflen=BUFFLEN;
+	RETVAL->fd=fh;
 	RETVAL->charpos=0;
 	RETVAL->tagcharpos=0;
 	RETVAL->fileline=1;
@@ -231,6 +278,12 @@ PPCODE:
 	if (chn!=EOF && PerlIO_ungetc(self->fd,chn)==EOF){
 		PerlIO_printf(PerlIO_stderr(),"%s:%d: ERROR, TagReader library can not ungetc \"%c\" before returning\n",self->filename,self->fileline,chn);
 		exit(1);
+	}
+	/* we have a strange html file not ending in newline and there is a closing tag at the very end */
+	if (chn==EOF && state==1 && ch=='>'){
+		state=3; 
+		self->buffer[bufpos]=ch;bufpos++;
+		self->buffer[bufpos]=(char)0;bufpos++;
 	}
 	/* buffer was already terminated above */
 	if (state == 3){

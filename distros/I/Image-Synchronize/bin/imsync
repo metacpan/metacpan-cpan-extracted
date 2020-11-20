@@ -818,7 +818,7 @@ corresponded to UTC+2:00.
 Since version 2.001 of this application, camera timezone offsets get
 stored with two time components, for example C<+0:00:15+02:00>.  The
 second component specifies the time zone that is appropriate for the
-images (the "nomimal timezone" that was in effect in the location
+images (the "nominal timezone" that was in effect in the location
 where the image was recorded), and the first component specifies the
 clock drift relative to that time zone.  In the example, the image was
 taken in a location where the timezone UTC+02:00 was active, and the

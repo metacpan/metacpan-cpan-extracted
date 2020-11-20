@@ -1,0 +1,17 @@
+# Netscape HTTP Cookie File
+# http://www.netscape.com/newsref/std/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+# Should be loaded as normal
+www.acme.com	FALSE	/	FALSE	2147483647	foo1	bar
+
+# Should be loaded with hostname www.acme.com
+#HttpOnly_www.acme.com	FALSE	/	FALSE	2147483647	foo2	bar
+ #HttpOnly_www.acme.com	FALSE	/	FALSE	2147483647	foo3	bar
+  #HttpOnly_www.acme.com	FALSE	/	FALSE	2147483647	foo4	bar
+
+# Should not be loaded (double prefix)
+#HttpOnly_#HttpOnly_www.acme.com	FALSE	/	FALSE	2147483647	foo5	bar
+
+# Should not be loaded (case-sensitivity)
+#Httponly_www.acme.com	FALSE	/	FALSE	2147483647	foo6	bar

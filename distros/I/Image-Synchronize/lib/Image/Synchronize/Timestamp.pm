@@ -130,7 +130,7 @@ use Modern::Perl;
 use Carp;
 use Clone qw(clone);
 use Scalar::Util qw(blessed looks_like_number);
-use Time::Local qw(timegm_modern timelocal_modern);;
+use Time::Local v1.30 qw(timegm_modern timelocal_modern);
 
 use parent qw(Clone);
 # Clone provides a 'clone' member

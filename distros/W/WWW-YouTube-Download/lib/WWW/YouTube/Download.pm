@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008001;
 
-our $VERSION = '0.64';
+our $VERSION = '0.65';
 
 use Carp qw(croak);
 use URI ();
@@ -547,13 +547,14 @@ sub _find_playlist_videos {
     for my $renderer ( @{ $playlistVideoListRenderer->{contents} } ) {
         $cnt++;
         my $video = $renderer->{playlistVideoRenderer};
+        my $titleText = @{$video->{title}->{runs}} ? $video->{title}->{runs}->[0]->{text} : $video->{title}->{simpleText};
 
         push(
             @videos,
             {
                 id      => $video->{videoId},
                 runtime => $video->{lengthSeconds},
-                title   => ( $video->{title}->{simpleText} || 'undef' )
+                title   => ( $titleText || 'undef' )
                 ,    # encoded in Perl internal
             }
         );
@@ -562,7 +563,7 @@ sub _find_playlist_videos {
             print " $cnt id:" . $video->{videoId};
             print " runtime:" . ( $video->{lengthSeconds} || 'undef' );
             print " title:"
-                . Encode::encode_utf8( $video->{title}->{simpleText}
+                . Encode::encode_utf8( $titleText
                     || 'undef' );
             print "\n";
         }
@@ -644,13 +645,14 @@ sub _find_playlist_json_videos {
     for my $renderer ( @{ $playlistVideoListContinuation->{contents} } ) {
         $cnt++;
         my $video = $renderer->{playlistVideoRenderer};
+        my $titleText = @{$video->{title}->{runs}} ? $video->{title}->{runs}->[0]->{text} : $video->{title}->{simpleText};
 
         push(
             @videos,
             {
                 id      => $video->{videoId},
                 runtime => $video->{lengthSeconds},
-                title   => ( $video->{title}->{simpleText} || 'undef' )
+                title   => ( $titleText || 'undef' )
                 ,    # encoded in Perl internal
             }
         );
@@ -659,7 +661,7 @@ sub _find_playlist_json_videos {
             print " $cnt id:" . $video->{videoId};
             print " runtime:" . ( $video->{lengthSeconds} || 'undef' );
             print " title:"
-                . Encode::encode_utf8( $video->{title}->{simpleText}
+                . Encode::encode_utf8( $titleText
                     || 'undef' );
             print "\n";
         }
@@ -707,7 +709,7 @@ WWW::YouTube::Download - WWW::YouTube::Download - Very simple YouTube video down
 
 =head1 VERSION
 
-version 0.64
+version 0.65
 
 =head1 SYNOPSIS
 

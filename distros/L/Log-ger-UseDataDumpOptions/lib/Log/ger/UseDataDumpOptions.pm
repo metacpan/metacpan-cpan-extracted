@@ -3,7 +3,7 @@ package Log::ger::UseDataDumpOptions;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Log-ger-UseDataDumpOptions'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Data::Dump::Options ();
 use Log::ger ();
@@ -26,7 +26,7 @@ Log::ger::UseDataDumpOptions - Use Data::Dump::Options to dump data structures
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::UseDataDumpOptions (from Perl distribution Log-ger-UseDataDumpOptions), released on 2020-06-06.
+This document describes version 0.003 of Log::ger::UseDataDumpOptions (from Perl distribution Log-ger-UseDataDumpOptions), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ Other modules to set data dumper for Log::ger:
 
 =over
 
-=item * L<Log::ger::UseDataBahe>
+=item * L<Log::ger::UseBaheForDump>
 
 =item * L<Log::ger::UseDataDump>
 
@@ -73,6 +73,10 @@ Other modules to set data dumper for Log::ger:
 =item * L<Log::ger::UseDataDumperCompact>
 
 =item * L<Log::ger::UseDataPrinter>
+
+=item * L<Log::ger::UseJSONForDump>
+
+=item * L<Log::ger::UseYAMLForDump>
 
 =back
 

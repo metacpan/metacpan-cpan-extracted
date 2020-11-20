@@ -14,6 +14,7 @@ WriteMakefile(
                           'Path::Class' => 0,
                           'Path::Iterator::Rule' => 0,
                           'Term::ProgressBar' => 0,
+                          'Time::Local' => '1.30',
                           'XML::Twig' => 0,
                           'YAML::Any' => 0,
                          },

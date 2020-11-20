@@ -1,7 +1,7 @@
 #!perl -w
 
 use Test;
-plan tests => 79;
+plan tests => 80;
 
 use HTTP::Cookies;
 use HTTP::Request;
@@ -417,6 +417,10 @@ ok($c->as_string =~ /foo1=bar/);
 undef($c);
 unlink($file);
 
+# Expect a HttpOnly cookie to be loaded, rather than treated as a comment
+$c = HTTP::Cookies::Netscape->new(file => 't/data/netscape-httponly.txt');
+ok(count_cookies($c), 4);
+undef($c);
 
 #
 # Some additional Netscape cookies test

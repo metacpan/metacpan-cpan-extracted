@@ -1,3 +1,4 @@
+# -*- perl -*-
 use Modern::Perl;
 
 use Image::Synchronize;
@@ -5,7 +6,7 @@ use Image::Synchronize::GroupedInfo;
 use Image::Synchronize::Logger;
 use Image::Synchronize::Timestamp;
 use Test::More;
-use YAML::Any qw(Load);
+use YAML::Any qw(Dump Load);
 
 # We need to mock the timezone offset of the local system, because it
 # varies from one system to the next.
@@ -59,6 +60,22 @@ sub trf {
   return $text;
 }
 
+sub giformat {
+  my (%data) = @_;
+  my @lines;
+  foreach my $key (sort keys %data) {
+    push @lines, sprintf('%-35s : ', $key) . $data{$key};
+  }
+  return join("\n", @lines);
+}
+
+# If a test fails then we want to see where the newlines in the dumped
+# YAML are
+sub shownl {
+  my ($text) = @_;
+  return $text =~ s/\n/<\n/gr;
+}
+
 Image::Synchronize::Logger->new({name => '',
                                  min_level => 0,
                                  action => sub {}})->set_as_default;
@@ -69,45 +86,49 @@ insert_image_info($s, 'IMG0002.jpg',
                  createdate => '2020-08-02 10:45:51');
 is($s->determine_new_values_for_file('IMG0002.jpg'), 1, 'first image');
 is(trf($s->{new_info}->{'IMG0002.jpg'}->stringify),
-   <<~EOD =~ s/\n$//r,
-     CameraID (XMP)                      : make|model|
-     CreateDate                          : 2020:08:02 10:45:51
-     DateTimeOriginal                    : 2020:08:02 10:45:51
-     DateTimeOriginal (XMP)              : 2020:08:02 10:45:51+01:00
-     FileModifyDate                      : 2020:08:02 10:45:51+01:00
-     ImsyncVersion (XMP)                 : VERSION
-     TimeSource (XMP)                    : Other
-     EOD
+   giformat(
+            'CameraID (XMP)'          => 'make|model|',
+            'CreateDate'              => '2020:08:02 10:45:51',
+            'DateTimeOriginal'        => '2020:08:02 10:45:51',
+            'DateTimeOriginal (XMP)'  => '2020:08:02 10:45:51+01:00',
+            'FileModifyDate'          => '2020:08:02 10:45:51+01:00',
+            'ImsyncVersion (XMP)'     => 'VERSION',
+            'TimeSource (XMP)'        => 'Other',
+          ),
    'first image -- new values');
-is($s->{gps_offsets}->stringify,
-   <<~EOD,
-     ---
-     make|model|:
-       2020-08-02T10:45:51: +00:00+01:00
-     EOD
+is(shownl($s->{gps_offsets}->stringify),
+   shownl(Dump(
+               {
+                'make|model|' =>
+                { '2020-08-02T10:45:51' =>  '+00:00+01:00' },
+              }
+             )),
    'first image -- offsets');
 
 insert_image_info($s, 'IMG0004.jpg',
                  createdate => '2020-08-02 10:48:04');
 is($s->determine_new_values_for_file('IMG0004.jpg'), 1, 'second image');
 is(trf($s->{new_info}->{'IMG0004.jpg'}->stringify),
-   <<~EOD =~ s/\n$//r,
-     CameraID (XMP)                      : make|model|
-     CreateDate                          : 2020:08:02 10:48:04
-     DateTimeOriginal                    : 2020:08:02 10:48:04
-     DateTimeOriginal (XMP)              : 2020:08:02 10:48:04+01:00
-     FileModifyDate                      : 2020:08:02 10:48:04+01:00
-     ImsyncVersion (XMP)                 : VERSION
-     TimeSource (XMP)                    : Other
-     EOD
+   giformat(
+            'CameraID (XMP)'         => 'make|model|',
+            'CreateDate'             => '2020:08:02 10:48:04',
+            'DateTimeOriginal'       => '2020:08:02 10:48:04',
+            'DateTimeOriginal (XMP)' => '2020:08:02 10:48:04+01:00',
+            'FileModifyDate'         => '2020:08:02 10:48:04+01:00',
+            'ImsyncVersion (XMP)'    => 'VERSION',
+            'TimeSource (XMP)'       => 'Other',
+          ),
    'second image -- new values');
-is($s->{gps_offsets}->stringify,
-   <<~EOD,
-     ---
-     make|model|:
-       2020-08-02T10:45:51: +00:00+01:00
-       2020-08-02T10:48:04: +00:00+01:00
-     EOD
+is(shownl($s->{gps_offsets}->stringify),
+   shownl(Dump(
+               {
+                'make|model|' =>
+                {
+                 '2020-08-02T10:45:51' => '+00:00+01:00',
+                 '2020-08-02T10:48:04' => '+00:00+01:00',
+               }
+              }
+             )),
    'second image -- offsets');
 
 done_testing();

@@ -3,7 +3,7 @@ NAME
     structures
 
 VERSION
-    This document describes version 0.002 of Log::ger::UseDataDumpOptions
+    This document describes version 0.003 of Log::ger::UseDataDumpOptions
     (from Perl distribution Log-ger-UseDataDumpOptions), released on
     2020-06-06.
 
@@ -34,7 +34,7 @@ SEE ALSO
 
     Other modules to set data dumper for Log::ger:
 
-    *   Log::ger::UseDataBahe
+    *   Log::ger::UseBaheForDump
 
     *   Log::ger::UseDataDump
 
@@ -47,6 +47,10 @@ SEE ALSO
     *   Log::ger::UseDataDumperCompact
 
     *   Log::ger::UseDataPrinter
+
+    *   Log::ger::UseJSONForDump
+
+    *   Log::ger::UseYAMLForDump
 
 AUTHOR
     perlancar <perlancar@cpan.org>

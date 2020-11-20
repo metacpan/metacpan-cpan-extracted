@@ -19,5 +19,9 @@ no_index:
     - inc
 requires:
   perl: '5.006000'
-version: v1.2.25.3
+resources:
+  bugtracker: https://trac.xapian.org/
+  homepage: https://xapian.org/
+  repository: https://git.xapian.org/?p=xapian;a=tree;f=search-xapian;hb=refs/heads/svn/1.2
+version: v1.2.25.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

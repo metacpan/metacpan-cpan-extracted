@@ -83,7 +83,7 @@ use YAML::Any qw(
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.004';
+our $VERSION = '2.005';
 
 my $CASE_TOLERANT;
 
@@ -2027,10 +2027,10 @@ sub inspect_files {
       if (  $count_essential_gps_tags
         and $count_essential_gps_tags < 3 )
       {
-        log_warn(<<~EOD);
-        File '$file' has some but not all of GPSDateTime,
-        GPSLongitude, GPSLatitude.  Ignoring its GPS information.
-        EOD
+        log_warn(<<EOD);
+File '$file' has some but not all of GPSDateTime,
+GPSLongitude, GPSLatitude.  Ignoring its GPS information.
+EOD
         $info->delete($_)
           foreach qw(GPSLatitude GPSLongitude GPSAltitude GPSDateTime);
       }

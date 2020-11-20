@@ -443,7 +443,7 @@ foreach my $test (@tests) {
     $co->make_effective;
     is(
       Dump(Image::Synchronize::CameraOffsets::export_internal($co->{effective})),
-      $test->{expect},
+      Dump(Load($test->{expect})), # output may depend on YAML version
       'merge ' . test_id( $test->{input} )
     );
   }

@@ -6,7 +6,7 @@ use vars qw($VERSION @ISA);
 require DynaLoader;
 
 @ISA = qw(DynaLoader);
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 bootstrap HTML::TagReader $VERSION;
 
@@ -22,10 +22,10 @@ by tags.
 =head1 SYNOPSIS
 
  use HTML::TagReader;
- # open then file and get an obj-ref:
+ # open the file and get an obj-ref:
  my $p=new HTML::TagReader "filename";
 
- # set to zero or undef to omit warnings about html error:
+ # set to zero or undef to omit warnings about html errors:
  $showerr=1; 
 
  # get only the tags:
@@ -40,6 +40,11 @@ by tags.
 
  # get the version of HTML::TagReader:
  my $ver=$HTML::TagReader::VERSION;
+
+ # Reading from PerlIO filehandles is also supported. To use a filename
+ # with HTML::TagReader is preferred but there could be cases where you don't
+ # have any file.
+ my $p = HTML::TagReader->new_from_iofh($fh);
 
 =head1 DESCRIPTION
 
@@ -60,9 +65,9 @@ in a html file together with line numbers and column:
     my $p=new HTML::TagReader "file.html";
     my @tag;
     while(@tag = $p->gettag(1)){
-            if ($tag[0]=~/ href ?=/i){
+            if ($tag[0]=~/ href +=/i){
                     # remove optional space before the equal sign:
-                    $tag[0]=~s/ ?= ?/=/g;
+                    $tag[0]=~s/ += */=/g;
                     print "line: $tag[1]: col: $tag[2]: $tag[0]\n";
             }
     }
@@ -74,21 +79,44 @@ wise:
     my $p=new HTML::TagReader "file.html";
     my @tag;
     while(@tag = $p->getbytoken(1)){
-            if ($tag[1] eq ""){
-                    print "line: $tag[2]: col: $tag[2]: not a tag (some text), \"$tag[0]\"\n\n";
+            if ($tag[1] eq ""){ # 1 is tag type, e.g "a" for <a href=...>
+                    print "line: $tag[2]: col: $tag[3]: not a tag (some text), \"$tag[0]\"\n\n";
             }else{
-                    print "line: $tag[2]: col: $tag[2]: is a tag, $tag[0]\n\n";
+                    print "line: $tag[2]: col: $tag[3]: is a tag, $tag[0]\n\n";
             }
     }
 
 =head2 new HTML::TagReader $file;
 
-Returns a reference to a TagReader object. This reference can
+Create a new TagReader object. This can be written as:
+
+ my $p = HTML::TagReader->new("file.html");
+  or
+ my $p=new HTML::TagReader "file.html";
+
+The reference returned by this function call can
 be used with gettag() or getbytoken() to read the next tag.
 You might want to test beforehand if the file is readable and
 produce your own error message if the file can not be read.
 The default HTML::TagReader behavior is to die with "ERROR: Can not 
 read file...".
+
+=head2 HTML::TagReader->new_from_iofh($fh); 
+
+This method is useful in cases where you do not have a file.
+E.g all data is in a string variable:
+
+ my $str = "<h1>using io fh</h1>\n<p>with the tag reader</p>\n<hr>";
+ open my $fh, "<", \$str;
+ my $p = HTML::TagReader->new_from_iofh($fh);
+ my @tag;
+ while(@tag = $p->gettag(1)){
+     print "line: $tag[1]: col: $tag[2]: $tag[0]\n";
+ }
+ close($fh);
+
+The returned $p is a reference to a TagReader object. This reference can
+be used with gettag() or getbytoken() to read the next tag.
 
 =head2 gettag($showerr);
 
@@ -111,7 +139,7 @@ a syntax error in the html/sgml/xml code.
 Currently only the following warning messages are implemented to
 warn about possible html syntax errors:
 
-- A starting '<' was found but no closing '>' after 300 characters
+- A starting '<' was found but no closing '>' after 400 characters
 
 - A single '<' was found which was not followed by [!/a-zA-Z]. Such
 a '<' should be written as &lt;
@@ -144,7 +172,7 @@ a syntax error in the html/sgml/xml code.
 Currently only the following warning messages are implemented to
 warn about possible html syntax errors:
 
-- A starting '<' was found but no closing '>' after 300 characters
+- A starting '<' was found but no closing '>' after 400 characters
 
 - A single '<' was found which was not followed by [!/a-zA-Z]. Such
 a '<' should be written as &lt;
@@ -171,7 +199,7 @@ HTML::Parser. HTML:TagReader is fast, generic and straight forward to use.
 
 =head1 COPYRIGHT
 
-Copyright (c) Guido Socher [guido(at)linuxfocus.org]
+Copyright (c) Guido Socher 
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

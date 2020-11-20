@@ -25,10 +25,11 @@ requires:
   Path::Class: '0'
   Path::Iterator::Rule: '0'
   Term::ProgressBar: '0'
+  Time::Local: '1.30'
   XML::Twig: '0'
   YAML::Any: '0'
 resources:
   bugtracker: https://github.com/LouisStrous/p5-Image-Synchronize/issues
   repository: https://github.com/LouisStrous/p5-Image-Synchronize.git
-version: '2.004'
+version: '2.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

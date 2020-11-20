@@ -39,6 +39,7 @@
             "Path::Class" : "0",
             "Path::Iterator::Rule" : "0",
             "Term::ProgressBar" : "0",
+            "Time::Local" : "1.30",
             "XML::Twig" : "0",
             "YAML::Any" : "0"
          }
@@ -55,6 +56,6 @@
          "web" : "https://github.com/LouisStrous/p5-Image-Synchronize"
       }
    },
-   "version" : "2.004",
+   "version" : "2.005",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

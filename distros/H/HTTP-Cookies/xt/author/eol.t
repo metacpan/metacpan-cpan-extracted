@@ -15,6 +15,7 @@ my @files = (
     't/10-original_spec.t',
     't/11-rfc_2965.t',
     't/cookies.t',
+    't/data/netscape-httponly.txt',
     't/issue26.t',
     't/issue32.t',
     't/publicsuffix.t'
